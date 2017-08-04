@@ -35,6 +35,7 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
@@ -110,8 +111,8 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
         URL busFile = WSSCUnitTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = WSSCUnitTest.class.getResource("DoubleItWSSC.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -136,8 +137,8 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
         URL busFile = WSSCUnitTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = WSSCUnitTest.class.getResource("DoubleItWSSC.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -166,8 +167,8 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
         URL busFile = WSSCUnitTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         STSClient stsClient = new STSClient(bus);
         stsClient.setSecureConv(true);
@@ -197,8 +198,8 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
         URL busFile = WSSCUnitTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         STSClient stsClient = new STSClient(bus);
         stsClient.setSecureConv(true);
@@ -232,8 +233,8 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
         URL busFile = WSSCUnitTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         STSClient stsClient = new STSClient(bus);
         stsClient.setSecureConv(true);

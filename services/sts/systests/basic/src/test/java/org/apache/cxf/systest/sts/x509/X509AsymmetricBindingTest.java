@@ -25,6 +25,7 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TokenTestUtils;
@@ -75,8 +76,8 @@ public class X509AsymmetricBindingTest extends AbstractBusClientServerTestBase {
         URL busFile = X509AsymmetricBindingTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509AsymmetricBindingTest.class.getResource("DoubleItAsymmetric.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);

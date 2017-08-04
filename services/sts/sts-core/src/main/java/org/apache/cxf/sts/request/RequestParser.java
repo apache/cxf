@@ -151,7 +151,7 @@ public class RequestParser {
                     tokenRequirements.setAppliesTo(element);
                     LOG.fine("Found AppliesTo element");
                 } else if (allowCustomContent) {
-                    tokenRequirements.addCustomContent((Element)requestObject);
+                    tokenRequirements.addCustomContent(requestObject);
                 } else {
                     LOG.log(
                         Level.WARNING,

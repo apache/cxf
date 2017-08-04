@@ -114,7 +114,7 @@ public final class LdapUtils {
             public Object mapFromAttributes(Attributes attrs) throws NamingException {
                 NamingEnumeration<? extends Attribute> attrEnum = attrs.getAll();
                 while (attrEnum.hasMore()) {
-                    return (String) attrEnum.next().get();
+                    return attrEnum.next().get();
                 }
                 return null;
             }

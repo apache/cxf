@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TestParam;
@@ -92,8 +93,8 @@ public class SAMLBatchUnitTest extends AbstractBusClientServerTestBase {
         URL busFile = SAMLBatchUnitTest.class.getResource("cxf-client-unit.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         String wsdlLocation =
             "https://localhost:" + test.getStsPort() + "/SecurityTokenService/Transport?wsdl";

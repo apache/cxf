@@ -617,7 +617,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
         while (child != null) {
             if (child instanceof Element
                 && "RequestSecurityTokenResponse".equals(((Element)child).getLocalName())) {
-                Element rstrChild = DOMUtils.getFirstElement((Element)child);
+                Element rstrChild = DOMUtils.getFirstElement(child);
                 while (rstrChild != null) {
                     if ("Status".equals(rstrChild.getLocalName())) {
                         Element e2 =

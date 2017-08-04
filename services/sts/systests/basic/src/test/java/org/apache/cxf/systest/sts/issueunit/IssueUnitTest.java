@@ -30,6 +30,7 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.helpers.DOMUtils;
@@ -112,8 +113,8 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         URL busFile = IssueUnitTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         // Get Metadata
         JaxWsProxyFactoryBean proxyFac = new JaxWsProxyFactoryBean();
@@ -143,8 +144,8 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         URL busFile = IssueUnitTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         // Get a token
         SecurityToken token =
@@ -184,8 +185,8 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         URL busFile = IssueUnitTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         // Get a token
         SecurityToken token =
@@ -224,8 +225,8 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         URL busFile = IssueUnitTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         // Get a token
         SecurityToken token =
@@ -261,8 +262,8 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         URL busFile = IssueUnitTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         // Get a token
         SecurityToken token =
@@ -300,8 +301,8 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         URL busFile = IssueUnitTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         try {
             requestSecurityToken(SAML1_TOKEN_TYPE, BEARER_KEYTYPE, bus, null);
@@ -322,8 +323,8 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         URL busFile = IssueUnitTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         // Get a token
         String context = "AuthenticationContext";
@@ -360,8 +361,8 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         URL busFile = IssueUnitTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         // Get a token
         SecurityToken token =
@@ -394,8 +395,8 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         URL busFile = IssueUnitTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
         CallbackHandler callbackHandler = new CommonCallbackHandler();

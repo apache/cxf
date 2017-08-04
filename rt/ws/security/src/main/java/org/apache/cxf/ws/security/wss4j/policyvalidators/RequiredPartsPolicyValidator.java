@@ -58,7 +58,7 @@ public class RequiredPartsPolicyValidator implements SecurityPolicyValidator {
             ai.setAsserted(true);
             for (Header h : rp.getHeaders()) {
                 QName qName = new QName(h.getNamespace(), h.getName());
-                if (header == null || DOMUtils.getFirstChildWithName((Element)header, qName) == null) {
+                if (header == null || DOMUtils.getFirstChildWithName(header, qName) == null) {
                     ai.setNotAsserted("No header element of name " + qName + " found.");
                 }
             }

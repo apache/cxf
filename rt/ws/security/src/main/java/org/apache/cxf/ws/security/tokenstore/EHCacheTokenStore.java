@@ -141,7 +141,7 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
 
     private int getTTL() {
         int parsedTTL = (int)ttl;
-        if (ttl != (long)parsedTTL) {
+        if (ttl != parsedTTL) {
              // Fall back to 60 minutes if the default TTL is set incorrectly
             parsedTTL = 3600;
         }

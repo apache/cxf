@@ -40,6 +40,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.CompressionUtils;
@@ -116,8 +117,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
@@ -148,8 +149,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
@@ -180,8 +181,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
@@ -222,8 +223,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
@@ -264,8 +265,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
@@ -306,8 +307,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
@@ -348,8 +349,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
@@ -388,8 +389,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
@@ -428,8 +429,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
@@ -461,8 +462,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
@@ -488,8 +489,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
@@ -550,8 +551,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
@@ -575,8 +576,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
@@ -615,8 +616,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
@@ -656,8 +657,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
@@ -697,8 +698,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
@@ -768,8 +769,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
@@ -837,8 +838,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
@@ -874,8 +875,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
@@ -896,8 +897,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
@@ -919,8 +920,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
@@ -962,8 +963,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
@@ -1008,8 +1009,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
@@ -1087,8 +1088,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
@@ -1162,8 +1163,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
@@ -1185,8 +1186,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
@@ -1203,8 +1204,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
@@ -1224,8 +1225,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());
@@ -1245,8 +1246,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         URL busFile = STSRESTTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         String address = "https://localhost:" + STSPORT + "/SecurityTokenService/token";
         WebClient client = WebClient.create(address, busFile.toString());

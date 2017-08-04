@@ -903,7 +903,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         if (o == null) {
             SecurityToken securityToken = getSecurityToken();
             if (securityToken != null) {
-                Element tokenElement = (Element)securityToken.getToken();
+                Element tokenElement = securityToken.getToken();
                 String namespace = tokenElement.getNamespaceURI();
                 String localname = tokenElement.getLocalName();
                 SamlTokenType tokenType = token.getSamlTokenType();

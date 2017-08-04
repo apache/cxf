@@ -502,7 +502,7 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
             (NodeList) digestAlgoExpr.evaluate(signedDoc, XPathConstants.NODESET);
 
         for (int i = 0; i < digestMethodNodes.getLength(); i++) {
-            Node node = (Node)digestMethodNodes.item(i);
+            Node node = digestMethodNodes.item(i);
             String digestAlgorithm = node.getAttributes().getNamedItem("Algorithm").getNodeValue();
             assertEquals(expectedDigestAlgorithm, digestAlgorithm);
         }
@@ -532,10 +532,10 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
 
         String strId = null;
         for (int i = 0; i < strKeyIdNodes.getLength(); i++) {
-            Node keyIdNode = (Node) strKeyIdNodes.item(i);
+            Node keyIdNode = strKeyIdNodes.item(i);
             String strKey = keyIdNode.getTextContent();
             if (strKey.equals(assertionId)) {
-                Node strNode = (Node) keyIdNode.getParentNode();
+                Node strNode = keyIdNode.getParentNode();
                 strId = strNode.getAttributes().
                     getNamedItemNS(nsContext.getNamespaceURI("wsu"), "Id").getNodeValue();
                 break;
@@ -552,7 +552,7 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
 
         boolean foundStrReference = false;
         for (int i = 0; i < sigReferenceNodes.getLength(); i++) {
-            Node sigRefNode = (Node) sigReferenceNodes.item(i);
+            Node sigRefNode = sigReferenceNodes.item(i);
             String sigRefURI = sigRefNode.getAttributes().getNamedItem("URI").getNodeValue();
             if (sigRefURI.equals("#" + strId)) {
                 foundStrReference = true;

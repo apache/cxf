@@ -656,7 +656,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
             } */
             } else if (token instanceof IssuedToken) {
                 SecurityToken sigTok = getSecurityToken();
-                SecurePart securePart = addIssuedToken((IssuedToken)token, sigTok, signed, endorse);
+                SecurePart securePart = addIssuedToken(token, sigTok, signed, endorse);
                 if (securePart != null) {
                     ret.put(token, securePart);
                     if (suppTokens.isEncryptedToken()) {

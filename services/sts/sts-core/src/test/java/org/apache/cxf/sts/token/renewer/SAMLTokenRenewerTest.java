@@ -123,7 +123,7 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         assertTrue(renewerResponse.getToken() != null);
 
         String oldId = new SamlAssertionWrapper(samlToken).getId();
-        String newId = new SamlAssertionWrapper((Element)renewerResponse.getToken()).getId();
+        String newId = new SamlAssertionWrapper(renewerResponse.getToken()).getId();
         assertFalse(oldId.equals(newId));
 
         // Now validate it again
@@ -264,7 +264,7 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         assertTrue(renewerResponse.getToken() != null);
 
         String oldId = new SamlAssertionWrapper(samlToken).getId();
-        String newId = new SamlAssertionWrapper((Element)renewerResponse.getToken()).getId();
+        String newId = new SamlAssertionWrapper(renewerResponse.getToken()).getId();
         assertFalse(oldId.equals(newId));
 
         // Now validate it again
@@ -340,7 +340,7 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         assertTrue(renewerResponse.getToken() != null);
 
         String oldId = new SamlAssertionWrapper(samlToken).getId();
-        String newId = new SamlAssertionWrapper((Element)renewerResponse.getToken()).getId();
+        String newId = new SamlAssertionWrapper(renewerResponse.getToken()).getId();
         assertFalse(oldId.equals(newId));
 
         // Now validate it again

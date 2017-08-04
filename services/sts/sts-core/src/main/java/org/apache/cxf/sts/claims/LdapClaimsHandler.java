@@ -254,7 +254,7 @@ public class LdapClaimsHandler implements ClaimsHandler, RealmSupport {
         c.setPrincipal(principal);
 
         try {
-            NamingEnumeration<?> list = (NamingEnumeration<?>)attr.getAll();
+            NamingEnumeration<?> list = attr.getAll();
             while (list.hasMore()) {
                 Object obj = list.next();
                 if (obj instanceof String) {

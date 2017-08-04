@@ -130,7 +130,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                 AbstractToken initiatorToken = initiatorWrapper.getToken();
                 if (initiatorToken instanceof IssuedToken) {
                     SecurityToken sigTok = getSecurityToken();
-                    addIssuedToken((IssuedToken)initiatorToken, sigTok, false, true);
+                    addIssuedToken(initiatorToken, sigTok, false, true);
 
                     if (sigTok != null) {
                         storeSecurityToken(initiatorToken, sigTok);
@@ -257,7 +257,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                 AbstractToken initiatorToken = initiatorWrapper.getToken();
                 if (initiatorToken instanceof IssuedToken) {
                     SecurityToken sigTok = getSecurityToken();
-                    addIssuedToken((IssuedToken)initiatorToken, sigTok, false, true);
+                    addIssuedToken(initiatorToken, sigTok, false, true);
 
                     if (sigTok != null) {
                         storeSecurityToken(initiatorToken, sigTok);

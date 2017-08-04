@@ -169,7 +169,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                 }
             } else if (encryptionToken instanceof IssuedToken) {
                 tok = getSecurityToken();
-                addIssuedToken((IssuedToken)encryptionToken, tok, false, true);
+                addIssuedToken(encryptionToken, tok, false, true);
 
                 if (tok == null && !isRequestor()) {
                     org.apache.xml.security.stax.securityToken.SecurityToken securityToken =
@@ -295,7 +295,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                     }
                 } else if (sigToken instanceof IssuedToken) {
                     sigTok = getSecurityToken();
-                    addIssuedToken((IssuedToken)sigToken, sigTok, false, true);
+                    addIssuedToken(sigToken, sigTok, false, true);
 
                     if (sigTok == null && !isRequestor()) {
                         org.apache.xml.security.stax.securityToken.SecurityToken securityToken =

@@ -26,6 +26,7 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
@@ -92,8 +93,8 @@ public class KerberosDelegationTokenTest extends AbstractBusClientServerTestBase
         URL busFile = KerberosDelegationTokenTest.class.getResource("cxf-intermediary-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = KerberosDelegationTokenTest.class.getResource("DoubleItIntermediary.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);

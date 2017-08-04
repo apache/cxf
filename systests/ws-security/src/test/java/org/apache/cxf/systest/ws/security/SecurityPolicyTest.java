@@ -227,8 +227,8 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
 
         URL busFile = SecurityPolicyTest.class.getResource("https_config_client.xml");
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SecurityPolicyTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -351,8 +351,8 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         SpringBusFactory bf = new SpringBusFactory();
 
         Bus bus = bf.createBus();
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SecurityPolicyTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -412,8 +412,8 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         SpringBusFactory bf = new SpringBusFactory();
 
         Bus bus = bf.createBus();
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SecurityPolicyTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -506,8 +506,8 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         SpringBusFactory bf = new SpringBusFactory();
 
         Bus bus = bf.createBus();
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SecurityPolicyTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -541,8 +541,8 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         SpringBusFactory bf = new SpringBusFactory();
 
         Bus bus = bf.createBus();
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SecurityPolicyTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -576,8 +576,8 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         SpringBusFactory bf = new SpringBusFactory();
 
         Bus bus = bf.createBus();
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SecurityPolicyTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -608,8 +608,8 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         SpringBusFactory bf = new SpringBusFactory();
 
         Bus bus = bf.createBus();
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SecurityPolicyTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -661,8 +661,8 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         SpringBusFactory bf = new SpringBusFactory();
 
         Bus bus = bf.createBus();
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
         Service service = Service.create(wsdl, SERVICE_QNAME);
 
         QName portQName = new QName(NAMESPACE, "DoubleItPortCXF4122");
@@ -706,8 +706,8 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
 
         URL busFile = SecurityPolicyTest.class.getResource("https_config_client.xml");
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SecurityPolicyTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);

@@ -158,7 +158,7 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
         }
 
         ClaimCollection claims =
-            SAMLUtils.getClaims((SamlAssertionWrapper)samlAssertion);
+            SAMLUtils.getClaims(samlAssertion);
         Set<Principal> roles =
             SAMLUtils.parseRolesFromClaims(claims, roleAttributeName, null);
 

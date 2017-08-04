@@ -30,6 +30,7 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
@@ -115,8 +116,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -151,8 +152,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -178,8 +179,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -205,8 +206,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -232,8 +233,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -259,8 +260,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("jaxws-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -290,8 +291,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -323,8 +324,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("intermediary-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItIntermediary.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -346,8 +347,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -373,8 +374,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -400,8 +401,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -425,8 +426,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -450,8 +451,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -477,8 +478,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -502,8 +503,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -529,8 +530,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -556,8 +557,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -584,8 +585,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -611,8 +612,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -642,8 +643,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -669,8 +670,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -696,8 +697,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -723,8 +724,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -750,8 +751,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -777,8 +778,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -804,8 +805,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -831,8 +832,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -858,8 +859,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -885,8 +886,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -914,8 +915,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -941,8 +942,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -971,8 +972,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -1002,8 +1003,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -1033,8 +1034,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -1064,8 +1065,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -1095,8 +1096,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -1126,8 +1127,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509Signature.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -1153,8 +1154,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509Signature.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -1180,8 +1181,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509Signature.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -1207,8 +1208,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509Signature.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -1237,8 +1238,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509Signature.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -1272,8 +1273,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -1303,8 +1304,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -1352,8 +1353,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -1387,8 +1388,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItOperations.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -1424,8 +1425,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -1474,8 +1475,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -1524,8 +1525,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509Signature.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -1551,8 +1552,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -1578,8 +1579,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL busFile = X509TokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509Addressing.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);

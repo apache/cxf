@@ -144,10 +144,10 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         if (encrCrypto != null) {
             final String encCryptoRefId = "RefId-" + encrCrypto.hashCode();
             message.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, encCryptoRefId);
-            message.put(encCryptoRefId, (Crypto)encrCrypto);
+            message.put(encCryptoRefId, encrCrypto);
         } else if (signCrypto != null) {
             message.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, signCryptoRefId);
-            message.put(signCryptoRefId, (Crypto)signCrypto);
+            message.put(signCryptoRefId, signCrypto);
         }
 
         return action;
@@ -184,10 +184,10 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         if (encrCrypto != null) {
             final String encCryptoRefId = "RefId-" + encrCrypto.hashCode();
             message.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, encCryptoRefId);
-            message.put(encCryptoRefId, (Crypto)encrCrypto);
+            message.put(encCryptoRefId, encrCrypto);
         } else if (signCrypto != null) {
             message.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, signCryptoRefId);
-            message.put(signCryptoRefId, (Crypto)signCrypto);
+            message.put(signCryptoRefId, signCrypto);
         }
 
         return action;

@@ -284,8 +284,8 @@ public class STSLoginModule implements LoginModule {
             URL busFile = Loader.getResource(cxfSpringCfg);
 
             Bus bus = bf.createBus(busFile.toString());
-            SpringBusFactory.setDefaultBus(bus);
-            SpringBusFactory.setThreadDefaultBus(bus);
+            BusFactory.setDefaultBus(bus);
+            BusFactory.setThreadDefaultBus(bus);
             c = new STSClient(bus);
         } else if (msg == null) {
             Bus bus = BusFactory.getDefaultBus(true);
@@ -370,7 +370,7 @@ public class STSLoginModule implements LoginModule {
             }
 
             ClaimCollection claims =
-                SAMLUtils.getClaims((SamlAssertionWrapper)samlAssertion);
+                SAMLUtils.getClaims(samlAssertion);
             return SAMLUtils.parseRolesFromClaims(claims, roleAttributeName, null);
         }
 

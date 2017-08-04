@@ -27,6 +27,7 @@ import javax.security.auth.callback.CallbackHandler;
 
 import org.w3c.dom.Element;
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
@@ -92,8 +93,8 @@ public class SAMLDelegationTest extends AbstractBusClientServerTestBase {
         URL busFile = SAMLDelegationTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         // Get a token from the UT endpoint first
         SecurityToken token =
@@ -129,8 +130,8 @@ public class SAMLDelegationTest extends AbstractBusClientServerTestBase {
         URL busFile = SAMLDelegationTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         // Get a token from the UT endpoint first
         SecurityToken token =
@@ -166,8 +167,8 @@ public class SAMLDelegationTest extends AbstractBusClientServerTestBase {
         URL busFile = SAMLDelegationTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
         CallbackHandler callbackHandler = new CommonCallbackHandler();
@@ -202,8 +203,8 @@ public class SAMLDelegationTest extends AbstractBusClientServerTestBase {
         URL busFile = SAMLDelegationTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         // Create SAML token
         Element samlToken =

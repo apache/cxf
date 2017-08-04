@@ -108,7 +108,7 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
                         unassertPolicy(token.getToken(), "No transport token id");
                         return;
                     }
-                    addIssuedToken((IssuedToken)token.getToken(), secToken, false, false);
+                    addIssuedToken(token.getToken(), secToken, false, false);
                 }
                 assertToken(token.getToken());
                 assertTokenWrapper(token);
@@ -222,7 +222,7 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
             if (token instanceof UsernameToken) {
                 addUsernameToken((UsernameToken)token);
             } else if (token instanceof IssuedToken) {
-                addIssuedToken((IssuedToken)token, getSecurityToken(), false, false);
+                addIssuedToken(token, getSecurityToken(), false, false);
             } else if (token instanceof KerberosToken) {
                 addKerberosToken((KerberosToken)token, false, false, false);
             } else if (token instanceof SamlToken) {
