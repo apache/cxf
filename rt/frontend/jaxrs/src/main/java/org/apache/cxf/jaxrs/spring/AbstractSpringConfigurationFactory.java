@@ -79,9 +79,8 @@ public abstract class AbstractSpringConfigurationFactory
     protected String getAddress() {
         if (!StringUtils.isEmpty(jaxrsServerAddress)) {
             return jaxrsServerAddress;
-        } else {
-            return "/";
         }
+        return "/";
     }
 
     protected String getTransportId() {

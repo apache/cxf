@@ -158,9 +158,8 @@ public abstract class AbstractConfigurableProvider {
     protected boolean isPayloadEmpty(HttpHeaders headers) {
         if (headers != null) {
             return isPayloadEmpty(headers.getRequestHeaders());
-        } else {
-            return false;
         }
+        return false;
     }
 
     protected boolean isPayloadEmpty(MultivaluedMap<String, String> headers) {

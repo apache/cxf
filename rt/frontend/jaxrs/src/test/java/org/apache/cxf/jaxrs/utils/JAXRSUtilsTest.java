@@ -211,6 +211,7 @@ public class JAXRSUtilsTest extends Assert {
         assertEquals("customerContext", context.get());
     }
 
+    @SuppressWarnings("cast")
     @Test
     public void testInjectApplicationInSingleton() throws Exception {
         CustomerApplication app = new CustomerApplication();
@@ -231,6 +232,7 @@ public class JAXRSUtilsTest extends Assert {
         assertTrue(proxy.get() instanceof UriInfo);
     }
 
+    @SuppressWarnings("cast")
     @Test
     public void testInjectApplicationInPerRequestResource() throws Exception {
         CustomerApplication app = new CustomerApplication();
@@ -2122,9 +2124,8 @@ public class JAXRSUtilsTest extends Assert {
         public <T> ParamConverter<T> getConverter(Class<T> cls, Type arg1, Annotation[] arg2) {
             if (cls == Locale.class) {
                 return (ParamConverter<T>)this;
-            } else {
-                return null;
             }
+            return null;
         }
 
         public Locale fromString(String s) {
@@ -2148,9 +2149,8 @@ public class JAXRSUtilsTest extends Assert {
         public <T> ParamConverter<T> getConverter(Class<T> cls, Type arg1, Annotation[] arg2) {
             if (cls == Query.class) {
                 return (ParamConverter<T>)this;
-            } else {
-                return null;
             }
+            return null;
         }
 
         public Query<String> fromString(String s) {

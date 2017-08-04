@@ -134,9 +134,8 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
                                                   RequestDispatcherProvider.class,
                                                   getBus()) != null) {
             return resourceName;
-        } else {
-            return null;
         }
+        return null;
     }
 
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
@@ -173,9 +172,8 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
                 }
             }
             return false;
-        } else {
-            return classResources.containsKey(typeName);
         }
+        return classResources.containsKey(typeName);
     }
 
     public void writeTo(Object o, Class<?> clazz, Type genericType, Annotation[] annotations,

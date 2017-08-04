@@ -279,9 +279,8 @@ public abstract class ProviderFactory {
             ParamConverter<T> converter = pi.getProvider().getConverter(paramType, genericType, anns);
             if (converter != null) {
                 return converter;
-            } else {
-                pi.clearThreadLocalProxies();
             }
+            pi.clearThreadLocalProxies();
         }
         return null;
     }
@@ -380,9 +379,8 @@ public abstract class ProviderFactory {
             }
 
             return interceptors;
-        } else {
-            return null;
         }
+        return null;
     }
 
     public <T> List<WriterInterceptor> createMessageBodyWriterInterceptor(Class<T> bodyType,
@@ -419,9 +417,8 @@ public abstract class ProviderFactory {
             }
 
             return interceptors;
-        } else {
-            return null;
         }
+        return null;
     }
 
 
@@ -1158,9 +1155,8 @@ public abstract class ProviderFactory {
         boolean isApplication = Application.class.isAssignableFrom(c.getDeclaringClass());
         if (isApplication) {
             return new ApplicationInfo((Application)instance, proxies, theBus);
-        } else {
-            return new ProviderInfo<Object>(instance, proxies, theBus, checkContexts, custom);
         }
+        return new ProviderInfo<Object>(instance, proxies, theBus, checkContexts, custom);
     }
 
     protected static class NameKey {

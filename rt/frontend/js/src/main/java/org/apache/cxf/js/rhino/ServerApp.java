@@ -140,9 +140,8 @@ public class ServerApp {
             if (f.isFile()) {
                 String name = f.getName();
                 return name.endsWith(".js") || name.endsWith(".jsx");
-            } else {
-                return false;
             }
+            return false;
         }
     }
 }

@@ -105,9 +105,8 @@ public final class ServerProviderFactory extends ProviderFactory {
         Object provider = createProvider(WADL_PROVIDER_NAME, bus);
         if (provider == null) {
             return null;
-        } else {
-            return new ProviderInfo<ContainerRequestFilter>((ContainerRequestFilter)provider, bus, true);
         }
+        return new ProviderInfo<ContainerRequestFilter>((ContainerRequestFilter)provider, bus, true);
     }
 
     public static ServerProviderFactory getInstance() {
@@ -314,9 +313,8 @@ public final class ServerProviderFactory extends ProviderFactory {
         }
         if (WADL_PROVIDER_NAME.equals(filterCls.getName())) {
             return true;
-        } else {
-            return isWadlGenerator(filterCls.getSuperclass());
         }
+        return isWadlGenerator(filterCls.getSuperclass());
     }
 
     public RequestPreprocessor getRequestPreprocessor() {

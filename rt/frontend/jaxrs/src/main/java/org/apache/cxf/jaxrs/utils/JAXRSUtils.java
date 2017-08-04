@@ -214,18 +214,16 @@ public final class JAXRSUtils {
 
         if (values == null) {
             return getConsumeTypes(provider.getClass().getAnnotation(Consumes.class));
-        } else {
-            return JAXRSUtils.getMediaTypes(values);
         }
+        return JAXRSUtils.getMediaTypes(values);
     }
 
     public static List<MediaType> getProviderProduceTypes(MessageBodyWriter<?> provider) {
         String[] values = getUserMediaTypes(provider, false);
         if (values == null) {
             return getProduceTypes(provider.getClass().getAnnotation(Produces.class));
-        } else {
-            return JAXRSUtils.getMediaTypes(values);
         }
+        return JAXRSUtils.getMediaTypes(values);
     }
 
     public static List<MediaType> getMediaTypes(String[] values) {
@@ -916,17 +914,16 @@ public final class JAXRSUtils {
 
             if ("".equals(key)) {
                 return InjectionUtils.handleBean(pClass, paramAnns, params, ParameterType.MATRIX, m, false);
-            } else {
-                List<String> values = params.get(key);
-                return InjectionUtils.createParameterObject(values,
-                                                            pClass,
-                                                            genericType,
-                                                            paramAnns,
-                                                            defaultValue,
-                                                            false,
-                                                            ParameterType.MATRIX,
-                                                            m);
             }
+            List<String> values = params.get(key);
+            return InjectionUtils.createParameterObject(values,
+                                                        pClass,
+                                                        genericType,
+                                                        paramAnns,
+                                                        defaultValue,
+                                                        false,
+                                                        ParameterType.MATRIX,
+                                                        m);
         }
 
         return null;
@@ -971,19 +968,17 @@ public final class JAXRSUtils {
 
         if ("".equals(key)) {
             return InjectionUtils.handleBean(pClass, paramAnns, params, ParameterType.FORM, m, false);
-        } else {
-            List<String> results = params.get(key);
-
-            return InjectionUtils.createParameterObject(results,
-                                                        pClass,
-                                                        genericType,
-                                                        paramAnns,
-                                                        defaultValue,
-                                                        false,
-                                                        ParameterType.FORM,
-                                                        m);
-
         }
+        List<String> results = params.get(key);
+
+        return InjectionUtils.createParameterObject(results,
+                                                    pClass,
+                                                    genericType,
+                                                    paramAnns,
+                                                    defaultValue,
+                                                    false,
+                                                    ParameterType.FORM,
+                                                    m);
     }
 
 
@@ -1166,17 +1161,16 @@ public final class JAXRSUtils {
     //CHECKSTYLE:ON
         if ("".equals(parameterName)) {
             return InjectionUtils.handleBean(paramType, paramAnns, values, ParameterType.PATH, m, decoded);
-        } else {
-            List<String> results = values.get(parameterName);
-            return InjectionUtils.createParameterObject(results,
-                                                    paramType,
-                                                    genericType,
-                                                    paramAnns,
-                                                    defaultValue,
-                                                    decoded,
-                                                    ParameterType.PATH,
-                                                    m);
         }
+        List<String> results = values.get(parameterName);
+        return InjectionUtils.createParameterObject(results,
+                                                paramType,
+                                                genericType,
+                                                paramAnns,
+                                                defaultValue,
+                                                decoded,
+                                                ParameterType.PATH,
+                                                m);
     }
 
 
@@ -1194,15 +1188,14 @@ public final class JAXRSUtils {
 
         if ("".equals(queryName)) {
             return InjectionUtils.handleBean(paramType, paramAnns, queryMap, ParameterType.QUERY, m, false);
-        } else {
-            return InjectionUtils.createParameterObject(queryMap.get(queryName),
-                                                        paramType,
-                                                        genericType,
-                                                        paramAnns,
-                                                        defaultValue,
-                                                        false,
-                                                        ParameterType.QUERY, m);
         }
+        return InjectionUtils.createParameterObject(queryMap.get(queryName),
+                                                    paramType,
+                                                    genericType,
+                                                    paramAnns,
+                                                    defaultValue,
+                                                    false,
+                                                    ParameterType.QUERY, m);
     }
 
 
@@ -1312,9 +1305,8 @@ public final class JAXRSUtils {
                 } catch (IOException e) {
                     if (e.getClass().getName().equals(NO_CONTENT_EXCEPTION)) {
                         throw ExceptionUtils.toBadRequestException(e, null);
-                    } else {
-                        throw e;
                     }
+                    throw e;
                 } catch (WebApplicationException ex) {
                     throw ex;
                 } catch (Exception ex) {
@@ -1347,14 +1339,13 @@ public final class JAXRSUtils {
                                                                             readers);
 
             return first.aroundReadFrom(context);
-        } else {
-            MessageBodyReader<?> provider = ((ReaderInterceptorMBR)readers.get(0)).getMBR();
-            @SuppressWarnings("rawtypes")
-            Class cls = targetTypeClass;
-            return provider.readFrom(
-                      cls, parameterType, parameterAnnotations, mediaType,
-                      new HttpHeadersImpl(m).getRequestHeaders(), is);
         }
+        MessageBodyReader<?> provider = ((ReaderInterceptorMBR)readers.get(0)).getMBR();
+        @SuppressWarnings("rawtypes")
+        Class cls = targetTypeClass;
+        return provider.readFrom(
+                  cls, parameterType, parameterAnnotations, mediaType,
+                  new HttpHeadersImpl(m).getRequestHeaders(), is);
     }
 
 
@@ -1710,9 +1701,8 @@ public final class JAXRSUtils {
     public static MediaType toMediaType(String value) {
         if (value == null) {
             return ALL_TYPES;
-        } else {
-            return MediaTypeHeaderProvider.valueOf(value);
         }
+        return MediaTypeHeaderProvider.valueOf(value);
     }
 
     public static Response toResponse(int status) {
@@ -1761,9 +1751,8 @@ public final class JAXRSUtils {
                 }
             }
             return r;
-        } else {
-            return response;
         }
+        return response;
     }
 
     public static Message getCurrentMessage() {

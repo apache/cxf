@@ -178,9 +178,8 @@ public final class AttachmentUtils {
                 LOG.warning(errorMsg.toString());
                 throw ExceptionUtils.toBadRequestException(
                           new MultipartReadException(id.value(), id.type(), errorMsg.toString()), null);
-            } else {
-                return null;
             }
+            return null;
         }
 
         return !infos.isEmpty() ? infos.get(0) : null;

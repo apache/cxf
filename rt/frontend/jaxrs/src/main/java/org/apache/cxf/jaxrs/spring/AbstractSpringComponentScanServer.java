@@ -212,9 +212,8 @@ public abstract class AbstractSpringComponentScanServer extends AbstractSpringCo
         if (Proxy.isProxyClass(type)) {
             LOG.fine("Can not determine the real class of the component '" + beanName + "'");
             return false;
-        } else {
-            return true;
         }
+        return true;
     }
     protected boolean matchesComponentName(String beanName, Set<String> componentScanBeansSet) {
         return componentScanBeansSet == null || componentScanBeansSet.contains(beanName);

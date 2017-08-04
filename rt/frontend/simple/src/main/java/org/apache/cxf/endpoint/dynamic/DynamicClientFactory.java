@@ -729,9 +729,8 @@ public class DynamicClientFactory {
 
             if (resolver.isResolved()) {
                 return resolver.getURI().toURL();
-            } else {
-                throw new ServiceConstructionException(new Message("COULD_NOT_RESOLVE_URL", LOG, s));
             }
+            throw new ServiceConstructionException(new Message("COULD_NOT_RESOLVE_URL", LOG, s));
         } catch (IOException e) {
             throw new ServiceConstructionException(new Message("COULD_NOT_RESOLVE_URL", LOG, s), e);
         }
@@ -802,9 +801,8 @@ public class DynamicClientFactory {
                 File file = new File(baseURI, systemId);
                 if (file.exists()) {
                     return new InputSource(Files.newInputStream(file.toPath()));
-                } else {
-                    return new InputSource(systemId);
                 }
+                return new InputSource(systemId);
             }
             return null;
         }

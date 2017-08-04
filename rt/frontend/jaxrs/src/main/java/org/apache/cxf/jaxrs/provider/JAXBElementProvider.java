@@ -163,9 +163,8 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
         if (isPayloadEmpty(headers)) {
             if (AnnotationUtils.getAnnotation(anns, Nullable.class) != null) {
                 return null;
-            } else {
-                reportEmptyContentLength();
             }
+            reportEmptyContentLength();
         }
 
         XMLStreamReader reader = null;
@@ -268,9 +267,8 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
         reader = createDepthReaderIfNeeded(reader, is);
         if (InjectionUtils.isSupportedCollectionOrArray(type)) {
             return new JAXBCollectionWrapperReader(TransformUtils.createNewReaderIfNeeded(reader, is));
-        } else {
-            return reader;
         }
+        return reader;
 
     }
 
@@ -510,9 +508,8 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
                 builder = mc.getUriInfo().getBaseUriBuilder();
             }
             return builder.path(path).path(xmlResourceOffset).build().toString();
-        } else {
-            return path;
         }
+        return path;
     }
 
 
@@ -541,9 +538,8 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
             // TODO: there has to be a better fix
             String propertyName = write ? "WRITE-" + Message.ATTACHMENTS : Message.ATTACHMENTS;
             return CastUtils.cast((Collection<?>)mc.get(propertyName));
-        } else {
-            return null;
         }
+        return null;
     }
     //CHECKSTYLE:OFF
     protected void marshal(Object obj, Class<?> cls, Type genericType,

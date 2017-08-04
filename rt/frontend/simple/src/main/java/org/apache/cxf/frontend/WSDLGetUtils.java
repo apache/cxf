@@ -482,11 +482,10 @@ public class WSDLGetUtils {
             if (name == null) {
                 setSoapAddressLocationOn(ports.iterator().next(), publishingUrl);
                 break; // only update the first port since we don't target any specific port
-            } else {
-                for (Port port : ports) {
-                    if (name.getLocalPart().equals(port.getName())) {
-                        setSoapAddressLocationOn(port, publishingUrl);
-                    }
+            }
+            for (Port port : ports) {
+                if (name.getLocalPart().equals(port.getName())) {
+                    setSoapAddressLocationOn(port, publishingUrl);
                 }
             }
         }

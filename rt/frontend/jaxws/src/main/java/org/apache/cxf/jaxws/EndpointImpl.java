@@ -836,11 +836,10 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
                                                                 Element... referenceParameters) {
         if (W3CEndpointReference.class.isAssignableFrom(clazz)) {
             return clazz.cast(getEndpointReference(referenceParameters));
-        } else {
-            throw new WebServiceException(new org.apache.cxf.common.i18n.Message(
-                "ENDPOINTREFERENCE_TYPE_NOT_SUPPORTED", LOG, clazz
-                .getName()).toString());
         }
+        throw new WebServiceException(new org.apache.cxf.common.i18n.Message(
+            "ENDPOINTREFERENCE_TYPE_NOT_SUPPORTED", LOG, clazz
+            .getName()).toString());
     }
 
     public void setEndpointContext(EndpointContext ctxt) {

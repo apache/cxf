@@ -112,9 +112,8 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
             Bus bus = BusFactory.getThreadDefaultBus();
             ep = createEndpointImpl(bus, bindingId, implementor);
             return ep;
-        } else {
-            throw new WebServiceException(new Message("INVALID_IMPLEMENTOR_EXC", LOG).toString());
         }
+        throw new WebServiceException(new Message("INVALID_IMPLEMENTOR_EXC", LOG).toString());
     }
     //new in 2.2
     public Endpoint createEndpoint(String bindingId,
@@ -125,9 +124,8 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
             Bus bus = BusFactory.getThreadDefaultBus();
             ep = createEndpointImpl(bus, bindingId, implementor, features);
             return ep;
-        } else {
-            throw new WebServiceException(new Message("INVALID_IMPLEMENTOR_EXC", LOG).toString());
         }
+        throw new WebServiceException(new Message("INVALID_IMPLEMENTOR_EXC", LOG).toString());
     }
 
     @Override
@@ -165,9 +163,8 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
             EndpointImpl ep = new EndpointImpl(bus, null, factory);
             ep.setImplementorClass(implementorClass);
             return ep;
-        } else {
-            throw new WebServiceException(new Message("INVALID_IMPLEMENTOR_EXC", LOG).toString());
         }
+        throw new WebServiceException(new Message("INVALID_IMPLEMENTOR_EXC", LOG).toString());
     }
 
 
@@ -212,8 +209,6 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
                 JAXBUtils.closeUnmarshaller(um);
             }
             return null;
-        } else {
-            //TODO: 200408
         }
         return null;
     }
@@ -382,9 +377,8 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
                 Exception e = pae.getException();
                 if (e instanceof JAXBException) {
                     throw (JAXBException)e;
-                } else {
-                    throw new SecurityException(e);
                 }
+                throw new SecurityException(e);
             }
         } catch (Exception e) {
             throw new WebServiceException(new Message("ERROR_UNMARSHAL_ENDPOINTREFERENCE", LOG).toString(),
@@ -424,9 +418,8 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
                 throw new WebServiceException(new Message("ERROR_UNMARSHAL_ENDPOINTREFERENCE", LOG)
                                                   .toString(),
                                               e);
-            } else {
-                throw new SecurityException(e);
             }
+            throw new SecurityException(e);
         }
     }
 

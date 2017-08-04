@@ -286,9 +286,8 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
     public Class<?> getServiceBeanClass() {
         if (serviceBean != null) {
             return ClassHelper.getRealClass(getBus(), serviceBean);
-        } else {
-            return getServiceFactory().getServiceClass();
         }
+        return getServiceFactory().getServiceClass();
     }
 
     /**

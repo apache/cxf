@@ -100,16 +100,15 @@ public class SpringResourceFactory implements ResourceProvider, ApplicationConte
     public Object getInstance(Message m) {
         if (singletonInstance != null) {
             return singletonInstance;
-        } else {
-            ProviderInfo<?> application = m == null ? null
-                : (ProviderInfo<?>)m.getExchange().getEndpoint().get(Application.class.getName());
-            Map<Class<?>, Object> mapValues = CastUtils.cast(application == null ? null
-                : Collections.singletonMap(Application.class, application.getProvider()));
-            Object[] values = ResourceUtils.createConstructorArguments(c, m, !isSingleton(), mapValues);
-            Object instance = values.length > 0 ? ac.getBean(beanId, values) : ac.getBean(beanId);
-            initInstance(m, instance);
-            return instance;
         }
+        ProviderInfo<?> application = m == null ? null
+            : (ProviderInfo<?>)m.getExchange().getEndpoint().get(Application.class.getName());
+        Map<Class<?>, Object> mapValues = CastUtils.cast(application == null ? null
+            : Collections.singletonMap(Application.class, application.getProvider()));
+        Object[] values = ResourceUtils.createConstructorArguments(c, m, !isSingleton(), mapValues);
+        Object instance = values.length > 0 ? ac.getBean(beanId, values) : ac.getBean(beanId);
+        initInstance(m, instance);
+        return instance;
     }
 
     protected void initInstance(Message m, Object instance) {

@@ -174,9 +174,8 @@ public class MultipartProvider extends AbstractConfigurableProvider
                 && !MessageUtils.isTrue(mc.getContextualProperty(SINGLE_PART_IS_COLLECTION))) {
                 List<Attachment> allMultiparts = AttachmentUtils.getMatchingAttachments(id, infos);
                 return getAttachmentCollection(t, allMultiparts, anns);
-            } else {
-                return fromAttachment(multipart, c, t, anns);
             }
+            return fromAttachment(multipart, c, t, anns);
         }
 
         if (id != null && !id.required()) {
@@ -292,22 +291,20 @@ public class MultipartProvider extends AbstractConfigurableProvider
                 handlers.add(handler);
             }
             return handlers;
-        } else {
-            String rootMediaType = getRootMediaType(anns, mt);
-            if (List.class.isAssignableFrom(obj.getClass())) {
-                return getAttachments((List<?>)obj, rootMediaType);
-            } else {
-                if (MultipartBody.class.isAssignableFrom(type)) {
-                    List<Attachment> atts = ((MultipartBody)obj).getAllAttachments();
-                    // these attachments may have no DataHandlers, but objects only
-                    return getAttachments(atts, rootMediaType);
-                }
-                Attachment handler = createDataHandler(obj,
-                                                       genericType, anns,
-                                                       rootMediaType, mt.toString(), 1);
-                return Collections.singletonList(handler);
-            }
         }
+        String rootMediaType = getRootMediaType(anns, mt);
+        if (List.class.isAssignableFrom(obj.getClass())) {
+            return getAttachments((List<?>)obj, rootMediaType);
+        }
+        if (MultipartBody.class.isAssignableFrom(type)) {
+            List<Attachment> atts = ((MultipartBody)obj).getAllAttachments();
+            // these attachments may have no DataHandlers, but objects only
+            return getAttachments(atts, rootMediaType);
+        }
+        Attachment handler = createDataHandler(obj,
+                                               genericType, anns,
+                                               rootMediaType, mt.toString(), 1);
+        return Collections.singletonList(handler);
     }
 
     private List<Attachment> getAttachments(List<?> objects, String rootMediaType) throws IOException {

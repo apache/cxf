@@ -478,18 +478,16 @@ public final class URITemplate {
         public boolean matches(String value) {
             if (pattern == null) {
                 return true;
-            } else {
-                return pattern.matcher(value).matches();
             }
+            return pattern.matcher(value).matches();
         }
 
         @Override
         public String getValue() {
             if (pattern != null) {
                 return "{" + name + ":" + pattern + "}";
-            } else {
-                return "{" + name + "}";
             }
+            return "{" + name + "}";
         }
     }
 
@@ -566,9 +564,8 @@ public final class URITemplate {
         public static String stripBraces(String token) {
             if (insideBraces(token)) {
                 return token.substring(1, token.length() - 1);
-            } else {
-                return token;
             }
+            return token;
         }
 
         public boolean hasNext() {
@@ -578,9 +575,8 @@ public final class URITemplate {
         public String next() {
             if (hasNext()) {
                 return tokens.get(tokenIdx++);
-            } else {
-                throw new IllegalStateException("no more elements");
             }
+            throw new IllegalStateException("no more elements");
         }
     }
 }

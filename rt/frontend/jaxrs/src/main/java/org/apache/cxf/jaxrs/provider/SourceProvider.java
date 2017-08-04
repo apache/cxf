@@ -105,9 +105,8 @@ public class SourceProvider<T> extends AbstractConfigurableProvider implements
                 } catch (XMLStreamException e) {
                     if (e.getMessage() != null && e.getMessage().startsWith("Maximum Number")) {
                         throw ExceptionUtils.toWebApplicationException(null, JAXRSUtils.toResponse(413));
-                    } else {
-                        throw ExceptionUtils.toBadRequestException(e, null);
                     }
+                    throw ExceptionUtils.toBadRequestException(e, null);
                 } catch (Exception e) {
                     IOException ioex = new IOException("Problem creating a Source object");
                     ioex.setStackTrace(e.getStackTrace());
@@ -153,9 +152,8 @@ public class SourceProvider<T> extends AbstractConfigurableProvider implements
             } catch (XMLStreamException ex) {
                 throw ExceptionUtils.toInternalServerErrorException(ex, null);
             }
-        } else {
-            return reader;
         }
+        return reader;
     }
 
     protected InputStream getRealStream(InputStream is) throws IOException {
@@ -178,9 +176,8 @@ public class SourceProvider<T> extends AbstractConfigurableProvider implements
         MessageContext mc = getContext();
         if (mc != null) {
             return mc.getContent(XMLStreamReader.class);
-        } else {
-            return null;
         }
+        return null;
     }
 
     public void writeTo(T source, Class<?> clazz, Type genericType, Annotation[] annotations,

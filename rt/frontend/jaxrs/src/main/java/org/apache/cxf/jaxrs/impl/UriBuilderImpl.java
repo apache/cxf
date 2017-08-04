@@ -892,9 +892,8 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         } catch (Exception ex) {
             if (new URITemplate(uriTemplate).getVariables().isEmpty()) {
                 throw new IllegalArgumentException(ex);
-            } else {
-                return uriAsTemplate(uriTemplate);
             }
+            return uriAsTemplate(uriTemplate);
 
         }
     }

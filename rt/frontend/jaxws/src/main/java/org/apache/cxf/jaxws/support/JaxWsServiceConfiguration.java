@@ -145,9 +145,8 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
             }
 
             return new QName(intf.getName().getNamespaceURI(), name);
-        } else {
-            return new QName(intf.getName().getNamespaceURI(), method.getName());
         }
+        return new QName(intf.getName().getNamespaceURI(), method.getName());
     }
 
     public Boolean isWebMethod(final Method method) {
@@ -361,20 +360,19 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
         }
         if (parameter >= annotations.length) {
             return null;
-        } else {
-            for (int i = 0; i < annotations[parameter].length; i++) {
-                Annotation annotation = annotations[parameter][i];
-                // With the ibm jdk, the condition:
-                // if (annotation.annotationType().equals(WebParam.class)) {
-                // SOMETIMES returns false even when the annotation type
-                // is a WebParam.  Doing an instanceof check or using the
-                // == operator seems to give the desired result.
-                if (annotation instanceof WebParam) {
-                    return (WebParam)annotation;
-                }
-            }
-            return null;
         }
+        for (int i = 0; i < annotations[parameter].length; i++) {
+            Annotation annotation = annotations[parameter][i];
+            // With the ibm jdk, the condition:
+            // if (annotation.annotationType().equals(WebParam.class)) {
+            // SOMETIMES returns false even when the annotation type
+            // is a WebParam.  Doing an instanceof check or using the
+            // == operator seems to give the desired result.
+            if (annotation instanceof WebParam) {
+                return (WebParam)annotation;
+            }
+        }
+        return null;
     }
     @Override
     public String getRequestWrapperPartName(OperationInfo op, Method method) {
@@ -451,37 +449,36 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
 
         if (paramNumber >= 0) {
             return getParameterName(op, method, paramNumber, op.getOutput().size(), "return", false);
-        } else {
-            WebResult webResult = getWebResult(method);
-
-            String tns = null;
-            String local = null;
-            if (webResult != null) {
-                tns = webResult.targetNamespace();
-                local = webResult.name();
-            }
-            if (tns == null || tns.length() == 0) {
-                QName wrappername = getResponseWrapperName(op, method);
-                if (wrappername != null) {
-                    tns = wrappername.getNamespaceURI();
-                }
-            }
-
-            if (tns == null || tns.length() == 0) {
-                tns = op.getName().getNamespaceURI();
-            }
-
-            if (local == null || local.length() == 0) {
-                if (Boolean.TRUE.equals(isRPC(method)) || !Boolean.FALSE.equals(isWrapped(method))) {
-                    local = getDefaultLocalName(op, method, paramNumber, op.getOutput().size(), "return");
-                } else {
-                    local = getOperationName(op.getInterface(),
-                                             method).getLocalPart() + "Response";
-                }
-            }
-
-            return new QName(tns, local);
         }
+        WebResult webResult = getWebResult(method);
+
+        String tns = null;
+        String local = null;
+        if (webResult != null) {
+            tns = webResult.targetNamespace();
+            local = webResult.name();
+        }
+        if (tns == null || tns.length() == 0) {
+            QName wrappername = getResponseWrapperName(op, method);
+            if (wrappername != null) {
+                tns = wrappername.getNamespaceURI();
+            }
+        }
+
+        if (tns == null || tns.length() == 0) {
+            tns = op.getName().getNamespaceURI();
+        }
+
+        if (local == null || local.length() == 0) {
+            if (Boolean.TRUE.equals(isRPC(method)) || !Boolean.FALSE.equals(isWrapped(method))) {
+                local = getDefaultLocalName(op, method, paramNumber, op.getOutput().size(), "return");
+            } else {
+                local = getOperationName(op.getInterface(),
+                                         method).getLocalPart() + "Response";
+            }
+        }
+
+        return new QName(tns, local);
     }
 
     @Override
@@ -490,29 +487,28 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
 
         if (paramNumber >= 0) {
             return getPartName(op, method, paramNumber, op.getOutput(), "return", false);
-        } else {
-            WebResult webResult = getWebResult(method);
-            String tns = op.getOutput().getName().getNamespaceURI();
-            String local = null;
-            if (webResult != null) {
-                if (Boolean.TRUE.equals(isRPC(method)) || isDocumentBare(method)) {
-                    local = webResult.partName();
-                }
-                if (local == null || local.length() == 0) {
-                    local = webResult.name();
-                }
-            }
-
-            if (local == null || local.length() == 0) {
-                if (Boolean.TRUE.equals(isRPC(method)) || !Boolean.FALSE.equals(isWrapped(method))) {
-                    local = "return";
-                } else {
-                    local = getOperationName(op.getInterface(), method).getLocalPart() + "Response";
-                }
-            }
-
-            return new QName(tns, local);
         }
+        WebResult webResult = getWebResult(method);
+        String tns = op.getOutput().getName().getNamespaceURI();
+        String local = null;
+        if (webResult != null) {
+            if (Boolean.TRUE.equals(isRPC(method)) || isDocumentBare(method)) {
+                local = webResult.partName();
+            }
+            if (local == null || local.length() == 0) {
+                local = webResult.name();
+            }
+        }
+
+        if (local == null || local.length() == 0) {
+            if (Boolean.TRUE.equals(isRPC(method)) || !Boolean.FALSE.equals(isWrapped(method))) {
+                local = "return";
+            } else {
+                local = getOperationName(op.getInterface(), method).getLocalPart() + "Response";
+            }
+        }
+
+        return new QName(tns, local);
     }
 
     @Override
@@ -787,10 +783,9 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
         if (j >= 0) {
             WebParam webParam = getWebParam(method, j);
             return webParam != null && webParam.header();
-        } else {
-            WebResult webResult = getWebResult(method);
-            return webResult != null && webResult.header();
         }
+        WebResult webResult = getWebResult(method);
+        return webResult != null && webResult.header();
     }
 
     @Override

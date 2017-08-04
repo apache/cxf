@@ -98,8 +98,7 @@ public class Parameter {
     public Class<?> getJavaType() {
         if (javaType == null) {
             return type == ParameterType.REQUEST_BODY ? InputStream.class : String.class;
-        } else {
-            return javaType;
         }
+        return javaType;
     }
 }

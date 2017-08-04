@@ -167,17 +167,15 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         String param = servletConfig.getInitParameter(PARAMETER_SPLIT_CHAR);
         if (!StringUtils.isEmpty(param) && SPACE_PARAMETER_SPLIT_CHAR.equals(param.trim())) {
             return " ";
-        } else {
-            return DEFAULT_PARAMETER_SPLIT_CHAR;
         }
+        return DEFAULT_PARAMETER_SPLIT_CHAR;
     }
     protected boolean getStaticSubResolutionValue(ServletConfig servletConfig) {
         String param = servletConfig.getInitParameter(STATIC_SUB_RESOLUTION_PARAM);
         if (param != null) {
             return Boolean.valueOf(param.trim());
-        } else {
-            return false;
         }
+        return false;
     }
 
     protected void setExtensions(JAXRSServerFactoryBean bean, ServletConfig servletConfig) {
@@ -391,9 +389,8 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
                 list.add(value);
             }
             return map;
-        } else {
-            return Collections.emptyMap();
         }
+        return Collections.emptyMap();
     }
 
     protected Map<Class<?>, ResourceProvider> getResourceProviders(ServletConfig servletConfig,

@@ -161,9 +161,8 @@ public final class InjectionUtils {
             ParameterizedType type = (ParameterizedType) scope;
             if (type.getRawType() == declaration) {
                 return type;
-            } else {
-                scope = type.getRawType();
             }
+            scope = type.getRawType();
         }
         if (scope instanceof Class) {
             Class<?> classScope = (Class<?>)scope;
@@ -575,9 +574,8 @@ public final class InjectionUtils {
                                                                BUNDLE,
                                                                cls.getName()).toString());
             throw new WebApplicationException(t, HttpUtils.getParameterFailureStatus(pType));
-        } else {
-            return result;
         }
+        return result;
     }
 
     private static <T> T evaluateFactoryMethod(String value,
@@ -771,22 +769,21 @@ public final class InjectionUtils {
                 }
             }
             return theValues;
-        } else {
-            Map<Object, Object> theValues = new HashMap<>();
-            Class<?> valueType =
-                (Class<?>) InjectionUtils.getType(paramType.getActualTypeArguments(), 1);
-            for (Map.Entry<String, List<String>> processedValuesEntry : processedValues.entrySet()) {
-                List<String> valuesList = processedValuesEntry.getValue();
-                for (String value : valuesList) {
-                    Object o = InjectionUtils.handleParameter(value,
-                                       decoded, valueType, valueType, paramAnns, pathParam, message);
-                    theValues.put(
-                        convertStringToPrimitive(processedValuesEntry.getKey(), keyType),
-                        o);
-                }
-            }
-            return theValues;
         }
+        Map<Object, Object> theValues = new HashMap<>();
+        Class<?> valueType =
+            (Class<?>) InjectionUtils.getType(paramType.getActualTypeArguments(), 1);
+        for (Map.Entry<String, List<String>> processedValuesEntry : processedValues.entrySet()) {
+            List<String> valuesList = processedValuesEntry.getValue();
+            for (String value : valuesList) {
+                Object o = InjectionUtils.handleParameter(value,
+                                   decoded, valueType, valueType, paramAnns, pathParam, message);
+                theValues.put(
+                    convertStringToPrimitive(processedValuesEntry.getKey(), keyType),
+                    o);
+            }
+        }
+        return theValues;
 
     }
 
@@ -1384,9 +1381,8 @@ public final class InjectionUtils {
         }
         if (param == ParameterType.PATH || param == ParameterType.MATRIX) {
             return HttpUtils.pathDecode(value);
-        } else {
-            return HttpUtils.urlDecode(value);
         }
+        return HttpUtils.urlDecode(value);
     }
 
     public static void invokeLifeCycleMethod(Object instance, Method method) {
@@ -1459,9 +1455,8 @@ public final class InjectionUtils {
         if (targetObject != null) {
             Class<?> targetClass = targetObject.getClass();
             return ClassHelper.getRealClassFromClass(targetClass);
-        } else {
-            return null;
         }
+        return null;
     }
 
     public static Type getGenericResponseType(Method invoked,

@@ -42,11 +42,10 @@ public class ApplicationInfo extends ProviderInfo<Application> {
         Map<String, Object> appProps = super.getProvider().getProperties();
         if (overridingProps.isEmpty()) {
             return appProps;
-        } else {
-            Map<String, Object> props = new HashMap<>(appProps);
-            props.putAll(overridingProps);
-            return props;
         }
+        Map<String, Object> props = new HashMap<>(appProps);
+        props.putAll(overridingProps);
+        return props;
     }
     public void setOverridingProps(Map<String, Object> overridingProps) {
         this.overridingProps = overridingProps;

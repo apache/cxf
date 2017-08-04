@@ -134,9 +134,8 @@ public final class JAXBUtils {
                 XmlAdapter xmlAdapter = typeAdapter.value().newInstance();
                 if (marshal) {
                     return xmlAdapter.marshal(obj);
-                } else {
-                    return xmlAdapter.unmarshal(obj);
                 }
+                return xmlAdapter.unmarshal(obj);
             } catch (Exception ex) {
                 LOG.log(Level.INFO, "(un)marshalling failed, using defaultValue", ex);
             }

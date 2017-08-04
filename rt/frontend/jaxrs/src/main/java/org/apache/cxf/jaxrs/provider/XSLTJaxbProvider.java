@@ -129,9 +129,8 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
         // is in that list then it can only be handled by the template
         if (inClassCanBeHandled(type.getName()) || inClassesToHandle == null && !supportJaxbOnly) {
             return inTemplatesAvailable(type, anns, mt);
-        } else {
-            return supportJaxbOnly;
         }
+        return supportJaxbOnly;
     }
 
     @Override
@@ -148,9 +147,8 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
         // is in that list then it can only be handled by the template
         if (outClassCanBeHandled(type.getName()) || outClassesToHandle == null && !supportJaxbOnly) {
             return outTemplatesAvailable(type, anns, mt);
-        } else {
-            return supportJaxbOnly;
         }
+        return supportJaxbOnly;
     }
 
     protected boolean inTemplatesAvailable(Class<?> cls, Annotation[] anns, MediaType mt) {
@@ -443,10 +441,9 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
         if (templates == null) {
             if (supportJaxbOnly) {
                 return null;
-            } else {
-                LOG.severe("No template is available");
-                throw ExceptionUtils.toInternalServerErrorException(null, null);
             }
+            LOG.severe("No template is available");
+            throw ExceptionUtils.toInternalServerErrorException(null, null);
         }
 
         TemplatesImpl templ = new TemplatesImpl(templates, uriResolver);

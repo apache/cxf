@@ -146,11 +146,10 @@ public class OperationResourceInfo {
         Set<String> criNames = classResourceInfo.getNameBindings();
         if (criNames.isEmpty()) {
             return nameBindings;
-        } else {
-            Set<String> all = new LinkedHashSet<String>(criNames);
-            all.addAll(nameBindings);
-            return all;
         }
+        Set<String> all = new LinkedHashSet<String>(criNames);
+        all.addAll(nameBindings);
+        return all;
     }
 
     private void checkOneway() {

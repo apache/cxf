@@ -198,9 +198,8 @@ public class ClassResourceInfo extends BeanResourceInfo {
     public Set<String> getNameBindings() {
         if (parent == null) {
             return nameBindings;
-        } else {
-            return parent.getNameBindings();
         }
+        return parent.getNameBindings();
     }
 
     public void setNameBindings(Set<String> names) {
@@ -260,9 +259,8 @@ public class ClassResourceInfo extends BeanResourceInfo {
         Produces produces = AnnotationUtils.getClassAnnotation(getServiceClass(), Produces.class);
         if (produces != null || parent == null) {
             return JAXRSUtils.getProduceTypes(produces);
-        } else {
-            return parent.getProduceMime();
         }
+        return parent.getProduceMime();
     }
 
     public List<MediaType> getConsumeMime() {
@@ -272,9 +270,8 @@ public class ClassResourceInfo extends BeanResourceInfo {
         Consumes consumes = AnnotationUtils.getClassAnnotation(getServiceClass(), Consumes.class);
         if (consumes != null || parent == null) {
             return JAXRSUtils.getConsumeTypes(consumes);
-        } else {
-            return parent.getConsumeMime();
         }
+        return parent.getConsumeMime();
     }
 
     public Path getPath() {
@@ -285,9 +282,8 @@ public class ClassResourceInfo extends BeanResourceInfo {
     public boolean isSingleton() {
         if (parent == null) {
             return resourceProvider != null && resourceProvider.isSingleton();
-        } else {
-            return parent.isSingleton();
         }
+        return parent.isSingleton();
     }
 
     public void setParent(ClassResourceInfo parent) {

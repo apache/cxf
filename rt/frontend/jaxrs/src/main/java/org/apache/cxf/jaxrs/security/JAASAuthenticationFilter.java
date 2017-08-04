@@ -139,28 +139,27 @@ public class JAASAuthenticationFilter implements ContainerRequestFilter {
 
             return Response.status(getRedirectStatus()).
                     header(HttpHeaders.LOCATION, finalRedirectURI).build();
-        } else {
-            ResponseBuilder builder = Response.status(Response.Status.UNAUTHORIZED);
-
-            StringBuilder sb = new StringBuilder();
-
-            List<String> authHeader = headers.getRequestHeader(HttpHeaders.AUTHORIZATION);
-            if (authHeader != null && !authHeader.isEmpty()) {
-                // should HttpHeadersImpl do it ?
-                String[] authValues = StringUtils.split(authHeader.get(0), " ");
-                if (authValues.length > 0) {
-                    sb.append(authValues[0]);
-                }
-            } else {
-                sb.append("Basic");
-            }
-            if (realmName != null) {
-                sb.append(" realm=\"").append(realmName).append('"');
-            }
-            builder.header(HttpHeaders.WWW_AUTHENTICATE, sb.toString());
-
-            return builder.build();
         }
+        ResponseBuilder builder = Response.status(Response.Status.UNAUTHORIZED);
+
+        StringBuilder sb = new StringBuilder();
+
+        List<String> authHeader = headers.getRequestHeader(HttpHeaders.AUTHORIZATION);
+        if (authHeader != null && !authHeader.isEmpty()) {
+            // should HttpHeadersImpl do it ?
+            String[] authValues = StringUtils.split(authHeader.get(0), " ");
+            if (authValues.length > 0) {
+                sb.append(authValues[0]);
+            }
+        } else {
+            sb.append("Basic");
+        }
+        if (realmName != null) {
+            sb.append(" realm=\"").append(realmName).append('"');
+        }
+        builder.header(HttpHeaders.WWW_AUTHENTICATE, sb.toString());
+
+        return builder.build();
     }
 
     protected Response.Status getRedirectStatus() {

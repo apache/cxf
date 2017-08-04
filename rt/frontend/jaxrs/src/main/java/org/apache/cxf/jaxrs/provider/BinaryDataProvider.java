@@ -245,9 +245,8 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
         Message message = PhaseInterceptorChain.getCurrentMessage();
         if (message != null) {
             return MessageUtils.isTrue(message.get(HTTP_RANGE_PROPERTY));
-        } else {
-            return false;
         }
+        return false;
     }
 
     public void setReportByteArraySize(boolean report) {

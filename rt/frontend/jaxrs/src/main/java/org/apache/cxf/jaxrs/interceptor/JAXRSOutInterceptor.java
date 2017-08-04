@@ -312,9 +312,8 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     private int getActualStatus(int status, Object responseObj) {
         if (status == -1) {
             return responseObj == null ? 204 : 200;
-        } else {
-            return status;
         }
+        return status;
     }
 
     private boolean checkBufferingMode(Message m, List<WriterInterceptor> writers, boolean firstTry) {
@@ -394,9 +393,8 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         if (excResponse == null) {
             setResponseStatus(message, 500);
             throw new Fault(ex);
-        } else {
-            serializeMessage(pf, message, excResponse, null, false);
         }
+        serializeMessage(pf, message, excResponse, null, false);
 
     }
 

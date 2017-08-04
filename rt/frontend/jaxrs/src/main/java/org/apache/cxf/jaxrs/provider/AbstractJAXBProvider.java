@@ -676,10 +676,9 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
 
         if (schema != null) {
             return schema;
-        } else {
-            SchemaHandler handler = schemaHandlers.get(cls.getName());
-            return handler != null ? handler.getSchema() : null;
         }
+        SchemaHandler handler = schemaHandlers.get(cls.getName());
+        return handler != null ? handler.getSchema() : null;
     }
 
 
@@ -815,9 +814,8 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
             } catch (XMLStreamException ex) {
                 throw ExceptionUtils.toInternalServerErrorException(ex, null);
             }
-        } else {
-            return reader;
         }
+        return reader;
     }
 
     protected DocumentDepthProperties getDepthProperties() {
@@ -919,20 +917,18 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
                                        theList.get(i), adapter, false);
                 }
                 return values;
-            } else {
-                if (!adapterChecked && adapter != null) {
-                    List<Object> newList = new ArrayList<>(theList.size());
-                    for (Object o : theList) {
-                        newList.add(org.apache.cxf.jaxrs.utils.JAXBUtils.useAdapter(o, adapter, false));
-                    }
-                    theList = newList;
-                }
-                if (collectionType == Set.class) {
-                    return new HashSet<>(theList);
-                } else {
-                    return theList;
-                }
             }
+            if (!adapterChecked && adapter != null) {
+                List<Object> newList = new ArrayList<>(theList.size());
+                for (Object o : theList) {
+                    newList.add(org.apache.cxf.jaxrs.utils.JAXBUtils.useAdapter(o, adapter, false));
+                }
+                theList = newList;
+            }
+            if (collectionType == Set.class) {
+                return new HashSet<>(theList);
+            }
+            return theList;
         }
 
     }

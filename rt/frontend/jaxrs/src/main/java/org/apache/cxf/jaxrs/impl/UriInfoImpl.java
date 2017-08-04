@@ -96,9 +96,8 @@ public class UriInfoImpl implements UriInfo {
         String value = doGetPath(decode, true);
         if (value.length() > 1 && value.startsWith("/")) {
             return value.substring(1);
-        } else {
-            return value;
         }
+        return value;
     }
 
     public List<PathSegment> getPathSegments() {

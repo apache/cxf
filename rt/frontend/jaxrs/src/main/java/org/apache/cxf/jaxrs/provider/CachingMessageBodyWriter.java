@@ -47,9 +47,8 @@ public class CachingMessageBodyWriter<T> extends AbstractCachingMessageProvider<
     public boolean isWriteable(Class<?> type, Type gType, Annotation[] anns, MediaType mt) {
         if (delegatingWriters != null) {
             return getDelegatingWriter(type, gType, anns, mt) != null;
-        } else {
-            return isProviderKeyNotSet();
         }
+        return isProviderKeyNotSet();
     }
 
     private MessageBodyWriter<T> getDelegatingWriter(Class<?> type, Type gType, Annotation[] anns, MediaType mt) {

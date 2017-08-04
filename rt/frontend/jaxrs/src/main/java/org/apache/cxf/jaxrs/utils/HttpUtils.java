@@ -300,9 +300,8 @@ public final class HttpUtils {
 
         if (locale == null) {
             return new Locale(language);
-        } else {
-            return new Locale(language, locale);
         }
+        return new Locale(language, locale);
 
     }
 
@@ -321,20 +320,19 @@ public final class HttpUtils {
     public static String getHeaderString(List<String> values) {
         if (values == null) {
             return null;
-        } else {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < values.size(); i++) {
-                String value = values.get(i);
-                if (StringUtils.isEmpty(value)) {
-                    continue;
-                }
-                sb.append(value);
-                if (i + 1 < values.size()) {
-                    sb.append(",");
-                }
-            }
-            return sb.toString();
         }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < values.size(); i++) {
+            String value = values.get(i);
+            if (StringUtils.isEmpty(value)) {
+                continue;
+            }
+            sb.append(value);
+            if (i + 1 < values.size()) {
+                sb.append(",");
+            }
+        }
+        return sb.toString();
     }
 
     public static boolean isDateRelatedHeader(String headerName) {

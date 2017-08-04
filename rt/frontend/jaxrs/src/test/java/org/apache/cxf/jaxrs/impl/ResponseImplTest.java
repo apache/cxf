@@ -468,9 +468,8 @@ public class ResponseImplTest extends Assert {
             throws IllegalArgumentException {
             if (arg0 == StringBean.class) {
                 return (HeaderDelegate<T>) new StringBeanHeaderDelegate();
-            } else {
-                return original.createHeaderDelegate(arg0);
             }
+            return original.createHeaderDelegate(arg0);
         }
 
         @Override

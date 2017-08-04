@@ -433,9 +433,8 @@ public class WrappedMessageContext implements MessageContext {
             if (tmp != null) {
                 if (MessageContext.HTTP_RESPONSE_HEADERS.equals(key)) {
                     return tmp.put(Message.PROTOCOL_HEADERS, value);
-                } else {
-                    return tmp.put(mappedKey, value);
                 }
+                return tmp.put(mappedKey, value);
             }
         } else if (BindingProvider.USERNAME_PROPERTY.equals(key)) {
             AuthorizationPolicy authPolicy =
