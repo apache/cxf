@@ -110,9 +110,8 @@ public class AbstractGreeterImpl implements Greeter {
             fd.setMajor((short)2);
             fd.setMinor((short)1);
             throw new PingMeFault("Pings succeed only every other time.", fd);
-        } else {
-            LOG.fine("Executing operation pingMe");
         }
+        LOG.fine("Executing operation pingMe");
     }
 
     public Response<PingMeResponse> pingMeAsync() {

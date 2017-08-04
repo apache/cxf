@@ -137,13 +137,12 @@ public final class XPathAssert {
             String value2 = DOMUtils.getContent(result);
             Assert.assertEquals(value, value2);
             return;
-        } else {
-            o = createXPath(namespaces).compile(xpath)
-                .evaluate(node, XPathConstants.STRING);
-            if (o instanceof String) {
-                Assert.assertEquals(value, (String)o);
-                return;
-            }
+        }
+        o = createXPath(namespaces).compile(xpath)
+            .evaluate(node, XPathConstants.STRING);
+        if (o instanceof String) {
+            Assert.assertEquals(value, o);
+            return;
         }
         throw new AssertionFailedError("No nodes were found for expression: "
             + xpath
@@ -172,14 +171,13 @@ public final class XPathAssert {
             QName q2 = DOMUtils.createQName(value2, result);
             Assert.assertEquals(value, q2);
             return;
-        } else {
-            o = createXPath(namespaces).compile(xpath)
-                .evaluate(node, XPathConstants.STRING);
-            if (o instanceof String) {
-                QName q2 = DOMUtils.createQName(o.toString(), node);
-                Assert.assertEquals(value, q2);
-                return;
-            }
+        }
+        o = createXPath(namespaces).compile(xpath)
+            .evaluate(node, XPathConstants.STRING);
+        if (o instanceof String) {
+            QName q2 = DOMUtils.createQName(o.toString(), node);
+            Assert.assertEquals(value, q2);
+            return;
         }
         throw new AssertionFailedError("No nodes were found for expression: "
             + xpath

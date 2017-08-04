@@ -147,18 +147,17 @@ public class ServerLauncher {
                 ex.printStackTrace();
                 throw new IOException(ex.getMessage());
             }
-        } else {
-            if (process != null) {
-                if (!serverIsStopped) {
-                    try {
-                        signalStop();
-                    } catch (IOException ex) {
-                        //ignore
-                    }
+        }
+        if (process != null) {
+            if (!serverIsStopped) {
+                try {
+                    signalStop();
+                } catch (IOException ex) {
+                    //ignore
                 }
-                waitForServerToStop();
-                process.destroy();
             }
+            waitForServerToStop();
+            process.destroy();
         }
         return serverPassed;
     }
