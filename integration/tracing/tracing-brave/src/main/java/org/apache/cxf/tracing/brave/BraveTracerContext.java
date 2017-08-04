@@ -104,8 +104,7 @@ public class BraveTracerContext implements TracerContext {
     private TraceScope newOrChildSpan(final String description, final Span parent) {
         if (parent == null) { 
             return new TraceScope(brave, tracer.newTrace().name(description).start());
-        } else {
-            return new TraceScope(brave, tracer.newChild(parent.context()).name(description).start());
         }
+        return new TraceScope(brave, tracer.newChild(parent.context()).name(description).start());
     }
 }

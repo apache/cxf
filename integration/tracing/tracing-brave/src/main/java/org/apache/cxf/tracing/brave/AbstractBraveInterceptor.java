@@ -72,9 +72,8 @@ public abstract class AbstractBraveInterceptor extends AbstractBraveProvider imp
             String query = safeGet(Message.QUERY_STRING);
             if (query != null) {
                 return uri + "?" + query;
-            } else {
-                return uri;
             }
+            return uri;
         }
 
         URI getUri() {
@@ -91,9 +90,8 @@ public abstract class AbstractBraveInterceptor extends AbstractBraveProvider imp
             boolean isOutbound = MessageUtils.isOutbound(message);
             if (isRequestor) {
                 return isOutbound ? message : message.getExchange().getOutMessage();
-            } else {
-                return isOutbound ? message.getExchange().getInMessage() : message;
             }
+            return isOutbound ? message.getExchange().getInMessage() : message;
         }
 
         Map<String, List<String>> getHeaders() {
