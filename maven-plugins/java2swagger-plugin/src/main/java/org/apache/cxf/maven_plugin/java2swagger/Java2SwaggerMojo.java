@@ -70,7 +70,7 @@ public class Java2SwaggerMojo extends AbstractMojo {
     private List<String> resourcePackages;
     
     /**
-     * @parameter default-value="1.0.0"
+     * @parameter default-value="${project.version}"
      */
     private String version;
     
@@ -81,13 +81,13 @@ public class Java2SwaggerMojo extends AbstractMojo {
     private String basePath;
     
     /**
-     * @parameter default-value="Sample REST Application"
+     * @parameter default-value="${project.name}"
      */
     private String title;
     
     
     /**
-     * @parameter default-value="The Application"
+     * @parameter default-value="${project.description}"
      */
     private String description;
     
