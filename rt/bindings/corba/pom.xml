@@ -99,8 +99,14 @@
                                     <deleteDirs>
                                         <deleteDir>${basedir}/target/generated/src/main/java/org/apache/cxf/wsdl</deleteDir>
                                     </deleteDirs>
+                                    <extensionArgs>
+                                        <extensionArg>-Xdv:attributes</extensionArg>
+                                    </extensionArgs>
                                 </xsdOption>
                             </xsdOptions>
+                            <extensions>
+                                <extension>org.apache.cxf.xjcplugins:cxf-xjc-dv:${cxf.xjc-utils.version}</extension>
+                            </extensions>
                         </configuration>
                         <goals>
                             <goal>xsdtojava</goal>

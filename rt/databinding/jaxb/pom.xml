@@ -54,6 +54,9 @@
                             <xsdOptions>
                                 <xsdOption>
                                     <xsd>${basedir}/src/test/resources/wsdl/jaxb/misc_test.xsd</xsd>
+                                    <extensionArgs>
+                                        <extensionArg>-Xdv:attributes</extensionArg>
+                                    </extensionArgs>
                                 </xsdOption>
                                 <xsdOption>
                                     <xsd>${basedir}/src/test/resources/wsdl/jaxb/form_test.xsd</xsd>
@@ -68,6 +71,9 @@
                                     <xsd>${basedir}/src/test/resources/wsdl/jaxb/rpc_lit.xsd</xsd>
                                 </xsdOption>
                             </xsdOptions>
+                            <extensions>
+                                <extension>org.apache.cxf.xjcplugins:cxf-xjc-dv:${cxf.xjc-utils.version}</extension>
+                            </extensions>
                         </configuration>
                         <goals>
                             <goal>xsdtojava-tests</goal>
