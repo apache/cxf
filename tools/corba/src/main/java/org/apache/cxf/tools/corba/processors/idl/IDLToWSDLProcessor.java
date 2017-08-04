@@ -386,12 +386,10 @@ public class IDLToWSDLProcessor extends IDLProcessor {
         if (token.countTokens() == 1) {
             if (env.get(ToolConstants.CFG_OUTPUTDIR) != null) {
                 return new File(outputDir + separator + ifile);
-            } else {
-                return new File(ifile);
             }
-        } else {
             return new File(ifile);
         }
+        return new File(ifile);
     }
 
     public Writer getOutputWriter(String filename, String outputDirectory) throws Exception {
@@ -401,19 +399,17 @@ public class IDLToWSDLProcessor extends IDLProcessor {
             String encoding = env.get(ToolCorbaConstants.CFG_WSDL_ENCODING).toString();
             return new FileWriterUtil()
                 .getWriter(new File(outputDirectory, filename), encoding);
-        } else {
-            FileWriterUtil fw = new FileWriterUtil(outputDirectory, null);
-            return fw.getWriter("", filename);
         }
+        FileWriterUtil fw = new FileWriterUtil(outputDirectory, null);
+        return fw.getWriter("", filename);
     }
 
     public Writer getOutputWriter(File file) throws Exception {
         if (env.optionSet(ToolCorbaConstants.CFG_WSDL_ENCODING)) {
             String encoding = env.get(ToolCorbaConstants.CFG_WSDL_ENCODING).toString();
             return new FileWriterUtil().getWriter(file, encoding);
-        } else {
-            return new FileWriterUtil().getWriter(file, StandardCharsets.UTF_8.name());
         }
+        return new FileWriterUtil().getWriter(file, StandardCharsets.UTF_8.name());
     }
 
     public String getBaseFilename(String ifile) {

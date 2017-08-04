@@ -33,6 +33,8 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.blueprint.AbstractBPBeanDefinitionParser;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.EndpointImpl;
+import org.osgi.service.blueprint.reflect.BeanMetadata;
+import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 
 class EndpointDefinitionParser extends AbstractBPBeanDefinitionParser {
@@ -76,7 +78,7 @@ class EndpointDefinitionParser extends AbstractBPBeanDefinitionParser {
             String pre = node.getPrefix();
             String name = node.getLocalName();
             if ("createdFromAPI".equals(name) || "abstract".equals(name)) {
-                cxfBean.setScope(MutableBeanMetadata.SCOPE_PROTOTYPE);
+                cxfBean.setScope(BeanMetadata.SCOPE_PROTOTYPE);
                 isAbstract = true;
             } else if ("publish".equals(name)) {
                 publish = Boolean.parseBoolean(val);
@@ -136,7 +138,7 @@ class EndpointDefinitionParser extends AbstractBPBeanDefinitionParser {
             cxfBean.setDestroyMethod("stop");
         }
         // We don't want to delay the registration of our Server
-        cxfBean.setActivation(MutableBeanMetadata.ACTIVATION_EAGER);
+        cxfBean.setActivation(ComponentMetadata.ACTIVATION_EAGER);
         return cxfBean;
     }
 }

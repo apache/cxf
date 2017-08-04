@@ -58,9 +58,8 @@ public final class WsdlOptionLoader {
         WsdlOption option = new WsdlOption();
         if (WsdlUtilities.fillWsdlOptionFromArtifact(option, artifact, outputDir)) {
             return option;
-        } else {
-            return null;
         }
+        return null;
     }
 
     /**

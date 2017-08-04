@@ -38,7 +38,6 @@ import javax.xml.ws.WebServiceProvider;
 import javax.xml.ws.soap.Addressing;
 import javax.xml.xpath.XPathConstants;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.BusFactory;
@@ -107,7 +106,7 @@ public class Server extends AbstractBusTestServerBase {
             //CHECK the incoming
             Element el;
             try {
-                el = ((Document)StaxUtils.read(obj)).getDocumentElement();
+                el = StaxUtils.read(obj).getDocumentElement();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -140,7 +139,7 @@ public class Server extends AbstractBusTestServerBase {
 
             Element el;
             try {
-                el = ((Document)StaxUtils.read(obj)).getDocumentElement();
+                el = StaxUtils.read(obj).getDocumentElement();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

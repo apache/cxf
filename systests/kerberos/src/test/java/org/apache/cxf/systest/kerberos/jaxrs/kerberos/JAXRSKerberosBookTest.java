@@ -27,7 +27,7 @@ import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.security.KerberosAuthOutInterceptor;
 import org.apache.cxf.systest.kerberos.common.SecurityTestUtil;
-import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.cxf.transport.http.auth.HttpAuthHeader;
 import org.apache.cxf.transport.http.auth.SpnegoAuthSupplier;
 import org.apache.directory.server.core.integ.AbstractLdapTestUnit;
@@ -93,14 +93,14 @@ public class JAXRSKerberosBookTest extends AbstractLdapTestUnit {
             "Server failed to launch",
             // run the server in the same process
             // set this to false to fork
-            AbstractBusClientServerTestBase.launchServer(BookKerberosServer.class, true)
+            AbstractClientServerTestBase.launchServer(BookKerberosServer.class, true)
         );
     }
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
-        AbstractBusClientServerTestBase.stopAllServers();
+        AbstractClientServerTestBase.stopAllServers();
         if (kerbyServer != null) {
             kerbyServer.stop();
         }

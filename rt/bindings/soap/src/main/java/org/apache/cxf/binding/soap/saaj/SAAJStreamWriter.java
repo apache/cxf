@@ -83,9 +83,8 @@ public final class SAAJStreamWriter extends OverlayW3CDOMStreamWriter {
                     Iterator<String> it = new W3CNamespaceContext((Element)nd).getPrefixes(nsuri);
                     if (it.hasNext()) {
                         return it.next();
-                    } else {
-                        nd = null;
                     }
+                    nd = null;
                 } else {
                     nd = nd.getNextSibling();
                 }
@@ -219,7 +218,7 @@ public final class SAAJStreamWriter extends OverlayW3CDOMStreamWriter {
                     el = ((SOAPElement)cur).addChildElement(local, "", "");
                 } else {
                     el = ((SOAPElement)cur).addChildElement(local, pfx == null ? "" : pfx, ns);
-                    adjustPrefix((SOAPElement)el, pfx);
+                    adjustPrefix(el, pfx);
                 }
                 cur.removeChild(el);
                 return el;

@@ -366,21 +366,20 @@ public class OperationVisitor extends VisitorBase {
         if (node.getType() == IDLTokenTypes.LITERAL_void) {
             // nothing to do here, move along
             return;
-        } else {
-            ParamTypeSpecVisitor visitor = new ParamTypeSpecVisitor(getScope(),
-                                                                    definition,
-                                                                    schema,
-                                                                    wsdlVisitor);
-
-            visitor.visit(node);
-
-            XmlSchemaType schemaType = visitor.getSchemaType();
-            CorbaTypeImpl corbaType = visitor.getCorbaType();
-            Scope fqName = visitor.getFullyQualifiedName();
-
-            addElement(outputWrappingSequence, schemaType, fqName, RETURN_PARAMETER);
-            addCorbaReturn(corbaType, fqName, RETURN_PARAMETER);
         }
+        ParamTypeSpecVisitor visitor = new ParamTypeSpecVisitor(getScope(),
+                                                                definition,
+                                                                schema,
+                                                                wsdlVisitor);
+
+        visitor.visit(node);
+
+        XmlSchemaType schemaType = visitor.getSchemaType();
+        CorbaTypeImpl corbaType = visitor.getCorbaType();
+        Scope fqName = visitor.getFullyQualifiedName();
+
+        addElement(outputWrappingSequence, schemaType, fqName, RETURN_PARAMETER);
+        addCorbaReturn(corbaType, fqName, RETURN_PARAMETER);
     }
 
     private void addCorbaReturn(CorbaTypeImpl corbaType, Scope fqName, String partName) {

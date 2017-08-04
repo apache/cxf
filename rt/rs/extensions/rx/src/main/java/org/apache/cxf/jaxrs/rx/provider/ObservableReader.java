@@ -52,7 +52,7 @@ public class ObservableReader<T> implements MessageBodyReader<Observable<T>> {
         @SuppressWarnings("unchecked")
         Class<T> actualCls = (Class<T>)InjectionUtils.getActualType(t);
         final MessageBodyReader<T> mbr =
-            (MessageBodyReader<T>)providers.getMessageBodyReader(actualCls, actualCls, anns, mt);
+            providers.getMessageBodyReader(actualCls, actualCls, anns, mt);
         if (mbr == null) {
             throw new ProcessingException("MBR is null");
         }

@@ -20,7 +20,7 @@ package org.apache.cxf.rs.security.oidc.utils;
 
 import java.util.List;
 
-import org.apache.cxf.rs.security.oidc.common.UserInfo;
+import org.apache.cxf.rs.security.oidc.common.AbstractUserInfo;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -39,7 +39,7 @@ public class OidcUtilsTest extends Assert {
         List<String> claims = OidcUtils.getScopeClaims(OidcUtils.PHONE_SCOPE);
         assertNotNull(claims);
         assertEquals(1, claims.size());
-        assertEquals(UserInfo.PHONE_CLAIM, claims.get(0));
+        assertEquals(AbstractUserInfo.PHONE_CLAIM, claims.get(0));
     }
     
     @Test

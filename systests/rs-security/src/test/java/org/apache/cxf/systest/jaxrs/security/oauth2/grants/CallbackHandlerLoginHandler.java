@@ -28,7 +28,7 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.grants.owner.ResourceOwnerLoginHandler;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.UsernameToken;
@@ -50,7 +50,7 @@ public class CallbackHandlerLoginHandler implements ResourceOwnerLoginHandler {
     public UserSubject createSubject(Client client, String user, String pass) {
         Document doc = DOMUtils.createDocument();
         UsernameToken token = new UsernameToken(false, doc,
-                                                WSConstants.PASSWORD_TEXT);
+                                                WSS4JConstants.PASSWORD_TEXT);
         token.setName(user);
         token.setPassword(pass);
 

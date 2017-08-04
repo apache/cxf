@@ -114,9 +114,8 @@ public class XMLSource {
             Node node = (Node)obj;
             if (cls.isPrimitive() || cls == String.class) {
                 return (T)readPrimitiveValue(node, cls);
-            } else {
-                return readNode(node, cls);
             }
+            return readNode(node, cls);
         }
         return cls.cast(evaluate(expression, namespaces, XPathConstants.STRING));
     }
@@ -348,9 +347,8 @@ public class XMLSource {
         if (String.class == cls) {
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 return StaxUtils.toString((Element)node);
-            } else {
-                return cls.cast(node.getNodeValue());
             }
+            return cls.cast(node.getNodeValue());
         }
 
         return InjectionUtils.convertStringToPrimitive(node.getNodeValue(), cls);
@@ -379,9 +377,8 @@ public class XMLSource {
             try {
                 if (cls.getAnnotation(XmlRootElement.class) != null) {
                     return cls.cast(u.unmarshal(s));
-                } else {
-                    return u.unmarshal(s, cls).getValue();
                 }
+                return u.unmarshal(s, cls).getValue();
             } finally {
                 JAXBUtils.closeUnmarshaller(u);
             }

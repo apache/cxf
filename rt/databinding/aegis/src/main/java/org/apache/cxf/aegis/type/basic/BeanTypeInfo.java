@@ -237,9 +237,8 @@ public class BeanTypeInfo {
     protected QName createMappedName(PropertyDescriptor desc, boolean qualified) {
         if (qualified) {
             return new QName(getDefaultNamespace(), desc.getName());
-        } else {
-            return new QName(null, desc.getName());
         }
+        return new QName(null, desc.getName());
     }
 
     public void mapAttribute(String property, QName mappedName) {

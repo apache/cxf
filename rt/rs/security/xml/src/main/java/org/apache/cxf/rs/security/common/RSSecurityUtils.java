@@ -63,7 +63,7 @@ public final class RSSecurityUtils {
         Object signatureProperties =
             SecurityUtils.getSecurityPropertyValue(SecurityConstants.SIGNATURE_PROPERTIES, m);
 
-        return "POST".equals((String)requestMessage.get(Message.HTTP_REQUEST_METHOD))
+        return "POST".equals(requestMessage.get(Message.HTTP_REQUEST_METHOD))
             && encryptionProperties != null && signatureProperties != null;
     }
 

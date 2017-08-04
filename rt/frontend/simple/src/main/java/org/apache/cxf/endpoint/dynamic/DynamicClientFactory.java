@@ -48,6 +48,7 @@ import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.util.StreamReaderDelegate;
@@ -73,6 +74,7 @@ import com.sun.tools.xjc.reader.internalizer.InternalizationLogic;
 
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.CXFBusFactory;
 import org.apache.cxf.catalog.OASISCatalogManager;
 import org.apache.cxf.catalog.OASISCatalogManagerHelper;
@@ -174,7 +176,7 @@ public class DynamicClientFactory {
      * @see CXFBusFactory#getDefaultBus()
      */
     public static DynamicClientFactory newInstance() {
-        Bus bus = CXFBusFactory.getThreadDefaultBus();
+        Bus bus = BusFactory.getThreadDefaultBus();
         return new DynamicClientFactory(bus);
     }
 
@@ -1033,7 +1035,7 @@ public class DynamicClientFactory {
 
         public int next() throws XMLStreamException {
             int i = super.next();
-            if (i == XMLStreamReader.START_ELEMENT) {
+            if (i == XMLStreamConstants.START_ELEMENT) {
                 QName qn = super.getName();
                 isInclude = qn.equals(WSDLConstants.QNAME_SCHEMA_INCLUDE);
                 isImport = qn.equals(WSDLConstants.QNAME_SCHEMA_IMPORT);
@@ -1051,7 +1053,7 @@ public class DynamicClientFactory {
 
         public int nextTag() throws XMLStreamException {
             int i = super.nextTag();
-            if (i == XMLStreamReader.START_ELEMENT) {
+            if (i == XMLStreamConstants.START_ELEMENT) {
                 QName qn = super.getName();
                 isInclude = qn.equals(WSDLConstants.QNAME_SCHEMA_INCLUDE);
                 isImport = qn.equals(WSDLConstants.QNAME_SCHEMA_IMPORT);

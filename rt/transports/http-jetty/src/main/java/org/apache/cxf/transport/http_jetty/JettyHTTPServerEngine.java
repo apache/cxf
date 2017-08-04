@@ -809,7 +809,7 @@ public class JettyHTTPServerEngine implements ServerEngine {
     }
 
     private ThreadPool getThreadPool() {
-        ThreadPool pool = (ThreadPool)server.getThreadPool();
+        ThreadPool pool = server.getThreadPool();
         if (pool == null) {
             pool = new QueuedThreadPool();
             try {

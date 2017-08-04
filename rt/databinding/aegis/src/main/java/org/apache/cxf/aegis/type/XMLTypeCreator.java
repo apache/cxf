@@ -233,9 +233,8 @@ public class XMLTypeCreator extends AbstractTypeCreator {
         Element mapping = findMapping(javaType);
         if (mapping != null) {
             return super.isEnum(javaType);
-        } else {
-            return nextCreator.isEnum(javaType);
         }
+        return nextCreator.isEnum(javaType);
     }
 
     @Override
@@ -243,9 +242,8 @@ public class XMLTypeCreator extends AbstractTypeCreator {
         Element mapping = findMapping(info.getType());
         if (mapping != null) {
             return super.createEnumType(info);
-        } else {
-            return nextCreator.createEnumType(info);
         }
+        return nextCreator.createEnumType(info);
     }
 
     @Override
@@ -406,9 +404,8 @@ public class XMLTypeCreator extends AbstractTypeCreator {
             type.setTypeMapping(getTypeMapping());
 
             return type;
-        } else {
-            return nextCreator.createDefaultType(info);
         }
+        return nextCreator.createDefaultType(info);
     }
 
     @Override
@@ -640,9 +637,8 @@ public class XMLTypeCreator extends AbstractTypeCreator {
             }
 
             return loadComponentClass(className);
-        } else {
-            return loadComponentClass(componentType);
         }
+        return loadComponentClass(componentType);
     }
 
     private Class<?> loadComponentClass(String componentType) {

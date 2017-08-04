@@ -168,9 +168,8 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
                     return new MediaType(MediaType.MEDIA_TYPE_WILDCARD,
                                          MediaType.MEDIA_TYPE_WILDCARD,
                                          parameters);
-                } else {
-                    return MediaType.WILDCARD_TYPE;
                 }
+                return MediaType.WILDCARD_TYPE;
 
             }
         }
@@ -187,8 +186,7 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
             }
             LOG.fine("Converting a malformed media type '" + mType + "' to '" + typeToString(mt) + "'");
             return mt;
-        } else {
-            throw new IllegalArgumentException("Media type separator is missing");
         }
+        throw new IllegalArgumentException("Media type separator is missing");
     }
 }

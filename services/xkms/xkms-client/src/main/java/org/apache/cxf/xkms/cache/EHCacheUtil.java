@@ -64,7 +64,7 @@ public final class EHCacheUtil {
         if (cc == null) {
             cc = new CacheConfiguration();
         } else {
-            cc = (CacheConfiguration)cc.clone();
+            cc = cc.clone();
         }
         cc.setName(key);
         return cc;

@@ -140,7 +140,7 @@ public abstract class AbstractSpnegoAuthSupplier {
         }
 
         try {
-            return (byte[])Subject.doAs(subject, new CreateServiceTicketAction(context, token));
+            return Subject.doAs(subject, new CreateServiceTicketAction(context, token));
         } catch (PrivilegedActionException e) {
             if (e.getCause() instanceof GSSException) {
                 throw (GSSException) e.getCause();

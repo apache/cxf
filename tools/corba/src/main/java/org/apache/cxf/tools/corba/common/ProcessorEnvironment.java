@@ -79,9 +79,8 @@ public class ProcessorEnvironment {
     public Object get(String key, Object defaultValue) {
         if (!optionSet(key)) {
             return defaultValue;
-        } else {
-            return get(key);
         }
+        return get(key);
     }
 
     public boolean getBooleanValue(String key, String defaultValue) {
@@ -145,9 +144,8 @@ public class ProcessorEnvironment {
     public String mapPackageName(String ns) {
         if (hasNamespace(ns)) {
             return mapNamespaceToPackageName(ns);
-        } else {
-            return getPackageName();
         }
+        return getPackageName();
     }
 
     public String getCustomizedNS(String ns) {

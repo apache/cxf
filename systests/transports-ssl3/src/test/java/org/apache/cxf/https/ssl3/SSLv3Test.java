@@ -33,6 +33,7 @@ import javax.net.ssl.TrustManagerFactory;
 import javax.xml.ws.BindingProvider;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -73,8 +74,8 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
         URL busFile = SSLv3Test.class.getResource("sslv3-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         System.setProperty("https.protocols", "SSLv3");
 
@@ -121,8 +122,8 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
         URL busFile = SSLv3Test.class.getResource("sslv3-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         System.setProperty("https.protocols", "SSLv3");
 
@@ -160,8 +161,8 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
         URL busFile = SSLv3Test.class.getResource("sslv3-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
@@ -188,8 +189,8 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
         URL busFile = SSLv3Test.class.getResource("sslv3-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
@@ -224,8 +225,8 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
         URL busFile = SSLv3Test.class.getResource("sslv3-client-allow.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
@@ -252,8 +253,8 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
         URL busFile = SSLv3Test.class.getResource("sslv3-client-allow.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
@@ -283,8 +284,8 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
         URL busFile = SSLv3Test.class.getResource("sslv3-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
@@ -311,8 +312,8 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
         URL busFile = SSLv3Test.class.getResource("sslv3-client-allow.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);

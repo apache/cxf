@@ -231,6 +231,7 @@ public class ManagedConnectionFactoryImplTest extends Assert {
         assertEquals("init was called once", 1, mcit.initCalledCount);
     }
 
+    @SuppressWarnings("cast")
     @Test
     public void testCreateManagedConnection() throws Exception {
         ManagedConnectionFactoryImplTester mcit = new ManagedConnectionFactoryImplTester();

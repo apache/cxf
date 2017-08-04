@@ -42,6 +42,7 @@ import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.MessageTrustDecider;
 import org.apache.cxf.transport.http.auth.HttpAuthSupplier;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
+import org.osgi.service.blueprint.reflect.BeanMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 
 public class HttpConduitBPBeanDefinitionParser extends AbstractBPBeanDefinitionParser {
@@ -56,7 +57,7 @@ public class HttpConduitBPBeanDefinitionParser extends AbstractBPBeanDefinitionP
         parseAttributes(element, context, bean);
         parseChildElements(element, context, bean);
 
-        bean.setScope(MutableBeanMetadata.SCOPE_PROTOTYPE);
+        bean.setScope(BeanMetadata.SCOPE_PROTOTYPE);
 
         return bean;
     }

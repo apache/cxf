@@ -539,7 +539,7 @@ public class ProviderFactoryTest extends Assert {
         Message m = new MessageImpl();
         Exchange ex = new ExchangeImpl();
         m.setExchange(ex);
-        m.put(ServerProviderFactory.IGNORE_TYPE_VARIABLES, true);
+        m.put(ProviderFactory.IGNORE_TYPE_VARIABLES, true);
         MessageBodyReader<Book> reader =
             pf.createMessageBodyReader(Book.class, Book.class, null, MediaType.APPLICATION_JSON_TYPE,
                                        m);

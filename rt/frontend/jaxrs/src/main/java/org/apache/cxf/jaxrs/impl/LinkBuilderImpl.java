@@ -67,9 +67,8 @@ public class LinkBuilderImpl implements Builder {
         if (!uri.isAbsolute() && baseUri != null && baseUri.isAbsolute()) {
             UriBuilder linkUriBuilder = UriBuilder.fromUri(baseUri);
             return HttpUtils.resolve(linkUriBuilder, uri);
-        } else {
-            return uri;
         }
+        return uri;
     }
 
     @Override
@@ -190,14 +189,13 @@ public class LinkBuilderImpl implements Builder {
             String rel = getRel();
             if (rel == null) {
                 return Collections.<String>emptyList();
-            } else {
-                String[] values = rel.split(" ");
-                List<String> rels = new ArrayList<>(values.length);
-                for (String val : values) {
-                    rels.add(val.trim());
-                }
-                return rels;
             }
+            String[] values = rel.split(" ");
+            List<String> rels = new ArrayList<>(values.length);
+            for (String val : values) {
+                rels.add(val.trim());
+            }
+            return rels;
         }
 
         @Override
@@ -256,9 +254,8 @@ public class LinkBuilderImpl implements Builder {
                 Link other = (Link)o;
                 return uri.equals(other.getUri())
                     && getParams().equals(other.getParams());
-            } else {
-                return false;
             }
+            return false;
         }
     }
 

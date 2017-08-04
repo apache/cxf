@@ -684,14 +684,13 @@ public class WSDLToCorbaHelper {
             if (itemType != null) {
                 return WSDLTypes.mapToSequence(name, checkPrefix(schematypeName),
                                            itemType.getQName(), null, 0, false);
-            } else {
-                // if the type of the simpleContent is a list with another simple type.
-                XmlSchemaType base = getSchemaType(ltype.getItemTypeName());
-                itemType = convertSchemaToCorbaType(base, base.getQName(), base, null, false);
-                if (itemType != null) {
-                    return WSDLTypes.mapToSequence(name, checkPrefix(schematypeName),
-                                                   itemType.getQName(), null, 0, false);
-                }
+            }
+            // if the type of the simpleContent is a list with another simple type.
+            XmlSchemaType base = getSchemaType(ltype.getItemTypeName());
+            itemType = convertSchemaToCorbaType(base, base.getQName(), base, null, false);
+            if (itemType != null) {
+                return WSDLTypes.mapToSequence(name, checkPrefix(schematypeName),
+                                               itemType.getQName(), null, 0, false);
             }
         } else if (stype.getContent() == null) {
             // elements primitive type
@@ -846,13 +845,12 @@ public class WSDLToCorbaHelper {
         }
         if (schemaType != null) {
             return schemaType;
-        } else {
-            for (XmlSchemaExternal extSchema : xmlSchema.getExternals()) {
-                if (!(extSchema instanceof XmlSchemaImport)) {
-                    schemaType = findTypeInSchema(extSchema.getSchema(), typeName);
-                    if (schemaType != null) {
-                        return schemaType;
-                    }
+        }
+        for (XmlSchemaExternal extSchema : xmlSchema.getExternals()) {
+            if (!(extSchema instanceof XmlSchemaImport)) {
+                schemaType = findTypeInSchema(extSchema.getSchema(), typeName);
+                if (schemaType != null) {
+                    return schemaType;
                 }
             }
         }
@@ -933,18 +931,15 @@ public class WSDLToCorbaHelper {
                         + minOccurs + ":maxOccurs=" + maxOccurs;
                     LOG.log(Level.WARNING, msg);
                     return null;
-                } else {
-                    return WSDLTypes.mapToArray(name, checkPrefix(schematypeName), arrayType,
-                                                elName, max, anonymous);
                 }
-            } else {
                 return WSDLTypes.mapToArray(name, checkPrefix(schematypeName), arrayType,
                                             elName, max, anonymous);
             }
-        } else {
-            return WSDLTypes.mapToSequence(name, checkPrefix(schematypeName), arrayType,
-                                           elName, max, anonymous);
+            return WSDLTypes.mapToArray(name, checkPrefix(schematypeName), arrayType,
+                                        elName, max, anonymous);
         }
+        return WSDLTypes.mapToSequence(name, checkPrefix(schematypeName), arrayType,
+                                       elName, max, anonymous);
     }
 
 
@@ -1568,9 +1563,8 @@ public class WSDLToCorbaHelper {
                 return new QName(name.getNamespaceURI(),
                                  name.getLocalPart(),
                                  prefix);
-            } else {
-                return null;
             }
+            return null;
         }
 
         return name;

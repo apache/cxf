@@ -117,25 +117,25 @@ public class Log4jLogger extends AbstractDelegatingLogger {
     private Level fromL4J(org.apache.log4j.Level l) {
         Level l2 = null;
         switch (l.toInt()) {
-        case org.apache.log4j.Level.ALL_INT:
+        case org.apache.log4j.Priority.ALL_INT:
             l2 = Level.ALL;
             break;
-        case org.apache.log4j.Level.FATAL_INT:
+        case org.apache.log4j.Priority.FATAL_INT:
             l2 = Level.SEVERE;
             break;
-        case org.apache.log4j.Level.ERROR_INT:
+        case org.apache.log4j.Priority.ERROR_INT:
             l2 = Level.SEVERE;
             break;
-        case org.apache.log4j.Level.WARN_INT:
+        case org.apache.log4j.Priority.WARN_INT:
             l2 = Level.WARNING;
             break;
-        case org.apache.log4j.Level.INFO_INT:
+        case org.apache.log4j.Priority.INFO_INT:
             l2 = Level.INFO;
             break;
-        case org.apache.log4j.Level.DEBUG_INT:
+        case org.apache.log4j.Priority.DEBUG_INT:
             l2 = Level.FINE;
             break;
-        case org.apache.log4j.Level.OFF_INT:
+        case org.apache.log4j.Priority.OFF_INT:
             l2 = Level.OFF;
             break;
         default:

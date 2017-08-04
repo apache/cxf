@@ -73,8 +73,8 @@ public class UndertowHTTPServerEngineFactoryHolder {
             Element element = StaxUtils.read(new StringReader(parsedElement)).getDocumentElement();
 
             UndertowHTTPServerEngineFactoryConfigType config
-                = (UndertowHTTPServerEngineFactoryConfigType) getJaxbObject(element,
-                    UndertowHTTPServerEngineFactoryConfigType.class);
+                = getJaxbObject(element,
+                UndertowHTTPServerEngineFactoryConfigType.class);
 
             factory = new UndertowHTTPServerEngineFactory();
 

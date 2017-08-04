@@ -87,7 +87,7 @@ public final class SAMLUtils {
     }
 
     private static org.opensaml.saml.saml1.core.Subject getSaml1Subject(SamlAssertionWrapper assertionW) {
-        for (Statement stmt : ((org.opensaml.saml.saml1.core.Assertion)assertionW.getSaml1()).getStatements()) {
+        for (Statement stmt : assertionW.getSaml1().getStatements()) {
             org.opensaml.saml.saml1.core.Subject samlSubject = null;
             if (stmt instanceof AttributeStatement) {
                 AttributeStatement attrStmt = (AttributeStatement) stmt;

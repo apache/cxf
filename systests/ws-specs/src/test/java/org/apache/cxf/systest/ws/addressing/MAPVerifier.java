@@ -47,8 +47,8 @@ public class MAPVerifier extends AbstractPhaseInterceptor<Message> {
     public MAPVerifier() {
         super(Phase.POST_LOGICAL);
         mapProperties = new HashMap<>();
-        mapProperties.put(MAPTest.INBOUND_KEY, ADDRESSING_PROPERTIES_INBOUND);
-        mapProperties.put(MAPTest.OUTBOUND_KEY, ADDRESSING_PROPERTIES_OUTBOUND);
+        mapProperties.put(MAPTestBase.INBOUND_KEY, ADDRESSING_PROPERTIES_INBOUND);
+        mapProperties.put(MAPTestBase.OUTBOUND_KEY, ADDRESSING_PROPERTIES_OUTBOUND);
     }
 
     public void handleMessage(Message message) {
@@ -63,8 +63,8 @@ public class MAPVerifier extends AbstractPhaseInterceptor<Message> {
         boolean isOutbound = ContextUtils.isOutbound(message);
         String mapProperty =
             (String)mapProperties.get(isOutbound
-                                      ? MAPTest.OUTBOUND_KEY
-                                      : MAPTest.INBOUND_KEY);
+                                      ? MAPTestBase.OUTBOUND_KEY
+                                      : MAPTestBase.INBOUND_KEY);
         AddressingProperties maps =
             (AddressingProperties)message.get(mapProperty);
         if (maps == null) {
@@ -89,7 +89,7 @@ public class MAPVerifier extends AbstractPhaseInterceptor<Message> {
                 exposeAs = null;
             }
         }
-        verificationCache.put(MAPTest.verifyMAPs(maps, this));
+        verificationCache.put(MAPTestBase.verifyMAPs(maps, this));
     }
 
     private String getExpectedExposeAs(boolean remove) {

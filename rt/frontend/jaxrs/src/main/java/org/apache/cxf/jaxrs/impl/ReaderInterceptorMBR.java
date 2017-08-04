@@ -56,7 +56,7 @@ public class ReaderInterceptorMBR implements ReaderInterceptor {
     })
     @Override
     public Object aroundReadFrom(ReaderInterceptorContext c) throws IOException, WebApplicationException {
-        Class entityCls = (Class)c.getType();
+        Class entityCls = c.getType();
         Type entityType = c.getGenericType();
         MediaType entityMt = c.getMediaType();
         Annotation[] entityAnns = c.getAnnotations();

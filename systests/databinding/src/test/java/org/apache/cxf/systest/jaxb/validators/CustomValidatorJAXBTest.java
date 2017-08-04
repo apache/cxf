@@ -34,7 +34,7 @@ public class CustomValidatorJAXBTest extends AbstractJUnit4SpringContextTests {
 
     @Test
     public void cleanTest() {
-        HelloWorld client = (HelloWorld)applicationContext
+        HelloWorld client = applicationContext
                 .getBean("testClient", HelloWorld.class);
 
         PassedObject hi = client.sayHi(new PassedObject("John", "Doe"));
@@ -45,7 +45,7 @@ public class CustomValidatorJAXBTest extends AbstractJUnit4SpringContextTests {
 
     @Test
     public void sendNullTest() {
-        HelloWorld client = (HelloWorld)applicationContext
+        HelloWorld client = applicationContext
                 .getBean("testClient", HelloWorld.class);
 
         PassedObject hi = client.sayHi(new PassedObject());
@@ -56,7 +56,7 @@ public class CustomValidatorJAXBTest extends AbstractJUnit4SpringContextTests {
 
     @Test
     public void returnNullTest() {
-        HelloWorld client = (HelloWorld)applicationContext
+        HelloWorld client = applicationContext
                 .getBean("testClient", HelloWorld.class);
 
         PassedObject hi = client.returnNull(new PassedObject("John", "Doe"));

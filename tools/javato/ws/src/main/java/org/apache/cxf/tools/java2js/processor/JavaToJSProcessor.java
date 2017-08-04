@@ -184,9 +184,8 @@ public class JavaToJSProcessor implements Processor {
     protected String getBindingId() {
         if (isSOAP12()) {
             return WSDLConstants.NS_SOAP12;
-        } else {
-            return WSDLConstants.NS_SOAP11;
         }
+        return WSDLConstants.NS_SOAP11;
     }
 
     protected boolean isSOAP12() {

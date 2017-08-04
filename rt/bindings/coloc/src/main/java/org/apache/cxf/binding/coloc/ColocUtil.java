@@ -299,8 +299,7 @@ public final class ColocUtil {
         OperationInfo oi = message.getExchange().getBindingOperationInfo().getOperationInfo();
         if (MessageUtils.isOutbound(message)) {
             return oi.getOutput();
-        } else {
-            return oi.getInput();
         }
+        return oi.getInput();
     }
 }

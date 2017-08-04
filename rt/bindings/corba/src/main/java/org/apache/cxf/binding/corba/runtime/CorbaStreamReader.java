@@ -38,7 +38,7 @@ public class CorbaStreamReader implements XMLStreamReader {
 
     public CorbaStreamReader(CorbaTypeEventProducer evProducer) {
         eventProducer = evProducer;
-        currentState = XMLStreamReader.START_DOCUMENT;
+        currentState = XMLStreamConstants.START_DOCUMENT;
     }
 
     public QName getName() {
@@ -62,25 +62,25 @@ public class CorbaStreamReader implements XMLStreamReader {
     }
 
     public boolean hasNext() throws XMLStreamException {
-        if (currentState == XMLStreamReader.START_DOCUMENT) {
+        if (currentState == XMLStreamConstants.START_DOCUMENT) {
             return true;
         }
         boolean hasNextEvent = eventProducer.hasNext();
-        if (!hasNextEvent && currentState != XMLStreamReader.END_DOCUMENT) {
-            currentState = XMLStreamReader.END_DOCUMENT;
+        if (!hasNextEvent && currentState != XMLStreamConstants.END_DOCUMENT) {
+            currentState = XMLStreamConstants.END_DOCUMENT;
             hasNextEvent = true;
         }
         return hasNextEvent;
     }
 
     public int next() throws XMLStreamException {
-        if (currentState == XMLStreamReader.START_DOCUMENT) {
+        if (currentState == XMLStreamConstants.START_DOCUMENT) {
             currentState = 0;
-            return XMLStreamReader.START_DOCUMENT;
+            return XMLStreamConstants.START_DOCUMENT;
         }
         // ensure we catch end_document state
         hasNext();
-        if (currentState != XMLStreamReader.END_DOCUMENT) {
+        if (currentState != XMLStreamConstants.END_DOCUMENT) {
             currentState = eventProducer.next();
         }
         return currentState;

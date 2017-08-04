@@ -449,9 +449,8 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         if (accessType == XmlAccessType.NONE
             || accessType == XmlAccessType.PROPERTY) {
             return checkJaxbAnnotation(field.getAnnotations());
-        } else {
-            return true;
         }
+        return true;
     }
 
     /**

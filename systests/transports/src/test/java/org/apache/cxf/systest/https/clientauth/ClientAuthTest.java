@@ -31,6 +31,7 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManagerFactory;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -68,8 +69,8 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
         URL busFile = ClientAuthTest.class.getResource("client-auth.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
@@ -92,8 +93,8 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
         URL busFile = ClientAuthTest.class.getResource("client-auth-invalid.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
@@ -121,8 +122,8 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
         URL busFile = ClientAuthTest.class.getResource("client-no-auth.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
@@ -150,8 +151,8 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
         URL busFile = ClientAuthTest.class.getResource("client-auth-chain.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
@@ -174,8 +175,8 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
         URL busFile = ClientAuthTest.class.getResource("client-auth-invalid2.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
@@ -203,8 +204,8 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
         URL busFile = ClientAuthTest.class.getResource("client-auth-invalid2.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
@@ -232,8 +233,8 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
         URL busFile = ClientAuthTest.class.getResource("client-auth-invalid.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);

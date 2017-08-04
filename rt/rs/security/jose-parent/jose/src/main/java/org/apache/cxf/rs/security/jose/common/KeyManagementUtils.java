@@ -361,7 +361,7 @@ public final class KeyManagementUtils {
         // Initial chain validation, to be enhanced as needed
         try {
             X509CertSelector certSelect = new X509CertSelector();
-            certSelect.setCertificate((X509Certificate) inCerts.get(0));
+            certSelect.setCertificate(inCerts.get(0));
             PKIXBuilderParameters pbParams = new PKIXBuilderParameters(ks, certSelect);
             pbParams.addCertStore(CertStore.getInstance("Collection",
                                                         new CollectionCertStoreParameters(inCerts)));

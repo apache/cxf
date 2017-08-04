@@ -164,9 +164,8 @@ public class DefaultLogEventMapper {
         String query = safeGet(message, Message.QUERY_STRING);
         if (query != null) {
             return uri + "?" + query;
-        } else {
-            return uri;
         }
+        return uri;
     }
 
     private boolean isBinaryContent(Message message) {
@@ -221,9 +220,8 @@ public class DefaultLogEventMapper {
         boolean isOutbound = MessageUtils.isOutbound(message);
         if (isRequestor) {
             return isOutbound ? message : message.getExchange().getOutMessage();
-        } else {
-            return isOutbound ? message.getExchange().getInMessage() : message;
         }
+        return isOutbound ? message.getExchange().getInMessage() : message;
     }
 
     private String getRestOperationName(Message curMessage) {
@@ -273,16 +271,13 @@ public class DefaultLogEventMapper {
         if (isOutbound) {
             if (isFault) {
                 return EventType.FAULT_OUT;
-            } else {
-                return isRequestor ? EventType.REQ_OUT : EventType.RESP_OUT;
             }
-        } else {
-            if (isFault) {
-                return EventType.FAULT_IN;
-            } else {
-                return isRequestor ? EventType.RESP_IN : EventType.REQ_IN;
-            }
+            return isRequestor ? EventType.REQ_OUT : EventType.RESP_OUT;
         }
+        if (isFault) {
+            return EventType.FAULT_IN;
+        }
+        return isRequestor ? EventType.RESP_IN : EventType.REQ_IN;
     }
 
     /**
@@ -296,10 +291,9 @@ public class DefaultLogEventMapper {
         Object opName = message.getExchange().get("org.apache.cxf.resource.operation.name");
         if (opName == null) {
             return true;
-        } else {
-            Integer responseCode = (Integer)message.get(Message.RESPONSE_CODE);
-            return (responseCode != null) && (responseCode >= 400);
         }
+        Integer responseCode = (Integer)message.get(Message.RESPONSE_CODE);
+        return (responseCode != null) && (responseCode >= 400);
     }
 
     public void setEpInfo(Message message, final LogEvent event) {

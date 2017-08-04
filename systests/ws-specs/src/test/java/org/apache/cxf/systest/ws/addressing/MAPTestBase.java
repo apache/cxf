@@ -47,7 +47,7 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.addressing.ReferenceParametersType;
-import org.apache.cxf.ws.addressing.soap.VersionTransformer;
+import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
 import org.apache.hello_world_soap_http.BadRecordLitFault;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.NoSuchCodeLitFault;
@@ -277,8 +277,8 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
         try {
             // expect two MAPs instances versioned with 200408, i.e. for both
             // the partial and full responses
-            mapVerifier.expectedExposedAs.add(VersionTransformer.Names200408.WSA_NAMESPACE_NAME);
-            mapVerifier.expectedExposedAs.add(VersionTransformer.Names200408.WSA_NAMESPACE_NAME);
+            mapVerifier.expectedExposedAs.add(Names200408.WSA_NAMESPACE_NAME);
+            mapVerifier.expectedExposedAs.add(Names200408.WSA_NAMESPACE_NAME);
             String greeting = greeter.greetMe("versioning1");
             assertEquals("unexpected response received from service",
                          "Hello versioning1",

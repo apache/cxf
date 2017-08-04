@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.impl;
 
 import java.util.Date;
 
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
@@ -59,7 +60,7 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
         boolean isSecure = false;
         Date expires = null;
         boolean httpOnly = false;
-        int version = NewCookie.DEFAULT_VERSION;
+        int version = Cookie.DEFAULT_VERSION;
 
         String[] tokens = StringUtils.split(c, ";");
         for (String token : tokens) {
@@ -153,9 +154,8 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
             }
             buff.append('"');
             return buff.toString();
-        } else {
-            return value == null ? "" : value;
         }
+        return value == null ? "" : value;
     }
     static String maybeQuoteAll(String value) {
         return maybeQuote(TSPECIALS_ALL, value);

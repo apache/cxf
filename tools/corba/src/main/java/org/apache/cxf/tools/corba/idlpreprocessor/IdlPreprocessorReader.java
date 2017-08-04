@@ -143,9 +143,8 @@ public final class IdlPreprocessorReader extends Reader {
 
         if (buf.length() == 0) {
             return -1;
-        } else {
-            return buf.charAt(readPos++);
         }
+        return buf.charAt(readPos++);
     }
 
     private void fillBuffer() throws IOException {

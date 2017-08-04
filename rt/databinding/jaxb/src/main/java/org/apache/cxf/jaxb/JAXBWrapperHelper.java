@@ -57,9 +57,8 @@ public class JAXBWrapperHelper extends AbstractWrapperHelper {
         if ("javax.xml.bind.JAXBElement".equals(method.getReturnType().getCanonicalName())) {
             JAXBElement<?> je = (JAXBElement<?>)method.invoke(in);
             return je == null ? je : je.getValue();
-        } else {
-            return method.invoke(in);
         }
+        return method.invoke(in);
     }
 
     @Override

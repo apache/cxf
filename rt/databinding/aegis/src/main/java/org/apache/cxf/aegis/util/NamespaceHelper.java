@@ -318,12 +318,11 @@ public final class NamespaceHelper {
         int index = value.indexOf(':');
         if (index == -1) {
             return new QName(nc.getNamespaceURI(""), value, "");
-        } else {
-            String prefix = value.substring(0, index);
-            String localName = value.substring(index + 1);
-            String ns = nc.getNamespaceURI(prefix);
-            return new QName(ns, localName, prefix);
         }
+        String prefix = value.substring(0, index);
+        String localName = value.substring(index + 1);
+        String ns = nc.getNamespaceURI(prefix);
+        return new QName(ns, localName, prefix);
     }
 
     public static QName createQName(Element e, String value, String defaultNamespace) {

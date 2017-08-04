@@ -41,6 +41,7 @@ import java.util.logging.Logger;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.util.StreamReaderDelegate;
@@ -179,7 +180,7 @@ public class JAXBDataBinding implements DataBindingProfile {
 
         public int next() throws XMLStreamException {
             int i = super.next();
-            if (i == XMLStreamReader.START_ELEMENT) {
+            if (i == XMLStreamConstants.START_ELEMENT) {
                 QName qn = super.getName();
                 isInclude = qn.equals(WSDLConstants.QNAME_SCHEMA_INCLUDE);
                 isImport = qn.equals(WSDLConstants.QNAME_SCHEMA_IMPORT);
@@ -197,7 +198,7 @@ public class JAXBDataBinding implements DataBindingProfile {
 
         public int nextTag() throws XMLStreamException {
             int i = super.nextTag();
-            if (i == XMLStreamReader.START_ELEMENT) {
+            if (i == XMLStreamConstants.START_ELEMENT) {
                 QName qn = super.getName();
                 isInclude = qn.equals(WSDLConstants.QNAME_SCHEMA_INCLUDE);
                 isImport = qn.equals(WSDLConstants.QNAME_SCHEMA_IMPORT);
@@ -418,9 +419,8 @@ public class JAXBDataBinding implements DataBindingProfile {
                     msg.append(System.getProperty("line.separator"));
                     if (args.contains("-X")) {
                         throw new ToolException(pluginUsage, e);
-                    } else {
-                        msg.append(pluginUsage);
                     }
+                    msg.append(pluginUsage);
                 }
 
                 throw new ToolException(msg.toString(), e);
@@ -747,7 +747,7 @@ public class JAXBDataBinding implements DataBindingProfile {
         return new StreamReaderDelegate(reader) {
             public int next() throws XMLStreamException {
                 int i = super.next();
-                return i == XMLStreamReader.CDATA ? XMLStreamReader.CHARACTERS : i;
+                return i == XMLStreamConstants.CDATA ? XMLStreamConstants.CHARACTERS : i;
             }
         };
     }
@@ -993,9 +993,8 @@ public class JAXBDataBinding implements DataBindingProfile {
                         InputSource src = new InputSource(new StringReader(writer.toString()));
                         src.setSystemId(sc.getSourceURI());
                         return new LSInputSAXWrapper(src);
-                    } else {
-                        throw new ToolException("Schema not found for namespace: " + namespaceURI);
                     }
+                    throw new ToolException("Schema not found for namespace: " + namespaceURI);
                 }
                 return new LSInputSAXWrapper(new InputSource(s));
             }

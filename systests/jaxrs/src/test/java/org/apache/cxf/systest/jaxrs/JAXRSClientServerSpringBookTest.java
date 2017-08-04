@@ -265,7 +265,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         NodeList nd = doc.getChildNodes();
         for (int i = 0; i < nd.getLength(); i++) {
             Node n = nd.item(i);
-            if (n.getNodeType() == Document.PROCESSING_INSTRUCTION_NODE) {
+            if (n.getNodeType() == Node.PROCESSING_INSTRUCTION_NODE) {
                 String piData = ((ProcessingInstruction)n).getData();
                 int hRefStart = piData.indexOf("href=\"");
                 if (hRefStart > 0) {

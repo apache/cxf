@@ -146,7 +146,7 @@ public class SourceProviderTest extends Assert {
     private <T> T verifyRead(MessageBodyReader<T> p, Class<?> type) throws Exception {
         @SuppressWarnings("unchecked")
         Class<T> cls = (Class<T>)type;
-        return (T)p.readFrom(cls,
+        return p.readFrom(cls,
                    null, null, null, null,
                    new ByteArrayInputStream("<test/>".getBytes()));
     }

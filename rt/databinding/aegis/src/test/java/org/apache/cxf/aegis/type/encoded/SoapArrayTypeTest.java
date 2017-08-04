@@ -175,13 +175,13 @@ public class SoapArrayTypeTest extends AbstractEncodedTest {
         ElementReader reader = new ElementReader(getClass().getResourceAsStream("arrayStructs.xml"));
         Address[] addresses = (Address[]) createArrayType(Address[].class).readObject(reader, context);
         reader.getXMLStreamReader().close();
-        StructTypeTest.validateShippingAddress(addresses[0]);
-        StructTypeTest.validateBillingAddress(addresses[1]);
+        AbstractEncodedTest.validateShippingAddress(addresses[0]);
+        AbstractEncodedTest.validateBillingAddress(addresses[1]);
 
         // round trip tests
         addresses = readWriteReadRef("arrayStructs.xml", Address[].class);
-        StructTypeTest.validateShippingAddress(addresses[0]);
-        StructTypeTest.validateBillingAddress(addresses[1]);
+        AbstractEncodedTest.validateShippingAddress(addresses[0]);
+        AbstractEncodedTest.validateBillingAddress(addresses[1]);
     }
 
     @Test

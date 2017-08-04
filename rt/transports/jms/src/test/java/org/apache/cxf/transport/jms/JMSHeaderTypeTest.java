@@ -43,7 +43,7 @@ public class JMSHeaderTypeTest {
         JMSMessageHeadersType messageHeaders = JMSMessageHeadersType.from(message);
         Set<String> keys = messageHeaders.getPropertyKeys();
         Assert.assertEquals(1, keys.size());
-        assertEquals(TEST_VALUE, (String)messageHeaders.getProperty(org.apache.cxf.message.Message.RESPONSE_CODE));
+        assertEquals(TEST_VALUE, messageHeaders.getProperty(org.apache.cxf.message.Message.RESPONSE_CODE));
     }
     
     @Test

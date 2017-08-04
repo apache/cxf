@@ -111,7 +111,7 @@ public class JAXRSCdiResourceExtension implements Extension {
         } else if (event.getAnnotated().isAnnotationPresent(Provider.class)) {
             providerBeans.add(event.getBean());
         } else if (event.getBean().getTypes().contains(javax.ws.rs.core.Feature.class)) {
-            providerBeans.add((Bean< ? extends Feature >)event.getBean());
+            providerBeans.add(event.getBean());
         } else if (event.getBean().getTypes().contains(Feature.class)) {
             featureBeans.add((Bean< ? extends Feature >)event.getBean());
         } else if (CdiBusBean.CXF.equals(event.getBean().getName())

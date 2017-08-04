@@ -1274,7 +1274,7 @@ public class WadlGenerator implements ContainerRequestFilter {
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         transformerFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
         Transformer t = transformerFactory.newTemplates(new StreamSource(is)).newTransformer();
-        t.setParameter("base.path", (String)m.get("http.base.path"));
+        t.setParameter("base.path", m.get("http.base.path"));
         StringWriter stringWriter = new StringWriter();
         t.transform(source, new StreamResult(stringWriter));
         return stringWriter.toString();

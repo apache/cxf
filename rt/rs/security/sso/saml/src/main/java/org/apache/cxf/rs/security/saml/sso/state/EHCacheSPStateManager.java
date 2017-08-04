@@ -152,7 +152,7 @@ public class EHCacheSPStateManager implements SPStateManager {
         }
 
         int parsedTTL = (int)ttl;
-        if (ttl != (long)parsedTTL) {
+        if (ttl != parsedTTL) {
             // Fall back to 5 minutes if the default TTL is set incorrectly
             parsedTTL = 60 * 5;
         }
@@ -169,7 +169,7 @@ public class EHCacheSPStateManager implements SPStateManager {
         }
 
         int parsedTTL = (int)ttl;
-        if (ttl != (long)parsedTTL) {
+        if (ttl != parsedTTL) {
             // Fall back to 60 minutes if the default TTL is set incorrectly
             parsedTTL = 3600;
         }

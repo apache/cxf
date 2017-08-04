@@ -103,9 +103,8 @@ public class CXFConnectionParam {
     public int hashCode() {
         if (getServiceName() != null) {
             return getInterface().hashCode() ^ getServiceName().hashCode();
-        } else {
-            return getInterface().hashCode() ^ (getAddress() != null ? getAddress().hashCode() : 1);
         }
+        return getInterface().hashCode() ^ (getAddress() != null ? getAddress().hashCode() : 1);
     }
 
     public String toString() {
@@ -122,8 +121,7 @@ public class CXFConnectionParam {
     private boolean areEquals(Object obj1, Object obj2) {
         if (obj1 == null) {
             return null == obj2;
-        } else {
-            return obj1.equals(obj2);
         }
+        return obj1.equals(obj2);
     }
 }

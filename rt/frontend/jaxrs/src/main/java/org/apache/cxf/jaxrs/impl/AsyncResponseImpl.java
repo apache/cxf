@@ -265,9 +265,8 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
             cont.suspend(AsyncResponse.NO_TIMEOUT);
             initialSuspend = false;
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     @SuppressWarnings("resource") // Response that is built here shouldn't be closed here

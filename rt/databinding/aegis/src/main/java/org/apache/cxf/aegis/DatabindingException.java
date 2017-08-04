@@ -70,11 +70,10 @@ public class DatabindingException extends RuntimeException {
     public String getMessage() {
         if (getCause() == null || getCause() == this) {
             return getActualMessage();
-        } else {
-            return getActualMessage() + ". Nested exception is "
-                   + getCause().getClass().getName() + ": "
-                   + getCause().getMessage();
         }
+        return getActualMessage() + ". Nested exception is "
+               + getCause().getClass().getName() + ": "
+               + getCause().getMessage();
     }
 
     public String getActualMessage() {

@@ -142,9 +142,8 @@ public class JAXWSFrontEndProcessor implements Processor {
             Class<?> clz = (Class<?>)type;
             if (clz.isArray()) {
                 return clz.getComponentType().getName() + "[]";
-            } else {
-                return clz.getName();
             }
+            return clz.getName();
         } else if (type instanceof ParameterizedType) {
             return type.toString();
         } else if (type instanceof GenericArrayType) {

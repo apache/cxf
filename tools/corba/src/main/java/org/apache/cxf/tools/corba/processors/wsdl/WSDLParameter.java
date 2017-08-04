@@ -420,13 +420,12 @@ public final class WSDLParameter {
         }
         if (schemaElement != null) {
             return schemaElement;
-        } else {
-            for (XmlSchemaExternal ext : xmlSchema.getExternals()) {
-                if (!(ext instanceof XmlSchemaImport)) {
-                    schemaElement = findElement(ext.getSchema(), elName);
-                    if (schemaElement != null) {
-                        return schemaElement;
-                    }
+        }
+        for (XmlSchemaExternal ext : xmlSchema.getExternals()) {
+            if (!(ext instanceof XmlSchemaImport)) {
+                schemaElement = findElement(ext.getSchema(), elName);
+                if (schemaElement != null) {
+                    return schemaElement;
                 }
             }
         }
@@ -493,14 +492,13 @@ public final class WSDLParameter {
                                                                                 annotation, false);
         if (corbaTypeImpl == null) {
             throw new Exception("Couldn't convert schema type to corba type : " + typeName);
+        }
+        if (nill) {
+            QName qname = corbaTypeImpl.getQName();
+            idltype = wsdlToCorbaBinding.getHelper().createQNameCorbaNamespace(qname.getLocalPart()
+                                                                                   + "_nil");
         } else {
-            if (nill) {
-                QName qname = corbaTypeImpl.getQName();
-                idltype = wsdlToCorbaBinding.getHelper().createQNameCorbaNamespace(qname.getLocalPart()
-                                                                                       + "_nil");
-            } else {
-                idltype = corbaTypeImpl.getQName();
-            }
+            idltype = corbaTypeImpl.getQName();
         }
         return idltype;
     }

@@ -219,10 +219,9 @@ public class SAAJOutInterceptor extends AbstractSoapInterceptor {
                     if (e.getCause() instanceof ConnectException) {
                         throw new SoapFault(e.getCause().getMessage(), e,
                                             message.getVersion().getSender());
-                    } else {
-                        throw new SoapFault(new Message("SOAPEXCEPTION", BUNDLE, e.getMessage()), e,
-                                            message.getVersion().getSender());
                     }
+                    throw new SoapFault(new Message("SOAPEXCEPTION", BUNDLE, e.getMessage()), e,
+                                        message.getVersion().getSender());
                 }
             }
         }

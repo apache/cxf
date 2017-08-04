@@ -764,9 +764,9 @@ public class ClientImpl
             }
 
             String startingAfterInterceptorID = (String) message.get(
-                PhaseInterceptorChain.STARTING_AFTER_INTERCEPTOR_ID);
+                InterceptorChain.STARTING_AFTER_INTERCEPTOR_ID);
             String startingInterceptorID = (String) message.get(
-                PhaseInterceptorChain.STARTING_AT_INTERCEPTOR_ID);
+                InterceptorChain.STARTING_AT_INTERCEPTOR_ID);
             if (startingAfterInterceptorID != null) {
                 chain.doInterceptStartingAfter(message, startingAfterInterceptorID);
             } else if (startingInterceptorID != null) {

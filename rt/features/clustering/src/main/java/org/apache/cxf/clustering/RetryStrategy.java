@@ -53,10 +53,9 @@ public class RetryStrategy extends SequentialStrategy {
         // and then stay on the same address for maxNumberOfRetries
         if (++counter <= maxNumberOfRetries) {
             return true;
-        } else {
-            counter = 0;
-            return false;
         }
+        counter = 0;
+        return false;
     }
 
 

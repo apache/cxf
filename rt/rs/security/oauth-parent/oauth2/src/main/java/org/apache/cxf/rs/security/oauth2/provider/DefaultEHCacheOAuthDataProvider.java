@@ -174,7 +174,7 @@ public class DefaultEHCacheOAuthDataProvider extends AbstractOAuthDataProvider {
     protected static void putCacheValue(Ehcache cache, String key, Object value, long ttl) {
         Element element = new Element(key, value);
         int parsedTTL = (int)ttl;
-        if (ttl != (long)parsedTTL) {
+        if (ttl != parsedTTL) {
             throw new OAuthServiceException("Requested time to live can not be supported");
         }
         element.setTimeToLive(parsedTTL);

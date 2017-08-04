@@ -124,9 +124,8 @@ public final class ProcessorUtil {
     public static String resolvePartType(MessagePartInfo part, ToolContext env) {
         if (env != null) {
             return resolvePartType(part, env, false);
-        } else {
-            return resolvePartType(part);
         }
+        return resolvePartType(part);
     }
 
     public static String resolvePartType(MessagePartInfo part, ToolContext context, boolean fullName) {
@@ -135,9 +134,8 @@ public final class ProcessorUtil {
             String primitiveType = JAXBUtils.builtInTypeToJavaType(part.getTypeQName().getLocalPart());
             if (part.getTypeQName() != null &&  primitiveType != null) {
                 return primitiveType;
-            } else {
-                return resolvePartType(part);
             }
+            return resolvePartType(part);
         }
         String name = "";
         if (part.isElement()) {
@@ -172,9 +170,8 @@ public final class ProcessorUtil {
         String result = NameUtil.mangleNameToVariableName(vName);
         if (JavaUtils.isJavaKeyword(result)) {
             return KEYWORDS_PREFIX + result;
-        } else {
-            return result;
         }
+        return result;
     }
 
     public static String parsePackageName(String namespace, String defaultPackageName) {
@@ -190,27 +187,24 @@ public final class ProcessorUtil {
     public static String getAbsolutePath(String location) throws IOException {
         if (location.startsWith("http://")) {
             return location;
-        } else {
-            return new File(location).getAbsolutePath().replace('\\', '/');
         }
+        return new File(location).getAbsolutePath().replace('\\', '/');
 
     }
 
     public static URL getWSDLURL(String location) throws Exception {
         if (location.startsWith("http://")) {
             return new URL(location);
-        } else {
-            return new File(getAbsolutePath(location)).toURI().toURL();
         }
+        return new File(getAbsolutePath(location)).toURI().toURL();
     }
 
     public static String classNameToFilePath(String className) {
         String str;
         if (className.indexOf(".") < 0) {
             return className;
-        } else {
-            str = className.replaceAll("\\.", "/");
         }
+        str = className.replaceAll("\\.", "/");
         return str;
     }
 

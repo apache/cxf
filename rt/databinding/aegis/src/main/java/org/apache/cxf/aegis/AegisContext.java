@@ -179,9 +179,8 @@ public class AegisContext {
     public AegisType getRootType(Class<?> clazz) {
         if (rootClasses.contains(clazz)) {
             return typeMapping.getType(clazz);
-        } else {
-            return null;
         }
+        return null;
     }
 
     /**
@@ -193,9 +192,8 @@ public class AegisContext {
     public AegisType getRootType(QName schemaTypeName) {
         if (rootTypeQNames.contains(schemaTypeName)) {
             return typeMapping.getType(schemaTypeName);
-        } else {
-            return null;
         }
+        return null;
     }
 
     private Set<Class<?>> rootMappableClasses() {

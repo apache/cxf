@@ -129,10 +129,9 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
                 }
             }
             return values.toArray(new String[values.size()]);
-        } else {
-            String separator = getSeparator();
-            return StringUtils.split(c, separator);
         }
+        String separator = getSeparator();
+        return StringUtils.split(c, separator);
     }
 
     public String toString(CacheControl c) {
@@ -191,13 +190,12 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
             String f = i == token.length() + 1 ? "" : token.substring(i + 1);
             if (f.length() < 2 || !f.startsWith("\"") || !f.endsWith("\"")) {
                 return;
-            } else {
-                f = f.length() == 2 ? "" : f.substring(1, f.length() - 1);
-                if (f.length() > 0) {
-                    String[] values = StringUtils.split(f, ",");
-                    for (String v : values) {
-                        fields.add(v.trim());
-                    }
+            }
+            f = f.length() == 2 ? "" : f.substring(1, f.length() - 1);
+            if (f.length() > 0) {
+                String[] values = StringUtils.split(f, ",");
+                for (String v : values) {
+                    fields.add(v.trim());
                 }
             }
         }

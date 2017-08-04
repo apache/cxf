@@ -54,11 +54,13 @@ public class ConnectionFactoryImplTest extends Assert {
     }
 
     @Test
+    @SuppressWarnings("cast")
     public void testInstanceOfSerializable() throws Exception {
         assertTrue("Instance of Serializable", cf instanceof Serializable);
     }
 
     @Test
+    @SuppressWarnings("cast")
     public void testInstanceOfReferencable() throws Exception {
         assertTrue("Instance of Referenceable", cf instanceof Referenceable);
 

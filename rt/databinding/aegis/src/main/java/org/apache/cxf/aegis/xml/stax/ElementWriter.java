@@ -154,11 +154,10 @@ public class ElementWriter extends AbstractMessageWriter {
          */
         if ("".equals(qname.getPrefix())) {
             return new ElementWriter(writer, qname.getLocalPart(), qname.getNamespaceURI());
-        } else {
-            return new ElementWriter(writer, qname.getLocalPart(),
-                                     qname.getNamespaceURI(),
-                                     qname.getPrefix());
         }
+        return new ElementWriter(writer, qname.getLocalPart(),
+                                 qname.getNamespaceURI(),
+                                 qname.getPrefix());
     }
 
     public String getNamespace() {

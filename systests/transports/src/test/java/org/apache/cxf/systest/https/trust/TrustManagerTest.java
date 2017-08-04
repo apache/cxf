@@ -34,6 +34,7 @@ import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
@@ -82,8 +83,8 @@ public class TrustManagerTest extends AbstractBusClientServerTestBase {
         URL busFile = TrustManagerTest.class.getResource("client-trust.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
@@ -117,8 +118,8 @@ public class TrustManagerTest extends AbstractBusClientServerTestBase {
         URL busFile = TrustManagerTest.class.getResource("client-trust.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
@@ -156,8 +157,8 @@ public class TrustManagerTest extends AbstractBusClientServerTestBase {
         URL busFile = TrustManagerTest.class.getResource("client-trust.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
@@ -193,8 +194,8 @@ public class TrustManagerTest extends AbstractBusClientServerTestBase {
         URL busFile = TrustManagerTest.class.getResource("client-trust.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
@@ -235,8 +236,8 @@ public class TrustManagerTest extends AbstractBusClientServerTestBase {
         URL busFile = TrustManagerTest.class.getResource("client-trust.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);

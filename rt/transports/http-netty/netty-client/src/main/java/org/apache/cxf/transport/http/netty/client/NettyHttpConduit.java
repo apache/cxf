@@ -190,7 +190,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
             entity.createRequest(out.getOutBuffer());
             // TODO need to check how to set the Chunked feature
             //request.getRequest().setChunked(true);
-            entity.getRequest().headers().set(Message.CONTENT_TYPE, (String)message.get(Message.CONTENT_TYPE));
+            entity.getRequest().headers().set(Message.CONTENT_TYPE, message.get(Message.CONTENT_TYPE));
             return out;
         }
         return super.createOutputStream(message, needToCacheRequest, isChunking, chunkThreshold);
@@ -352,7 +352,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
                             session = sslHandler.engine().getSession();
                         }
                     } else {
-                        setException((Exception) future.cause());
+                        setException(future.cause());
                     }
                 }
             };

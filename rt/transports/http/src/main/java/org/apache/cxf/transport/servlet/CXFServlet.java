@@ -77,7 +77,7 @@ public class CXFServlet extends CXFNonSpringServlet
             String busParam = servletConfig.getInitParameter(BUS_PARAMETER);
             String busName = busParam == null ? "cxf" : busParam.trim();
 
-            setBus((Bus)wac.getBean(busName, Bus.class));
+            setBus(wac.getBean(busName, Bus.class));
         } else {
             busCreated = true;
             setBus(BusFactory.newInstance().createBus());

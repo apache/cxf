@@ -227,9 +227,8 @@ public class CorbaStreamOutEndingInterceptor extends AbstractPhaseInterceptor<Me
         MessagePartInfo part = msgInfo.getMessageParts().get(0);
         if (part.isElement()) {
             return part.getElementQName().getNamespaceURI();
-        } else {
-            return part.getName().getNamespaceURI();
         }
+        return part.getName().getNamespaceURI();
     }
 
 }

@@ -94,8 +94,7 @@ public class OptionGroup implements TokenConsumer {
     public String toString() {
         if (element.hasAttribute("id")) {
             return getId();
-        } else {
-            return super.toString();
         }
+        return super.toString();
     }
 }

@@ -703,11 +703,11 @@ public abstract class ProviderFactory {
             .getGenericInterfaces()[0]).getActualTypeArguments()[0];
         if (type == Object.class) {
             theProviderComparator =
-                (Comparator<?>)(new ProviderInfoClassComparator((Comparator<Object>)theProviderComparator));
+                new ProviderInfoClassComparator((Comparator<Object>)theProviderComparator);
         }
         List<T> theProviders = (List<T>)listOfProviders;
         Comparator<? super T> theComparator = (Comparator<? super T>)theProviderComparator;
-        Collections.sort((List<T>)theProviders, theComparator);
+        Collections.sort(theProviders, theComparator);
     }
 
     private void sortContextResolvers() {

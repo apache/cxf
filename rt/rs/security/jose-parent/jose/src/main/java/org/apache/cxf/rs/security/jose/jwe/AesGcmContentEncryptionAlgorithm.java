@@ -34,10 +34,10 @@ public class AesGcmContentEncryptionAlgorithm extends AbstractContentEncryptionA
         super(checkAlgorithm(algo), generateCekOnce);
     }
     public AesGcmContentEncryptionAlgorithm(String encodedCek, String encodedIv, ContentAlgorithm algo) {
-        this((byte[])CryptoUtils.decodeSequence(encodedCek), CryptoUtils.decodeSequence(encodedIv), algo);
+        this(CryptoUtils.decodeSequence(encodedCek), CryptoUtils.decodeSequence(encodedIv), algo);
     }
     public AesGcmContentEncryptionAlgorithm(String encodedCek, ContentAlgorithm algo) {
-        this((byte[])CryptoUtils.decodeSequence(encodedCek), null, algo);
+        this(CryptoUtils.decodeSequence(encodedCek), null, algo);
     }
     public AesGcmContentEncryptionAlgorithm(SecretKey key, ContentAlgorithm algo) {
         this(key, (byte[])null, algo);

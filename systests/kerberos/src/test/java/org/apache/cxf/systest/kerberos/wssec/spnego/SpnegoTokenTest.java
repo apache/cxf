@@ -26,9 +26,10 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.kerberos.common.SecurityTestUtil;
-import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.directory.server.core.integ.AbstractLdapTestUnit;
 import org.apache.kerby.kerberos.kerb.server.SimpleKdcServer;
@@ -100,21 +101,21 @@ public class SpnegoTokenTest extends AbstractLdapTestUnit {
             "Server failed to launch",
             // run the server in the same process
             // set this to false to fork
-            AbstractBusClientServerTestBase.launchServer(Server.class, true)
+            AbstractClientServerTestBase.launchServer(Server.class, true)
         );
 
         org.junit.Assert.assertTrue(
             "Server failed to launch",
             // run the server in the same process
             // set this to false to fork
-            AbstractBusClientServerTestBase.launchServer(StaxServer.class, true)
+            AbstractClientServerTestBase.launchServer(StaxServer.class, true)
         );
     }
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
-        AbstractBusClientServerTestBase.stopAllServers();
+        AbstractClientServerTestBase.stopAllServers();
         if (kerbyServer != null) {
             kerbyServer.stop();
         }
@@ -221,8 +222,8 @@ public class SpnegoTokenTest extends AbstractLdapTestUnit {
         URL busFile = SpnegoTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SpnegoTokenTest.class.getResource("DoubleItSpnego.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);

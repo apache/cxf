@@ -36,6 +36,7 @@ import org.apache.cxf.binding.soap.interceptor.Soap11FaultOutInterceptor.Soap11F
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.StaxUtils;
 
@@ -62,7 +63,7 @@ public class Soap12FaultOutInterceptor extends AbstractSoapInterceptor {
             super(Phase.MARSHAL);
         }
         public void handleMessage(SoapMessage message) throws Fault {
-            LOG.info(getClass() + (String) message.get(SoapMessage.CONTENT_TYPE));
+            LOG.info(getClass() + (String) message.get(Message.CONTENT_TYPE));
 
             XMLStreamWriter writer = message.getContent(XMLStreamWriter.class);
             Fault f = (Fault)message.getContent(Exception.class);

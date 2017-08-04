@@ -32,8 +32,7 @@ public class HttpClientSpanParser extends HttpClientParser {
     private String buildSpanDescription(final String path, final String method) {
         if (StringUtils.isEmpty(method)) {
             return path;
-        } else {
-            return method + " " + path;
         }
+        return method + " " + path;
     }
 }

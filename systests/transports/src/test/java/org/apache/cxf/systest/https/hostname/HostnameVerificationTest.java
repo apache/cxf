@@ -24,6 +24,7 @@ import java.net.URL;
 import javax.xml.ws.BindingProvider;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.hello_world.Greeter;
@@ -67,8 +68,8 @@ public class HostnameVerificationTest extends AbstractBusClientServerTestBase {
         URL busFile = HostnameVerificationTest.class.getResource("hostname-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
@@ -96,8 +97,8 @@ public class HostnameVerificationTest extends AbstractBusClientServerTestBase {
         URL busFile = HostnameVerificationTest.class.getResource("hostname-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
@@ -135,8 +136,8 @@ public class HostnameVerificationTest extends AbstractBusClientServerTestBase {
         URL busFile = HostnameVerificationTest.class.getResource("hostname-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
@@ -164,8 +165,8 @@ public class HostnameVerificationTest extends AbstractBusClientServerTestBase {
         URL busFile = HostnameVerificationTest.class.getResource("hostname-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);

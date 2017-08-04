@@ -29,6 +29,7 @@ import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
 import org.apache.cxf.configuration.blueprint.AbstractBPBeanDefinitionParser;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transports.http.configuration.HTTPServerPolicy;
+import org.osgi.service.blueprint.reflect.BeanMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 
 public class HttpDestinationBPBeanDefinitionParser extends AbstractBPBeanDefinitionParser {
@@ -51,7 +52,7 @@ public class HttpDestinationBPBeanDefinitionParser extends AbstractBPBeanDefinit
         parseAttributes(element, context, bean);
         parseChildElements(element, context, bean);
 
-        bean.setScope(MutableBeanMetadata.SCOPE_PROTOTYPE);
+        bean.setScope(BeanMetadata.SCOPE_PROTOTYPE);
 
         return bean;
     }

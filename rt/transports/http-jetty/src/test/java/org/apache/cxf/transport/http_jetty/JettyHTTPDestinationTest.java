@@ -772,10 +772,10 @@ public class JettyHTTPDestinationTest extends Assert {
                     bus, threadDefaultBus);
         assertNotNull("unexpected null message", inMessage);
         assertSame("unexpected HTTP request",
-                   inMessage.get(JettyHTTPDestination.HTTP_REQUEST),
+                   inMessage.get(AbstractHTTPDestination.HTTP_REQUEST),
                    request);
         assertSame("unexpected HTTP response",
-                   inMessage.get(JettyHTTPDestination.HTTP_RESPONSE),
+                   inMessage.get(AbstractHTTPDestination.HTTP_RESPONSE),
                    response);
         assertEquals("unexpected method",
                      inMessage.get(Message.HTTP_REQUEST_METHOD),
@@ -879,10 +879,10 @@ public class JettyHTTPDestinationTest extends Assert {
 
         if (oneway) {
             assertNull("unexpected HTTP response",
-                       outMsg.get(JettyHTTPDestination.HTTP_RESPONSE));
+                       outMsg.get(AbstractHTTPDestination.HTTP_RESPONSE));
         } else {
             assertNotNull("expected HTTP response",
-                           outMsg.get(JettyHTTPDestination.HTTP_RESPONSE));
+                           outMsg.get(AbstractHTTPDestination.HTTP_RESPONSE));
             responseOS.close();
         }
     }

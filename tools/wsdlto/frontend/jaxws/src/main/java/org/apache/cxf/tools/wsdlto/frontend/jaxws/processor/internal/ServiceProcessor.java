@@ -562,18 +562,17 @@ public class ServiceProcessor extends AbstractProcessor {
     private static String getJavaTypeForMimeType(MIMEPart mPart) {
         if (mPart.getExtensibilityElements().size() > 1) {
             return "javax.activation.DataHandler";
-        } else {
-            ExtensibilityElement extElement = (ExtensibilityElement)mPart.getExtensibilityElements().get(0);
-            if (extElement instanceof MIMEContent) {
-                MIMEContent mimeContent = (MIMEContent)extElement;
-                if ("image/jpeg".equals(mimeContent.getType()) || "image/gif".equals(mimeContent.getType())) {
-                    return "java.awt.Image";
-                } else if ("text/xml".equals(mimeContent.getType())
-                           || "application/xml".equals(mimeContent.getType())) {
-                    return "javax.xml.transform.Source";
-                }  else {
-                    return "javax.activation.DataHandler";
-                }
+        }
+        ExtensibilityElement extElement = (ExtensibilityElement)mPart.getExtensibilityElements().get(0);
+        if (extElement instanceof MIMEContent) {
+            MIMEContent mimeContent = (MIMEContent)extElement;
+            if ("image/jpeg".equals(mimeContent.getType()) || "image/gif".equals(mimeContent.getType())) {
+                return "java.awt.Image";
+            } else if ("text/xml".equals(mimeContent.getType())
+                       || "application/xml".equals(mimeContent.getType())) {
+                return "javax.xml.transform.Source";
+            }  else {
+                return "javax.activation.DataHandler";
             }
         }
         return "javax.activation.DataHandler";
@@ -763,9 +762,8 @@ public class ServiceProcessor extends AbstractProcessor {
         for (OperationInfo operation : service.getInterface().getOperations()) {
             if (operationName.equals(operation.getName()) && isIn) {
                 return operation.getInput();
-            } else {
-                return operation.getOutput();
             }
+            return operation.getOutput();
         }
         return null;
     }

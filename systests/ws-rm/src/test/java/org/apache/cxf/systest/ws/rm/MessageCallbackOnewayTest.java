@@ -391,7 +391,7 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
                     } catch (InterruptedException e) { /* ignored */ }
                 }
                 try {
-                    callbacks.wait((long)delay);
+                    callbacks.wait(delay);
                 } catch (InterruptedException e) { /* ignored */ }
                 if (callbacks.size() > count) {
                     fail("Expected " + count + " callbacks, got " + callbacks.size());

@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -107,9 +108,8 @@ public class RPCInInterceptor extends AbstractInDatabindingInterceptor {
                 // it's doc-lit-bare
                 new BareInInterceptor().handleMessage(message);
                 return;
-            } else {
-                setMessage(message, operation);
             }
+            setMessage(message, operation);
         } else {
             operation = message.getExchange().getBindingOperationInfo();
         }
@@ -140,7 +140,7 @@ public class RPCInInterceptor extends AbstractInDatabindingInterceptor {
                 if (qn.equals(SOAP12_RESULT)) {
                     //just ignore this.   The parts should work correctly.
                     try {
-                        while (xmlReader.getEventType() != XMLStreamReader.END_ELEMENT) {
+                        while (xmlReader.getEventType() != XMLStreamConstants.END_ELEMENT) {
                             xmlReader.next();
                         }
                         xmlReader.next();

@@ -115,7 +115,7 @@ public final class PersistenceUtils {
             MessageImpl msgImpl1 = new MessageImpl();
             msgImpl1.setContent(OutputStream.class, cos);
             msgImpl1.setAttachments(msg.getAttachments());
-            msgImpl1.put(Message.CONTENT_TYPE, (String) msg.get(Message.CONTENT_TYPE));
+            msgImpl1.put(Message.CONTENT_TYPE, msg.get(Message.CONTENT_TYPE));
             msgImpl1.setContent(InputStream.class, msgContent);
             AttachmentSerializer serializer = new AttachmentSerializer(msgImpl1);
             serializer.setXop(false);

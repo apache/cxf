@@ -127,7 +127,7 @@ public class JAXRSClientServerTikaTest extends AbstractBusClientServerTestBase {
 
     @SuppressWarnings("unchecked")
     private Collection<ScoreDoc> search(final String expression) {
-        return (Collection<ScoreDoc>)createWebClient("/catalog")
+        return createWebClient("/catalog")
             .accept(MediaType.APPLICATION_JSON)
             .query("$filter", expression)
             .get(Collection.class);

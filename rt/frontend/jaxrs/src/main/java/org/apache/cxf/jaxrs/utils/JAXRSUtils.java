@@ -1350,7 +1350,7 @@ public final class JAXRSUtils {
         } else {
             MessageBodyReader<?> provider = ((ReaderInterceptorMBR)readers.get(0)).getMBR();
             @SuppressWarnings("rawtypes")
-            Class cls = (Class)targetTypeClass;
+            Class cls = targetTypeClass;
             return provider.readFrom(
                       cls, parameterType, parameterAnnotations, mediaType,
                       new HttpHeadersImpl(m).getRequestHeaders(), is);

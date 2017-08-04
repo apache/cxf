@@ -134,21 +134,19 @@ public class WSDLToIDLAction {
                 String msgStr = "No bindings exists within this WSDL.";
                 org.apache.cxf.common.i18n.Message msg = new org.apache.cxf.common.i18n.Message(msgStr, LOG);
                 throw new Exception(msg.toString());
-            } else {
-                List<QName> portTypes = new ArrayList<>();
-                for (Binding binding : bindings) {
-                    List<?> ext = binding.getExtensibilityElements();
-                    if (!(ext.get(0) instanceof BindingType)) {
-                        continue;
-                    }
-                    if (portTypes.contains(binding.getPortType().getQName())) {
-                        continue;
-                    } else {
-                        portTypes.add(binding.getPortType().getQName());
-                    }
-                    generateIDL(def, binding);
-                    root = IdlRoot.create();
+            }
+            List<QName> portTypes = new ArrayList<>();
+            for (Binding binding : bindings) {
+                List<?> ext = binding.getExtensibilityElements();
+                if (!(ext.get(0) instanceof BindingType)) {
+                    continue;
                 }
+                if (portTypes.contains(binding.getPortType().getQName())) {
+                    continue;
+                }
+                portTypes.add(binding.getPortType().getQName());
+                generateIDL(def, binding);
+                root = IdlRoot.create();
             }
         }
         printWriter.close();
@@ -360,18 +358,16 @@ public class WSDLToIDLAction {
             if (defn != null) {
                 if (defn instanceof IdlType) {
                     return (IdlType)defn;
-                } else {
-                    String msgStr = local + " is an incorrect idltype.";
-                    org.apache.cxf.common.i18n.Message msg =
-                        new org.apache.cxf.common.i18n.Message(msgStr, LOG);
-                    throw new Exception(msg.toString());
                 }
-            } else {
-                try {
-                    idlType = createType(ntype, name, corbatypeImpl);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
+                String msgStr = local + " is an incorrect idltype.";
+                org.apache.cxf.common.i18n.Message msg =
+                    new org.apache.cxf.common.i18n.Message(msgStr, LOG);
+                throw new Exception(msg.toString());
+            }
+            try {
+                idlType = createType(ntype, name, corbatypeImpl);
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
         }
         return idlType;

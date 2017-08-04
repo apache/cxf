@@ -124,9 +124,8 @@ public final class JarLoader {
 
         if (name.indexOf("!/") != -1) {
             return name.substring(0, name.indexOf("!/"));
-        } else {
-            return name;
         }
+        return name;
     }
 
     private static void readArchive(String name) throws MalformedURLException, IOException {

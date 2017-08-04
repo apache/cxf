@@ -130,16 +130,15 @@ public class HttpHeadersImpl implements HttpHeaders {
         String separator = getCookieSeparatorFromProperty();
         if (separator != null) {
             return separator;
-        } else {
-            if (value.contains(DOLLAR_CHAR)
-                && (value.contains(COOKIE_VERSION_PARAM)
-                    || value.contains(COOKIE_PATH_PARAM)
-                    || value.contains(COOKIE_DOMAIN_PARAM))) {
-                return DEFAULT_SEPARATOR;
-            }
-
-            return DEFAULT_COOKIE_SEPARATOR;
         }
+        if (value.contains(DOLLAR_CHAR)
+            && (value.contains(COOKIE_VERSION_PARAM)
+                || value.contains(COOKIE_PATH_PARAM)
+                || value.contains(COOKIE_DOMAIN_PARAM))) {
+            return DEFAULT_SEPARATOR;
+        }
+
+        return DEFAULT_COOKIE_SEPARATOR;
     }
     private String getCookieSeparatorFromProperty() {
         Object cookiePropValue = message.getContextualProperty(COOKIE_SEPARATOR_PROPERTY);
@@ -152,9 +151,8 @@ public class HttpHeadersImpl implements HttpHeaders {
                 throw ExceptionUtils.toInternalServerErrorException(null, null);
             }
             return separator;
-        } else {
-            return null;
         }
+        return null;
     }
 
     public Locale getLanguage() {
@@ -177,9 +175,8 @@ public class HttpHeadersImpl implements HttpHeaders {
                 newHeaders.put(entry.getKey(), getRequestHeader(entry.getKey()));
             }
             return new MetadataMap<String, String>(Collections.unmodifiableMap(newHeaders), false);
-        } else {
-            return new MetadataMap<String, String>(Collections.unmodifiableMap(headers), false);
         }
+        return new MetadataMap<String, String>(Collections.unmodifiableMap(headers), false);
     }
 
     public List<Locale> getAcceptableLanguages() {
@@ -263,13 +260,12 @@ public class HttpHeadersImpl implements HttpHeaders {
             String[] ls = StringUtils.split(originalValue, sep);
             if (ls.length == 1) {
                 return Collections.singletonList(ls[0].trim());
-            } else {
-                List<String> newValues = new ArrayList<>();
-                for (String v : ls) {
-                    newValues.add(v.trim());
-                }
-                return newValues;
             }
+            List<String> newValues = new ArrayList<>();
+            for (String v : ls) {
+                newValues.add(v.trim());
+            }
+            return newValues;
         }
         if (originalValue.startsWith("\"") && originalValue.endsWith("\"")) {
             String actualValue = originalValue.length() == 2 ? ""

@@ -66,7 +66,7 @@ public class HTTPUndertowTransportActivator
 
     UndertowHTTPServerEngineFactory factory = new UndertowHTTPServerEngineFactory() {
         public MBeanServer getMBeanServer() {
-            return (MBeanServer)mbeanServerTracker.getService();
+            return mbeanServerTracker.getService();
         }
     };
 

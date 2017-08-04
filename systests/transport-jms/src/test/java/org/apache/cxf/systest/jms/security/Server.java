@@ -28,7 +28,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
-import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.common.ConfigurationConstants;
 
 public class Server extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(Server.class);
@@ -43,9 +43,9 @@ public class Server extends AbstractBusTestServerBase {
         setBus(bus);
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_SIGNED);
-        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new KeystorePasswordCallback());
-        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "bob.properties");
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SAML_TOKEN_SIGNED);
+        inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new KeystorePasswordCallback());
+        inProperties.put(ConfigurationConstants.SIG_VER_PROP_FILE, "bob.properties");
 
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
 

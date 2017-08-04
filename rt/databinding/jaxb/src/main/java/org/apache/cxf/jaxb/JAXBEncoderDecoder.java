@@ -266,9 +266,8 @@ public final class JAXBEncoderDecoder {
                 Message faultMessage = new Message("MARSHAL_ERROR", LOG, marshalEx.getLinkedException()
                     .getMessage());
                 throw new Fault(faultMessage, ex);
-            } else {
-                throw new Fault(new Message("MARSHAL_ERROR", LOG, ex.getMessage()), ex);
             }
+            throw new Fault(new Message("MARSHAL_ERROR", LOG, ex.getMessage()), ex);
         }
     }
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -312,9 +311,8 @@ public final class JAXBEncoderDecoder {
                 Message faultMessage = new Message("MARSHAL_ERROR", LOG, marshalEx.getLinkedException()
                     .getMessage());
                 throw new Fault(faultMessage, ex);
-            } else {
-                throw new Fault(new Message("MARSHAL_ERROR", LOG, ex.getMessage()), ex);
             }
+            throw new Fault(new Message("MARSHAL_ERROR", LOG, ex.getMessage()), ex);
         }
 
     }
@@ -346,9 +344,8 @@ public final class JAXBEncoderDecoder {
                 Message faultMessage = new Message("MARSHAL_ERROR", LOG, marshalEx.getLinkedException()
                     .getMessage());
                 throw new Fault(faultMessage, ex);
-            } else {
-                throw new Fault(new Message("MARSHAL_ERROR", LOG, ex.getMessage()), ex);
             }
+            throw new Fault(new Message("MARSHAL_ERROR", LOG, ex.getMessage()), ex);
         }
 
     }
@@ -526,7 +523,7 @@ public final class JAXBEncoderDecoder {
 
             XmlAccessType accessType = Utils.getXmlAccessType(cls);
             reader.nextTag();
-            while (reader.getEventType() == XMLStreamReader.START_ELEMENT) {
+            while (reader.getEventType() == XMLStreamConstants.START_ELEMENT) {
                 QName q = reader.getName();
                 String fieldName = q.getLocalPart();
                 Field f = Utils.getField(cls, accessType, fieldName);
@@ -598,7 +595,7 @@ public final class JAXBEncoderDecoder {
                         }
                     }
                 }
-                if (reader.getEventType() == XMLStreamReader.END_ELEMENT && q.equals(reader.getName())) {
+                if (reader.getEventType() == XMLStreamConstants.END_ELEMENT && q.equals(reader.getName())) {
                     reader.next();
                 }
             }
@@ -906,10 +903,9 @@ public final class JAXBEncoderDecoder {
                 if (unmarshalEx.getLinkedException() != null) {
                     throw new Fault(new Message("UNMARSHAL_ERROR", LOG,
                                             unmarshalEx.getLinkedException().getMessage()), ex);
-                } else {
-                    throw new Fault(new Message("UNMARSHAL_ERROR", LOG,
-                                                unmarshalEx.getMessage()), ex);
                 }
+                throw new Fault(new Message("UNMARSHAL_ERROR", LOG,
+                                            unmarshalEx.getMessage()), ex);
             }
             throw new Fault(new Message("UNMARSHAL_ERROR", LOG, ex.getMessage()), ex);
         }
@@ -1092,9 +1088,8 @@ public final class JAXBEncoderDecoder {
                 javax.xml.bind.UnmarshalException unmarshalEx = (javax.xml.bind.UnmarshalException)ex;
                 throw new Fault(new Message("UNMARSHAL_ERROR", LOG, unmarshalEx.getLinkedException()
                     .getMessage()), ex);
-            } else {
-                throw new Fault(new Message("UNMARSHAL_ERROR", LOG, ex.getMessage()), ex);
             }
+            throw new Fault(new Message("UNMARSHAL_ERROR", LOG, ex.getMessage()), ex);
         }
     }
 }

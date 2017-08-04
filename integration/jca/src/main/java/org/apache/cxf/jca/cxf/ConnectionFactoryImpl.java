@@ -81,9 +81,8 @@ public class ConnectionFactoryImpl implements CXFConnectionFactory,
             // non-managed, null Subject
             ManagedConnection connection = managedConnectionFactory.createManagedConnection(null, reqInfo);
             return connection.getConnection(null, reqInfo);
-        } else {
-            return connectionManager.allocateConnection(managedConnectionFactory, reqInfo);
         }
+        return connectionManager.allocateConnection(managedConnectionFactory, reqInfo);
     }
 
 

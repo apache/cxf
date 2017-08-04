@@ -87,7 +87,7 @@ public class FragmentDialectLanguageXPath10 implements FragmentDialectLanguage {
         }
 
         try {
-            return (String) xPath.evaluate(
+            return xPath.evaluate(
                 expressionStr, representation.getAny(), XPathConstants.STRING);
         } catch (XPathException ex) {
             throw new InvalidExpression();

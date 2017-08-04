@@ -45,6 +45,7 @@ public class ManagedConnectionImplTest extends ManagedConnectionTestBase {
     protected QName portName;
 
     @Test
+    @SuppressWarnings("cast")
     public void testInstanceOfConnection() throws Exception {
         assertTrue("Instance of Connection", mci instanceof Connection);
         ((Connection)mci).close();
