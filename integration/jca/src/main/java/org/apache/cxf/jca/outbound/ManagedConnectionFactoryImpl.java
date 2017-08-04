@@ -191,9 +191,8 @@ public class ManagedConnectionFactoryImpl implements ManagedConnectionFactory,
         if (resourceAdapter instanceof ResourceAdapterImpl) {
             return ((ResourceAdapterImpl)resourceAdapter).getBootstrapContext()
                 .getWorkManager();
-        } else {
-            return null;
         }
+        return null;
     }
 
 }

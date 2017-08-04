@@ -26,7 +26,7 @@ import javax.enterprise.inject.spi.InjectionPoint;
 import javax.enterprise.inject.spi.InjectionTarget;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.bus.CXFBusFactory;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
 
 final class CdiBusBean extends AbstractCXFBean< ExtensionManagerBus > {
@@ -63,7 +63,7 @@ final class CdiBusBean extends AbstractCXFBean< ExtensionManagerBus > {
     @Override
     public ExtensionManagerBus create(final CreationalContext< ExtensionManagerBus > ctx) {
         final ExtensionManagerBus instance = injectionTarget.produce(ctx);
-        CXFBusFactory.possiblySetDefaultBus(instance);
+        BusFactory.possiblySetDefaultBus(instance);
         instance.initialize();
 
         injectionTarget.inject(instance, ctx);

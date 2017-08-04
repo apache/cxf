@@ -143,15 +143,13 @@ public class PlugInClassLoader extends SecureClassLoader {
 
         if (bytes != null) {
             return defineClass(name, bytes, 0, bytes.length, protectionDomain);
-        } else {
-            LOG.config("can't find name " + name + " , try to using the ploader");
-            Class<?> result = ploader.loadClass(name);
-            if (null == result) {
-                throw new ClassNotFoundException(name);
-            } else {
-                return result;
-            }
         }
+        LOG.config("can't find name " + name + " , try to using the ploader");
+        Class<?> result = ploader.loadClass(name);
+        if (null == result) {
+            throw new ClassNotFoundException(name);
+        }
+        return result;
     }
 
 
