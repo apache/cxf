@@ -31,7 +31,6 @@ import org.apache.cxf.systest.jaxrs.Book;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXRSCompletionStageTest extends AbstractBusClientServerTestBase {
@@ -54,7 +53,6 @@ public class JAXRSCompletionStageTest extends AbstractBusClientServerTestBase {
         assertEquals(123L, book.getId());
     }
     @Test
-    @Ignore
     public void testGetBookAsyncStageAsyncResponse() throws Exception {
         String address = "http://localhost:" + PORT + "/completable/booksAsync";
         WebClient wc = createWebClient(address);

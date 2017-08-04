@@ -26,6 +26,8 @@ import java.lang.reflect.Proxy;
 import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletionStage;
 import java.util.logging.Logger;
 
 import javax.ws.rs.WebApplicationException;
@@ -189,6 +191,9 @@ public class JAXRSInvoker extends AbstractInvoker {
                 asyncResponse = (AsyncResponseImpl)inMessage.get(AsyncResponse.class);
             }
             result = invoke(exchange, resourceObject, methodToInvoke, params);
+            if (asyncResponse == null && !ori.isSubResourceLocator()) {
+                asyncResponse = checkFutureResponse(inMessage, checkResultObject(result));
+            }
             if (asyncResponse != null) {
                 if (!asyncResponse.suspendContinuationIfNeeded()) {
                     result = handleAsyncResponse(exchange, asyncResponse);
@@ -224,7 +229,7 @@ public class JAXRSInvoker extends AbstractInvoker {
                 List<MediaType> acceptContentType =
                     (List<MediaType>)exchange.get(Message.ACCEPT_CONTENT_TYPE);
 
-                result = checkResultObject(result, subResourcePath);
+                result = checkSubResultObject(result, subResourcePath);
 
                 Class<?> subResponseType = null;
                 if (result.getClass() == Class.class) {
@@ -290,6 +295,22 @@ public class JAXRSInvoker extends AbstractInvoker {
         }
         setResponseContentTypeIfNeeded(inMessage, result);
         return result;
+    }
+
+    protected AsyncResponseImpl checkFutureResponse(Message inMessage, Object result) {
+        if (result instanceof CompletionStage) {
+            final CompletionStage<?> stage = (CompletionStage<?>)result;
+            final AsyncResponseImpl asyncResponse = new AsyncResponseImpl(inMessage);
+            stage.whenComplete((v, t) -> {
+                if (t instanceof CancellationException) {
+                    asyncResponse.cancel();
+                } else {
+                    asyncResponse.resume(v != null ? v : t);
+                }
+            });
+            return asyncResponse;
+        }
+        return null;
     }
 
     protected Method getMethodToInvoke(ClassResourceInfo cri, OperationResourceInfo ori, Object resourceObject) {
@@ -401,10 +422,8 @@ public class JAXRSInvoker extends AbstractInvoker {
 
 
 
-    private static Object checkResultObject(Object result, String subResourcePath) {
+    private static Object checkResultObject(Object result) {
 
-
-        //the result becomes the object that will handle the request
         if (result != null) {
             if (result instanceof MessageContentsList) {
                 result = ((MessageContentsList)result).get(0);
@@ -414,6 +433,10 @@ public class JAXRSInvoker extends AbstractInvoker {
                 result = ((Object[])result)[0];
             }
         }
+        return result;
+    }
+    private static Object checkSubResultObject(Object result, String subResourcePath) {
+        result = checkResultObject(result);
         if (result == null) {
             org.apache.cxf.common.i18n.Message errorM =
                 new org.apache.cxf.common.i18n.Message("NULL_SUBRESOURCE",
