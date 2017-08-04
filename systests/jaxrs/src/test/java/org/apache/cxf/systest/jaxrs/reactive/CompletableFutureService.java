@@ -20,6 +20,8 @@
 package org.apache.cxf.systest.jaxrs.reactive;
 
 
+import java.util.concurrent.CompletableFuture;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
@@ -41,6 +43,12 @@ public class CompletableFutureService {
         } else {
             throw new NotFoundException();
         }
+    }
+    @GET
+    @Produces("text/xml")
+    @Path("booksAsync/{id}")
+    public CompletableFuture<Book> getBookAsync(@PathParam("id") long id) {
+        return CompletableFuture.supplyAsync(() -> new Book("cxf", 123L));
     }
 }
 
