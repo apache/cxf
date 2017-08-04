@@ -39,7 +39,6 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
@@ -58,9 +57,9 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         Service service = createService();
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
-        inProperties.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
-        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.USERNAME_TOKEN);
+        inProperties.put(ConfigurationConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
+        inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
@@ -85,7 +84,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
 
         // Negative test for wrong password type
         service.getInInterceptors().remove(inInterceptor);
-        inProperties.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
+        inProperties.put(ConfigurationConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
         inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
@@ -108,9 +107,9 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         Service service = createService();
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
-        inProperties.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
-        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.USERNAME_TOKEN);
+        inProperties.put(ConfigurationConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
+        inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
@@ -134,7 +133,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
 
         // Negative test for wrong password type
         service.getInInterceptors().remove(inInterceptor);
-        inProperties.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
+        inProperties.put(ConfigurationConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
         inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
@@ -156,9 +155,9 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         Service service = createService();
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
-        inProperties.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
-        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.USERNAME_TOKEN);
+        inProperties.put(ConfigurationConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
+        inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
@@ -183,7 +182,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
 
         // Negative test for wrong password type
         service.getInInterceptors().remove(inInterceptor);
-        inProperties.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
+        inProperties.put(ConfigurationConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
         inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
@@ -205,9 +204,9 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         Service service = createService();
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
-        inProperties.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
-        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.USERNAME_TOKEN);
+        inProperties.put(ConfigurationConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
+        inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
@@ -231,7 +230,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
 
         // Negative test for wrong password type
         service.getInInterceptors().remove(inInterceptor);
-        inProperties.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
+        inProperties.put(ConfigurationConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
         inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
@@ -253,9 +252,9 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         Service service = createService();
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
-        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        inProperties.put(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inProperties.put(ConfigurationConstants.DEC_PROP_FILE, "insecurity.properties");
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
@@ -289,9 +288,9 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         Service service = createService();
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
-        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        inProperties.put(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inProperties.put(ConfigurationConstants.DEC_PROP_FILE, "insecurity.properties");
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
@@ -321,9 +320,9 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         Service service = createService();
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
-        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        inProperties.put(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inProperties.put(ConfigurationConstants.DEC_PROP_FILE, "insecurity.properties");
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
@@ -356,7 +355,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
             // expected
         }
 
-        inProperties.put(WSHandlerConstants.ALLOW_RSA15_KEY_TRANSPORT_ALGORITHM, "true");
+        inProperties.put(ConfigurationConstants.ALLOW_RSA15_KEY_TRANSPORT_ALGORITHM, "true");
         assertEquals("test", echo.echo("test"));
     }
 
@@ -366,9 +365,9 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         Service service = createService();
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
-        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        inProperties.put(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inProperties.put(ConfigurationConstants.DEC_PROP_FILE, "insecurity.properties");
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
@@ -404,7 +403,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
             // expected
         }
 
-        inProperties.put(WSHandlerConstants.ALLOW_RSA15_KEY_TRANSPORT_ALGORITHM, "true");
+        inProperties.put(ConfigurationConstants.ALLOW_RSA15_KEY_TRANSPORT_ALGORITHM, "true");
         assertEquals("test", echo.echo("test"));
     }
 
@@ -415,11 +414,11 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
 
         Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(
-            WSHandlerConstants.ACTION,
-            WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.ENCRYPT
+            ConfigurationConstants.ACTION,
+            ConfigurationConstants.USERNAME_TOKEN + " " + ConfigurationConstants.ENCRYPT
         );
-        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        inProperties.put(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inProperties.put(ConfigurationConstants.DEC_PROP_FILE, "insecurity.properties");
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
@@ -459,11 +458,11 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
 
         Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(
-            WSHandlerConstants.ACTION,
-            WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.ENCRYPT
+            ConfigurationConstants.ACTION,
+            ConfigurationConstants.USERNAME_TOKEN + " " + ConfigurationConstants.ENCRYPT
         );
-        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        inProperties.put(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inProperties.put(ConfigurationConstants.DEC_PROP_FILE, "insecurity.properties");
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
@@ -501,9 +500,9 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         Service service = createService();
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
+        inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inProperties.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
@@ -536,9 +535,9 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         Service service = createService();
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
+        inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inProperties.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
@@ -568,11 +567,11 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
 
         Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(
-            WSHandlerConstants.ACTION,
-            WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.USERNAME_TOKEN
+            ConfigurationConstants.ACTION,
+            ConfigurationConstants.SIGNATURE + " " + ConfigurationConstants.USERNAME_TOKEN
         );
-        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inProperties.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
@@ -615,11 +614,11 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
 
         Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(
-            WSHandlerConstants.ACTION,
-            WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.USERNAME_TOKEN
+            ConfigurationConstants.ACTION,
+            ConfigurationConstants.SIGNATURE + " " + ConfigurationConstants.USERNAME_TOKEN
         );
-        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inProperties.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
@@ -657,7 +656,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         Service service = createService();
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.TIMESTAMP);
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.TIMESTAMP);
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
@@ -680,7 +679,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
 
         // Negative test for no Timestamp
         service.getInInterceptors().remove(inInterceptor);
-        inProperties.put(WSHandlerConstants.ACTION, "");
+        inProperties.put(ConfigurationConstants.ACTION, "");
         inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
@@ -702,7 +701,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         Service service = createService();
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.TIMESTAMP);
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.TIMESTAMP);
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
@@ -723,7 +722,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
 
         // Negative test for no Timestamp
         service.getInInterceptors().remove(inInterceptor);
-        inProperties.put(WSHandlerConstants.ACTION, "");
+        inProperties.put(ConfigurationConstants.ACTION, "");
         inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
@@ -746,11 +745,11 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
 
         Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(
-            WSHandlerConstants.ACTION,
-            WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.TIMESTAMP
+            ConfigurationConstants.ACTION,
+            ConfigurationConstants.SIGNATURE + " " + ConfigurationConstants.TIMESTAMP
         );
-        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inProperties.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
@@ -791,11 +790,11 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
 
         Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(
-            WSHandlerConstants.ACTION,
-            WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.TIMESTAMP
+            ConfigurationConstants.ACTION,
+            ConfigurationConstants.SIGNATURE + " " + ConfigurationConstants.TIMESTAMP
         );
-        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inProperties.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
@@ -833,11 +832,11 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
 
         Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(
-            WSHandlerConstants.ACTION,
-            WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.TIMESTAMP
+            ConfigurationConstants.ACTION,
+            ConfigurationConstants.SIGNATURE + " " + ConfigurationConstants.TIMESTAMP
         );
-        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inProperties.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
@@ -882,9 +881,9 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         Service service = createService();
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new KeystorePasswordCallback());
-        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "cxfca.properties");
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
+        inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new KeystorePasswordCallback());
+        inProperties.put(ConfigurationConstants.SIG_VER_PROP_FILE, "cxfca.properties");
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
@@ -922,9 +921,9 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         Service service = createService();
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new KeystorePasswordCallback());
-        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "cxfca.properties");
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
+        inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new KeystorePasswordCallback());
+        inProperties.put(ConfigurationConstants.SIG_VER_PROP_FILE, "cxfca.properties");
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
@@ -956,12 +955,12 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
 
         Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(
-            WSHandlerConstants.ACTION,
-            WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT
+            ConfigurationConstants.ACTION,
+            ConfigurationConstants.SIGNATURE + " " + ConfigurationConstants.ENCRYPT
         );
-        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
-        inProperties.put(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inProperties.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.DEC_PROP_FILE, "insecurity.properties");
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
@@ -999,12 +998,12 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
 
         Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(
-            WSHandlerConstants.ACTION,
-            WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT
+            ConfigurationConstants.ACTION,
+            ConfigurationConstants.SIGNATURE + " " + ConfigurationConstants.ENCRYPT
         );
-        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
-        inProperties.put(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inProperties.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.DEC_PROP_FILE, "insecurity.properties");
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
@@ -1039,18 +1038,18 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         Service service = createService();
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
+        inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inProperties.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
         Map<String, Object> outProperties = new HashMap<>();
-        outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        outProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        outProperties.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
-        outProperties.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
-        outProperties.put(WSHandlerConstants.USER, "myalias");
+        outProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
+        outProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        outProperties.put(ConfigurationConstants.SIG_PROP_FILE, "outsecurity.properties");
+        outProperties.put(ConfigurationConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
+        outProperties.put(ConfigurationConstants.USER, "myalias");
 
         WSS4JOutInterceptor domOhandler = new WSS4JOutInterceptor(outProperties);
         service.getOutInterceptors().add(domOhandler);
@@ -1093,18 +1092,18 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         Service service = createService();
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
+        inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inProperties.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
         Map<String, Object> outProperties = new HashMap<>();
-        outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        outProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        outProperties.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
-        outProperties.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
-        outProperties.put(WSHandlerConstants.USER, "myalias");
+        outProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
+        outProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        outProperties.put(ConfigurationConstants.SIG_PROP_FILE, "outsecurity.properties");
+        outProperties.put(ConfigurationConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
+        outProperties.put(ConfigurationConstants.USER, "myalias");
 
         WSS4JOutInterceptor domOhandler = new WSS4JOutInterceptor(outProperties);
         service.getOutInterceptors().add(domOhandler);

@@ -30,6 +30,7 @@ import org.w3c.dom.Document;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.EncryptionActionToken;
 import org.apache.wss4j.common.SignatureActionToken;
 import org.apache.wss4j.dom.WSConstants;
@@ -56,11 +57,11 @@ public class SecurityActionTokenTest extends AbstractSecurityTest {
 
         Map<String, Object> outProperties = new HashMap<>();
         outProperties.put(WSHandlerConstants.HANDLER_ACTIONS, actions);
-        outProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        outProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
+        inProperties.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
 
         List<String> xpaths = new ArrayList<>();
         xpaths.add("//wsse:Security");
@@ -88,9 +89,9 @@ public class SecurityActionTokenTest extends AbstractSecurityTest {
         outProperties.put(WSHandlerConstants.HANDLER_ACTIONS, actions);
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
-        inProperties.put(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
-        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        inProperties.put(ConfigurationConstants.DEC_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
 
         List<String> xpaths = new ArrayList<>();
         xpaths.add("//wsse:Security");

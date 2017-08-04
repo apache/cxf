@@ -33,8 +33,8 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.transport.local.LocalTransportFactory;
+import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.crypto.CryptoFactory;
-import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
@@ -53,9 +53,9 @@ public class StaxToDOMSignatureIdentifierTest extends AbstractSecurityTest {
         Service service = createService();
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
+        inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inProperties.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
@@ -91,9 +91,9 @@ public class StaxToDOMSignatureIdentifierTest extends AbstractSecurityTest {
         Service service = createService();
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
+        inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inProperties.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
@@ -129,9 +129,9 @@ public class StaxToDOMSignatureIdentifierTest extends AbstractSecurityTest {
         Service service = createService();
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
+        inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inProperties.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
@@ -167,10 +167,10 @@ public class StaxToDOMSignatureIdentifierTest extends AbstractSecurityTest {
         Service service = createService();
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
-        inProperties.put(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
+        inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inProperties.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.IS_BSP_COMPLIANT, "false");
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
@@ -206,10 +206,10 @@ public class StaxToDOMSignatureIdentifierTest extends AbstractSecurityTest {
         Service service = createService();
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
-        inProperties.put(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
+        inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inProperties.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.IS_BSP_COMPLIANT, "false");
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 

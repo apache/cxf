@@ -51,6 +51,7 @@ import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.principal.UsernameTokenPrincipal;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
@@ -88,14 +89,14 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
     @Test
     public void testSignature() throws Exception {
         Map<String, Object> outProperties = new HashMap<>();
-        outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        outProperties.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
-        outProperties.put(WSHandlerConstants.USER, "myalias");
+        outProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
+        outProperties.put(ConfigurationConstants.SIG_PROP_FILE, "outsecurity.properties");
+        outProperties.put(ConfigurationConstants.USER, "myalias");
         outProperties.put("password", "myAliasPassword");
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
+        inProperties.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
 
         List<String> xpaths = new ArrayList<>();
         xpaths.add("//wsse:Security");
@@ -114,15 +115,15 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
     @Test
     public void testDirectReferenceSignature() throws Exception {
         Map<String, Object> outProperties = new HashMap<>();
-        outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        outProperties.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
-        outProperties.put(WSHandlerConstants.USER, "myalias");
-        outProperties.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
+        outProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
+        outProperties.put(ConfigurationConstants.SIG_PROP_FILE, "outsecurity.properties");
+        outProperties.put(ConfigurationConstants.USER, "myalias");
+        outProperties.put(ConfigurationConstants.SIG_KEY_ID, "DirectReference");
         outProperties.put("password", "myAliasPassword");
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
+        inProperties.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
 
         List<String> xpaths = new ArrayList<>();
         xpaths.add("//wsse:Security");
@@ -142,15 +143,15 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
     @Test
     public void testEncryption() throws Exception {
         Map<String, Object> outProperties = new HashMap<>();
-        outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
-        outProperties.put(WSHandlerConstants.ENC_PROP_FILE, "outsecurity.properties");
-        outProperties.put(WSHandlerConstants.USER, "myalias");
+        outProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        outProperties.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
+        outProperties.put(ConfigurationConstants.USER, "myalias");
         outProperties.put("password", "myAliasPassword");
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
-        inProperties.put(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
-        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        inProperties.put(ConfigurationConstants.DEC_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
 
         List<String> xpaths = new ArrayList<>();
         xpaths.add("//wsse:Security");
@@ -191,25 +192,25 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
     public void testEncryptedUsernameToken() throws Exception {
         Map<String, Object> outProperties = new HashMap<>();
         outProperties.put(
-            WSHandlerConstants.ACTION,
-            WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.ENCRYPT
+            ConfigurationConstants.ACTION,
+            ConfigurationConstants.USERNAME_TOKEN + " " + ConfigurationConstants.ENCRYPT
         );
-        outProperties.put(WSHandlerConstants.ENC_PROP_FILE, "outsecurity.properties");
-        outProperties.put(WSHandlerConstants.USER, "alice");
+        outProperties.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
+        outProperties.put(ConfigurationConstants.USER, "alice");
         outProperties.put("password", "alicePassword");
-        outProperties.put(WSHandlerConstants.ENCRYPTION_USER, "myalias");
+        outProperties.put(ConfigurationConstants.ENCRYPTION_USER, "myalias");
         outProperties.put(
-            WSHandlerConstants.ENCRYPTION_PARTS,
+            ConfigurationConstants.ENCRYPTION_PARTS,
             "{Content}{" + WSConstants.WSSE_NS + "}UsernameToken"
         );
 
         Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(
-            WSHandlerConstants.ACTION,
-            WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.ENCRYPT
+            ConfigurationConstants.ACTION,
+            ConfigurationConstants.USERNAME_TOKEN + " " + ConfigurationConstants.ENCRYPT
         );
-        inProperties.put(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
-        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inProperties.put(ConfigurationConstants.DEC_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
 
         List<String> xpaths = new ArrayList<>();
         xpaths.add("//wsse:Security");
@@ -242,15 +243,15 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
     @Test
     public void testUsernameToken() throws Exception {
         Map<String, Object> outProperties = new HashMap<>();
-        outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
-        outProperties.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
-        outProperties.put(WSHandlerConstants.USER, "alice");
+        outProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.USERNAME_TOKEN);
+        outProperties.put(ConfigurationConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
+        outProperties.put(ConfigurationConstants.USER, "alice");
         outProperties.put("password", "alicePassword");
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
-        inProperties.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
-        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.USERNAME_TOKEN);
+        inProperties.put(ConfigurationConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
+        inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
 
         List<String> xpaths = new ArrayList<>();
         xpaths.add("//wsse:Security");
@@ -275,9 +276,9 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
 
         SoapMessage msg = getSoapMessageForDom(doc);
 
-        msg.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        msg.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
-        msg.put(WSHandlerConstants.USER, "myalias");
+        msg.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
+        msg.put(ConfigurationConstants.SIG_PROP_FILE, "outsecurity.properties");
+        msg.put(ConfigurationConstants.USER, "myalias");
         msg.put("password", "myAliasPassword");
 
         handler.handleMessage(msg);
@@ -314,7 +315,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         ex.setInMessage(inmsg);
         inmsg.setContent(SOAPMessage.class, saajMsg);
 
-        inHandler.setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.NO_SECURITY);
+        inHandler.setProperty(ConfigurationConstants.ACTION, WSHandlerConstants.NO_SECURITY);
 
         inHandler.handleMessage(inmsg);
 
@@ -334,9 +335,9 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
 
         SoapMessage msg = getSoapMessageForDom(doc);
 
-        msg.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        msg.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
-        msg.put(WSHandlerConstants.USER, "myalias");
+        msg.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
+        msg.put(ConfigurationConstants.SIG_PROP_FILE, "outsecurity.properties");
+        msg.put(ConfigurationConstants.USER, "myalias");
         msg.put("password", "myAliasPassword");
 
         handler.handleMessage(msg);
@@ -381,7 +382,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         ex.setInMessage(inmsg);
         inmsg.setContent(SOAPMessage.class, saajMsg);
 
-        inHandler.setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
+        inHandler.setProperty(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
 
         inHandler.handleMessage(inmsg);
 
@@ -399,16 +400,16 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
     @Test
     public void testPKIPath() throws Exception {
         Map<String, Object> outProperties = new HashMap<>();
-        outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        outProperties.put(WSHandlerConstants.USER, "alice");
-        outProperties.put(WSHandlerConstants.SIG_PROP_FILE, "alice.properties");
-        outProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new KeystorePasswordCallback());
-        outProperties.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
-        outProperties.put(WSHandlerConstants.USE_SINGLE_CERTIFICATE, "false");
+        outProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
+        outProperties.put(ConfigurationConstants.USER, "alice");
+        outProperties.put(ConfigurationConstants.SIG_PROP_FILE, "alice.properties");
+        outProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new KeystorePasswordCallback());
+        outProperties.put(ConfigurationConstants.SIG_KEY_ID, "DirectReference");
+        outProperties.put(ConfigurationConstants.USE_SINGLE_CERTIFICATE, "false");
 
         Map<String, Object> inProperties = new HashMap<>();
-        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "cxfca.properties");
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
+        inProperties.put(ConfigurationConstants.SIG_VER_PROP_FILE, "cxfca.properties");
 
         List<String> xpaths = new ArrayList<>();
         xpaths.add("//wsse:Security");
@@ -429,29 +430,29 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
     public void testUsernameTokenSignature() throws Exception {
         Map<String, Object> outProperties = new HashMap<>();
         outProperties.put(
-            WSHandlerConstants.ACTION,
-            WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.SIGNATURE);
-        outProperties.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
-        outProperties.put(WSHandlerConstants.USER, "alice");
+            ConfigurationConstants.ACTION,
+            ConfigurationConstants.USERNAME_TOKEN + " " + ConfigurationConstants.SIGNATURE);
+        outProperties.put(ConfigurationConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
+        outProperties.put(ConfigurationConstants.USER, "alice");
 
-        outProperties.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
-        outProperties.put(WSHandlerConstants.SIGNATURE_USER, "myalias");
+        outProperties.put(ConfigurationConstants.SIG_PROP_FILE, "outsecurity.properties");
+        outProperties.put(ConfigurationConstants.SIGNATURE_USER, "myalias");
         outProperties.put(
-            WSHandlerConstants.PW_CALLBACK_CLASS,
+            ConfigurationConstants.PW_CALLBACK_CLASS,
             "org.apache.cxf.ws.security.wss4j.TestPwdCallback"
         );
 
         Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(
-            WSHandlerConstants.ACTION,
-            WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.SIGNATURE
+            ConfigurationConstants.ACTION,
+            ConfigurationConstants.USERNAME_TOKEN + " " + ConfigurationConstants.SIGNATURE
         );
-        inProperties.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
+        inProperties.put(ConfigurationConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
         inProperties.put(
-            WSHandlerConstants.PW_CALLBACK_CLASS,
+            ConfigurationConstants.PW_CALLBACK_CLASS,
             "org.apache.cxf.ws.security.wss4j.TestPwdCallback"
         );
-        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
 
         List<String> xpaths = new ArrayList<>();
         xpaths.add("//wsse:Security");

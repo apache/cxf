@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.util.StreamReaderDelegate;
@@ -413,9 +414,9 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
             XMLStreamReader xmlReader = message.getContent(XMLStreamReader.class);
             try {
                 int i = xmlReader.getEventType();
-                while (i == XMLStreamReader.NAMESPACE
-                    || i == XMLStreamReader.ATTRIBUTE
-                    || i == XMLStreamReader.CHARACTERS) {
+                while (i == XMLStreamConstants.NAMESPACE
+                    || i == XMLStreamConstants.ATTRIBUTE
+                    || i == XMLStreamConstants.CHARACTERS) {
                     i = xmlReader.next();
                 }
             } catch (XMLStreamException e) {

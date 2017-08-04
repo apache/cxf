@@ -62,6 +62,7 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
+import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.ThreadLocalSecurityProvider;
@@ -231,7 +232,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
 
             List<Integer> actions = WSSecurityUtil.decodeAction(action);
 
-            String actor = (String)getOption(WSHandlerConstants.ACTOR);
+            String actor = (String)getOption(ConfigurationConstants.ACTOR);
             if (actor == null) {
                 actor = (String)msg.getContextualProperty(SecurityConstants.ACTOR);
             }
@@ -254,8 +255,8 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
 
             // Only search for and expand (Signed) XOP Elements if MTOM is enabled (and not
             // explicitly specified by the user)
-            if (getString(WSHandlerConstants.EXPAND_XOP_INCLUDE_FOR_SIGNATURE, msg) == null
-                && getString(WSHandlerConstants.EXPAND_XOP_INCLUDE, msg) == null) {
+            if (getString(ConfigurationConstants.EXPAND_XOP_INCLUDE_FOR_SIGNATURE, msg) == null
+                && getString(ConfigurationConstants.EXPAND_XOP_INCLUDE, msg) == null) {
                 reqData.setExpandXopInclude(AttachmentUtil.isMtomEnabled(msg));
             }
 
@@ -437,7 +438,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
 
         // Now check to see if SIGNATURE_PARTS are specified
         String signatureParts =
-            (String)getProperty(msg, WSHandlerConstants.SIGNATURE_PARTS);
+            (String)getProperty(msg, ConfigurationConstants.SIGNATURE_PARTS);
         if (signatureParts != null) {
             String warning = "To enforce that particular elements were signed you must either "
                 + "use WS-SecurityPolicy, or else use the CryptoCoverageChecker or "
@@ -572,9 +573,9 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
     }
 
     private String getAction(SoapMessage msg, SoapVersion version) {
-        String action = (String)getOption(WSHandlerConstants.ACTION);
+        String action = (String)getOption(ConfigurationConstants.ACTION);
         if (action == null) {
-            action = (String)msg.get(WSHandlerConstants.ACTION);
+            action = (String)msg.get(ConfigurationConstants.ACTION);
         }
         if (action == null) {
             LOG.warning("No security action was defined!");

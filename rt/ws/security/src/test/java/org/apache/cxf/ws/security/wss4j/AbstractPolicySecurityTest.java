@@ -64,6 +64,7 @@ import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JOutInterceptor.PolicyBasedWSS4JOutInterceptorInternal;
 import org.apache.neethi.Policy;
+import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
@@ -376,23 +377,23 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
         for (CoverageType type : types) {
             switch(type) {
             case SIGNED:
-                action += " " + WSHandlerConstants.SIGNATURE;
+                action += " " + ConfigurationConstants.SIGNATURE;
                 break;
             case ENCRYPTED:
-                action += " " + WSHandlerConstants.ENCRYPT;
+                action += " " + ConfigurationConstants.ENCRYPT;
                 break;
             default:
                 fail("Unsupported coverage type.");
             }
         }
-        inHandler.setProperty(WSHandlerConstants.ACTION, action);
-        inHandler.setProperty(WSHandlerConstants.SIG_VER_PROP_FILE,
+        inHandler.setProperty(ConfigurationConstants.ACTION, action);
+        inHandler.setProperty(ConfigurationConstants.SIG_VER_PROP_FILE,
                 "insecurity.properties");
-        inHandler.setProperty(WSHandlerConstants.DEC_PROP_FILE,
+        inHandler.setProperty(ConfigurationConstants.DEC_PROP_FILE,
                 "insecurity.properties");
-        inHandler.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS,
+        inHandler.setProperty(ConfigurationConstants.PW_CALLBACK_CLASS,
                 TestPwdCallback.class.getName());
-        inHandler.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
+        inHandler.setProperty(ConfigurationConstants.IS_BSP_COMPLIANT, "false");
 
         return inHandler;
     }

@@ -81,6 +81,7 @@ import org.apache.cxf.ws.security.wss4j.CXFCallbackLookup;
 import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.neethi.Assertion;
+import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -1660,7 +1661,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         if (encrUser == null || "".equals(encrUser)) {
             unassertPolicy(token, "A " + (sign ? "signature" : "encryption") + " username needs to be declared.");
         }
-        if (WSHandlerConstants.USE_REQ_SIG_CERT.equals(encrUser)) {
+        if (ConfigurationConstants.USE_REQ_SIG_CERT.equals(encrUser)) {
             List<WSHandlerResult> results =
                 CastUtils.cast((List<?>)
                     message.getExchange().getInMessage().get(WSHandlerConstants.RECV_RESULTS));

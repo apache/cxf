@@ -36,11 +36,11 @@ import org.apache.cxf.ws.security.wss4j.Echo;
 import org.apache.cxf.ws.security.wss4j.EchoImpl;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor;
+import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.junit.Test;
 
@@ -68,9 +68,9 @@ public class DOMToStaxSamlTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_UNSIGNED);
+        properties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SAML_TOKEN_UNSIGNED);
         properties.put(
-            WSHandlerConstants.SAML_CALLBACK_REF, new SAML1CallbackHandler()
+            ConfigurationConstants.SAML_CALLBACK_REF, new SAML1CallbackHandler()
         );
 
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
@@ -99,13 +99,13 @@ public class DOMToStaxSamlTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_SIGNED);
-        properties.put(WSHandlerConstants.SAML_CALLBACK_REF, new SAML1CallbackHandler());
+        properties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SAML_TOKEN_SIGNED);
+        properties.put(ConfigurationConstants.SAML_CALLBACK_REF, new SAML1CallbackHandler());
 
-        properties.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
-        properties.put(WSHandlerConstants.USER, "alice");
-        properties.put(WSHandlerConstants.PW_CALLBACK_REF, new PasswordCallbackHandler());
-        properties.put(WSHandlerConstants.SIG_PROP_FILE, "alice.properties");
+        properties.put(ConfigurationConstants.SIG_KEY_ID, "DirectReference");
+        properties.put(ConfigurationConstants.USER, "alice");
+        properties.put(ConfigurationConstants.PW_CALLBACK_REF, new PasswordCallbackHandler());
+        properties.put(ConfigurationConstants.SIG_PROP_FILE, "alice.properties");
 
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
@@ -131,9 +131,9 @@ public class DOMToStaxSamlTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_UNSIGNED);
+        properties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SAML_TOKEN_UNSIGNED);
         properties.put(
-            WSHandlerConstants.SAML_CALLBACK_REF, new SAML2CallbackHandler()
+            ConfigurationConstants.SAML_CALLBACK_REF, new SAML2CallbackHandler()
         );
 
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
@@ -162,13 +162,13 @@ public class DOMToStaxSamlTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_SIGNED);
-        properties.put(WSHandlerConstants.SAML_CALLBACK_REF, new SAML2CallbackHandler());
+        properties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SAML_TOKEN_SIGNED);
+        properties.put(ConfigurationConstants.SAML_CALLBACK_REF, new SAML2CallbackHandler());
 
-        properties.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
-        properties.put(WSHandlerConstants.USER, "alice");
-        properties.put(WSHandlerConstants.PW_CALLBACK_REF, new PasswordCallbackHandler());
-        properties.put(WSHandlerConstants.SIG_PROP_FILE, "alice.properties");
+        properties.put(ConfigurationConstants.SIG_KEY_ID, "DirectReference");
+        properties.put(ConfigurationConstants.USER, "alice");
+        properties.put(ConfigurationConstants.PW_CALLBACK_REF, new PasswordCallbackHandler());
+        properties.put(ConfigurationConstants.SIG_PROP_FILE, "alice.properties");
 
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
@@ -201,16 +201,16 @@ public class DOMToStaxSamlTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_SIGNED);
+        properties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SAML_TOKEN_SIGNED);
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
         callbackHandler.setSignAssertion(true);
-        properties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
+        properties.put(ConfigurationConstants.SAML_CALLBACK_REF, callbackHandler);
 
-        properties.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
-        properties.put(WSHandlerConstants.USER, "alice");
-        properties.put(WSHandlerConstants.PW_CALLBACK_REF, new PasswordCallbackHandler());
-        properties.put(WSHandlerConstants.SIG_PROP_FILE, "alice.properties");
+        properties.put(ConfigurationConstants.SIG_KEY_ID, "DirectReference");
+        properties.put(ConfigurationConstants.USER, "alice");
+        properties.put(ConfigurationConstants.PW_CALLBACK_REF, new PasswordCallbackHandler());
+        properties.put(ConfigurationConstants.SIG_PROP_FILE, "alice.properties");
 
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
@@ -251,16 +251,16 @@ public class DOMToStaxSamlTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_SIGNED);
+        properties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SAML_TOKEN_SIGNED);
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         callbackHandler.setSignAssertion(true);
-        properties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
+        properties.put(ConfigurationConstants.SAML_CALLBACK_REF, callbackHandler);
 
-        properties.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
-        properties.put(WSHandlerConstants.USER, "alice");
-        properties.put(WSHandlerConstants.PW_CALLBACK_REF, new PasswordCallbackHandler());
-        properties.put(WSHandlerConstants.SIG_PROP_FILE, "alice.properties");
+        properties.put(ConfigurationConstants.SIG_KEY_ID, "DirectReference");
+        properties.put(ConfigurationConstants.USER, "alice");
+        properties.put(ConfigurationConstants.PW_CALLBACK_REF, new PasswordCallbackHandler());
+        properties.put(ConfigurationConstants.SIG_PROP_FILE, "alice.properties");
 
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
