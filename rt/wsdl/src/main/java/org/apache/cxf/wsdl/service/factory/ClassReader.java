@@ -52,6 +52,8 @@ class ClassReader extends ByteArrayInputStream {
     private static final int CONSTANT_FIELDREF = 9;
     private static final int CONSTANT_METHODREF = 10;
     private static final int CONSTANT_INTERFACE_METHOD_REF = 11;
+    private static final int CONSTANT_METHOD_HANDLE = 15;
+    private static final int CONSTANT_METHOD_TYPE = 16;
     private static final int CONSTANT_STRING = 8;
     private static final int CONSTANT_INTEGER = 3;
     private static final int CONSTANT_FLOAT = 4;
@@ -59,6 +61,7 @@ class ClassReader extends ByteArrayInputStream {
     private static final int CONSTANT_DOUBLE = 6;
     private static final int CONSTANT_NAME_AND_TYPE = 12;
     private static final int CONSTANT_UTF_8 = 1;
+    private static final int CONSTANT_INVOKE_DYNAMIC = 18;
     /**
      * the constant pool. constant pool indices in the class file directly index
      * into this array. The value stored in this array is the position in the
@@ -318,15 +321,22 @@ class ClassReader extends ByteArrayInputStream {
             case CONSTANT_METHODREF:
             case CONSTANT_INTERFACE_METHOD_REF:
             case CONSTANT_NAME_AND_TYPE:
+            case CONSTANT_INVOKE_DYNAMIC: // 2x short: (bootstrap-method, name-and-type)
 
                 readShort(); // class index or (12) name index
                 readShort(); // string index or class index
                 break;
 
+            case CONSTANT_METHOD_HANDLE:
+                read(); // reference kind
+                readShort(); // reference index
+                break;
+                
             case CONSTANT_CLASS:
             case CONSTANT_STRING:
+            case CONSTANT_METHOD_TYPE:
 
-                readShort(); // string index or class index
+                readShort(); // string-, class- or method-index
                 break;
 
             case CONSTANT_LONG:
@@ -354,7 +364,7 @@ class ClassReader extends ByteArrayInputStream {
 
             default:
                 // corrupt class file
-                throw new IllegalStateException();
+                throw new IllegalStateException("unhandled constant \"" + c + "\"");
             }
         }
     }
