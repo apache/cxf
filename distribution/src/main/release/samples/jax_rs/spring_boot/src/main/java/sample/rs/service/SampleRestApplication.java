@@ -18,6 +18,7 @@
  */
 package sample.rs.service;
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Server;
@@ -46,7 +47,10 @@ public class SampleRestApplication {
         endpoint.setBus(bus);
         endpoint.setServiceBeans(Arrays.<Object>asList(new HelloServiceImpl1(), new HelloServiceImpl2()));
         endpoint.setAddress("/");
-        endpoint.setFeatures(Arrays.asList(new Swagger2Feature()));
+        Swagger2Feature swagger2Feature = new Swagger2Feature();
+        swagger2Feature.setTitle("Sample REST Application");
+        swagger2Feature.setDescription("The Application");
+        endpoint.setFeatures(Collections.singletonList(swagger2Feature));
         return endpoint.create();
     }
 }

@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -93,7 +92,7 @@ public class Java2SwaggerMojo extends AbstractMojo {
     
     
     /**
-     * @parameter default-value="users@cxf.apache.org"
+     * @parameter
      */
     private String contact;
     
@@ -109,7 +108,7 @@ public class Java2SwaggerMojo extends AbstractMojo {
     private String licenseUrl;
     
     /**
-     * @parameter default-value="example.cxf.apache.org:8181"
+     * @parameter
      */
     private String host;
 
@@ -294,22 +293,17 @@ public class Java2SwaggerMojo extends AbstractMojo {
         License swaggerLicense = new License();
         swaggerLicense.name(this.license)
             .url(this.licenseUrl);
-        swaggerContact.email(this.contact)
-            .name("Apache CXF")
-            .url("http://cxf.apache.org/");
+        swaggerContact.name(this.contact);
         info.version(this.version)
             .description(this.description)
             .contact(swaggerContact)
             .license(swaggerLicense)
             .title(this.title);
         swagger.setInfo(info);
-        if (this.schemes == null || this.schemes.size() == 0) {
-            this.schemes = new ArrayList<String>();
-            this.schemes.add("http");
-            this.schemes.add("https");
-        }
-        for (String scheme : this.schemes) {
-            swagger.scheme(Scheme.forValue(scheme));
+        if (this.schemes != null) {
+            for (String scheme : this.schemes) {
+                swagger.scheme(Scheme.forValue(scheme));
+            }
         }
         swagger.setHost(this.host);
         swagger.setBasePath(this.basePath);

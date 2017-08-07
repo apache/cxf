@@ -49,6 +49,8 @@ public class Swagger2Customizer {
 
     protected boolean replaceTags;
 
+    protected boolean applyDefaultVersion = true;
+
     protected DocumentationProvider javadocProvider;
 
     protected List<ClassResourceInfo> cris;
@@ -137,6 +139,7 @@ public class Swagger2Customizer {
                 }
             });
         }
+        applyDefaultVersion(data);
         return data;
     }
 
@@ -160,6 +163,16 @@ public class Swagger2Customizer {
             normalizedPath.append('}');
         }
         return StringUtils.EMPTY.equals(normalizedPath.toString()) ? "/" : normalizedPath.toString();
+    }
+
+    protected void applyDefaultVersion(Swagger data) {
+        if (applyDefaultVersion && data.getInfo() != null && data.getInfo().getVersion() == null
+                && beanConfig != null && beanConfig.getResourcePackage() != null) {
+            Package resourcePackage = Package.getPackage(beanConfig.getResourcePackage());
+            if (resourcePackage != null) {
+                data.getInfo().setVersion(resourcePackage.getImplementationVersion());
+            }
+        }
     }
 
     /**
@@ -208,6 +221,9 @@ public class Swagger2Customizer {
 
     public void setBeanConfig(BeanConfig beanConfig) {
         this.beanConfig = beanConfig;
+    }
 
+    public void setApplyDefaultVersion(boolean applyDefaultVersion) {
+        this.applyDefaultVersion = applyDefaultVersion;
     }
 }
