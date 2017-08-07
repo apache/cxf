@@ -308,6 +308,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
         destination.shutdown();
     }
 
+    @SuppressWarnings("cast")
     @Test
     public void testIsMultiplexCapable() throws Exception {
         EndpointInfo ei = setupServiceInfo("HelloWorldService", "HelloWorldPort");

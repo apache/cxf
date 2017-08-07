@@ -46,6 +46,7 @@ import javax.ws.rs.ext.RuntimeDelegate;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.jaxrs.client.AbstractClient;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 
@@ -390,7 +391,7 @@ public class InvocationBuilderImpl implements Invocation.Builder {
     }
 
     private ExecutorService getConfiguredExecutorService() {
-        return (ExecutorService)config.getProperty(WebClient.EXECUTOR_SERVICE_PROPERTY);
+        return (ExecutorService)config.getProperty(AbstractClient.EXECUTOR_SERVICE_PROPERTY);
     }
 
 }

@@ -98,9 +98,8 @@ public class UndertowHTTPDestination extends ServletDestination {
                IOException {
         if (serverEngineFactory == null) {
             return;
-        } else { 
-            nurl = new URL(getAddress(endpointInfo));
         }
+        nurl = new URL(getAddress(endpointInfo));
         engine =
             serverEngineFactory.retrieveUndertowHTTPServerEngine(nurl.getPort());
         if (engine == null) {

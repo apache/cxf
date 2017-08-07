@@ -226,9 +226,8 @@ public class NettyHttpServerEngine implements ServerEngine {
         NettyHttpContextHandler contextHandler = handlerMap.get(contextName);
         if (contextHandler != null) {
             return contextHandler.getNettyHttpHandler(url.getPath());
-        } else {
-            return null;
         }
+        return null;
     }
 
     public void shutdown() {

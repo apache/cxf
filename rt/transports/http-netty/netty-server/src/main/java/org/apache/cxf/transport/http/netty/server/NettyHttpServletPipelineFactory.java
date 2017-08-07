@@ -170,9 +170,8 @@ public class NettyHttpServletPipelineFactory extends ChannelInitializer<Channel>
         if (tlsServerParameters != null) {
             SSLEngine sslEngine = SSLUtils.createServerSSLEngine(tlsServerParameters);
             return new SslHandler(sslEngine);
-        } else {
-            return null;
         }
+        return null;
     }
 
     private class HttpSessionWatchdog implements Runnable {

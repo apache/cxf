@@ -47,9 +47,8 @@ public class HttpNettyTransportNamespaceHandler extends BaseNamespaceHandler {
         if (NETTY_SERVER_TRANSPORT.equals(s)) {
             return getClass().getClassLoader().
                 getResource("schemas/configuration/http-netty-server.xsd");
-        } else {
-            return super.findCoreSchemaLocation(s);
         }
+        return super.findCoreSchemaLocation(s);
     }
 
     @SuppressWarnings("rawtypes")

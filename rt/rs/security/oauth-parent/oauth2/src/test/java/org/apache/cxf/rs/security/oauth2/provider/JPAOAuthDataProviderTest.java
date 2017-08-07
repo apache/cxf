@@ -203,6 +203,7 @@ public class JPAOAuthDataProviderTest extends Assert {
      * Checks that having multiple token each with its own
      * userSubject (but having same login) works.
      */
+    @SuppressWarnings("cast")
     @Test
     public void testAddGetDeleteMultipleAccessToken() {
         Client c = addClient("101", "bob");

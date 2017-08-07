@@ -21,6 +21,7 @@ package org.apache.cxf.jca.outbound;
 import java.io.PrintWriter;
 
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,7 +36,6 @@ import javax.resource.spi.ResourceAdapterAssociation;
 import javax.resource.spi.work.WorkManager;
 import javax.security.auth.Subject;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jca.core.logging.LoggerHelper;
 import org.apache.cxf.jca.cxf.ResourceAdapterImpl;
@@ -121,7 +121,7 @@ public class ManagedConnectionFactoryImpl implements ManagedConnectionFactory,
 
         ManagedConnectionFactoryImpl that = (ManagedConnectionFactoryImpl)o;
 
-        return ObjectUtils.equals(that.getBusConfigURL(), busConfigURL);
+        return Objects.equals(that.getBusConfigURL(), busConfigURL);
     }
 
     public PrintWriter getLogWriter() throws ResourceException {
@@ -156,12 +156,12 @@ public class ManagedConnectionFactoryImpl implements ManagedConnectionFactory,
 
             ManagedConnectionImpl mc = (ManagedConnectionImpl)obj;
 
-            if (!ObjectUtils.equals(busConfigURL,
+            if (!Objects.equals(busConfigURL,
                     mc.getManagedConnectionFactoryImpl().getBusConfigURL())) {
                 continue;
             }
 
-            if (!ObjectUtils.equals(reqInfo, mc.getRequestInfo())) {
+            if (!Objects.equals(reqInfo, mc.getRequestInfo())) {
                 continue;
             }
 

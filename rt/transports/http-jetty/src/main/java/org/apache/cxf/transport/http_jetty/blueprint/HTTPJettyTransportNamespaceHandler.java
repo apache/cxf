@@ -48,9 +48,8 @@ public class HTTPJettyTransportNamespaceHandler extends BaseNamespaceHandler {
         if (JETTY_TRANSPORT.equals(s)) {
             return getClass().getClassLoader().
                 getResource("schemas/configuration/http-jetty.xsd");
-        } else {
-            return super.findCoreSchemaLocation(s);
         }
+        return super.findCoreSchemaLocation(s);
     }
 
     @SuppressWarnings("rawtypes")

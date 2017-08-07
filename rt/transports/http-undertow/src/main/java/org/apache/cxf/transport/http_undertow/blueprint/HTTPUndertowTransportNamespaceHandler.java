@@ -48,9 +48,8 @@ public class HTTPUndertowTransportNamespaceHandler implements NamespaceHandler {
         if (UNDERTOW_TRANSPORT.equals(s)) {
             return getClass().getClassLoader().
                 getResource("schemas/configuration/http-undertow.xsd");
-        } else {
-            return null;
         }
+        return null;
     }
 
     @SuppressWarnings("rawtypes")

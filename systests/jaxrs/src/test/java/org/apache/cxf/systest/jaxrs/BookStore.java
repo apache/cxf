@@ -1185,7 +1185,6 @@ public class BookStore {
     @POST
     @Path("/books/element/echo")
     public JAXBElement<Book> echoBookElement(JAXBElement<Book> element) throws Exception {
-        Assert.assertTrue(element instanceof JAXBElement);
         return element;
     }
     @POST

@@ -157,7 +157,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         return result;
     }
     public final boolean isGET(SoapMessage message) {
-        String method = (String)message.get(SoapMessage.HTTP_REQUEST_METHOD);
+        String method = (String)message.get(org.apache.cxf.message.Message.HTTP_REQUEST_METHOD);
         return "GET".equals(method) && message.getContent(XMLStreamReader.class) == null;
     }
 

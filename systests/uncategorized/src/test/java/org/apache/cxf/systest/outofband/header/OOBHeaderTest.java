@@ -123,7 +123,7 @@ public class OOBHeaderTest extends AbstractBusClientServerTestBase {
             assertTrue("HeaderHolder list expected to conain 1 object received " + oobHdr.size(),
                     oobHdr.size() == 1);
 
-            if (oobHdr != null & oobHdr instanceof List) {
+            if (oobHdr != null) {
                 Iterator<?> iter = oobHdr.iterator();
                 while (iter.hasNext()) {
                     Object hdr = iter.next();

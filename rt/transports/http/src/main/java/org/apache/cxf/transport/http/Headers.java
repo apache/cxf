@@ -477,9 +477,8 @@ public class Headers {
             && ct.indexOf("charset=") == -1
             && !ct.toLowerCase().contains("multipart/related")) {
             return ct + "; charset=" + enc;
-        } else {
-            return ct;
         }
+        return ct;
     }
 
     // Assumes that response body is not available only
@@ -547,22 +546,16 @@ public class Headers {
         if (headerObject.getClass() == String.class) {
             // Most likely
             return headerObject.toString();
-        } else {
-            // We may consider introducing CXF HeaderDelegate interface
-            // so that the below code may be pushed back to the JAX-RS
-            // front-end where non String header objects are more likely
-            // to be set. Though the below code may be generally useful
-
-            String headerString;
-            if (headerObject instanceof Date) {
-                headerString = toHttpDate((Date)headerObject);
-            } else if (headerObject instanceof Locale) {
-                headerString = toHttpLanguage((Locale)headerObject);
-            } else {
-                headerString = headerObject.toString();
-            }
-            return headerString;
         }
+        String headerString;
+        if (headerObject instanceof Date) {
+            headerString = toHttpDate((Date)headerObject);
+        } else if (headerObject instanceof Locale) {
+            headerString = toHttpLanguage((Locale)headerObject);
+        } else {
+            headerString = headerObject.toString();
+        }
+        return headerString;
     }
 
     void removeContentType() {

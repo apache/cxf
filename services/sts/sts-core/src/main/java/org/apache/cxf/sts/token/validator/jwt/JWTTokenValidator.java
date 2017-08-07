@@ -25,7 +25,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.soap.Node;
 
 import org.w3c.dom.Element;
 
@@ -76,7 +75,7 @@ public class JWTTokenValidator implements TokenValidator {
         Object token = validateTarget.getToken();
         if (token instanceof Element) {
             Element tokenEl = (Element)token;
-            if (tokenEl.getFirstChild().getNodeType() == Node.TEXT_NODE) {
+            if (tokenEl.getFirstChild().getNodeType() == org.w3c.dom.Node.TEXT_NODE) {
                 try {
                     JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(tokenEl.getTextContent());
                     if (jwtConsumer.getJwtToken() != null) {

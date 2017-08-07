@@ -266,10 +266,9 @@ public class UndertowHTTPServerEngine implements ServerEngine {
             }
             Sequence<String> supportProtocols = Sequence.of(protocols);
             return result.setSocketOption(Options.SSL_ENABLED_PROTOCOLS, supportProtocols);
-        } else {
-            Sequence<String> supportProtocols = Sequence.of("TLSv1", "TLSv1.1", "TLSv1.2");
-            return result.setSocketOption(Options.SSL_ENABLED_PROTOCOLS, supportProtocols);
         }
+        Sequence<String> supportProtocols = Sequence.of("TLSv1", "TLSv1.1", "TLSv1.2");
+        return result.setSocketOption(Options.SSL_ENABLED_PROTOCOLS, supportProtocols);
     }
 
 

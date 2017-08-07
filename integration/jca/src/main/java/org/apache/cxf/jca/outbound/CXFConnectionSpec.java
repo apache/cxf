@@ -19,11 +19,11 @@
 package org.apache.cxf.jca.outbound;
 
 import java.net.URL;
+import java.util.Objects;
 
 import javax.resource.spi.ConnectionRequestInfo;
 import javax.xml.namespace.QName;
 
-import org.apache.commons.lang3.ObjectUtils;
 
 /**
  *
@@ -124,27 +124,27 @@ public class CXFConnectionSpec implements ConnectionRequestInfo {
 
         CXFConnectionSpec that = (CXFConnectionSpec)other;
 
-        if (!ObjectUtils.equals(that.getWsdlURL(), wsdlURL)) {
+        if (!Objects.equals(that.getWsdlURL(), wsdlURL)) {
             return false;
         }
 
-        if (!ObjectUtils.equals(that.getBusConfigURL(), busConfigURL)) {
+        if (!Objects.equals(that.getBusConfigURL(), busConfigURL)) {
             return false;
         }
 
-        if (!ObjectUtils.equals(that.getServiceClass(), serviceClass)) {
+        if (!Objects.equals(that.getServiceClass(), serviceClass)) {
             return false;
         }
 
-        if (!ObjectUtils.equals(that.getServiceName(), serviceName)) {
+        if (!Objects.equals(that.getServiceName(), serviceName)) {
             return false;
         }
 
-        if (!ObjectUtils.equals(that.getEndpointName(), endpointName)) {
+        if (!Objects.equals(that.getEndpointName(), endpointName)) {
             return false;
         }
 
-        return ObjectUtils.equals(that.getAddress(), address);
+        return Objects.equals(that.getAddress(), address);
     }
 
     // Required by JCA Spec

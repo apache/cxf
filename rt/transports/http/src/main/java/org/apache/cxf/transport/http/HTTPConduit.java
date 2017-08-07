@@ -703,9 +703,8 @@ public abstract class HTTPConduit
         }
         if (defaultAddress == null) {
             return setAndGetDefaultAddress(result);
-        } else {
-            return result.equals(defaultAddress.getString()) ? defaultAddress : new Address(result);
         }
+        return result.equals(defaultAddress.getString()) ? defaultAddress : new Address(result);
     }
 
     /**
@@ -1006,9 +1005,8 @@ public abstract class HTTPConduit
                     String location = locs.get(0);
                     if (location != null) {
                         return location;
-                    } else {
-                        return null;
                     }
+                    return null;
                 }
             }
         }
@@ -1298,9 +1296,8 @@ public abstract class HTTPConduit
                         + "Make sure server certificate is correct, or to disable this check "
                         + "(NOT recommended for production) set the CXF client TLS "
                         + "configuration property \"disableCNCheck\" to true.");
-                } else {
-                    throw e;
                 }
+                throw e;
             }
         }
         protected String getMethod() {
@@ -1853,15 +1850,13 @@ public abstract class HTTPConduit
 
             if (MessageUtils.isTrue(message.getContextualProperty(AUTO_REDIRECT_ALLOW_REL_URI))) {
                 return URI.create(lastURL).resolve(newURL).toString();
-            } else {
-                String msg = "Relative Redirect detected on Conduit '"
-                    + conduitName + "' on '" + newURL + "'";
-                LOG.log(Level.INFO, msg);
-                throw new IOException(msg);
             }
-        } else {
-            return newURL;
+            String msg = "Relative Redirect detected on Conduit '"
+                + conduitName + "' on '" + newURL + "'";
+            LOG.log(Level.INFO, msg);
+            throw new IOException(msg);
         }
+        return newURL;
 
     }
 
