@@ -22,7 +22,7 @@ package org.apache.cxf.jaxrs.nio;
  * Class NioReader.
  */
 @FunctionalInterface
-public interface NioReaderHandler {
+public interface NioReadHandler {
     /**
      * Called every time it is possible to read from the input stream without blocking. The last
      * time this method is called, the value of {@code in.isFinished()} must be {@code true} to

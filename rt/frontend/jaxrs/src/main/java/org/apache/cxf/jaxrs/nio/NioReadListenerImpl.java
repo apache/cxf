@@ -30,11 +30,11 @@ import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 public final class NioReadListenerImpl implements ReadListener {
     private static final Logger LOG = LogUtils.getL7dLogger(NioReadListenerImpl.class);
     private final NioReadEntity entity;
-    private final DelegatingNioInputStream in;
+    private final NioInputStream in;
 
     public NioReadListenerImpl(NioReadEntity entity, ServletInputStream in) {
         this.entity = entity;
-        this.in = new DelegatingNioInputStream(in);
+        this.in = new NioInputStream(in);
     }
 
     @Override

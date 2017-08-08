@@ -27,11 +27,11 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 public class NioReadEntity {
-    private final NioReaderHandler reader;
-    private final NioCompletionHandler completion;
+    private final NioReadHandler reader;
+    private final NioReadCompletionHandler completion;
     private final NioErrorHandler error;
 
-    public NioReadEntity(NioReaderHandler reader, NioCompletionHandler completion, NioErrorHandler error) {
+    public NioReadEntity(NioReadHandler reader, NioReadCompletionHandler completion, NioErrorHandler error) {
         this.reader = reader;
         this.completion = completion;
         this.error = error;
@@ -49,11 +49,11 @@ public class NioReadEntity {
         }
     }
 
-    public NioReaderHandler getReader() {
+    public NioReadHandler getReader() {
         return reader;
     }
 
-    public NioCompletionHandler getCompletion() {
+    public NioReadCompletionHandler getCompletion() {
         return completion;
     }
 

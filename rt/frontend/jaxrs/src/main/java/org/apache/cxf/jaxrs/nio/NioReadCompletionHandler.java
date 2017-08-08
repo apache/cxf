@@ -18,17 +18,8 @@
  */
 package org.apache.cxf.jaxrs.nio;
 
-/**
- * Class NioWriterHandler.
- */
 @FunctionalInterface
-public interface NioWriterHandler {
-    /**
-     * Method called when it is possible to write some data without blocking.
-     *
-     * @param out output stream.
-     * @return {@code true} if there is more data to write, {@code false} otherwise.
-     */
-    boolean write(NioOutputStream out);
+public interface NioReadCompletionHandler {
+    void complete(NioInputStream in);
 }
 

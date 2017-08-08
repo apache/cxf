@@ -54,11 +54,10 @@ import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
-import org.apache.cxf.jaxrs.nio.DelegatingNioOutputStream;
 import org.apache.cxf.jaxrs.nio.NioOutputStream;
 import org.apache.cxf.jaxrs.nio.NioWriteEntity;
+import org.apache.cxf.jaxrs.nio.NioWriteHandler;
 import org.apache.cxf.jaxrs.nio.NioWriteListenerImpl;
-import org.apache.cxf.jaxrs.nio.NioWriterHandler;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -215,7 +214,7 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
         NioWriteListenerImpl listener =
             new NioWriteListenerImpl(cont,
                                      new NioWriteEntity(getNioHandler(is), null),
-                                     new DelegatingNioOutputStream(os));
+                                     new NioOutputStream(os));
         Message m = JAXRSUtils.getCurrentMessage();
         m.put(WriteListener.class, listener);
         cont.suspend(0);
@@ -261,9 +260,9 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
         this.bufferSize = bufferSize;
     }
 
-    protected NioWriterHandler getNioHandler(final InputStream in) {
+    protected NioWriteHandler getNioHandler(final InputStream in) {
 
-        return new NioWriterHandler() {
+        return new NioWriteHandler() {
             final byte[] buffer = new byte[bufferSize];
             @Override
             public boolean write(NioOutputStream out) {

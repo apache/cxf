@@ -32,12 +32,12 @@ public final class NioWriteListenerImpl implements WriteListener {
     private static final Logger LOG = LogUtils.getL7dLogger(NioWriteListenerImpl.class);
     private Continuation cont;
     private final NioWriteEntity entity;
-    private final DelegatingNioOutputStream out;
+    private final NioOutputStream out;
 
     public NioWriteListenerImpl(Continuation cont, NioWriteEntity entity, OutputStream out) {
         this.cont = cont;
         this.entity = entity;
-        this.out = new DelegatingNioOutputStream(out);
+        this.out = new NioOutputStream(out);
     }
 
     @Override

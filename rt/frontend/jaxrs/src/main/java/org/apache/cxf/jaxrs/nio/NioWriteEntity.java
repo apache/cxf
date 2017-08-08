@@ -19,15 +19,15 @@
 package org.apache.cxf.jaxrs.nio;
 
 public final class NioWriteEntity {
-    private final NioWriterHandler writer;
+    private final NioWriteHandler writer;
     private final NioErrorHandler error;
 
-    public NioWriteEntity(final NioWriterHandler writer, final NioErrorHandler error) {
+    public NioWriteEntity(final NioWriteHandler writer, final NioErrorHandler error) {
         this.writer = writer;
         this.error = error;
     }
 
-    public NioWriterHandler getWriter() {
+    public NioWriteHandler getWriter() {
         return writer;
     }
 
