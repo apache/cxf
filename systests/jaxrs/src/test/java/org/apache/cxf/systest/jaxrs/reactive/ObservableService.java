@@ -65,14 +65,6 @@ public class ObservableService {
 
     @GET
     @Produces("application/json")
-    @Path("textJsonImplicitList")
-    public Observable<HelloWorldBean> getJsonImplicitList() {
-        HelloWorldBean bean1 = new HelloWorldBean();
-        HelloWorldBean bean2 = new HelloWorldBean("Ciao");
-        return Observable.just(bean1, bean2);
-    }
-    @GET
-    @Produces("application/json")
     @Path("textJsonImplicitListAsync")
     public void getJsonImplicitListAsync(@Suspended AsyncResponse ar) {
         final HelloWorldBean bean1 = new HelloWorldBean();
