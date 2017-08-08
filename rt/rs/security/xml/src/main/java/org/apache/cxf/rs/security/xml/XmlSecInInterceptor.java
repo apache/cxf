@@ -149,10 +149,7 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> imple
             return false;
         }
         Integer responseCode = (Integer)message.get(Message.RESPONSE_CODE);
-        if (responseCode != null && responseCode != 200) {
-            return false;
-        }
-        return true;
+        return !(responseCode != null && responseCode != 200);
     }
     
     private boolean isServerGet(Message message) {

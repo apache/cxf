@@ -27,6 +27,7 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
@@ -41,7 +42,6 @@ import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
-import org.apache.wss4j.dom.WSConstants;
 
 /**
  * A CallbackHandler instance that is used by the STS to mock up a SAML Attribute Assertion.
@@ -55,8 +55,8 @@ public class SamlCallbackHandler implements CallbackHandler {
     private String cryptoAlias = "alice";
     private String cryptoPassword = "password";
     private String cryptoPropertiesFile = "alice.properties";
-    private String signatureAlgorithm = WSConstants.RSA_SHA1;
-    private String digestAlgorithm = WSConstants.SHA1;
+    private String signatureAlgorithm = WSS4JConstants.RSA_SHA1;
+    private String digestAlgorithm = WSS4JConstants.SHA1;
 
     public SamlCallbackHandler() {
         //

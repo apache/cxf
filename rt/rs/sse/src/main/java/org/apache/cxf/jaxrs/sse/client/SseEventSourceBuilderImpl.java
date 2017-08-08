@@ -21,12 +21,12 @@ package org.apache.cxf.jaxrs.sse.client;
 import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.sse.InboundSseEvent;
+import javax.ws.rs.sse.SseEvent;
 import javax.ws.rs.sse.SseEventSource;
 import javax.ws.rs.sse.SseEventSource.Builder;
 
 public class SseEventSourceBuilderImpl extends SseEventSource.Builder {
-    private long delay = InboundSseEvent.RECONNECT_NOT_SET;
+    private long delay = SseEvent.RECONNECT_NOT_SET;
     private TimeUnit unit = TimeUnit.MILLISECONDS;
     private WebTarget target;
     

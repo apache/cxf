@@ -141,7 +141,6 @@ public class PushBack401 extends AbstractPhaseInterceptor<Message> {
         }
         // No Authorization: Basic
         replyUnauthorized(message, null);
-        return;
     }
 
     /**
