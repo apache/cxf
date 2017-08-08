@@ -80,9 +80,8 @@ public class JwsJsonSignatureEntry implements JsonObject {
     public String getDecodedJwsPayload() {
         if (protectedHeader == null || !JwsUtils.isPayloadUnencoded(protectedHeader)) {
             return JoseUtils.decodeToString(jwsPayload);
-        } else {
-            return jwsPayload;
         }
+        return jwsPayload;
     }
     public byte[] getDecodedJwsPayloadBytes() {
         return StringUtils.toBytesUTF8(getDecodedJwsPayload());
@@ -108,9 +107,8 @@ public class JwsJsonSignatureEntry implements JsonObject {
     public String getUnsignedSequence() {
         if (getEncodedProtectedHeader() != null) {
             return getEncodedProtectedHeader() + "." + getJwsPayload();
-        } else {
-            return "." + getJwsPayload();
         }
+        return "." + getJwsPayload();
     }
     public String getKeyId() {
         return getUnionHeader().getKeyId();

@@ -140,9 +140,8 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
         if (durableSubscriptionName != null && destination instanceof Topic) {
             return session.createDurableSubscriber((Topic)destination, durableSubscriptionName,
                                                    messageSelector, pubSubNoLocal);
-        } else {
-            return session.createConsumer(destination, messageSelector);
         }
+        return session.createConsumer(destination, messageSelector);
     }
     
     protected void handleException(Exception e) {

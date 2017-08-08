@@ -141,9 +141,8 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
                     "WSA_REQUIRED_EXC", LOG);
                 LOG.log(Level.INFO, msg.toString());
                 throw new RMException(msg);
-            } else {
-                return;
             }
+            return;
         }
 
         String action = null;

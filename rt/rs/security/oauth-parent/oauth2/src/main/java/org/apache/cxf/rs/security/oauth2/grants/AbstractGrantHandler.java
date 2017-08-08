@@ -197,8 +197,7 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
                 throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
             }
             return audiences;
-        } else {
-            return client.getRegisteredAudiences();
         }
+        return client.getRegisteredAudiences();
     }
 }

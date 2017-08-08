@@ -39,16 +39,14 @@ public class OAuthJoseJwtConsumer extends JoseJwtConsumer {
     protected JwsSignatureVerifier getInitializedSignatureVerifier(String clientSecret) {
         if (verifyWithClientSecret && !StringUtils.isEmpty(clientSecret)) {
             return OAuthUtils.getClientSecretSignatureVerifier(clientSecret);
-        } else {
-            return null;
         }
+        return null;
     }
     protected JweDecryptionProvider getInitializedDecryptionProvider(String clientSecret) {
         if (decryptWithClientSecret && !StringUtils.isEmpty(clientSecret)) {
             return OAuthUtils.getClientSecretDecryptionProvider(clientSecret);
-        } else {
-            return null;
         }
+        return null;
     }
 
     public boolean isDecryptWithClientSecret() {

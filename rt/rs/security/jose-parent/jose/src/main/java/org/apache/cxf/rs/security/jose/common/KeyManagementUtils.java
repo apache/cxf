@@ -101,9 +101,8 @@ public final class KeyManagementUtils {
             Certificate[] certs = keyStore.getCertificateChain(alias);
             if (certs != null) {
                 return Arrays.copyOf(certs, certs.length, X509Certificate[].class);
-            } else {
-                return new X509Certificate[]{(X509Certificate)CryptoUtils.loadCertificate(keyStore, alias)};
             }
+            return new X509Certificate[]{(X509Certificate)CryptoUtils.loadCertificate(keyStore, alias)};
         } catch (Exception ex) {
             LOG.warning("X509 Certificates can not be created");
             throw new JoseException(ex);
@@ -347,9 +346,8 @@ public final class KeyManagementUtils {
                 }
             }
             return certs;
-        } else {
-            return null;
         }
+        return null;
     }
     //TODO: enhance the certificate validation code
     public static void validateCertificateChain(Properties storeProperties, List<X509Certificate> inCerts) {

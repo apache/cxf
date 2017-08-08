@@ -49,13 +49,12 @@ final class HttpsMessageTrustDecider extends MessageTrustDecider {
             throw new UntrustedURLConnectionIOException(
                 "No server certificates were found"
             );
-        } else {
-            X509Certificate[] certs = (X509Certificate[])info.getServerCertificates();
-            if (!certConstraints.matches(certs[0])) {
-                throw new UntrustedURLConnectionIOException(
-                    "The server certificate(s) do not match the defined cert constraints"
-                );
-            }
+        }
+        X509Certificate[] certs = (X509Certificate[])info.getServerCertificates();
+        if (!certConstraints.matches(certs[0])) {
+            throw new UntrustedURLConnectionIOException(
+                "The server certificate(s) do not match the defined cert constraints"
+            );
         }
     }
 }

@@ -167,9 +167,8 @@ public class DefaultEHCacheOAuthDataProvider extends AbstractOAuthDataProvider {
         Element e = cache.get(key);
         if (e != null) {
             return cls.cast(e.getObjectValue());
-        } else {
-            return null;
         }
+        return null;
     }
     protected static void putCacheValue(Ehcache cache, String key, Object value, long ttl) {
         Element element = new Element(key, value);

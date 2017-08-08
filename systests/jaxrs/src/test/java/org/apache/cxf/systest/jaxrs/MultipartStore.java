@@ -176,9 +176,8 @@ public class MultipartStore {
     public String testNullPart(@Multipart(value = "someid", required = false) String value) {
         if (value != null) {
             return value;
-        } else {
-            return "nobody home";
         }
+        return "nobody home";
     }
     @POST
     @Path("/books/testnullparts")
@@ -188,9 +187,8 @@ public class MultipartStore {
                                 @Multipart(value = "someid2", required = false) String value2) {
         if (value2 != null) {
             return value + value2;
-        } else {
-            return "nobody home2";
         }
+        return "nobody home2";
     }
 
     @POST

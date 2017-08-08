@@ -70,9 +70,8 @@ public class ResourceFactoryImpl implements ResourceFactory {
         ResourceReference resourceReference = resourceResolver.resolve(body);
         if (resourceReference.getResourceManager() != null) {
             return createLocally(body, resourceReference);
-        } else {
-            return createRemotely(body, resourceReference);
         }
+        return createRemotely(body, resourceReference);
     }
 
     public ResourceResolver getResourceResolver() {

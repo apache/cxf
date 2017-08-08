@@ -225,9 +225,8 @@ public class AbstractSSOSpHandler {
     protected String getIssuerId(Message m) {
         if (issuerId == null) {
             return new UriInfoImpl(m).getBaseUri().toString();
-        } else {
-            return issuerId;
         }
+        return issuerId;
     }
 
     public boolean isSupportUnsolicited() {

@@ -499,17 +499,16 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
                     CALL_ARGS.add(s);
                 }
                 return null;
-            } else {
-                synchronized (CALL_ARGS) {
-                    CALL_ARGS.add(s);
-                }
-                String resp =
-                    "<greetMeResponse "
-                        + "xmlns=\"http://cxf.apache.org/greeter_control/types\">"
-                        + "<responseType>" + s.toUpperCase() + "</responseType>"
-                    + "</greetMeResponse>";
-                return new StreamSource(new StringReader(resp));
             }
+            synchronized (CALL_ARGS) {
+                CALL_ARGS.add(s);
+            }
+            String resp =
+                "<greetMeResponse "
+                    + "xmlns=\"http://cxf.apache.org/greeter_control/types\">"
+                    + "<responseType>" + s.toUpperCase() + "</responseType>"
+                + "</greetMeResponse>";
+            return new StreamSource(new StringReader(resp));
         }
     }
 }

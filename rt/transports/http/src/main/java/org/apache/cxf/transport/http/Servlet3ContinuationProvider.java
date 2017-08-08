@@ -224,9 +224,8 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
             String exName = (String)inMessage.getContextualProperty("disconnected.client.exception.class");
             if (exName != null) {
                 return exName.equals(IOException.class.getName()) || exName.equals(ex.getClass().getName());
-            } else {
-                return false;
             }
+            return false;
         }
 
         @Override

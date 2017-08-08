@@ -257,9 +257,8 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         String method = map.get(pojoClass.getName());
         if (method != null) {
             return method;
-        } else {
-            return getCollectionMethod(map, pojoClass.getSuperclass());
         }
+        return getCollectionMethod(map, pojoClass.getSuperclass());
     }
 
     @SuppressWarnings("unchecked")
@@ -314,9 +313,8 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         T handler = handlers.get(pojoClass.getName());
         if (handler != null) {
             return handler;
-        } else {
-            return getAtomElementHandlerSuperClass(handlers, pojoClass.getSuperclass());
         }
+        return getAtomElementHandlerSuperClass(handlers, pojoClass.getSuperclass());
     }
 
     //CHECKSTYLE:OFF
@@ -603,13 +601,12 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
 
         if (isFeed) {
             return readFromFeedOrEntry(cls, mt, headers, is);
-        } else {
-            AtomEntryProvider p = new AtomEntryProvider();
-            p.setAutodetectCharset(autodetectCharset);
-            Entry entry = p.readFrom(Entry.class, Entry.class,
-                                     new Annotation[]{}, mt, headers, is);
-            return readFromEntry(entry, cls);
         }
+        AtomEntryProvider p = new AtomEntryProvider();
+        p.setAutodetectCharset(autodetectCharset);
+        Entry entry = p.readFrom(Entry.class, Entry.class,
+                                 new Annotation[]{}, mt, headers, is);
+        return readFromEntry(entry, cls);
     }
 
     @SuppressWarnings("unchecked")

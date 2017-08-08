@@ -143,16 +143,15 @@ public abstract class JmsSubscription extends AbstractSubscription implements Me
         if (session == null) {
             PauseFailedFaultType fault = new PauseFailedFaultType();
             throw new PauseFailedFault("Subscription is already paused", fault);
-        } else {
-            try {
-                session.close();
-                isSessionActive = false;
-            } catch (JMSException e) {
-                PauseFailedFaultType fault = new PauseFailedFaultType();
-                throw new PauseFailedFault("Error pausing subscription", fault, e);
-            } finally {
-                session = null;
-            }
+        }
+        try {
+            session.close();
+            isSessionActive = false;
+        } catch (JMSException e) {
+            PauseFailedFaultType fault = new PauseFailedFaultType();
+            throw new PauseFailedFault("Error pausing subscription", fault, e);
+        } finally {
+            session = null;
         }
     }
 
@@ -161,16 +160,15 @@ public abstract class JmsSubscription extends AbstractSubscription implements Me
         if (session != null) {
             ResumeFailedFaultType fault = new ResumeFailedFaultType();
             throw new ResumeFailedFault("Subscription is already running", fault);
-        } else {
-            try {
-                session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-                MessageConsumer consumer = session.createConsumer(jmsTopic);
-                consumer.setMessageListener(this);
-                isSessionActive = true;
-            } catch (JMSException e) {
-                ResumeFailedFaultType fault = new ResumeFailedFaultType();
-                throw new ResumeFailedFault("Error resuming subscription", fault, e);
-            }
+        }
+        try {
+            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            MessageConsumer consumer = session.createConsumer(jmsTopic);
+            consumer.setMessageListener(this);
+            isSessionActive = true;
+        } catch (JMSException e) {
+            ResumeFailedFaultType fault = new ResumeFailedFaultType();
+            throw new ResumeFailedFault("Error resuming subscription", fault, e);
         }
     }
 

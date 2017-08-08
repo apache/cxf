@@ -36,8 +36,8 @@ import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.OAuthRedirectionState;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
+import org.apache.cxf.rs.security.oidc.common.AbstractUserInfo;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
-import org.apache.cxf.rs.security.oidc.common.UserInfo;
 import org.apache.cxf.rt.security.crypto.MessageDigestUtils;
 
 public final class OidcUtils {
@@ -54,24 +54,24 @@ public final class OidcUtils {
     public static final String EMAIL_SCOPE = "email";
     public static final String ADDRESS_SCOPE = "address";
     public static final String PHONE_SCOPE = "phone";
-    public static final List<String> PROFILE_CLAIMS = Arrays.asList(UserInfo.NAME_CLAIM,
-                                                                    UserInfo.FAMILY_NAME_CLAIM,
-                                                                    UserInfo.GIVEN_NAME_CLAIM,
-                                                                    UserInfo.MIDDLE_NAME_CLAIM,
-                                                                    UserInfo.NICKNAME_CLAIM,
-                                                                    UserInfo.PREFERRED_USERNAME_CLAIM,
-                                                                    UserInfo.PROFILE_CLAIM,
-                                                                    UserInfo.PICTURE_CLAIM,
-                                                                    UserInfo.WEBSITE_CLAIM,
-                                                                    UserInfo.GENDER_CLAIM,
-                                                                    UserInfo.BIRTHDATE_CLAIM,
-                                                                    UserInfo.ZONEINFO_CLAIM,
-                                                                    UserInfo.LOCALE_CLAIM,
-                                                                    UserInfo.UPDATED_AT_CLAIM);
-    public static final List<String> EMAIL_CLAIMS = Arrays.asList(UserInfo.EMAIL_CLAIM,
-                                                                  UserInfo.EMAIL_VERIFIED_CLAIM);
-    public static final List<String> ADDRESS_CLAIMS = Arrays.asList(UserInfo.ADDRESS_CLAIM);
-    public static final List<String> PHONE_CLAIMS = Arrays.asList(UserInfo.PHONE_CLAIM);
+    public static final List<String> PROFILE_CLAIMS = Arrays.asList(AbstractUserInfo.NAME_CLAIM,
+                                                                    AbstractUserInfo.FAMILY_NAME_CLAIM,
+                                                                    AbstractUserInfo.GIVEN_NAME_CLAIM,
+                                                                    AbstractUserInfo.MIDDLE_NAME_CLAIM,
+                                                                    AbstractUserInfo.NICKNAME_CLAIM,
+                                                                    AbstractUserInfo.PREFERRED_USERNAME_CLAIM,
+                                                                    AbstractUserInfo.PROFILE_CLAIM,
+                                                                    AbstractUserInfo.PICTURE_CLAIM,
+                                                                    AbstractUserInfo.WEBSITE_CLAIM,
+                                                                    AbstractUserInfo.GENDER_CLAIM,
+                                                                    AbstractUserInfo.BIRTHDATE_CLAIM,
+                                                                    AbstractUserInfo.ZONEINFO_CLAIM,
+                                                                    AbstractUserInfo.LOCALE_CLAIM,
+                                                                    AbstractUserInfo.UPDATED_AT_CLAIM);
+    public static final List<String> EMAIL_CLAIMS = Arrays.asList(AbstractUserInfo.EMAIL_CLAIM,
+                                                                  AbstractUserInfo.EMAIL_VERIFIED_CLAIM);
+    public static final List<String> ADDRESS_CLAIMS = Arrays.asList(AbstractUserInfo.ADDRESS_CLAIM);
+    public static final List<String> PHONE_CLAIMS = Arrays.asList(AbstractUserInfo.PHONE_CLAIM);
     public static final String CLAIMS_PARAM = "claims";
     public static final String CLAIM_NAMES_PROPERTY = "_claim_names";
     public static final String CLAIM_SOURCES_PROPERTY = "_claim_sources";
@@ -100,9 +100,8 @@ public final class OidcUtils {
         String prompt = params.getFirst(PROMPT_PARAMETER);
         if (prompt != null) {
             return Arrays.asList(prompt.trim().split(" "));
-        } else {
-            return Collections.emptyList();
         }
+        return Collections.emptyList();
     }
 
     public static String getOpenIdScope() {

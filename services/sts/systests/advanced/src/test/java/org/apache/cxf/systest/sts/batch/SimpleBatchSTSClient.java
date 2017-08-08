@@ -454,11 +454,10 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
                 && VersionTransformer.isSupported(el.getNamespaceURI())
                 && "MetadataReference".equals(ref.getLocalName())) {
                 return DOMUtils.getContent(el);
-            } else {
-                String ad = findMEXLocation(el);
-                if (ad != null) {
-                    return ad;
-                }
+            }
+            String ad = findMEXLocation(el);
+            if (ad != null) {
+                return ad;
             }
             el = DOMUtils.getNextElement(el);
         }
@@ -963,25 +962,24 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noCipher");
             }
             return cipherValue;
-        } else {
-            try {
-                EncryptedKeyProcessor proc = new EncryptedKeyProcessor();
-                RequestData data = new RequestData();
-                data.setWssConfig(WSSConfig.getNewInstance());
-                data.setDecCrypto(createCrypto(true));
-                data.setCallbackHandler(createHandler());
+        }
+        try {
+            EncryptedKeyProcessor proc = new EncryptedKeyProcessor();
+            RequestData data = new RequestData();
+            data.setWssConfig(WSSConfig.getNewInstance());
+            data.setDecCrypto(createCrypto(true));
+            data.setCallbackHandler(createHandler());
 
-                WSDocInfo docInfo = new WSDocInfo(child.getOwnerDocument());
-                data.setWsDocInfo(docInfo);
+            WSDocInfo docInfo = new WSDocInfo(child.getOwnerDocument());
+            data.setWsDocInfo(docInfo);
 
-                List<WSSecurityEngineResult> result = proc.handleToken(child, data);
-                return
-                    (byte[])result.get(0).get(
-                        WSSecurityEngineResult.TAG_SECRET
-                    );
-            } catch (IOException e) {
-                throw new TrustException("ENCRYPTED_KEY_ERROR", e, LOG);
-            }
+            List<WSSecurityEngineResult> result = proc.handleToken(child, data);
+            return
+                (byte[])result.get(0).get(
+                    WSSecurityEngineResult.TAG_SECRET
+                );
+        } catch (IOException e) {
+            throw new TrustException("ENCRYPTED_KEY_ERROR", e, LOG);
         }
     }
 

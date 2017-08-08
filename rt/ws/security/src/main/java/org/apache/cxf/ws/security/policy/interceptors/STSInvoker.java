@@ -133,9 +133,8 @@ abstract class STSInvoker implements Invoker {
             } catch (Exception ex) {
                 throw new Fault(ex);
             }
-        } else {
-            throw new Fault("Unknown SecureConversation element: " + requestEl.getLocalName(), LOG);
         }
+        throw new Fault("Unknown SecureConversation element: " + requestEl.getLocalName(), LOG);
     }
 
     abstract void doIssue(

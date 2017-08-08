@@ -191,9 +191,8 @@ final class InternalContextUtils {
                         && partialResponse.getContent(Exception.class) != null) {
                         if (partialResponse.getContent(Exception.class) instanceof Fault) {
                             throw (Fault)partialResponse.getContent(Exception.class);
-                        } else {
-                            throw new Fault(partialResponse.getContent(Exception.class));
                         }
+                        throw new Fault(partialResponse.getContent(Exception.class));
                     }
                     if (chain != null) {
                         chain.reset();

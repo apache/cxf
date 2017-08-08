@@ -723,13 +723,11 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
         if (x.getVarInt() == null) {
             if (x.getVarFloat() == null) {
                 return y.getVarInt() == null && y.getVarFloat() == null;
-            } else {
-                return false;
             }
-        } else {
-            if (x.getVarFloat() == null || y.getVarInt() == null || y.getVarFloat() == null) {
-                return false;
-            }
+            return false;
+        }
+        if (x.getVarFloat() == null || y.getVarInt() == null || y.getVarFloat() == null) {
+            return false;
         }
         return x.getVarFloat().compareTo(y.getVarFloat()) == 0
             && x.getVarInt() == y.getVarInt();
@@ -1088,9 +1086,8 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
             } else if (xo instanceof RecSeqB6918) {
                 if (yo instanceof RecSeqB6918) {
                     return equals((RecSeqB6918)xo, (RecSeqB6918)yo);
-                } else {
-                    return false;
                 }
+                return false;
             }
         }
         return true;

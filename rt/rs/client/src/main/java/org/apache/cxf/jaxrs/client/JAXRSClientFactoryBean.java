@@ -247,9 +247,8 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
         if (initialState != null) {
             return headers != null
                 ? initialState.newState(URI.create(getAddress()), headers, null) : initialState;
-        } else {
-            return null;
         }
+        return null;
     }
 
     /**
@@ -270,9 +269,8 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
     public Client create() {
         if (serviceClass == WebClient.class) {
             return createWebClient();
-        } else {
-            return createWithValues();
         }
+        return createWithValues();
     }
 
     /**
@@ -391,9 +389,8 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
                         && AnnotationUtils.getAnnotation(anns, HeaderParam.class) == null
                         && AnnotationUtils.getAnnotation(anns, CookieParam.class) == null) {
                         return (ParamConverter<T>)new UrlEncodingParamConverter(encodeClientParametersList);
-                    } else {
-                        return null;
                     }
+                    return null;
                 }
 
             });

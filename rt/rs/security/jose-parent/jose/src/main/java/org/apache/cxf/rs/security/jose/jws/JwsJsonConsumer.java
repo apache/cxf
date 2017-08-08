@@ -109,9 +109,8 @@ public class JwsJsonConsumer {
     public String getDecodedJwsPayload() {
         if (validateB64Status()) {
             return JoseUtils.decodeToString(jwsPayload);
-        } else {
-            return jwsPayload;
         }
+        return jwsPayload;
     }
     public byte[] getDecodedJwsPayloadBytes() {
         return StringUtils.toBytesUTF8(getDecodedJwsPayload());
@@ -220,9 +219,8 @@ public class JwsJsonConsumer {
             JwsJsonProducer producer = new JwsJsonProducer(getDecodedJwsPayload());
             producer.getSignatureEntries().addAll(nonValidated);
             return producer.getJwsJsonSignedDocument();
-        } else {
-            return null;
         }
+        return null;
     }
 
 

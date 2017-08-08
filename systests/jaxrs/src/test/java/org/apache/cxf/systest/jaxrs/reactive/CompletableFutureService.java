@@ -40,9 +40,8 @@ public class CompletableFutureService {
     public Book getBook(@PathParam("id") long id) {
         if (123L == id) {
             return new Book("cxf", 123L);
-        } else {
-            throw new NotFoundException();
         }
+        throw new NotFoundException();
     }
     @GET
     @Produces("text/xml")

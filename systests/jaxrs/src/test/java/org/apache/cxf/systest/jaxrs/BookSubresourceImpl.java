@@ -118,9 +118,8 @@ public class BookSubresourceImpl implements BookSubresource {
         String comment2 = comments.get(2L);
         if ("Good".equals(comment1) && "Good".equals(comment2)) {
             return book;
-        } else {
-            return null;
         }
+        return null;
     }
 
 }

@@ -176,9 +176,8 @@ public class DefaultConditionsProvider implements ConditionsProvider {
                     if (isFailLifetimeExceedance()) {
                         throw new STSException("Requested lifetime exceeds maximum lifetime",
                                                STSException.INVALID_TIME);
-                    } else {
-                        expirationTime = creationTime.plusSeconds(getMaxLifetime());
                     }
+                    expirationTime = creationTime.plusSeconds(getMaxLifetime());
                 }
 
                 conditions.setNotAfter(expirationTime);

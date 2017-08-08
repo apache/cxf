@@ -157,9 +157,8 @@ public class BookStoreSoapRestImpl implements BookStoreJaxrsJaxws {
     public Response checkBook(Long id) {
         if (id.longValue() != 0L) {
             return Response.status(HttpStatus.SC_NOT_FOUND).build();
-        } else {
-            return Response.ok().build();
         }
+        return Response.ok().build();
     }
 
 }

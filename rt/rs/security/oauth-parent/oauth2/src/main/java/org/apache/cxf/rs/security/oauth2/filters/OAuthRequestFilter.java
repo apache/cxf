@@ -219,9 +219,8 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
     protected boolean checkScopeProperty(String scope) {
         if (!requiredScopes.isEmpty()) {
             return requiredScopes.contains(scope);
-        } else {
-            return true;
         }
+        return true;
     }
     public void setUseUserSubject(boolean useUserSubject) {
         this.useUserSubject = useUserSubject;
@@ -292,9 +291,8 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
     protected String[] getAuthorizationParts(Message m) {
         if (!checkFormData) {
             return AuthorizationUtils.getAuthorizationParts(getMessageContext(), supportedSchemes);
-        } else {
-            return new String[]{OAuthConstants.BEARER_AUTHORIZATION_SCHEME, getTokenFromFormData(m)};
         }
+        return new String[]{OAuthConstants.BEARER_AUTHORIZATION_SCHEME, getTokenFromFormData(m)};
     }
 
     protected String getTokenFromFormData(Message message) {

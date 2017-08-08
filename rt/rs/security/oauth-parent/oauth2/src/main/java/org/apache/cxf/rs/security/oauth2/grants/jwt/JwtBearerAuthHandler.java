@@ -72,9 +72,8 @@ public class JwtBearerAuthHandler extends OAuthServerJoseJwtConsumer implements 
             client = clientProvider.getClient(clientId);
             if (client == null) {
                 throw ExceptionUtils.toNotAuthorizedException(null, null);
-            } else {
-                message.put(Client.class, client);
             }
+            message.put(Client.class, client);
         }
         JwtToken token = super.getJwtToken(assertion, client);
 

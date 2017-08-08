@@ -397,9 +397,8 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
                 //reason phrase in response, return a informative value
                 //to tell user no reason phrase in the response instead of null
                 return "no reason phrase in the response";
-            } else {
-                return connection.getResponseMessage();
             }
+            return connection.getResponseMessage();
         }
         protected InputStream getPartialResponse() throws IOException {
             return ChunkedUtil.getPartialResponse(connection, connection.getResponseCode());

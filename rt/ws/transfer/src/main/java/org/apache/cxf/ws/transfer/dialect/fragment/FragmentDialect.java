@@ -97,9 +97,8 @@ public class FragmentDialect implements Dialect {
                 if (languages.containsKey(languageIRI)) {
                     FragmentDialectLanguage language = languages.get(languageIRI);
                     return generateGetResponse(language.getResourceFragment(representation, expression));
-                } else {
-                    throw new UnsupportedLanguage();
                 }
+                throw new UnsupportedLanguage();
             }
         }
         throw new SoapFault("wsf:Expression is not present.", getSoapVersion().getSender());
@@ -132,9 +131,8 @@ public class FragmentDialect implements Dialect {
                         mode = FragmentDialectConstants.FRAGMENT_MODE_ADD;
                     }
                     return modifyRepresentation(resourceFragment, mode, value);
-                } else {
-                    throw new UnsupportedLanguage();
                 }
+                throw new UnsupportedLanguage();
             }
         }
         throw new SoapFault("wsf:Fragment is not present.", getSoapVersion().getSender());
@@ -270,9 +268,8 @@ public class FragmentDialect implements Dialect {
             }
             expression.getContent().add(expr);
             return expression;
-        } else {
-            throw new InvalidExpression();
         }
+        throw new InvalidExpression();
     }
 
     /**

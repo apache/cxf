@@ -38,16 +38,14 @@ public class OAuthJoseJwtProducer extends JoseJwtProducer {
     protected JwsSignatureProvider getInitializedSignatureProvider(String clientSecret) {
         if (signWithClientSecret && !StringUtils.isEmpty(clientSecret)) {
             return OAuthUtils.getClientSecretSignatureProvider(clientSecret);
-        } else {
-            return null;
         }
+        return null;
     }
     protected JweEncryptionProvider getInitializedEncryptionProvider(String clientSecret) {
         if (encryptWithClientSecret && !StringUtils.isEmpty(clientSecret)) {
             return OAuthUtils.getClientSecretEncryptionProvider(clientSecret);
-        } else {
-            return null;
         }
+        return null;
     }
 
     public void setEncryptWithClientSecret(boolean encryptWithClientSecret) {

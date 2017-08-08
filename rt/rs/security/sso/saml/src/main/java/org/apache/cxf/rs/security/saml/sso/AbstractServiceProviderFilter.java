@@ -269,9 +269,8 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
                              .path(assertionConsumerServiceAddress)
                              .build()
                              .toString();
-        } else {
-            return assertionConsumerServiceAddress;
         }
+        return assertionConsumerServiceAddress;
     }
 
     protected void reportError(String code) {
@@ -292,13 +291,11 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
         if (addWebAppContext) {
             if (addEndpointAddressToContext) {
                 return new UriInfoImpl(m).getBaseUri().getRawPath();
-            } else {
-                String httpBasePath = (String)m.get("http.base.path");
-                return URI.create(httpBasePath).getRawPath();
             }
-        } else {
-            return "/";
+            String httpBasePath = (String)m.get("http.base.path");
+            return URI.create(httpBasePath).getRawPath();
         }
+        return "/";
     }
 
     public String getWebAppDomain() {

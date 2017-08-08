@@ -52,8 +52,7 @@ class DelegatingServletConfig implements ServletConfig {
     public String getInitParameter(String name) {
         if (Objects.equals(SwaggerContextService.USE_PATH_BASED_CONFIG, name)) {
             return "true";
-        } else {
-            return delegate.getInitParameter(name);
         }
+        return delegate.getInitParameter(name);
     }
 }

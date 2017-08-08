@@ -197,9 +197,8 @@ public class EffectivePolicyImpl implements EffectivePolicy {
         if (null == alternative) {
             PolicyUtils.logPolicy(LOG, Level.FINE, "No alternative supported.", getPolicy());
             throw new PolicyException(new org.apache.cxf.common.i18n.Message("NO_ALTERNATIVE_EXC", BUNDLE));
-        } else {
-            setChosenAlternative(alternative);
         }
+        setChosenAlternative(alternative);
     }
 
     void initialiseInterceptors(PolicyEngine engine, Message m) {

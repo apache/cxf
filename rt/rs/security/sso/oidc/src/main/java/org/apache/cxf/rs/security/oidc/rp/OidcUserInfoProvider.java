@@ -46,9 +46,8 @@ public class OidcUserInfoProvider implements ContextProvider<UserInfoContext> {
                 }
 
             };
-        } else {
-            return null;
         }
+        return null;
 
     }
 

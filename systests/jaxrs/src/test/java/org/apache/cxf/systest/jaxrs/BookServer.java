@@ -242,9 +242,8 @@ public class BookServer extends AbstractBusTestServerBase {
             String status = r.getHeaderString("Status");
             if ("notReturned".equals(status)) {
                 return new BookNotReturnedException(status);
-            } else {
-                return null;
             }
+            return null;
         }
 
     }
@@ -255,9 +254,8 @@ public class BookServer extends AbstractBusTestServerBase {
             String status = r.getHeaderString("Status");
             if ("notFound".equals(status)) {
                 return new BookNotFoundFault(status);
-            } else {
-                return null;
             }
+            return null;
         }
 
     }

@@ -500,13 +500,12 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
             saml1Assertion.setID(IDGenerator.generateID("_"));
 
             return oldId;
-        } else {
-            org.opensaml.saml.saml2.core.Assertion saml2Assertion = assertion.getSaml2();
-            String oldId = saml2Assertion.getID();
-            saml2Assertion.setID(IDGenerator.generateID("_"));
-
-            return oldId;
         }
+        org.opensaml.saml.saml2.core.Assertion saml2Assertion = assertion.getSaml2();
+        String oldId = saml2Assertion.getID();
+        saml2Assertion.setID(IDGenerator.generateID("_"));
+
+        return oldId;
     }
 
     private void storeTokenInCache(
@@ -532,9 +531,8 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
     private DateTime getExpiryDate(SamlAssertionWrapper assertion) {
         if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
             return assertion.getSaml2().getConditions().getNotOnOrAfter();
-        } else {
-            return assertion.getSaml1().getConditions().getNotOnOrAfter();
         }
+        return assertion.getSaml1().getConditions().getNotOnOrAfter();
     }
 
     private static class ProofOfPossessionValidator {

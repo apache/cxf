@@ -347,9 +347,8 @@ public class WadlGenerator implements ContainerRequestFilter {
             if (!isJson) {
                 if (stylesheetReference != null && applyStylesheetLocally) {
                     return transformLocally(m, ui, new StreamSource(new StringReader(entity)));
-                } else {
-                    return entity;
                 }
+                return entity;
             }
             return StaxUtils.read(new StringReader(entity));
         } catch (Exception ex) {
@@ -362,9 +361,8 @@ public class WadlGenerator implements ContainerRequestFilter {
         String publishedEndpointUrl = (String)ei.getProperty("publishedEndpointUrl");
         if (publishedEndpointUrl == null) {
             return ui.getBaseUri().toString();
-        } else {
-            return publishedEndpointUrl;
         }
+        return publishedEndpointUrl;
     }
 
     protected void handleGrammars(StringBuilder sbApp, StringBuilder sbGrammars, SchemaWriter writer,
@@ -675,9 +673,8 @@ public class WadlGenerator implements ContainerRequestFilter {
             }
 
             return ori1PathParams == ori2PathParams && ori1MatrixParams == ori2MatrixParams;
-        } else {
-            return true;
         }
+        return true;
     }
 
     private boolean openResource(String path) {
@@ -794,9 +791,8 @@ public class WadlGenerator implements ContainerRequestFilter {
                 }
             }
             return new Annotation[] {};
-        } else {
-            return opMethod.getDeclaredAnnotations();
         }
+        return opMethod.getDeclaredAnnotations();
     }
 
     private void writeParam(StringBuilder sb, Parameter pm, OperationResourceInfo ori, boolean isJson) {
@@ -1540,9 +1536,8 @@ public class WadlGenerator implements ContainerRequestFilter {
         String ns = JAXBUtils.getPackageNamespace(type);
         if (ns != null) {
             return getQNameFromParts(name, ns, type, clsMap);
-        } else {
-            return null;
         }
+        return null;
 
     }
 
@@ -1873,9 +1868,8 @@ public class WadlGenerator implements ContainerRequestFilter {
             if (context != null) {
                 JAXBContextProxy proxy = JAXBUtils.createJAXBContextProxy(context);
                 return new JaxbContextQNameResolver(proxy);
-            } else {
-                return null;
             }
+            return null;
         } else if (externalQnamesMap != null) {
             return new SchemaQNameResolver(externalQnamesMap);
         } else {
@@ -2086,9 +2080,8 @@ public class WadlGenerator implements ContainerRequestFilter {
                 QName qname = DOMUtils.convertStringToQName(name.value(), name.prefix());
                 if (qname.getPrefix().length() > 0) {
                     return qname;
-                } else {
-                    return getQNameFromParts(qname.getLocalPart(), qname.getNamespaceURI(), type, clsMap);
                 }
+                return getQNameFromParts(qname.getLocalPart(), qname.getNamespaceURI(), type, clsMap);
             }
             return null;
         }

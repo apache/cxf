@@ -1699,9 +1699,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
                 SgBaseTypeA yTypeA = y.getSg04NillableBaseElementA().getValue();
                 return equals(xTypeA, yTypeA);
             }
-        } else {
-            return y.getSg04NillableBaseElementA() == null;
         }
+        return y.getSg04NillableBaseElementA() == null;
     }
     @Test
     public void testChoiceWithSubstitutionGroupNil() throws Exception {
@@ -1754,17 +1753,15 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
                 SgDerivedTypeC xTypeC = (SgDerivedTypeC)x;
                 SgDerivedTypeC yTypeC = (SgDerivedTypeC)y;
                 return equals(xTypeC, yTypeC);
-            } else {
-                return false;
             }
+            return false;
         } else if (x instanceof SgDerivedTypeB) {
             if (y instanceof SgDerivedTypeB) {
                 SgDerivedTypeB xTypeB = (SgDerivedTypeB)x;
                 SgDerivedTypeB yTypeB = (SgDerivedTypeB)y;
                 return equals(xTypeB, yTypeB);
-            } else {
-                return false;
             }
+            return false;
         }
         return true;
     }

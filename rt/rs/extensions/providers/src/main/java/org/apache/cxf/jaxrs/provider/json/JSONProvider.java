@@ -211,9 +211,8 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         if (isPayloadEmpty(headers)) {
             if (AnnotationUtils.getAnnotation(anns, Nullable.class) != null) {
                 return null;
-            } else {
-                reportEmptyContentLength();
             }
+            reportEmptyContentLength();
         }
 
         XMLStreamReader reader = null;
@@ -259,9 +258,8 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         } catch (XMLStreamException e) {
             if (e.getCause() instanceof JSONSequenceTooLargeException) {
                 throw new WebApplicationException(413);
-            } else {
-                handleXMLStreamException(e, true);
             }
+            handleXMLStreamException(e, true);
         } catch (WebApplicationException e) {
             throw e;
         } catch (Exception e) {
@@ -323,9 +321,8 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
 
             };
             return new SequenceInputStream(list);
-        } else {
-            return is;
         }
+        return is;
 
     }
 

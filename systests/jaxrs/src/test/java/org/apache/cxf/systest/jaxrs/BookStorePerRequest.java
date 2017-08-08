@@ -109,11 +109,10 @@ public class BookStorePerRequest {
         Book book = books.get(Long.parseLong(id));
         if (book != null) {
             return book;
-        } else {
-            BookNotFoundDetails details = new BookNotFoundDetails();
-            details.setId(Long.parseLong(id));
-            throw new BookNotFoundFault(details);
         }
+        BookNotFoundDetails details = new BookNotFoundDetails();
+        details.setId(Long.parseLong(id));
+        throw new BookNotFoundFault(details);
     }
 
 

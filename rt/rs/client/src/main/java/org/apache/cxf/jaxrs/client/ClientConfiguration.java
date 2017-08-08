@@ -68,9 +68,8 @@ public class ClientConfiguration implements InterceptorProvider, ConduitSelector
         Conduit conduit = getConduit();
         if (conduit instanceof HTTPConduit) {
             return ((HTTPConduit)conduit).getClient().getReceiveTimeout();
-        } else {
-            return synchronousTimeout;
         }
+        return synchronousTimeout;
     }
 
     /**

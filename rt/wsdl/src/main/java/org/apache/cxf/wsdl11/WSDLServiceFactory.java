@@ -115,15 +115,14 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
             }
             if (services.size() == 0) {
                 throw new ServiceConstructionException(new Message("NO_SERVICE_EXC", LOG));
-            } else {
-                //@@TODO  - this isn't good, need to return all the services
-                serviceName = services.get(0).getName();
-                //get all the service info's that match that first one.
-                Iterator<ServiceInfo> it = services.iterator();
-                while (it.hasNext()) {
-                    if (!it.next().getName().equals(serviceName)) {
-                        it.remove();
-                    }
+            }
+            //@@TODO  - this isn't good, need to return all the services
+            serviceName = services.get(0).getName();
+            //get all the service info's that match that first one.
+            Iterator<ServiceInfo> it = services.iterator();
+            while (it.hasNext()) {
+                if (!it.next().getName().equals(serviceName)) {
+                    it.remove();
                 }
             }
         } else {

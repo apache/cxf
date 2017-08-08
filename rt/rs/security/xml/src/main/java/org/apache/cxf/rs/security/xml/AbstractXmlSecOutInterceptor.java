@@ -91,9 +91,8 @@ public abstract class AbstractXmlSecOutInterceptor extends AbstractPhaseIntercep
         MessageContentsList objs = MessageContentsList.getContentsList(message);
         if (objs == null || objs.size() == 0) {
             return null;
-        } else {
-            return objs.get(0);
         }
+        return objs.get(0);
     }
 
     @SuppressWarnings("unchecked")

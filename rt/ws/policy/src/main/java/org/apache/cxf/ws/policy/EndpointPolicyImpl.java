@@ -170,9 +170,8 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         }
         if (null == alternative) {
             throw new PolicyException(new org.apache.cxf.common.i18n.Message("NO_ALTERNATIVE_EXC", BUNDLE));
-        } else {
-            setChosenAlternative(alternative);
         }
+        setChosenAlternative(alternative);
     }
 
     protected Collection<Assertion> getSupportedAlternatives(Message msg) {

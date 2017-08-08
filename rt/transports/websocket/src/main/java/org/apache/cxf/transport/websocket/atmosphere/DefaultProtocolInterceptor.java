@@ -343,9 +343,8 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
             if (request.attributes().get(RESPONSE_PARENT) == null) {
                 request.attributes().put(RESPONSE_PARENT, "true");
                 return createResponse(response, responseDraft, true);
-            } else {
-                return createResponse(response, responseDraft, false);
             }
+            return createResponse(response, responseDraft, false);
         }
 
         @Override

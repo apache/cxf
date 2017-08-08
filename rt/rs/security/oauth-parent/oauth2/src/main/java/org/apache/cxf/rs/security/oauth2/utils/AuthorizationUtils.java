@@ -42,9 +42,8 @@ public final class AuthorizationUtils {
         String[] parts = AuthorizationUtils.getAuthorizationParts(mc);
         if (parts.length == 2) {
             return getBasicAuthParts(parts[1]);
-        } else {
-            return null;
         }
+        return null;
     }
     public static String[] getBasicAuthParts(String basicAuthData) {
         String authDecoded = null;

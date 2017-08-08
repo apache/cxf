@@ -442,9 +442,8 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
 
                 utBuilder.setUserInfo(userName, password);
                 return utBuilder;
-            } else {
-                policyNotAsserted(token, "No username available", message);
             }
+            policyNotAsserted(token, "No username available", message);
         } else {
             policyNotAsserted(token, "No username available", message);
         }

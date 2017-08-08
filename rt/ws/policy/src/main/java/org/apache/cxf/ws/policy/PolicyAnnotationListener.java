@@ -450,9 +450,8 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
     private Element loadPolicy(String uri, String defName) {
         if (!uri.startsWith("#")) {
             return loadRemotePolicy(uri, defName);
-        } else {
-            return loadLocalPolicy(uri);
         }
+        return loadLocalPolicy(uri);
     }
 
     private Element loadRemotePolicy(String uri, String defName) {
@@ -492,8 +491,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
             .getBeanOfType(uri.substring(1), PolicyBean.class);
         if (null != pb) {
             return pb.getElement();
-        } else {
-            return null;
         }
+        return null;
     }
 }

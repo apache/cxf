@@ -698,19 +698,18 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
     ) throws Exception {
         if (endorse) {
             throw new Exception("Endorsing UsernameTokens are not supported in the streaming code");
-        } else {
-            SecurePart securePart = addUsernameToken(token);
-            if (securePart != null) {
-                ret.put(token, securePart);
-                //WebLogic and WCF always encrypt these
-                //See:  http://e-docs.bea.com/wls/docs103/webserv_intro/interop.html
-                //encryptedTokensIdList.add(utBuilder.getId());
-                if (encryptedToken
-                    || MessageUtils.getContextualBoolean(message,
-                                                         SecurityConstants.ALWAYS_ENCRYPT_UT,
-                                                         true)) {
-                    encryptedTokensList.add(securePart);
-                }
+        }
+        SecurePart securePart = addUsernameToken(token);
+        if (securePart != null) {
+            ret.put(token, securePart);
+            //WebLogic and WCF always encrypt these
+            //See:  http://e-docs.bea.com/wls/docs103/webserv_intro/interop.html
+            //encryptedTokensIdList.add(utBuilder.getId());
+            if (encryptedToken
+                || MessageUtils.getContextualBoolean(message,
+                                                     SecurityConstants.ALWAYS_ENCRYPT_UT,
+                                                     true)) {
+                encryptedTokensList.add(securePart);
             }
         }
     }

@@ -56,9 +56,8 @@ public class AuthorizationService {
         RedirectionBasedGrantService service = getService(responseType);
         if (service != null) {
             return service.authorize();
-        } else {
-            return reportInvalidResponseType();
         }
+        return reportInvalidResponseType();
     }
 
     @GET
@@ -67,9 +66,8 @@ public class AuthorizationService {
         RedirectionBasedGrantService service = getService(responseType);
         if (service != null) {
             return service.authorizeDecision();
-        } else {
-            return reportInvalidResponseType();
         }
+        return reportInvalidResponseType();
     }
 
     /**
@@ -84,9 +82,8 @@ public class AuthorizationService {
         RedirectionBasedGrantService service = getService(responseType);
         if (service != null) {
             return service.authorizeDecisionForm(params);
-        } else {
-            return reportInvalidResponseType();
         }
+        return reportInvalidResponseType();
     }
 
     private RedirectionBasedGrantService getService(String responseType) {

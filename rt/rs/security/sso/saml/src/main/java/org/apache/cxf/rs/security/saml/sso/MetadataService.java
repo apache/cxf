@@ -96,12 +96,11 @@ public class MetadataService extends AbstractSSOSpHandler {
                                                   rawPath + logoutServiceAddress,
                                                   privateKey, issuerCerts[0],
                                                   true);
-            } else {
-                return metadataWriter.getMetaData(serviceAddress, assertionConsumerServiceAddress,
-                                                  logoutServiceAddress,
-                                                  privateKey, issuerCerts[0],
-                                                  true);
             }
+            return metadataWriter.getMetaData(serviceAddress, assertionConsumerServiceAddress,
+                                              logoutServiceAddress,
+                                              privateKey, issuerCerts[0],
+                                              true);
         } catch (Exception ex) {
             LOG.log(Level.FINE, ex.getMessage(), ex);
             throw ExceptionUtils.toInternalServerErrorException(ex, null);

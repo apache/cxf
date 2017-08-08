@@ -62,10 +62,8 @@ public class BearerAuthSupplier extends AbstractAuthSupplier implements HttpAuth
         // the last call resulted in 401, trying to refresh the token(s)
         if (refreshAccessToken(authPolicy)) {
             return createAuthorizationHeader();
-        } else {
-            return null;
-
         }
+        return null;
     }
     private void refreshAccessTokenIfExpired(AuthorizationPolicy authPolicy) {
         ClientAccessToken at = getClientAccessToken();

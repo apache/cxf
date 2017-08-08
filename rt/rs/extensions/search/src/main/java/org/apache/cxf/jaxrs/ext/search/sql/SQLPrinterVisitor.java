@@ -78,9 +78,8 @@ public class SQLPrinterVisitor<T> extends AbstractUntypedSearchConditionVisitor<
                 } else if (properties.length == 2) {
                     if (joinDone) {
                         throw new SearchParseException("SQL Visitor has already created JOIN");
-                    } else {
-                        joinDone = true;
                     }
+                    joinDone = true;
                     String joinTable = getRealPropertyName(properties[0]);
                     // Joining key can be pre-configured
                     String joiningKey = primaryTable;

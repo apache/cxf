@@ -31,9 +31,8 @@ public class CustomWebApplicationExceptionMapper extends WebApplicationException
         if (exception.getResponse().getStatus() == 500) {
             return Response.status(500).type("text/plain")
                 .entity(exception.getCause().getMessage()).build();
-        } else {
-            return super.toResponse(exception);
         }
+        return super.toResponse(exception);
     }
 
 }

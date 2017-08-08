@@ -71,9 +71,8 @@ public class JmsTopicExpressionConverter {
                 }
             }
             throw new InvalidTopicException("No topic name available topic: " + topic);
-        } else {
-            throw new InvalidTopicException("Topic dialect: " + dialect + " not supported");
         }
+        throw new InvalidTopicException("Topic dialect: " + dialect + " not supported");
     }
 
     // Implementation methods

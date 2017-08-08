@@ -975,9 +975,8 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         public Exception fromResponse(Response r) {
             if (r.getStatus() == HttpStatus.SC_NOT_FOUND) {
                 return new NotFoundException();
-            } else {
-                return null;
             }
+            return null;
         }
     }
 

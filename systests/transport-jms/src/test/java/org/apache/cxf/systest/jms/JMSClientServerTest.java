@@ -529,9 +529,8 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
             if (!ack) {
                 if (requestServant.getException() != null) {
                     throw requestServant.getException();
-                } else {
-                    fail("The decoupled one-way reply was sent");
                 }
+                fail("The decoupled one-way reply was sent");
             }
         } catch (Exception ex) {
             throw ex;

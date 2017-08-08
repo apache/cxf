@@ -277,11 +277,10 @@ public class JWTTokenProvider implements TokenProvider {
                 JwsUtils.loadSignatureProvider(signingProperties, jwsHeaders);
 
             return jws.signWith(sigProvider);
-        } else {
-            JwsHeaders jwsHeaders = new JwsHeaders(SignatureAlgorithm.NONE);
-            JwsJwtCompactProducer jws = new JwsJwtCompactProducer(jwsHeaders, claims);
-            return jws.getSignedEncodedJws();
         }
+        JwsHeaders jwsHeaders = new JwsHeaders(SignatureAlgorithm.NONE);
+        JwsJwtCompactProducer jws = new JwsJwtCompactProducer(jwsHeaders, claims);
+        return jws.getSignedEncodedJws();
 
     }
 

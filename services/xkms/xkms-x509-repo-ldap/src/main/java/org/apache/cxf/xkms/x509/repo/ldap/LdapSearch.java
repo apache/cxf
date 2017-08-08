@@ -123,9 +123,8 @@ public class LdapSearch {
         if (answer.hasMore()) {
             SearchResult sr = answer.next();
             return sr.getAttributes();
-        } else {
-            return null;
         }
+        return null;
     }
 
     public Attribute findAttribute(String rootDN, String filter, String attrName) throws NamingException {

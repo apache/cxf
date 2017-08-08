@@ -268,14 +268,13 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         checkRequestedScopes(client, requestedScopes);
         if (requestedScopes.isEmpty()) {
             return Collections.emptyList();
-        } else {
-            List<OAuthPermission> list = new ArrayList<>();
-            for (String scope : requestedScopes) {
-                convertSingleScopeToPermission(client, scope, list);
-            }
-            if (!list.isEmpty()) {
-                return list;
-            }
+        }
+        List<OAuthPermission> list = new ArrayList<>();
+        for (String scope : requestedScopes) {
+            convertSingleScopeToPermission(client, scope, list);
+        }
+        if (!list.isEmpty()) {
+            return list;
         }
         throw new OAuthServiceException("Requested scopes can not be mapped");
 
@@ -341,9 +340,8 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
             MultivaluedMap<String, String> params = 
                 (MultivaluedMap<String, String>)messageContext.get(OAuthConstants.TOKEN_REQUEST_PARAMS);
             return params;
-        } else {
-            return null;
         }
+        return null;
     }
     protected RefreshToken updateExistingRefreshToken(RefreshToken rt, ServerAccessToken at) {
         synchronized (refreshTokenLock) {

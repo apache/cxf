@@ -848,10 +848,9 @@ public class RMTxStore implements RMStore {
             } catch (SQLException ex) {
                 if (!isTableExistsError(ex)) {
                     throw ex;
-                } else {
-                    LOG.fine("Table CXF_RM_SRC_SEQUENCES already exists.");
-                    verifyTable(con, SRC_SEQUENCES_TABLE_NAME, SRC_SEQUENCES_TABLE_COLS);
                 }
+                LOG.fine("Table CXF_RM_SRC_SEQUENCES already exists.");
+                verifyTable(con, SRC_SEQUENCES_TABLE_NAME, SRC_SEQUENCES_TABLE_COLS);
             } finally {
                 stmt.close();
             }
@@ -862,10 +861,9 @@ public class RMTxStore implements RMStore {
             } catch (SQLException ex) {
                 if (!isTableExistsError(ex)) {
                     throw ex;
-                } else {
-                    LOG.fine("Table CXF_RM_DEST_SEQUENCES already exists.");
-                    verifyTable(con, DEST_SEQUENCES_TABLE_NAME, DEST_SEQUENCES_TABLE_COLS);
                 }
+                LOG.fine("Table CXF_RM_DEST_SEQUENCES already exists.");
+                verifyTable(con, DEST_SEQUENCES_TABLE_NAME, DEST_SEQUENCES_TABLE_COLS);
             } finally {
                 stmt.close();
             }
@@ -877,12 +875,11 @@ public class RMTxStore implements RMStore {
                 } catch (SQLException ex) {
                     if (!isTableExistsError(ex)) {
                         throw ex;
-                    } else {
-                        if (LOG.isLoggable(Level.FINE)) {
-                            LOG.fine("Table " + tableName + " already exists.");
-                        }
-                        verifyTable(con, tableName, MESSAGES_TABLE_COLS);
                     }
+                    if (LOG.isLoggable(Level.FINE)) {
+                        LOG.fine("Table " + tableName + " already exists.");
+                    }
+                    verifyTable(con, tableName, MESSAGES_TABLE_COLS);
                 } finally {
                     stmt.close();
                 }
@@ -995,9 +992,8 @@ public class RMTxStore implements RMStore {
             PreparedStatement stmt = cachedStatements.get(sql);
             statementLocks.get(stmt).lock();
             return stmt;
-        } else {
-            return con.prepareStatement(sql);
         }
+        return con.prepareStatement(sql);
     }
 
     /**

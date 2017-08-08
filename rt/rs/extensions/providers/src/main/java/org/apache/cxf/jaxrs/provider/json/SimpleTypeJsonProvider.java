@@ -112,16 +112,15 @@ public class SimpleTypeJsonProvider<T> extends AbstractConfigurableProvider
             } finally {
                 JAXRSUtils.getCurrentMessage().put(ProviderFactory.ACTIVE_JAXRS_PROVIDER_KEY, null);
             }
-        } else {
-            String data = IOUtils.toString(is).trim();
-            int index = data.indexOf(':');
-            data = data.substring(index + 1, data.length() - 1).trim();
-            if (data.startsWith("\"")) {
-                data = data.substring(1, data.length() - 1);
-            }
-            return primitiveHelper.readFrom(type, genericType, annotations, mediaType, headers,
-                                            new ByteArrayInputStream(StringUtils.toBytesUTF8(data)));
         }
+        String data = IOUtils.toString(is).trim();
+        int index = data.indexOf(':');
+        data = data.substring(index + 1, data.length() - 1).trim();
+        if (data.startsWith("\"")) {
+            data = data.substring(1, data.length() - 1);
+        }
+        return primitiveHelper.readFrom(type, genericType, annotations, mediaType, headers,
+                                        new ByteArrayInputStream(StringUtils.toBytesUTF8(data)));
     }
 
 }

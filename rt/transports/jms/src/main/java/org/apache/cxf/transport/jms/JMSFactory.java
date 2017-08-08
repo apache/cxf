@@ -109,8 +109,7 @@ public final class JMSFactory {
                     workQueue.execute(command, 0);
                 }
             };
-        } else {
-            return Executors.newFixedThreadPool(20);
         }
+        return Executors.newFixedThreadPool(20);
     }
 }

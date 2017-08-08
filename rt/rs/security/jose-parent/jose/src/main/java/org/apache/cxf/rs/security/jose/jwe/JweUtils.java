@@ -83,9 +83,8 @@ public final class JweUtils {
         if (keyAlgo != null) {
             KeyEncryptionProvider keyEncryptionProvider = getSecretKeyEncryptionAlgorithm(key, keyAlgo);
             return encrypt(keyEncryptionProvider, contentAlgo, content, ct);
-        } else {
-            return encryptDirect(key, contentAlgo, content, ct);
         }
+        return encryptDirect(key, contentAlgo, content, ct);
     }
     public static String encrypt(JsonWebKey key, ContentAlgorithm contentAlgo, byte[] content, String ct) {
         KeyEncryptionProvider keyEncryptionProvider = getKeyEncryptionProvider(key);
@@ -110,9 +109,8 @@ public final class JweUtils {
         if (keyAlgo != null) {
             KeyDecryptionProvider keyDecryptionProvider = getSecretKeyDecryptionProvider(key, keyAlgo);
             return decrypt(keyDecryptionProvider, contentAlgo, content);
-        } else {
-            return decryptDirect(key, contentAlgo, content);
         }
+        return decryptDirect(key, contentAlgo, content);
     }
     public static byte[] decrypt(JsonWebKey key, ContentAlgorithm contentAlgo, String content) {
         KeyDecryptionProvider keyDecryptionProvider = getKeyDecryptionProvider(key);
@@ -255,9 +253,8 @@ public final class JweUtils {
         KeyType keyType = jwk.getKeyType();
         if (KeyType.OCTET == keyType) {
             return getContentEncryptionProvider(JwkUtils.toSecretKey(jwk), ctAlgo);
-        } else {
-            return null;
         }
+        return null;
     }
     public static ContentEncryptionProvider getContentEncryptionProvider(SecretKey key,
                                                                           ContentAlgorithm algorithm) {
@@ -303,9 +300,8 @@ public final class JweUtils {
     public static JweEncryption getDirectKeyJweEncryption(JsonWebKey key) {
         if (AlgorithmUtils.isEcdhEsDirect(key.getAlgorithm())) {
             return getEcDirectKeyJweEncryption(key, ContentAlgorithm.A128GCM);
-        } else {
-            return getDirectKeyJweEncryption(JwkUtils.toSecretKey(key), getContentAlgo(key.getAlgorithm()));
         }
+        return getDirectKeyJweEncryption(JwkUtils.toSecretKey(key), getContentAlgo(key.getAlgorithm()));
     }
     public static JweEncryption getEcDirectKeyJweEncryption(JsonWebKey key, ContentAlgorithm ctAlgo) {
         if (AlgorithmUtils.isEcdhEsDirect(key.getAlgorithm())) {
@@ -315,9 +311,8 @@ public final class JweUtils {
             }
             ECPublicKey ecKey = JwkUtils.toECPublicKey(key);
             return new EcdhDirectKeyJweEncryption(ecKey, curve, ctAlgo);
-        } else {
-            throw new JweException(JweException.Error.INVALID_KEY_ALGORITHM);
         }
+        throw new JweException(JweException.Error.INVALID_KEY_ALGORITHM);
     }
     public static JweEncryption getDirectKeyJweEncryption(SecretKey key, ContentAlgorithm algo) {
         return getDirectKeyJweEncryption(key.getEncoded(), algo);
@@ -325,17 +320,15 @@ public final class JweUtils {
     public static JweEncryption getDirectKeyJweEncryption(byte[] key, ContentAlgorithm algo) {
         if (AlgorithmUtils.isAesCbcHmac(algo.getJwaName())) {
             return new AesCbcHmacJweEncryption(algo, key, null, new DirectKeyEncryptionAlgorithm());
-        } else {
-            return new JweEncryption(new DirectKeyEncryptionAlgorithm(),
-                                 getContentEncryptionProvider(key, algo));
         }
+        return new JweEncryption(new DirectKeyEncryptionAlgorithm(),
+                             getContentEncryptionProvider(key, algo));
     }
     public static JweDecryption getDirectKeyJweDecryption(JsonWebKey key) {
         if (AlgorithmUtils.isEcdhEsDirect(key.getAlgorithm())) {
             return getEcDirectKeyJweDecryption(key, ContentAlgorithm.A128GCM);
-        } else {
-            return getDirectKeyJweDecryption(JwkUtils.toSecretKey(key), getContentAlgo(key.getAlgorithm()));
         }
+        return getDirectKeyJweDecryption(JwkUtils.toSecretKey(key), getContentAlgo(key.getAlgorithm()));
     }
     public static JweDecryption getDirectKeyJweDecryption(SecretKey key, ContentAlgorithm algorithm) {
         return getDirectKeyJweDecryption(key.getEncoded(), algorithm);
@@ -343,10 +336,9 @@ public final class JweUtils {
     public static JweDecryption getDirectKeyJweDecryption(byte[] key, ContentAlgorithm algorithm) {
         if (AlgorithmUtils.isAesCbcHmac(algorithm.getJwaName())) {
             return new AesCbcHmacJweDecryption(new DirectKeyDecryptionAlgorithm(key), algorithm);
-        } else {
-            return new JweDecryption(new DirectKeyDecryptionAlgorithm(key),
-                                 getContentDecryptionProvider(algorithm));
         }
+        return new JweDecryption(new DirectKeyDecryptionAlgorithm(key),
+                             getContentDecryptionProvider(algorithm));
     }
     public static JweDecryption getEcDirectKeyJweDecryption(JsonWebKey key, ContentAlgorithm ctAlgo) {
         if (AlgorithmUtils.isEcdhEsDirect(key.getAlgorithm())) {
@@ -356,9 +348,8 @@ public final class JweUtils {
             }
             ECPrivateKey ecKey = JwkUtils.toECPrivateKey(key);
             return new EcdhDirectKeyJweDecryption(ecKey, ctAlgo);
-        } else {
-            throw new JweException(JweException.Error.INVALID_KEY_ALGORITHM);
         }
+        throw new JweException(JweException.Error.INVALID_KEY_ALGORITHM);
     }
     public static JweEncryptionProvider loadEncryptionProvider(boolean required) {
         return loadEncryptionProvider(null, required);
@@ -631,10 +622,9 @@ public final class JweUtils {
         ContentAlgorithm contentEncryptionAlgo = headers.getContentEncryptionAlgorithm();
         if (AlgorithmUtils.isAesCbcHmac(contentEncryptionAlgo.getJwaName())) {
             return new AesCbcHmacJweEncryption(contentEncryptionAlgo, keyEncryptionProvider, generateCekOnce);
-        } else {
-            return new JweEncryption(keyEncryptionProvider,
-                                     getContentEncryptionProvider(contentEncryptionAlgo, generateCekOnce));
         }
+        return new JweEncryption(keyEncryptionProvider,
+                                 getContentEncryptionProvider(contentEncryptionAlgo, generateCekOnce));
     }
     public static JweDecryptionProvider createJweDecryptionProvider(PrivateKey key,
                                                                     KeyAlgorithm keyAlgo,
@@ -654,10 +644,9 @@ public final class JweUtils {
                                                                     ContentAlgorithm contentDecryptionAlgo) {
         if (AlgorithmUtils.isAesCbcHmac(contentDecryptionAlgo.getJwaName())) {
             return new AesCbcHmacJweDecryption(keyDecryptionProvider, contentDecryptionAlgo);
-        } else {
-            return new JweDecryption(keyDecryptionProvider,
-                                     getContentDecryptionProvider(contentDecryptionAlgo));
         }
+        return new JweDecryption(keyDecryptionProvider,
+                                 getContentDecryptionProvider(contentDecryptionAlgo));
     }
     public static boolean validateCriticalHeaders(JoseHeaders headers) {
         //TODO: Validate JWE specific constraints
@@ -733,9 +722,8 @@ public final class JweUtils {
             newAAD[headersAAD.length] = '.';
             System.arraycopy(aad, 0, newAAD, headersAAD.length + 1, aad.length);
             return newAAD;
-        } else {
-            return headersAAD;
         }
+        return headersAAD;
     }
     private static byte[] calculateDerivedKey(byte[] keyZ,
                                               String algoName,
@@ -827,9 +815,8 @@ public final class JweUtils {
                 contentEncryptionAlgo.getJwaName(), compression, headers);
         if (ctEncryptionProvider == null) {
             return createJweEncryptionProvider(keyEncryptionProvider, headers);
-        } else {
-            return new JweEncryption(keyEncryptionProvider, ctEncryptionProvider);
         }
+        return new JweEncryption(keyEncryptionProvider, ctEncryptionProvider);
     }
     private static JweDecryptionProvider createJweDecryptionProvider(KeyDecryptionProvider keyDecryptionProvider,
                                                                     SecretKey ctDecryptionKey,
@@ -840,9 +827,8 @@ public final class JweUtils {
         }
         if (keyDecryptionProvider != null) {
             return createJweDecryptionProvider(keyDecryptionProvider, contentDecryptionAlgo);
-        } else {
-            return getDirectKeyJweDecryption(ctDecryptionKey, contentDecryptionAlgo);
         }
+        return getDirectKeyJweDecryption(ctDecryptionKey, contentDecryptionAlgo);
     }
     public static KeyAlgorithm getKeyEncryptionAlgorithm(Message m, Properties props,
                                                    KeyAlgorithm algo, KeyAlgorithm defaultAlgo) {
@@ -944,12 +930,11 @@ public final class JweUtils {
         String storeType = props.getProperty(JoseConstants.RSSEC_KEY_STORE_TYPE);
         if ("jwk".equals(storeType)) {
             return JwkUtils.loadPublicJwkSet(m, props);
-        } else {
-            //TODO: consider loading all the public keys in the store
-            PublicKey key = KeyManagementUtils.loadPublicKey(m, props);
-            JsonWebKey jwk = JwkUtils.fromPublicKey(key, props, JoseConstants.RSSEC_ENCRYPTION_KEY_ALGORITHM);
-            return new JsonWebKeys(jwk);
         }
+        //TODO: consider loading all the public keys in the store
+        PublicKey key = KeyManagementUtils.loadPublicKey(m, props);
+        JsonWebKey jwk = JwkUtils.fromPublicKey(key, props, JoseConstants.RSSEC_ENCRYPTION_KEY_ALGORITHM);
+        return new JsonWebKeys(jwk);
     }
     
     public static Properties loadJweProperties(Message m, String propLoc) {

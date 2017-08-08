@@ -73,18 +73,17 @@ public class MemoryResourceManager implements ResourceManager {
         String resource = storage.get(uuid);
         if (resource.isEmpty()) {
             return new Representation();
-        } else {
-            Document doc = null;
-            try {
-                doc = StaxUtils.read(new StringReader(storage.get(uuid)));
-            } catch (XMLStreamException e) {
-                LOG.severe(e.getLocalizedMessage());
-                throw new SoapFault("Internal Error", getSoapVersion().getReceiver());
-            }
-            Representation representation = new Representation();
-            representation.setAny(doc.getDocumentElement());
-            return representation;
         }
+        Document doc = null;
+        try {
+            doc = StaxUtils.read(new StringReader(storage.get(uuid)));
+        } catch (XMLStreamException e) {
+            LOG.severe(e.getLocalizedMessage());
+            throw new SoapFault("Internal Error", getSoapVersion().getReceiver());
+        }
+        Representation representation = new Representation();
+        representation.setAny(doc.getDocumentElement());
+        return representation;
     }
 
     @Override

@@ -208,12 +208,10 @@ class ParamReader extends ClassReader {
 
             if (found) {
                 return paramNames;
-            } else {
-                return null;
             }
-        } else {
             return null;
         }
+        return null;
     }
 
     private static class MethodInfo {

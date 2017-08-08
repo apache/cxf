@@ -132,9 +132,8 @@ public class JCacheOAuthDataProvider extends AbstractOAuthDataProvider {
     public List<ServerAccessToken> getAccessTokens(Client c, UserSubject sub) {
         if (isUseJwtFormatForAccessTokens() && isStoreJwtTokenKeyOnly()) {
             return getJwtAccessTokens(c, sub);
-        } else {
-            return getTokens(accessTokenCache, c, sub);
         }
+        return getTokens(accessTokenCache, c, sub);
     }
 
     @Override
@@ -146,9 +145,8 @@ public class JCacheOAuthDataProvider extends AbstractOAuthDataProvider {
     public ServerAccessToken getAccessToken(String accessTokenKey) throws OAuthServiceException {
         if (isUseJwtFormatForAccessTokens() && isStoreJwtTokenKeyOnly()) {
             return getJwtAccessToken(accessTokenKey);
-        } else {
-            return getToken(accessTokenCache, accessTokenKey);
         }
+        return getToken(accessTokenCache, accessTokenKey);
     }
 
     @Override

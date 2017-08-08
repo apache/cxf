@@ -116,9 +116,8 @@ public class SamlOAuthValidator {
                              .path(accessTokenServiceAddress)
                              .build()
                              .toString();
-        } else {
-            return accessTokenServiceAddress;
         }
+        return accessTokenServiceAddress;
     }
 
     private boolean validateAuthenticationSubject(Message m,

@@ -52,34 +52,33 @@ public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
         Message m = JAXRSUtils.getCurrentMessage();
         if (checkSecurityContext(m)) {
             return;
-        } else {
-            try {
-                SamlRequestInfo info = createSamlRequestInfo(m);
-                String urlEncodedRequest =
-                    URLEncoder.encode(info.getSamlRequest(), StandardCharsets.UTF_8.name());
+        }
+        try {
+            SamlRequestInfo info = createSamlRequestInfo(m);
+            String urlEncodedRequest =
+                URLEncoder.encode(info.getSamlRequest(), StandardCharsets.UTF_8.name());
 
-                UriBuilder ub = UriBuilder.fromUri(getIdpServiceAddress());
+            UriBuilder ub = UriBuilder.fromUri(getIdpServiceAddress());
 
-                ub.queryParam(SSOConstants.SAML_REQUEST, urlEncodedRequest);
-                ub.queryParam(SSOConstants.RELAY_STATE, info.getRelayState());
-                if (isSignRequest()) {
-                    signRequest(urlEncodedRequest, info.getRelayState(), ub);
-                }
-
-                String contextCookie = createCookie(SSOConstants.RELAY_STATE,
-                                                    info.getRelayState(),
-                                                    info.getWebAppContext(),
-                                                    info.getWebAppDomain());
-
-                context.abortWith(Response.seeOther(ub.build())
-                               .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store")
-                               .header("Pragma", "no-cache")
-                               .header(HttpHeaders.SET_COOKIE, contextCookie)
-                               .build());
-            } catch (Exception ex) {
-                LOG.log(Level.FINE, ex.getMessage(), ex);
-                throw ExceptionUtils.toInternalServerErrorException(ex, null);
+            ub.queryParam(SSOConstants.SAML_REQUEST, urlEncodedRequest);
+            ub.queryParam(SSOConstants.RELAY_STATE, info.getRelayState());
+            if (isSignRequest()) {
+                signRequest(urlEncodedRequest, info.getRelayState(), ub);
             }
+
+            String contextCookie = createCookie(SSOConstants.RELAY_STATE,
+                                                info.getRelayState(),
+                                                info.getWebAppContext(),
+                                                info.getWebAppDomain());
+
+            context.abortWith(Response.seeOther(ub.build())
+                           .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store")
+                           .header("Pragma", "no-cache")
+                           .header(HttpHeaders.SET_COOKIE, contextCookie)
+                           .build());
+        } catch (Exception ex) {
+            LOG.log(Level.FINE, ex.getMessage(), ex);
+            throw ExceptionUtils.toInternalServerErrorException(ex, null);
         }
     }
 

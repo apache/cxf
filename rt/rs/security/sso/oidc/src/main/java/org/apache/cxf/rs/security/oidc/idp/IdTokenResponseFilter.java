@@ -152,9 +152,8 @@ public class IdTokenResponseFilter extends OAuthServerJoseJwtProducer implements
             //TODO: OIDC core talks about various security algorithm preferences
             // that may be set during the client registrations, they can be passed along too
             return keyServiceClient.post(jwt, String.class);
-        } else {
-            return super.processJwt(jwt, client);
         }
+        return super.processJwt(jwt, client);
     }
     public void setKeyServiceClient(WebClient keyServiceClient) {
         this.keyServiceClient = keyServiceClient;

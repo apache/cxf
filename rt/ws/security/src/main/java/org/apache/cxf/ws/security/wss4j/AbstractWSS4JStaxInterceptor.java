@@ -104,15 +104,14 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
     protected WSSSecurityProperties createSecurityProperties() {
         if (userSecurityProperties != null) {
             return new WSSSecurityProperties(userSecurityProperties);
-        } else {
-            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            ConfigurationConverter.parseActions(properties, securityProperties);
-            ConfigurationConverter.parseUserProperties(properties, securityProperties);
-            ConfigurationConverter.parseCallback(properties, securityProperties);
-            ConfigurationConverter.parseBooleanProperties(properties, securityProperties);
-            ConfigurationConverter.parseNonBooleanProperties(properties, securityProperties);
-            return securityProperties;
         }
+        WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+        ConfigurationConverter.parseActions(properties, securityProperties);
+        ConfigurationConverter.parseUserProperties(properties, securityProperties);
+        ConfigurationConverter.parseCallback(properties, securityProperties);
+        ConfigurationConverter.parseBooleanProperties(properties, securityProperties);
+        ConfigurationConverter.parseNonBooleanProperties(properties, securityProperties);
+        return securityProperties;
     }
 
     protected void translateProperties(SoapMessage msg, WSSSecurityProperties securityProperties) {

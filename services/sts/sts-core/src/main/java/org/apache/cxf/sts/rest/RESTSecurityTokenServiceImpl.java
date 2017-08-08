@@ -157,16 +157,15 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
         if ("jwt".equals(tokenType)) {
             // Discard the wrapper here
             return Response.ok(((Element)requestedToken.getAny()).getTextContent()).build();
-        } else {
-            // Base-64 encode the token + return it
-            try {
-                String encodedToken =
-                    encodeToken(DOM2Writer.nodeToString((Element)requestedToken.getAny()));
-                return Response.ok(encodedToken).build();
-            } catch (Exception ex) {
-                LOG.warning(ex.getMessage());
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-            }
+        }
+        // Base-64 encode the token + return it
+        try {
+            String encodedToken =
+                encodeToken(DOM2Writer.nodeToString((Element)requestedToken.getAny()));
+            return Response.ok(encodedToken).build();
+        } catch (Exception ex) {
+            LOG.warning(ex.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
 

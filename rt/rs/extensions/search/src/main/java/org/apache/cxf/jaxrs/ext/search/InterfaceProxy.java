@@ -36,10 +36,9 @@ public class InterfaceProxy implements InvocationHandler {
         boolean isGetter = "get".equals(methodName.substring(0,  3));
         if (isGetter) {
             return map.get(property);
-        } else {
-            map.put(property, args[0]);
-            return null;
         }
+        map.put(property, args[0]);
+        return null;
     }
 
 }

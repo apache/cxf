@@ -145,36 +145,32 @@ public class CompletionStageRxInvokerImpl implements CompletionStageRxInvoker {
     public <T> CompletionStage<T> method(String name, Entity<?> entity, Class<T> responseType) {
         if (ex == null) {
             return CompletableFuture.supplyAsync(() -> wc.sync().method(name, entity, responseType));
-        } else {
-            return CompletableFuture.supplyAsync(() -> wc.sync().method(name, entity, responseType), ex);
         }
+        return CompletableFuture.supplyAsync(() -> wc.sync().method(name, entity, responseType), ex);
     }
 
     @Override
     public <T> CompletionStage<T> method(String name, Entity<?> entity, GenericType<T> responseType) {
         if (ex == null) {
             return CompletableFuture.supplyAsync(() -> wc.sync().method(name, entity, responseType));
-        } else {
-            return CompletableFuture.supplyAsync(() -> wc.sync().method(name, entity, responseType), ex);
         }
+        return CompletableFuture.supplyAsync(() -> wc.sync().method(name, entity, responseType), ex);
     }
 
     @Override
     public <T> CompletionStage<T> method(String name, Class<T> responseType) {
         if (ex == null) {
             return CompletableFuture.supplyAsync(() -> wc.sync().method(name, responseType));
-        } else {
-            return CompletableFuture.supplyAsync(() -> wc.sync().method(name, responseType), ex);
         }
+        return CompletableFuture.supplyAsync(() -> wc.sync().method(name, responseType), ex);
     }
 
     @Override
     public <T> CompletionStage<T> method(String name, GenericType<T> responseType) {
         if (ex == null) {
             return CompletableFuture.supplyAsync(() -> wc.sync().method(name, responseType));
-        } else {
-            return CompletableFuture.supplyAsync(() -> wc.sync().method(name, responseType), ex);
         }
+        return CompletableFuture.supplyAsync(() -> wc.sync().method(name, responseType), ex);
     }
 
 }

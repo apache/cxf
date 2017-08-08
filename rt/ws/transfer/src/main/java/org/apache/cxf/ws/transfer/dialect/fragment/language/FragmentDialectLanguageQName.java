@@ -79,9 +79,8 @@ public class FragmentDialectLanguageQName implements FragmentDialectLanguage {
                 if (prefix != null && !prefix.isEmpty()) {
                     Element resource = (Element) representation.getAny();
                     return resource.getAttribute("xmlns:" + prefix);
-                } else {
-                    return null;
                 }
+                return null;
             }
 
             @Override
@@ -123,12 +122,10 @@ public class FragmentDialectLanguageQName implements FragmentDialectLanguage {
             Matcher m = qNamePattern.matcher(expressionValue);
             if (m.matches()) {
                 return "/node()/" + expressionValue;
-            } else {
-                throw new InvalidExpression();
             }
-        } else {
             throw new InvalidExpression();
         }
+        throw new InvalidExpression();
     }
 
 }

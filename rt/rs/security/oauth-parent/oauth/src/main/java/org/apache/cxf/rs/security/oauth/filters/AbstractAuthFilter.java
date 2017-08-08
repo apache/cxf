@@ -165,10 +165,9 @@ public class AbstractAuthFilter {
             if (consumerSecret != null && !consumerSecret.equals(client.getSecretKey())) {
                 LOG.warning("Client secret is invalid");
                 throw new OAuthProblemException(OAuth.Problems.CONSUMER_KEY_UNKNOWN);
-            } else {
-                OAuthUtils.validateMessage(oAuthMessage, client, null,
-                                           dataProvider, validator);
             }
+            OAuthUtils.validateMessage(oAuthMessage, client, null,
+                                       dataProvider, validator);
             accessToken = client.getPreAuthorizedToken();
             if (accessToken == null || !accessToken.isPreAuthorized()) {
                 LOG.warning("Preauthorized access token is unavailable");

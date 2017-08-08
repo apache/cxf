@@ -69,9 +69,8 @@ final class JMSURIParser {
             String found = uri.substring(pos, separatorPos);
             pos = separatorPos + 1;
             return found;
-        } else {
-            return null;
         }
+        return null;
     }
 
     public Map<String, Object> parseQuery() {

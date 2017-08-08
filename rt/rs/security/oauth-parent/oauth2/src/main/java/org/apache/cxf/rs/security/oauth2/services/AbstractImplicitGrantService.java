@@ -67,11 +67,10 @@ public abstract class AbstractImplicitGrantService extends RedirectionBasedGrant
         if (isFormResponse(state)) {
             return createHtmlResponse(prepareFormResponse(state, client, requestedScope,
                                             approvedScope, userSubject, preAuthorizedToken));
-        } else {
-            StringBuilder sb =
-                prepareRedirectResponse(state, client, requestedScope, approvedScope, userSubject, preAuthorizedToken);
-            return Response.seeOther(URI.create(sb.toString())).build();
         }
+        StringBuilder sb =
+            prepareRedirectResponse(state, client, requestedScope, approvedScope, userSubject, preAuthorizedToken);
+        return Response.seeOther(URI.create(sb.toString())).build();
     }
 
     protected StringBuilder prepareRedirectResponse(OAuthRedirectionState state,

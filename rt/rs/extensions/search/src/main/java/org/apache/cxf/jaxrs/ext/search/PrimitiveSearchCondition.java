@@ -99,11 +99,10 @@ public class PrimitiveSearchCondition<T> implements SearchCondition<T> {
     public boolean isMet(T pojo) {
         if (isPrimitive(pojo)) {
             return compare(pojo, cType, propertyValue);
-        } else {
-            Object lValue = getValue(propertyName, pojo);
-            Object rValue = getPrimitiveValue(propertyName, propertyValue);
-            return lValue == null ? false : compare(lValue, cType, rValue);
         }
+        Object lValue = getValue(propertyName, pojo);
+        Object rValue = getPrimitiveValue(propertyName, propertyValue);
+        return lValue == null ? false : compare(lValue, cType, rValue);
     }
 
     private Object getValue(String getter, T pojo) {
@@ -206,9 +205,8 @@ public class PrimitiveSearchCondition<T> implements SearchCondition<T> {
             } else {
                 return lval.contains(rval);
             }
-        } else {
-            return lval.equals(rval);
         }
+        return lval.equals(rval);
     }
 
     protected static Object getPrimitiveValue(String name, Object value) {

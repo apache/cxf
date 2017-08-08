@@ -194,9 +194,8 @@ public final class EncoderDecoder10AImpl extends EncoderDecoder {
             close.setIdentifier(VersionTransformer.convert(seq.getIdentifier()));
             close.setLastMsgNumber(seq.getMessageNumber());
             return close;
-        } else {
-            return null;
         }
+        return null;
     }
 
     public SequenceAcknowledgement decodeSequenceAcknowledgement(Element elem) throws JAXBException {

@@ -77,9 +77,8 @@ public class DigestAuthSupplier implements HttpAuthSupplier {
                 return di.generateAuth(getAuthURI(currentURI),
                                        authPolicy.getUserName(),
                                        authPolicy.getPassword());
-            } else {
-                return null;
             }
+            return null;
         }
         HttpAuthHeader authHeader = new HttpAuthHeader(fullHeader);
         if (authHeader.authTypeIsDigest()) {

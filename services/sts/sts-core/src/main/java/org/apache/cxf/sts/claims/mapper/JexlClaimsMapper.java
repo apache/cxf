@@ -77,9 +77,8 @@ public class JexlClaimsMapper implements ClaimsMapper {
             LOG.warning("No claim mapping script defined");
             return new ProcessedClaimCollection(); // TODO Check if null or an exception would be more
                                                    // appropriate
-        } else {
-            return (ProcessedClaimCollection)s.execute(context);
         }
+        return (ProcessedClaimCollection)s.execute(context);
     }
 
     public Script getScript() {

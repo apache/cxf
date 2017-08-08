@@ -849,10 +849,9 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             }
 
             return utBuilder;
-        } else {
-            unassertPolicy(token, "No username available");
-            return null;
         }
+        unassertPolicy(token, "No username available");
+        return null;
     }
 
     protected WSSecUsernameToken addDKUsernameToken(UsernameToken token, boolean useMac) {
@@ -884,10 +883,9 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             }
 
             return utBuilder;
-        } else {
-            unassertPolicy(token, "No username available");
-            return null;
         }
+        unassertPolicy(token, "No username available");
+        return null;
     }
 
     protected SamlAssertionWrapper addSamlToken(SamlToken token) throws WSSecurityException {

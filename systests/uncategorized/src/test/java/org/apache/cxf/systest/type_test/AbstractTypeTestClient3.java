@@ -524,6 +524,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
 
     //org.apache.type_test.types1.DerivedEmptyBaseEmptyAll
 
+    @SuppressWarnings("cast")
     @Test
     public void testDerivedEmptyBaseEmptyAll() throws Exception {
         if (!shouldRunTest("DerivedEmptyBaseEmptyAll")) {
@@ -553,6 +554,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
 
     //org.apache.type_test.types1.DerivedEmptyBaseEmptyChoice
 
+    @SuppressWarnings("cast")
     @Test
     public void testDerivedEmptyBaseEmptyChoice() throws Exception {
         if (!shouldRunTest("DerivedEmptyBaseEmptyChoice")) {
@@ -585,10 +587,9 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
     protected boolean equals(RestrictedChoiceBaseChoice x, RestrictedChoiceBaseChoice y) {
         if (x.getVarFloat() != null && y.getVarFloat() != null) {
             return x.getVarFloat().compareTo(y.getVarFloat()) == 0;
-        } else {
-            return x.getVarInt() != null && y.getVarInt() != null
-                && x.getVarInt().compareTo(y.getVarInt()) == 0;
         }
+        return x.getVarInt() != null && y.getVarInt() != null
+            && x.getVarInt().compareTo(y.getVarInt()) == 0;
     }
 
     @Test
@@ -1419,10 +1420,9 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
     protected boolean equals(ChoiceWithBinary x, ChoiceWithBinary y) {
         if (x.getBase64() != null && y.getBase64() != null) {
             return Arrays.equals(x.getBase64(), y.getBase64());
-        } else {
-            return x.getHex() != null && y.getHex() != null
-                && Arrays.equals(x.getHex(), y.getHex());
         }
+        return x.getHex() != null && y.getHex() != null
+            && Arrays.equals(x.getHex(), y.getHex());
     }
 
     @Test
@@ -1583,18 +1583,17 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
             return x.getVarInt().compareTo(y.getVarInt()) == 0
                 && x.getVarString().equals(y.getVarString())
                 && x.getVarFloat().compareTo(y.getVarFloat()) == 0;
-        } else {
-            if (x.getVarOtherFloat() != null && y.getVarOtherFloat() != null) {
-                return x.getVarOtherFloat().compareTo(y.getVarOtherFloat()) == 0;
-            }
-            if (x.getVarOtherInt() != null && y.getVarOtherInt() != null) {
-                return x.getVarOtherInt().compareTo(y.getVarOtherInt()) == 0;
-            }
-            if (x.getVarOtherString() != null && y.getVarOtherString() != null) {
-                return x.getVarOtherString().equals(y.getVarOtherString());
-            }
-            return false;
         }
+        if (x.getVarOtherFloat() != null && y.getVarOtherFloat() != null) {
+            return x.getVarOtherFloat().compareTo(y.getVarOtherFloat()) == 0;
+        }
+        if (x.getVarOtherInt() != null && y.getVarOtherInt() != null) {
+            return x.getVarOtherInt().compareTo(y.getVarOtherInt()) == 0;
+        }
+        if (x.getVarOtherString() != null && y.getVarOtherString() != null) {
+            return x.getVarOtherString().equals(y.getVarOtherString());
+        }
+        return false;
     }
 
     // XXX - Generated code flattens nested structs

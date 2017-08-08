@@ -62,9 +62,8 @@ public class KeystorePasswordCallback implements CallbackHandler {
                 if (pass != null) {
                     pc.setPassword(pass);
                     return;
-                } else {
-                    pc.setPassword("password");
                 }
+                pc.setPassword("password");
             }
         }
     }

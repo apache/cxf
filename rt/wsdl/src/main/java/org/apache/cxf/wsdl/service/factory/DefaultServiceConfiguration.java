@@ -66,9 +66,8 @@ public class DefaultServiceConfiguration extends AbstractServiceConfiguration {
             name = new QName(ns, local + i);
             if (service.getOperation(name) == null) {
                 return name;
-            } else {
-                i++;
             }
+            i++;
         }
     }
 
@@ -298,9 +297,8 @@ public class DefaultServiceConfiguration extends AbstractServiceConfiguration {
         if (miString != null) {
             if ("unbounded".equals(miString)) {
                 return Long.MAX_VALUE;
-            } else {
-                return Long.valueOf(miString, 10);
             }
+            return Long.valueOf(miString, 10);
         }
         // If no explicit spec and an array of bytes, default to unbounded.
         if (mpi.getTypeClass() != null && mpi.getTypeClass().isArray()

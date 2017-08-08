@@ -135,9 +135,8 @@ public class ManagedRMEndpoint implements ManagedComponent {
     public int getQueuedMessageTotalCount(boolean outbound) {
         if (outbound) {
             return endpoint.getManager().getRetransmissionQueue().countUnacknowledged();
-        } else {
-            return endpoint.getManager().getRedeliveryQueue().countUndelivered();
         }
+        return endpoint.getManager().getRedeliveryQueue().countUndelivered();
     }
 
     @ManagedOperation(description = "Number of Queued Messages")
@@ -153,13 +152,12 @@ public class ManagedRMEndpoint implements ManagedComponent {
                 throw new IllegalArgumentException("no sequence");
             }
             return manager.getRetransmissionQueue().countUnacknowledged(ss);
-        } else {
-            DestinationSequence ds = getDestinationSeq(sid);
-            if (null == ds) {
-                throw new IllegalArgumentException("no sequence");
-            }
-            return manager.getRedeliveryQueue().countUndelivered(ds);
         }
+        DestinationSequence ds = getDestinationSeq(sid);
+        if (null == ds) {
+            throw new IllegalArgumentException("no sequence");
+        }
+        return manager.getRedeliveryQueue().countUndelivered(ds);
     }
 
     @ManagedOperation(description = "List of UnAcknowledged Message Numbers")

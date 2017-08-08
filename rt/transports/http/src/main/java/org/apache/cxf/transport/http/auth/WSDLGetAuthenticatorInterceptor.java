@@ -72,12 +72,11 @@ public class WSDLGetAuthenticatorInterceptor extends AbstractPhaseInterceptor<Me
                 if (policy == null) {
                     handle401response(message, endpoint);
                     return;
-                } else {
-                    Subject subject = (Subject)authenticate(policy.getUserName(), policy.getPassword());
-                    if (subject == null) {
-                        handle401response(message, endpoint);
-                        return;
-                    }
+                }
+                Subject subject = (Subject)authenticate(policy.getUserName(), policy.getPassword());
+                if (subject == null) {
+                    handle401response(message, endpoint);
+                    return;
                 }
 
             }

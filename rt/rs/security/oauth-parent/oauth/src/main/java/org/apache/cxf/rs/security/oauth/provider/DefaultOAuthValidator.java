@@ -49,14 +49,13 @@ public class DefaultOAuthValidator extends SimpleOAuthValidator {
         throws OAuthProblemException {
         if (token == null) {
             throw new OAuthProblemException(OAuth.Problems.TOKEN_REJECTED);
-        } else {
-            Long issuedAt = token.getIssuedAt();
-            Long lifetime = token.getLifetime();
-            if (lifetime != -1
-                && (issuedAt + lifetime < (System.currentTimeMillis() / 1000))) {
-                provider.removeToken(token);
-                throw new OAuthProblemException(OAuth.Problems.TOKEN_EXPIRED);
-            }
+        }
+        Long issuedAt = token.getIssuedAt();
+        Long lifetime = token.getLifetime();
+        if (lifetime != -1
+            && (issuedAt + lifetime < (System.currentTimeMillis() / 1000))) {
+            provider.removeToken(token);
+            throw new OAuthProblemException(OAuth.Problems.TOKEN_EXPIRED);
         }
     }
 }

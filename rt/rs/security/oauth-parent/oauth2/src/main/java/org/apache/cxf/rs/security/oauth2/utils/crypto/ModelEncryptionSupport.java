@@ -457,9 +457,8 @@ public final class ModelEncryptionSupport {
         String pureStringList = prepareSimpleString(listStr);
         if (pureStringList.isEmpty()) {
             return Collections.emptyList();
-        } else {
-            return Arrays.asList(pureStringList.split(","));
         }
+        return Arrays.asList(pureStringList.split(","));
     }
 
     public static Map<String, String> parseSimpleMap(String mapStr) {

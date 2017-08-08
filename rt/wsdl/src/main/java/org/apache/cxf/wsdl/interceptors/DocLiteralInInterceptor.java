@@ -354,8 +354,7 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
         Object keepParametersWrapperFlag = message.get(KEEP_PARAMETERS_WRAPPER);
         if (keepParametersWrapperFlag == null) {
             return msgInfo.getFirstMessagePart().getTypeClass() != null;
-        } else {
-            return Boolean.parseBoolean(keepParametersWrapperFlag.toString());
         }
+        return Boolean.parseBoolean(keepParametersWrapperFlag.toString());
     }
 }

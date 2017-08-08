@@ -185,9 +185,8 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
                 }
             }
             return list;
-        } else {
-            return null;
         }
+        return null;
     }
 
     protected static Map<String, String> parseMapSequence(String sequence) {
@@ -208,9 +207,8 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
                 }
             }
             return map;
-        } else {
-            return Collections.emptyMap();
         }
+        return Collections.emptyMap();
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -470,9 +468,8 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
         public boolean isSecure() {
             if (originalProto != null) {
                 return "https".equals(originalProto);
-            } else {
-                return super.isSecure();
             }
+            return super.isSecure();
         }
         @Override
         public StringBuffer getRequestURL() {
@@ -490,9 +487,8 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
         public String getRemoteAddr() {
             if (originalClientIp != null) {
                 return originalClientIp;
-            } else {
-                return super.getRemoteAddr();
             }
+            return super.getRemoteAddr();
         }
 
     }

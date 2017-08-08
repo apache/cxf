@@ -107,16 +107,15 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
             Response codeResponse = createCodeResponse(rc, ui);
             rc.abortWith(codeResponse);
             return;
-        } else {
-            // complete the code flow if possible
-            MultivaluedMap<String, String> requestParams = toRequestState(rc, ui);
-            if (codeResponseQueryParamsAvailable(requestParams)
-                && (completeUri == null || absoluteRequestUri.endsWith(completeUri))) {
-                processCodeResponse(rc, ui, requestParams);
-                checkSecurityContextEnd(rc, requestParams);
-                // let the request continue
-                return;
-            }
+        }
+        // complete the code flow if possible
+        MultivaluedMap<String, String> requestParams = toRequestState(rc, ui);
+        if (codeResponseQueryParamsAvailable(requestParams)
+            && (completeUri == null || absoluteRequestUri.endsWith(completeUri))) {
+            processCodeResponse(rc, ui, requestParams);
+            checkSecurityContextEnd(rc, requestParams);
+            // let the request continue
+            return;
         }
         // neither the start nor the end of the flow
         rc.abortWith(Response.status(401).build());
@@ -249,13 +248,12 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
     private AuthorizationCodeGrant prepareCodeGrant(String codeParam, URI absoluteRedirectUri) {
         if (codeRequestJoseProducer == null) {
             return new AuthorizationCodeGrant(codeParam, absoluteRedirectUri);
-        } else {
-            JwtRequestCodeGrant grant =
-                new JwtRequestCodeGrant(codeParam, absoluteRedirectUri, consumer.getClientId());
-            grant.setClientSecret(consumer.getClientSecret());
-            grant.setJoseProducer(codeRequestJoseProducer);
-            return grant;
         }
+        JwtRequestCodeGrant grant =
+            new JwtRequestCodeGrant(codeParam, absoluteRedirectUri, consumer.getClientId());
+        grant.setClientSecret(consumer.getClientSecret());
+        grant.setJoseProducer(codeRequestJoseProducer);
+        return grant;
     }
 
     protected ClientTokenContext initializeClientTokenContext(ContainerRequestContext rc,

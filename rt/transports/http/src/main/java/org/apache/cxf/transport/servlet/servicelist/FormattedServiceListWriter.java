@@ -138,16 +138,14 @@ public class FormattedServiceListWriter implements ServiceListWriter {
         if (endpointAddress.startsWith("http://") || endpointAddress.startsWith("https://")) {
             if (endpointAddress.startsWith(basePath) || showForeignContexts) {
                 return endpointAddress;
-            } else {
-                return null;
             }
-        } else {
-            String address = basePath;
-            if (address.endsWith("/") && endpointAddress.startsWith("/")) {
-                address = address.substring(0, address.length() - 1);
-            }
-            return address + endpointAddress;
+            return null;
         }
+        String address = basePath;
+        if (address.endsWith("/") && endpointAddress.startsWith("/")) {
+            address = address.substring(0, address.length() - 1);
+        }
+        return address + endpointAddress;
     }
 
     private void writeRESTfulEndpoints(PrintWriter writer,

@@ -79,9 +79,8 @@ public class JPACMTCodeDataProvider extends JPACodeDataProvider {
             // lock RT for update
             lockRefreshTokenForUpdate(rt);
             return super.updateRefreshToken(rt, at);
-        } else {
-            return super.updateExistingRefreshToken(rt, at);
         }
+        return super.updateExistingRefreshToken(rt, at);
     }
     
     protected void lockRefreshTokenForUpdate(final RefreshToken refreshToken) {

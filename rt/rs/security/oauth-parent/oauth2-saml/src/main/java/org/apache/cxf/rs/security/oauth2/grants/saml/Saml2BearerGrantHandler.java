@@ -145,9 +145,8 @@ public class Saml2BearerGrantHandler extends AbstractGrantHandler {
             return new SamlUserSubject(jaxrsSc.getUserPrincipal().getName(),
                                        roles,
                                        jaxrsSc.getClaims());
-        } else {
-            return new UserSubject(sc.getUserPrincipal().getName());
         }
+        return new UserSubject(sc.getUserPrincipal().getName());
 
     }
 

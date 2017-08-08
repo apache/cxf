@@ -141,10 +141,9 @@ public class JaxrsServletContainerInitializer implements ServletContainerInitial
         ServletRegistration sr = ctx.getServletRegistration(name);
         if (sr != null) {
             return sr.getMappings().iterator().next();
-        } else {
-            final String error = "Servlet with a name " + name + " is not available";
-            throw new ServletException(error);
         }
+        final String error = "Servlet with a name " + name + " is not available";
+        throw new ServletException(error);
     }
 
     private boolean isApplicationServletAvailable(final ServletContext ctx, final Class<?> appClass) {

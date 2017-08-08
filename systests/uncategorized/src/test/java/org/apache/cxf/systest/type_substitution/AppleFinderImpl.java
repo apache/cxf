@@ -33,9 +33,8 @@ public class AppleFinderImpl implements AppleFinder {
             apples.add(new Fuji("Red", "mild", "Fuji-1"));
             apples.add(new Fuji("Yellow", "sweet", "Fuji-2"));
             return apples;
-        } else {
-            return null;
         }
+        return null;
 
     }
 

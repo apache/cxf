@@ -214,9 +214,8 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
                 if (isFailLifetimeExceedance()) {
                     throw new STSException("Requested lifetime exceeds maximum lifetime",
                                            STSException.INVALID_TIME);
-                } else {
-                    expirationTime = creationTime.plusSeconds(getMaxLifetime());
                 }
+                expirationTime = creationTime.plusSeconds(getMaxLifetime());
             }
 
             long creationTimeInSeconds = creationTime.getEpochSecond();

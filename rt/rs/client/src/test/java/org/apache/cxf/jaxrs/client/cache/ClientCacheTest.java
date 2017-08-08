@@ -221,9 +221,8 @@ public class ClientCacheTest extends Assert {
             if (o instanceof Book) {
                 Book other = (Book)o;
                 return other.id.equals(id) && other.name.equals(name);
-            } else {
-                return false;
             }
+            return false;
         }
     }
 

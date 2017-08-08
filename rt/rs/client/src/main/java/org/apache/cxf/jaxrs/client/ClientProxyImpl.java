@@ -833,9 +833,8 @@ public class ClientProxyImpl extends AbstractClient implements
             || callbackRespClass.isAssignableFrom(methodReturnType)
             || PrimitiveUtils.canPrimitiveTypeBeAutoboxed(methodReturnType, callbackRespClass)) {
             return callback;
-        } else {
-            return null;
         }
+        return null;
     }
 
     protected void doInvokeAsync(OperationResourceInfo ori, Message outMessage,

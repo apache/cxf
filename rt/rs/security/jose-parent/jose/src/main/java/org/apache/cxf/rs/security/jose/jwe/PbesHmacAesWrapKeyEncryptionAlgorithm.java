@@ -105,9 +105,8 @@ public class PbesHmacAesWrapKeyEncryptionAlgorithm implements KeyEncryptionProvi
                 LOG.warning("Password hash calculation error");
                 throw new JweException(JweException.Error.KEY_ENCRYPTION_FAILURE, ex);
             }
-        } else {
-            return p;
         }
+        return p;
     }
     @Override
     public byte[] getEncryptedContentEncryptionKey(JweHeaders headers, byte[] cek) {

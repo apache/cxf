@@ -441,9 +441,8 @@ public class JMSDestinationTest extends AbstractJMSTester {
     private String getDestinationName(Destination dest) throws JMSException {
         if (dest instanceof Queue) {
             return ((Queue)dest).getQueueName();
-        } else {
-            return ((Topic)dest).getTopicName();
         }
+        return ((Topic)dest).getTopicName();
     }
 
     protected void verifyReplyToSet(Message cxfMsg,

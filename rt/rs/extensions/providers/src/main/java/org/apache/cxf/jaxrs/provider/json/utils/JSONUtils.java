@@ -196,9 +196,8 @@ public final class JSONUtils {
             if (name != null
                 && XSI_URI.equals(name.getNamespaceURI())) {
                 return XSI_PREFIX;
-            } else {
-                return super.getAttributePrefix(n);
             }
+            return super.getAttributePrefix(n);
         }
 
         @Override

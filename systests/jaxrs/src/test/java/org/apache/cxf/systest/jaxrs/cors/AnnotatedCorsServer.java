@@ -81,9 +81,8 @@ public class AnnotatedCorsServer {
             return Response.ok().header(CorsHeaderConstants.HEADER_AC_ALLOW_METHODS, "DELETE PUT")
                 .header(CorsHeaderConstants.HEADER_AC_ALLOW_CREDENTIALS, "false")
                 .header(CorsHeaderConstants.HEADER_AC_ALLOW_ORIGIN, "http://area51.mil:3333").build();
-        } else {
-            return Response.ok().build();
         }
+        return Response.ok().build();
     }
 
     @GET

@@ -74,9 +74,8 @@ public class JwtClaims extends JsonMapObject {
         List<String> audiences = getAudiences();
         if (!StringUtils.isEmpty(audiences)) {
             return audiences.get(0);
-        } else {
-            return null;
         }
+        return null;
     }
 
     /**

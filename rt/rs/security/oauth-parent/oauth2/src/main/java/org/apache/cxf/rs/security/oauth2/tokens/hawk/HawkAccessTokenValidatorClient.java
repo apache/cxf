@@ -46,9 +46,8 @@ public class HawkAccessTokenValidatorClient extends AbstractHawkAccessTokenValid
             map.putSingle(HTTP_VERB, mc.getRequest().getMethod());
             map.putSingle(HTTP_URI, mc.getUriInfo().getRequestUri().toString());
             return validator.validateAccessToken(mc, authScheme, authSchemeData, map);
-        } else {
-            return super.validateAccessToken(mc, authScheme, authSchemeData, extraProps);
         }
+        return super.validateAccessToken(mc, authScheme, authSchemeData, extraProps);
 
     }
     protected AccessTokenValidation getAccessTokenValidation(MessageContext mc,

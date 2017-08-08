@@ -116,12 +116,11 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
                     JAXRSUtils.getCurrentMessage().getExchange().put(OAuthConstants.NONCE, grant.getNonce());
                 }
                 return token;
-            } else {
-                // the grant was issued based on the authorization time check confirming the
-                // token was available but it has expired by now or been removed then
-                // creating a completely new token can be wrong - though this needs to be reviewed
-                throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
             }
+            // the grant was issued based on the authorization time check confirming the
+            // token was available but it has expired by now or been removed then
+            // creating a completely new token can be wrong - though this needs to be reviewed
+            throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
         }
         // Make sure the client supports the authorization code in cases where
         // the implicit/hybrid service was initiating the code grant processing flow

@@ -104,9 +104,8 @@ public class EcdhDirectKeyJweEncryption extends JweEncryption {
         private byte[] toApuBytes(String apuString) {
             if (apuString != null) {
                 return toBytes(apuString);
-            } else {
-                return CryptoUtils.generateSecureRandomBytes(512 / 8);
             }
+            return CryptoUtils.generateSecureRandomBytes(512 / 8);
 
         }
         private byte[] toBytes(String str) {

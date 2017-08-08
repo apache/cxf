@@ -594,9 +594,8 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 // ignore
             }
             return new DelegatingCallbackHandler(pwdCallback);
-        } else {
-            return getCallback(reqData);
         }
+        return getCallback(reqData);
     }
 
     protected CallbackHandler getCallback(RequestData reqData) throws WSSecurityException {

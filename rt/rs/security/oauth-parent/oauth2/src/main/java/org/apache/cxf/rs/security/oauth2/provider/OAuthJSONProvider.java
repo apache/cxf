@@ -227,14 +227,12 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
         Map<String, String> params = readJSONResponse(is);
         if (Map.class.isAssignableFrom(cls)) {
             return params;
-        } else {
-            ClientAccessToken token = OAuthClientUtils.fromMapToClientToken(params);
-            if (token == null) {
-                throw new WebApplicationException(500);
-            } else {
-                return token;
-            }
         }
+        ClientAccessToken token = OAuthClientUtils.fromMapToClientToken(params);
+        if (token == null) {
+            throw new WebApplicationException(500);
+        }
+        return token;
 
     }
 

@@ -183,9 +183,8 @@ public final class RMUtils {
     public static boolean equalStrings(String aval, String bval) {
         if (null != aval) {
             return aval.equals(bval);
-        } else {
-            return null == bval;
         }
+        return null == bval;
     }
 
     /**
@@ -198,8 +197,7 @@ public final class RMUtils {
     public static boolean equalLongs(Long aval, Long bval) {
         if (null != aval) {
             return aval.equals(bval);
-        } else {
-            return null == bval;
         }
+        return null == bval;
     }
 }

@@ -155,9 +155,8 @@ public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestB
         protected XMLStreamWriter getStreamWriter(Object obj, OutputStream os, MediaType mt) {
             if (mt.equals(MediaType.TEXT_XML_TYPE)) {
                 return new CachingXmlEventWriter();
-            } else {
-                throw new RuntimeException();
             }
+            throw new RuntimeException();
         }
         @Override
         public void writeTo(Object obj, Class<?> cls, Type genericType, Annotation[] anns,
@@ -166,9 +165,8 @@ public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestB
             if (failHeaders != null && !failHeaders.isEmpty()) {
                 os.write("fail".getBytes());
                 throw new IOException();
-            } else {
-                super.writeTo(obj, cls, genericType, anns, m, headers, os);
             }
+            super.writeTo(obj, cls, genericType, anns, m, headers, os);
         }
     }
 }

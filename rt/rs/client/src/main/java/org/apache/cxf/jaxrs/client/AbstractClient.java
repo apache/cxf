@@ -608,9 +608,8 @@ public abstract class AbstractClient implements Client {
                 if (actualEx instanceof RuntimeException
                     && useProcExProp != null && PropertyUtils.isFalse(useProcExProp)) {
                     throw (Exception)actualEx;
-                } else {
-                    throw new ProcessingException(actualEx);
                 }
+                throw new ProcessingException(actualEx);
             } else if (!exchange.isOneWay() || cfg.isResponseExpectedForOneway()) {
                 waitForResponseCode(exchange);
             }

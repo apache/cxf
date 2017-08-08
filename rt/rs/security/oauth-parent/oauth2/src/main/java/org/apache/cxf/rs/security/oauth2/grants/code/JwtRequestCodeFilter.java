@@ -98,9 +98,8 @@ public class JwtRequestCodeFilter extends OAuthJoseJwtConsumer implements Author
                 newParams.putSingle(key, value.toString());
             }
             return newParams;
-        } else {
-            return params;
         }
+        return params;
     }
     private boolean isRequestUriValid(Client client, String requestUri) {
         //TODO: consider restricting to specific hosts

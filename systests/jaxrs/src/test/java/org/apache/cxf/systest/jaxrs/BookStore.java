@@ -225,12 +225,11 @@ public class BookStore {
                 ? ui.getAbsolutePathBuilder().queryParam("redirect", "true").build().toString()
                 : "http://otherhost/redirect";
             return Response.status(303).cookie(NewCookie.valueOf("a=b")).header("Location", uri).build();
-        } else {
-            return Response.ok(new Book("CXF", 123L), "application/xml")
-                .header("RequestURI", this.ui.getRequestUri().toString())
-                .header("TheCookie", cookie)
-                .build();
         }
+        return Response.ok(new Book("CXF", 123L), "application/xml")
+            .header("RequestURI", this.ui.getRequestUri().toString())
+            .header("TheCookie", cookie)
+            .build();
     }
 
     @GET
@@ -240,12 +239,10 @@ public class BookStore {
         if (done == null) {
             if (loop) {
                 return Response.status(303).header("Location", "relative?loop=true").build();
-            } else {
-                return Response.status(303).header("Location", "relative?redirect=true").build();
             }
-        } else {
-            return Response.ok(new Book("CXF", 124L), "application/xml").build();
+            return Response.status(303).header("Location", "relative?redirect=true").build();
         }
+        return Response.ok(new Book("CXF", 124L), "application/xml").build();
     }
 
     @GET
@@ -299,9 +296,8 @@ public class BookStore {
             } catch (InterruptedException e) {
             }
             return Response.ok(book).build();
-        } else {
-            return Response.ok(book).build();
         }
+        return Response.ok(book).build();
     }
 
     @DELETE
@@ -525,9 +521,8 @@ public class BookStore {
         throws BookNotFoundFault, BookNotReturnedException {
         if (notReturned) {
             throw new WebApplicationException(Response.status(404).header("Status", "notReturned").build());
-        } else {
-            throw new WebApplicationException(Response.status(404).header("Status", "notFound").build());
         }
+        throw new WebApplicationException(Response.status(404).header("Status", "notFound").build());
     }
 
     @GET
@@ -1317,11 +1312,10 @@ public class BookStore {
         Book book = books.get(Long.parseLong(id));
         if (book != null) {
             return book;
-        } else {
-            BookNotFoundDetails details = new BookNotFoundDetails();
-            details.setId(Long.parseLong(id));
-            throw new BookNotFoundFault(details);
         }
+        BookNotFoundDetails details = new BookNotFoundDetails();
+        details.setId(Long.parseLong(id));
+        throw new BookNotFoundFault(details);
     }
 
     @Path("/booksubresource/{bookId}/")
@@ -1329,11 +1323,10 @@ public class BookStore {
         Book book = books.get(Long.parseLong(id));
         if (book != null) {
             return book;
-        } else {
-            BookNotFoundDetails details = new BookNotFoundDetails();
-            details.setId(Long.parseLong(id));
-            throw new BookNotFoundFault(details);
         }
+        BookNotFoundDetails details = new BookNotFoundDetails();
+        details.setId(Long.parseLong(id));
+        throw new BookNotFoundFault(details);
     }
 
     @Path("/booksubresource/context")
@@ -1365,11 +1358,10 @@ public class BookStore {
         Book book = books.get(new Long(id));
         if (book != null) {
             return book.getName();
-        } else {
-            BookNotFoundDetails details = new BookNotFoundDetails();
-            details.setId(id);
-            throw new BookNotFoundFault(details);
         }
+        BookNotFoundDetails details = new BookNotFoundDetails();
+        details.setId(id);
+        throw new BookNotFoundFault(details);
     }
 
     @POST
@@ -1772,10 +1764,9 @@ public class BookStore {
                 throw new WebApplicationException(
                      Response.status(410).header("content-type", "text/plain")
                      .entity("This is supposed to go on the wire").build());
-            } else {
-                output.write("This is not supposed to go on the wire".getBytes());
-                throw new WebApplicationException(410);
             }
+            output.write("This is not supposed to go on the wire".getBytes());
+            throw new WebApplicationException(410);
         }
 
     }

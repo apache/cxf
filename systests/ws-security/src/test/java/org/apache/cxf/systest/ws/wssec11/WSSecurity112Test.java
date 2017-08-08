@@ -126,21 +126,20 @@ public class WSSecurity112Test extends WSSecurity11Common {
                 {new TestParam("XD-ES", StaxServer12.PORT, false)},
                 {new TestParam("XD-SEES", StaxServer12.PORT, false)},
             });
-        } else {
-            return Arrays.asList(new TestParam[][] {
-                {new TestParam("X", Server12Restricted.PORT, false)},
-                {new TestParam("X-NoTimestamp", Server12Restricted.PORT, false)},
-                {new TestParam("XD", Server12Restricted.PORT, false)},
-                {new TestParam("XD-ES", Server12Restricted.PORT, false)},
-                {new TestParam("XD-SEES", Server12Restricted.PORT, false)},
-
-                {new TestParam("X", StaxServer12Restricted.PORT, false)},
-                {new TestParam("X-NoTimestamp", StaxServer12Restricted.PORT, false)},
-                {new TestParam("XD", StaxServer12Restricted.PORT, false)},
-                {new TestParam("XD-ES", StaxServer12Restricted.PORT, false)},
-                {new TestParam("XD-SEES", StaxServer12Restricted.PORT, false)},
-            });
         }
+        return Arrays.asList(new TestParam[][] {
+            {new TestParam("X", Server12Restricted.PORT, false)},
+            {new TestParam("X-NoTimestamp", Server12Restricted.PORT, false)},
+            {new TestParam("XD", Server12Restricted.PORT, false)},
+            {new TestParam("XD-ES", Server12Restricted.PORT, false)},
+            {new TestParam("XD-SEES", Server12Restricted.PORT, false)},
+
+            {new TestParam("X", StaxServer12Restricted.PORT, false)},
+            {new TestParam("X-NoTimestamp", StaxServer12Restricted.PORT, false)},
+            {new TestParam("XD", StaxServer12Restricted.PORT, false)},
+            {new TestParam("XD-ES", StaxServer12Restricted.PORT, false)},
+            {new TestParam("XD-SEES", StaxServer12Restricted.PORT, false)},
+        });
     }
 
     @org.junit.AfterClass

@@ -208,8 +208,7 @@ public final class SwaggerParseUtils {
                 sb.append(s);
             }
             return sb.toString();
-        } else {
-            return null;
         }
+        return null;
     }
 }

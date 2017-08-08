@@ -317,9 +317,8 @@ public final class OAuthClientUtils {
             ClientAccessToken token = fromMapToClientToken(map, defaultTokenType);
             if (token == null) {
                 throw new OAuthServiceException(OAuthConstants.SERVER_ERROR);
-            } else {
-                return token;
             }
+            return token;
         } else if (response.getStatus() >= 400 && map.containsKey(OAuthConstants.ERROR_KEY)) {
             OAuthError error = new OAuthError(map.get(OAuthConstants.ERROR_KEY),
                                               map.get(OAuthConstants.ERROR_DESCRIPTION_KEY));

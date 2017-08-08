@@ -529,9 +529,8 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
                                                                  "PolicyReference");
         if (policyReference != null) {
             return policyReference.getAttributeNS(null, "URI");
-        } else {
-            return null;
         }
+        return null;
     }
 
     private String getOperationPolicyReferenceId(Element operationElement, String policyNamespace) {
@@ -539,9 +538,8 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
                                                                  "PolicyReference");
         if (policyReference != null) {
             return policyReference.getAttributeNS(null, "URI");
-        } else {
-            return null;
         }
+        return null;
     }
 }
 

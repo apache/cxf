@@ -39,9 +39,8 @@ public class MyBeanLocator implements ConfiguredBeanLocator {
     public <T> T getBeanOfType(String name, Class<T> type) {
         if (registry.containsKey(name)) {
             return (T)registry.get(name);
-        } else {
-            return cbl.getBeanOfType(name, type);
         }
+        return cbl.getBeanOfType(name, type);
     }
 
     @SuppressWarnings("unchecked")

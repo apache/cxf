@@ -118,26 +118,24 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
             if (matchingClaim == null) {
                 if (claimBean.getClaimMode() == ClaimMode.STRICT) {
                     return false;
-                } else {
-                    continue;
                 }
+                continue;
             }
             List<Object> claimValues = claim.getValues();
             List<Object> matchingClaimValues = matchingClaim.getValues();
             if (claimBean.isMatchAll()
                 && !matchingClaimValues.containsAll(claimValues)) {
                 return false;
-            } else {
-                boolean matched = false;
-                for (Object value : matchingClaimValues) {
-                    if (claimValues.contains(value)) {
-                        matched = true;
-                        break;
-                    }
+            }
+            boolean matched = false;
+            for (Object value : matchingClaimValues) {
+                if (claimValues.contains(value)) {
+                    matched = true;
+                    break;
                 }
-                if (!matched) {
-                    return false;
-                }
+            }
+            if (!matched) {
+                return false;
             }
         }
         return true;

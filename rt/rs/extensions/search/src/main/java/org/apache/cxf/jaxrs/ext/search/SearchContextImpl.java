@@ -102,13 +102,11 @@ public class SearchContextImpl implements SearchContext {
             } catch (SearchParseException ex) {
                 if (PropertyUtils.isTrue(message.getContextualProperty(BLOCK_SEARCH_EXCEPTION))) {
                     return null;
-                } else {
-                    throw ex;
                 }
+                throw ex;
             }
-        } else {
-            return null;
         }
+        return null;
 
     }
 
@@ -130,9 +128,8 @@ public class SearchContextImpl implements SearchContext {
             if (queryStr.contains(SHORT_SEARCH_QUERY) || queryStr.contains(SEARCH_QUERY)) {
                 if (params.containsKey(SHORT_SEARCH_QUERY)) {
                     return params.getFirst(SHORT_SEARCH_QUERY);
-                } else {
-                    return params.getFirst(SEARCH_QUERY);
                 }
+                return params.getFirst(SEARCH_QUERY);
             } else if (MessageUtils.isTrue(message.getContextualProperty(USE_PLAIN_QUERY_PARAMETERS))) {
                 return convertPlainQueriesToFiqlExp(params);
             }

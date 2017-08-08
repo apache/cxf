@@ -85,11 +85,10 @@ public class QueryContextProvider implements ContextProvider<QueryContext> {
             Object visitor = message.getContextualProperty(SearchUtils.SEARCH_VISITOR_PROPERTY);
             if (visitor == null) {
                 return null;
-            } else {
-                //TODO: consider introducing SearchConditionVisitor.getBeanClass &&
-                //      SearchConditionVisitor.getQueryClass to avoid such casts
-                return (SearchConditionVisitor<T, Y>)visitor;
             }
+            //TODO: consider introducing SearchConditionVisitor.getBeanClass &&
+            //      SearchConditionVisitor.getQueryClass to avoid such casts
+            return (SearchConditionVisitor<T, Y>)visitor;
         }
 
 

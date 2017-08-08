@@ -311,10 +311,9 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     protected TypedQuery<Client> getClientsQuery(UserSubject resourceOwnerSubject, EntityManager entityManager) {
         if (resourceOwnerSubject == null) {
             return entityManager.createQuery(CLIENT_QUERY, Client.class);
-        } else {
-            return entityManager.createQuery(CLIENT_QUERY + " WHERE ros.login = :login", Client.class).
-                    setParameter("login", resourceOwnerSubject.getLogin());
         }
+        return entityManager.createQuery(CLIENT_QUERY + " WHERE ros.login = :login", Client.class).
+                setParameter("login", resourceOwnerSubject.getLogin());
     }
 
     protected TypedQuery<BearerAccessToken> getTokensQuery(Client c, UserSubject resourceOwnerSubject,

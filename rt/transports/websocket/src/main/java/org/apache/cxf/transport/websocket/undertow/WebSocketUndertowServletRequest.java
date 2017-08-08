@@ -439,9 +439,8 @@ public class WebSocketUndertowServletRequest implements HttpServletRequest {
         // our protocol assumes no multiple headers
         if (requestHeaders.get(name) != null) {
             return Collections.enumeration(Arrays.asList(requestHeaders.get(name)));
-        } else {
-            return Collections.enumeration(Arrays.asList());
         }
+        return Collections.enumeration(Arrays.asList());
     }
 
     @Override

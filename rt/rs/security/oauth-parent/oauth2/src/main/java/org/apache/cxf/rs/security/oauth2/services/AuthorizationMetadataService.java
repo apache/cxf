@@ -97,9 +97,8 @@ public class AuthorizationMetadataService {
         endpointAddress = endpointAddress != null ? endpointAddress : defRelAddress;
         if (endpointAddress.startsWith("https")) {
             return endpointAddress;
-        } else {
-            return UriBuilder.fromUri(baseUri).path(endpointAddress).build().toString();
         }
+        return UriBuilder.fromUri(baseUri).path(endpointAddress).build().toString();
     }
 
     private String getBaseUri(UriInfo ui) {

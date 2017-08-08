@@ -51,12 +51,11 @@ public class WrappedKeyDecryptionAlgorithm implements KeyDecryptionProvider {
             keyProps.setBlockSize(getKeyCipherBlockSize());
             return CryptoUtils.decryptBytes(getEncryptedContentEncryptionKey(jweDecryptionInput),
                                             getCekDecryptionKey(), keyProps);
-        } else {
-            return CryptoUtils.unwrapSecretKey(getEncryptedContentEncryptionKey(jweDecryptionInput),
-                                               getContentEncryptionAlgorithm(jweDecryptionInput),
-                                               getCekDecryptionKey(),
-                                               keyProps).getEncoded();
         }
+        return CryptoUtils.unwrapSecretKey(getEncryptedContentEncryptionKey(jweDecryptionInput),
+                                           getContentEncryptionAlgorithm(jweDecryptionInput),
+                                           getCekDecryptionKey(),
+                                           keyProps).getEncoded();
     }
 
     protected Key getCekDecryptionKey() {

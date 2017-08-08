@@ -147,11 +147,10 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> imple
     private boolean canDocumentBeRead(Message message) {
         if (isServerGet(message)) {
             return false;
-        } else {
-            Integer responseCode = (Integer)message.get(Message.RESPONSE_CODE);
-            if (responseCode != null && responseCode != 200) {
-                return false;
-            }
+        }
+        Integer responseCode = (Integer)message.get(Message.RESPONSE_CODE);
+        if (responseCode != null && responseCode != 200) {
+            return false;
         }
         return true;
     }
@@ -460,13 +459,12 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> imple
 
         if (!canDocumentBeRead(message)) {
             return ctx.proceed();
-        } else {
-            prepareMessage(message);
-            Object object = ctx.proceed();
-            new StaxActionInInterceptor(requireSignature,
-                                        requireEncryption).handleMessage(message);
-            return object;
         }
+        prepareMessage(message);
+        Object object = ctx.proceed();
+        new StaxActionInInterceptor(requireSignature,
+                                    requireEncryption).handleMessage(message);
+        return object;
 
     }
 

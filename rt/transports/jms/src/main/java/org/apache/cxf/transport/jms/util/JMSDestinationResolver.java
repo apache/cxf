@@ -37,9 +37,8 @@ public class JMSDestinationResolver implements DestinationResolver {
         }
         if (pubSubDomain) {
             return session.createTopic(destinationName);
-        } else {
-            return session.createQueue(destinationName);
         }
+        return session.createQueue(destinationName);
     }
 
     public void setJndiTemplate(JndiHelper jt) {

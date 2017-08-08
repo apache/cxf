@@ -38,17 +38,18 @@ public class SVSubjectProvider extends DefaultSubjectProvider {
             if (STSConstants.SYMMETRIC_KEY_KEYTYPE.equals(keyType)
                 || STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
                 return SAML2Constants.CONF_SENDER_VOUCHES;
-            } else {
-                return SAML2Constants.CONF_BEARER;
             }
-        } else {
-            if (STSConstants.SYMMETRIC_KEY_KEYTYPE.equals(keyType)
-                || STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
-                return SAML1Constants.CONF_SENDER_VOUCHES;
-            } else {
-                return SAML1Constants.CONF_BEARER;
-            }
+            return SAML2Constants.CONF_BEARER;
         }
+        return extracted(keyType);
+    }
+
+    private String extracted(String keyType) {
+        if (STSConstants.SYMMETRIC_KEY_KEYTYPE.equals(keyType)
+            || STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
+            return SAML1Constants.CONF_SENDER_VOUCHES;
+        }
+        return SAML1Constants.CONF_BEARER;
     }
 
 }

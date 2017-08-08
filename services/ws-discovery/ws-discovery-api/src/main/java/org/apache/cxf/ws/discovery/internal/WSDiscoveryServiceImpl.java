@@ -262,9 +262,8 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
             } catch (RuntimeException ex) {
                 if (!optional) {
                     throw ex;
-                } else {
-                    LOG.log(Level.WARNING, "Could not start WS-Discovery Service.", ex);
                 }
+                LOG.log(Level.WARNING, "Could not start WS-Discovery Service.", ex);
             } finally {
                 if (b != bus) {
                     BusFactory.setThreadDefaultBus(b);
@@ -318,13 +317,12 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
         URI uri = URI.create(scope);
         if (uri.getScheme() == null) {
             return UUID.fromString(scope);
-        } else {
-            if (uri.getScheme().equals("urn")) {
-                uri = URI.create(uri.getSchemeSpecificPart());
-            }
-            if (uri.getScheme().equals("uuid")) {
-                return UUID.fromString(uri.getSchemeSpecificPart());
-            }
+        }
+        if (uri.getScheme().equals("urn")) {
+            uri = URI.create(uri.getSchemeSpecificPart());
+        }
+        if (uri.getScheme().equals("uuid")) {
+            return UUID.fromString(uri.getSchemeSpecificPart());
         }
         return null;
     }

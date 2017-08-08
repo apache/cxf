@@ -63,9 +63,8 @@ public class JsonMapObject implements Serializable {
         Object value = getProperty(name);
         if (value != null) {
             return CastUtils.cast((Map<?, ?>)value);
-        } else {
-            return null;
         }
+        return null;
     }
 
     public Map<String, Object> asMap() {
@@ -75,41 +74,36 @@ public class JsonMapObject implements Serializable {
         Object value = getProperty(name);
         if (value != null) {
             return value instanceof Integer ? (Integer)value : Integer.parseInt(value.toString());
-        } else {
-            return null;
         }
+        return null;
     }
     public Long getLongProperty(String name) {
         Object value = getProperty(name);
         if (value != null) {
             return value instanceof Long ? (Long)value : Long.parseLong(value.toString());
-        } else {
-            return null;
         }
+        return null;
     }
     public Boolean getBooleanProperty(String name) {
         Object value = getProperty(name);
         if (value != null) {
             return value instanceof Boolean ? (Boolean)value : Boolean.parseBoolean(value.toString());
-        } else {
-            return null;
         }
+        return null;
     }
     public String getStringProperty(String name) {
         Object value = getProperty(name);
         if (value != null) {
             return value.toString();
-        } else {
-            return null;
         }
+        return null;
     }
     public List<String> getListStringProperty(String name) {
         Object value = getProperty(name);
         if (value != null) {
             return CastUtils.cast((List<?>)value);
-        } else {
-            return null;
         }
+        return null;
     }
     public int hashCode() {
         return values.hashCode();

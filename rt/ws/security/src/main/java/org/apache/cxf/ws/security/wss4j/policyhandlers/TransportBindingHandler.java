@@ -145,9 +145,8 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                         if (secToken == null) {
                             unassertPolicy(transportToken, "No transport token id");
                             return;
-                        } else {
-                            assertPolicy(transportToken);
                         }
+                        assertPolicy(transportToken);
                         if (isTokenRequired(transportToken.getIncludeTokenType())) {
                             Element el = secToken.getToken();
                             addEncryptedKeyElement(cloneElement(el));
@@ -393,31 +392,29 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             dkSig.computeSignature(referenceList, false, null);
 
             return dkSig.getSignatureValue();
-        } else {
-            WSSecSignature sig = getSignatureBuilder(token, false, false);
-            assertPolicy(wrapper);
-            if (sig != null) {
-                sig.prependBSTElementToHeader();
-
-                List<Reference> referenceList = sig.addReferencesToSign(sigParts);
-
-                if (bottomUpElement == null) {
-                    sig.computeSignature(referenceList, false, null);
-                } else {
-                    sig.computeSignature(referenceList, true, bottomUpElement);
-                }
-                bottomUpElement = sig.getSignatureElement();
-                mainSigId = sig.getId();
-
-                return sig.getSignatureValue();
-            } else {
-                return new byte[0];
-            }
         }
+        WSSecSignature sig = getSignatureBuilder(token, false, false);
+        assertPolicy(wrapper);
+        if (sig != null) {
+            sig.prependBSTElementToHeader();
+
+            List<Reference> referenceList = sig.addReferencesToSign(sigParts);
+
+            if (bottomUpElement == null) {
+                sig.computeSignature(referenceList, false, null);
+            } else {
+                sig.computeSignature(referenceList, true, bottomUpElement);
+            }
+            bottomUpElement = sig.getSignatureElement();
+            mainSigId = sig.getId();
+
+            return sig.getSignatureValue();
+        }
+        return new byte[0];
     }
 
     private byte[] doIssuedTokenSignature(
-        AbstractToken token, SupportingTokens wrapper
+        final AbstractToken token, final SupportingTokens wrapper
     ) throws Exception {
         boolean tokenIncluded = false;
         // Get the issued token
@@ -448,9 +445,8 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
 
         if (token.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
             return doDerivedKeySignature(tokenIncluded, secTok, token, sigParts);
-        } else {
-            return doSignature(tokenIncluded, secTok, token, wrapper, sigParts);
         }
+        return doSignature(tokenIncluded, secTok, token, wrapper, sigParts);
     }
 
     private byte[] doDerivedKeySignature(

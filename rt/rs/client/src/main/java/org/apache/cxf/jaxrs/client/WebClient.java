@@ -1231,9 +1231,8 @@ public class WebClient extends AbstractClient {
         AbstractClient newClient = toAbstractClient(client);
         if (newClient == null) {
             return null;
-        } else  {
-            return newClient.getState();
         }
+        return newClient.getState();
     }
 
     static URI convertStringToURI(String baseAddress) {
@@ -1244,9 +1243,8 @@ public class WebClient extends AbstractClient {
             // as the relative address will not work as the base address
             if (baseAddress.startsWith(HTTP_SCHEME)) {
                 return new UriBuilderImpl().uriAsTemplate(baseAddress).build();
-            } else {
-                throw ex;
             }
+            throw ex;
         }
     }
 

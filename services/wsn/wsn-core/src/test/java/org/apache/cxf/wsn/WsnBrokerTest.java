@@ -384,9 +384,8 @@ public abstract class WsnBrokerTest extends Assert {
         public InputStream getResourceAsStream(String name) {
             if ("META-INF/services/javax.xml.ws.spi.Provider".equals(name)) {
                 return provider != null ? new ByteArrayInputStream(provider.getBytes()) : null;
-            } else {
-                return super.getResourceAsStream(name);
             }
+            return super.getResourceAsStream(name);
         }
         @Override
         public Enumeration<URL> getResources(String name) throws IOException {

@@ -148,36 +148,32 @@ public class ObservableRxInvokerImpl implements ObservableRxInvoker {
     public <T> Observable<T> method(String name, Entity<?> entity, Class<T> responseType) {
         if (sc == null) {
             return Observable.from(wc.async().method(name, entity, responseType));
-        } else {
-            return Observable.from(wc.async().method(name, entity, responseType), sc);
         }
+        return Observable.from(wc.async().method(name, entity, responseType), sc);
     }
 
     @Override
     public <T> Observable<T> method(String name, Entity<?> entity, GenericType<T> responseType) {
         if (sc == null) {
             return Observable.from(wc.async().method(name, entity, responseType));
-        } else {
-            return Observable.from(wc.async().method(name, entity, responseType), sc);
         }
+        return Observable.from(wc.async().method(name, entity, responseType), sc);
     }
 
     @Override
     public <T> Observable<T> method(String name, Class<T> responseType) {
         if (sc == null) {
             return Observable.from(wc.async().method(name, responseType));
-        } else {
-            return Observable.from(wc.async().method(name, responseType), sc);
         }
+        return Observable.from(wc.async().method(name, responseType), sc);
     }
 
     @Override
     public <T> Observable<T> method(String name, GenericType<T> responseType) {
         if (sc == null) {
             return Observable.from(wc.async().method(name, responseType));
-        } else {
-            return Observable.from(wc.async().method(name, responseType), sc);
         }
+        return Observable.from(wc.async().method(name, responseType), sc);
     }
 
 }

@@ -86,11 +86,10 @@ public class BookStoreWithInterface2 extends BookStoreStorage implements BookInt
         Book book = books.get(id);
         if (book != null) {
             return book;
-        } else {
-            BookNotFoundDetails details = new BookNotFoundDetails();
-            details.setId(id);
-            throw new BookNotFoundFault(details);
         }
+        BookNotFoundDetails details = new BookNotFoundDetails();
+        details.setId(id);
+        throw new BookNotFoundFault(details);
     }
 
     public Book getThatBook() throws BookNotFoundFault {

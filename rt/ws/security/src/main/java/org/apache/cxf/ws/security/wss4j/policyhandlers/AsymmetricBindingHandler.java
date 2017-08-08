@@ -449,107 +449,106 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             AlgorithmSuite algorithmSuite = abinding.getAlgorithmSuite();
             if (encrToken.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
                 return doEncryptionDerived(recToken, encrToken, encrParts, algorithmSuite);
-            } else {
-                try {
-                    WSSecEncrypt encr = new WSSecEncrypt(secHeader);
-                    encr.setEncryptionSerializer(new StaxSerializer());
-                    encr.setIdAllocator(wssConfig.getIdAllocator());
-                    encr.setCallbackLookup(callbackLookup);
-                    encr.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
-                    encr.setStoreBytesInAttachment(storeBytesInAttachment);
-                    encr.setExpandXopInclude(isExpandXopInclude());
-                    encr.setWsDocInfo(wsDocInfo);
+            }
+            try {
+                WSSecEncrypt encr = new WSSecEncrypt(secHeader);
+                encr.setEncryptionSerializer(new StaxSerializer());
+                encr.setIdAllocator(wssConfig.getIdAllocator());
+                encr.setCallbackLookup(callbackLookup);
+                encr.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
+                encr.setStoreBytesInAttachment(storeBytesInAttachment);
+                encr.setExpandXopInclude(isExpandXopInclude());
+                encr.setWsDocInfo(wsDocInfo);
 
-                    Crypto crypto = getEncryptionCrypto();
+                Crypto crypto = getEncryptionCrypto();
 
-                    SecurityToken securityToken = getSecurityToken();
-                    if (!isRequestor() && securityToken != null
-                        && recToken.getToken() instanceof SamlToken) {
-                        String tokenType = securityToken.getTokenType();
-                        if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
-                            || WSConstants.SAML_NS.equals(tokenType)) {
-                            encr.setCustomEKTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
-                            encr.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
-                            encr.setCustomEKTokenId(securityToken.getId());
-                        } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
-                            || WSConstants.SAML2_NS.equals(tokenType)) {
-                            encr.setCustomEKTokenValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
-                            encr.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
-                            encr.setCustomEKTokenId(securityToken.getId());
-                        } else {
-                            setKeyIdentifierType(encr, encrToken);
-                        }
+                SecurityToken securityToken = getSecurityToken();
+                if (!isRequestor() && securityToken != null
+                    && recToken.getToken() instanceof SamlToken) {
+                    String tokenType = securityToken.getTokenType();
+                    if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
+                        || WSConstants.SAML_NS.equals(tokenType)) {
+                        encr.setCustomEKTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+                        encr.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
+                        encr.setCustomEKTokenId(securityToken.getId());
+                    } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
+                        || WSConstants.SAML2_NS.equals(tokenType)) {
+                        encr.setCustomEKTokenValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
+                        encr.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
+                        encr.setCustomEKTokenId(securityToken.getId());
                     } else {
                         setKeyIdentifierType(encr, encrToken);
                     }
-                    //
-                    // Using a stored cert is only suitable for the Issued Token case, where
-                    // we're extracting the cert from a SAML Assertion on the provider side
-                    //
-                    if (!isRequestor() && securityToken != null
-                        && securityToken.getX509Certificate() != null) {
-                        encr.setUseThisCert(securityToken.getX509Certificate());
-                    } else if (!isRequestor() && securityToken != null
-                        && securityToken.getKey() instanceof PublicKey) {
-                        encr.setUseThisPublicKey((PublicKey)securityToken.getKey());
-                    } else {
-                        setEncryptionUser(encr, encrToken, false, crypto);
-                    }
-                    if (!encr.isCertSet() && encr.getUseThisPublicKey() == null && crypto == null) {
-                        unassertPolicy(recToken, "Missing security configuration. "
-                                + "Make sure jaxws:client element is configured "
-                                + "with a " + SecurityConstants.ENCRYPT_PROPERTIES + " value.");
-                    }
-                    AlgorithmSuiteType algType = algorithmSuite.getAlgorithmSuiteType();
-                    encr.setSymmetricEncAlgorithm(algType.getEncryption());
-                    encr.setKeyEncAlgo(algType.getAsymmetricKeyWrap());
-                    encr.setMGFAlgorithm(algType.getMGFAlgo());
-                    encr.setDigestAlgorithm(algType.getEncryptionDigest());
-                    encr.prepare(crypto);
-
-                    Element encryptedKeyElement = encr.getEncryptedKeyElement();
-                    List<Element> attachments = encr.getAttachmentEncryptedDataElements();
-                    //Encrypt, get hold of the ref list and add it
-                    if (externalRef) {
-                        Element refList = encr.encryptForRef(null, encrParts);
-                        if (refList != null) {
-                            insertBeforeBottomUp(refList);
-                        }
-                        if (attachments != null) {
-                            for (Element attachment : attachments) {
-                                this.insertBeforeBottomUp(attachment);
-                            }
-                        }
-                        if (refList != null || (attachments != null && !attachments.isEmpty())) {
-                            this.addEncryptedKeyElement(encryptedKeyElement);
-                        }
-                    } else {
-                        Element refList = encr.encryptForRef(null, encrParts);
-                        if (refList != null || (attachments != null && !attachments.isEmpty())) {
-                            this.addEncryptedKeyElement(encryptedKeyElement);
-                        }
-
-                        // Add internal refs
-                        if (refList != null) {
-                            encryptedKeyElement.appendChild(refList);
-                        }
-                        if (attachments != null) {
-                            for (Element attachment : attachments) {
-                                this.addEncryptedKeyElement(attachment);
-                            }
-                        }
-                    }
-
-                    // Put BST before EncryptedKey element
-                    if (encr.getBSTTokenId() != null) {
-                        encr.prependBSTElementToHeader();
-                    }
-
-                    return encr;
-                } catch (WSSecurityException e) {
-                    LOG.log(Level.FINE, e.getMessage(), e);
-                    unassertPolicy(recToken, e);
+                } else {
+                    setKeyIdentifierType(encr, encrToken);
                 }
+                //
+                // Using a stored cert is only suitable for the Issued Token case, where
+                // we're extracting the cert from a SAML Assertion on the provider side
+                //
+                if (!isRequestor() && securityToken != null
+                    && securityToken.getX509Certificate() != null) {
+                    encr.setUseThisCert(securityToken.getX509Certificate());
+                } else if (!isRequestor() && securityToken != null
+                    && securityToken.getKey() instanceof PublicKey) {
+                    encr.setUseThisPublicKey((PublicKey)securityToken.getKey());
+                } else {
+                    setEncryptionUser(encr, encrToken, false, crypto);
+                }
+                if (!encr.isCertSet() && encr.getUseThisPublicKey() == null && crypto == null) {
+                    unassertPolicy(recToken, "Missing security configuration. "
+                            + "Make sure jaxws:client element is configured "
+                            + "with a " + SecurityConstants.ENCRYPT_PROPERTIES + " value.");
+                }
+                AlgorithmSuiteType algType = algorithmSuite.getAlgorithmSuiteType();
+                encr.setSymmetricEncAlgorithm(algType.getEncryption());
+                encr.setKeyEncAlgo(algType.getAsymmetricKeyWrap());
+                encr.setMGFAlgorithm(algType.getMGFAlgo());
+                encr.setDigestAlgorithm(algType.getEncryptionDigest());
+                encr.prepare(crypto);
+
+                Element encryptedKeyElement = encr.getEncryptedKeyElement();
+                List<Element> attachments = encr.getAttachmentEncryptedDataElements();
+                //Encrypt, get hold of the ref list and add it
+                if (externalRef) {
+                    Element refList = encr.encryptForRef(null, encrParts);
+                    if (refList != null) {
+                        insertBeforeBottomUp(refList);
+                    }
+                    if (attachments != null) {
+                        for (Element attachment : attachments) {
+                            this.insertBeforeBottomUp(attachment);
+                        }
+                    }
+                    if (refList != null || (attachments != null && !attachments.isEmpty())) {
+                        this.addEncryptedKeyElement(encryptedKeyElement);
+                    }
+                } else {
+                    Element refList = encr.encryptForRef(null, encrParts);
+                    if (refList != null || (attachments != null && !attachments.isEmpty())) {
+                        this.addEncryptedKeyElement(encryptedKeyElement);
+                    }
+
+                    // Add internal refs
+                    if (refList != null) {
+                        encryptedKeyElement.appendChild(refList);
+                    }
+                    if (attachments != null) {
+                        for (Element attachment : attachments) {
+                            this.addEncryptedKeyElement(attachment);
+                        }
+                    }
+                }
+
+                // Put BST before EncryptedKey element
+                if (encr.getBSTTokenId() != null) {
+                    encr.prependBSTElementToHeader();
+                }
+
+                return encr;
+            } catch (WSSecurityException e) {
+                LOG.log(Level.FINE, e.getMessage(), e);
+                unassertPolicy(recToken, e);
             }
         }
         return null;

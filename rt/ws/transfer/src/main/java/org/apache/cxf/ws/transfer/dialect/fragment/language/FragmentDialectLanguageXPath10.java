@@ -51,9 +51,8 @@ public class FragmentDialectLanguageXPath10 implements FragmentDialectLanguage {
                 if (prefix != null && !prefix.isEmpty()) {
                     Element resource = (Element) representation.getAny();
                     return resource.getAttribute("xmlns:" + prefix);
-                } else {
-                    return null;
                 }
+                return null;
             }
 
             @Override
@@ -76,12 +75,10 @@ public class FragmentDialectLanguageXPath10 implements FragmentDialectLanguage {
             if (checkResultConstraints(result)) {
                 if (result.getLength() == 0) {
                     return null;
-                } else {
-                    return result;
                 }
-            } else {
-                return result.item(0);
+                return result;
             }
+            return result.item(0);
         } catch (XPathException ex) {
             // See https://www.java.net/node/681793
         }
@@ -102,9 +99,8 @@ public class FragmentDialectLanguageXPath10 implements FragmentDialectLanguage {
     private String getXPathFromExpression(ExpressionType expression) {
         if (expression.getContent().size() == 1) {
             return (String) expression.getContent().get(0);
-        } else {
-            throw new InvalidExpression();
         }
+        throw new InvalidExpression();
     }
 
     /**

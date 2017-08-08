@@ -205,9 +205,8 @@ public final class OAuthUtils {
         UserSubject subject = mc.getContent(UserSubject.class);
         if (subject != null) {
             return subject;
-        } else {
-            return OAuthUtils.createSubject(sc);
         }
+        return OAuthUtils.createSubject(sc);
     }
     public static UserSubject createSubject(SecurityContext securityContext) {
         List<String> roleNames = Collections.emptyList();
@@ -357,18 +356,17 @@ public final class OAuthUtils {
             // the current request scopes
             if (!partialMatchScopeValidation) {
                 return registeredScopes.containsAll(requestScopes);
-            } else {
-                for (String requestScope : requestScopes) {
-                    boolean match = false;
-                    for (String registeredScope : registeredScopes) {
-                        if (requestScope.startsWith(registeredScope)) {
-                            match = true;
-                            break;
-                        }
+            }
+            for (String requestScope : requestScopes) {
+                boolean match = false;
+                for (String registeredScope : registeredScopes) {
+                    if (requestScope.startsWith(registeredScope)) {
+                        match = true;
+                        break;
                     }
-                    if (!match) {
-                        return false;
-                    }
+                }
+                if (!match) {
+                    return false;
                 }
             }
         }
@@ -438,9 +436,8 @@ public final class OAuthUtils {
         if (!AlgorithmUtils.isHmacSign(sigAlgo)) {
             // Must be HS-based for the symmetric signature
             throw new OAuthServiceException(OAuthConstants.SERVER_ERROR);
-        } else {
-            return sigAlgo;
         }
+        return sigAlgo;
     }
 
     public static String convertListOfScopesToString(List<String> registeredScopes) {

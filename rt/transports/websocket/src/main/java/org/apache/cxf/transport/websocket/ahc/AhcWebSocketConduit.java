@@ -381,9 +381,8 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
                 if (first && isStatusCode(line)) {
                     statusCode = Integer.parseInt(line);
                     continue;
-                } else {
-                    first = false;
                 }
+                first = false;
                 int del = line.indexOf(':');
                 String h = line.substring(0, del).trim();
                 String v = line.substring(del + 1).trim();

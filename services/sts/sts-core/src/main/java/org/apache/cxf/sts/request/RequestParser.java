@@ -373,19 +373,18 @@ public class RequestParser {
                 Element element = (Element)useKey.getAny();
                 if ("KeyInfo".equals(element.getLocalName())) {
                     return parseKeyInfoElement((Element)useKey.getAny());
-                } else {
-                    NodeList x509CertData =
-                        element.getElementsByTagNameNS(
-                            Constants.SignatureSpecNS, Constants._TAG_X509CERTIFICATE
-                        );
-                    if (x509CertData != null && x509CertData.getLength() > 0) {
-                        try {
-                            x509 = Base64Utility.decode(x509CertData.item(0).getTextContent().trim());
-                            LOG.fine("Found X509Certificate UseKey type");
-                        } catch (Exception e) {
-                            LOG.log(Level.WARNING, "", e);
-                            throw new STSException(e.getMessage(), e, STSException.INVALID_REQUEST);
-                        }
+                }
+                NodeList x509CertData =
+                    element.getElementsByTagNameNS(
+                        Constants.SignatureSpecNS, Constants._TAG_X509CERTIFICATE
+                    );
+                if (x509CertData != null && x509CertData.getLength() > 0) {
+                    try {
+                        x509 = Base64Utility.decode(x509CertData.item(0).getTextContent().trim());
+                        LOG.fine("Found X509Certificate UseKey type");
+                    } catch (Exception e) {
+                        LOG.log(Level.WARNING, "", e);
+                        throw new STSException(e.getMessage(), e, STSException.INVALID_REQUEST);
                     }
                 }
             }

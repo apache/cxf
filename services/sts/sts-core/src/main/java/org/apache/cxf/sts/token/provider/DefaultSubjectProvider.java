@@ -207,17 +207,14 @@ public class DefaultSubjectProvider implements SubjectProvider {
             if (STSConstants.SYMMETRIC_KEY_KEYTYPE.equals(keyType)
                 || STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
                 return SAML1Constants.CONF_HOLDER_KEY;
-            } else {
-                return SAML1Constants.CONF_BEARER;
             }
-        } else {
-            if (STSConstants.SYMMETRIC_KEY_KEYTYPE.equals(keyType)
-                || STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
-                return SAML2Constants.CONF_HOLDER_KEY;
-            } else {
-                return SAML2Constants.CONF_BEARER;
-            }
+            return SAML1Constants.CONF_BEARER;
         }
+        if (STSConstants.SYMMETRIC_KEY_KEYTYPE.equals(keyType)
+            || STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
+            return SAML2Constants.CONF_HOLDER_KEY;
+        }
+        return SAML2Constants.CONF_BEARER;
     }
 
     /**

@@ -33,9 +33,8 @@ public class GetMethodQueryWebRequest extends GetMethodWebRequest {
         int pos = urlString.indexOf('?');
         if (pos > 0) {
             return urlString.substring(pos + 1);
-        } else {
-            return "";
         }
+        return "";
     }
 
 

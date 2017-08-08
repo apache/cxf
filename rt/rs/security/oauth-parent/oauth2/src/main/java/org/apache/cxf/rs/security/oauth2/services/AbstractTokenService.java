@@ -133,10 +133,9 @@ public class AbstractTokenService extends AbstractOAuthService {
     protected boolean isConfidenatialClientSecretValid(Client client, String providedClientSecret) {
         if (clientSecretVerifier != null) {
             return clientSecretVerifier.validateClientSecret(client, providedClientSecret);
-        } else {
-            return client.getClientSecret() != null
-                && providedClientSecret != null && client.getClientSecret().equals(providedClientSecret);
         }
+        return client.getClientSecret() != null
+            && providedClientSecret != null && client.getClientSecret().equals(providedClientSecret);
     }
     protected boolean isValidPublicClient(Client client, String clientId, String clientSecret) {
         return canSupportPublicClients
@@ -216,9 +215,8 @@ public class AbstractTokenService extends AbstractOAuthService {
         OAuthError customError = ex.getError();
         if (writeCustomErrors && customError != null) {
             return createErrorResponseFromBean(customError);
-        } else {
-            return createErrorResponseFromBean(new OAuthError(error));
         }
+        return createErrorResponseFromBean(new OAuthError(error));
     }
 
     protected Response createErrorResponse(MultivaluedMap<String, String> params,

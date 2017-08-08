@@ -212,9 +212,8 @@ public class JAXRSClientServerUserResourceDefaultTest extends AbstractBusClientS
                 String id = ui.getPathParameters().getFirst("id");
                 Book book = books.get(id);
                 return Response.ok(book, headers.getAcceptableMediaTypes().get(0)).build();
-            } else {
-                throw new NotAllowedException("GET");
             }
+            throw new NotAllowedException("GET");
         }
         public Book echo(Book book) {
             return book;

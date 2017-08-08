@@ -213,9 +213,8 @@ public abstract class AbstractSpnegoAuthSupplier {
     public CallbackHandler getUsernamePasswordHandler(final String username, final String password) {
         if (StringUtils.isEmpty(username)) {
             return null;
-        } else {
-            return new NamePasswordCallbackHandler(username, password);
         }
+        return new NamePasswordCallbackHandler(username, password);
     }
 
     public void setCredDelegation(boolean delegation) {

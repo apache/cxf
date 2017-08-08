@@ -127,9 +127,8 @@ public class WSDLServiceBuilderTest extends Assert {
                 service = serv;
                 if (seq == serviceSeq) {
                     break;
-                } else {
-                    seq++;
                 }
+                seq++;
             }
         }
     }

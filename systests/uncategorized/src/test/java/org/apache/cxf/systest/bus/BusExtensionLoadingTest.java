@@ -88,9 +88,8 @@ public class BusExtensionLoadingTest extends Assert {
         public Class<?> loadClass(final String className) throws ClassNotFoundException {
             if (className.contains("cxf")) {
                 throw new ClassNotFoundException("TestClassLoader does not load CXF classes: " +  className);
-            } else {
-                return super.loadClass(className);
             }
+            return super.loadClass(className);
         }
 
         @Override

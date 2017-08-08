@@ -135,9 +135,8 @@ public class AtmosphereWebSocketJettyDestination extends JettyHTTPDestination im
                     throw new IOException(e);
                 }
                 return;
-            } else {
-                super.handle(target, baseRequest, request, response);
             }
+            super.handle(target, baseRequest, request, response);
         }
     }
 

@@ -151,10 +151,9 @@ public class AuthorizationRequestHandler {
             if (OAuthConstants.OAUTH_CALLBACK_OOB.equals(callbackValue)) {
                 OOBAuthorizationResponse bean = convertQueryParamsToOOB(queryParams);
                 return Response.ok().entity(bean).build();
-            } else {
-                URI callbackURI = buildCallbackURI(callbackValue, queryParams);
-                return Response.seeOther(callbackURI).build();
             }
+            URI callbackURI = buildCallbackURI(callbackValue, queryParams);
+            return Response.seeOther(callbackURI).build();
 
         } catch (OAuthProblemException e) {
             LOG.log(Level.WARNING, "An OAuth related problem: {0}", new Object[]{e.fillInStackTrace()});

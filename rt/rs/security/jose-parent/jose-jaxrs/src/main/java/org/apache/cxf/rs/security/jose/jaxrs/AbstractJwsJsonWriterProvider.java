@@ -63,9 +63,8 @@ public class AbstractJwsJsonWriterProvider {
             if (sigProviders == null) {
                 LOG.warning("JWS JSON init properties resource is not identified");
                 throw new JwsException(JwsException.Error.NO_INIT_PROPERTIES);
-            } else {
-                return Collections.emptyList();
             }
+            return Collections.emptyList();
         }
         List<String> propLocs = null;
         if (propLocsProp instanceof String) {

@@ -271,9 +271,8 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
         if (ex != null) {
             if (ex.getCause() instanceof RuntimeException) {
                 throw (RuntimeException)ex.getCause();
-            } else {
-                throw new RuntimeException(ex);
             }
+            throw new RuntimeException(ex);
         }
     }
 

@@ -61,32 +61,31 @@ public class SamlPostBindingFilter extends AbstractServiceProviderFilter {
         Message m = JAXRSUtils.getCurrentMessage();
         if (checkSecurityContext(m)) {
             return;
-        } else {
-            try {
-                SamlRequestInfo info = createSamlRequestInfo(m);
-                info.setIdpServiceAddress(getIdpServiceAddress());
-                // This depends on RequestDispatcherProvider linking
-                // SamlRequestInfo with the jsp page which will fill
-                // in the XHTML form using SamlRequestInfo
-                // in principle we could've built the XHTML form right here
-                // but it will be cleaner to get that done in JSP
+        }
+        try {
+            SamlRequestInfo info = createSamlRequestInfo(m);
+            info.setIdpServiceAddress(getIdpServiceAddress());
+            // This depends on RequestDispatcherProvider linking
+            // SamlRequestInfo with the jsp page which will fill
+            // in the XHTML form using SamlRequestInfo
+            // in principle we could've built the XHTML form right here
+            // but it will be cleaner to get that done in JSP
 
-                String contextCookie = createCookie(SSOConstants.RELAY_STATE,
-                                                    info.getRelayState(),
-                                                    info.getWebAppContext(),
-                                                    info.getWebAppDomain());
-                new MessageContextImpl(m).getHttpServletResponse().addHeader(
-                    HttpHeaders.SET_COOKIE, contextCookie);
+            String contextCookie = createCookie(SSOConstants.RELAY_STATE,
+                                                info.getRelayState(),
+                                                info.getWebAppContext(),
+                                                info.getWebAppDomain());
+            new MessageContextImpl(m).getHttpServletResponse().addHeader(
+                HttpHeaders.SET_COOKIE, contextCookie);
 
-                context.abortWith(Response.ok(info)
-                               .type("text/html")
-                               .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store")
-                               .header("Pragma", "no-cache")
-                               .build());
+            context.abortWith(Response.ok(info)
+                           .type("text/html")
+                           .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store")
+                           .header("Pragma", "no-cache")
+                           .build());
 
-            } catch (Exception ex) {
-                throw ExceptionUtils.toInternalServerErrorException(ex, null);
-            }
+        } catch (Exception ex) {
+            throw ExceptionUtils.toInternalServerErrorException(ex, null);
         }
     }
 

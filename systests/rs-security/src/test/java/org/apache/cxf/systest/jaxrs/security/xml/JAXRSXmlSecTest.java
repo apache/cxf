@@ -691,9 +691,8 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         } catch (WebApplicationException ex) {
             if (propagateException) {
                 throw ex;
-            } else {
-                fail(ex.getMessage());
             }
+            fail(ex.getMessage());
         } catch (ProcessingException ex) {
             assertTrue(ex.getCause() instanceof BadRequestException);
         }

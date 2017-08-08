@@ -283,9 +283,8 @@ public abstract class AbstractJPATypedQueryVisitor<T, T1, E>
             String post = name.substring(name.indexOf('.') + 1);
             final Path<?> nextPath = getNextPath(element, pre, post, cv, null);
             return getPath(nextPath, post, cv, collSize);
-        } else {
-            return getNextPath(element, name, null, cv, collSize);
         }
+        return getNextPath(element, name, null, cv, collSize);
     }
 
     private Path<?> getNextPath(Path<?> element, String name, String postName,
@@ -297,12 +296,10 @@ public abstract class AbstractJPATypedQueryVisitor<T, T1, E>
             final Path<?> path = getExistingJoinProperty((From<?, ?>)element, name);
             if (path != null) {
                 return path;
-            } else {
-                return element == root ? root.join(name) : ((Join<?, ?>)element).join(name);
             }
-        } else {
-            return element.get(name);
+            return element == root ? root.join(name) : ((Join<?, ?>)element).join(name);
         }
+        return element.get(name);
     }
 
     private boolean isJoinProperty(String prop) {

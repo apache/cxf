@@ -139,9 +139,8 @@ public abstract class WSS4JBasicAuthValidator {
             context.setIssuer(SAMLUtils.getIssuer(samlAssertion));
             context.setAssertionElement(SAMLUtils.getAssertionElement(samlAssertion));
             return context;
-        } else {
-            return createSecurityContext(credential.getPrincipal());
         }
+        return createSecurityContext(credential.getPrincipal());
     }
 
     public Validator getValidator() {

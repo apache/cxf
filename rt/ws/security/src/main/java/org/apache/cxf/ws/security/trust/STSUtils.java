@@ -102,9 +102,8 @@ public final class STSUtils {
     public static STSClient getClient(Message message, String type, IssuedToken itok) {
         if (itok != null) {
             return getClientWithIssuer(message, type, itok.getIssuer());
-        } else {
-            return getClientWithIssuer(message, type, null);
         }
+        return getClientWithIssuer(message, type, null);
     }
 
     public static STSClient getClientWithIssuer(Message message, String type, Element issuer) {
@@ -241,11 +240,10 @@ public final class STSUtils {
                 && VersionTransformer.isSupported(el.getNamespaceURI())
                 && "MetadataReference".equals(ref.getLocalName())) {
                 return DOMUtils.getContent(el);
-            } else {
-                String ad = findMEXLocation(el);
-                if (ad != null) {
-                    return ad;
-                }
+            }
+            String ad = findMEXLocation(el);
+            if (ad != null) {
+                return ad;
             }
             el = DOMUtils.getNextElement(el);
         }

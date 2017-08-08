@@ -115,9 +115,8 @@ public final class SearchUtils {
         }
         if (!containsWildcard(value)) {
             return alwaysWildcard ? "%" + value + "%" : value;
-        } else {
-            value = value.replaceAll("\\*", "%");
         }
+        value = value.replaceAll("\\*", "%");
         return value;
     }
 

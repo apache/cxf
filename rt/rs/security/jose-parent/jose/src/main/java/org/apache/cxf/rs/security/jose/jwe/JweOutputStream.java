@@ -62,10 +62,9 @@ public class JweOutputStream extends FilterOutputStream {
             len -= lenToCopy;
             if (lastRawDataChunk.length < blockSize) {
                 return;
-            } else {
-                encryptAndWrite(lastRawDataChunk, 0, lastRawDataChunk.length);
-                lastRawDataChunk = null;
             }
+            encryptAndWrite(lastRawDataChunk, 0, lastRawDataChunk.length);
+            lastRawDataChunk = null;
         }
         int offset = 0;
         int chunkSize = blockSize > len ? blockSize : blockSize * (len / blockSize);

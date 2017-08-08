@@ -308,9 +308,8 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
             return sessionAuthenticityTokenProvider.getSessionState(super.getMessageContext(),
                                                                      sessionToken,
                                                                      subject);
-        } else {
-            return null;
         }
+        return null;
     }
 
 
@@ -335,9 +334,8 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         if (StringUtils.isEmpty(approvedScope)) {
             // no down-scoping done by a user, all of the requested scopes have been authorized
             return requestedScope;
-        } else {
-            return approvedScope;
         }
+        return approvedScope;
     }
 
     /**
@@ -514,9 +512,8 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         }
         if (StringUtils.isEmpty(sessionToken)) {
             return false;
-        } else {
-            return requestToken.equals(sessionToken);
         }
+        return requestToken.equals(sessionToken);
     }
 
     /**

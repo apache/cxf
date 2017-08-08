@@ -182,9 +182,8 @@ public class WSSecurity10Test extends AbstractBusClientServerTestBase {
         try {
             if ("UserNameOverTransport".equals(portPrefix)) {
                 return new URL("https://localhost:" + port + "/" + portPrefix + "?wsdl");
-            } else {
-                return new URL("http://localhost:" + port + "/" + portPrefix + "?wsdl");
             }
+            return new URL("http://localhost:" + port + "/" + portPrefix + "?wsdl");
         } catch (MalformedURLException mue) {
             return null;
         }

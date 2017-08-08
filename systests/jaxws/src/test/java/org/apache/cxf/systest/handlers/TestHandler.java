@@ -191,9 +191,8 @@ public class TestHandler<T extends LogicalMessageContext>
         addHandlerId(msg, ctx, outbound);
         if (checkServerOutBindStopHandler(outbound, ctx)) {
             return false;
-        } else {
-            return getHandleMessageRet();
         }
+        return getHandleMessageRet();
     }
 
     private void addHandlerId(LogicalMessage msg, T ctx, boolean outbound) {

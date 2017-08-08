@@ -307,18 +307,16 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
             ClassResourceInfo subcri = ori.getClassResourceInfo().getSubResource(cls, cls);
             if (subcri == null) {
                 return null;
-            } else {
-                MultivaluedMap<String, String> newValues = new MetadataMap<String, String>();
-                newValues.putAll(values);
-                return findPreflightMethod(Collections.singletonMap(subcri, newValues),
-                                           values.getFirst(URITemplate.FINAL_MATCH_GROUP),
-                                           httpMethod,
-                                           newValues,
-                                           m);
             }
-        } else {
-            return ori;
+            MultivaluedMap<String, String> newValues = new MetadataMap<String, String>();
+            newValues.putAll(values);
+            return findPreflightMethod(Collections.singletonMap(subcri, newValues),
+                                       values.getFirst(URITemplate.FINAL_MATCH_GROUP),
+                                       httpMethod,
+                                       newValues,
+                                       m);
         }
+        return ori;
     }
 
     private void setAllowOriginAndCredentials(Message m,
@@ -392,17 +390,15 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
     private boolean effectiveAllowAllOrigins(CrossOriginResourceSharing ann) {
         if (ann != null) {
             return ann.allowAllOrigins();
-        } else {
-            return allowOrigins.isEmpty();
         }
+        return allowOrigins.isEmpty();
     }
 
     private boolean effectiveAllowCredentials(CrossOriginResourceSharing ann) {
         if (ann != null) {
             return ann.allowCredentials();
-        } else {
-            return allowCredentials;
         }
+        return allowCredentials;
     }
 
     private boolean effectiveAllowOrigins(CrossOriginResourceSharing ann, List<String> origins) {
@@ -424,9 +420,8 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
     private boolean effectiveAllowAnyHeaders(CrossOriginResourceSharing ann) {
         if (ann != null) {
             return ann.allowHeaders().length == 0;
-        } else {
-            return allowHeaders.isEmpty();
         }
+        return allowHeaders.isEmpty();
     }
 
     private boolean effectiveAllowHeaders(CrossOriginResourceSharing ann, List<String> aHeaders) {
@@ -460,12 +455,10 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
             int ma = ann.maxAge();
             if (ma < 0) {
                 return null;
-            } else {
-                return Integer.valueOf(ma);
             }
-        } else {
-            return maxAge;
+            return Integer.valueOf(ma);
         }
+        return maxAge;
     }
 
     /**

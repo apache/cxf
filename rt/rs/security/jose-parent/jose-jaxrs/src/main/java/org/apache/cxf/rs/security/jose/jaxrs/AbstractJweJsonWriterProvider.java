@@ -74,9 +74,8 @@ public class AbstractJweJsonWriterProvider {
             if (encProviders == null) {
                 LOG.warning("JWE JSON init properties resource is not identified");
                 throw new JweException(JweException.Error.NO_INIT_PROPERTIES);
-            } else {
-                return Collections.emptyList();
             }
+            return Collections.emptyList();
         }
         List<String> propLocs = null;
         if (propLocsProp instanceof String) {

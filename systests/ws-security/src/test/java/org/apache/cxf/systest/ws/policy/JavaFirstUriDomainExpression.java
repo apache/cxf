@@ -61,9 +61,8 @@ public class JavaFirstUriDomainExpression implements DomainExpression {
     public boolean appliesTo(BindingOperationInfo boi) {
         if ("usernamepassword".equals(url)) {
             return "doOperationLevelPolicy".equals(boi.getName().getLocalPart());
-        } else {
-            return false;
         }
+        return false;
     }
 
     @Override

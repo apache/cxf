@@ -1259,23 +1259,22 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
                 mpi.setElementQName(qname);
                 mpi.setConcreteName(qname);
                 continue;
+            }
+            if (null == mpi.getTypeQName() && mpi.getXmlSchema() == null) {
+                throw new ServiceConstructionException(new Message("UNMAPPABLE_PORT_TYPE", LOG,
+                                                                   method.getDeclaringClass().getName(),
+                                                                   method.getName(),
+                                                                   mpi.getName()));
+            }
+            if (mpi.getTypeQName() != null) {
+                el.setSchemaTypeName(mpi.getTypeQName());
             } else {
-                if (null == mpi.getTypeQName() && mpi.getXmlSchema() == null) {
-                    throw new ServiceConstructionException(new Message("UNMAPPABLE_PORT_TYPE", LOG,
-                                                                       method.getDeclaringClass().getName(),
-                                                                       method.getName(),
-                                                                       mpi.getName()));
-                }
-                if (mpi.getTypeQName() != null) {
-                    el.setSchemaTypeName(mpi.getTypeQName());
-                } else {
-                    el.setSchemaType((XmlSchemaType)mpi.getXmlSchema());
-                }
-                mpi.setXmlSchema(el);
-                mpi.setConcreteName(qname);
-                if (mpi.getTypeQName() != null) {
-                    addImport(schema, mpi.getTypeQName().getNamespaceURI());
-                }
+                el.setSchemaType((XmlSchemaType)mpi.getXmlSchema());
+            }
+            mpi.setXmlSchema(el);
+            mpi.setConcreteName(qname);
+            if (mpi.getTypeQName() != null) {
+                addImport(schema, mpi.getTypeQName().getNamespaceURI());
             }
 
             mpi.setElement(true);

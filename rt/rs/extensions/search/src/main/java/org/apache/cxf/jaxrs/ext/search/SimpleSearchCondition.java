@@ -130,18 +130,16 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
     public ConditionType getConditionType() {
         if (scts.size() > 1) {
             return joiningType;
-        } else {
-            return scts.get(0).getStatement().getCondition();
         }
+        return scts.get(0).getStatement().getCondition();
     }
 
     @Override
     public List<SearchCondition<T>> getSearchConditions() {
         if (scts.size() > 1) {
             return Collections.unmodifiableList(scts);
-        } else {
-            return null;
         }
+        return null;
     }
 
     private List<SearchCondition<T>> createConditions(Map<String, ConditionType> getters2operators,
@@ -151,43 +149,42 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
         if (isBuiltIn(condition)) {
             return Collections.singletonList(
                 (SearchCondition<T>)new PrimitiveSearchCondition<>(null, condition, null, sharedType, condition));
-        } else {
-            List<SearchCondition<T>> list = new ArrayList<>();
-            Map<String, Object> get2val = getGettersAndValues();
-
-            Set<String> keySet = get2val != null ? get2val.keySet()
-                : ((SearchBean)condition).getKeySet();
-
-            for (String getter : keySet) {
-                ConditionType ct = getters2operators == null ? sharedType
-                    : getters2operators.get(getter.toLowerCase());
-                if (ct == null) {
-                    continue;
-                }
-                Object rval = get2val != null
-                    ? get2val.get(getter) : ((SearchBean)condition).get(getter);
-                if (rval == null) {
-                    continue;
-                }
-                String realGetter = realGetters != null && realGetters.containsKey(getter)
-                    ? realGetters.get(getter) : getter;
-
-                TypeInfo tInfo = propertyTypeInfo != null ? propertyTypeInfo.get(getter) : null;
-                Type genType = tInfo != null ? tInfo.getGenericType() : rval.getClass();
-                CollectionCheckInfo checkInfo = tInfo != null ? tInfo.getCollectionCheckInfo() : null;
-
-                PrimitiveSearchCondition<T> pc = checkInfo == null
-                    ? new PrimitiveSearchCondition<>(realGetter, rval, genType, ct, condition)
-                    : new CollectionCheckCondition<>(realGetter, rval, genType, ct, condition, checkInfo);
-
-                list.add(pc);
-
-            }
-            if (list.isEmpty()) {
-                throw new IllegalStateException("This search condition is empty and can not be used");
-            }
-            return list;
         }
+        List<SearchCondition<T>> list = new ArrayList<>();
+        Map<String, Object> get2val = getGettersAndValues();
+
+        Set<String> keySet = get2val != null ? get2val.keySet()
+            : ((SearchBean)condition).getKeySet();
+
+        for (String getter : keySet) {
+            ConditionType ct = getters2operators == null ? sharedType
+                : getters2operators.get(getter.toLowerCase());
+            if (ct == null) {
+                continue;
+            }
+            Object rval = get2val != null
+                ? get2val.get(getter) : ((SearchBean)condition).get(getter);
+            if (rval == null) {
+                continue;
+            }
+            String realGetter = realGetters != null && realGetters.containsKey(getter)
+                ? realGetters.get(getter) : getter;
+
+            TypeInfo tInfo = propertyTypeInfo != null ? propertyTypeInfo.get(getter) : null;
+            Type genType = tInfo != null ? tInfo.getGenericType() : rval.getClass();
+            CollectionCheckInfo checkInfo = tInfo != null ? tInfo.getCollectionCheckInfo() : null;
+
+            PrimitiveSearchCondition<T> pc = checkInfo == null
+                ? new PrimitiveSearchCondition<>(realGetter, rval, genType, ct, condition)
+                : new CollectionCheckCondition<>(realGetter, rval, genType, ct, condition, checkInfo);
+
+            list.add(pc);
+
+        }
+        if (list.isEmpty()) {
+            throw new IllegalStateException("This search condition is empty and can not be used");
+        }
+        return list;
     }
 
     /**
@@ -283,9 +280,8 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
             //we do not need compare class objects
             getters2values.keySet().remove("class");
             return getters2values;
-        } else {
-            return null;
         }
+        return null;
     }
 
     private Object getValue(Beanspector<T> beanspector, String getter, T pojo) {
@@ -320,9 +316,8 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
     public PrimitiveStatement getStatement() {
         if (scts.size() == 1) {
             return scts.get(0).getStatement();
-        } else {
-            return null;
         }
+        return null;
     }
 
     @Override
