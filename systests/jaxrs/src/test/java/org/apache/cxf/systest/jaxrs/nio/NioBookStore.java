@@ -99,6 +99,7 @@ public class NioBookStore {
         final LongAdder adder = new LongAdder();
 
         new NioReadEntity(
+        // read handler                  
         in -> {
             try {
                 final int n = in.read(buffer);
@@ -107,24 +108,16 @@ public class NioBookStore {
                     out.write(buffer, 0, n);
                 }
             } catch (IOException e) {
-                throw new WebApplicationException(e);
+                response.resume(new WebApplicationException(e));
             }
         },
-        in -> {
-            try {
-                if (!in.isFinished()) {
-                    throw new IllegalStateException("Reader did not finish yet");
-                }
-
-                out.close();
+        // completion handler
+        (in, throwable) -> {
+            if (throwable != null) {
+                response.resume(throwable);
+            } else {
                 response.resume("Book Store uploaded: " + adder.longValue() + " bytes");
-            } catch (IOException e) {
-                throw new WebApplicationException(e);
             }
-        },
-        throwable -> {              // error handler
-            System.out.println("Problem found: " + throwable.getMessage());
-            throw throwable;
         });
     }
 }

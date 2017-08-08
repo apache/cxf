@@ -20,9 +20,9 @@ package org.apache.cxf.jaxrs.nio;
 
 public final class NioWriteEntity {
     private final NioWriteHandler writer;
-    private final NioErrorHandler error;
+    private final NioWriteErrorHandler error;
 
-    public NioWriteEntity(final NioWriteHandler writer, final NioErrorHandler error) {
+    public NioWriteEntity(final NioWriteHandler writer, final NioWriteErrorHandler error) {
         this.writer = writer;
         this.error = error;
     }
@@ -31,7 +31,7 @@ public final class NioWriteEntity {
         return writer;
     }
 
-    public NioErrorHandler getError() {
+    public NioWriteErrorHandler getError() {
         return error;
     }
 }

@@ -19,7 +19,7 @@
 package org.apache.cxf.jaxrs.nio;
 
 @FunctionalInterface
-public interface NioErrorHandler {
+public interface NioWriteErrorHandler {
     /**
      * Method called when an exception or error occurred.
      *
