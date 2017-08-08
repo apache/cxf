@@ -50,12 +50,22 @@
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-codegen-plugin</artifactId>
                 <version>${project.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.cxf.xjcplugins</groupId>
+                        <artifactId>cxf-xjc-dv</artifactId>
+                        <version>${cxf.xjc-utils.version}</version>
+                    </dependency>
+                </dependencies>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>
                         <configuration>
                             <fork>${cxf.codegenplugin.forkmode}</fork>
                             <defaultOptions>
+                                <xjcargs>
+                                    <xjcarg>-Xdv:attributes</xjcarg>
+                                </xjcargs>
                                 <markGenerated>true</markGenerated>
                                 <faultSerialVersionUID>1</faultSerialVersionUID>
                             </defaultOptions>

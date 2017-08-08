@@ -96,6 +96,9 @@
                                     <deleteDirs>
                                         <deleteDir>${basedir}/target/generated/src/test/java/org/apache/cxf/wsdl</deleteDir>
                                     </deleteDirs>
+                                    <extensionArgs>
+                                        <extensionArg>-Xdv:attributes</extensionArg>
+                                    </extensionArgs>
                                 </xsdOption>
                             </xsdOptions>
                         </configuration>

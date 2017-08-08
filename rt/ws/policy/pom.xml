@@ -139,6 +139,9 @@
                                         <deleteDir>${basedir}/target/generated/src/main/java/org/oasis_open</deleteDir>
                                         <deleteDir>${basedir}/target/generated/src/main/java/org/w3</deleteDir>
                                     </deleteDirs>
+                                    <extensionArgs>
+                                        <extensionArg>-Xdv:attributes</extensionArg>
+                                    </extensionArgs>
                                 </xsdOption>
                                 <xsdOption>
                                     <xsd>${basedir}/src/main/resources/schemas/ws-policy-200607.xsd</xsd>
@@ -148,8 +151,14 @@
                                         <deleteDir>${basedir}/target/generated/src/main/java/org/oasis_open</deleteDir>
                                         <deleteDir>${basedir}/target/generated/src/main/java/org/w3</deleteDir>
                                     </deleteDirs>
+                                    <extensionArgs>
+                                        <extensionArg>-Xdv:attributes</extensionArg>
+                                    </extensionArgs>
                                 </xsdOption>
                             </xsdOptions>
+                            <extensions>
+                                <extension>org.apache.cxf.xjcplugins:cxf-xjc-dv:${cxf.xjc-utils.version}</extension>
+                            </extensions>
                         </configuration>
                         <goals>
                             <goal>xsdtojava</goal>

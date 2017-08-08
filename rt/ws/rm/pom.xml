@@ -167,6 +167,7 @@
                                     </deleteDirs>
                                     <extensionArgs>
                                         <extensionArg>-npa</extensionArg>
+                                        <extensionArg>-Xdv:attributes</extensionArg>
                                     </extensionArgs>
                                 </xsdOption>
                                 <xsdOption>
@@ -178,6 +179,7 @@
                                     </deleteDirs>
                                     <extensionArgs>
                                         <extensionArg>-npa</extensionArg>
+                                        <extensionArg>-Xdv:attributes</extensionArg>
                                     </extensionArgs>
                                 </xsdOption>
                                 <xsdOption>
@@ -189,6 +191,7 @@
                                     </deleteDirs>
                                     <extensionArgs>
                                         <extensionArg>-npa</extensionArg>
+                                        <extensionArg>-Xdv:attributes</extensionArg>
                                     </extensionArgs>
                                 </xsdOption>
                                 <xsdOption>
@@ -200,6 +203,7 @@
                                     </deleteDirs>
                                     <extensionArgs>
                                         <extensionArg>-npa</extensionArg>
+                                        <extensionArg>-Xdv:attributes</extensionArg>
                                     </extensionArgs>
                                 </xsdOption>
                                 <xsdOption>
@@ -208,7 +212,7 @@
                                     <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
                                     <extension>true</extension>
                                     <extensionArgs>
-                                        <extensionArg>-Xdv</extensionArg>
+                                        <extensionArg>-Xdv:attributes</extensionArg>
                                     </extensionArgs>
                                 </xsdOption>
                             </xsdOptions>

@@ -114,12 +114,18 @@
                                     <bindingFile>${basedir}/src/main/resources/schemas/eventing.xjb</bindingFile>
                                     <catalog>${basedir}/src/main/resources/schemas/catalog.cat</catalog>
                                     <extension>true</extension>
+                                    <extensionArgs>
+                                        <extensionArg>-Xdv:attributes</extensionArg>
+                                    </extensionArgs>
                                 </xsdOption>
                                 <xsdOption>
                                     <xsd>${basedir}/src/main/resources/schemas/eventdescriptions.xsd</xsd>
                                     <packagename>org.apache.cxf.ws.eventing.descriptions</packagename>
                                     <catalog>${basedir}/src/main/resources/schemas/catalog.cat</catalog>
                                     <extension>true</extension>
+                                    <extensionArgs>
+                                        <extensionArg>-Xdv:attributes</extensionArg>
+                                    </extensionArgs>
                                 </xsdOption>
                             </xsdOptions>
                         </configuration>
