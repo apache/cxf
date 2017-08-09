@@ -36,6 +36,13 @@
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-codegen-plugin</artifactId>
                 <version>${project.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.cxf.xjcplugins</groupId>
+                        <artifactId>cxf-xjc-dv</artifactId>
+                        <version>${cxf.xjc-utils.version}</version>
+                    </dependency>
+                </dependencies>
                 <executions>
                     <execution>
                         <id>generate-test-sources</id>
@@ -45,6 +52,9 @@
                             <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>
                             <testWsdlRoot>${basedir}/src/test/resources/wsdl_systest</testWsdlRoot>
                             <defaultOptions>
+                                <xjcargs>
+                                    <xjcarg>-Xdv</xjcarg>
+                                </xjcargs>
                                 <markGenerated>true</markGenerated>
                                 <faultSerialVersionUID>1</faultSerialVersionUID>
                                 <frontEnd>cxf</frontEnd>

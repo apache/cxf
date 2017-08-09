@@ -115,7 +115,7 @@
                                     <catalog>${basedir}/src/main/resources/schemas/catalog.cat</catalog>
                                     <extension>true</extension>
                                     <extensionArgs>
-                                        <extensionArg>-Xdv:attributes</extensionArg>
+                                        <extensionArg>-Xdv</extensionArg>
                                     </extensionArgs>
                                 </xsdOption>
                                 <xsdOption>
@@ -124,7 +124,7 @@
                                     <catalog>${basedir}/src/main/resources/schemas/catalog.cat</catalog>
                                     <extension>true</extension>
                                     <extensionArgs>
-                                        <extensionArg>-Xdv:attributes</extensionArg>
+                                        <extensionArg>-Xdv</extensionArg>
                                     </extensionArgs>
                                 </xsdOption>
                             </xsdOptions>

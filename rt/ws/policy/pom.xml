@@ -140,7 +140,7 @@
                                         <deleteDir>${basedir}/target/generated/src/main/java/org/w3</deleteDir>
                                     </deleteDirs>
                                     <extensionArgs>
-                                        <extensionArg>-Xdv:attributes</extensionArg>
+                                        <extensionArg>-Xdv</extensionArg>
                                     </extensionArgs>
                                 </xsdOption>
                                 <xsdOption>
@@ -152,7 +152,7 @@
                                         <deleteDir>${basedir}/target/generated/src/main/java/org/w3</deleteDir>
                                     </deleteDirs>
                                     <extensionArgs>
-                                        <extensionArg>-Xdv:attributes</extensionArg>
+                                        <extensionArg>-Xdv</extensionArg>
                                     </extensionArgs>
                                 </xsdOption>
                             </xsdOptions>

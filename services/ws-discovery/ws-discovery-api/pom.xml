@@ -88,6 +88,11 @@
                         <artifactId>cxf-xjc-bug986</artifactId>
                         <version>${cxf.xjc-utils.version}</version>
                     </dependency>
+                    <dependency>
+                        <groupId>org.apache.cxf.xjcplugins</groupId>
+                        <artifactId>cxf-xjc-dv</artifactId>
+                        <version>${cxf.xjc-utils.version}</version>
+                    </dependency>
                 </dependencies>
                 <executions>
                     <execution>
@@ -102,6 +107,7 @@
                                 <wsdlOption>
                                     <xjcargs>
                                         <xjcarg>-Xbug986</xjcarg>
+                                        <xjcarg>-Xdv</xjcarg>
                                     </xjcargs>
                                     <wsdl>${basedir}/src/main/resources/org/apache/cxf/ws/discovery/wsdl/wsdd-discovery-1.1-wsdl-os.wsdl</wsdl>
                                     <extraargs>

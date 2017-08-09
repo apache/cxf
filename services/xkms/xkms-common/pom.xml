@@ -53,6 +53,13 @@
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-codegen-plugin</artifactId>
                 <version>${project.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.cxf.xjcplugins</groupId>
+                        <artifactId>cxf-xjc-dv</artifactId>
+                        <version>${cxf.xjc-utils.version}</version>
+                    </dependency>
+                </dependencies>
                 <executions>
                     <execution>
                         <id>generate-sources</id>
@@ -64,6 +71,9 @@
                             <fork>${cxf.codegenplugin.forkmode}</fork>
                             <wsdlOptions>
                                 <wsdlOption>
+                                    <xjcargs>
+                                        <xjcarg>-Xdv</xjcarg>
+                                    </xjcargs>
                                     <wsdl>${basedir}/src/main/model/xkms.wsdl</wsdl>
                                     <bindingFile>${basedir}/src/main/model/binding.xjb</bindingFile>
                                 </wsdlOption>

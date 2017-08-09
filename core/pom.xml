@@ -289,7 +289,7 @@
                                     <extensionArgs>
                                         <extensionArg>-Xjavadoc</extensionArg>
                                         <extensionArg>-npa</extensionArg>
-                                        <extensionArg>-Xdv:attributes</extensionArg>
+                                        <extensionArg>-Xdv</extensionArg>
                                     </extensionArgs>
                                 </xsdOption>
                                 <xsdOption>
@@ -298,7 +298,7 @@
                                     <extensionArgs>
                                         <extensionArg>-npa</extensionArg>
                                         <extensionArg>-Xjavadoc</extensionArg>
-                                        <extensionArg>-Xdv:attributes</extensionArg>
+                                        <extensionArg>-Xdv</extensionArg>
                                     </extensionArgs>
                                 </xsdOption>
                                 <xsdOption>
@@ -318,7 +318,7 @@
                                     <extensionArgs>
                                         <extensionArg>-npa</extensionArg>
                                         <extensionArg>-Xjavadoc</extensionArg>
-                                        <extensionArg>-Xdv:attributes</extensionArg>
+                                        <extensionArg>-Xdv</extensionArg>
                                     </extensionArgs>
                                 </xsdOption>
                                 <xsdOption>
@@ -327,7 +327,7 @@
                                     <extensionArgs>
                                         <extensionArg>-Xjavadoc</extensionArg>
                                         <extensionArg>-npa</extensionArg>
-                                        <extensionArg>-Xdv:attributes</extensionArg>
+                                        <extensionArg>-Xdv</extensionArg>
                                     </extensionArgs>
                                 </xsdOption>
                             </xsdOptions>

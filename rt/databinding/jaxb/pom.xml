@@ -55,7 +55,7 @@
                                 <xsdOption>
                                     <xsd>${basedir}/src/test/resources/wsdl/jaxb/misc_test.xsd</xsd>
                                     <extensionArgs>
-                                        <extensionArg>-Xdv:attributes</extensionArg>
+                                        <extensionArg>-Xdv</extensionArg>
                                     </extensionArgs>
                                 </xsdOption>
                                 <xsdOption>

@@ -157,12 +157,14 @@
                             <additionalJvmArgs>${cxf.xjc.jvmArgs}</additionalJvmArgs>
                             <extensions>
                                 <extension>org.apache.cxf.xjcplugins:cxf-xjc-bug986:${cxf.xjc-utils.version}</extension>
+                                <extension>org.apache.cxf.xjcplugins:cxf-xjc-dv:${cxf.xjc-utils.version}</extension>
                             </extensions>
                             <sourceRoot>${basedir}/target/generated/src/main/java</sourceRoot>
                             <xsdOptions>
                                 <xsdOption>
                                     <extensionArgs>
                                         <arg>-Xbug986</arg>
+                                        <arg>-Xdv</arg>
                                     </extensionArgs>
                                     <xsd>${basedir}/src/main/resources/schemas/configuration/http-undertow.xsd</xsd>
                                     <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
