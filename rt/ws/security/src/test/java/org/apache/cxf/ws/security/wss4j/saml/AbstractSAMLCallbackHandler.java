@@ -30,6 +30,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.bean.ActionBean;
 import org.apache.wss4j.common.saml.bean.AttributeBean;
@@ -181,10 +182,10 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
             // Append the EncryptedKey to a KeyInfo element
             Element keyInfoElement =
                 doc.createElementNS(
-                    WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.KEYINFO_LN
+                    WSS4JConstants.SIG_NS, WSS4JConstants.SIG_PREFIX + ":" + WSS4JConstants.KEYINFO_LN
                 );
             keyInfoElement.setAttributeNS(
-                WSConstants.XMLNS_NS, "xmlns:" + WSConstants.SIG_PREFIX, WSConstants.SIG_NS
+                WSS4JConstants.XMLNS_NS, "xmlns:" + WSS4JConstants.SIG_PREFIX, WSS4JConstants.SIG_NS
             );
             keyInfoElement.appendChild(encryptedKeyElement);
 

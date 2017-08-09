@@ -36,10 +36,10 @@ import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.ConfigurationConstants;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandler;
 
@@ -49,9 +49,9 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
     private static final Set<QName> HEADERS = new HashSet<>();
 
     static {
-        HEADERS.add(new QName(WSConstants.WSSE_NS, "Security"));
-        HEADERS.add(new QName(WSConstants.ENC_NS, "EncryptedData"));
-        HEADERS.add(new QName(WSConstants.WSSE11_NS, "EncryptedHeader"));
+        HEADERS.add(new QName(WSS4JConstants.WSSE_NS, "Security"));
+        HEADERS.add(new QName(WSS4JConstants.ENC_NS, "EncryptedData"));
+        HEADERS.add(new QName(WSS4JConstants.WSSE11_NS, "EncryptedHeader"));
     }
 
     private Map<String, Object> properties = new ConcurrentHashMap<>();

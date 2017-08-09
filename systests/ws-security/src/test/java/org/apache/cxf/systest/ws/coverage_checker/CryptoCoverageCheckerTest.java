@@ -36,7 +36,7 @@ import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JStaxOutInterceptor;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
@@ -710,7 +710,7 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
                      "org.apache.cxf.systest.ws.common.KeystorePasswordCallback");
         outProps.put("encryptionParts",
                      "{}{http://schemas.xmlsoap.org/soap/envelope/}Body;"
-                     + "{Element}{" + WSConstants.WSSE_NS + "}UsernameToken;");
+                     + "{Element}{" + WSS4JConstants.WSSE_NS + "}UsernameToken;");
 
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);

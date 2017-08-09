@@ -37,10 +37,10 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.WSConstants;
 import org.example.contract.doubleit.DoubleItFault;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
@@ -307,9 +307,9 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
                 // Find the Timestamp + change it.
 
                 Element timestampElement =
-                    XMLUtils.findElement(securityHeader, "Timestamp", WSConstants.WSU_NS);
+                    XMLUtils.findElement(securityHeader, "Timestamp", WSS4JConstants.WSU_NS);
                 Element createdValue =
-                    XMLUtils.findElement(timestampElement, "Created", WSConstants.WSU_NS);
+                    XMLUtils.findElement(timestampElement, "Created", WSS4JConstants.WSU_NS);
                 
                 ZonedDateTime created = ZonedDateTime.parse(createdValue.getTextContent());
                 // Add 5 seconds
@@ -328,7 +328,7 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
         public void modifySecurityHeader(Element securityHeader) {
             if (securityHeader != null) {
                 Element signatureElement =
-                    XMLUtils.findElement(securityHeader, "Signature", WSConstants.SIG_NS);
+                    XMLUtils.findElement(securityHeader, "Signature", WSS4JConstants.SIG_NS);
 
                 Node firstChild = signatureElement.getFirstChild();
                 while (!(firstChild instanceof Element) && firstChild != null) {
@@ -349,9 +349,9 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
         public void modifySecurityHeader(Element securityHeader) {
             if (securityHeader != null) {
                 Element encryptedKey =
-                    XMLUtils.findElement(securityHeader, "EncryptedKey", WSConstants.ENC_NS);
+                    XMLUtils.findElement(securityHeader, "EncryptedKey", WSS4JConstants.ENC_NS);
                 Element cipherValue =
-                    XMLUtils.findElement(encryptedKey, "CipherValue", WSConstants.ENC_NS);
+                    XMLUtils.findElement(encryptedKey, "CipherValue", WSS4JConstants.ENC_NS);
                 String cipherText = cipherValue.getTextContent();
 
                 StringBuilder stringBuilder = new StringBuilder(cipherText);
@@ -383,7 +383,7 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
         public void modifySOAPBody(Element soapBody) {
             if (soapBody != null) {
                 Element cipherValue =
-                    XMLUtils.findElement(soapBody, "CipherValue", WSConstants.ENC_NS);
+                    XMLUtils.findElement(soapBody, "CipherValue", WSS4JConstants.ENC_NS);
                 String cipherText = cipherValue.getTextContent();
 
                 StringBuilder stringBuilder = new StringBuilder(cipherText);

@@ -50,13 +50,13 @@ import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 import org.apache.cxf.sts.token.validator.TokenValidatorResponse;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.util.DateUtil;
-import org.apache.wss4j.dom.WSConstants;
 import org.junit.BeforeClass;
 
 /**
@@ -81,7 +81,7 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
             createSAMLAssertion(
-                WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50000, true, false
+                WSS4JConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50000, true, false
             );
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
@@ -158,7 +158,7 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
             createSAMLAssertion(
-                WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50000, false, false
+                WSS4JConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50000, false, false
             );
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
@@ -212,7 +212,7 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
             createSAMLAssertion(
-                WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, true
+                WSS4JConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, true
             );
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
@@ -288,7 +288,7 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
             createSAMLAssertion(
-                WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, true
+                WSS4JConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, true
             );
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
@@ -365,7 +365,7 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
             createSAMLAssertion(
-                WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, false
+                WSS4JConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, false
             );
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
@@ -424,7 +424,7 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
             createSAMLAssertion(
-                WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, true
+                WSS4JConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, true
             );
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
@@ -482,7 +482,7 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
             createSAMLAssertion(
-                WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50000, true, false
+                WSS4JConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50000, true, false
             );
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);

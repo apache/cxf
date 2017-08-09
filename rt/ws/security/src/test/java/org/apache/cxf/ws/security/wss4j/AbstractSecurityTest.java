@@ -50,21 +50,21 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.test.AbstractCXFTest;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.WSS4JConstants;
 
 
 public abstract class AbstractSecurityTest extends AbstractCXFTest {
     public AbstractSecurityTest() {
         super();
 
-        addNamespace("wsse", WSConstants.WSSE_NS);
-        addNamespace("wsse11", WSConstants.WSSE11_NS);
-        addNamespace("ds", WSConstants.SIG_NS);
+        addNamespace("wsse", WSS4JConstants.WSSE_NS);
+        addNamespace("wsse11", WSS4JConstants.WSSE11_NS);
+        addNamespace("ds", WSS4JConstants.SIG_NS);
         addNamespace("s", Soap11.getInstance().getNamespace());
-        addNamespace("xenc", WSConstants.ENC_NS);
-        addNamespace("wsu", WSConstants.WSU_NS);
-        addNamespace("saml1", WSConstants.SAML_NS);
-        addNamespace("saml2", WSConstants.SAML2_NS);
+        addNamespace("xenc", WSS4JConstants.ENC_NS);
+        addNamespace("wsu", WSS4JConstants.WSU_NS);
+        addNamespace("saml1", WSS4JConstants.SAML_NS);
+        addNamespace("saml2", WSS4JConstants.SAML2_NS);
     }
 
     /**

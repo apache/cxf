@@ -53,6 +53,7 @@ import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 import org.apache.cxf.sts.token.validator.TokenValidatorResponse;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
@@ -88,7 +89,7 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
             createSAMLAssertion(
-                WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50000, true, false
+                WSS4JConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50000, true, false
             );
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
@@ -165,7 +166,7 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
             createSAMLAssertion(
-                WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50000, true, false
+                WSS4JConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50000, true, false
             );
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);

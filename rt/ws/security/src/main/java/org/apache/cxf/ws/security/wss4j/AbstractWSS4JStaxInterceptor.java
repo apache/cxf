@@ -59,6 +59,7 @@ import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.setup.ConfigurationConverter;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 
 public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
     PhaseInterceptor<SoapMessage> {
@@ -68,7 +69,7 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
 
     static {
         HEADERS.add(new QName(WSSConstants.NS_WSSE10, "Security"));
-        HEADERS.add(new QName(WSSConstants.NS_XMLENC, "EncryptedData"));
+        HEADERS.add(new QName(XMLSecurityConstants.NS_XMLENC, "EncryptedData"));
         HEADERS.add(new QName(WSSConstants.NS_WSSE11, "EncryptedHeader"));
     }
 

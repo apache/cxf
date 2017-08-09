@@ -47,12 +47,12 @@ import org.apache.cxf.sts.token.realm.UsernameTokenRealmCodec;
 import org.apache.cxf.ws.security.sts.provider.model.ObjectFactory;
 import org.apache.cxf.ws.security.sts.provider.model.secext.UsernameTokenType;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.principal.WSUsernameTokenPrincipalImpl;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.UsernameToken;
@@ -254,7 +254,7 @@ public class UsernameTokenValidator implements TokenValidator {
         String createdTime
     ) {
         boolean hashed = false;
-        if (WSConstants.PASSWORD_DIGEST.equals(passwordType)) {
+        if (WSS4JConstants.PASSWORD_DIGEST.equals(passwordType)) {
             hashed = true;
         }
         WSUsernameTokenPrincipalImpl principal = new WSUsernameTokenPrincipalImpl(username, hashed);

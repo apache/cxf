@@ -49,6 +49,7 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
@@ -94,7 +95,7 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
         Element child = DOMUtils.getFirstElement(el);
         while (child != null) {
             if (SPConstants.USERNAME_TOKEN.equals(child.getLocalName())
-                && WSConstants.WSSE_NS.equals(child.getNamespaceURI())) {
+                && WSS4JConstants.WSSE_NS.equals(child.getNamespaceURI())) {
                 try {
                     boolean bspCompliant = isWsiBSPCompliant(message);
                     Principal principal = null;
@@ -428,9 +429,9 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
                 utBuilder.setIdAllocator(wssConfig.getIdAllocator());
                 utBuilder.setWsTimeSource(wssConfig.getCurrentTime());
                 if (token.getPasswordType() == UsernameToken.PasswordType.HashPassword) {
-                    utBuilder.setPasswordType(WSConstants.PASSWORD_DIGEST);
+                    utBuilder.setPasswordType(WSS4JConstants.PASSWORD_DIGEST);
                 } else {
-                    utBuilder.setPasswordType(WSConstants.PASSWORD_TEXT);
+                    utBuilder.setPasswordType(WSS4JConstants.PASSWORD_TEXT);
                 }
 
                 if (token.isCreated()) {

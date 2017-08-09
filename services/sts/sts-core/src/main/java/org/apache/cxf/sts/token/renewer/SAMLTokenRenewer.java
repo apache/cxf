@@ -51,6 +51,7 @@ import org.apache.cxf.sts.token.realm.RealmProperties;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
@@ -110,7 +111,7 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
             Element tokenElement = (Element)token;
             String namespace = tokenElement.getNamespaceURI();
             String localname = tokenElement.getLocalName();
-            if ((WSConstants.SAML_NS.equals(namespace) || WSConstants.SAML2_NS.equals(namespace))
+            if ((WSS4JConstants.SAML_NS.equals(namespace) || WSS4JConstants.SAML2_NS.equals(namespace))
                 && "Assertion".equals(localname)) {
                 return true;
             }

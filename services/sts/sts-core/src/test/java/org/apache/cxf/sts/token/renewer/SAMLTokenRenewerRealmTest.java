@@ -55,12 +55,12 @@ import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 import org.apache.cxf.sts.token.validator.TokenValidatorResponse;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.util.DateUtil;
-import org.apache.wss4j.dom.WSConstants;
 import org.junit.BeforeClass;
 
 /**
@@ -86,7 +86,7 @@ public class SAMLTokenRenewerRealmTest extends org.junit.Assert {
 
         TokenProviderParameters providerParameters =
             createProviderParameters(
-                WSConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, crypto, "mystskey",
+                WSS4JConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, crypto, "mystskey",
                 callbackHandler
             );
 
@@ -159,7 +159,7 @@ public class SAMLTokenRenewerRealmTest extends org.junit.Assert {
 
         TokenProviderParameters providerParameters =
             createProviderParameters(
-                WSConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, crypto, "mystskey",
+                WSS4JConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, crypto, "mystskey",
                 callbackHandler
             );
 

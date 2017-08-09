@@ -43,13 +43,13 @@ import org.apache.cxf.systest.ws.saml.client.SamlRoleCallbackHandler;
 import org.apache.cxf.systest.ws.ut.SecurityHeaderCacheInterceptor;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.bean.AudienceRestrictionBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.KeyInfoBean.CERT_IDENTIFIER;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
-import org.apache.wss4j.dom.WSConstants;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
@@ -1192,7 +1192,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
 
         SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true, true);
         callbackHandler.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
-        callbackHandler.setDigestAlgorithm(WSConstants.SHA256);
+        callbackHandler.setDigestAlgorithm(WSS4JConstants.SHA256);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         ((BindingProvider)saml2Port).getRequestContext().put(
             SecurityConstants.SAML_CALLBACK_HANDLER, callbackHandler

@@ -50,7 +50,7 @@ import org.apache.cxf.systest.sts.deployment.StaxSTSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.trust.STSClient;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.example.contract.doubleit.DoubleItPortType;
 
 import org.junit.BeforeClass;
@@ -340,7 +340,7 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document requestDoc = db.newDocument();
         Element root = requestDoc.createElementNS("http://www.example.org/schema/DoubleIt", "ns2:DoubleIt");
-        root.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:ns2", "http://www.example.org/schema/DoubleIt");
+        root.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:ns2", "http://www.example.org/schema/DoubleIt");
         Element number = requestDoc.createElementNS(null, "numberToDouble");
         number.setTextContent("25");
         root.appendChild(number);

@@ -26,9 +26,9 @@ import java.util.List;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractBinding;
@@ -132,10 +132,10 @@ public final class AlgorithmSuiteTranslater {
 
             algorithmSuite.addTransformAlgorithm(cxfAlgorithmSuite.getC14n().getValue());
             algorithmSuite.addTransformAlgorithm(SPConstants.STRT10);
-            algorithmSuite.addTransformAlgorithm(WSConstants.C14N_EXCL_OMIT_COMMENTS);
-            algorithmSuite.addTransformAlgorithm(WSConstants.NS_XMLDSIG_ENVELOPED_SIGNATURE);
-            algorithmSuite.addTransformAlgorithm(WSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS);
-            algorithmSuite.addTransformAlgorithm(WSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS);
+            algorithmSuite.addTransformAlgorithm(WSS4JConstants.C14N_EXCL_OMIT_COMMENTS);
+            algorithmSuite.addTransformAlgorithm(WSS4JConstants.NS_XMLDSIG_ENVELOPED_SIGNATURE);
+            algorithmSuite.addTransformAlgorithm(WSS4JConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS);
+            algorithmSuite.addTransformAlgorithm(WSS4JConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS);
 
             algorithmSuite.addDerivedKeyAlgorithm(SPConstants.P_SHA1);
             algorithmSuite.addDerivedKeyAlgorithm(SPConstants.P_SHA1_L128);

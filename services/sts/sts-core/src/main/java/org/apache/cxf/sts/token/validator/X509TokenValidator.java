@@ -37,6 +37,7 @@ import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.sts.token.realm.CertConstraintsParser;
 import org.apache.cxf.ws.security.sts.provider.model.secext.BinarySecurityTokenType;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.token.BinarySecurity;
@@ -100,8 +101,8 @@ public class X509TokenValidator implements TokenValidator {
             && X509_V3_TYPE.equals(((BinarySecurityTokenType)token).getValueType())) {
             return true;
         } else if (token instanceof Element
-            && WSConstants.SIG_NS.equals(((Element)token).getNamespaceURI())
-            && WSConstants.X509_DATA_LN.equals(((Element)token).getLocalName())) {
+            && WSS4JConstants.SIG_NS.equals(((Element)token).getNamespaceURI())
+            && WSS4JConstants.X509_DATA_LN.equals(((Element)token).getLocalName())) {
             return true;
         }
         return false;

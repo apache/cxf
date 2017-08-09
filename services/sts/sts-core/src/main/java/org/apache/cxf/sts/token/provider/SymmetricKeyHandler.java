@@ -30,9 +30,9 @@ import org.apache.cxf.sts.request.BinarySecret;
 import org.apache.cxf.sts.request.Entropy;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.ws.security.sts.provider.STSException;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.derivedKey.P_SHA1;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 /**
@@ -58,18 +58,18 @@ public class SymmetricKeyHandler {
         // Test EncryptWith
         String encryptWith = keyRequirements.getEncryptWith();
         if (encryptWith != null) {
-            if ((WSConstants.AES_128.equals(encryptWith) || WSConstants.AES_128_GCM.equals(encryptWith))
+            if ((WSS4JConstants.AES_128.equals(encryptWith) || WSS4JConstants.AES_128_GCM.equals(encryptWith))
                 && keySize < 128) {
                 keySize = 128;
-            } else if ((WSConstants.AES_192.equals(encryptWith)
-                || WSConstants.AES_192_GCM.equals(encryptWith))
+            } else if ((WSS4JConstants.AES_192.equals(encryptWith)
+                || WSS4JConstants.AES_192_GCM.equals(encryptWith))
                 && keySize < 192) {
                 keySize = 192;
-            } else if ((WSConstants.AES_256.equals(encryptWith)
-                || WSConstants.AES_256_GCM.equals(encryptWith))
+            } else if ((WSS4JConstants.AES_256.equals(encryptWith)
+                || WSS4JConstants.AES_256_GCM.equals(encryptWith))
                 && keySize < 256) {
                 keySize = 256;
-            } else if (WSConstants.TRIPLE_DES.equals(encryptWith) && keySize < 192) {
+            } else if (WSS4JConstants.TRIPLE_DES.equals(encryptWith) && keySize < 192) {
                 keySize = 192;
             }
         }

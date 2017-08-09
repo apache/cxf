@@ -41,11 +41,11 @@ import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.sts.token.provider.jwt.JWTTokenProvider;
 import org.apache.cxf.ws.security.sts.provider.model.secext.AttributedString;
 import org.apache.cxf.ws.security.sts.provider.model.secext.UsernameTokenType;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
-import org.apache.wss4j.dom.WSConstants;
 import org.junit.Assert;
 
 /**
@@ -128,10 +128,10 @@ public class JWTProviderActAsTest extends org.junit.Assert {
     private Element getSAMLAssertion(String user) throws Exception {
         TokenProvider samlTokenProvider = new SAMLTokenProvider();
         TokenProviderParameters providerParameters =
-            createProviderParameters(WSConstants.WSS_SAML_TOKEN_TYPE, null);
+            createProviderParameters(WSS4JConstants.WSS_SAML_TOKEN_TYPE, null);
         providerParameters.getKeyRequirements().setKeyType(STSConstants.BEARER_KEY_KEYTYPE);
         providerParameters.setPrincipal(new CustomTokenPrincipal(user));
-        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML_TOKEN_TYPE));
+        assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);

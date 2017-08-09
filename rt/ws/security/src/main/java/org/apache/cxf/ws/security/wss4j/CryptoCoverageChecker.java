@@ -46,6 +46,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageScope;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
@@ -148,7 +149,8 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
                             CastUtils.cast((List<?>)signedResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
                         if (sl != null) {
                             if (sl.size() == 1
-                                && sl.get(0).getName().equals(new QName(WSConstants.SIG_NS, WSConstants.SIG_LN))) {
+                                && sl.get(0).getName().equals(new QName(WSS4JConstants.SIG_NS,
+                                                                        WSS4JConstants.SIG_LN))) {
                                 //endorsing the signature so don't include
                                 continue;
                             }

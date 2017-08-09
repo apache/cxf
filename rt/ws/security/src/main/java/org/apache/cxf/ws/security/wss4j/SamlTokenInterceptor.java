@@ -46,6 +46,7 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
@@ -89,8 +90,8 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
         Element child = DOMUtils.getFirstElement(el);
         while (child != null) {
             if ("Assertion".equals(child.getLocalName())
-                && (WSConstants.SAML_NS.equals(child.getNamespaceURI())
-                    || WSConstants.SAML2_NS.equals(child.getNamespaceURI()))) {
+                && (WSS4JConstants.SAML_NS.equals(child.getNamespaceURI())
+                    || WSS4JConstants.SAML2_NS.equals(child.getNamespaceURI()))) {
                 try {
                     List<WSSecurityEngineResult> samlResults = processToken(child, message);
                     if (samlResults != null) {

@@ -78,6 +78,7 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.secext.AttributedString;
 import org.apache.cxf.ws.security.sts.provider.model.secext.PasswordString;
 import org.apache.cxf.ws.security.sts.provider.model.secext.UsernameTokenType;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
@@ -86,7 +87,6 @@ import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.DOM2Writer;
-import org.apache.wss4j.dom.WSConstants;
 
 /**
  * Some unit tests for the issue operation.
@@ -136,14 +136,14 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                    QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                    QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
 
         // Get a SAML Token via the SAMLTokenProvider
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
-            createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler);
+            createSAMLAssertion(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler);
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
         OnBehalfOfType onbehalfof = new OnBehalfOfType();
@@ -207,14 +207,14 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                    QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                    QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
 
         // Get a SAML Token via the SAMLTokenProvider
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
-            createSAMLAssertion(WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler);
+            createSAMLAssertion(WSS4JConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler);
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
         OnBehalfOfType onbehalfof = new OnBehalfOfType();
@@ -275,14 +275,14 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                    QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                    QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
 
         // Get a SAML Token via the SAMLTokenProvider
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
-            createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
+            createSAMLAssertion(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
                             callbackHandler, null, STSConstants.SYMMETRIC_KEY_TYPE);
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
@@ -356,14 +356,14 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                    QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                    QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
 
         // Get a SAML Token via the SAMLTokenProvider
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
-            createSAMLAssertion(WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey",
+            createSAMLAssertion(WSS4JConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey",
                             callbackHandler, null, STSConstants.SYMMETRIC_KEY_TYPE);
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
@@ -437,14 +437,14 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                    QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                    QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
 
         // Get a SAML Token via the SAMLTokenProvider
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
-            createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
+            createSAMLAssertion(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
                             callbackHandler, null, STSConstants.PUBLIC_KEY_KEYTYPE);
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
@@ -518,14 +518,14 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                    QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                    QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
 
         // Get a SAML Token via the SAMLTokenProvider
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
-            createSAMLAssertion(WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey",
+            createSAMLAssertion(WSS4JConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey",
                             callbackHandler, null, STSConstants.PUBLIC_KEY_KEYTYPE);
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
@@ -604,14 +604,14 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                    QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                    QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
 
         // Get a SAML Token via the SAMLTokenProvider
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
-            createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler);
+            createSAMLAssertion(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler);
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
         OnBehalfOfType onbehalfof = new OnBehalfOfType();
@@ -682,14 +682,14 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                    QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                    QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
 
         // Get a SAML Token via the SAMLTokenProvider
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
-            createSAMLAssertion(WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler);
+            createSAMLAssertion(WSS4JConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler);
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
         OnBehalfOfType onbehalfof = new OnBehalfOfType();
@@ -755,7 +755,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                    QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                    QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
 
@@ -833,7 +833,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                    QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                    QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
 
@@ -915,14 +915,14 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
 
         // Get a SAML Token via the SAMLTokenProvider
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
-            createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
+            createSAMLAssertion(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
                     callbackHandler, realms, STSConstants.BEARER_KEY_KEYTYPE);
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
@@ -1018,14 +1018,14 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                    QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                    QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
 
         // Get a SAML Token via the SAMLTokenProvider
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
-            createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler);
+            createSAMLAssertion(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler);
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
         OnBehalfOfType onbehalfof = new OnBehalfOfType();
@@ -1126,7 +1126,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                    QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                    QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
 
@@ -1147,7 +1147,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         // Get a SAML Token via the SAMLTokenProvider
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
-            createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler);
+            createSAMLAssertion(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler);
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
         OnBehalfOfType onbehalfof = new OnBehalfOfType();
@@ -1286,7 +1286,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         if (password != null) {
             PasswordString passwordString = new PasswordString();
             passwordString.setValue(password);
-            passwordString.setType(WSConstants.PASSWORD_TEXT);
+            passwordString.setType(WSS4JConstants.PASSWORD_TEXT);
             JAXBElement<PasswordString> passwordType =
                 new JAXBElement<PasswordString>(
                         QNameConstants.PASSWORD, PasswordString.class, passwordString
@@ -1341,7 +1341,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         claimType.setAttributeNS(
                 null, "Uri", ClaimTypes.FIRSTNAME.toString()
         );
-        claimType.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", STSConstants.IDT_NS_05_05);
+        claimType.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns", STSConstants.IDT_NS_05_05);
 
         return claimType;
     }
@@ -1352,11 +1352,11 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
     private Element createAppliesToElement(String addressUrl) {
         Document doc = DOMUtils.createDocument();
         Element appliesTo = doc.createElementNS(STSConstants.WSP_NS, "wsp:AppliesTo");
-        appliesTo.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsp", STSConstants.WSP_NS);
+        appliesTo.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:wsp", STSConstants.WSP_NS);
         Element endpointRef = doc.createElementNS(STSConstants.WSA_NS_05, "wsa:EndpointReference");
-        endpointRef.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsa", STSConstants.WSA_NS_05);
+        endpointRef.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:wsa", STSConstants.WSA_NS_05);
         Element address = doc.createElementNS(STSConstants.WSA_NS_05, "wsa:Address");
-        address.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsa", STSConstants.WSA_NS_05);
+        address.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:wsa", STSConstants.WSA_NS_05);
         address.setTextContent(addressUrl);
         endpointRef.appendChild(address);
         appliesTo.appendChild(endpointRef);

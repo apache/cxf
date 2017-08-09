@@ -60,6 +60,7 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenRespons
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.UseKeyType;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
@@ -127,7 +128,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
@@ -199,7 +200,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
@@ -272,7 +273,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
         request.getAny().add(createAppliesToURIElement("http://dummy-service.com/dummy"));
@@ -347,7 +348,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
@@ -357,7 +358,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType2 =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType2);
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
@@ -432,7 +433,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
         EncryptionProperties encryptionProperties = new EncryptionProperties();
         if (!unrestrictedPoliciesInstalled) {
-            encryptionProperties.setEncryptionAlgorithm(WSConstants.AES_128);
+            encryptionProperties.setEncryptionAlgorithm(WSS4JConstants.AES_128);
         }
         service.setEncryptionProperties(encryptionProperties);
         issueOperation.setServices(Collections.singletonList(service));
@@ -452,7 +453,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
@@ -524,7 +525,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
         JAXBElement<String> keyType =
@@ -615,7 +616,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
         JAXBElement<String> keyType =
@@ -713,7 +714,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
         JAXBElement<String> keyType =
@@ -805,7 +806,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
         JAXBElement<String> keyType =
@@ -829,7 +830,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         WSSecEncryptedKey builder = new WSSecEncryptedKey(doc);
         builder.setUserInfo("mystskey");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-        builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOAEP);
+        builder.setKeyEncAlgo(WSS4JConstants.KEYTRANSPORT_RSAOAEP);
 
         builder.prepare(stsProperties.getSignatureCrypto());
         Element encryptedKeyElement = builder.getEncryptedKeyElement();
@@ -923,7 +924,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
@@ -987,8 +988,8 @@ public class IssueSamlUnitTest extends org.junit.Assert {
 
         SignatureProperties sigProperties = new SignatureProperties();
         List<String> acceptedC14nAlgorithms = new ArrayList<>();
-        acceptedC14nAlgorithms.add(WSConstants.C14N_EXCL_OMIT_COMMENTS);
-        acceptedC14nAlgorithms.add(WSConstants.C14N_EXCL_WITH_COMMENTS);
+        acceptedC14nAlgorithms.add(WSS4JConstants.C14N_EXCL_OMIT_COMMENTS);
+        acceptedC14nAlgorithms.add(WSS4JConstants.C14N_EXCL_WITH_COMMENTS);
         sigProperties.setAcceptedC14nAlgorithms(acceptedC14nAlgorithms);
         stsProperties.setSignatureProperties(sigProperties);
 
@@ -998,13 +999,13 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
         JAXBElement<String> c14nAlg =
             new JAXBElement<String>(
-                QNameConstants.C14N_ALGORITHM, String.class, WSConstants.C14N_EXCL_WITH_COMMENTS
+                QNameConstants.C14N_ALGORITHM, String.class, WSS4JConstants.C14N_EXCL_WITH_COMMENTS
             );
         request.getAny().add(c14nAlg);
 
@@ -1041,7 +1042,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         assertTrue(tokenString.contains("AttributeStatement"));
         assertTrue(tokenString.contains("alice"));
         assertTrue(tokenString.contains(SAML2Constants.CONF_BEARER));
-        assertTrue(tokenString.contains(WSConstants.C14N_EXCL_WITH_COMMENTS));
+        assertTrue(tokenString.contains(WSS4JConstants.C14N_EXCL_WITH_COMMENTS));
     }
 
     /**
@@ -1079,7 +1080,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         List<String> acceptedSignatureAlgorithms = new ArrayList<>();
         String signatureAlgorithm = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
         acceptedSignatureAlgorithms.add(signatureAlgorithm);
-        acceptedSignatureAlgorithms.add(WSConstants.RSA_SHA1);
+        acceptedSignatureAlgorithms.add(WSS4JConstants.RSA_SHA1);
         sigProperties.setAcceptedSignatureAlgorithms(acceptedSignatureAlgorithms);
         stsProperties.setSignatureProperties(sigProperties);
 
@@ -1089,7 +1090,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
@@ -1167,7 +1168,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
         JAXBElement<String> keyType =
@@ -1273,7 +1274,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
@@ -1365,7 +1366,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
@@ -1448,7 +1449,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
     private Element createAppliesToElement(String addressUrl) {
         Document doc = DOMUtils.createDocument();
         Element appliesTo = doc.createElementNS(STSConstants.WSP_NS, "wsp:AppliesTo");
-        appliesTo.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsp", STSConstants.WSP_NS);
+        appliesTo.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:wsp", STSConstants.WSP_NS);
         appliesTo.appendChild(createEndpointReference(doc, addressUrl));
         return appliesTo;
     }
@@ -1456,7 +1457,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
     private Element createAppliesToURIElement(String addressUrl) {
         Document doc = DOMUtils.createDocument();
         Element appliesTo = doc.createElementNS(STSConstants.WSP_NS, "wsp:AppliesTo");
-        appliesTo.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsp", STSConstants.WSP_NS);
+        appliesTo.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:wsp", STSConstants.WSP_NS);
 
         Element uri = doc.createElementNS(STSConstants.WSP_NS, "wsp:URI");
         uri.setTextContent(addressUrl);
@@ -1467,9 +1468,9 @@ public class IssueSamlUnitTest extends org.junit.Assert {
 
     private Element createEndpointReference(Document doc, String addressUrl) {
         Element endpointRef = doc.createElementNS(STSConstants.WSA_NS_05, "wsa:EndpointReference");
-        endpointRef.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsa", STSConstants.WSA_NS_05);
+        endpointRef.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:wsa", STSConstants.WSA_NS_05);
         Element address = doc.createElementNS(STSConstants.WSA_NS_05, "wsa:Address");
-        address.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsa", STSConstants.WSA_NS_05);
+        address.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:wsa", STSConstants.WSA_NS_05);
         address.setTextContent(addressUrl);
         endpointRef.appendChild(address);
 
@@ -1484,9 +1485,9 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         cryptoType.setAlias(alias);
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
         Document doc = DOMUtils.createDocument();
-        Element x509Data = doc.createElementNS(WSConstants.SIG_NS, "ds:X509Data");
-        x509Data.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:ds", WSConstants.SIG_NS);
-        Element x509Cert = doc.createElementNS(WSConstants.SIG_NS, "ds:X509Certificate");
+        Element x509Data = doc.createElementNS(WSS4JConstants.SIG_NS, "ds:X509Data");
+        x509Data.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:ds", WSS4JConstants.SIG_NS);
+        Element x509Cert = doc.createElementNS(WSS4JConstants.SIG_NS, "ds:X509Certificate");
         Text certText = doc.createTextNode(Base64.getMimeEncoder().encodeToString(certs[0].getEncoded()));
         x509Cert.appendChild(certText);
         x509Data.appendChild(x509Cert);

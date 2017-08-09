@@ -66,6 +66,7 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.OutboundSecurityContext;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.SecurePart.Modifier;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityEvent.AbstractSecuredElementSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
@@ -235,7 +236,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                 //Check for signature protection
                 if (sbinding.isEncryptSignature()) {
                     SecurePart part =
-                        new SecurePart(new QName(WSSConstants.NS_DSIG, "Signature"), Modifier.Element);
+                        new SecurePart(new QName(XMLSecurityConstants.NS_DSIG, "Signature"), Modifier.Element);
                     encrParts.add(part);
                     if (signatureConfirmationAdded) {
                         part = new SecurePart(WSSConstants.TAG_WSSE11_SIG_CONF, Modifier.Element);
@@ -373,7 +374,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             //Check for signature protection
             if (sbinding.isEncryptSignature()) {
                 SecurePart part =
-                    new SecurePart(new QName(WSSConstants.NS_DSIG, "Signature"), Modifier.Element);
+                    new SecurePart(new QName(XMLSecurityConstants.NS_DSIG, "Signature"), Modifier.Element);
                 enc.add(part);
                 if (signatureConfirmationAdded) {
                     part = new SecurePart(WSSConstants.TAG_WSSE11_SIG_CONF, Modifier.Element);
@@ -406,7 +407,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
 
             // Action
             WSSSecurityProperties properties = getProperties();
-            WSSConstants.Action actionToPerform = WSSConstants.ENCRYPT;
+            WSSConstants.Action actionToPerform = XMLSecurityConstants.ENCRYPT;
             if (recToken.getToken().getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
                 actionToPerform = WSSConstants.ENCRYPT_WITH_DERIVED_KEY;
                 if (MessageUtils.isRequestor(message) && recToken.getToken() instanceof X509Token) {
@@ -506,7 +507,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
 
         // Action
         WSSSecurityProperties properties = getProperties();
-        WSSConstants.Action actionToPerform = WSSConstants.SIGNATURE;
+        WSSConstants.Action actionToPerform = XMLSecurityConstants.SIGNATURE;
         if (wrapper.getToken().getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
             actionToPerform = WSSConstants.SIGNATURE_WITH_DERIVED_KEY;
             if (MessageUtils.isRequestor(message) && policyToken instanceof X509Token) {
@@ -545,7 +546,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         AbstractToken sigToken = wrapper.getToken();
         if (sbinding.isProtectTokens() && sigToken instanceof X509Token && isRequestor()) {
             SecurePart securePart =
-                new SecurePart(new QName(WSSConstants.NS_XMLENC, "EncryptedKey"), Modifier.Element);
+                new SecurePart(new QName(XMLSecurityConstants.NS_XMLENC, "EncryptedKey"), Modifier.Element);
             properties.addSignaturePart(securePart);
         }
 

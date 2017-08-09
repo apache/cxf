@@ -72,13 +72,13 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.StatusType;
 import org.apache.cxf.ws.security.sts.provider.model.ValidateTargetType;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.DOM2Writer;
-import org.apache.wss4j.dom.WSConstants;
 import org.junit.Assert;
 
 /**
@@ -120,7 +120,7 @@ public class ValidateJWTTransformationTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
 
@@ -206,7 +206,7 @@ public class ValidateJWTTransformationTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
 
@@ -301,7 +301,7 @@ public class ValidateJWTTransformationTest extends org.junit.Assert {
 
         // Create a SAML Token
         Element samlToken =
-            createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
+            createSAMLAssertion(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
                                 new PasswordCallbackHandler());
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);

@@ -21,6 +21,7 @@ package org.apache.cxf.sts.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.dom.WSConstants;
 
 /**
@@ -38,17 +39,17 @@ public class EncryptionProperties {
 
     public EncryptionProperties() {
         // Default symmetric encryption algorithms
-        acceptedEncryptionAlgorithms.add(WSConstants.TRIPLE_DES);
-        acceptedEncryptionAlgorithms.add(WSConstants.AES_128);
-        acceptedEncryptionAlgorithms.add(WSConstants.AES_192);
-        acceptedEncryptionAlgorithms.add(WSConstants.AES_256);
-        acceptedEncryptionAlgorithms.add(WSConstants.AES_128_GCM);
-        acceptedEncryptionAlgorithms.add(WSConstants.AES_192_GCM);
-        acceptedEncryptionAlgorithms.add(WSConstants.AES_256_GCM);
+        acceptedEncryptionAlgorithms.add(WSS4JConstants.TRIPLE_DES);
+        acceptedEncryptionAlgorithms.add(WSS4JConstants.AES_128);
+        acceptedEncryptionAlgorithms.add(WSS4JConstants.AES_192);
+        acceptedEncryptionAlgorithms.add(WSS4JConstants.AES_256);
+        acceptedEncryptionAlgorithms.add(WSS4JConstants.AES_128_GCM);
+        acceptedEncryptionAlgorithms.add(WSS4JConstants.AES_192_GCM);
+        acceptedEncryptionAlgorithms.add(WSS4JConstants.AES_256_GCM);
 
         // Default key wrap algorithms
-        acceptedKeyWrapAlgorithms.add(WSConstants.KEYTRANSPORT_RSA15);
-        acceptedKeyWrapAlgorithms.add(WSConstants.KEYTRANSPORT_RSAOAEP);
+        acceptedKeyWrapAlgorithms.add(WSS4JConstants.KEYTRANSPORT_RSA15);
+        acceptedKeyWrapAlgorithms.add(WSS4JConstants.KEYTRANSPORT_RSAOAEP);
     }
 
     /**

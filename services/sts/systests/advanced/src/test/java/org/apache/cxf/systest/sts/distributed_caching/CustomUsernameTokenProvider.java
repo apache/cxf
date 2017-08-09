@@ -27,7 +27,7 @@ import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 
 /**
@@ -51,7 +51,7 @@ public class CustomUsernameTokenProvider implements TokenProvider {
             Document doc = DOMUtils.createDocument();
 
             // Mock up a UsernameToken
-            UsernameToken usernameToken = new UsernameToken(true, doc, WSConstants.PASSWORD_TEXT);
+            UsernameToken usernameToken = new UsernameToken(true, doc, WSS4JConstants.PASSWORD_TEXT);
             usernameToken.setName("alice");
             usernameToken.setPassword("password");
             String id = "UT-1234";

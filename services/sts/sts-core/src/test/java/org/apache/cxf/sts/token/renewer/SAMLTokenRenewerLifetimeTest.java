@@ -46,12 +46,12 @@ import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.util.DateUtil;
-import org.apache.wss4j.dom.WSConstants;
 import org.junit.BeforeClass;
 
 
@@ -98,7 +98,7 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         // Create token.
         Element samlToken =
             createSAMLAssertion(
-                WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, true
+                WSS4JConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, true
             );
         // Sleep to expire the token
         Thread.sleep(100);
@@ -140,7 +140,7 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         // Create token.
         Element samlToken =
             createSAMLAssertion(
-                WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, true
+                WSS4JConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, true
             );
         // Sleep to expire the token
         Thread.sleep(100);
@@ -194,7 +194,7 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         // Create token.
         Element samlToken =
             createSAMLAssertion(
-                WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, true
+                WSS4JConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, true
             );
         // Sleep to expire the token
         Thread.sleep(100);
@@ -245,7 +245,7 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         // Create token.
         Element samlToken =
             createSAMLAssertion(
-                WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, true
+                WSS4JConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, true
             );
         // Sleep to expire the token
         Thread.sleep(100);
@@ -301,7 +301,7 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         // Create token.
         Element samlToken =
             createSAMLAssertion(
-                WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, true
+                WSS4JConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, true
             );
         // Sleep to expire the token
         Thread.sleep(100);

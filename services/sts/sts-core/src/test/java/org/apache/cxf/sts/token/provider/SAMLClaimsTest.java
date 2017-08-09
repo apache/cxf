@@ -43,6 +43,7 @@ import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.service.EncryptionProperties;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -50,7 +51,6 @@ import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.DOM2Writer;
-import org.apache.wss4j.dom.WSConstants;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.saml.saml2.core.Attribute;
 
@@ -78,7 +78,7 @@ public class SAMLClaimsTest extends org.junit.Assert {
     public void testSaml2Claims() throws Exception {
         TokenProvider samlTokenProvider = new SAMLTokenProvider();
         TokenProviderParameters providerParameters =
-            createProviderParameters(WSConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, null);
+            createProviderParameters(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, null);
 
         ClaimsManager claimsManager = new ClaimsManager();
         ClaimsHandler claimsHandler = new CustomClaimsHandler();
@@ -88,7 +88,7 @@ public class SAMLClaimsTest extends org.junit.Assert {
         ClaimCollection claims = createClaims();
         providerParameters.setRequestedPrimaryClaims(claims);
 
-        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
+        assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML2_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
@@ -113,7 +113,7 @@ public class SAMLClaimsTest extends org.junit.Assert {
     public void testSaml2MultipleClaims() throws Exception {
         TokenProvider samlTokenProvider = new SAMLTokenProvider();
         TokenProviderParameters providerParameters =
-            createProviderParameters(WSConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, null);
+            createProviderParameters(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, null);
 
         ClaimsManager claimsManager = new ClaimsManager();
         ClaimsHandler claimsHandler = new CustomClaimsHandler();
@@ -129,7 +129,7 @@ public class SAMLClaimsTest extends org.junit.Assert {
         secondaryClaims.add(claim);
         providerParameters.setRequestedSecondaryClaims(secondaryClaims);
 
-        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
+        assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML2_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
@@ -156,7 +156,7 @@ public class SAMLClaimsTest extends org.junit.Assert {
     public void testSaml2MultipleClaimsSameDialect() throws Exception {
         TokenProvider samlTokenProvider = new SAMLTokenProvider();
         TokenProviderParameters providerParameters =
-            createProviderParameters(WSConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, null);
+            createProviderParameters(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, null);
 
         ClaimsManager claimsManager = new ClaimsManager();
         ClaimsHandler claimsHandler = new CustomClaimsHandler();
@@ -174,7 +174,7 @@ public class SAMLClaimsTest extends org.junit.Assert {
         secondaryClaims.setDialect(ClaimTypes.URI_BASE);
         providerParameters.setRequestedSecondaryClaims(secondaryClaims);
 
-        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
+        assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML2_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
@@ -198,7 +198,7 @@ public class SAMLClaimsTest extends org.junit.Assert {
     public void testSaml2StaticClaims() throws Exception {
         TokenProvider samlTokenProvider = new SAMLTokenProvider();
         TokenProviderParameters providerParameters =
-            createProviderParameters(WSConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, null);
+            createProviderParameters(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, null);
 
         ClaimsManager claimsManager = new ClaimsManager();
         StaticClaimsHandler claimsHandler = new StaticClaimsHandler();
@@ -214,7 +214,7 @@ public class SAMLClaimsTest extends org.junit.Assert {
         claims.add(claim);
         providerParameters.setRequestedPrimaryClaims(claims);
 
-        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
+        assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML2_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
@@ -241,7 +241,7 @@ public class SAMLClaimsTest extends org.junit.Assert {
     public void testSaml2StaticEndpointClaims() throws Exception {
         TokenProvider samlTokenProvider = new SAMLTokenProvider();
         TokenProviderParameters providerParameters =
-            createProviderParameters(WSConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, null);
+            createProviderParameters(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, null);
 
         ClaimsManager claimsManager = new ClaimsManager();
         StaticEndpointClaimsHandler claimsHandler = new StaticEndpointClaimsHandler();
@@ -267,7 +267,7 @@ public class SAMLClaimsTest extends org.junit.Assert {
         claims.add(claim);
         providerParameters.setRequestedPrimaryClaims(claims);
 
-        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
+        assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML2_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
@@ -295,7 +295,7 @@ public class SAMLClaimsTest extends org.junit.Assert {
     public void testSaml2StaticEndpointClaimsUnknownAppliesTo() throws Exception {
         TokenProvider samlTokenProvider = new SAMLTokenProvider();
         TokenProviderParameters providerParameters =
-            createProviderParameters(WSConstants.WSS_SAML2_TOKEN_TYPE,
+            createProviderParameters(WSS4JConstants.WSS_SAML2_TOKEN_TYPE,
                     STSConstants.BEARER_KEY_KEYTYPE, APPLICATION_APPLIES_TO + "UNKNOWN");
 
         ClaimsManager claimsManager = new ClaimsManager();
@@ -322,7 +322,7 @@ public class SAMLClaimsTest extends org.junit.Assert {
         claims.add(claim);
         providerParameters.setRequestedPrimaryClaims(claims);
 
-        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
+        assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML2_TOKEN_TYPE));
 
         try {
             samlTokenProvider.createToken(providerParameters);
@@ -339,7 +339,7 @@ public class SAMLClaimsTest extends org.junit.Assert {
     public void testSaml2ClaimsInteger() throws Exception {
         TokenProvider samlTokenProvider = new SAMLTokenProvider();
         TokenProviderParameters providerParameters =
-            createProviderParameters(WSConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, null);
+            createProviderParameters(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, null);
 
         ClaimsManager claimsManager = new ClaimsManager();
         ClaimsHandler claimsHandler = new CustomClaimsHandler();
@@ -352,7 +352,7 @@ public class SAMLClaimsTest extends org.junit.Assert {
         claims.add(claim);
         providerParameters.setRequestedPrimaryClaims(claims);
 
-        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
+        assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML2_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);

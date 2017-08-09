@@ -77,6 +77,7 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenRespons
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -84,7 +85,6 @@ import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.DOM2Writer;
-import org.apache.wss4j.dom.WSConstants;
 
 /**
  * Some unit tests for the issue operation to issue SAML tokens with Claims information.
@@ -120,7 +120,7 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
         Element secondaryParameters = createSecondaryParameters();
@@ -181,7 +181,7 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
         Element secondaryParameters = createSecondaryParameters();
@@ -244,7 +244,7 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
         Element secondaryParameters = createCustomSecondaryParameters();
@@ -299,7 +299,7 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
 
@@ -311,7 +311,7 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
         claimType.setAttributeNS(
             null, "Uri", ClaimTypes.COUNTRY.toString()
         );
-        claimType.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", STSConstants.IDT_NS_05_05);
+        claimType.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns", STSConstants.IDT_NS_05_05);
         claims.appendChild(claimType);
 
         request.getAny().add(secondaryParameters);
@@ -420,7 +420,7 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
 
@@ -523,7 +523,7 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
 
@@ -546,7 +546,7 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
         // create a SAML Token via the SAMLTokenProvider which contains claims
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
-            createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
+            createSAMLAssertion(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
                     callbackHandler, realms);
         Document docToken = samlToken.getOwnerDocument();
         samlToken = (Element)docToken.appendChild(samlToken);
@@ -676,7 +676,7 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
 
@@ -699,7 +699,7 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
         // create a SAML Token via the SAMLTokenProvider which contains claims
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
-            createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
+            createSAMLAssertion(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
                     callbackHandler, realms);
         Document docToken = samlToken.getOwnerDocument();
         samlToken = (Element)docToken.appendChild(samlToken);
@@ -794,11 +794,11 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
     private Element createAppliesToElement(String addressUrl) {
         Document doc = DOMUtils.createDocument();
         Element appliesTo = doc.createElementNS(STSConstants.WSP_NS, "wsp:AppliesTo");
-        appliesTo.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsp", STSConstants.WSP_NS);
+        appliesTo.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:wsp", STSConstants.WSP_NS);
         Element endpointRef = doc.createElementNS(STSConstants.WSA_NS_05, "wsa:EndpointReference");
-        endpointRef.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsa", STSConstants.WSA_NS_05);
+        endpointRef.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:wsa", STSConstants.WSA_NS_05);
         Element address = doc.createElementNS(STSConstants.WSA_NS_05, "wsa:Address");
-        address.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsa", STSConstants.WSA_NS_05);
+        address.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:wsa", STSConstants.WSA_NS_05);
         address.setTextContent(addressUrl);
         endpointRef.appendChild(address);
         appliesTo.appendChild(endpointRef);
@@ -822,7 +822,7 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
     private Element createSecondaryParameters() {
         Document doc = DOMUtils.createDocument();
         Element secondary = doc.createElementNS(STSConstants.WST_NS_05_12, "SecondaryParameters");
-        secondary.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", STSConstants.WST_NS_05_12);
+        secondary.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns", STSConstants.WST_NS_05_12);
 
         Element claims = doc.createElementNS(STSConstants.WST_NS_05_12, "Claims");
         claims.setAttributeNS(null, "Dialect", STSConstants.IDT_NS_05_05);
@@ -842,7 +842,7 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
     private Element createCustomSecondaryParameters() {
         Document doc = DOMUtils.createDocument();
         Element secondary = doc.createElementNS(STSConstants.WST_NS_05_12, "SecondaryParameters");
-        secondary.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", STSConstants.WST_NS_05_12);
+        secondary.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns", STSConstants.WST_NS_05_12);
 
         Element claims = doc.createElementNS(STSConstants.WST_NS_05_12, "Claims");
         claims.setAttributeNS(null, "Dialect", CustomClaimParser.CLAIMS_DIALECT);
@@ -863,7 +863,7 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
         claimType.setAttributeNS(
             null, "Uri", ClaimTypes.LASTNAME.toString()
         );
-        claimType.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", STSConstants.IDT_NS_05_05);
+        claimType.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns", STSConstants.IDT_NS_05_05);
 
         return claimType;
     }
@@ -871,7 +871,7 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
     private Element createClaimValue(Document doc) {
         Element claimValue = doc.createElementNS(STSConstants.IDT_NS_05_05, "ClaimValue");
         claimValue.setAttributeNS(null, "Uri", ROLE_CLAIM.toString());
-        claimValue.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", STSConstants.IDT_NS_05_05);
+        claimValue.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns", STSConstants.IDT_NS_05_05);
         Element value = doc.createElementNS(STSConstants.IDT_NS_05_05, "Value");
         value.setTextContent("administrator");
         claimValue.appendChild(value);

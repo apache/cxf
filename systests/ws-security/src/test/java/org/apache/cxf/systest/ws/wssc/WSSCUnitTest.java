@@ -293,7 +293,7 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
         algSuitePolicy.addPolicyComponent(algSuitePolicyEa);
         All algSuitePolicyAll = new All();
         algSuitePolicyAll.addAssertion(
-            new PrimitiveAssertion(new QName(SP12Constants.SP_NS, SP12Constants.ALGO_SUITE_BASIC128)));
+            new PrimitiveAssertion(new QName(SP12Constants.SP_NS, SPConstants.ALGO_SUITE_BASIC128)));
         algSuitePolicyEa.addPolicyComponent(algSuitePolicyAll);
         AlgorithmSuite algorithmSuite = new AlgorithmSuite(SPConstants.SPVersion.SP12, algSuitePolicy);
 

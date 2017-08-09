@@ -61,9 +61,9 @@ import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
 import org.apache.cxf.ws.security.trust.claims.RoleClaimsCallbackHandler;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.util.Loader;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.apache.wss4j.dom.validate.Credential;
@@ -347,7 +347,7 @@ public class STSLoginModule implements LoginModule {
 
         Document doc = DOMUtils.createDocument();
         UsernameToken token = new UsernameToken(false, doc,
-                                                WSConstants.PASSWORD_TEXT);
+                                                WSS4JConstants.PASSWORD_TEXT);
         token.setName(username);
         token.setPassword(password);
         return token;

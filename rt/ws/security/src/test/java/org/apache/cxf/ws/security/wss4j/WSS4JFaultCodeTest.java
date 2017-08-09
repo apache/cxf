@@ -39,7 +39,7 @@ import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.ConfigurationConstants;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.junit.Test;
 
 
@@ -95,7 +95,7 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
         } catch (SoapFault fault) {
             assertTrue(fault.getReason().startsWith(
                 "An error was discovered processing the <wsse:Security> header"));
-            QName faultCode = new QName(WSConstants.WSSE_NS, "InvalidSecurity");
+            QName faultCode = new QName(WSS4JConstants.WSSE_NS, "InvalidSecurity");
             assertTrue(fault.getFaultCode().equals(faultCode));
         }
     }
@@ -156,7 +156,7 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
             fail("Expected failure on an invalid Timestamp");
         } catch (SoapFault fault) {
             assertTrue(fault.getReason().contains("Invalid timestamp"));
-            QName faultCode = new QName(WSConstants.WSSE_NS, "MessageExpired");
+            QName faultCode = new QName(WSS4JConstants.WSSE_NS, "MessageExpired");
             assertTrue(fault.getFaultCode().equals(faultCode));
         }
     }
@@ -215,7 +215,7 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
         } catch (SoapFault fault) {
             assertTrue(fault.getReason().startsWith(
                 "An error was discovered processing the <wsse:Security> header"));
-            QName faultCode = new QName(WSConstants.WSSE_NS, "InvalidSecurity");
+            QName faultCode = new QName(WSS4JConstants.WSSE_NS, "InvalidSecurity");
             assertTrue(fault.getFaultCode().equals(faultCode));
         }
     }

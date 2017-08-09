@@ -47,14 +47,13 @@ import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.ws.security.sts.provider.model.secext.AttributedString;
 import org.apache.cxf.ws.security.sts.provider.model.secext.UsernameTokenType;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.util.DOM2Writer;
-import org.apache.wss4j.dom.WSConstants;
-
 import org.junit.Assert;
 import org.opensaml.core.xml.XMLObject;
 
@@ -81,13 +80,13 @@ public class SAMLProviderActAsTest extends org.junit.Assert {
 
         TokenProviderParameters providerParameters =
             createProviderParameters(
-                WSConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, usernameTokenType
+                WSS4JConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, usernameTokenType
             );
         //Principal must be set in ReceivedToken/ActAs
         providerParameters.getTokenRequirements().getActAs().setPrincipal(
                 new CustomTokenPrincipal(username.getValue()));
 
-        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML_TOKEN_TYPE));
+        assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
@@ -129,13 +128,13 @@ public class SAMLProviderActAsTest extends org.junit.Assert {
 
         TokenProviderParameters providerParameters =
             createProviderParameters(
-                WSConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, saml1Assertion
+                WSS4JConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, saml1Assertion
             );
         //Principal must be set in ReceivedToken/ActAs
         providerParameters.getTokenRequirements().getActAs().setPrincipal(
                 new CustomTokenPrincipal(user));
 
-        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
+        assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML2_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
@@ -184,13 +183,13 @@ public class SAMLProviderActAsTest extends org.junit.Assert {
 
         TokenProviderParameters providerParameters =
             createProviderParameters(
-                WSConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, usernameTokenType
+                WSS4JConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, usernameTokenType
             );
         //Principal must be set in ReceivedToken/ActAs
         providerParameters.getTokenRequirements().getActAs().setPrincipal(
                 new CustomTokenPrincipal(username.getValue()));
 
-        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML_TOKEN_TYPE));
+        assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
@@ -236,7 +235,7 @@ public class SAMLProviderActAsTest extends org.junit.Assert {
 
         TokenProviderParameters providerParameters =
             createProviderParameters(
-                WSConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, usernameTokenType
+                WSS4JConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, usernameTokenType
             );
         //Principal must be set in ReceivedToken/ActAs
         providerParameters.getTokenRequirements().getActAs().setPrincipal(
@@ -251,7 +250,7 @@ public class SAMLProviderActAsTest extends org.junit.Assert {
         ClaimCollection claims = createClaims();
         providerParameters.setRequestedPrimaryClaims(claims);
 
-        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
+        assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML2_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
@@ -303,13 +302,13 @@ public class SAMLProviderActAsTest extends org.junit.Assert {
 
         TokenProviderParameters providerParameters =
             createProviderParameters(
-                WSConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, usernameTokenType
+                WSS4JConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, usernameTokenType
             );
         //Principal must be set in ReceivedToken/ActAs
         providerParameters.getTokenRequirements().getActAs().setPrincipal(
                 new CustomTokenPrincipal(username.getValue()));
 
-        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML_TOKEN_TYPE));
+        assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
@@ -341,14 +340,14 @@ public class SAMLProviderActAsTest extends org.junit.Assert {
         // Now get another token "ActAs" the previous token
         providerParameters =
             createProviderParameters(
-                WSConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, token
+                WSS4JConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, token
             );
         //Principal must be set in ReceivedToken/ActAs
         providerParameters.getTokenRequirements().getActAs().setPrincipal(
                 new CustomTokenPrincipal("service-A"));
         providerParameters.setPrincipal(new CustomTokenPrincipal("service-A"));
 
-        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
+        assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML2_TOKEN_TYPE));
         providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
@@ -387,9 +386,9 @@ public class SAMLProviderActAsTest extends org.junit.Assert {
     private Element getSAMLAssertion() throws Exception {
         TokenProvider samlTokenProvider = new SAMLTokenProvider();
         TokenProviderParameters providerParameters =
-            createProviderParameters(WSConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, null);
+            createProviderParameters(WSS4JConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, null);
         providerParameters.setPrincipal(new CustomTokenPrincipal("bob"));
-        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML_TOKEN_TYPE));
+        assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);

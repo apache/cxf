@@ -47,6 +47,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.token.BinarySecurity;
@@ -797,7 +798,7 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
                                            List<WSSecurityEngineResult> encryptedResults) {
         if (signedRef.getProtectedElement() != null
             && "EncryptedData".equals(signedRef.getProtectedElement().getLocalName())
-            && WSConstants.ENC_NS.equals(signedRef.getProtectedElement().getNamespaceURI())) {
+            && WSS4JConstants.ENC_NS.equals(signedRef.getProtectedElement().getNamespaceURI())) {
             String encryptedDataId =
                 signedRef.getProtectedElement().getAttributeNS(null, "Id");
             for (WSSecurityEngineResult result : encryptedResults) {

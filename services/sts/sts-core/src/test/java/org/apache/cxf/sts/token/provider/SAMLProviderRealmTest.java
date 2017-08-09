@@ -33,12 +33,12 @@ import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.sts.token.realm.RealmProperties;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.util.DOM2Writer;
-import org.apache.wss4j.dom.WSConstants;
 
 /**
  * Some unit tests for creating SAML Tokens via the SAMLTokenProvider in different realms
@@ -52,7 +52,7 @@ public class SAMLProviderRealmTest extends org.junit.Assert {
     public void testRealms() throws Exception {
         TokenProvider samlTokenProvider = new SAMLTokenProvider();
         TokenProviderParameters providerParameters =
-            createProviderParameters(WSConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE);
+            createProviderParameters(WSS4JConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE);
         providerParameters.setRealm("A");
 
         // Create Realms
@@ -66,7 +66,7 @@ public class SAMLProviderRealmTest extends org.junit.Assert {
         ((SAMLTokenProvider)samlTokenProvider).setRealmMap(samlRealms);
 
         // Realm "A"
-        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML_TOKEN_TYPE, "A"));
+        assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML_TOKEN_TYPE, "A"));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
@@ -80,7 +80,7 @@ public class SAMLProviderRealmTest extends org.junit.Assert {
 
         // Realm "B"
         providerParameters.setRealm("B");
-        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML_TOKEN_TYPE, "B"));
+        assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML_TOKEN_TYPE, "B"));
         providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
@@ -94,7 +94,7 @@ public class SAMLProviderRealmTest extends org.junit.Assert {
 
         // Default Realm
         providerParameters.setRealm(null);
-        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML_TOKEN_TYPE, null));
+        assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML_TOKEN_TYPE, null));
         providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
@@ -112,7 +112,7 @@ public class SAMLProviderRealmTest extends org.junit.Assert {
     public void testRealmsUsingOldRealmClass() throws Exception {
         TokenProvider samlTokenProvider = new SAMLTokenProvider();
         TokenProviderParameters providerParameters =
-            createProviderParameters(WSConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE);
+            createProviderParameters(WSS4JConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE);
         providerParameters.setRealm("A");
 
         // Create Realms
@@ -127,7 +127,7 @@ public class SAMLProviderRealmTest extends org.junit.Assert {
         ((SAMLTokenProvider)samlTokenProvider).setRealmMap(samlRealms);
 
         // Realm "A"
-        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML_TOKEN_TYPE, "A"));
+        assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML_TOKEN_TYPE, "A"));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
@@ -141,7 +141,7 @@ public class SAMLProviderRealmTest extends org.junit.Assert {
 
         // Realm "B"
         providerParameters.setRealm("B");
-        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML_TOKEN_TYPE, "B"));
+        assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML_TOKEN_TYPE, "B"));
         providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
@@ -155,7 +155,7 @@ public class SAMLProviderRealmTest extends org.junit.Assert {
 
         // Default Realm
         providerParameters.setRealm(null);
-        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML_TOKEN_TYPE, null));
+        assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML_TOKEN_TYPE, null));
         providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);

@@ -83,6 +83,7 @@ import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.neethi.Assertion;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.WSEncryptionPart;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -564,16 +565,16 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         sig.setStoreBytesInAttachment(storeBytesInAttachment);
         
         String tokenType = secToken.getTokenType();
-        if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
-            || WSConstants.SAML_NS.equals(tokenType)) {
-            sig.setCustomTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
-        } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
-            || WSConstants.SAML2_NS.equals(tokenType)) {
-            sig.setCustomTokenValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
+        if (WSS4JConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
+            || WSS4JConstants.SAML_NS.equals(tokenType)) {
+            sig.setCustomTokenValueType(WSS4JConstants.WSS_SAML_KI_VALUE_TYPE);
+        } else if (WSS4JConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
+            || WSS4JConstants.SAML2_NS.equals(tokenType)) {
+            sig.setCustomTokenValueType(WSS4JConstants.WSS_SAML2_KI_VALUE_TYPE);
         } else if (tokenType != null) {
             sig.setCustomTokenValueType(tokenType);
         } else {
-            sig.setCustomTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+            sig.setCustomTokenValueType(WSS4JConstants.WSS_SAML_KI_VALUE_TYPE);
         }
         sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getAsymmetricSignature());
         sig.setSigCanonicalization(binding.getAlgorithmSuite().getC14n().getValue());
@@ -668,8 +669,8 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                 WSSecSignature tempSig = (WSSecSignature) tempTok;
                 SecurityTokenReference secRef = tempSig.getSecurityTokenReference();
 
-                if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())
-                    || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) {
+                if (WSS4JConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())
+                    || WSS4JConstants.WSS_SAML2_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) {
 
                     Element secRefElement = cloneElement(secRef.getElement());
                     addSupportingElement(secRefElement);
@@ -712,13 +713,13 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             } else if (tempTok instanceof WSSecurityTokenHolder) {
                 SecurityToken token = ((WSSecurityTokenHolder)tempTok).getToken();
                 String tokenType = token.getTokenType();
-                if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
-                    || WSConstants.SAML_NS.equals(tokenType)
-                    || WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
-                    || WSConstants.SAML2_NS.equals(tokenType)) {
+                if (WSS4JConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
+                    || WSS4JConstants.SAML_NS.equals(tokenType)
+                    || WSS4JConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
+                    || WSS4JConstants.SAML2_NS.equals(tokenType)) {
                     Document doc = token.getToken().getOwnerDocument();
-                    boolean saml1 = WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
-                        || WSConstants.SAML_NS.equals(tokenType);
+                    boolean saml1 = WSS4JConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
+                        || WSS4JConstants.SAML_NS.equals(tokenType);
                     String id = token.getId();
                     if (id == null || "".equals(id)) {
                         if (saml1) {
@@ -778,21 +779,21 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                 new org.apache.wss4j.common.token.Reference(doc);
             ref.setURI("#" + id);
             if (saml1) {
-                ref.setValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
-                secRefSaml.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
+                ref.setValueType(WSS4JConstants.WSS_SAML_KI_VALUE_TYPE);
+                secRefSaml.addTokenType(WSS4JConstants.WSS_SAML_TOKEN_TYPE);
             } else {
-                secRefSaml.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+                secRefSaml.addTokenType(WSS4JConstants.WSS_SAML2_TOKEN_TYPE);
             }
             secRefSaml.setReference(ref);
         } else {
-            Element keyId = doc.createElementNS(WSConstants.WSSE_NS, "wsse:KeyIdentifier");
+            Element keyId = doc.createElementNS(WSS4JConstants.WSSE_NS, "wsse:KeyIdentifier");
             String valueType = null;
             if (saml1) {
-                valueType = WSConstants.WSS_SAML_KI_VALUE_TYPE;
-                secRefSaml.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
+                valueType = WSS4JConstants.WSS_SAML_KI_VALUE_TYPE;
+                secRefSaml.addTokenType(WSS4JConstants.WSS_SAML_TOKEN_TYPE);
             } else {
-                valueType = WSConstants.WSS_SAML2_KI_VALUE_TYPE;
-                secRefSaml.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+                valueType = WSS4JConstants.WSS_SAML2_KI_VALUE_TYPE;
+                secRefSaml.addTokenType(WSS4JConstants.WSS_SAML2_TOKEN_TYPE);
             }
             keyId.setAttributeNS(
                 null, "ValueType", valueType
@@ -830,9 +831,9 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                 if (password != null) {
                     // If the password is available then build the token
                     if (token.getPasswordType() == UsernameToken.PasswordType.HashPassword) {
-                        utBuilder.setPasswordType(WSConstants.PASSWORD_DIGEST);
+                        utBuilder.setPasswordType(WSS4JConstants.PASSWORD_DIGEST);
                     } else {
-                        utBuilder.setPasswordType(WSConstants.PASSWORD_TEXT);
+                        utBuilder.setPasswordType(WSS4JConstants.PASSWORD_TEXT);
                     }
                     utBuilder.setUserInfo(userName, password);
                 } else {
@@ -907,10 +908,10 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                 String localname = tokenElement.getLocalName();
                 SamlTokenType tokenType = token.getSamlTokenType();
                 if ((tokenType == SamlTokenType.WssSamlV11Token10 || tokenType == SamlTokenType.WssSamlV11Token11)
-                    && WSConstants.SAML_NS.equals(namespace) && "Assertion".equals(localname)) {
+                    && WSS4JConstants.SAML_NS.equals(namespace) && "Assertion".equals(localname)) {
                     return new SamlAssertionWrapper(tokenElement);
                 } else if (tokenType == SamlTokenType.WssSamlV20Token11
-                    && WSConstants.SAML2_NS.equals(namespace) && "Assertion".equals(localname)) {
+                    && WSS4JConstants.SAML2_NS.equals(namespace) && "Assertion".equals(localname)) {
                     return new SamlAssertionWrapper(tokenElement);
                 }
             }
@@ -974,9 +975,9 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         }
         SecurityToken secToken = new SecurityToken(id);
         if (assertion.getSaml2() != null) {
-            secToken.setTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+            secToken.setTokenType(WSS4JConstants.WSS_SAML2_TOKEN_TYPE);
         } else {
-            secToken.setTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
+            secToken.setTokenType(WSS4JConstants.WSS_SAML_TOKEN_TYPE);
         }
         secToken.setToken(assertion.getElement());
         getTokenStore().add(secToken);
@@ -987,15 +988,15 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         String id = null;
         if (samlToken != null) {
             QName elName = DOMUtils.getElementQName(samlToken);
-            if (elName.equals(new QName(WSConstants.SAML_NS, "Assertion"))
+            if (elName.equals(new QName(WSS4JConstants.SAML_NS, "Assertion"))
                 && samlToken.hasAttributeNS(null, "AssertionID")) {
                 id = samlToken.getAttributeNS(null, "AssertionID");
-            } else if (elName.equals(new QName(WSConstants.SAML2_NS, "Assertion"))
+            } else if (elName.equals(new QName(WSS4JConstants.SAML2_NS, "Assertion"))
                 && samlToken.hasAttributeNS(null, "ID")) {
                 id = samlToken.getAttributeNS(null, "ID");
             }
             if (id == null) {
-                id = samlToken.getAttributeNS(WSConstants.WSU_NS, "Id");
+                id = samlToken.getAttributeNS(WSS4JConstants.WSU_NS, "Id");
             }
         }
         return id;
@@ -1772,13 +1773,13 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             } else {
                 int type = attached ? WSConstants.CUSTOM_SYMM_SIGNING
                     : WSConstants.CUSTOM_SYMM_SIGNING_DIRECT;
-                if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
-                    || WSConstants.SAML_NS.equals(tokenType)) {
-                    sig.setCustomTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+                if (WSS4JConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
+                    || WSS4JConstants.SAML_NS.equals(tokenType)) {
+                    sig.setCustomTokenValueType(WSS4JConstants.WSS_SAML_KI_VALUE_TYPE);
                     sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
-                } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
-                    || WSConstants.SAML2_NS.equals(tokenType)) {
-                    sig.setCustomTokenValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
+                } else if (WSS4JConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
+                    || WSS4JConstants.SAML2_NS.equals(tokenType)) {
+                    sig.setCustomTokenValueType(WSS4JConstants.WSS_SAML2_KI_VALUE_TYPE);
                     sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
                 } else {
                     sig.setCustomTokenValueType(tokenType);
@@ -2007,7 +2008,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                 = new SecurityTokenReference(doc);
             if (tok.getSHA1() != null) {
                 tokenRef.setKeyIdentifierEncKeySHA1(tok.getSHA1());
-                tokenRef.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
+                tokenRef.addTokenType(WSS4JConstants.WSS_ENC_KEY_VALUE_TYPE);
             }
             dkSign.setExternalKey(tok.getSecret(), tokenRef.getElement());
 
@@ -2022,10 +2023,10 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         dkSign.setDerivedKeyLength(algType.getSignatureDerivedKeyLength() / 8);
         if (tok.getSHA1() != null) {
             //Set the value type of the reference
-            dkSign.setCustomValueType(WSConstants.SOAPMESSAGE_NS11 + "#"
-                + WSConstants.ENC_KEY_VALUE_TYPE);
+            dkSign.setCustomValueType(WSS4JConstants.SOAPMESSAGE_NS11 + "#"
+                + WSS4JConstants.ENC_KEY_VALUE_TYPE);
         } else if (policyToken instanceof UsernameToken) {
-            dkSign.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
+            dkSign.setCustomValueType(WSS4JConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
         }
 
         dkSign.prepare();
@@ -2072,7 +2073,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             if (isRequestor()) {
                 // TODO Add support for SAML2 here
                 sig.setCustomTokenValueType(
-                    WSConstants.SOAPMESSAGE_NS11 + "#" + WSConstants.ENC_KEY_VALUE_TYPE
+                    WSS4JConstants.SOAPMESSAGE_NS11 + "#" + WSS4JConstants.ENC_KEY_VALUE_TYPE
                 );
                 sig.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
             } else {
@@ -2083,18 +2084,18 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
 
         } else {
             String tokenType = tok.getTokenType();
-            if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
-                || WSConstants.SAML_NS.equals(tokenType)) {
-                sig.setCustomTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
-            } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
-                || WSConstants.SAML2_NS.equals(tokenType)) {
-                sig.setCustomTokenValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
+            if (WSS4JConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
+                || WSS4JConstants.SAML_NS.equals(tokenType)) {
+                sig.setCustomTokenValueType(WSS4JConstants.WSS_SAML_KI_VALUE_TYPE);
+            } else if (WSS4JConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
+                || WSS4JConstants.SAML2_NS.equals(tokenType)) {
+                sig.setCustomTokenValueType(WSS4JConstants.WSS_SAML2_KI_VALUE_TYPE);
             } else if (tokenType != null) {
                 sig.setCustomTokenValueType(tokenType);
             } else if (policyToken instanceof UsernameToken) {
-                sig.setCustomTokenValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
+                sig.setCustomTokenValueType(WSS4JConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
             } else {
-                sig.setCustomTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+                sig.setCustomTokenValueType(WSS4JConstants.WSS_SAML_KI_VALUE_TYPE);
             }
             sig.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         }

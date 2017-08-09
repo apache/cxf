@@ -41,6 +41,7 @@ import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.wss4j.AttachmentCallbackHandler;
 import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.wss4j.common.WSEncryptionPart;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
@@ -481,7 +482,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         }
 
         if (token instanceof UsernameToken) {
-            dkSign.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
+            dkSign.setCustomValueType(WSS4JConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
         }
 
         // Set the algo info
@@ -534,12 +535,12 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
         } else if (token instanceof UsernameToken) {
             sig.setCustomTokenId(secTok.getId());
-            sig.setCustomTokenValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
+            sig.setCustomTokenValueType(WSS4JConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
             int type = tokenIncluded ? WSConstants.CUSTOM_SYMM_SIGNING
                     : WSConstants.CUSTOM_SYMM_SIGNING_DIRECT;
             sig.setKeyIdentifierType(type);
         } else if (secTok.getTokenType() == null) {
-            sig.setCustomTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+            sig.setCustomTokenValueType(WSS4JConstants.WSS_SAML_KI_VALUE_TYPE);
             sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
         } else {
             String id = secTok.getWsuId();
@@ -551,13 +552,13 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                 sig.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
             }
             String tokenType = secTok.getTokenType();
-            if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
-                || WSConstants.SAML_NS.equals(tokenType)) {
-                sig.setCustomTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+            if (WSS4JConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
+                || WSS4JConstants.SAML_NS.equals(tokenType)) {
+                sig.setCustomTokenValueType(WSS4JConstants.WSS_SAML_KI_VALUE_TYPE);
                 sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
-            } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
-                || WSConstants.SAML2_NS.equals(tokenType)) {
-                sig.setCustomTokenValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
+            } else if (WSS4JConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
+                || WSS4JConstants.SAML2_NS.equals(tokenType)) {
+                sig.setCustomTokenValueType(WSS4JConstants.WSS_SAML2_KI_VALUE_TYPE);
                 sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
             } else {
                 sig.setCustomTokenValueType(tokenType);
@@ -627,7 +628,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         // Add timestamp
         if (timestampEl != null) {
             WSEncryptionPart timestampPart =
-                    new WSEncryptionPart("Timestamp", WSConstants.WSU_NS, "Element");
+                    new WSEncryptionPart("Timestamp", WSS4JConstants.WSU_NS, "Element");
             String id = addWsuIdToElement(timestampEl.getElement());
             timestampPart.setId(id);
             timestampPart.setElement(timestampEl.getElement());

@@ -27,11 +27,11 @@ import org.w3c.dom.Element;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
-import org.apache.wss4j.dom.WSConstants;
 import org.opensaml.saml.saml1.core.AudienceRestrictionCondition;
 
 /**
@@ -53,7 +53,7 @@ public class SAMLDelegationHandler implements TokenDelegationHandler {
             Element tokenElement = (Element)token;
             String namespace = tokenElement.getNamespaceURI();
             String localname = tokenElement.getLocalName();
-            if ((WSConstants.SAML_NS.equals(namespace) || WSConstants.SAML2_NS.equals(namespace))
+            if ((WSS4JConstants.SAML_NS.equals(namespace) || WSS4JConstants.SAML2_NS.equals(namespace))
                 && "Assertion".equals(localname)) {
                 return true;
             }

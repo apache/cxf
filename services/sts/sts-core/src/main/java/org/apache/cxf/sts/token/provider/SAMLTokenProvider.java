@@ -40,6 +40,7 @@ import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.token.realm.RealmProperties;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
@@ -48,7 +49,6 @@ import org.apache.wss4j.common.saml.bean.AuthDecisionStatementBean;
 import org.apache.wss4j.common.saml.bean.AuthenticationStatementBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
-import org.apache.wss4j.dom.WSConstants;
 import org.joda.time.DateTime;
 import org.opensaml.saml.common.SAMLVersion;
 
@@ -84,8 +84,8 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
         if (realm != null && !realmMap.containsKey(realm)) {
             return false;
         }
-        return WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType) || WSConstants.SAML2_NS.equals(tokenType)
-            || WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType) || WSConstants.SAML_NS.equals(tokenType);
+        return WSS4JConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType) || WSS4JConstants.SAML2_NS.equals(tokenType)
+            || WSS4JConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType) || WSS4JConstants.SAML_NS.equals(tokenType);
     }
 
     /**
@@ -133,8 +133,8 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
             TokenProviderResponse response = new TokenProviderResponse();
 
             String tokenType = tokenRequirements.getTokenType();
-            if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
-                || WSConstants.SAML2_NS.equals(tokenType)) {
+            if (WSS4JConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
+                || WSS4JConstants.SAML2_NS.equals(tokenType)) {
                 response.setTokenId(token.getAttributeNS(null, "ID"));
             } else {
                 response.setTokenId(token.getAttributeNS(null, "AssertionID"));

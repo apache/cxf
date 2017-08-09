@@ -36,8 +36,7 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.transport.local.LocalConduit;
 import org.apache.cxf.transport.local.LocalTransportFactory;
 import org.apache.wss4j.common.ConfigurationConstants;
-import org.apache.wss4j.dom.WSConstants;
-
+import org.apache.wss4j.common.WSS4JConstants;
 import org.junit.Test;
 
 public class UserNameTokenAuthorizationTest extends AbstractSecurityTest {
@@ -81,14 +80,14 @@ public class UserNameTokenAuthorizationTest extends AbstractSecurityTest {
         if (digest) {
             wsOut.setProperty("password", "myAliasPassword");
         } else {
-            wsOut.setProperty(ConfigurationConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
+            wsOut.setProperty(ConfigurationConstants.PASSWORD_TYPE, WSS4JConstants.PW_TEXT);
         }
 
         if (encryptUsernameTokenOnly) {
             wsOut.setProperty(ConfigurationConstants.ENCRYPTION_USER, "myalias");
             wsOut.setProperty(
                 ConfigurationConstants.ENCRYPTION_PARTS,
-                "{Content}{" + WSConstants.WSSE_NS + "}UsernameToken"
+                "{Content}{" + WSS4JConstants.WSSE_NS + "}UsernameToken"
             );
         }
         wsOut.setProperty(ConfigurationConstants.PW_CALLBACK_CLASS, TestPwdCallback.class.getName());

@@ -35,8 +35,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.MapNamespaceContext;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
 
 
@@ -73,11 +73,11 @@ public final class CryptoCoverageUtil {
             Element protectedElement = signedRef.getProtectedElement();
             if (protectedElement != null
                 && ("EncryptedData".equals(protectedElement.getLocalName())
-                && WSConstants.ENC_NS.equals(protectedElement.getNamespaceURI())
-                || WSConstants.ENCRYPTED_HEADER.equals(protectedElement.getLocalName())
-                && WSConstants.WSSE11_NS.equals(protectedElement.getNamespaceURI())
-                || WSConstants.ENCRYPED_ASSERTION_LN.equals(protectedElement.getLocalName())
-                && WSConstants.SAML2_NS.equals(protectedElement.getNamespaceURI()))) {
+                && WSS4JConstants.ENC_NS.equals(protectedElement.getNamespaceURI())
+                || WSS4JConstants.ENCRYPTED_HEADER.equals(protectedElement.getLocalName())
+                && WSS4JConstants.WSSE11_NS.equals(protectedElement.getNamespaceURI())
+                || WSS4JConstants.ENCRYPED_ASSERTION_LN.equals(protectedElement.getLocalName())
+                && WSS4JConstants.SAML2_NS.equals(protectedElement.getNamespaceURI()))) {
                 for (WSDataRef encryptedRef : encryptedRefs) {
                     if (protectedElement == encryptedRef.getEncryptedElement()) {
 
@@ -140,9 +140,9 @@ public final class CryptoCoverageUtil {
     ) throws WSSecurityException {
         String requiredTransform = null;
         if (type == CoverageType.SIGNED && scope == CoverageScope.CONTENT) {
-            requiredTransform = WSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS;
+            requiredTransform = WSS4JConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS;
         } else if (type == CoverageType.SIGNED) {
-            requiredTransform = WSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS;
+            requiredTransform = WSS4JConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS;
         }
 
         if (attachments != null) {

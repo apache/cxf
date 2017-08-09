@@ -45,6 +45,7 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.trust.STSUtils;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.derivedKey.P_SHA1;
@@ -52,7 +53,6 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.token.Reference;
 import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.util.DateUtil;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 
@@ -292,12 +292,12 @@ abstract class STSInvoker implements Invoker {
         String namespace
     ) throws Exception {
         writer.writeStartElement(prefix, "Lifetime", namespace);
-        writer.writeNamespace("wsu", WSConstants.WSU_NS);
-        writer.writeStartElement("wsu", "Created", WSConstants.WSU_NS);
+        writer.writeNamespace("wsu", WSS4JConstants.WSU_NS);
+        writer.writeStartElement("wsu", "Created", WSS4JConstants.WSU_NS);
         writer.writeCharacters(created.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
         writer.writeEndElement();
 
-        writer.writeStartElement("wsu", "Expires", WSConstants.WSU_NS);
+        writer.writeStartElement("wsu", "Expires", WSS4JConstants.WSU_NS);
         writer.writeCharacters(expires.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
         writer.writeEndElement();
         writer.writeEndElement();

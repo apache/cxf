@@ -37,6 +37,8 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.xml.security.stax.ext.SecurePart;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+
 import org.junit.Test;
 
 
@@ -70,10 +72,10 @@ public class StaxCryptoCoverageCheckerTest extends AbstractSecurityTest {
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
         List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
-        actions.add(WSSConstants.ENCRYPT);
+        actions.add(XMLSecurityConstants.ENCRYPT);
         properties.setActions(actions);
         properties.setEncryptionUser("myalias");
-        properties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES128);
+        properties.setEncryptionSymAlgorithm(XMLSecurityConstants.NS_XENC_AES128);
 
         Properties outCryptoProperties =
             CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
@@ -167,14 +169,14 @@ public class StaxCryptoCoverageCheckerTest extends AbstractSecurityTest {
         WSSSecurityProperties properties = new WSSSecurityProperties();
         List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
         actions.add(WSSConstants.USERNAMETOKEN);
-        actions.add(WSSConstants.ENCRYPT);
+        actions.add(XMLSecurityConstants.ENCRYPT);
         properties.setActions(actions);
         properties.addEncryptionPart(
             new SecurePart(new QName(WSSConstants.NS_WSSE10, "UsernameToken"), SecurePart.Modifier.Element)
         );
         properties.setEncryptionUser("myalias");
         properties.setTokenUser("username");
-        properties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES128);
+        properties.setEncryptionSymAlgorithm(XMLSecurityConstants.NS_XENC_AES128);
 
         Properties outCryptoProperties =
             CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
@@ -222,7 +224,7 @@ public class StaxCryptoCoverageCheckerTest extends AbstractSecurityTest {
         WSSSecurityProperties properties = new WSSSecurityProperties();
         List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
         actions.add(WSSConstants.USERNAMETOKEN);
-        actions.add(WSSConstants.SIGNATURE);
+        actions.add(XMLSecurityConstants.SIGNATURE);
         properties.setActions(actions);
         properties.setSignatureUser("myalias");
 
@@ -282,7 +284,7 @@ public class StaxCryptoCoverageCheckerTest extends AbstractSecurityTest {
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
         List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
-        actions.add(WSSConstants.SIGNATURE);
+        actions.add(XMLSecurityConstants.SIGNATURE);
         properties.setActions(actions);
         properties.setSignatureUser("myalias");
 
@@ -369,7 +371,7 @@ public class StaxCryptoCoverageCheckerTest extends AbstractSecurityTest {
         WSSSecurityProperties properties = new WSSSecurityProperties();
         List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
         actions.add(WSSConstants.TIMESTAMP);
-        actions.add(WSSConstants.SIGNATURE);
+        actions.add(XMLSecurityConstants.SIGNATURE);
         properties.setActions(actions);
         properties.addSignaturePart(
             new SecurePart(new QName(WSSConstants.NS_WSU10, "Timestamp"), SecurePart.Modifier.Element)
@@ -415,12 +417,12 @@ public class StaxCryptoCoverageCheckerTest extends AbstractSecurityTest {
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
         List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
-        actions.add(WSSConstants.ENCRYPT);
-        actions.add(WSSConstants.SIGNATURE);
+        actions.add(XMLSecurityConstants.ENCRYPT);
+        actions.add(XMLSecurityConstants.SIGNATURE);
         properties.setActions(actions);
         properties.setEncryptionUser("myalias");
         properties.setSignatureUser("myalias");
-        properties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES128);
+        properties.setEncryptionSymAlgorithm(XMLSecurityConstants.NS_XENC_AES128);
 
         Properties outCryptoProperties =
             CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());

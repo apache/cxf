@@ -48,6 +48,7 @@ import org.apache.cxf.ws.security.wss4j.AttachmentCallbackHandler;
 import org.apache.cxf.ws.security.wss4j.StaxSerializer;
 import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.wss4j.common.WSEncryptionPart;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -422,8 +423,8 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             try {
                 // Encrypt, get hold of the ref list and add it
                 Element secondRefList = saaj.getSOAPPart()
-                    .createElementNS(WSConstants.ENC_NS,
-                                     WSConstants.ENC_PREFIX + ":ReferenceList");
+                    .createElementNS(WSS4JConstants.ENC_NS,
+                                     WSS4JConstants.ENC_PREFIX + ":ReferenceList");
                 if (lastEncryptedKeyElement != null) {
                     insertAfter(secondRefList, lastEncryptedKeyElement);
                 } else {
@@ -466,14 +467,14 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 if (!isRequestor() && securityToken != null
                     && recToken.getToken() instanceof SamlToken) {
                     String tokenType = securityToken.getTokenType();
-                    if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
-                        || WSConstants.SAML_NS.equals(tokenType)) {
-                        encr.setCustomEKTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
+                    if (WSS4JConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
+                        || WSS4JConstants.SAML_NS.equals(tokenType)) {
+                        encr.setCustomEKTokenValueType(WSS4JConstants.WSS_SAML_KI_VALUE_TYPE);
                         encr.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
                         encr.setCustomEKTokenId(securityToken.getId());
-                    } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
-                        || WSConstants.SAML2_NS.equals(tokenType)) {
-                        encr.setCustomEKTokenValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
+                    } else if (WSS4JConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
+                        || WSS4JConstants.SAML2_NS.equals(tokenType)) {
+                        encr.setCustomEKTokenValueType(WSS4JConstants.WSS_SAML2_KI_VALUE_TYPE);
                         encr.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
                         encr.setCustomEKTokenId(securityToken.getId());
                     } else {
@@ -577,8 +578,8 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
 
             dkEncr.setExternalKey(this.encryptedKeyValue, this.encryptedKeyId);
             dkEncr.getParts().addAll(encrParts);
-            dkEncr.setCustomValueType(WSConstants.SOAPMESSAGE_NS11 + "#"
-                + WSConstants.ENC_KEY_VALUE_TYPE);
+            dkEncr.setCustomValueType(WSS4JConstants.SOAPMESSAGE_NS11 + "#"
+                + WSS4JConstants.ENC_KEY_VALUE_TYPE);
             AlgorithmSuiteType algType = algorithmSuite.getAlgorithmSuiteType();
             dkEncr.setSymmetricEncAlgorithm(algType.getEncryption());
             dkEncr.setDerivedKeyLength(algType.getEncryptionDerivedKeyLength() / 8);
@@ -665,8 +666,8 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             AlgorithmSuiteType algType = abinding.getAlgorithmSuite().getAlgorithmSuiteType();
             dkSign.setDigestAlgorithm(algType.getDigest());
             dkSign.setDerivedKeyLength(algType.getSignatureDerivedKeyLength() / 8);
-            dkSign.setCustomValueType(WSConstants.SOAPMESSAGE_NS11 + "#"
-                    + WSConstants.ENC_KEY_VALUE_TYPE);
+            dkSign.setCustomValueType(WSS4JConstants.SOAPMESSAGE_NS11 + "#"
+                    + WSS4JConstants.ENC_KEY_VALUE_TYPE);
 
             boolean includePrefixes =
                 MessageUtils.getContextualBoolean(
@@ -682,7 +683,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                         new QName(abinding.getName().getNamespaceURI(), SPConstants.PROTECT_TOKENS));
                     if (bstElement != null) {
                         WSEncryptionPart bstPart =
-                            new WSEncryptionPart(bstElement.getAttributeNS(WSConstants.WSU_NS, "Id"));
+                            new WSEncryptionPart(bstElement.getAttributeNS(WSS4JConstants.WSU_NS, "Id"));
                         bstPart.setElement(bstElement);
                         sigParts.add(bstPart);
                     } else {
@@ -829,9 +830,9 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     SamlAssertionWrapper samlAssertion =
                         (SamlAssertionWrapper)wser.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
                     if (samlAssertion.getSamlVersion() == SAMLVersion.VERSION_20) {
-                        tempTok.setTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+                        tempTok.setTokenType(WSS4JConstants.WSS_SAML2_TOKEN_TYPE);
                     } else {
-                        tempTok.setTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
+                        tempTok.setTokenType(WSS4JConstants.WSS_SAML_TOKEN_TYPE);
                     }
 
                     message.put(SecurityConstants.TOKEN, tempTok);

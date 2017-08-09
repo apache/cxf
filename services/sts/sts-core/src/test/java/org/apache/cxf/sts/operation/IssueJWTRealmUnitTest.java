@@ -56,11 +56,11 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenRespons
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
-import org.apache.wss4j.dom.WSConstants;
 import org.junit.Assert;
 
 /**
@@ -435,11 +435,11 @@ public class IssueJWTRealmUnitTest extends org.junit.Assert {
     private Element createAppliesToElement(String addressUrl) {
         Document doc = DOMUtils.createDocument();
         Element appliesTo = doc.createElementNS(STSConstants.WSP_NS, "wsp:AppliesTo");
-        appliesTo.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsp", STSConstants.WSP_NS);
+        appliesTo.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:wsp", STSConstants.WSP_NS);
         Element endpointRef = doc.createElementNS(STSConstants.WSA_NS_05, "wsa:EndpointReference");
-        endpointRef.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsa", STSConstants.WSA_NS_05);
+        endpointRef.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:wsa", STSConstants.WSA_NS_05);
         Element address = doc.createElementNS(STSConstants.WSA_NS_05, "wsa:Address");
-        address.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsa", STSConstants.WSA_NS_05);
+        address.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:wsa", STSConstants.WSA_NS_05);
         address.setTextContent(addressUrl);
         endpointRef.appendChild(address);
         appliesTo.appendChild(endpointRef);

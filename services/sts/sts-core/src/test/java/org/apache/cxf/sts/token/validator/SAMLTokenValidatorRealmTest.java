@@ -44,11 +44,11 @@ import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.apache.cxf.sts.token.realm.RealmProperties;
 import org.apache.cxf.sts.token.realm.SAMLRealmCodec;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
-import org.apache.wss4j.dom.WSConstants;
 
 /**
  * Some unit tests for validating a SAML token in different realms via the SAMLTokenValidator.
@@ -68,7 +68,7 @@ public class SAMLTokenValidatorRealmTest extends org.junit.Assert {
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
-            createSAMLAssertion(WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, "A");
+            createSAMLAssertion(WSS4JConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, "A");
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
 
@@ -111,7 +111,7 @@ public class SAMLTokenValidatorRealmTest extends org.junit.Assert {
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
-            createSAMLAssertion(WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, "B");
+            createSAMLAssertion(WSS4JConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, "B");
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
 

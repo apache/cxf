@@ -64,6 +64,7 @@ import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.xml.security.stax.ext.OutboundSecurityContext;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.SecurePart.Modifier;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 
 /**
  *
@@ -355,7 +356,7 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
             throw new Exception("Endorsing UsernameTokens are not supported in the streaming code");
         } else if (token instanceof KerberosToken) {
             WSSSecurityProperties properties = getProperties();
-            properties.addAction(WSSConstants.SIGNATURE);
+            properties.addAction(XMLSecurityConstants.SIGNATURE);
             configureSignature(token, false);
 
             addKerberosToken((KerberosToken)token, false, true, false);
@@ -377,7 +378,7 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
 
         // Action
         WSSSecurityProperties properties = getProperties();
-        WSSConstants.Action actionToPerform = WSSConstants.SIGNATURE;
+        WSSConstants.Action actionToPerform = XMLSecurityConstants.SIGNATURE;
         if (token.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
             actionToPerform = WSSConstants.SIGNATURE_WITH_DERIVED_KEY;
         }

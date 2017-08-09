@@ -60,13 +60,13 @@ import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.util.DateUtil;
-import org.apache.wss4j.dom.WSConstants;
 import org.junit.BeforeClass;
 
 
@@ -95,7 +95,7 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
-            createSAMLAssertion(WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler);
+            createSAMLAssertion(WSS4JConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler);
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
 
@@ -128,7 +128,7 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
-            createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler);
+            createSAMLAssertion(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler);
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
 
@@ -165,7 +165,7 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
             createSAMLAssertionWithClaimsProvider(
-                WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler
+                WSS4JConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler
             );
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
@@ -196,7 +196,7 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
         Crypto crypto = CryptoFactory.getInstance(getEveCryptoProperties());
         CallbackHandler callbackHandler = new EveCallbackHandler();
         Element samlToken =
-            createSAMLAssertion(WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "eve", callbackHandler);
+            createSAMLAssertion(WSS4JConstants.WSS_SAML_TOKEN_TYPE, crypto, "eve", callbackHandler);
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
 
@@ -229,7 +229,7 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
         Crypto crypto = CryptoFactory.getInstance(getEveCryptoProperties());
         CallbackHandler callbackHandler = new EveCallbackHandler();
         Element samlToken =
-            createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "eve", callbackHandler);
+            createSAMLAssertion(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, crypto, "eve", callbackHandler);
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
 
@@ -263,7 +263,7 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
-            createSAMLAssertion(WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50);
+            createSAMLAssertion(WSS4JConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50);
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
 
@@ -293,7 +293,7 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
-            createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50);
+            createSAMLAssertion(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50);
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
 
@@ -325,7 +325,7 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
-            createSAMLAssertion(WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler);
+            createSAMLAssertion(WSS4JConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler);
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
 
@@ -364,7 +364,7 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
-            createSAMLAssertionWithRoles(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
+            createSAMLAssertionWithRoles(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
                                          callbackHandler, "manager");
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
@@ -401,7 +401,7 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
-            createSAMLAssertionWithRoles(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
+            createSAMLAssertionWithRoles(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
                                          callbackHandler, "employee");
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
@@ -438,7 +438,7 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
-            createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler);
+            createSAMLAssertion(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler);
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
 
@@ -456,7 +456,7 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
 
         // Replace "alice" with "bob".
         Element nameID =
-            (Element)samlToken.getElementsByTagNameNS(WSConstants.SAML2_NS, "NameID").item(0);
+            (Element)samlToken.getElementsByTagNameNS(WSS4JConstants.SAML2_NS, "NameID").item(0);
         nameID.setTextContent("bob");
 
         // Now validate again

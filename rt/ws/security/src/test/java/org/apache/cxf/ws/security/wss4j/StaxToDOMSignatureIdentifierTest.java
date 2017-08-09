@@ -38,6 +38,8 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+
 import org.junit.Test;
 
 
@@ -68,7 +70,7 @@ public class StaxToDOMSignatureIdentifierTest extends AbstractSecurityTest {
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
         List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
-        actions.add(WSSConstants.SIGNATURE);
+        actions.add(XMLSecurityConstants.SIGNATURE);
         properties.setActions(actions);
         properties.setSignatureKeyIdentifier(
             WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE
@@ -106,7 +108,7 @@ public class StaxToDOMSignatureIdentifierTest extends AbstractSecurityTest {
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
         List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
-        actions.add(WSSConstants.SIGNATURE);
+        actions.add(XMLSecurityConstants.SIGNATURE);
         properties.setActions(actions);
         properties.setSignatureKeyIdentifier(
             WSSecurityTokenConstants.KeyIdentifier_IssuerSerial
@@ -144,7 +146,7 @@ public class StaxToDOMSignatureIdentifierTest extends AbstractSecurityTest {
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
         List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
-        actions.add(WSSConstants.SIGNATURE);
+        actions.add(XMLSecurityConstants.SIGNATURE);
         properties.setActions(actions);
         properties.setSignatureKeyIdentifier(
             WSSecurityTokenConstants.KEYIDENTIFIER_THUMBPRINT_IDENTIFIER
@@ -183,7 +185,7 @@ public class StaxToDOMSignatureIdentifierTest extends AbstractSecurityTest {
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
         List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
-        actions.add(WSSConstants.SIGNATURE);
+        actions.add(XMLSecurityConstants.SIGNATURE);
         properties.setActions(actions);
         properties.setSignatureKeyIdentifier(
             WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier
@@ -222,7 +224,7 @@ public class StaxToDOMSignatureIdentifierTest extends AbstractSecurityTest {
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
         List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
-        actions.add(WSSConstants.SIGNATURE);
+        actions.add(XMLSecurityConstants.SIGNATURE);
         properties.setActions(actions);
         properties.setSignatureKeyIdentifier(
             WSSecurityTokenConstants.KeyIdentifier_KeyValue

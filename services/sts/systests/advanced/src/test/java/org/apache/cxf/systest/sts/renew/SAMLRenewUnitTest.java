@@ -34,7 +34,7 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
@@ -98,7 +98,7 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
 
         // Request the token
         SecurityToken token =
-            requestSecurityToken(bus, wsdlLocation, WSConstants.WSS_SAML_TOKEN_TYPE, 2, true);
+            requestSecurityToken(bus, wsdlLocation, WSS4JConstants.WSS_SAML_TOKEN_TYPE, 2, true);
         assertNotNull(token);
         // Sleep to expire the token
         Thread.sleep(2100);
@@ -135,7 +135,7 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
 
         // Request the token
         SecurityToken token =
-            requestSecurityToken(bus, wsdlLocation, WSConstants.WSS_SAML2_TOKEN_TYPE, 2, true);
+            requestSecurityToken(bus, wsdlLocation, WSS4JConstants.WSS_SAML2_TOKEN_TYPE, 2, true);
         assertNotNull(token);
         // Sleep to expire the token
         Thread.sleep(2100);
@@ -172,7 +172,7 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
 
         // Request the token
         SecurityToken token =
-            requestSecurityToken(bus, wsdlLocation, WSConstants.WSS_SAML2_TOKEN_TYPE, 2, false);
+            requestSecurityToken(bus, wsdlLocation, WSS4JConstants.WSS_SAML2_TOKEN_TYPE, 2, false);
         assertNotNull(token);
         // Sleep to expire the token
         Thread.sleep(2100);
@@ -202,7 +202,7 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
 
         // Request the token
         SecurityToken token =
-            requestSecurityToken(bus, wsdlLocation, WSConstants.WSS_SAML_TOKEN_TYPE, 300, false);
+            requestSecurityToken(bus, wsdlLocation, WSS4JConstants.WSS_SAML_TOKEN_TYPE, 300, false);
         assertNotNull(token);
 
         // Validate the token
@@ -234,7 +234,7 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
 
         // Request the token
         SecurityToken token =
-            requestSecurityToken(bus, wsdlLocation, WSConstants.WSS_SAML2_TOKEN_TYPE, 2, true);
+            requestSecurityToken(bus, wsdlLocation, WSS4JConstants.WSS_SAML2_TOKEN_TYPE, 2, true);
         assertNotNull(token);
         // Sleep to expire the token
         Thread.sleep(2100);
@@ -265,7 +265,7 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
 
         // Request the token
         SecurityToken token =
-            requestSecurityToken(bus, wsdlLocation, WSConstants.WSS_SAML_TOKEN_TYPE, 300, false, false);
+            requestSecurityToken(bus, wsdlLocation, WSS4JConstants.WSS_SAML_TOKEN_TYPE, 300, false, false);
         assertNotNull(token);
 
         // Validate the token

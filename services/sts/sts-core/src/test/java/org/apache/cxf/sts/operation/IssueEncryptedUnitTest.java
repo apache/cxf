@@ -44,6 +44,7 @@ import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseCollectionType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.dom.WSConstants;
@@ -77,7 +78,7 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
         service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
         EncryptionProperties encryptionProperties = new EncryptionProperties();
         if (!unrestrictedPoliciesInstalled) {
-            encryptionProperties.setEncryptionAlgorithm(WSConstants.AES_128);
+            encryptionProperties.setEncryptionAlgorithm(WSS4JConstants.AES_128);
         }
         service.setEncryptionProperties(encryptionProperties);
         issueOperation.setServices(Collections.singletonList(service));
@@ -129,7 +130,7 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
         service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
         EncryptionProperties encryptionProperties = new EncryptionProperties();
         if (!unrestrictedPoliciesInstalled) {
-            encryptionProperties.setEncryptionAlgorithm(WSConstants.AES_128);
+            encryptionProperties.setEncryptionAlgorithm(WSS4JConstants.AES_128);
         }
         service.setEncryptionProperties(encryptionProperties);
         issueOperation.setServices(Collections.singletonList(service));
@@ -189,7 +190,7 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
         service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
         EncryptionProperties encryptionProperties = new EncryptionProperties();
         encryptionProperties.setEncryptionName("myservicekey");
-        encryptionProperties.setEncryptionAlgorithm(WSConstants.AES_128);
+        encryptionProperties.setEncryptionAlgorithm(WSS4JConstants.AES_128);
         service.setEncryptionProperties(encryptionProperties);
         issueOperation.setServices(Collections.singletonList(service));
 
@@ -220,7 +221,7 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
             response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
 
-        encryptionProperties.setEncryptionAlgorithm(WSConstants.KEYTRANSPORT_RSA15);
+        encryptionProperties.setEncryptionAlgorithm(WSS4JConstants.KEYTRANSPORT_RSA15);
         try {
             issueOperation.issue(request, null, msgCtx);
             fail("Failure expected on a bad encryption algorithm");
@@ -267,7 +268,7 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
         JAXBElement<String> encryptionAlgorithmType =
             new JAXBElement<String>(
-                QNameConstants.ENCRYPTION_ALGORITHM, String.class, WSConstants.AES_128
+                QNameConstants.ENCRYPTION_ALGORITHM, String.class, WSS4JConstants.AES_128
             );
         request.getAny().add(encryptionAlgorithmType);
 
@@ -283,12 +284,12 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
         assertTrue(!securityTokenResponse.isEmpty());
 
         // Now specify a non-supported algorithm
-        List<String> acceptedAlgorithms = Collections.singletonList(WSConstants.KEYTRANSPORT_RSA15);
+        List<String> acceptedAlgorithms = Collections.singletonList(WSS4JConstants.KEYTRANSPORT_RSA15);
         encryptionProperties.setAcceptedEncryptionAlgorithms(acceptedAlgorithms);
         request.getAny().remove(request.getAny().size() - 1);
         encryptionAlgorithmType =
             new JAXBElement<String>(
-                QNameConstants.ENCRYPTION_ALGORITHM, String.class, WSConstants.KEYTRANSPORT_RSA15
+                QNameConstants.ENCRYPTION_ALGORITHM, String.class, WSS4JConstants.KEYTRANSPORT_RSA15
             );
         request.getAny().add(encryptionAlgorithmType);
         try {
@@ -327,9 +328,9 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
         EncryptionProperties encryptionProperties = new EncryptionProperties();
         encryptionProperties.setEncryptionName("myservicekey");
         if (!unrestrictedPoliciesInstalled) {
-            encryptionProperties.setEncryptionAlgorithm(WSConstants.AES_128);
+            encryptionProperties.setEncryptionAlgorithm(WSS4JConstants.AES_128);
         }
-        encryptionProperties.setKeyWrapAlgorithm(WSConstants.KEYTRANSPORT_RSAOAEP);
+        encryptionProperties.setKeyWrapAlgorithm(WSS4JConstants.KEYTRANSPORT_RSAOAEP);
         service.setEncryptionProperties(encryptionProperties);
         issueOperation.setServices(Collections.singletonList(service));
 
@@ -360,7 +361,7 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
             response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
 
-        encryptionProperties.setKeyWrapAlgorithm(WSConstants.AES_128);
+        encryptionProperties.setKeyWrapAlgorithm(WSS4JConstants.AES_128);
         try {
             issueOperation.issue(request, null, msgCtx);
             fail("Failure expected on a bad key-wrap algorithm");
@@ -396,7 +397,7 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
         EncryptionProperties encryptionProperties = new EncryptionProperties();
         encryptionProperties.setEncryptionName("myservicekey");
         if (!unrestrictedPoliciesInstalled) {
-            encryptionProperties.setEncryptionAlgorithm(WSConstants.AES_128);
+            encryptionProperties.setEncryptionAlgorithm(WSS4JConstants.AES_128);
         }
         service.setEncryptionProperties(encryptionProperties);
         issueOperation.setServices(Collections.singletonList(service));
@@ -418,7 +419,7 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
         JAXBElement<String> encryptionAlgorithmType =
             new JAXBElement<String>(
-                QNameConstants.KEYWRAP_ALGORITHM, String.class, WSConstants.KEYTRANSPORT_RSAOAEP
+                QNameConstants.KEYWRAP_ALGORITHM, String.class, WSS4JConstants.KEYTRANSPORT_RSAOAEP
             );
         request.getAny().add(encryptionAlgorithmType);
 
@@ -470,7 +471,7 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
         EncryptionProperties encryptionProperties = new EncryptionProperties();
         encryptionProperties.setEncryptionName("myservicekey");
         if (!unrestrictedPoliciesInstalled) {
-            encryptionProperties.setEncryptionAlgorithm(WSConstants.AES_128);
+            encryptionProperties.setEncryptionAlgorithm(WSS4JConstants.AES_128);
         }
         encryptionProperties.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
         service.setEncryptionProperties(encryptionProperties);
@@ -528,11 +529,11 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
     private Element createAppliesToElement(String addressUrl) {
         Document doc = DOMUtils.createDocument();
         Element appliesTo = doc.createElementNS(STSConstants.WSP_NS, "wsp:AppliesTo");
-        appliesTo.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsp", STSConstants.WSP_NS);
+        appliesTo.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:wsp", STSConstants.WSP_NS);
         Element endpointRef = doc.createElementNS(STSConstants.WSA_NS_05, "wsa:EndpointReference");
-        endpointRef.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsa", STSConstants.WSA_NS_05);
+        endpointRef.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:wsa", STSConstants.WSA_NS_05);
         Element address = doc.createElementNS(STSConstants.WSA_NS_05, "wsa:Address");
-        address.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsa", STSConstants.WSA_NS_05);
+        address.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:wsa", STSConstants.WSA_NS_05);
         address.setTextContent(addressUrl);
         endpointRef.appendChild(address);
         appliesTo.appendChild(endpointRef);

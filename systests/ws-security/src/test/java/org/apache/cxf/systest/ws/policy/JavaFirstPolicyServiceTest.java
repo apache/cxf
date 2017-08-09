@@ -47,8 +47,7 @@ import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 import org.apache.neethi.Constants;
 import org.apache.wss4j.common.ConfigurationConstants;
-import org.apache.wss4j.dom.WSConstants;
-
+import org.apache.wss4j.common.WSS4JConstants;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -394,7 +393,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
 
         Map<String, Object> outProps = new HashMap<>();
         outProps.put(ConfigurationConstants.ACTION, ConfigurationConstants.USERNAME_TOKEN);
-        outProps.put(ConfigurationConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
+        outProps.put(ConfigurationConstants.PASSWORD_TYPE, WSS4JConstants.PW_TEXT);
         outProps.put(ConfigurationConstants.PW_CALLBACK_REF, callback);
         outProps.put(ConfigurationConstants.USER, username);
         return outProps;
@@ -403,7 +402,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
     private Map<String, Object> getNoPasswordProperties(String username) {
         Map<String, Object> outProps = new HashMap<>();
         outProps.put(ConfigurationConstants.ACTION, ConfigurationConstants.USERNAME_TOKEN);
-        outProps.put(ConfigurationConstants.PASSWORD_TYPE, WSConstants.PW_NONE);
+        outProps.put(ConfigurationConstants.PASSWORD_TYPE, WSS4JConstants.PW_NONE);
         outProps.put(ConfigurationConstants.USER, username);
         return outProps;
     }

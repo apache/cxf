@@ -75,13 +75,13 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenRespons
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.DOM2Writer;
-import org.apache.wss4j.dom.WSConstants;
 
 /**
  * Some unit tests for the issue operation to issue SAML tokens with Claims information.
@@ -207,7 +207,7 @@ public class JexlIssueSamlClaimsTest extends org.junit.Assert {
         throws WSSecurityException {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType = new JAXBElement<String>(QNameConstants.TOKEN_TYPE, String.class,
-                                                                WSConstants.WSS_SAML2_TOKEN_TYPE);
+                                                                WSS4JConstants.WSS_SAML2_TOKEN_TYPE);
         request.getAny().add(tokenType);
 
         // Add a ClaimsType
@@ -229,7 +229,8 @@ public class JexlIssueSamlClaimsTest extends org.junit.Assert {
 
         // create a SAML Token via the SAMLTokenProvider which contains claims
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler,
+        Element samlToken = createSAMLAssertion(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, 
+                                                crypto, "mystskey", callbackHandler,
                                                 realms);
         Document docToken = samlToken.getOwnerDocument();
         samlToken = (Element)docToken.appendChild(samlToken);
@@ -294,7 +295,7 @@ public class JexlIssueSamlClaimsTest extends org.junit.Assert {
     private Element createClaimsType(Document doc, URI claimTypeURI) {
         Element claimType = doc.createElementNS(STSConstants.IDT_NS_05_05, "ClaimType");
         claimType.setAttributeNS(null, "Uri", claimTypeURI.toString());
-        claimType.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", STSConstants.IDT_NS_05_05);
+        claimType.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns", STSConstants.IDT_NS_05_05);
 
         return claimType;
     }

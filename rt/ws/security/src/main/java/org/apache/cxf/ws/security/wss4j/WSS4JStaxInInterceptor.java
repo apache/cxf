@@ -59,6 +59,7 @@ import org.apache.wss4j.stax.setup.InboundWSSec;
 import org.apache.wss4j.stax.setup.WSSec;
 import org.apache.wss4j.stax.validate.Validator;
 import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.securityEvent.AbstractSecuredElementSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
@@ -347,7 +348,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
         }
         validator = loadValidator(SecurityConstants.SIGNATURE_TOKEN_VALIDATOR, message);
         if (validator != null) {
-            properties.addValidator(WSSConstants.TAG_dsig_Signature, validator);
+            properties.addValidator(XMLSecurityConstants.TAG_dsig_Signature, validator);
         }
         validator = loadValidator(SecurityConstants.TIMESTAMP_TOKEN_VALIDATOR, message);
         if (validator != null) {

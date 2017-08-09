@@ -33,7 +33,7 @@ import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.builders.xml.XMLPrimitiveAssertionBuilder;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.AlgorithmSuite;
@@ -80,7 +80,7 @@ public class MGF256AlgorithmSuiteLoader implements AlgorithmSuiteLoader {
                     SPConstants.SHA1,
                     "http://www.w3.org/2009/xmlenc11#aes256-gcm",
                     SPConstants.KW_AES256,
-                    WSConstants.KEYTRANSPORT_RSAOAEP_XENC11,
+                    WSS4JConstants.KEYTRANSPORT_RSAOAEP_XENC11,
                     SPConstants.P_SHA1_L256,
                     SPConstants.P_SHA1_L192,
                     256, 192, 256, 256, 1024, 4096
@@ -93,14 +93,14 @@ public class MGF256AlgorithmSuiteLoader implements AlgorithmSuiteLoader {
                      SPConstants.SHA256,
                      "http://www.w3.org/2009/xmlenc11#aes256-gcm",
                      SPConstants.KW_AES256,
-                     WSConstants.KEYTRANSPORT_RSAOAEP_XENC11,
+                     WSS4JConstants.KEYTRANSPORT_RSAOAEP_XENC11,
                      SPConstants.P_SHA1_L256,
                      SPConstants.P_SHA1_L192,
                      256, 192, 256, 256, 1024, 4096
                  )
             );
-            ALGORITHM_SUITE_TYPES.get("Basic256GCMMGFSHA256").setMGFAlgo(WSConstants.MGF_SHA256);
-            ALGORITHM_SUITE_TYPES.get("Basic256GCMMGFSHA256Digest").setMGFAlgo(WSConstants.MGF_SHA256);
+            ALGORITHM_SUITE_TYPES.get("Basic256GCMMGFSHA256").setMGFAlgo(WSS4JConstants.MGF_SHA256);
+            ALGORITHM_SUITE_TYPES.get("Basic256GCMMGFSHA256Digest").setMGFAlgo(WSS4JConstants.MGF_SHA256);
             ALGORITHM_SUITE_TYPES.get("Basic256GCMMGFSHA256Digest").setEncryptionDigest(SPConstants.SHA256);
         }
 

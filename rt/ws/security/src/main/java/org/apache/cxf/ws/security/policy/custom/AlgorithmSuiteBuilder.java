@@ -29,7 +29,7 @@ import org.apache.neethi.AssertionBuilderFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.builders.AssertionBuilder;
 import org.apache.wss4j.policy.SP11Constants;
-import org.apache.wss4j.policy.SP13Constants;
+import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.SPUtils;
 import org.apache.wss4j.policy.model.AlgorithmSuite;
@@ -77,7 +77,7 @@ public class AlgorithmSuiteBuilder implements AssertionBuilder<Element> {
 
     @Override
     public QName[] getKnownElements() {
-        return new QName[]{SP13Constants.ALGORITHM_SUITE, SP11Constants.ALGORITHM_SUITE};
+        return new QName[]{SP12Constants.ALGORITHM_SUITE, SP11Constants.ALGORITHM_SUITE};
     }
 
 }

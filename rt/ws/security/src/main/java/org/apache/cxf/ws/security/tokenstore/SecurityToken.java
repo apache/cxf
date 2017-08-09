@@ -39,11 +39,11 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.token.Reference;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.WSConstants;
 
 
 /**
@@ -227,14 +227,14 @@ public class SecurityToken implements Serializable {
         try {
             Element createdElem =
                 DOMUtils.getFirstChildWithName(lifetimeElem,
-                                                WSConstants.WSU_NS,
-                                                WSConstants.CREATED_LN);
+                                                WSS4JConstants.WSU_NS,
+                                                WSS4JConstants.CREATED_LN);
             this.created = ZonedDateTime.parse(DOMUtils.getContent(createdElem)).toInstant();
 
             Element expiresElem =
                 DOMUtils.getFirstChildWithName(lifetimeElem,
-                                                WSConstants.WSU_NS,
-                                                WSConstants.EXPIRES_LN);
+                                                WSS4JConstants.WSU_NS,
+                                                WSS4JConstants.EXPIRES_LN);
             this.expires = ZonedDateTime.parse(DOMUtils.getContent(expiresElem)).toInstant();
         } catch (DateTimeParseException e) {
             //shouldn't happen
@@ -454,7 +454,7 @@ public class SecurityToken implements Serializable {
         }
 
         if ("KeyInfo".equals(child.getLocalName())
-            && WSConstants.SIG_NS.equals(child.getNamespaceURI())) {
+            && WSS4JConstants.SIG_NS.equals(child.getNamespaceURI())) {
             return DOMUtils.getContent(child);
         } else if (Reference.TOKEN.getLocalPart().equals(child.getLocalName())
             && Reference.TOKEN.getNamespaceURI().equals(child.getNamespaceURI())) {

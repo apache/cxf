@@ -56,8 +56,8 @@ import org.apache.neethi.All;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.spnego.SpnegoTokenContext;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
@@ -278,7 +278,7 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 throw new Exception("No BinaryExchange element received");
             }
             String encoding = binaryExchange.getAttributeNS(null, "EncodingType");
-            if (!WSConstants.BASE64_ENCODING.equals(encoding)) {
+            if (!WSS4JConstants.BASE64_ENCODING.equals(encoding)) {
                 throw new Exception("Unknown encoding type: " + encoding);
             }
 
@@ -316,12 +316,12 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             writer.writeStartElement(prefix, "RequestedProofToken", namespace);
 
             // EncryptedKey
-            writer.writeStartElement(WSConstants.ENC_PREFIX, "EncryptedKey", WSConstants.ENC_NS);
-            writer.writeStartElement(WSConstants.ENC_PREFIX, "EncryptionMethod", WSConstants.ENC_NS);
+            writer.writeStartElement(WSS4JConstants.ENC_PREFIX, "EncryptedKey", WSS4JConstants.ENC_NS);
+            writer.writeStartElement(WSS4JConstants.ENC_PREFIX, "EncryptionMethod", WSS4JConstants.ENC_NS);
             writer.writeAttribute("Algorithm", namespace + "/spnego#GSS_Wrap");
             writer.writeEndElement();
-            writer.writeStartElement(WSConstants.ENC_PREFIX, "CipherData", WSConstants.ENC_NS);
-            writer.writeStartElement(WSConstants.ENC_PREFIX, "CipherValue", WSConstants.ENC_NS);
+            writer.writeStartElement(WSS4JConstants.ENC_PREFIX, "CipherData", WSS4JConstants.ENC_NS);
+            writer.writeStartElement(WSS4JConstants.ENC_PREFIX, "CipherValue", WSS4JConstants.ENC_NS);
 
             writer.writeCharacters(Base64.getMimeEncoder().encodeToString(key));
 

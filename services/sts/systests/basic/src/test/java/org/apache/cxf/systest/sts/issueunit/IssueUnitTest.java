@@ -57,6 +57,7 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.cxf.wsdl.WSDLManager;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -64,7 +65,6 @@ import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
@@ -403,20 +403,20 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
 
         //Create SAML token
         Element samlToken =
-            createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
+            createSAMLAssertion(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
                     callbackHandler, null, "alice", "a-issuer");
 
         String id = null;
         QName elName = DOMUtils.getElementQName(samlToken);
-        if (elName.equals(new QName(WSConstants.SAML_NS, "Assertion"))
+        if (elName.equals(new QName(WSS4JConstants.SAML_NS, "Assertion"))
             && samlToken.hasAttributeNS(null, "AssertionID")) {
             id = samlToken.getAttributeNS(null, "AssertionID");
-        } else if (elName.equals(new QName(WSConstants.SAML2_NS, "Assertion"))
+        } else if (elName.equals(new QName(WSS4JConstants.SAML2_NS, "Assertion"))
             && samlToken.hasAttributeNS(null, "ID")) {
             id = samlToken.getAttributeNS(null, "ID");
         }
         if (id == null) {
-            id = samlToken.getAttributeNS(WSConstants.WSU_NS, "Id");
+            id = samlToken.getAttributeNS(WSS4JConstants.WSU_NS, "Id");
         }
 
         SecurityToken wstoken = new SecurityToken(id, samlToken, null, null);

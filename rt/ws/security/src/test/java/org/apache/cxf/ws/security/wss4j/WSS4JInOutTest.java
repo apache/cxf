@@ -52,6 +52,7 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.wss4j.common.ConfigurationConstants;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.principal.UsernameTokenPrincipal;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
@@ -201,7 +202,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         outProperties.put(ConfigurationConstants.ENCRYPTION_USER, "myalias");
         outProperties.put(
             ConfigurationConstants.ENCRYPTION_PARTS,
-            "{Content}{" + WSConstants.WSSE_NS + "}UsernameToken"
+            "{Content}{" + WSS4JConstants.WSSE_NS + "}UsernameToken"
         );
 
         Map<String, Object> inProperties = new HashMap<>();
@@ -244,13 +245,13 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
     public void testUsernameToken() throws Exception {
         Map<String, Object> outProperties = new HashMap<>();
         outProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.USERNAME_TOKEN);
-        outProperties.put(ConfigurationConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
+        outProperties.put(ConfigurationConstants.PASSWORD_TYPE, WSS4JConstants.PW_TEXT);
         outProperties.put(ConfigurationConstants.USER, "alice");
         outProperties.put("password", "alicePassword");
 
         Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.USERNAME_TOKEN);
-        inProperties.put(ConfigurationConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
+        inProperties.put(ConfigurationConstants.PASSWORD_TYPE, WSS4JConstants.PW_DIGEST);
         inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
 
         List<String> xpaths = new ArrayList<>();
@@ -366,8 +367,8 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         final Map<QName, Object> customMap = new HashMap<>();
         customMap.put(
             new QName(
-                WSConstants.SIG_NS,
-                WSConstants.SIG_LN
+                WSS4JConstants.SIG_NS,
+                WSS4JConstants.SIG_LN
             ),
             CustomProcessor.class
         );
@@ -432,7 +433,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         outProperties.put(
             ConfigurationConstants.ACTION,
             ConfigurationConstants.USERNAME_TOKEN + " " + ConfigurationConstants.SIGNATURE);
-        outProperties.put(ConfigurationConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
+        outProperties.put(ConfigurationConstants.PASSWORD_TYPE, WSS4JConstants.PW_TEXT);
         outProperties.put(ConfigurationConstants.USER, "alice");
 
         outProperties.put(ConfigurationConstants.SIG_PROP_FILE, "outsecurity.properties");
@@ -447,7 +448,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
             ConfigurationConstants.ACTION,
             ConfigurationConstants.USERNAME_TOKEN + " " + ConfigurationConstants.SIGNATURE
         );
-        inProperties.put(ConfigurationConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
+        inProperties.put(ConfigurationConstants.PASSWORD_TYPE, WSS4JConstants.PW_TEXT);
         inProperties.put(
             ConfigurationConstants.PW_CALLBACK_CLASS,
             "org.apache.cxf.ws.security.wss4j.TestPwdCallback"
@@ -472,8 +473,8 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         final Map<QName, String> ret = new HashMap<>();
         ret.put(
             new QName(
-                WSConstants.SIG_NS,
-                WSConstants.SIG_LN
+                WSS4JConstants.SIG_NS,
+                WSS4JConstants.SIG_LN
             ),
             null
         );

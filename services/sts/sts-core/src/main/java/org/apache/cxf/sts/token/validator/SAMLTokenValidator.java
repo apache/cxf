@@ -41,13 +41,13 @@ import org.apache.cxf.sts.token.realm.CertConstraintsParser;
 import org.apache.cxf.sts.token.realm.SAMLRealmCodec;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.SAMLTokenPrincipalImpl;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.handler.RequestData;
@@ -123,7 +123,7 @@ public class SAMLTokenValidator implements TokenValidator {
             Element tokenElement = (Element)token;
             String namespace = tokenElement.getNamespaceURI();
             String localname = tokenElement.getLocalName();
-            if ((WSConstants.SAML_NS.equals(namespace) || WSConstants.SAML2_NS.equals(namespace))
+            if ((WSS4JConstants.SAML_NS.equals(namespace) || WSS4JConstants.SAML2_NS.equals(namespace))
                 && "Assertion".equals(localname)) {
                 return true;
             }

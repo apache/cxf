@@ -41,11 +41,11 @@ import org.apache.cxf.ws.security.sts.provider.model.secext.AttributedString;
 import org.apache.cxf.ws.security.sts.provider.model.secext.EncodedString;
 import org.apache.cxf.ws.security.sts.provider.model.secext.PasswordString;
 import org.apache.cxf.ws.security.sts.provider.model.secext.UsernameTokenType;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 
 
@@ -89,7 +89,7 @@ public class UsernameTokenValidatorTest extends org.junit.Assert {
         // Add a password
         PasswordString password = new PasswordString();
         password.setValue("clarinet");
-        password.setType(WSConstants.PASSWORD_TEXT);
+        password.setType(WSS4JConstants.PASSWORD_TEXT);
         JAXBElement<PasswordString> passwordType =
             new JAXBElement<PasswordString>(
                 QNameConstants.PASSWORD, PasswordString.class, password
@@ -127,7 +127,7 @@ public class UsernameTokenValidatorTest extends org.junit.Assert {
         // Add a password
         PasswordString password = new PasswordString();
         password.setValue("clarinet");
-        password.setType(WSConstants.PASSWORD_TEXT);
+        password.setType(WSS4JConstants.PASSWORD_TEXT);
         JAXBElement<PasswordString> passwordType =
             new JAXBElement<PasswordString>(
                 QNameConstants.PASSWORD, PasswordString.class, password
@@ -177,7 +177,7 @@ public class UsernameTokenValidatorTest extends org.junit.Assert {
 
         // Create a WSS4J UsernameToken
         Document doc = DOMUtils.createDocument();
-        UsernameToken ut = new UsernameToken(true, doc, WSConstants.PASSWORD_DIGEST);
+        UsernameToken ut = new UsernameToken(true, doc, WSS4JConstants.PASSWORD_DIGEST);
         ut.setName("alice");
         ut.setPassword("clarinet");
         ut.addNonce(doc);
@@ -186,7 +186,7 @@ public class UsernameTokenValidatorTest extends org.junit.Assert {
         // Add a password
         PasswordString password = new PasswordString();
         password.setValue(ut.getPassword());
-        password.setType(WSConstants.PASSWORD_DIGEST);
+        password.setType(WSS4JConstants.PASSWORD_DIGEST);
         JAXBElement<PasswordString> passwordType =
             new JAXBElement<PasswordString>(
                 QNameConstants.PASSWORD, PasswordString.class, password
@@ -196,7 +196,7 @@ public class UsernameTokenValidatorTest extends org.junit.Assert {
         // Add a nonce
         EncodedString nonce = new EncodedString();
         nonce.setValue(ut.getNonce());
-        nonce.setEncodingType(WSConstants.SOAPMESSAGE_NS + "#Base64Binary");
+        nonce.setEncodingType(WSS4JConstants.SOAPMESSAGE_NS + "#Base64Binary");
         JAXBElement<EncodedString> nonceType =
             new JAXBElement<EncodedString>(
                 QNameConstants.NONCE, EncodedString.class, nonce
@@ -205,8 +205,8 @@ public class UsernameTokenValidatorTest extends org.junit.Assert {
 
         // Add Created value
         String created = ut.getCreated();
-        Element createdElement = doc.createElementNS(WSConstants.WSU_NS, "Created");
-        createdElement.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", WSConstants.WSU_NS);
+        Element createdElement = doc.createElementNS(WSS4JConstants.WSU_NS, "Created");
+        createdElement.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns", WSS4JConstants.WSU_NS);
         createdElement.setTextContent(created);
         usernameToken.getAny().add(createdElement);
 

@@ -73,6 +73,7 @@ import org.apache.cxf.ws.security.sts.provider.model.secext.ReferenceType;
 import org.apache.cxf.ws.security.sts.provider.model.secext.SecurityTokenReferenceType;
 import org.apache.cxf.ws.security.sts.provider.model.utility.AttributedDateTime;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.common.util.XMLUtils;
@@ -268,16 +269,16 @@ public abstract class AbstractOperation {
         TokenReference tokenReference = new TokenReference();
         tokenReference.setIdentifier(tokenId);
 
-        if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
-            || WSConstants.SAML_NS.equals(tokenType)) {
-            tokenReference.setWsse11TokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
+        if (WSS4JConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
+            || WSS4JConstants.SAML_NS.equals(tokenType)) {
+            tokenReference.setWsse11TokenType(WSS4JConstants.WSS_SAML_TOKEN_TYPE);
             tokenReference.setUseKeyIdentifier(true);
-            tokenReference.setWsseValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
-        } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
-            || WSConstants.SAML2_NS.equals(tokenType)) {
-            tokenReference.setWsse11TokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+            tokenReference.setWsseValueType(WSS4JConstants.WSS_SAML_KI_VALUE_TYPE);
+        } else if (WSS4JConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
+            || WSS4JConstants.SAML2_NS.equals(tokenType)) {
+            tokenReference.setWsse11TokenType(WSS4JConstants.WSS_SAML2_TOKEN_TYPE);
             tokenReference.setUseKeyIdentifier(true);
-            tokenReference.setWsseValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
+            tokenReference.setWsseValueType(WSS4JConstants.WSS_SAML2_KI_VALUE_TYPE);
         } else {
             tokenReference.setUseDirectReference(true);
             tokenReference.setWsseValueType(tokenType);

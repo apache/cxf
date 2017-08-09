@@ -76,13 +76,13 @@ import org.apache.cxf.ws.security.sts.provider.model.ValidateTargetType;
 import org.apache.cxf.ws.security.sts.provider.model.secext.AttributedString;
 import org.apache.cxf.ws.security.sts.provider.model.secext.PasswordString;
 import org.apache.cxf.ws.security.sts.provider.model.secext.UsernameTokenType;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.DOM2Writer;
-import org.apache.wss4j.dom.WSConstants;
 
 /**
  * In this test, a token (UsernameToken or SAMLToken) is validated and transformed into a SAML Assertion.
@@ -126,7 +126,7 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
 
@@ -212,7 +212,7 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
 
@@ -371,7 +371,7 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
 
@@ -394,7 +394,7 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         // create a SAML Token via the SAMLTokenProvider which contains claims
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
-            createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
+            createSAMLAssertion(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
                     callbackHandler, realms);
         Document docToken = samlToken.getOwnerDocument();
         samlToken = (Element)docToken.appendChild(samlToken);
@@ -489,7 +489,7 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
         Object claims =
@@ -599,7 +599,7 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
 
@@ -622,7 +622,7 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         // create a SAML Token via the SAMLTokenProvider which contains claims
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
-            createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
+            createSAMLAssertion(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
                     callbackHandler, realms);
         Document docToken = samlToken.getOwnerDocument();
         samlToken = (Element)docToken.appendChild(samlToken);
@@ -764,7 +764,7 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         // Add a password
         PasswordString passwordString = new PasswordString();
         passwordString.setValue(password);
-        passwordString.setType(WSConstants.PASSWORD_TEXT);
+        passwordString.setType(WSS4JConstants.PASSWORD_TEXT);
         JAXBElement<PasswordString> passwordType =
             new JAXBElement<PasswordString>(
                 QNameConstants.PASSWORD, PasswordString.class, passwordString
@@ -799,7 +799,7 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
     private Element createClaimsElementInSecondaryParameters() {
         Document doc = DOMUtils.createDocument();
         Element secondary = doc.createElementNS(STSConstants.WST_NS_05_12, "SecondaryParameters");
-        secondary.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", STSConstants.WST_NS_05_12);
+        secondary.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns", STSConstants.WST_NS_05_12);
 
         Element claims = doc.createElementNS(STSConstants.WST_NS_05_12, "Claims");
         claims.setAttributeNS(null, "Dialect", STSConstants.IDT_NS_05_05);
@@ -817,7 +817,7 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         claimType.setAttributeNS(
             null, "Uri", ClaimTypes.LASTNAME.toString()
         );
-        claimType.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", STSConstants.IDT_NS_05_05);
+        claimType.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns", STSConstants.IDT_NS_05_05);
 
         return claimType;
     }

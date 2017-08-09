@@ -35,10 +35,12 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.transport.local.LocalTransportFactory;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.ConfigurationConstants;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.CryptoFactory;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+
 import org.junit.Test;
 
 
@@ -67,7 +69,7 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
 
         Map<String, Object> properties = new HashMap<>();
         properties.put(ConfigurationConstants.ACTION, ConfigurationConstants.USERNAME_TOKEN);
-        properties.put(ConfigurationConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
+        properties.put(ConfigurationConstants.PASSWORD_TYPE, WSS4JConstants.PW_TEXT);
         properties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
         properties.put(ConfigurationConstants.USER, "username");
 
@@ -115,7 +117,7 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
 
         Map<String, Object> properties = new HashMap<>();
         properties.put(ConfigurationConstants.ACTION, ConfigurationConstants.USERNAME_TOKEN);
-        properties.put(ConfigurationConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
+        properties.put(ConfigurationConstants.PASSWORD_TYPE, WSS4JConstants.PW_DIGEST);
         properties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
         properties.put(ConfigurationConstants.USER, "username");
 
@@ -199,8 +201,8 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         properties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
         properties.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
         properties.put(ConfigurationConstants.USER, "myalias");
-        properties.put(ConfigurationConstants.ENC_KEY_TRANSPORT, WSConstants.KEYTRANSPORT_RSA15);
-        properties.put(ConfigurationConstants.ENC_SYM_ALGO, WSConstants.TRIPLE_DES);
+        properties.put(ConfigurationConstants.ENC_KEY_TRANSPORT, WSS4JConstants.KEYTRANSPORT_RSA15);
+        properties.put(ConfigurationConstants.ENC_SYM_ALGO, WSS4JConstants.TRIPLE_DES);
 
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
@@ -519,7 +521,7 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
 
         WSSSecurityProperties outProperties = new WSSSecurityProperties();
         List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
-        actions.add(WSSConstants.SIGNATURE);
+        actions.add(XMLSecurityConstants.SIGNATURE);
         actions.add(WSSConstants.SIGNATURE_CONFIRMATION);
         outProperties.setActions(actions);
         outProperties.setSignatureUser("myalias");

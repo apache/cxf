@@ -41,7 +41,7 @@ import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.cxf.ws.security.trust.STSUtils;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.SecureConversationToken;
 import org.apache.wss4j.policy.model.Trust10;
@@ -197,7 +197,7 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                 String tokenType = tok.getTokenType();
                 tok.setTokenType(tokenType);
                 if (tokenType == null || "".equals(tokenType)) {
-                    tok.setTokenType(WSConstants.WSC_SCT);
+                    tok.setTokenType(WSS4JConstants.WSC_SCT);
                 }
                 return tok;
             } catch (RuntimeException e) {

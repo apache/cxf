@@ -57,8 +57,8 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.UseKeyType;
 import org.apache.cxf.ws.security.trust.STSUtils;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.util.DOM2Writer;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.keys.content.X509Data;
 
@@ -85,9 +85,9 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
         DEFAULT_CLAIM_TYPE_MAP.put("nameidentifier", CLAIM_TYPE_NS + "/claims/nameidentifier");
 
         DEFAULT_TOKEN_TYPE_MAP = new HashMap<>();
-        DEFAULT_TOKEN_TYPE_MAP.put("saml", WSConstants.WSS_SAML2_TOKEN_TYPE);
-        DEFAULT_TOKEN_TYPE_MAP.put("saml2.0", WSConstants.WSS_SAML2_TOKEN_TYPE);
-        DEFAULT_TOKEN_TYPE_MAP.put("saml1.1", WSConstants.WSS_SAML_TOKEN_TYPE);
+        DEFAULT_TOKEN_TYPE_MAP.put("saml", WSS4JConstants.WSS_SAML2_TOKEN_TYPE);
+        DEFAULT_TOKEN_TYPE_MAP.put("saml2.0", WSS4JConstants.WSS_SAML2_TOKEN_TYPE);
+        DEFAULT_TOKEN_TYPE_MAP.put("saml1.1", WSS4JConstants.WSS_SAML_TOKEN_TYPE);
         DEFAULT_TOKEN_TYPE_MAP.put("jwt", JWTTokenProvider.JWT_TOKEN_TYPE);
         DEFAULT_TOKEN_TYPE_MAP.put("sct", STSUtils.TOKEN_TYPE_SCT_05_12);
 

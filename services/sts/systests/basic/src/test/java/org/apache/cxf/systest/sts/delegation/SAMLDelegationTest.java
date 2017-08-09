@@ -45,11 +45,11 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
-import org.apache.wss4j.dom.WSConstants;
 import org.junit.BeforeClass;
 
 /**
@@ -175,7 +175,7 @@ public class SAMLDelegationTest extends AbstractBusClientServerTestBase {
 
         // Create SAML token
         Element samlToken =
-            createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE,
+            createSAMLAssertion(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE,
                                 crypto, "eve", callbackHandler, "alice", "a-issuer");
 
         try {
@@ -208,7 +208,7 @@ public class SAMLDelegationTest extends AbstractBusClientServerTestBase {
 
         // Create SAML token
         Element samlToken =
-            createUnsignedSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE,
+            createUnsignedSAMLAssertion(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE,
                                 "alice", "a-issuer");
 
         try {

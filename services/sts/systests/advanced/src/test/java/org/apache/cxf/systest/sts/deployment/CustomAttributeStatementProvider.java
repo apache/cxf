@@ -29,10 +29,10 @@ import org.apache.cxf.sts.claims.ProcessedClaim;
 import org.apache.cxf.sts.claims.ProcessedClaimCollection;
 import org.apache.cxf.sts.token.provider.AttributeStatementProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.saml.bean.AttributeBean;
 import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
-import org.apache.wss4j.dom.WSConstants;
 
 public class CustomAttributeStatementProvider implements AttributeStatementProvider {
 
@@ -80,8 +80,8 @@ public class CustomAttributeStatementProvider implements AttributeStatementProvi
             AttributeBean attributeBean = new AttributeBean();
 
             URI claimType = claim.getClaimType();
-            if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
-                || WSConstants.SAML2_NS.equals(tokenType)) {
+            if (WSS4JConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
+                || WSS4JConstants.SAML2_NS.equals(tokenType)) {
                 attributeBean.setQualifiedName(claimType.toString());
                 attributeBean.setNameFormat(nameFormat);
             } else {

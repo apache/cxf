@@ -48,6 +48,7 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
@@ -55,7 +56,6 @@ import org.apache.wss4j.common.saml.bean.KeyInfoBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.common.util.KeyUtils;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.SPConstants.IncludeTokenType;
 import org.apache.wss4j.policy.model.AbstractBinding;
@@ -94,6 +94,7 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.OutboundSecurityContext;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.SecurePart.Modifier;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.impl.securityToken.GenericOutboundSecurityToken;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
@@ -245,11 +246,11 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                 kerberosSecurityTokenProvider.getId());
 
         if (encrypting) {
-            outboundSecurityContext.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION,
+            outboundSecurityContext.put(XMLSecurityConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION,
                     kerberosSecurityTokenProvider.getId());
         }
         if (endorsing) {
-            outboundSecurityContext.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE,
+            outboundSecurityContext.put(XMLSecurityConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE,
                     kerberosSecurityTokenProvider.getId());
         }
 
@@ -350,7 +351,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                                 samlCallback.setAssertionElement(el);
                                 samlCallback.setSubject(subjectBean);
 
-                                if (WSConstants.SAML_NS.equals(el.getNamespaceURI())) {
+                                if (WSS4JConstants.SAML_NS.equals(el.getNamespaceURI())) {
                                     samlCallback.setSamlVersion(Version.SAML_11);
                                 } else {
                                     samlCallback.setSamlVersion(Version.SAML_20);
@@ -363,7 +364,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                 properties.setSamlCallbackHandler(callbackHandler);
 
                 QName qname = WSSConstants.TAG_SAML2_ASSERTION;
-                if (WSConstants.SAML_NS.equals(el.getNamespaceURI())) {
+                if (WSS4JConstants.SAML_NS.equals(el.getNamespaceURI())) {
                     qname = WSSConstants.TAG_SAML_ASSERTION;
                 }
 
@@ -450,9 +451,9 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
 
         outboundSecurityContext.registerSecurityTokenProvider(
                 encryptedKeySecurityTokenProvider.getId(), encryptedKeySecurityTokenProvider);
-        outboundSecurityContext.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION,
+        outboundSecurityContext.put(XMLSecurityConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION,
                 encryptedKeySecurityTokenProvider.getId());
-        outboundSecurityContext.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE,
+        outboundSecurityContext.put(XMLSecurityConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE,
                 encryptedKeySecurityTokenProvider.getId());
         outboundSecurityContext.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_CUSTOM_TOKEN,
                 encryptedKeySecurityTokenProvider.getId());
@@ -679,7 +680,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                         new SecurePart(WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN, Modifier.Element);
                     encryptedTokensList.add(part);
                 }
-                ret.put(token, new SecurePart(WSSConstants.TAG_dsig_Signature, Modifier.Element));
+                ret.put(token, new SecurePart(XMLSecurityConstants.TAG_dsig_Signature, Modifier.Element));
             } else if (token instanceof SamlToken) {
                 SecurePart securePart = addSamlToken((SamlToken)token, signed, endorse);
                 if (securePart != null) {
@@ -990,8 +991,8 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         if (properties.getActions() != null) {
             List<WSSConstants.Action> actionList = properties.getActions();
             if (actionList.contains(WSSConstants.SAML_TOKEN_SIGNED)
-                && actionList.contains(WSSConstants.SIGNATURE)) {
-                actionList.remove(WSSConstants.SIGNATURE);
+                && actionList.contains(XMLSecurityConstants.SIGNATURE)) {
+                actionList.remove(XMLSecurityConstants.SIGNATURE);
             }
         }
     }
@@ -1001,9 +1002,9 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         if (properties.getActions() != null) {
             List<WSSConstants.Action> actionList = properties.getActions();
             boolean sigConf = actionList.contains(WSSConstants.SIGNATURE_CONFIRMATION);
-            if (sigConf && actionList.contains(WSSConstants.SIGNATURE)) {
+            if (sigConf && actionList.contains(XMLSecurityConstants.SIGNATURE)) {
                 actionList.remove(WSSConstants.SIGNATURE_CONFIRMATION);
-                actionList.add(actionList.indexOf(WSSConstants.SIGNATURE) + 1,
+                actionList.add(actionList.indexOf(XMLSecurityConstants.SIGNATURE) + 1,
                                WSSConstants.SIGNATURE_CONFIRMATION);
             } else if (sigConf && actionList.contains(WSSConstants.SIGNATURE_WITH_DERIVED_KEY)) {
                 actionList.remove(WSSConstants.SIGNATURE_CONFIRMATION);
@@ -1029,7 +1030,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
     protected void putCustomTokenAfterSignature() {
         if (properties.getActions() != null) {
             List<WSSConstants.Action> actionList = properties.getActions();
-            if ((actionList.contains(WSSConstants.SIGNATURE)
+            if ((actionList.contains(XMLSecurityConstants.SIGNATURE)
                 || actionList.contains(WSSConstants.SIGNATURE_WITH_DERIVED_KEY)
                 || actionList.contains(WSSConstants.SIGNATURE_WITH_KERBEROS_TOKEN))
                 && actionList.contains(WSSConstants.CUSTOM_TOKEN)) {

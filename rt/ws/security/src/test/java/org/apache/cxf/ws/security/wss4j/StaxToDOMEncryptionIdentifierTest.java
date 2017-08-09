@@ -38,6 +38,8 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+
 import org.junit.Test;
 
 
@@ -68,13 +70,13 @@ public class StaxToDOMEncryptionIdentifierTest extends AbstractSecurityTest {
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
         List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
-        actions.add(WSSConstants.ENCRYPT);
+        actions.add(XMLSecurityConstants.ENCRYPT);
         properties.setActions(actions);
         properties.setEncryptionUser("myalias");
         properties.setEncryptionKeyIdentifier(
             WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE
         );
-        properties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES128);
+        properties.setEncryptionSymAlgorithm(XMLSecurityConstants.NS_XENC_AES128);
 
         Properties cryptoProperties =
             CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
@@ -107,13 +109,13 @@ public class StaxToDOMEncryptionIdentifierTest extends AbstractSecurityTest {
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
         List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
-        actions.add(WSSConstants.ENCRYPT);
+        actions.add(XMLSecurityConstants.ENCRYPT);
         properties.setActions(actions);
         properties.setEncryptionUser("myalias");
         properties.setEncryptionKeyIdentifier(
             WSSecurityTokenConstants.KeyIdentifier_IssuerSerial
         );
-        properties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES128);
+        properties.setEncryptionSymAlgorithm(XMLSecurityConstants.NS_XENC_AES128);
 
         Properties cryptoProperties =
             CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
@@ -146,13 +148,13 @@ public class StaxToDOMEncryptionIdentifierTest extends AbstractSecurityTest {
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
         List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
-        actions.add(WSSConstants.ENCRYPT);
+        actions.add(XMLSecurityConstants.ENCRYPT);
         properties.setActions(actions);
         properties.setEncryptionUser("myalias");
         properties.setEncryptionKeyIdentifier(
             WSSecurityTokenConstants.KEYIDENTIFIER_THUMBPRINT_IDENTIFIER
         );
-        properties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES128);
+        properties.setEncryptionSymAlgorithm(XMLSecurityConstants.NS_XENC_AES128);
 
         Properties cryptoProperties =
             CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
@@ -186,13 +188,13 @@ public class StaxToDOMEncryptionIdentifierTest extends AbstractSecurityTest {
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
         List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
-        actions.add(WSSConstants.ENCRYPT);
+        actions.add(XMLSecurityConstants.ENCRYPT);
         properties.setActions(actions);
         properties.setEncryptionUser("myalias");
         properties.setEncryptionKeyIdentifier(
             WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier
         );
-        properties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES128);
+        properties.setEncryptionSymAlgorithm(XMLSecurityConstants.NS_XENC_AES128);
 
         Properties cryptoProperties =
             CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
@@ -225,13 +227,13 @@ public class StaxToDOMEncryptionIdentifierTest extends AbstractSecurityTest {
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
         List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
-        actions.add(WSSConstants.ENCRYPT);
+        actions.add(XMLSecurityConstants.ENCRYPT);
         properties.setActions(actions);
         properties.setEncryptionUser("myalias");
         properties.setEncryptionKeyIdentifier(
             WSSecurityTokenConstants.KEYIDENTIFIER_ENCRYPTED_KEY_SHA1_IDENTIFIER
         );
-        properties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES128);
+        properties.setEncryptionSymAlgorithm(XMLSecurityConstants.NS_XENC_AES128);
 
         Properties cryptoProperties =
             CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());

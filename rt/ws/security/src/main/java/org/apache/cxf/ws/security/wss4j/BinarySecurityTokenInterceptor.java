@@ -35,6 +35,7 @@ import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
@@ -65,8 +66,8 @@ public class BinarySecurityTokenInterceptor extends AbstractTokenInterceptor {
         Element el = (Element)h.getObject();
         Element child = DOMUtils.getFirstElement(el);
         while (child != null) {
-            if (WSConstants.BINARY_TOKEN_LN.equals(child.getLocalName())
-                && WSConstants.WSSE_NS.equals(child.getNamespaceURI())) {
+            if (WSS4JConstants.BINARY_TOKEN_LN.equals(child.getLocalName())
+                && WSS4JConstants.WSSE_NS.equals(child.getNamespaceURI())) {
                 try {
                     List<WSSecurityEngineResult> bstResults = processToken(child, message);
                     if (bstResults != null) {

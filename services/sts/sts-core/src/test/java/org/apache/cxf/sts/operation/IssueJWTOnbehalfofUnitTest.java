@@ -71,12 +71,12 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.secext.AttributedString;
 import org.apache.cxf.ws.security.sts.provider.model.secext.PasswordString;
 import org.apache.cxf.ws.security.sts.provider.model.secext.UsernameTokenType;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
-import org.apache.wss4j.dom.WSConstants;
 import org.junit.Assert;
 
 /**
@@ -134,7 +134,7 @@ public class IssueJWTOnbehalfofUnitTest extends org.junit.Assert {
         // Get a SAML Token via the SAMLTokenProvider
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
-            createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler);
+            createSAMLAssertion(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler);
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
         OnBehalfOfType onbehalfof = new OnBehalfOfType();
@@ -329,7 +329,7 @@ public class IssueJWTOnbehalfofUnitTest extends org.junit.Assert {
         // Get a SAML Token via the SAMLTokenProvider
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Element samlToken =
-            createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
+            createSAMLAssertion(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
                     callbackHandler, realms, STSConstants.BEARER_KEY_KEYTYPE);
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
@@ -464,7 +464,7 @@ public class IssueJWTOnbehalfofUnitTest extends org.junit.Assert {
         if (password != null) {
             PasswordString passwordString = new PasswordString();
             passwordString.setValue(password);
-            passwordString.setType(WSConstants.PASSWORD_TEXT);
+            passwordString.setType(WSS4JConstants.PASSWORD_TEXT);
             JAXBElement<PasswordString> passwordType =
                 new JAXBElement<PasswordString>(
                         QNameConstants.PASSWORD, PasswordString.class, passwordString
