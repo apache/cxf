@@ -112,12 +112,13 @@ public class NioBookStore {
             }
         },
         // completion handler
-        (in, throwable) -> {
-            if (throwable != null) {
-                response.resume(throwable);
-            } else {
-                response.resume("Book Store uploaded: " + adder.longValue() + " bytes");
-            }
-        });
+        () -> {
+            response.resume("Book Store uploaded: " + adder.longValue() + " bytes");
+        },
+        // error handler
+        t -> {
+            response.resume(t);
+        }
+        );
     }
 }

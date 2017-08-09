@@ -20,6 +20,6 @@ package org.apache.cxf.jaxrs.nio;
 
 @FunctionalInterface
 public interface NioReadCompletionHandler {
-    void complete(NioInputStream in, Throwable t);
+    void complete();
 }
 

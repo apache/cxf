@@ -40,7 +40,7 @@ public final class NioReadListenerImpl implements ReadListener {
     @Override
     public void onError(Throwable t) {
         try {
-            entity.getCompletion().complete(null, t);
+            entity.getError().error(t);
         } catch (final Throwable ex) {
             LOG.warning("NIO NioReadListener error: " + ExceptionUtils.getStackTrace(ex));
         }
@@ -55,6 +55,6 @@ public final class NioReadListenerImpl implements ReadListener {
 
     @Override
     public void onAllDataRead() throws IOException {
-        entity.getCompletion().complete(in, null);
+        entity.getCompletion().complete();
     }
 }

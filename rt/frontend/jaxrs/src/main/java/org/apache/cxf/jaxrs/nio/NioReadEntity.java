@@ -29,10 +29,12 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 public class NioReadEntity {
     private final NioReadHandler reader;
     private final NioReadCompletionHandler completion;
+    private final NioErrorHandler error;
     
-    public NioReadEntity(NioReadHandler reader, NioReadCompletionHandler completion) {
+    public NioReadEntity(NioReadHandler reader, NioReadCompletionHandler completion, NioErrorHandler error) {
         this.reader = reader;
         this.completion = completion;
+        this.error = error;
         
         try {
             final Message m = JAXRSUtils.getCurrentMessage();
@@ -53,5 +55,9 @@ public class NioReadEntity {
 
     public NioReadCompletionHandler getCompletion() {
         return completion;
+    }
+    
+    public NioErrorHandler getError() {
+        return error;
     }
 }
