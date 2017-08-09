@@ -217,10 +217,12 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
                 buffer.getMessage().append("\nMessage (saved to tmp file):\n");
                 buffer.getMessage().append("Filename: " + bos.getTempFile().getAbsolutePath() + "\n");
             }
+            boolean truncated = false;
             if (bos.size() > limit && limit != -1) {
                 buffer.getMessage().append("(message truncated to " + limit + " bytes)\n");
+                truncated = true;
             }
-            writePayload(buffer.getPayload(), bos, encoding, ct);
+            writePayload(buffer.getPayload(), bos, encoding, ct, truncated);
 
             bos.close();
         } catch (Exception e) {

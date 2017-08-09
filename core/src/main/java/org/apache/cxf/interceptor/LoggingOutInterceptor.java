@@ -231,21 +231,24 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
                 return;
             }
 
+            boolean truncated = false;
             if (cos.getTempFile() == null) {
                 //buffer.append("Outbound Message:\n");
                 if (cos.size() >= lim) {
                     buffer.getMessage().append("(message truncated to " + lim + " bytes)\n");
+                    truncated = true;
                 }
             } else {
                 buffer.getMessage().append("Outbound Message (saved to tmp file):\n");
                 buffer.getMessage().append("Filename: " + cos.getTempFile().getAbsolutePath() + "\n");
                 if (cos.size() >= lim) {
                     buffer.getMessage().append("(message truncated to " + lim + " bytes)\n");
+                    truncated = true;
                 }
             }
             try {
                 String encoding = (String)message.get(Message.ENCODING);
-                writePayload(buffer.getPayload(), cos, encoding, ct);
+                writePayload(buffer.getPayload(), cos, encoding, ct, truncated);
             } catch (Exception ex) {
                 //ignore
             }
