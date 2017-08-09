@@ -219,6 +219,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
             }
             if (bos.size() > limit && limit != -1) {
                 buffer.getMessage().append("(message truncated to " + limit + " bytes)\n");
+                ct = "text/plain";
             }
             writePayload(buffer.getPayload(), bos, encoding, ct);
 
