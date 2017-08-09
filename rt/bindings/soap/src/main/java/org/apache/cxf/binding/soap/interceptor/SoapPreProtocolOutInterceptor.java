@@ -19,23 +19,15 @@
 
 package org.apache.cxf.binding.soap.interceptor;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
-import org.apache.cxf.binding.soap.Soap11;
-import org.apache.cxf.binding.soap.Soap12;
-import org.apache.cxf.binding.soap.SoapBindingConstants;
-import org.apache.cxf.binding.soap.SoapMessage;
-import org.apache.cxf.binding.soap.SoapVersion;
+import org.apache.cxf.binding.soap.*;
 import org.apache.cxf.binding.soap.model.SoapOperationInfo;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.BindingOperationInfo;
+
+import java.util.*;
 
 import static org.apache.cxf.message.Message.MIME_HEADERS;
 
@@ -114,17 +106,16 @@ public class SoapPreProtocolOutInterceptor extends AbstractSoapInterceptor {
         String action = getSoapAction(message, boi);
         
         if (message.getVersion() instanceof Soap11) {
-            Map<String, List<String>> reqHeaders 
-                = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
-            if (reqHeaders == null) {
-                reqHeaders = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+            Map<String, List<String>> tempReqHeaders = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+            Map<String, List<String>> reqHeaders
+                    = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
+            if (reqHeaders != null) {
+                tempReqHeaders.putAll(reqHeaders);
             }
-            
-            if (reqHeaders.size() == 0) {
-                message.put(Message.PROTOCOL_HEADERS, reqHeaders);
+            if (!tempReqHeaders.containsKey(SoapBindingConstants.SOAP_ACTION)) {
+                tempReqHeaders.put(SoapBindingConstants.SOAP_ACTION, Collections.singletonList(action));
             }
-            
-            reqHeaders.put(SoapBindingConstants.SOAP_ACTION, Collections.singletonList(action));
+            message.put(Message.PROTOCOL_HEADERS, tempReqHeaders);
         } else if (message.getVersion() instanceof Soap12 && !"\"\"".equals(action)) {
             String ct = (String) message.get(Message.CONTENT_TYPE);
             
