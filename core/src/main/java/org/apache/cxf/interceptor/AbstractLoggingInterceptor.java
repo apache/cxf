@@ -156,10 +156,10 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     }
 
     protected void writePayload(StringBuilder builder, CachedOutputStream cos,
-                                String encoding, String contentType) 
+                                String encoding, String contentType, boolean truncated)
         throws Exception {
         // Just transform the XML message when the cos has content
-        if (isPrettyLogging() && contentType != null && contentType.contains("xml") 
+        if (!truncated && isPrettyLogging() && contentType != null && contentType.contains("xml")
             && !contentType.toLowerCase().contains("multipart/related") && cos.size() > 0) {
 
             StringWriter swriter = new StringWriter();
