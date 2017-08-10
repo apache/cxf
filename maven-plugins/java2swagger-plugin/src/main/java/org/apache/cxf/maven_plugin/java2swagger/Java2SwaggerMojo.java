@@ -34,7 +34,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.SerializationFeature;
 
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.maven.plugin.AbstractMojo;
@@ -286,8 +285,8 @@ public class Java2SwaggerMojo extends AbstractMojo {
 
     private void configureSwagger() {
         swagger = new Swagger();
-        mapper.configure(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS, false);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
         Info info = new Info();
         Contact swaggerContact = new Contact();
         License swaggerLicense = new License();
