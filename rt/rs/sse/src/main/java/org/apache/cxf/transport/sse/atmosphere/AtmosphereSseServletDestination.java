@@ -67,6 +67,10 @@ public class AtmosphereSseServletDestination extends ServletDestination {
         framework.addInitParameter(ApplicationConfig.WEBSOCKET_SUPPORT, "true");
         framework.addInitParameter(ApplicationConfig.DISABLE_ATMOSPHEREINTERCEPTOR, "true");
         framework.addInitParameter(ApplicationConfig.CLOSE_STREAM_ON_CANCEL, "true");
+        // Atmosphere does not limit amount of threads and application can crash in no time
+        // https://github.com/Atmosphere/atmosphere/wiki/Configuring-Atmosphere-for-Performance
+        framework.addInitParameter(ApplicationConfig.BROADCASTER_MESSAGE_PROCESSING_THREADPOOL_MAXSIZE, "20");
+        framework.addInitParameter(ApplicationConfig.BROADCASTER_ASYNC_WRITE_THREADPOOL_MAXSIZE, "20");
         framework.setBroadcasterCacheClassName(UUIDBroadcasterCache.class.getName());
         framework.addAtmosphereHandler("/", new DestinationHandler());
         framework.init();

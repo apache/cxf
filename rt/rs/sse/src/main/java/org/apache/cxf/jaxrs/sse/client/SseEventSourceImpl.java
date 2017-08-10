@@ -28,6 +28,7 @@ import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedHashMap;
@@ -52,6 +53,7 @@ public class SseEventSourceImpl implements SseEventSource {
     
     // It may happen that open() and close() could be called on separate threads
     private volatile ScheduledExecutorService executor;
+    private volatile boolean managedExecutor = true;
     private volatile InboundSseEventProcessor processor; 
     private volatile TimeUnit unit;
     private volatile long delay;
@@ -160,14 +162,18 @@ public class SseEventSourceImpl implements SseEventSource {
         }
 
         // Create the executor for scheduling the reconnect tasks 
-        executor = 
-            (ScheduledExecutorService)target.getConfiguration().getProperty("scheduledExecutorService");
+        final Configuration configuration = target.getConfiguration();
         if (executor == null) {
-            executor = Executors.newSingleThreadScheduledExecutor();    
+            executor = (ScheduledExecutorService)configuration
+                .getProperty("scheduledExecutorService");
+            
+            if (executor == null) {
+                executor = Executors.newSingleThreadScheduledExecutor();
+                managedExecutor = false; /* we manage lifecycle */
+            }
         }
         
-        
-        final Object lastEventId = target.getConfiguration().getProperty(HttpHeaders.LAST_EVENT_ID_HEADER);
+        final Object lastEventId = configuration.getProperty(HttpHeaders.LAST_EVENT_ID_HEADER);
         connect(lastEventId != null ? lastEventId.toString() : null);
     }
 
@@ -187,7 +193,7 @@ public class SseEventSourceImpl implements SseEventSource {
                 .get();
             
             // A client can be told to stop reconnecting using the HTTP 204 No Content 
-            // response code. In this case, we should stop here.
+            // response code. In this case, we should give up.
             if (response.getStatus() == 204) {
                 LOG.fine("SSE endpoint " + target.getUri() + " returns no data, disconnecting");
                 state.compareAndSet(SseSourceState.CONNECTING, SseSourceState.CLOSED);
@@ -196,11 +202,18 @@ public class SseEventSourceImpl implements SseEventSource {
             }
 
             final Endpoint endpoint = WebClient.getConfig(target).getEndpoint();
-            processor = new InboundSseEventProcessor(endpoint, delegate);
+            // Create new processor if this is the first time or the old one has been closed 
+            if (processor == null || processor.isClosed()) {
+                LOG.fine("Creating new instance of SSE event processor ...");
+                processor = new InboundSseEventProcessor(endpoint, delegate);
+            }
+            
+            // Start consuming events
             processor.run(response);
+            LOG.fine("SSE event processor has been started ...");
             
             state.compareAndSet(SseSourceState.CONNECTING, SseSourceState.OPEN);
-            LOG.fine("Opened SSE connection to " + target.getUri());
+            LOG.fine("Successfuly opened SSE connection to " + target.getUri());
         } catch (final Exception ex) {
             if (processor != null) {
                 processor.close(1, TimeUnit.SECONDS);
@@ -234,8 +247,10 @@ public class SseEventSourceImpl implements SseEventSource {
             throw new IllegalStateException("The SseEventSource is not opened, but in " + state.get() + " state");
         }
         
-        if (executor != null) {
+        if (executor != null && !managedExecutor) {
             executor.shutdown();
+            executor = null;
+            managedExecutor = true;
         }
 
         // Should never happen

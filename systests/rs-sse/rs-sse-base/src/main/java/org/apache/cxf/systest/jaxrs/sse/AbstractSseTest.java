@@ -88,7 +88,22 @@ public abstract class AbstractSseTest extends AbstractSseBaseTest {
             )
         );
     }
-    
+
+    @Test
+    public void testNoDataIsReturnedFromInboundSseEvents() throws InterruptedException {
+        final WebTarget target = createWebTarget("/rest/api/bookstore/nodata");
+        final Collection<Book> books = new ArrayList<>();
+        
+        try (SseEventSource eventSource = SseEventSource.target(target).build()) {
+            eventSource.register(collect(books), System.out::println);
+            eventSource.open();
+            // Give the SSE stream some time to collect all events
+            Thread.sleep(1000);
+        }
+        // Easing the test verification here, it does not work well for Atm + Jetty
+        assertTrue(books.isEmpty());
+    }
+
     @Test
     public void testBooksStreamIsReconnectedFromInboundSseEvents() throws InterruptedException {
         final WebTarget target = createWebTarget("/rest/api/bookstore/sse/0");

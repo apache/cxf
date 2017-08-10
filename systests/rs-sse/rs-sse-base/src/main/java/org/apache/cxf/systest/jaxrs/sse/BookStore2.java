@@ -102,6 +102,13 @@ public class BookStore2 {
             latch.countDown();
         }
     }
+    
+    @GET
+    @Path("nodata")
+    @Produces(MediaType.SERVER_SENT_EVENTS)
+    public void nodata(@Context SseEventSink sink) {
+        sink.close();
+    }
 
     @POST
     @Path("broadcast/close")

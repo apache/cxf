@@ -94,6 +94,13 @@ public class BookStore {
     }
 
     @GET
+    @Path("nodata")
+    @Produces(MediaType.SERVER_SENT_EVENTS)
+    public void nodata(@Context SseEventSink sink) {
+        sink.close();
+    }
+
+    @GET
     @Path("broadcast/sse")
     @Produces(MediaType.SERVER_SENT_EVENTS)
     public void broadcast(@Context SseEventSink sink) {

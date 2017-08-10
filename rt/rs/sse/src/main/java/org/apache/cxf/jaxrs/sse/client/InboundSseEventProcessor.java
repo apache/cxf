@@ -118,9 +118,12 @@ public class InboundSseEventProcessor {
                 response.close();
             }
 
-            closed = true;
             return null;
         };
+    }
+    
+    boolean isClosed() {
+        return closed;
     }
     
     boolean close(long timeout, TimeUnit unit) {
