@@ -172,7 +172,7 @@ public class SAMLSSOResponseValidator {
         }
 
         // Issuer value must match (be contained in) Issuer IDP
-        if (enforceKnownIssuer && !issuerIDP.startsWith(issuer.getValue())) {
+        if (enforceKnownIssuer && (issuer.getValue() == null || !issuerIDP.startsWith(issuer.getValue()))) {
             LOG.fine("Issuer value: " + issuer.getValue() + " does not match issuer IDP: "
                 + issuerIDP);
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
