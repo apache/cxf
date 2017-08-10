@@ -46,15 +46,8 @@ public class UriHandlerInitTest extends Assert {
                              + newValue.length(), newValue.length(), len);
 
             } finally {
-                if (origVal != null) {
-                    properties.put(PROP_NAME, origVal);
-                }
+                properties.put(PROP_NAME, origVal);
             }
         }
     }
-
-
-
-
-
 }

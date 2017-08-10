@@ -242,7 +242,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
                     super.writeEndElement();
                 }
             }
-        } else if (replaceContent) {
+        } else if (null != appendProp && replaceContent) {
             //
             replaceText = appendProp.getText();
         } else if (dropped) {

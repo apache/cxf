@@ -184,7 +184,7 @@ public class VersionTransformer {
             exposed.setServiceName(serviceName);
         }
         String portLocalName = EndpointReferenceUtils.getPortName(internal);
-        if (portLocalName != null) {
+        if (portLocalName != null && serviceQName != null) {
             String namespace = serviceQName.getNamespaceURI() != null
                                ? serviceQName.getNamespaceURI()
                                : Names.WSDL_INSTANCE_NAMESPACE_NAME;
@@ -221,7 +221,7 @@ public class VersionTransformer {
             exposed.setServiceName(serviceName);
         }
         String portLocalName = EndpointReferenceUtils.getPortName(internal);
-        if (portLocalName != null) {
+        if (portLocalName != null && serviceQName != null) {
             String namespace = serviceQName.getNamespaceURI() != null
                 ? serviceQName.getNamespaceURI() : Names.WSDL_INSTANCE_NAMESPACE_NAME;
             QName portQName = new QName(namespace, portLocalName);

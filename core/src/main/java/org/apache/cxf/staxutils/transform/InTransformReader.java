@@ -139,7 +139,7 @@ public class InTransformReader extends DepthXMLStreamReader {
             if (null != appendProp && !replaceContent) {
                 // handle one of the four append modes
                 handleAppendMode(expected, appendProp);
-            } else if (replaceContent) {
+            } else if (null != appendProp && replaceContent) {
                 replaceText = appendProp.getText();
                 if (doDebug) {
                     LOG.fine("replacing content with " + replaceText);
