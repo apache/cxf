@@ -655,7 +655,6 @@ public final class JAXBUtils {
                 cls = Class.forName("com.sun.xml.bind.api.JAXBRIContext");
                 refClass = Class.forName(pkg + "api.TypeReference");
             } catch (ClassNotFoundException e) {
-                // TODO Auto-generated catch block
                 cls = Class.forName("com.sun.xml.internal.bind.api.JAXBRIContext", true, getXJCClassLoader());
                 pkg = "com.sun.xml.internal.bind.";
                 refClass = Class.forName(pkg + "api.TypeReference", true, getXJCClassLoader());
@@ -786,7 +785,6 @@ public final class JAXBUtils {
             try {
                 cls = Class.forName("com.sun.codemodel.writer.FileCodeWriter");
             } catch (ClassNotFoundException e) {
-                // TODO Auto-generated catch block
                 cls = Class.forName("com.sun.codemodel.internal.writer.FileCodeWriter",
                                     true, getXJCClassLoader());
             }

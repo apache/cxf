@@ -110,7 +110,6 @@ public class HWDOMSourcePayloadProvider implements Provider<DOMSource> {
 
                     throw new SOAPFaultException(soapFault);
                 } catch (SOAPException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             }

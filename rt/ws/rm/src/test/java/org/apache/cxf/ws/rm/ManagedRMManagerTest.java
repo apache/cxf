@@ -487,11 +487,9 @@ public class ManagedRMManagerTest extends Assert {
         }
 
         public void addUnacknowledged(Message message) {
-            // TODO Auto-generated method stub
         }
 
         public void purgeAcknowledged(SourceSequence seq) {
-            // TODO Auto-generated method stub
         }
 
         public void purgeAll(SourceSequence seq) {
@@ -515,16 +513,13 @@ public class ManagedRMManagerTest extends Assert {
         }
 
         public Map<Long, RetryStatus> getRetransmissionStatuses(SourceSequence seq) {
-            // TODO Auto-generated method stub
             return null;
         }
 
         public void start() {
-            // TODO Auto-generated method stub
         }
 
         public void stop(SourceSequence seq) {
-            // TODO Auto-generated method stub
         }
 
         public void suspend(SourceSequence seq) {

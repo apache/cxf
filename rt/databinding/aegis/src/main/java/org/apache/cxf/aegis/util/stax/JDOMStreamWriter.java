@@ -178,7 +178,6 @@ public class JDOMStreamWriter implements XMLStreamWriter {
     }
 
     public void writeCharacters(char[] text, int start, int len) throws XMLStreamException {
-        // TODO Auto-generated method stub
         currentNode.addContent(new String(text, start, len));
     }
 

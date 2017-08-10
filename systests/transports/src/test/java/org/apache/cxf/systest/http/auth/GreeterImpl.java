@@ -28,12 +28,9 @@ public class GreeterImpl implements Greeter {
     }
 
     public void pingMe() throws PingMeFault {
-        // TODO Auto-generated method stub
-
     }
 
     public String greetMe(String requestType) {
-        // TODO Auto-generated method stub
         return null;
     }
 

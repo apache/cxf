@@ -1079,12 +1079,10 @@ public class HandlerChainInvokerTest extends Assert {
 
 
         public void init(Map<String, Object> arg0) {
-            // TODO Auto-generated method stub
         }
 
 
         public void destroy() {
-            // TODO Auto-generated method stub
         }
 
         public int getHandleMessageCount() {

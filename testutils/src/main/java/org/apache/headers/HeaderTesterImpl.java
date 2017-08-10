@@ -39,7 +39,6 @@ import org.apache.headers.types.SOAPHeaderData;
 public class HeaderTesterImpl implements HeaderTester {
 
     public InHeaderResponse inHeader(InHeader me, SOAPHeaderData headerInfo) {
-        // TODO Auto-generated method stub
         InHeaderResponse resp = new InHeaderResponse();
         resp.setResponseType("requestType=" + me.getRequestType() + "\nheaderData.message="
                 + headerInfo.getMessage() + "\nheaderData.getOriginator=" + headerInfo.getOriginator());
@@ -47,7 +46,6 @@ public class HeaderTesterImpl implements HeaderTester {
     }
 
     public InoutHeaderResponse inoutHeader(InoutHeader me, Holder<SOAPHeaderData> headerInfo) {
-        // TODO Auto-generated method stub
         InoutHeaderResponse resp = new InoutHeaderResponse();
         resp.setResponseType("requestType=" + me.getRequestType());
         if (headerInfo.value != null) {

@@ -404,7 +404,6 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
 
         @Override
         public long getSize(Book arg0, Class<?> arg1, Type arg2, Annotation[] arg3, MediaType arg4) {
-            // TODO Auto-generated method stub
             return 0;
         }
 
@@ -445,7 +444,6 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         @Override
         public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext)
             throws IOException {
-            // TODO Auto-generated method stub
 
         }
 

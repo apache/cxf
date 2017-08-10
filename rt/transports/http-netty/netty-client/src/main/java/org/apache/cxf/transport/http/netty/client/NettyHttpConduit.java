@@ -621,7 +621,6 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
 
     @Override
     public void initComplete() {
-        // TODO Auto-generated method stub
 
     }
 
@@ -634,8 +633,6 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
 
     @Override
     public void preShutdown() {
-        // TODO Auto-generated method stub
-
     }
 
 

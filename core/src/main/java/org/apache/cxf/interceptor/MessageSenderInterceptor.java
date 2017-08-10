@@ -66,7 +66,7 @@ public class MessageSenderInterceptor extends AbstractPhaseInterceptor<Message> 
         }
     }
 
-    public static Conduit getConduit(Message message) {
+    public static Conduit getConduit(Message message) throws IOException {
         Exchange exchange = message.getExchange();
         Conduit conduit = exchange.getConduit(message);
         if (conduit == null

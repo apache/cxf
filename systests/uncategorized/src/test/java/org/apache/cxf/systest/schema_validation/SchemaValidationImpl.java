@@ -94,7 +94,6 @@ public class SchemaValidationImpl implements SchemaValidation {
 
     public SomeResponseWithHeader doSomethingWithHeader(SomeRequestWithHeader in,
                                                         SomeHeader inHeader) {
-        // TODO Auto-generated method stub
         return null;
     }
 }

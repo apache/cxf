@@ -131,7 +131,6 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
                     }
 
                     public OutputStream getOutputStream() throws IOException {
-                        // TODO Auto-generated method stub
                         return null;
                     }
 

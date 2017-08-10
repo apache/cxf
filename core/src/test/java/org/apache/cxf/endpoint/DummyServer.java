@@ -30,12 +30,10 @@ public class DummyServer implements Server {
     }
 
     public Destination getDestination() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public Endpoint getEndpoint() {
-        // TODO Auto-generated method stub
         return null;
     }
 

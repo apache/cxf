@@ -1453,103 +1453,84 @@ public class JAXBElementProviderTest extends Assert {
 
         @SuppressWarnings("rawtypes")
         public <A extends XmlAdapter> A getAdapter(Class<A> type) {
-            // TODO Auto-generated method stub
             return null;
         }
 
         public AttachmentMarshaller getAttachmentMarshaller() {
-            // TODO Auto-generated method stub
             return null;
         }
 
         public ValidationEventHandler getEventHandler() throws JAXBException {
-            // TODO Auto-generated method stub
             return null;
         }
 
         public Listener getListener() {
-            // TODO Auto-generated method stub
             return null;
         }
 
         public Node getNode(Object contentTree) throws JAXBException {
-            // TODO Auto-generated method stub
             return null;
         }
 
         public Object getProperty(String name) throws PropertyException {
-            // TODO Auto-generated method stub
             return null;
         }
 
         public Schema getSchema() {
-            // TODO Auto-generated method stub
             return null;
         }
 
         public void marshal(Object jaxbElement, Result result) throws JAXBException {
-            // TODO Auto-generated method stub
-
+    
         }
 
         public void marshal(Object jaxbElement, OutputStream os) throws JAXBException {
         }
 
         public void marshal(Object jaxbElement, File output) throws JAXBException {
-            // TODO Auto-generated method stub
-
+    
         }
 
         public void marshal(Object jaxbElement, Writer writer) throws JAXBException {
-            // TODO Auto-generated method stub
-
+    
         }
 
         public void marshal(Object jaxbElement, ContentHandler handler) throws JAXBException {
-            // TODO Auto-generated method stub
-
+    
         }
 
         public void marshal(Object jaxbElement, Node node) throws JAXBException {
-            // TODO Auto-generated method stub
-
+    
         }
 
         public void marshal(Object jaxbElement, XMLStreamWriter writer) throws JAXBException {
-            // TODO Auto-generated method stub
-
+    
         }
 
         public void marshal(Object jaxbElement, XMLEventWriter writer) throws JAXBException {
-            // TODO Auto-generated method stub
-
+    
         }
 
         @SuppressWarnings("rawtypes")
         public void setAdapter(XmlAdapter adapter) {
-            // TODO Auto-generated method stub
-
+    
         }
 
         @SuppressWarnings("rawtypes")
         public <A extends XmlAdapter> void setAdapter(Class<A> type, A adapter) {
-            // TODO Auto-generated method stub
-
+    
         }
 
         public void setAttachmentMarshaller(AttachmentMarshaller am) {
-            // TODO Auto-generated method stub
-
+    
         }
 
         public void setEventHandler(ValidationEventHandler handler) throws JAXBException {
-            // TODO Auto-generated method stub
-
+    
         }
 
         public void setListener(Listener listener) {
-            // TODO Auto-generated method stub
-
+    
         }
 
         public void setProperty(String name, Object value) throws PropertyException {
@@ -1558,8 +1539,7 @@ public class JAXBElementProviderTest extends Assert {
         }
 
         public void setSchema(Schema schema) {
-            // TODO Auto-generated method stub
-
+    
         }
 
     }

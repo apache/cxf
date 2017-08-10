@@ -823,7 +823,6 @@ public class ProviderFactoryTest extends Assert {
     private static class TestRuntimeExceptionMapper implements ExceptionMapper<RuntimeException> {
 
         public Response toResponse(RuntimeException exception) {
-            // TODO Auto-generated method stub
             return null;
         }
 
@@ -842,13 +841,11 @@ public class ProviderFactoryTest extends Assert {
         public Book readFrom(Class<Book> arg0, Type arg1, Annotation[] arg2,
                              MediaType arg3, MultivaluedMap<String, String> arg4, InputStream arg5)
             throws IOException, WebApplicationException {
-            // TODO Auto-generated method stub
             return null;
         }
 
         public long getSize(Book t, Class<?> type, Type genericType, Annotation[] annotations,
                             MediaType mediaType) {
-            // TODO Auto-generated method stub
             return 0;
         }
 
@@ -860,7 +857,6 @@ public class ProviderFactoryTest extends Assert {
         public void writeTo(Book arg0, Class<?> arg1, Type arg2, Annotation[] arg3,
                             MediaType arg4, MultivaluedMap<String, Object> arg5, OutputStream arg6)
             throws IOException, WebApplicationException {
-            // TODO Auto-generated method stub
 
         }
     }
@@ -878,13 +874,11 @@ public class ProviderFactoryTest extends Assert {
         public SuperBook readFrom(Class<SuperBook> arg0, Type arg1, Annotation[] arg2, MediaType arg3,
                                   MultivaluedMap<String, String> arg4, InputStream arg5)
             throws IOException, WebApplicationException {
-            // TODO Auto-generated method stub
             return null;
         }
 
         public long getSize(SuperBook t, Class<?> type, Type genericType,
                             Annotation[] annotations, MediaType mediaType) {
-            // TODO Auto-generated method stub
             return 0;
         }
 
@@ -896,7 +890,6 @@ public class ProviderFactoryTest extends Assert {
         public void writeTo(SuperBook arg0, Class<?> arg1, Type arg2,
                             Annotation[] arg3, MediaType arg4, MultivaluedMap<String, Object> arg5,
                             OutputStream arg6) throws IOException, WebApplicationException {
-            // TODO Auto-generated method stub
 
         }
 
@@ -915,13 +908,11 @@ public class ProviderFactoryTest extends Assert {
         public T readFrom(Class<T> arg0, Type arg1, Annotation[] arg2, MediaType arg3,
                           MultivaluedMap<String, String> arg4, InputStream arg5)
             throws IOException, WebApplicationException {
-            // TODO Auto-generated method stub
             return null;
         }
 
         public long getSize(T t, Class<?> type, Type genericType,
                             Annotation[] annotations, MediaType mediaType) {
-            // TODO Auto-generated method stub
             return 0;
         }
 
@@ -935,7 +926,6 @@ public class ProviderFactoryTest extends Assert {
                             MediaType mediaType, MultivaluedMap<String, Object> httpHeaders,
                             OutputStream entityStream)
             throws IOException, WebApplicationException {
-            // TODO Auto-generated method stub
         }
 
     }
@@ -952,7 +942,6 @@ public class ProviderFactoryTest extends Assert {
         public Object readFrom(Class<Object> arg0, Type arg1, Annotation[] arg2, MediaType arg3,
                                   MultivaluedMap<String, String> arg4, InputStream arg5)
             throws IOException, WebApplicationException {
-            // TODO Auto-generated method stub
             return null;
         }
 
@@ -969,7 +958,6 @@ public class ProviderFactoryTest extends Assert {
         public Object readFrom(Class<Object> arg0, Type arg1, Annotation[] arg2, MediaType arg3,
                                   MultivaluedMap<String, String> arg4, InputStream arg5)
             throws IOException, WebApplicationException {
-            // TODO Auto-generated method stub
             return null;
         }
 
@@ -989,7 +977,6 @@ public class ProviderFactoryTest extends Assert {
         implements ExceptionMapper<T> {
 
         public Response toResponse(T arg0) {
-            // TODO Auto-generated method stub
             return null;
         }
 
@@ -1008,19 +995,16 @@ public class ProviderFactoryTest extends Assert {
         public Object readFrom(Class<Object> arg0, Type arg1, Annotation[] arg2, MediaType arg3,
                                MultivaluedMap<String, String> arg4, InputStream arg5) throws IOException,
             WebApplicationException {
-            // TODO Auto-generated method stub
             return null;
         }
 
         @Override
         public long getSize(Object arg0, Class<?> arg1, Type arg2, Annotation[] arg3, MediaType arg4) {
-            // TODO Auto-generated method stub
             return 0;
         }
 
         @Override
         public boolean isWriteable(Class<?> arg0, Type arg1, Annotation[] arg2, MediaType arg3) {
-            // TODO Auto-generated method stub
             return false;
         }
 
@@ -1028,7 +1012,6 @@ public class ProviderFactoryTest extends Assert {
         public void writeTo(Object arg0, Class<?> arg1, Type arg2, Annotation[] arg3, MediaType arg4,
                             MultivaluedMap<String, Object> arg5, OutputStream arg6) throws IOException,
             WebApplicationException {
-            // TODO Auto-generated method stub
 
         }
     }

@@ -75,18 +75,12 @@ public class NodeDataReader implements DataReader<Node> {
     }
 
     public void setSchema(Schema s) {
-        // TODO Auto-generated method stub
-
     }
 
     public void setAttachments(Collection<Attachment> attachments) {
-        // TODO Auto-generated method stub
-
     }
 
     public void setProperty(String prop, Object value) {
-        // TODO Auto-generated method stub
-
     }
 
 }

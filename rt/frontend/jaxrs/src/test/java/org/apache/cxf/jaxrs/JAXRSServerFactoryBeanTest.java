@@ -68,7 +68,6 @@ public class JAXRSServerFactoryBeanTest extends Assert {
     private static class CustomExceptionMapper implements ExceptionMapper<Exception> {
 
         public Response toResponse(Exception exception) {
-            // TODO Auto-generated method stub
             return null;
         }
 
@@ -77,7 +76,6 @@ public class JAXRSServerFactoryBeanTest extends Assert {
     private static class RuntimeExceptionMapper implements ExceptionMapper<RuntimeException> {
 
         public Response toResponse(RuntimeException exception) {
-            // TODO Auto-generated method stub
             return null;
         }
 

@@ -146,7 +146,6 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
                 webSockethandler.setServer(server);
                 webSockethandler.start();
             } catch (Exception e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
             webSocketFactory = webSockethandler.getWebSocketFactory();

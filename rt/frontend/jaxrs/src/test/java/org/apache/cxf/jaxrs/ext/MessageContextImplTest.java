@@ -221,7 +221,6 @@ public class MessageContextImplTest extends Assert {
     public static class CustomContextResolver implements ContextResolver<JAXBContext> {
 
         public JAXBContext getContext(Class<?> type) {
-            // TODO Auto-generated method stub
             return null;
         }
 

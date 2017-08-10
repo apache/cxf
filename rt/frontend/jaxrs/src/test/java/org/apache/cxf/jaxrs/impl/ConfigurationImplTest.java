@@ -52,7 +52,6 @@ public class ConfigurationImplTest extends Assert {
         @Override
         public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
             throws IOException {
-            // TODO Auto-generated method stub
 
         }
 

@@ -96,13 +96,11 @@ public class GreeterSessionImpl implements Greeter {
 
 
     public Future<?> greetMeAsync(String requestType, AsyncHandler<GreetMeResponse> asyncHandler) {
-        // TODO Auto-generated method stub
         return null;
     }
 
 
     public Response<GreetMeResponse> greetMeAsync(String requestType) {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -129,25 +127,21 @@ public class GreeterSessionImpl implements Greeter {
 
 
     public Future<?> pingMeAsync(AsyncHandler<PingMeResponse> asyncHandler) {
-        // TODO Auto-generated method stub
         return null;
     }
 
 
     public Response<PingMeResponse> pingMeAsync() {
-        // TODO Auto-generated method stub
         return null;
     }
 
 
     public Future<?> sayHiAsync(AsyncHandler<SayHiResponse> asyncHandler) {
-        // TODO Auto-generated method stub
         return null;
     }
 
 
     public Response<SayHiResponse> sayHiAsync() {
-        // TODO Auto-generated method stub
         return null;
     }
 

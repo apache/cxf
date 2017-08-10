@@ -514,7 +514,6 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
 
         @Override
         public String marshal(CustomerBean v) throws Exception {
-            // TODO Auto-generated method stub
             return null;
         }
 
@@ -546,7 +545,6 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
 
         @Override
         public ABean marshal(CustomerBean v) throws Exception {
-            // TODO Auto-generated method stub
             return null;
         }
 

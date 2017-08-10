@@ -333,7 +333,6 @@ public class WebClientTest extends Assert {
 
         @Override
         public ComplexObject fromString(String value) throws IllegalArgumentException {
-            // TODO Auto-generated method stub
             return null;
         }
 

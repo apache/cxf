@@ -198,7 +198,6 @@ public class JAXRSUtilsTest extends Assert {
         sf.setServiceBeanObjects(customer);
         sf.setProvider(new ContextProvider<CustomerContext>() {
             public CustomerContext createContext(Message message) {
-                // TODO Auto-generated method stub
                 return contextImpl;
             }
         });
@@ -2112,7 +2111,6 @@ public class JAXRSUtilsTest extends Assert {
 
         @Override
         public String toString(MyType<Integer> value) {
-            // TODO Auto-generated method stub
             return null;
         }
 
@@ -2135,7 +2133,6 @@ public class JAXRSUtilsTest extends Assert {
 
         @Override
         public String toString(Locale arg0) throws IllegalArgumentException {
-            // TODO Auto-generated method stub
             return null;
         }
 
@@ -2159,7 +2156,6 @@ public class JAXRSUtilsTest extends Assert {
 
         @Override
         public String toString(Query<String> arg0) throws IllegalArgumentException {
-            // TODO Auto-generated method stub
             return null;
         }
 

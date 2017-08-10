@@ -539,7 +539,6 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
 
         @Override
         public void failed(Throwable arg0) {
-            // TODO Auto-generated method stub
 
         }
 
@@ -558,7 +557,6 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
 
         @Override
         public void failed(Throwable arg0) {
-            // TODO Auto-generated method stub
 
         }
 

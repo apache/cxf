@@ -85,32 +85,26 @@ public class TwoWayJMSImplBase implements HelloWorldPortType {
     }
 
     public Response<String> greetMeAsync(String stringParam0) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public Future<?> greetMeAsync(String stringParam0, AsyncHandler<String> asyncHandler) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public Response<String> sayHiAsync() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public Future<?> sayHiAsync(AsyncHandler<String> asyncHandler) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public Response<TestRpcLitFaultResponse> testRpcLitFaultAsync(String in) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public Future<?> testRpcLitFaultAsync(String in, AsyncHandler<TestRpcLitFaultResponse> asyncHandler) {
-        // TODO Auto-generated method stub
         return null;
     }
 

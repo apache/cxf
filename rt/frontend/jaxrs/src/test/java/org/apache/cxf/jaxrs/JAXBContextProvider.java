@@ -27,7 +27,6 @@ import javax.xml.bind.JAXBContext;
 public class JAXBContextProvider implements ContextResolver<JAXBContext> {
 
     public JAXBContext getContext(Class<?> type) {
-        // TODO Auto-generated method stub
         return null;
     }
 

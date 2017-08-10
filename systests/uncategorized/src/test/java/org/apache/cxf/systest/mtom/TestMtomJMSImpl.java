@@ -36,7 +36,6 @@ import org.apache.cxf.mime.types.XopStringType;
 public class TestMtomJMSImpl implements TestMtom {
 
     public void testXop(Holder<String> name, Holder<DataHandler> attachinfo) {
-        // TODO Auto-generated method stub
         name.value = "return detail + " + name.value;
     }
 

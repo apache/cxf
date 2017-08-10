@@ -106,7 +106,6 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
 
     @Override
     public String getCharacterEncoding() {
-        // TODO Auto-generated method stub
         LOG.log(Level.FINE, "getCharacterEncoding()");
         return null;
     }
@@ -191,7 +190,6 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
 
     @Override
     public String getParameter(String name) {
-        // TODO Auto-generated method stub
         if (LOG.isLoggable(Level.FINE)) {
             LOG.log(Level.FINE, "getParameter({0})", name);
         }
@@ -200,21 +198,18 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
 
     @Override
     public Map<String, String[]> getParameterMap() {
-        // TODO Auto-generated method stub
         LOG.log(Level.FINE, "getParameterMap()");
         return null;
     }
 
     @Override
     public Enumeration<String> getParameterNames() {
-        // TODO Auto-generated method stub
         LOG.log(Level.FINE, "getParameterNames()");
         return null;
     }
 
     @Override
     public String[] getParameterValues(String name) {
-        // TODO Auto-generated method stub
         if (LOG.isLoggable(Level.FINE)) {
             LOG.log(Level.FINE, "getParameterValues({0})", name);
         }
@@ -235,7 +230,6 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
 
     @Override
     public String getRealPath(String path) {
-        // TODO Auto-generated method stub
         LOG.log(Level.FINE, "getRealPath");
         return null;
     }
@@ -260,7 +254,6 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
 
     @Override
     public RequestDispatcher getRequestDispatcher(String path) {
-        // TODO Auto-generated method stub
         LOG.log(Level.FINE, "getRequestDispatcher");
         return null;
     }
@@ -332,14 +325,12 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
 
     @Override
     public AsyncContext startAsync(ServletRequest servletRequest, ServletResponse servletResponse) {
-        // TODO Auto-generated method stub
         LOG.log(Level.FINE, "startAsync");
         return null;
     }
 
     @Override
     public boolean authenticate(HttpServletResponse servletResponse) throws IOException, ServletException {
-        // TODO Auto-generated method stub
         LOG.log(Level.FINE, "authenticate");
         return false;
     }

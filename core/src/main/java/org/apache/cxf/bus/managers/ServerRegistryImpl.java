@@ -76,8 +76,6 @@ public class ServerRegistryImpl implements ServerRegistry, BusLifeCycleListener 
     }
 
     public void initComplete() {
-        // TODO Auto-generated method stub
-
     }
 
     @PreDestroy

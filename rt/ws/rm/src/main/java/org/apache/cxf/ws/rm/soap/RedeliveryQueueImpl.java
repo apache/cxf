@@ -224,7 +224,6 @@ public class RedeliveryQueueImpl implements RedeliveryQueue {
 
 
     public void start() {
-        // TODO Auto-generated method stub
 
     }
 

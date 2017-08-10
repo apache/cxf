@@ -31,33 +31,27 @@ import org.apache.hello_world_xml_http.bare.types.MyComplexStructType;
 public class GreeterImpl implements Greeter {
 
     public String greetMe(String me) {
-        // TODO Auto-generated method stub
         return "Hello " + me;
     }
 
     public String sayHi() {
-        // TODO Auto-generated method stub
         return "Bonjour";
     }
 
     public MyComplexStructType sendReceiveData(MyComplexStructType in) {
-        // TODO Auto-generated method stub
         return in;
     }
 
     public String testMultiParamPart(MyComplexStructType in2, String in1) {
-        // TODO Auto-generated method stub
         in2.setElem1(in1);
         return "Bonjour";
     }
 
     public String testTriPart(MyComplexStructType in1, String in3, String in2) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public String testTriPartNoOrder(String in3, MyComplexStructType in1, String in2) {
-        // TODO Auto-generated method stub
         return null;
     }
 

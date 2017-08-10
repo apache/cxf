@@ -90,20 +90,17 @@ public class DummyBus extends AbstractBasicInterceptorProvider implements Bus {
 
     //    @Override
     public String getId() {
-        // TODO Auto-generated method stub
         return null;
     }
 
 
     public <T> T getConfiguration(AbstractPropertiesHolder props, T defaultValue, Class<T> type) {
-        // TODO Auto-generated method stub
         return null;
     }
 
 
     //    @Override
     public void run() {
-        // TODO Auto-generated method stub
 
     }
 
@@ -142,7 +139,6 @@ public class DummyBus extends AbstractBasicInterceptorProvider implements Bus {
 
 
     public Collection<Feature> getFeatures() {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -151,17 +147,14 @@ public class DummyBus extends AbstractBasicInterceptorProvider implements Bus {
     }
 
     public void setId(String i) {
-        // TODO Auto-generated method stub
 
     }
 
     public void setProperties(Map<String, Object> properties) {
-        // TODO Auto-generated method stub
 
     }
 
     public void setFeatures(Collection<? extends Feature> features) {
-        // TODO Auto-generated method stub
 
     }
 

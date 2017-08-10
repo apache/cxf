@@ -352,12 +352,10 @@ public abstract class AbstractDOMStreamReader<T, I> implements XMLStreamReader {
     }
 
     public boolean standaloneSet() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     public String getCharacterEncodingScheme() {
-        // TODO Auto-generated method stub
         return null;
     }
 }

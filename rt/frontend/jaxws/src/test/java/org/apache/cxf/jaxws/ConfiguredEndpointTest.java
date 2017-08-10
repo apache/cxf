@@ -371,7 +371,6 @@ public class ConfiguredEndpointTest extends Assert {
         }
 
         public void handleMessage(Message message) throws Fault {
-            // TODO Auto-generated method stub
         }
     }
 }

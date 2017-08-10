@@ -186,7 +186,6 @@ public class AnotherDerivedGreeterImpl implements GreeterEndpointInterface {
     }
 
     public String testNillable(String nillElem, int intElem) {
-        // TODO Auto-generated method stub
         return null;
     }
 

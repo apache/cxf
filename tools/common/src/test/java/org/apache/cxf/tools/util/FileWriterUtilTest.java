@@ -54,7 +54,6 @@ public class FileWriterUtilTest extends Assert {
             String path = targetDir.getAbsolutePath() + packPath;
             assertNotNull(new File(path).getName());
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } finally {
             cleanDir(targetDir);
@@ -73,7 +72,6 @@ public class FileWriterUtilTest extends Assert {
             fileWriter = new FileWriterUtil(targetDir.getAbsolutePath(), null);
             assertNotNull(fileWriter.getWriter("com.iona.test.SAMPLE", "A.java"));
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } finally {
             cleanDir(targetDir);

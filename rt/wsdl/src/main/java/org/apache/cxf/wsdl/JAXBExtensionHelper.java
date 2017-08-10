@@ -286,7 +286,6 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
     public void marshall(@SuppressWarnings("rawtypes") Class parent, QName qname,
                          ExtensibilityElement obj, PrintWriter pw,
                          final Definition wsdl, ExtensionRegistry registry) throws WSDLException {
-        // TODO Auto-generated method stub
         try {
             Marshaller u = createMarshaller();
             u.setProperty("jaxb.encoding", StandardCharsets.UTF_8.name());

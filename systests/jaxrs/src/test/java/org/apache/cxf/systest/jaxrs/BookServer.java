@@ -264,8 +264,6 @@ public class BookServer extends AbstractBusTestServerBase {
         @Override
         public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext)
             throws IOException {
-            // TODO Auto-generated method stub
-
         }
 
     }

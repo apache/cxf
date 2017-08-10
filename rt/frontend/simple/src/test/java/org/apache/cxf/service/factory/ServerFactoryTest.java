@@ -116,27 +116,22 @@ public class ServerFactoryTest extends AbstractSimpleFrontendTest {
     public static class CustomDestination implements Destination {
 
         public EndpointReferenceType getAddress() {
-            // TODO Auto-generated method stub
             return null;
         }
 
         public Conduit getBackChannel(Message inMessage) throws IOException {
-            // TODO Auto-generated method stub
             return null;
         }
 
         public void shutdown() {
-            // TODO Auto-generated method stub
 
         }
 
         public void setMessageObserver(MessageObserver observer) {
-            // TODO Auto-generated method stub
 
         }
 
         public MessageObserver getMessageObserver() {
-            // TODO Auto-generated method stub
             return null;
         }
 

@@ -49,7 +49,6 @@ public class A implements B {
 
     @Override
     public String hello() {
-        // TODO Auto-generated method stub
         return null;
     }
 }

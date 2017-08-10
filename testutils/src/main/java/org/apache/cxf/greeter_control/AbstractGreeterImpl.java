@@ -86,12 +86,10 @@ public class AbstractGreeterImpl implements Greeter {
     }
 
     public Future<?> greetMeAsync(String arg0, AsyncHandler<GreetMeResponse> arg1) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public Response<GreetMeResponse> greetMeAsync(String arg0) {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -115,27 +113,22 @@ public class AbstractGreeterImpl implements Greeter {
     }
 
     public Response<PingMeResponse> pingMeAsync() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public Future<?> pingMeAsync(AsyncHandler<PingMeResponse> arg0) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public String sayHi() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public Response<SayHiResponse> sayHiAsync() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public Future<?> sayHiAsync(AsyncHandler<SayHiResponse> arg0) {
-        // TODO Auto-generated method stub
         return null;
     }
 
