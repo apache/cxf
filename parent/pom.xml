@@ -81,6 +81,7 @@
         <cxf.commons-codec.version>1.10</cxf.commons-codec.version>
         <cxf.commons-collections.version>3.2.2</cxf.commons-collections.version>
         <cxf.commons-lang3.version>3.6</cxf.commons-lang3.version>
+        <cxf.commons-text.version>1.1</cxf.commons-text.version>
         <cxf.derby.version>10.13.1.1</cxf.derby.version>
         <cxf.dropwizard.version>3.2.0</cxf.dropwizard.version>
         <cxf.ehcache.version>2.10.3</cxf.ehcache.version>
@@ -1712,6 +1713,11 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>${cxf.commons-lang3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-text</artifactId>
+                <version>${cxf.commons-text.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.bouncycastle</groupId>

@@ -404,6 +404,7 @@
         <feature version="${project.version}">cxf-jaxws</feature>
         <feature version="${project.version}">cxf-javascript</feature>
         <bundle start-level="35" dependency="true">mvn:org.apache.commons/commons-lang3/${cxf.commons-lang3.version}</bundle>
+        <bundle start-level="35" dependency="true">mvn:org.apache.commons/commons-text/${cxf.commons-text.version}</bundle>
         <bundle dependency="true">wrap:mvn:org.apache.velocity/velocity-engine-core/${cxf.velocity.version}</bundle>
         <bundle dependency="true">mvn:commons-collections/commons-collections/${cxf.commons-collections.version}</bundle>
         <bundle>mvn:org.apache.cxf/cxf-tools-common/${project.version}</bundle>
