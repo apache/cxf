@@ -203,12 +203,10 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
                 um = context.createUnmarshaller();
                 return um.unmarshal(reader, EndpointReferenceType.class).getValue();
             } catch (JAXBException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                throw new IllegalArgumentException("Could not unmarshal EndpointReference", e);
             } finally {
                 JAXBUtils.closeUnmarshaller(um);
             }
-            return null;
         }
         return null;
     }

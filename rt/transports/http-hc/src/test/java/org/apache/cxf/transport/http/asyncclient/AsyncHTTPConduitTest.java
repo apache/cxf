@@ -197,10 +197,8 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
                 try {
                     res.get().getResponseType();
                 } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 } catch (ExecutionException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             }
@@ -292,10 +290,8 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
                             System.out.println("Problem " + c + " != " + s);
                         }
                     } catch (InterruptedException e) {
-                        // TODO Auto-generated catch block
                         e.printStackTrace();
                     } catch (ExecutionException e) {
-                        // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
                     wdone[c] = true;

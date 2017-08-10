@@ -116,7 +116,7 @@ public class CatalogWSDLLocator implements WSDLLocator {
             in = this.resolver.resolve(resolvedImportLocation, null);
         }
 
-        // XXX: If we return null (as per javadoc), a NPE is raised in WSDL4J code.
+        // If we return null (as per javadoc), a NPE is raised in WSDL4J code.
         // So let's return new InputSource() and let WSDL4J fail. Optionally,
         // we can throw a similar exception as in CatalogXmlSchemaURIResolver.
         if (in == null) {

@@ -284,8 +284,7 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
             PortComponentHandlerType pt = JAXBUtils.unmarshall(ctx, el, PortComponentHandlerType.class).getValue();
             chain.addAll(buildHandlerChain(pt, classLoader));
         } catch (JAXBException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new IllegalArgumentException("Could not unmarshal handler chain", e);
         }
     }
 
