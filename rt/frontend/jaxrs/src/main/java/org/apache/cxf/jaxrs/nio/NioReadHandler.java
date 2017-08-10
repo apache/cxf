@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.jaxrs.nio;
 
+import java.io.IOException;
+
 /**
  * Class NioReader.
  */
@@ -30,6 +32,6 @@ public interface NioReadHandler {
      *
      * @param in input stream.
      */
-    void read(NioInputStream in);
+    void read(NioInputStream in) throws IOException;
 }
 

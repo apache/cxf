@@ -22,6 +22,10 @@ public final class NioWriteEntity {
     private final NioWriteHandler writer;
     private final NioErrorHandler error;
 
+    public NioWriteEntity(final NioWriteHandler writer) {
+        this(writer, null);
+    }
+    
     public NioWriteEntity(final NioWriteHandler writer, final NioErrorHandler error) {
         this.writer = writer;
         this.error = error;

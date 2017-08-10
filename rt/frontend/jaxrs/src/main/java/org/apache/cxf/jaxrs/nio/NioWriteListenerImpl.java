@@ -53,7 +53,11 @@ public final class NioWriteListenerImpl implements WriteListener {
     @Override
     public void onError(Throwable t) {
         try {
-            entity.getError().error(t);
+            if (entity.getError() != null) {
+                entity.getError().error(t);
+            } else {
+                throw t;
+            }
         } catch (final Throwable ex) {
             LOG.warning("NIO WriteListener error: " + ExceptionUtils.getStackTrace(ex));
         } finally {

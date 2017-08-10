@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.jaxrs.nio;
 
+import java.io.IOException;
+
 /**
  * Class NioWriterHandler.
  */
@@ -29,6 +31,6 @@ public interface NioWriteHandler {
      * @param out output stream.
      * @return {@code true} if there is more data to write, {@code false} otherwise.
      */
-    boolean write(NioOutputStream out);
+    boolean write(NioOutputStream out) throws IOException;
 }
 
