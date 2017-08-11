@@ -896,7 +896,7 @@ public final class ResourceUtils {
     public static Object createProviderInstance(Class<?> cls) {
         try {
             Constructor<?> c = ResourceUtils.findResourceConstructor(cls, false);
-            if (c.getParameterTypes().length == 0) {
+            if (c != null && c.getParameterTypes().length == 0) {
                 return c.newInstance();
             }
             return c;

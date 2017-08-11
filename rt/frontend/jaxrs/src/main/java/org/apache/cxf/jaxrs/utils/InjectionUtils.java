@@ -929,12 +929,12 @@ public final class InjectionUtils {
             realGenericType = realType;
         } else {
             Type[] types = getActualTypes(genericType);
-            if (types.length == 0 || !(types[0] instanceof ParameterizedType)) {
+            if (types == null || types.length == 0 || !(types[0] instanceof ParameterizedType)) {
                 realType = getActualType(genericType);
                 realGenericType = realType;
             } else {
                 realType = getRawType(types[0]);
-                realGenericType = types[0] == realType ? realType : types[0];
+                realGenericType = types[0];
             }
         }
         Object theValues = null;

@@ -339,7 +339,8 @@ public final class JAXRSUtils {
                 if (cris.isEmpty()) {
                     firstCri = cri;
                     cris.put(cri, entry.getValue());
-                } else if (URITemplate.compareTemplates(firstCri.getURITemplate(), cri.getURITemplate()) == 0) {
+                } else if (firstCri != null
+                        && URITemplate.compareTemplates(firstCri.getURITemplate(), cri.getURITemplate()) == 0) {
                     cris.put(cri, entry.getValue());
                 } else {
                     break;
@@ -1550,8 +1551,10 @@ public final class JAXRSUtils {
                     String subTypeBeforePlus1 = splitMediaSubType(subType1, false);
                     String subTypeBeforePlus2 = splitMediaSubType(subType2, false);
                     nullPossible = subTypeBeforePlus1 == null || subTypeBeforePlus2 == null;
-                    isCompatible = subTypeBeforePlus1 == null && subTypeBeforePlus2.equals(subType1)
-                        || subTypeBeforePlus2 == null && subTypeBeforePlus1.equals(subType2);
+                    isCompatible = subTypeBeforePlus1 == null && subTypeBeforePlus2 != null
+                            && subTypeBeforePlus2.equals(subType1)
+                            || subTypeBeforePlus2 == null && subTypeBeforePlus1 != null
+                            && subTypeBeforePlus1.equals(subType2);
                     if (!isCompatible && !nullPossible) {
                         isCompatible = subTypeBeforePlus1.equalsIgnoreCase(subTypeBeforePlus2)
                             && (subType1.charAt(subType1.length() - 1) == '*'
@@ -1569,7 +1572,7 @@ public final class JAXRSUtils {
                     String subTypeBeforePlus1 = splitMediaSubType(subType1, false);
                     String subTypeBeforePlus2 = splitMediaSubType(subType2, false);
 
-                    isCompatible = subTypeBeforePlus1.equalsIgnoreCase(subTypeBeforePlus2)
+                    isCompatible = subTypeBeforePlus1 != null && subTypeBeforePlus1.equalsIgnoreCase(subTypeBeforePlus2)
                         && (subType1.charAt(subType1.length() - 1) == '*'
                             || subType2.charAt(subType2.length() - 1) == '*');
                 }
