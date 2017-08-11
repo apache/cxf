@@ -25,7 +25,6 @@ import java.util.UUID;
 import org.apache.cxf.xkms.handlers.Applications;
 import org.apache.cxf.xkms.handlers.XKMSConstants;
 import org.apache.cxf.xkms.itests.BasicIntegrationTest;
-import org.apache.cxf.xkms.model.extensions.ResultDetails;
 import org.apache.cxf.xkms.model.xkms.LocateRequestType;
 import org.apache.cxf.xkms.model.xkms.LocateResultType;
 import org.apache.cxf.xkms.model.xkms.MessageAbstractType;
@@ -102,8 +101,6 @@ public class XKMSServiceTest extends BasicIntegrationTest {
                             result.getResultMajor());
         Assert.assertEquals(ResultMinorEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_FAILURE.value(),
                             result.getResultMinor());
-        ResultDetails message = (ResultDetails)result.getMessageExtension().get(0);
-        Assert.assertEquals("org.apache.cxf.xkms.model.xkms.PrototypeKeyBindingType must be set", message.getDetails());
     }
 
     @Test
