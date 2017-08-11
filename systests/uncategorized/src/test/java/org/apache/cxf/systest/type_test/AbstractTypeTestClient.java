@@ -1028,26 +1028,16 @@ public abstract class AbstractTypeTestClient
         if (!shouldRunTest("NMTOKENS")) {
             return;
         }
-        //
-        // XXX - The jaxb ri code generation produces different method
+
+        // The jaxb ri code generation produces different method
         // signatures for the NMTOKENS type between using rpc literal
         // and doc literal styles.
-        //
-        if (testDocLiteral) {
+        if (testDocLiteral || testXMLBinding) {
             List<String> x = Arrays.asList("123:abc");
             List<String> yOrig = Arrays.asList("abc.-_:", "a");
             Holder<List<String>> y = new Holder<List<String>>(yOrig);
             Holder<List<String>> z = new Holder<List<String>>();
-            List<String> ret = docClient.testNMTOKENS(x, y, z);
-            assertTrue("testNMTOKENS(): Incorrect value for inout param", x.equals(y.value));
-            assertTrue("testNMTOKENS(): Incorrect value for out param", yOrig.equals(z.value));
-            assertTrue("testNMTOKENS(): Incorrect return value", x.equals(ret));
-        } else if (testXMLBinding) {
-            List<String> x = Arrays.asList("123:abc");
-            List<String> yOrig = Arrays.asList("abc.-_:", "a");
-            Holder<List<String>> y = new Holder<List<String>>(yOrig);
-            Holder<List<String>> z = new Holder<List<String>>();
-            List<String> ret = xmlClient.testNMTOKENS(x, y, z);
+            List<String> ret = testXMLBinding ? xmlClient.testNMTOKENS(x, y, z) : docClient.testNMTOKENS(x, y, z);
             assertTrue("testNMTOKENS(): Incorrect value for inout param", x.equals(y.value));
             assertTrue("testNMTOKENS(): Incorrect value for out param", yOrig.equals(z.value));
             assertTrue("testNMTOKENS(): Incorrect return value", x.equals(ret));

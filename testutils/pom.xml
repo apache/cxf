@@ -133,6 +133,7 @@
                                 <mkdir dir="${generated.src.test}/org/apache/cxf/systest/type_test" />
                                 <xslt style="${test.resources.dir}/wsdl/type_test/type_test_impl_java.xsl" in="${test.resources.dir}/wsdl/type_test/type_test.xsd" out="${generated.src.test}/org/apache/cxf/systest/type_test/TypeTestImpl.java" />
                                 <xslt style="${test.resources.dir}/wsdl/type_test/type_test_tester_java.xsl" in="${test.resources.dir}/wsdl/type_test/type_test.xsd" out="${generated.src.test}/org/apache/cxf/systest/type_test/TypeTestTester.java" />
+                                <xslt style="${test.resources.dir}/wsdl/type_test/validation.xsl" in="${generated.resources.test}/wsdl/type_test/type_test_1.xsd" out="${generated.resources.test}/wsdl/type_test/type_test_1_validation.xsd" />
                             </tasks>
                         </configuration>
                         <goals>

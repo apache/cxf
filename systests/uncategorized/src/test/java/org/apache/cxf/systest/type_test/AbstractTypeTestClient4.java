@@ -24,22 +24,23 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import javax.xml.namespace.QName;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Holder;
 
 import org.apache.type_test.types1.AnonymousType;
-//importorg.apache.type_test.types1.ComplexArray;
-//importorg.apache.type_test.types1.ComplexChoice;
-//importorg.apache.type_test.types1.ComplexStruct;
-//importorg.apache.type_test.types1.DerivedAllBaseAll;
-//importorg.apache.type_test.types1.DerivedAllBaseChoice;
-//importorg.apache.type_test.types1.DerivedAllBaseStruct;
-//importorg.apache.type_test.types1.DerivedChoiceBaseAll;
+import org.apache.type_test.types1.ComplexArray;
+import org.apache.type_test.types1.ComplexChoice;
+import org.apache.type_test.types1.ComplexStruct;
+import org.apache.type_test.types1.DerivedAllBaseAll;
+import org.apache.type_test.types1.DerivedAllBaseChoice;
+import org.apache.type_test.types1.DerivedAllBaseStruct;
+import org.apache.type_test.types1.DerivedChoiceBaseAll;
 import org.apache.type_test.types1.DerivedChoiceBaseArray;
-//importorg.apache.type_test.types1.DerivedChoiceBaseComplex;
+import org.apache.type_test.types1.DerivedChoiceBaseComplex;
 import org.apache.type_test.types1.DerivedEmptyBaseEmptyAll;
-//importorg.apache.type_test.types1.DerivedStructBaseAll;
 import org.apache.type_test.types1.DerivedStructBaseChoice;
 import org.apache.type_test.types1.DerivedStructBaseStruct;
 import org.apache.type_test.types1.EmptyAll;
@@ -49,7 +50,7 @@ import org.apache.type_test.types1.OccuringAll;
 import org.apache.type_test.types1.RecSeqB6918;
 import org.apache.type_test.types1.RestrictedAllBaseAll;
 import org.apache.type_test.types1.RestrictedStructBaseStruct;
-//importorg.apache.type_test.types1.SimpleAll;
+import org.apache.type_test.types1.SimpleAll;
 import org.apache.type_test.types1.SimpleChoice;
 import org.apache.type_test.types1.SimpleStruct;
 import org.apache.type_test.types1.UnboundedArray;
@@ -1133,7 +1134,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
      *  {min occurs} = {max occurs} = 1, and that particle must be part of a
      *  pair which constitutes the {content type} of a complex type definition.
      *
-
+*/
     //org.apache.type_test.types1.ComplexArray
 
     protected boolean equals(ComplexArray x, ComplexArray y) {
@@ -1151,12 +1152,11 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
     }
 
     @Test
-    @Ignore
     public void testComplexArray() throws Exception {
         if (!shouldRunTest("ComplexArray")) {
             return;
         }
-        DerivedChoiceBaseStruct xx = new DerivedChoiceBaseStruct();
+        DerivedAllBaseStruct xx = new DerivedAllBaseStruct();
         //Base
         xx.setVarFloat(3.14f);
         xx.setVarInt(new BigInteger("42"));
@@ -1187,12 +1187,12 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
 
         Holder<ComplexArray> y = new Holder<ComplexArray>(yOrig);
         Holder<ComplexArray> z = new Holder<ComplexArray>();
-        ComplexArray ret;
-        if (testDocLiteral) {
-            ret = docClient.testComplexArray(x, y, z);
-        } else {
-            ret = rpcClient.testComplexArray(x, y, z);
-        }
+        ComplexArray ret = runWithoutValidation((BindingProvider)docClient, () -> {
+            if (testDocLiteral) {
+                return docClient.testComplexArray(x, y, z);
+            }
+            return rpcClient.testComplexArray(x, y, z); 
+        });
 
         if (!perfTestOnly) {
             assertTrue("testComplexArray(): Incorrect value for inout param",
@@ -1204,7 +1204,6 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
     }
 
     //org.apache.type_test.types1.ComplexChoice
-
     protected boolean equals(ComplexChoice x, ComplexChoice y) {
         DerivedChoiceBaseComplex xx = x.getVarDerivedStruct();
         DerivedChoiceBaseComplex yy = y.getVarDerivedStruct();
@@ -1213,6 +1212,19 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
                 && x.getVarFloat().compareTo(y.getVarFloat()) == 0);
     }
 
+    <T> T runWithoutValidation(BindingProvider bp, Supplier<T> r) {
+        Object o = bp.getRequestContext().put("schema-validation-enabled", Boolean.FALSE);
+        try {
+            return r.get();
+        } finally {
+            if (o != null) {
+                bp.getRequestContext().put("schema-validation-enabled", o);
+            } else {
+                bp.getRequestContext().remove("schema-validation-enabled");
+            }
+        }
+    }
+    @Test
     public void testComplexChoice() throws Exception {
         if (!shouldRunTest("ComplexChoice")) {
             return;
@@ -1239,12 +1251,12 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
 
         Holder<ComplexChoice> y = new Holder<ComplexChoice>(yOrig);
         Holder<ComplexChoice> z = new Holder<ComplexChoice>();
-        ComplexChoice ret;
-        if (testDocLiteral) {
-            ret = docClient.testComplexChoice(x, y, z);
-        } else {
-            ret = rpcClient.testComplexChoice(x, y, z);
-        }
+        ComplexChoice ret = runWithoutValidation((BindingProvider)docClient, () -> {
+            if (testDocLiteral) {
+                return docClient.testComplexChoice(x, y, z);
+            }
+            return rpcClient.testComplexChoice(x, y, z); 
+        });
 
         if (!perfTestOnly) {
             assertTrue("testComplexChoice(): Incorrect value for inout param",
@@ -1256,12 +1268,11 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
     }
 
     //org.apache.type_test.types1.ComplexStruct
-
     protected boolean equals(ComplexStruct x, ComplexStruct y) {
         return equals(x.getVarDerivedStruct(), y.getVarDerivedStruct())
             && Float.compare(x.getVarFloat(), y.getVarFloat()) == 0;
     }
-
+    @Test
     public void testComplexStruct() throws Exception {
         if (!shouldRunTest("ComplexStruct")) {
             return;
@@ -1304,12 +1315,12 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
 
         Holder<ComplexStruct> y = new Holder<ComplexStruct>(yOrig);
         Holder<ComplexStruct> z = new Holder<ComplexStruct>();
-        ComplexStruct ret;
-        if (testDocLiteral) {
-            ret = docClient.testComplexStruct(x, y, z);
-        } else {
-            ret = rpcClient.testComplexStruct(x, y, z);
-        }
+        ComplexStruct ret = runWithoutValidation((BindingProvider)docClient, () -> {
+            if (testDocLiteral) {
+                return docClient.testComplexStruct(x, y, z);
+            }
+            return rpcClient.testComplexStruct(x, y, z); 
+        });
 
         if (!perfTestOnly) {
             assertTrue("testComplexStruct(): Incorrect value for inout param",
@@ -1329,7 +1340,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
             || (x.getVarFloatExtExt() != null && y.getVarFloatExtExt() != null
                  && x.getVarFloatExtExt().compareTo(y.getVarFloatExtExt()) == 0));
     }
-
+    @Test
     public void testDerivedChoiceBaseComplex() throws Exception {
         if (!shouldRunTest("DerivedChoiceBaseComplex")) {
             return;
@@ -1364,12 +1375,12 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
 
         Holder<DerivedChoiceBaseComplex> y = new Holder<DerivedChoiceBaseComplex>(yOrig);
         Holder<DerivedChoiceBaseComplex> z = new Holder<DerivedChoiceBaseComplex>();
-        DerivedChoiceBaseComplex ret;
-        if (testDocLiteral) {
-            ret = docClient.testDerivedChoiceBaseComplex(x, y, z);
-        } else {
-            ret = rpcClient.testDerivedChoiceBaseComplex(x, y, z);
-        }
+        DerivedChoiceBaseComplex ret = runWithoutValidation((BindingProvider)docClient, () -> {
+            if (testDocLiteral) {
+                return docClient.testDerivedChoiceBaseComplex(x, y, z);
+            }
+            return rpcClient.testDerivedChoiceBaseComplex(x, y, z); 
+        });
 
         if (!perfTestOnly) {
             assertTrue("testDerivedChoiceBaseComplex(): Incorrect value for inout param",
@@ -1388,7 +1399,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
             && (x.getVarStringExt().equals(y.getVarStringExt()))
             && (x.getAttrString().equals(y.getAttrString()));
     }
-
+    @Test
     public void testDerivedAllBaseAll() throws Exception {
         if (!shouldRunTest("DerivedAllBaseAll")) {
             return;
@@ -1418,12 +1429,12 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
         Holder<DerivedAllBaseAll> y = new Holder<DerivedAllBaseAll>(yOrig);
         Holder<DerivedAllBaseAll> z = new Holder<DerivedAllBaseAll>();
 
-        DerivedAllBaseAll ret;
-        if (testDocLiteral) {
-            ret = docClient.testDerivedAllBaseAll(x, y, z);
-        } else {
-            ret = rpcClient.testDerivedAllBaseAll(x, y, z);
-        }
+        DerivedAllBaseAll ret = runWithoutValidation((BindingProvider)docClient, () -> {
+            if (testDocLiteral) {
+                return docClient.testDerivedAllBaseAll(x, y, z);
+            }
+            return rpcClient.testDerivedAllBaseAll(x, y, z); 
+        });
         if (!perfTestOnly) {
             assertTrue("testDerivedAllBaseAll(): Incorrect value for inout param",
                        equals(x, y.value));
@@ -1441,7 +1452,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
             && x.getVarStringExt().equals(y.getVarStringExt())
             && x.getAttrString().equals(y.getAttrString());
     }
-
+    @Test
     public void testDerivedAllBaseChoice() throws Exception {
         if (!shouldRunTest("DerivedAllBaseChoice")) {
             return;
@@ -1465,12 +1476,12 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
         Holder<DerivedAllBaseChoice> y = new Holder<DerivedAllBaseChoice>(yOrig);
         Holder<DerivedAllBaseChoice> z = new Holder<DerivedAllBaseChoice>();
 
-        DerivedAllBaseChoice ret;
-        if (testDocLiteral) {
-            ret = docClient.testDerivedAllBaseChoice(x, y, z);
-        } else {
-            ret = rpcClient.testDerivedAllBaseChoice(x, y, z);
-        }
+        DerivedAllBaseChoice ret = runWithoutValidation((BindingProvider)docClient, () -> {
+            if (testDocLiteral) {
+                return docClient.testDerivedAllBaseChoice(x, y, z);
+            }
+            return rpcClient.testDerivedAllBaseChoice(x, y, z); 
+        });
         if (!perfTestOnly) {
             assertTrue("testDerivedAllBaseChoice(): Incorrect value for inout param",
                        equals(x, y.value));
@@ -1488,7 +1499,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
             && (x.getVarStringExt().equals(y.getVarStringExt()))
             && (x.getAttrString().equals(y.getAttrString()));
     }
-
+    @Test       
     public void testDerivedAllBaseStruct() throws Exception {
         if (!shouldRunTest("DerivedAllBaseStruct")) {
             return;
@@ -1518,12 +1529,12 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
         Holder<DerivedAllBaseStruct> y = new Holder<DerivedAllBaseStruct>(yOrig);
         Holder<DerivedAllBaseStruct> z = new Holder<DerivedAllBaseStruct>();
 
-        DerivedAllBaseStruct ret;
-        if (testDocLiteral) {
-            ret = docClient.testDerivedAllBaseStruct(x, y, z);
-        } else {
-            ret = rpcClient.testDerivedAllBaseStruct(x, y, z);
-        }
+        DerivedAllBaseStruct ret = runWithoutValidation((BindingProvider)docClient, () -> {
+            if (testDocLiteral) {
+                return docClient.testDerivedAllBaseStruct(x, y, z);
+            }
+            return rpcClient.testDerivedAllBaseStruct(x, y, z); 
+        });
         if (!perfTestOnly) {
             assertTrue("testDerivedAllBaseStruct(): Incorrect value for inout param",
                        equals(x, y.value));
@@ -1547,7 +1558,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
         return equals((SimpleAll)x, (SimpleAll)y)
             && x.getAttrString().equals(y.getAttrString());
     }
-
+    @Test
     public void testDerivedChoiceBaseAll() throws Exception {
         if (!shouldRunTest("DerivedChoiceBaseAll")) {
             return;
@@ -1575,12 +1586,12 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
         Holder<DerivedChoiceBaseAll> y = new Holder<DerivedChoiceBaseAll>(yOrig);
         Holder<DerivedChoiceBaseAll> z = new Holder<DerivedChoiceBaseAll>();
 
-        DerivedChoiceBaseAll ret;
-        if (testDocLiteral) {
-            ret = docClient.testDerivedChoiceBaseAll(x, y, z);
-        } else {
-            ret = rpcClient.testDerivedChoiceBaseAll(x, y, z);
-        }
+        DerivedChoiceBaseAll ret = runWithoutValidation((BindingProvider)docClient, () -> {
+            if (testDocLiteral) {
+                return docClient.testDerivedChoiceBaseAll(x, y, z);
+            }
+            return rpcClient.testDerivedChoiceBaseAll(x, y, z); 
+        });
         if (!perfTestOnly) {
             assertTrue("testDerivedChoiceBaseAll(): Incorrect value for inout param",
                        equals(x, y.value));
@@ -1590,8 +1601,9 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
         }
     }
 
+    
+    /*
     //org.apache.type_test.types1.DerivedStructBaseAll
-
     protected boolean equals(DerivedStructBaseAll x, DerivedStructBaseAll y) {
         return equals((SimpleAll)x, (SimpleAll)y)
             && (Float.compare(x.getVarFloatExt(), y.getVarFloatExt()) == 0)
@@ -1694,7 +1706,6 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
     */
 
     //org.apache.type_test.types1.RestrictedStructBaseStruct;
-
     protected boolean equals(RestrictedStructBaseStruct x, RestrictedStructBaseStruct y) {
         return (x.getVarFloat() == y.getVarFloat())
             && (x.getVarInt().equals(y.getVarInt()))

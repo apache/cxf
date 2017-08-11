@@ -35,6 +35,9 @@
   <!-- group selection parameter -->  
   <xsl:param name="groupID"/>
 
+
+  <xsl:template match="@itst:noValidation" mode="attribute_copy"/>
+
   <!-- copy attributes from any node -->
   <xsl:template match="@*" mode="attribute_copy">
     <xsl:attribute name="{name(.)}">

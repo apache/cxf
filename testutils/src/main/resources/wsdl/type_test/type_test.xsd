@@ -944,11 +944,11 @@
             </extension>
         </complexContent>
     </complexType>
-    <!-- XXX cos-all-limited.1.2: An 'all' model group must appear in a
+    <!-- cos-all-limited.1.2: An 'all' model group must appear in a
     particle with {min occurs} = {max occurs} = 1, and that particle must be
     part of a pair which constitutes the {content type} of a complex type
-    definition.
-    <complexType name="DerivedChoiceBaseAll">
+    definition.  -->
+    <complexType name="DerivedChoiceBaseAll" itst:noValidation="1">
         <complexContent mixed="false">
             <extension base="x1:SimpleAll">
                 <choice>
@@ -959,7 +959,7 @@
             </extension>
         </complexContent>
     </complexType>
-    <complexType name="DerivedAllBaseStruct">
+    <complexType name="DerivedAllBaseStruct" itst:noValidation="1">
         <complexContent mixed="false">
             <extension base="x1:SimpleStruct">
                 <all>
@@ -970,7 +970,7 @@
             </extension>
         </complexContent>
     </complexType>
-    <complexType name="DerivedAllBaseChoice">
+    <complexType name="DerivedAllBaseChoice" itst:noValidation="1">
         <complexContent mixed="false">
             <extension base="x1:SimpleChoice">
                 <all>
@@ -981,7 +981,7 @@
             </extension>
         </complexContent>
     </complexType>
-    <complexType name="DerivedAllBaseAll">
+    <complexType name="DerivedAllBaseAll" itst:noValidation="1">
         <complexContent mixed="false">
             <extension base="x1:SimpleAll">
                 <all>
@@ -992,7 +992,7 @@
             </extension>
         </complexContent>
     </complexType>
-    <complexType name="DerivedChoiceBaseComplex">
+    <complexType name="DerivedChoiceBaseComplex" itst:noValidation="1">
         <complexContent mixed="false">
             <extension base="x1:DerivedAllBaseStruct">
                 <choice>
@@ -1003,7 +1003,7 @@
             </extension>
         </complexContent>
     </complexType>
-    -->
+
     <complexType name="DerivedChoiceBaseArray">
         <complexContent mixed="false">
             <extension base="x1:UnboundedArray">
@@ -1061,25 +1061,26 @@
             </extension>
         </complexContent>
     </complexType>
-    <!-- XXX - TODO - DerivedChoiceBaseComplex issue 
-    <complexType name="ComplexStruct">
+    <complexType name="ComplexStruct" itst:noValidation="1">
         <sequence>
             <element name="varFloat" type="float"/>
             <element name="varDerivedStruct" type="x1:DerivedChoiceBaseComplex"/>
         </sequence>
+        <anyAttribute/>
     </complexType>
-    <complexType name="ComplexChoice">
+    <complexType name="ComplexChoice" itst:noValidation="1">
         <choice>
             <element name="varFloat" type="float"/>
             <element name="varDerivedStruct" type="x1:DerivedChoiceBaseComplex"/>
         </choice>
+        <anyAttribute/>
     </complexType>
-    <complexType name="ComplexArray">
+    <complexType name="ComplexArray" itst:noValidation="1">
         <sequence>
             <element name="varDerivedItem" nillable="true" minOccurs="2" maxOccurs="2" type="x1:DerivedAllBaseStruct"/>
         </sequence>
+        <anyAttribute/>
     </complexType>
-    -->
 
     <!-- ComplexContentRestriction types -->
 

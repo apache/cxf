@@ -1130,7 +1130,6 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
     }
 
     // StructWithInvalidAny
-    // XXX - no exception thrown
     @Test
     public void testStructWithInvalidAny() throws Exception {
         if (!shouldRunTest("StructWithInvalidAny")) {
@@ -1230,7 +1229,6 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
     }
 
     // StructWithInvalidAnyArray
-    // XXX - no exception thrown
     @Test
     public void testStructWithInvalidAnyArray() throws Exception {
         if (!shouldRunTest("StructWithInvalidAnyArray")) {
@@ -1481,7 +1479,6 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         return false;
     }
 
-    // XXX - Generated code flattens nested choice
     @Test
     public void testChoiceWithGroupChoice() throws Exception {
         if (!shouldRunTest("ChoiceWithGroupChoice")) {
@@ -1539,7 +1536,6 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         return false;
     }
 
-    // XXX - Generated code flattens nested structs
     @Test
     public void testChoiceWithGroupSeq() throws Exception {
         if (!shouldRunTest("ChoiceWithGroupSeq")) {
@@ -1596,7 +1592,6 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         return false;
     }
 
-    // XXX - Generated code flattens nested structs
     @Test
     public void testChoiceWithGroups() throws Exception {
         if (!shouldRunTest("ChoiceWithGroups")) {

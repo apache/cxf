@@ -232,7 +232,7 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
     }
 
     //org.apache.type_test.types1.AnonymousStruct
-    // XXX - generated code flattens nested struct into top-level class.
+    //generated code flattens nested struct into top-level class.
     protected boolean equals(AnonymousStruct x, AnonymousStruct y) {
         return (x.getVarFloat() == y.getVarFloat())
             && (x.getVarInt() == y.getVarInt())
