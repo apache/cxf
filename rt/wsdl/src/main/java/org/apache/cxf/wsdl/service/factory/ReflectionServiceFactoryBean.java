@@ -2010,8 +2010,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
     }
 
     protected boolean isMatchOperation(String methodNameInClass, String methodNameInWsdl) {
-        // TODO: This seems wrong and not sure who put it here. Will revisit -
-        // DBD
+        // checks to make sure the operation names match ignoring the case of the first character
         boolean ret = false;
         String initOfMethodInClass = methodNameInClass.substring(0, 1);
         String initOfMethodInWsdl = methodNameInWsdl.substring(0, 1);

@@ -151,22 +151,10 @@ public class WSDLManagerImpl implements WSDLManager {
         return bus;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * XXX - getExtensionRegistry()
-     *
-     * @see org.apache.cxf.wsdl.WSDLManager#getExtenstionRegistry()
-     */
     public ExtensionRegistry getExtensionRegistry() {
         return registry;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.cxf.wsdl.WSDLManager#getDefinition(java.lang.String)
-     */
     public Definition getDefinition(String url) throws WSDLException {
         synchronized (definitionsMap) {
             if (definitionsMap.containsKey(url)) {
