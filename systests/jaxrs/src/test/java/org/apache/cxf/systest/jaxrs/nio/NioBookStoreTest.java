@@ -76,7 +76,7 @@ public class NioBookStoreTest extends AbstractBusClientServerTestBase {
     @Test
     public void testPostBookStore() throws IOException {
         final Response response = createWebClient("/bookstore", MediaType.TEXT_PLAIN)
-            .type(MediaType.APPLICATION_OCTET_STREAM)
+            .type(MediaType.TEXT_PLAIN)
             .post(IOUtils.readBytesFromStream(getClass().getResourceAsStream("/files/books.txt")));
 
         try {

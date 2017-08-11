@@ -85,7 +85,7 @@ public class NioBookStore {
     }
 
     @POST
-    @Consumes(MediaType.APPLICATION_OCTET_STREAM)
+    @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.TEXT_PLAIN)
     public void uploadBookStream(@Suspended AsyncResponse response) {
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
