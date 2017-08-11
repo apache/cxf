@@ -111,10 +111,10 @@ public class ContextUtilsTest {
         MessageImpl message = new MessageImpl();
 
         storeMAPs(maps, message, true);
-        assertThat(message.get(ADDRESSING_PROPERTIES_OUTBOUND), equalTo(maps));
+        assertThat((AddressingProperties)message.get(ADDRESSING_PROPERTIES_OUTBOUND), equalTo(maps));
 
         storeMAPs(maps, message, false);
-        assertThat(message.get(ADDRESSING_PROPERTIES_INBOUND), equalTo(maps));
+        assertThat((AddressingProperties)message.get(ADDRESSING_PROPERTIES_INBOUND), equalTo(maps));
     }
 
     @Test
@@ -212,4 +212,5 @@ public class ContextUtilsTest {
         assertThat(hasEmptyAction(maps), is(false));
         assertThat(maps.getAction(), notNullValue());
     }
+
 }
