@@ -81,7 +81,12 @@ public final class ServiceUtils {
         if (validationType == null) {
             validationType = getSchemaValidationTypeFromModel(message);
         }
-
+        if (validationType == null) {
+            Object obj = message.getContextualProperty(Message.SCHEMA_VALIDATION_ENABLED);
+            if (obj != null) {
+                validationType = getSchemaValidationType(obj);
+            }
+        }
         if (validationType == null) {
             validationType = SchemaValidationType.NONE;
         }
@@ -90,7 +95,10 @@ public final class ServiceUtils {
     }
 
     private static SchemaValidationType getOverrideSchemaValidationType(Message message) {
-        Object obj = message.getContextualProperty(Message.SCHEMA_VALIDATION_ENABLED);
+        Object obj = message.get(Message.SCHEMA_VALIDATION_ENABLED);
+        if (obj == null && message.getExchange() != null) {
+            obj = message.getExchange().get(Message.SCHEMA_VALIDATION_ENABLED);
+        }
         if (obj != null) {
             // this method will transform the legacy enabled as well
             return getSchemaValidationType(obj);

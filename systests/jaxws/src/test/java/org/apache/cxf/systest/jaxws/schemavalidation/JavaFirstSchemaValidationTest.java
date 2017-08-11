@@ -66,7 +66,8 @@ public class JavaFirstSchemaValidationTest extends Assert {
         createServer(PORT, PersonService.class, new PersonServiceImpl(), null, createSchemaValidationFeature());
 
         createServer(PORT2, PersonServiceWithRequestResponseAnns.class,
-                new PersonServiceWithRequestResponseAnnsImpl(), SchemaValidationType.NONE);
+                new PersonServiceWithRequestResponseAnnsImpl(), SchemaValidationType.NONE,
+                    createNoSchemaValidationFeature());
 
         createServer(PORT, PersonServiceAnnotated.class, new PersonServiceAnnotatedImpl(), null);
 
@@ -91,6 +92,12 @@ public class JavaFirstSchemaValidationTest extends Assert {
         operationMap.put("saveNoValidation", SchemaValidationType.NONE);
         operationMap.put("saveValidateIn", SchemaValidationType.IN);
         operationMap.put("saveValidateOut", SchemaValidationType.OUT);
+        DefaultSchemaValidationTypeProvider provider = new DefaultSchemaValidationTypeProvider(operationMap);
+        return new SchemaValidationFeature(provider);
+    }
+    private static SchemaValidationFeature createNoSchemaValidationFeature() {
+        Map<String, SchemaValidationType> operationMap = new HashMap<>();
+        operationMap.put("*", SchemaValidationType.NONE);
         DefaultSchemaValidationTypeProvider provider = new DefaultSchemaValidationTypeProvider(operationMap);
         return new SchemaValidationFeature(provider);
     }
@@ -319,7 +326,7 @@ public class JavaFirstSchemaValidationTest extends Assert {
             noValidationServerClient.saveValidateIn(person);
             fail("Expected exception");
         } catch (SOAPFaultException e) {
-            assertTrue(e.getMessage().contains("Unmarshalling Error"));
+            assertTrue(e.getMessage(), e.getMessage().contains("Unmarshalling Error"));
         }
 
         person.setFirstName(""); // empty string is valid

@@ -69,7 +69,6 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
         }
 
         DepthXMLStreamReader xmlReader = getXMLStreamReader(message);
-        DataReader<XMLStreamReader> dr = getDataReader(message);
         MessageContentsList parameters = new MessageContentsList();
 
         Exchange exchange = message.getExchange();
@@ -90,6 +89,7 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
         if (bop != null && bop.getBinding() != null) {
             forceDocLitBare = Boolean.TRUE.equals(bop.getBinding().getService().getProperty("soap.force.doclit.bare"));
         }
+        DataReader<XMLStreamReader> dr = getDataReader(message);
 
         try {
             if (!forceDocLitBare && bop != null && bop.isUnwrappedCapable()) {
