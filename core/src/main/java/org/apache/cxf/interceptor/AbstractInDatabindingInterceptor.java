@@ -272,7 +272,6 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
             local = local.substring(0, local.length() - 8);
         }
 
-        // TODO: Allow overridden methods.
         BindingOperationInfo bop = ServiceModelUtil.getOperation(exchange, local);
 
         if (bop != null) {

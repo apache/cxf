@@ -77,9 +77,6 @@ public class BareInInterceptor extends AbstractInDatabindingInterceptor {
         Endpoint ep = exchange.getEndpoint();
         BindingOperationInfo bop = exchange.getBindingOperationInfo();
         ServiceInfo si = ep.getEndpointInfo().getService();
-        // XXX - Should the BindingMessageInfo.class be put on
-        // the message?
-        //MessageInfo msgInfo = message.get(MessageInfo.class);
         BindingMessageInfo msgInfo = null;
 
         boolean client = isRequestor(message);
@@ -102,11 +99,6 @@ public class BareInInterceptor extends AbstractInDatabindingInterceptor {
 
             }
         } else {
-            // XXX - Is the call to
-            // AbstractInDatabindingInterceptor.getMessageInfo()
-            // necessary?  Should we put the BindingMessageInfo on
-            // the message instead of the MessageInfo?
-            // msgInfo = getMessageInfo(message, bop, exchange);
             getMessageInfo(message, bop);
             if (client) {
                 msgInfo = bop.getOutput();

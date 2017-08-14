@@ -75,7 +75,6 @@ import org.apache.type_test.types3.OccuringStruct;
 import org.apache.type_test.types3.OccuringStruct1;
 import org.apache.type_test.types3.OccuringStruct2;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
@@ -1266,24 +1265,6 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
             // Expected
             fail("testStructWithInvalidAnyArray(): caught expected exception - woot.");
         }
-    }
-
-    @Test
-    @Ignore
-    public void testStructWithAnyStrict() throws Exception {
-        if (!shouldRunTest("StructWithAnyStrict")) {
-            return;
-        }
-        // XXX - only added to the soap typetest
-    }
-
-    @Test
-    @Ignore
-    public void testStructWithAnyArrayLax() throws Exception {
-        if (!shouldRunTest("StructWithAnyArrayLax")) {
-            return;
-        }
-        // XXX - only added to the soap typetest
     }
 
     //org.apache.type_test.types2.IDTypeAttribute

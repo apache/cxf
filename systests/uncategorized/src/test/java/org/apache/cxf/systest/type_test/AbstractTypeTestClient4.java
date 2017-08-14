@@ -1128,14 +1128,12 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
         }
     }
 
-    /* XXX - The DerivedChoiceBaseAll, DerivedStructBaseAll, DerivedAll* types
+    /*  The DerivedChoiceBaseAll, DerivedStructBaseAll, DerivedAll* types
      *  result in an error creating the Schema object:
      *  cos-all-limited.1.2: An 'all' model group must appear in a particle with
      *  {min occurs} = {max occurs} = 1, and that particle must be part of a
      *  pair which constitutes the {content type} of a complex type definition.
-     *
-*/
-    //org.apache.type_test.types1.ComplexArray
+     */
 
     protected boolean equals(ComplexArray x, ComplexArray y) {
         List<DerivedAllBaseStruct> xx = x.getVarDerivedItem();

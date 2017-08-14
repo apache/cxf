@@ -101,12 +101,10 @@ public final class ValidatorUtil {
                     schemaCol.read(schemaEl, tns);
                 } catch (RuntimeException ex) {
                     LOG.log(Level.WARNING, "SCHEMA_READ_FAIL", tns);
-                    //
                     // Couldn't find schema... check if it's relative to wsdl.
-                    // XXX - Using setBaseUri() on the XmlSchemaCollection,
+                    // Using setBaseUri() on the XmlSchemaCollection,
                     // only seems to work for the first imported xsd... so pass
                     // in the baseURI here.
-                    //
                     try {
                         schemaCol.read(schemaEl, baseURI);
                     } catch (RuntimeException ex2) {

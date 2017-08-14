@@ -712,9 +712,7 @@ public final class StaxUtils {
 
     /**
      * Copies the reader to the writer. The start and end document methods must
-     * be handled on the writer manually. TODO: if the namespace on the reader
-     * has been declared previously to where we are in the stream, this probably
-     * won't work.
+     * be handled on the writer manually. 
      *
      * @param reader
      * @param writer
