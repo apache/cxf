@@ -308,11 +308,13 @@
                             <java.lang.String>org.eclipse.jdt.core.javabuilder</java.lang.String>
                             <java.lang.String>net.sf.eclipsecs.core.CheckstyleBuilder</java.lang.String>
                             <java.lang.String>net.sourceforge.pmd.eclipse.plugin.pmdBuilder</java.lang.String>
+                            <java.lang.String>ch.acanda.eclipse.pmd.builder.PMDBuilder</java.lang.String>
                         </buildcommands>
                         <projectnatures>
                             <nature>org.eclipse.jdt.core.javanature</nature>
                             <nature>net.sf.eclipsecs.core.CheckstyleNature</nature>
                             <nature>net.sourceforge.pmd.eclipse.plugin.pmdNature</nature>
+                            <nature>ch.acanda.eclipse.pmd.builder.PMDNature</nature>
                         </projectnatures>
                         <ajdtVersion>none</ajdtVersion>
                         <additionalConfig>
@@ -323,6 +325,10 @@
                             <file>
                                 <name>.pmd</name>
                                 <location>/cxf-eclipse-pmd${cxf.pmd.eclipse.ruleset.ext}</location>
+                            </file>
+                            <file>
+                                <name>.eclipse-pmd</name>
+                                <location>/cxf-eclipse-pmd-new</location>
                             </file>
                             <file>
                                 <name>.ruleset</name>

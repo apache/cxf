@@ -8,8 +8,7 @@
 .classpath
 .ekstazi
 .pmd
-.pmdruleset
-.pmdruleset.xml
+.eclipse-pmd
 .project
 .ruleset
 .settings/
