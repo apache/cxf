@@ -416,7 +416,6 @@ public final class AttachmentUtil {
         if (StringUtils.isEmpty(cd)) {
             return null;
         }
-        //TODO: save ContentDisposition directly
         ContentDisposition c = new ContentDisposition(cd);
         String s = c.getParameter("filename");
         if (s == null) {

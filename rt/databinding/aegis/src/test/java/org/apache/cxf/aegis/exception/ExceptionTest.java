@@ -29,7 +29,6 @@ import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.invoker.BeanInvoker;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class ExceptionTest extends AbstractAegisTest {
@@ -66,7 +65,6 @@ public class ExceptionTest extends AbstractAegisTest {
     }
 
     @Test(expected = HelloException.class)
-    @Ignore("Not working yet due to namespace things")
     public void testJaxwsServerSimpleClient() throws Exception {
         JaxWsServerFactoryBean sfbean = new JaxWsServerFactoryBean();
         sfbean.setServiceClass(ExceptionService.class);

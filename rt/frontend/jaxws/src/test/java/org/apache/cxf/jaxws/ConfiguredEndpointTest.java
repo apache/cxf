@@ -270,8 +270,6 @@ public class ConfiguredEndpointTest extends Assert {
 
     @Test
     public void testSpringConfiguredServerEndpoint() {
-        // FIXME - duplicating the config file just for one value is ugly, must be a better
-        // way.
         doTestConfiguredServerEndpoint("true", "org/apache/cxf/jaxws/configured-endpoints.xml");
         doTestConfiguredServerEndpoint("BOTH", "org/apache/cxf/jaxws/schemavalidationtype-configured-endpoints.xml");
     }

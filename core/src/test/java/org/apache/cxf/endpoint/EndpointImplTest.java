@@ -62,5 +62,4 @@ public class EndpointImplTest extends Assert {
         assertTrue("hashcode must remain equal", hashcode == ep.hashCode());
     }
 
-    //TODO add other tests
 }

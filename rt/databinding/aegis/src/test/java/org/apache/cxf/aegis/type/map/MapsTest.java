@@ -37,7 +37,6 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -70,13 +69,16 @@ public class MapsTest extends AbstractAegisTest {
         clientInterface = (MapTest)proxyFac.create();
     }
 
-    @Ignore
     @Test
     public void testMapWsdl() throws WSDLException {
         Definition wsdlDef = getWSDLDefinition("MapTestService");
         StringWriter sink = new StringWriter();
         WSDLFactory.newInstance().newWSDLWriter().writeWSDL(wsdlDef, sink);
-        System.out.println(sink.toString());
+        String wsdl = sink.toString();
+        assertTrue(wsdl.contains("name=\"anyType2intMap\""));
+        assertTrue(wsdl.contains("name=\"string2booleanMap\""));
+        assertTrue(wsdl.contains("name=\"long2stringMap\""));
+        assertTrue(wsdl.contains("name=\"string2longMap\""));
     }
 
     @Test

@@ -281,6 +281,10 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                                                                  session,
                                                                  correlationId,
                                                                  JMSConstants.JMS_CLIENT_REQUEST_HEADERS);
+        if (replyToDestination == null && headers.isSetJMSReplyTo()) {
+            String replyTo = headers.getJMSReplyTo();
+            replyToDestination = jmsConfig.getReplyDestination(session, replyTo);
+        }
         if (replyToDestination != null) {
             message.setJMSReplyTo(replyToDestination);
         }
