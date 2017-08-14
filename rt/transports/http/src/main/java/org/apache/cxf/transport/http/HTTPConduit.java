@@ -1068,7 +1068,7 @@ public abstract class HTTPConduit
     }
 
     public boolean canAssert(QName type) {
-        return new ClientPolicyCalculator().equals(type);
+        return type.equals(new QName("http://cxf.apache.org/transports/http/configuration", "client"));
     }
 
     public void propertyChange(PropertyChangeEvent evt) {

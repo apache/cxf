@@ -524,7 +524,6 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
 
     //org.apache.type_test.types1.DerivedEmptyBaseEmptyAll
 
-    @SuppressWarnings("cast")
     @Test
     public void testDerivedEmptyBaseEmptyAll() throws Exception {
         if (!shouldRunTest("DerivedEmptyBaseEmptyAll")) {
@@ -554,7 +553,6 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
 
     //org.apache.type_test.types1.DerivedEmptyBaseEmptyChoice
 
-    @SuppressWarnings("cast")
     @Test
     public void testDerivedEmptyBaseEmptyChoice() throws Exception {
         if (!shouldRunTest("DerivedEmptyBaseEmptyChoice")) {

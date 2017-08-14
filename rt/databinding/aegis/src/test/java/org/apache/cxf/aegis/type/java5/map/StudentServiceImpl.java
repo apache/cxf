@@ -41,7 +41,7 @@ public class StudentServiceImpl implements StudentService {
     public List<Student> getStudents(Map<String, String> filters) {
         List<Student> returnValue = new LinkedList<Student>();
         for (Map.Entry<Long, Student> e : studentMap.entrySet()) {
-            if (filters.containsKey(e.getValue())) {
+            if (filters.containsKey((Object)e.getValue())) {
                 returnValue.add(e.getValue());
             }
 

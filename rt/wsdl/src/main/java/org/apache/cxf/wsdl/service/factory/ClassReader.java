@@ -305,7 +305,6 @@ class ClassReader extends ByteArrayInputStream {
         }
     }
 
-    @SuppressWarnings("fallthrough")
     protected final void readCpool() throws IOException {
         int count = readShort(); // cpool count
         cpoolIndex = new int[count];

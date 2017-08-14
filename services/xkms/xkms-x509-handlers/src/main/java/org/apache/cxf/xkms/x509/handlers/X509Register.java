@@ -65,7 +65,7 @@ public class X509Register implements Register {
         }
         List<String> respondWithList = request.getRespondWith();
         if ((respondWithList != null) && !(respondWithList.isEmpty())) {
-            return respondWithList.contains(RespondWithEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_X_509_CERT);
+            return respondWithList.contains((Object)RespondWithEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_X_509_CERT);
         }
         // Default handler
         return true;

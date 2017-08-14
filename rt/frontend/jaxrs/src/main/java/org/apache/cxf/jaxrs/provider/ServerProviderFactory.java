@@ -472,7 +472,7 @@ public final class ServerProviderFactory extends ProviderFactory {
 
         @Override
         public boolean isEnabled(Feature f) {
-            return dynamicFeatures.contains(f);
+            return dynamicFeatures.contains((Object)f);
         }
 
         @Override

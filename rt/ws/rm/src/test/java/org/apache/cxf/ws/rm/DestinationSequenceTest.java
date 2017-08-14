@@ -119,7 +119,6 @@ public class DestinationSequenceTest extends Assert {
         otherSeq = new DestinationSequence(otherId, ref, destination, ProtocolVariation.RM10WSA200408);
         assertTrue(!seq.equals(otherSeq));
         assertTrue(seq.hashCode() != otherSeq.hashCode());
-        assertTrue(!seq.equals(this));
     }
 
     @Test

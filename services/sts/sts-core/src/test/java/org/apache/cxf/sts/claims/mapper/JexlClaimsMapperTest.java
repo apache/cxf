@@ -68,7 +68,7 @@ public class JexlClaimsMapperTest extends org.junit.Assert {
         assertEquals("Jan Bernhardt", result.get(1).getValues().get(0));
 
         for (ProcessedClaim c : result) {
-            if ("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname".equals(c.getClaimType())) {
+            if ("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname".equals(c.getClaimType().toString())) {
                 fail("Only merged claim should be in result set, but not the individual claims");
             }
         }

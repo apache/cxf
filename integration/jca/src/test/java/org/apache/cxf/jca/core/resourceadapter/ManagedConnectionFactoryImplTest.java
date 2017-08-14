@@ -41,7 +41,6 @@ public class ManagedConnectionFactoryImplTest extends Assert {
 
 
     @Test
-    @SuppressWarnings("cast")
     public void testManagedConnectionFactoryImplInstanceOfResourceBean() throws Exception {
         assertNotNull("mcf is not null", mcf);
         assertTrue("ManagedConnectionFactoryImpl is ResourceBean", mcf instanceof ResourceBean);

@@ -144,7 +144,6 @@ public class ManagedConnectionFactoryImplTest extends Assert {
             .getDeclaredMethod("hashCode", (Class[])null));
         assertEquals("equal with its self", mci, mci);
         assertTrue("not equal with another", !mci.equals(new ManagedConnectionFactoryImpl()));
-        assertTrue("not equal with another thing", !mci.equals(this));
     }
 
     @Test
@@ -231,7 +230,6 @@ public class ManagedConnectionFactoryImplTest extends Assert {
         assertEquals("init was called once", 1, mcit.initCalledCount);
     }
 
-    @SuppressWarnings("cast")
     @Test
     public void testCreateManagedConnection() throws Exception {
         ManagedConnectionFactoryImplTester mcit = new ManagedConnectionFactoryImplTester();

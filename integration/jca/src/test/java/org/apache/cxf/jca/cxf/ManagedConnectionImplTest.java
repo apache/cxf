@@ -45,7 +45,6 @@ public class ManagedConnectionImplTest extends ManagedConnectionTestBase {
     protected QName portName;
 
     @Test
-    @SuppressWarnings("cast")
     public void testInstanceOfConnection() throws Exception {
         assertTrue("Instance of Connection", mci instanceof Connection);
         ((Connection)mci).close();
@@ -57,15 +56,6 @@ public class ManagedConnectionImplTest extends ManagedConnectionTestBase {
         cri.setAddress("http://localhost:9000/soap");
         Object o = mci.getConnection(subj, cri);
         assertTrue(o instanceof Foo);
-    }
-
-
-    @Ignore("Need to check the classloader")
-    public void testThreadContextClassLoaderIsSet() throws Exception {
-        //set the threadContextClassLoader for Bus
-        //TODO njiang classloader things
-        //check the threadContextClassLoader
-        mci.getConnection(subj, cri);
     }
 
     @Test

@@ -45,7 +45,6 @@ public class ResourceAdapterImplTest extends Assert {
     }
 
     @Test
-    @SuppressWarnings("cast")
     public void testConstructorWithoutProperties() throws Exception {
         ResourceAdapterImpl rai = new ResourceAdapterImpl();
         assertTrue("constructed without props", rai instanceof ResourceAdapterImpl);
@@ -55,7 +54,6 @@ public class ResourceAdapterImplTest extends Assert {
     }
 
     @Test
-    @SuppressWarnings("cast")
     public void testConstructorWithProperties() throws Exception {
         Properties props = new Properties();
         ResourceAdapterImpl rai = new ResourceAdapterImpl(props);

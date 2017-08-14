@@ -227,7 +227,6 @@ public class StaxBuilder {
      * @param node <code>Code</node> to examine.
      * @param doc JDOM <code>Document</code> being built.
      */
-    @SuppressWarnings("fallthrough")
     private void buildTree(JDOMFactory f, XMLStreamReader r, Document doc) throws XMLStreamException {
         Element current = null; // At top level
         int event = r.getEventType();

@@ -210,7 +210,6 @@ public class JAXRSUtilsTest extends Assert {
         assertEquals("customerContext", context.get());
     }
 
-    @SuppressWarnings("cast")
     @Test
     public void testInjectApplicationInSingleton() throws Exception {
         CustomerApplication app = new CustomerApplication();
@@ -231,7 +230,6 @@ public class JAXRSUtilsTest extends Assert {
         assertTrue(proxy.get() instanceof UriInfo);
     }
 
-    @SuppressWarnings("cast")
     @Test
     public void testInjectApplicationInPerRequestResource() throws Exception {
         CustomerApplication app = new CustomerApplication();
@@ -967,7 +965,7 @@ public class JAXRSUtilsTest extends Assert {
         assertTrue(set1.contains(Cookie.valueOf("c1=c1Value")));
         assertEquals("c2Value", params.get(2));
         Set<Cookie> set2 = CastUtils.cast((Set<?>)params.get(3));
-        assertTrue(set2.contains("c2Value"));
+        assertTrue(set2.contains((Object)"c2Value"));
         assertEquals(1, set2.size());
 
     }
