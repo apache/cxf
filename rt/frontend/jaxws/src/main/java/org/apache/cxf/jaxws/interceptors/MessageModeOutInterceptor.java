@@ -53,6 +53,7 @@ import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor.SAAJOutEndingInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJStreamWriter;
 import org.apache.cxf.binding.soap.saaj.SAAJUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.helpers.ServiceUtils;
@@ -63,7 +64,6 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.message.MessageImpl;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.BindingFaultInfo;
@@ -272,7 +272,7 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
             try {
                 Object xmlDec = soapMessage.getProperty(SOAPMessage.WRITE_XML_DECLARATION);
                 if (xmlDec != null) {
-                    boolean b = MessageUtils.isTrue(xmlDec);
+                    boolean b = PropertyUtils.isTrue(xmlDec);
                     message.put(StaxOutInterceptor.FORCE_START_DOCUMENT, b);
                 }
             } catch (SOAPException e) {

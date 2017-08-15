@@ -88,7 +88,7 @@ public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
         }
 
         if (skipOnFault && null != message.getContent(Exception.class)
-            || MessageUtils.isTrue(message.getContextualProperty(TRANSFORM_SKIP))) {
+            || MessageUtils.getContextualBoolean(message, TRANSFORM_SKIP, false)) {
             return;
         }
 

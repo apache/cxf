@@ -280,8 +280,8 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
                     boolean includeLocationOnly = false;
                     org.apache.cxf.message.Message message = PhaseInterceptorChain.getCurrentMessage();
                     if (message != null) {
-                        includeLocationOnly = MessageUtils.isTrue(
-                            message.getContextualProperty("org.apache.cxf.wsa.metadata.wsdlLocationOnly"));
+                        includeLocationOnly = MessageUtils
+                            .getContextualBoolean(message, "org.apache.cxf.wsa.metadata.wsdlLocationOnly", false);
                     }
                     String attrubuteValue = serviceName != null && !includeLocationOnly
                             ? serviceName.getNamespaceURI() + " " + wsdlDocumentLocation

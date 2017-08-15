@@ -294,7 +294,7 @@ public class WSDLGetUtils {
                     base), e);
         }
 
-        boolean rewriteAllSoapAddress = MessageUtils.isTrue(message.getContextualProperty(AUTO_REWRITE_ADDRESS_ALL));
+        boolean rewriteAllSoapAddress = MessageUtils.getContextualBoolean(message, AUTO_REWRITE_ADDRESS_ALL, false);
         if (rewriteAllSoapAddress) {
             List<Element> portList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
                                                                          "http://schemas.xmlsoap.org/wsdl/",
@@ -305,8 +305,7 @@ public class WSDLGetUtils {
                 rewriteAddressProtocolHostPort(base, el, basePath, "http://schemas.xmlsoap.org/wsdl/soap12/");
             }
         }
-        Object rewriteSoapAddress = message.getContextualProperty(AUTO_REWRITE_ADDRESS);
-        if (rewriteSoapAddress == null || MessageUtils.isTrue(rewriteSoapAddress) || rewriteAllSoapAddress) {
+        if (MessageUtils.getContextualBoolean(message, AUTO_REWRITE_ADDRESS, true) || rewriteAllSoapAddress) {
             List<Element> serviceList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
                                                               "http://schemas.xmlsoap.org/wsdl/",
                                                               "service");

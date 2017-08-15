@@ -156,8 +156,7 @@ public final class AttachmentUtil {
     }
 
     public static boolean isMtomEnabled(Message message) {
-        Object prop = message.getContextualProperty(Message.MTOM_ENABLED);
-        return MessageUtils.isTrue(prop);
+        return MessageUtils.getContextualBoolean(message, Message.MTOM_ENABLED, false);
     }
 
     public static void setStreamedAttachmentProperties(Message message, CachedOutputStream bos)

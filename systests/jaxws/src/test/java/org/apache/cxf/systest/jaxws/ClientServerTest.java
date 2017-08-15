@@ -28,7 +28,6 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -40,7 +39,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
-import javax.xml.bind.JAXBContext;
 import javax.xml.namespace.QName;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.AsyncHandler;
@@ -59,6 +57,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.dynamic.DynamicClientFactory;
+import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxws.DispatchImpl;
 import org.apache.cxf.message.Message;
@@ -881,23 +880,6 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
 
     }
 
-    /*
-    @Test
-    public void testDynamicClientFactory2() throws Exception {
-        String wsdlUrl = "http://sdpwsparam.strikeiron.com/sdpNFLTeams?WSDL";
-
-        //TODO test fault exceptions
-        DynamicClientFactory dcf = DynamicClientFactory.newInstance();
-        Client client = dcf.createClient(wsdlUrl);
-        Object o = Class.forName("com.strikeiron.GetTeamInfoByCity", true,
-                                 Thread.currentThread().getContextClassLoader()).newInstance();
-        Object[] result = client.invoke("GetTeamInfoByCity", "a", "b", "New England");
-
-
-        //System.out.println(Arrays.asList(result));
-
-    }
-    */
     @Test
     public void testDynamicClientFactory() throws Exception {
         URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
@@ -905,7 +887,6 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         String wsdlUrl = null;
         wsdlUrl = wsdl.toURI().toString();
 
-        //TODO test fault exceptions
         DynamicClientFactory dcf = DynamicClientFactory.newInstance();
         Client client = dcf.createClient(wsdlUrl, serviceName, portName);
         updateAddressPort(client, PORT);
@@ -913,17 +894,9 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         Object[] result = client.invoke("sayHi");
         assertNotNull("no response received from service", result);
         assertEquals("Bonjour", result[0]);
-        //TODO: the following isn't a real test. We need to test against a service
-        // that would actually notice the difference. At least it ensures that
-        // specifying the property does not explode.
-        Map<String, Object> jaxbContextProperties = new HashMap<>();
-        if (JAXBContext.newInstance(String.class).getClass().getName().contains("internal")) {
-            jaxbContextProperties.put("com.sun.xml.internal.bind.defaultNamespaceRemap", "uri:ultima:thule");
-        } else {
-            jaxbContextProperties.put("com.sun.xml.bind.defaultNamespaceRemap", "uri:ultima:thule");
-        }
-        dcf.setJaxbContextProperties(jaxbContextProperties);
+
         client = dcf.createClient(wsdlUrl, serviceName, portName);
+        new LoggingFeature().initialize(client, client.getBus());
         updateAddressPort(client, PORT);
         client.invoke("greetMe", "test");
         result = client.invoke("sayHi");

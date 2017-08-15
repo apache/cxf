@@ -402,8 +402,7 @@ public class Headers {
      * from the PROTOCOL_HEADERS in the message.
      */
     private void transferProtocolHeadersToURLConnection(URLConnection connection) {
-        boolean addHeaders = MessageUtils.isTrue(
-                message.getContextualProperty(ADD_HEADERS_PROPERTY));
+        boolean addHeaders = MessageUtils.getContextualBoolean(message, ADD_HEADERS_PROPERTY, false);
         for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
             String header = entry.getKey();
             List<String> headerList = entry.getValue();
@@ -512,8 +511,7 @@ public class Headers {
             response.setContentType(contentType);
         }
 
-        boolean addHeaders = MessageUtils.isTrue(
-                message.getContextualProperty(ADD_HEADERS_PROPERTY));
+        boolean addHeaders = MessageUtils.getContextualBoolean(message, ADD_HEADERS_PROPERTY, false);
         for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
             String header = entry.getKey();
             List<?> headerList = entry.getValue();

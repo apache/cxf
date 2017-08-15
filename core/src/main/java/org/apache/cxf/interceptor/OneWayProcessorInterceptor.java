@@ -80,10 +80,10 @@ public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message
             final InterceptorChain chain = message.getInterceptorChain();
 
             boolean robust =
-                MessageUtils.isTrue(message.getContextualProperty(Message.ROBUST_ONEWAY));
+                MessageUtils.getContextualBoolean(message, Message.ROBUST_ONEWAY, false);
 
             boolean useOriginalThread =
-                MessageUtils.isTrue(message.getContextualProperty(USE_ORIGINAL_THREAD));
+                MessageUtils.getContextualBoolean(message, USE_ORIGINAL_THREAD, false);
 
             if (!useOriginalThread && !robust) {
                 //need to suck in all the data from the input stream as

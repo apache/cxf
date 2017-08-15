@@ -26,6 +26,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
 import org.apache.cxf.BusException;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
@@ -197,7 +198,7 @@ public abstract class AbstractConduitSelector implements ConduitSelector, Closea
         // will need to keep low level conduits operating on InputStreams open
         // and will be responsible for closing the streams
 
-        if (MessageUtils.isTrue(exchange.get(KEEP_CONDUIT_ALIVE))) {
+        if (PropertyUtils.isTrue(exchange.get(KEEP_CONDUIT_ALIVE))) {
             return;
         }
         try {

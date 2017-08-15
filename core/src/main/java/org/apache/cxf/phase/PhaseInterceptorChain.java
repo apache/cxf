@@ -432,7 +432,7 @@ public class PhaseInterceptorChain implements InterceptorChain {
     }
 
     private boolean isRobustOneWay(Message message) {
-        return MessageUtils.isTrue(message.getContextualProperty(Message.ROBUST_ONEWAY));
+        return MessageUtils.getContextualBoolean(message, Message.ROBUST_ONEWAY, false);
     }
 
     /**
