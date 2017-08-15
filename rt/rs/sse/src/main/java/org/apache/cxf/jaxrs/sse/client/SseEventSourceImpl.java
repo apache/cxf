@@ -196,11 +196,19 @@ public class SseEventSourceImpl implements SseEventSource {
             // response code. In this case, we should give up.
             if (response.getStatus() == 204) {
                 LOG.fine("SSE endpoint " + target.getUri() + " returns no data, disconnecting");
-                state.compareAndSet(SseSourceState.CONNECTING, SseSourceState.CLOSED);
+                state.set(SseSourceState.CLOSED);
                 response.close();
                 return;
             }
 
+            // Should not happen but if close() was called from another thread, we could
+            // end up there.
+            if (state.get() == SseSourceState.CLOSED) {
+                LOG.fine("SSE connection to " + target.getUri() + " has been closed already");
+                response.close();
+                return;
+            }
+            
             final Endpoint endpoint = WebClient.getConfig(target).getEndpoint();
             // Create new processor if this is the first time or the old one has been closed 
             if (processor == null || processor.isClosed()) {
@@ -212,7 +220,10 @@ public class SseEventSourceImpl implements SseEventSource {
             processor.run(response);
             LOG.fine("SSE event processor has been started ...");
             
-            state.compareAndSet(SseSourceState.CONNECTING, SseSourceState.OPEN);
+            if (!state.compareAndSet(SseSourceState.CONNECTING, SseSourceState.OPEN)) {
+                throw new IllegalStateException("The SseEventSource is already in " + state.get() + " state");
+            }
+            
             LOG.fine("Successfuly opened SSE connection to " + target.getUri());
         } catch (final Exception ex) {
             if (processor != null) {
@@ -273,10 +284,12 @@ public class SseEventSourceImpl implements SseEventSource {
         }
         
         // If the connection was still on connecting state, just try to reconnect
-        if (state.get() != SseSourceState.CONNECTING 
-            && !state.compareAndSet(SseSourceState.OPEN, SseSourceState.CONNECTING)) {
-            throw new IllegalStateException("The SseEventSource is not opened, but in " + state.get()
-                + " state, unable to reconnect");
+        if (state.get() != SseSourceState.CONNECTING) { 
+            LOG.fine("The SseEventSource is still opened, moving it to connecting state");
+            if (!state.compareAndSet(SseSourceState.OPEN, SseSourceState.CONNECTING)) {
+                throw new IllegalStateException("The SseEventSource is not opened, but in " + state.get()
+                    + " state, unable to reconnect");
+            }
         }
                 
         executor.schedule(() -> {

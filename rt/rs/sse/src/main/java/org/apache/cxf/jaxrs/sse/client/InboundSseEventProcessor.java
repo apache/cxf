@@ -56,7 +56,7 @@ public class InboundSseEventProcessor {
     protected InboundSseEventProcessor(Endpoint endpoint, InboundSseEventListener listener) {
         this.endpoint = endpoint;
         this.listener = listener;
-        this.executor = Executors.newSingleThreadExecutor();
+        this.executor = Executors.newSingleThreadScheduledExecutor();
     }
     
     void run(final Response response) {
@@ -94,7 +94,7 @@ public class InboundSseEventProcessor {
                         if (line.startsWith(ID)) {
                             builder.id(line.substring(ID.length()));
                         } else if (line.startsWith(COMMENT)) {
-                            builder.id(line.substring(COMMENT.length()));
+                            builder.comment(line.substring(COMMENT.length()));
                         } else if (line.startsWith(RETRY)) {
                             builder.reconnectDelay(line.substring(RETRY.length()));
                         } else if (line.startsWith(DATA)) {

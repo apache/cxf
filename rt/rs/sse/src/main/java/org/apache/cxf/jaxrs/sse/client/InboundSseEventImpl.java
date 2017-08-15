@@ -37,7 +37,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.client.ClientProviderFactory;
 import org.apache.cxf.message.Message;
 
-public class InboundSseEventImpl implements InboundSseEvent {
+public final class InboundSseEventImpl implements InboundSseEvent {
     private final String id;
     private final String name;
     private final String comment;
@@ -142,13 +142,13 @@ public class InboundSseEventImpl implements InboundSseEvent {
 
     @Override
     public <T> T readData(Class<T> type) {
-        return read(type, type, MediaType.WILDCARD_TYPE);
+        return read(type, type, MediaType.TEXT_PLAIN_TYPE);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> T readData(GenericType<T> type) {
-        return read((Class<T>)type.getRawType(), type.getType(), MediaType.WILDCARD_TYPE);
+        return read((Class<T>)type.getRawType(), type.getType(), MediaType.TEXT_PLAIN_TYPE);
     }
 
     @Override
