@@ -70,8 +70,7 @@ public class OsgiSwaggerUiResolver extends SwaggerUiResolver {
     }
 
     private String getSwaggerUiRoot(Bundle b, String swaggerUiVersion) {
-        final String resourcesRootStart = "META-INF/resources/webjars/swagger-ui/";
-        URL entry = b.getEntry(resourcesRootStart + swaggerUiVersion);
+        URL entry = b.getEntry(SwaggerUiResolver.UI_RESOURCES_ROOT_START + swaggerUiVersion);
         if (entry != null) {
             return entry.toString() + "/";
         }
