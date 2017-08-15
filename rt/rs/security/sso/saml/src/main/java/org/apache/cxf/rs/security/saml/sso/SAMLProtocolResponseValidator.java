@@ -30,6 +30,7 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -222,6 +223,12 @@ public class SAMLProtocolResponseValidator {
             return;
         }
 
+        // Required to make IdResolver happy in OpenSAML
+        Attr idAttr = samlResponse.getDOM().getAttributeNodeNS(null, "ID");
+        if (idAttr != null) {
+            samlResponse.getDOM().setIdAttributeNode(idAttr, true);
+        }
+
         validateResponseSignature(
             samlResponse.getSignature(), samlResponse.getDOM().getOwnerDocument(),
             sigCrypto, callbackHandler
@@ -238,6 +245,12 @@ public class SAMLProtocolResponseValidator {
     ) throws WSSecurityException {
         if (!samlResponse.isSigned()) {
             return;
+        }
+
+        // Required to make IdResolver happy in OpenSAML
+        Attr idAttr = samlResponse.getDOM().getAttributeNodeNS(null, "ID");
+        if (idAttr != null) {
+            samlResponse.getDOM().setIdAttributeNode(idAttr, true);
         }
 
         validateResponseSignature(
