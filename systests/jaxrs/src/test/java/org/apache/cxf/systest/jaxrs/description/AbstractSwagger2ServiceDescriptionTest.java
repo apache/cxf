@@ -161,6 +161,8 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
         } finally {
             client.close();
         }
+        
+        checkUiResource();
     }
 
     @Test
@@ -193,6 +195,13 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
             .accept(MediaType.APPLICATION_JSON).accept("application/yaml");
     }
 
+    protected void checkUiResource() {
+        WebClient uiClient = WebClient.create("http://localhost:" + getPort() + "/api-docs")
+            .accept(MediaType.WILDCARD);
+        String uiHtml = uiClient.get(String.class);
+        assertTrue(uiHtml.contains("<title>Swagger UI</title>"));
+    }
+    
     private static String getExpectedValue(String name, Object... args) throws IOException {
         return String.format(IOUtils.readStringFromStream(
             AbstractSwagger2ServiceDescriptionTest.class.getResourceAsStream(name)), args);
