@@ -192,7 +192,6 @@ public final class WebSocketUtils {
         return buildResponse((byte[])null, data, offset, length);
     }
 
-    //FIXME (consolidate the response building code)
     public static byte[] buildHeaderLine(String name, String value) {
         byte[] hl = new byte[name.length() + COLSP.length + value.length() + CRLF.length];
         System.arraycopy(name.getBytes(), 0, hl, 0, name.length());

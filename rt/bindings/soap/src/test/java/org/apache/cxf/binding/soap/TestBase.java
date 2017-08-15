@@ -102,11 +102,6 @@ public class TestBase extends Assert {
         return null;
     }
 
-    public ServiceInfo getTestService(Class<?> clz) {
-        // FIXME?!?!?!?? There should NOT be JAX-WS stuff here
-        return null;
-    }
-
     protected BindingInfo getTestService(String wsdlUrl, String port) throws Exception {
         ServiceInfo service = getMockedServiceModel(getClass().getResource(wsdlUrl).toString());
         assertNotNull(service);

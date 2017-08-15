@@ -535,11 +535,6 @@ public class ClientImpl
 
     private void completeExchange(Exchange exchange) {
         getConduitSelector().complete(exchange);
-        Message outMessage = exchange.getOutMessage();
-        if (outMessage != null && outMessage.get("transport.retransmit.url") != null) {
-            //FIXME: target address has been updated at the transport level,
-            //       update the the current client accordingly
-        }
     }
 
     /**

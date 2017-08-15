@@ -259,9 +259,7 @@ public class SOAPJMSTestSuiteTest extends AbstractBusClientServerTestBase {
         requestHeader.setJMSDeliveryMode(DeliveryMode.NON_PERSISTENT);
         requestHeader.setTimeToLive(10800000);
         requestHeader.setJMSPriority(3);
-
-        // FIXME had to change this
-        requestHeader.setJMSReplyTo("dynamicQueues/replyqueue00091");
+        requestHeader.setJMSReplyTo("dynamicQueues/replyqueue00093");
 
         twoWayTestWithRequestHeader(testcase, simplePort, requestHeader);
     }

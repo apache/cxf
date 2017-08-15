@@ -64,7 +64,6 @@ public class WsdlGetUtilsTest extends AbstractBusClientServerTestBase {
         Server server = factory.create();
 
         try {
-            // FIXME - surely there is a better way to create a stubbed message and exchange
             Message message = new MessageImpl();
             Exchange exchange = new ExchangeImpl();
             exchange.put(Bus.class, getBus());

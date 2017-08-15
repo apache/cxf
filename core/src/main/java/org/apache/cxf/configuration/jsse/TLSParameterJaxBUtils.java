@@ -205,8 +205,7 @@ public final class TLSParameterJaxBUtils {
         if (pst.isSetUrl()) {
             return createTrustStore(new URL(pst.getUrl()).openStream(), type);
         }
-        // TODO error?
-        return null;
+        throw new IllegalArgumentException("Could not create KeyStore based on information in CertStoreType");
     }
 
     private static InputStream getResourceAsStream(String resource) {

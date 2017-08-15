@@ -685,8 +685,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         }
 
         protected boolean usingProxy() {
-            //FIXME - need to get the Proxy stuff from the connection
-            return false;
+            return this.entity.getConfig().getProxy() != null;
         }
 
         protected HttpsURLConnectionInfo getHttpsURLConnectionInfo() throws IOException {
