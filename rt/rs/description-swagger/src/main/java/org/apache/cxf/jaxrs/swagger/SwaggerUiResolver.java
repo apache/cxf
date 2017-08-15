@@ -20,8 +20,11 @@ package org.apache.cxf.jaxrs.swagger;
 
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Enumeration;
 
 public class SwaggerUiResolver {
+    static final String UI_RESOURCES_ROOT_START = "META-INF/resources/webjars/swagger-ui/";
+    
     static final SwaggerUiResolver HELPER;
     static {
         SwaggerUiResolver theHelper = null;
@@ -42,30 +45,45 @@ public class SwaggerUiResolver {
         try {
             ClassLoader cl = AbstractSwaggerFeature.class.getClassLoader();
             if (cl instanceof URLClassLoader) {
-                final String resourcesRootStart = "META-INF/resources/webjars/swagger-ui/";
                 for (URL url : ((URLClassLoader)cl).getURLs()) {
-                    String urlStr = url.toString();
-                    int swaggerUiIndex = urlStr.lastIndexOf("/swagger-ui-"); 
-                    if (swaggerUiIndex != -1) {
-                        boolean urlEndsWithJarSep = urlStr.endsWith(".jar!/");
-                        if (urlEndsWithJarSep || urlStr.endsWith(".jar")) {
-                            int offset = urlEndsWithJarSep ? 6 : 4;
-                            String version = urlStr.substring(swaggerUiIndex + 12, urlStr.length() - offset);
-                            if (swaggerUiVersion != null && !swaggerUiVersion.equals(version)) {
-                                continue;
-                            }
-                            if (!urlEndsWithJarSep) {
-                                urlStr = "jar:" + urlStr + "!/";
-                            }
-                            return urlStr + resourcesRootStart + version + "/";
-                        }
+                    String root = 
+                        checkUiRoot(url.toString(), swaggerUiMavenGroupAndArtifact, swaggerUiVersion);
+                    if (root != null) {
+                        return root;
                     }
                 }
-                
+            } else {
+                Enumeration<URL> urls = cl.getResources(UI_RESOURCES_ROOT_START);
+                while (urls.hasMoreElements()) {
+                    String urlStr = urls.nextElement().toString().replace(UI_RESOURCES_ROOT_START, "");     
+                    String root = checkUiRoot(urlStr, swaggerUiMavenGroupAndArtifact, swaggerUiVersion);
+                    if (root != null) {
+                        return root;
+                    }
+                }
             }
         } catch (Throwable ex) {
             // ignore
         }   
+        return null;
+    }
+
+    protected static String checkUiRoot(String urlStr, String swaggerUiMavenGroupAndArtifact, String swaggerUiVersion) {
+        int swaggerUiIndex = urlStr.lastIndexOf("/swagger-ui-");
+        if (swaggerUiIndex != -1) {
+            boolean urlEndsWithJarSep = urlStr.endsWith(".jar!/");
+            if (urlEndsWithJarSep || urlStr.endsWith(".jar")) {
+                int offset = urlEndsWithJarSep ? 6 : 4;
+                String version = urlStr.substring(swaggerUiIndex + 12, urlStr.length() - offset);
+                if (swaggerUiVersion != null && !swaggerUiVersion.equals(version)) {
+                    return null;
+                }
+                if (!urlEndsWithJarSep) {
+                    urlStr = "jar:" + urlStr + "!/";
+                }
+                return urlStr + UI_RESOURCES_ROOT_START + version + "/";
+            }
+        }
         return null;
     }
 
