@@ -67,6 +67,11 @@ public class AbstractTokenService extends AbstractOAuthService {
                     client = getClient(clientId, params);
                     checkCertificateBinding(client, getTlsSessionInfo());
                     validateClientAuthenticationMethod(client, OAuthConstants.TOKEN_ENDPOINT_AUTH_TLS);
+                } else if (canSupportPublicClients) {
+                    client = getValidClient(clientId, params);
+                    if (!isValidPublicClient(client, clientId)) {
+                        client = null;
+                    }
                 }
             }
         } else {
@@ -121,9 +126,6 @@ public class AbstractTokenService extends AbstractOAuthService {
         if (!client.getClientId().equals(clientId)) {
             reportInvalidClient();
         }
-        if (isValidPublicClient(client, clientId, providedClientSecret)) {
-            return client;
-        }
         if (!client.isConfidential()
             || !isConfidenatialClientSecretValid(client, providedClientSecret)) {
             reportInvalidClient();
@@ -138,11 +140,10 @@ public class AbstractTokenService extends AbstractOAuthService {
                 && providedClientSecret != null && client.getClientSecret().equals(providedClientSecret);
         }
     }
-    protected boolean isValidPublicClient(Client client, String clientId, String clientSecret) {
-        return canSupportPublicClients 
-            && !client.isConfidential() 
-            && client.getClientSecret() == null 
-            && clientSecret == null;
+    protected boolean isValidPublicClient(Client client, String clientId) {
+        return canSupportPublicClients
+            && !client.isConfidential()
+            && client.getClientSecret() == null;
     }
     
     protected Client getClientFromBasicAuthScheme(MultivaluedMap<String, String> params) {
@@ -158,20 +159,20 @@ public class AbstractTokenService extends AbstractOAuthService {
     protected void checkCertificateBinding(Client client, TLSSessionInfo tlsSessionInfo) {
         String subjectDn = client.getProperties().get(OAuthConstants.TLS_CLIENT_AUTH_SUBJECT_DN);
         if (subjectDn == null && client.getApplicationCertificates().isEmpty()) {
-            LOG.warning("Client \"" + client.getClientId() + "\" can not be bound to the TLS cerificate");
+            LOG.warning("Client \"" + client.getClientId() + "\" can not be bound to the TLS certificate");
             reportInvalidClient();
         }
         X509Certificate cert = OAuthUtils.getRootTLSCertificate(tlsSessionInfo);
         
         if (subjectDn != null 
             && !subjectDn.equals(OAuthUtils.getSubjectDnFromTLSCertificates(cert))) {
-            LOG.warning("Client \"" + client.getClientId() + "\" can not be bound to the TLS cerificate");
+            LOG.warning("Client \"" + client.getClientId() + "\" can not be bound to the TLS certificate");
             reportInvalidClient();
         }
         String issuerDn = client.getProperties().get(OAuthConstants.TLS_CLIENT_AUTH_ISSUER_DN);
         if (issuerDn != null 
             && !issuerDn.equals(OAuthUtils.getIssuerDnFromTLSCertificates(cert))) {
-            LOG.warning("Client \"" + client.getClientId() + "\" can not be bound to the TLS cerificate");
+            LOG.warning("Client \"" + client.getClientId() + "\" can not be bound to the TLS certificate");
             reportInvalidClient();
         }
         if (!client.getApplicationCertificates().isEmpty()) {
