@@ -130,6 +130,35 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
         assertNotNull(at.getTokenKey());
     }
 
+    @Test()
+    public void testConfidentialClientIdOnly() throws Exception {
+        String address = "https://localhost:" + PORT + "/oauth2/token";
+        WebClient wc = createWebClient(address);
+
+        try {
+            OAuthClientUtils.getAccessToken(wc,
+                                            new Consumer("fredNoPassword"),
+                                            new CustomGrant(),
+                                            false);
+            fail("NotAuthorizedException exception is expected");
+        } catch (OAuthServiceException ex) {
+            assertEquals("invalid_client", ex.getError().getError());
+        }
+    }
+
+    @Test
+    public void testConfidentialClientIdAndSecret() throws Exception {
+        String address = "https://localhost:" + PORT + "/oauth2/token";
+        WebClient wc = createWebClient(address);
+
+        
+        ClientAccessToken at = OAuthClientUtils.getAccessToken(wc,
+                                                               new Consumer("fred", "password"),
+                                                               new CustomGrant(),
+                                                               false);
+        assertNotNull(at.getTokenKey());
+    }
+    
     @Test
     public void testTwoWayTLSAuthenticationCustomGrant() throws Exception {
         String address = "https://localhost:" + PORT + "/oauth2/token";
