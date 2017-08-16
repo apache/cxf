@@ -29,6 +29,7 @@ import org.apache.cxf.testutil.common.TestUtil;
 
 public class BookServerOAuth2 extends AbstractBusTestServerBase {
     public static final String PORT = TestUtil.getPortNumber("jaxrs-oauth2");
+    public static final String PORT_PUBLIC = TestUtil.getPortNumber("jaxrs-oauth2-public");
     private static final URL SERVER_CONFIG_FILE =
         BookServerOAuth2.class.getResource("server.xml");
 

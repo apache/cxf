@@ -115,6 +115,10 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
         client.getAllowedGrantTypes().add("custom_grant");
         this.setClient(client);
         
+        client = new Client("fredPublic", null, false);
+        client.getAllowedGrantTypes().add("custom_grant");
+        this.setClient(client);
+        
         client = new Client("fred", "password", true);
         client.getAllowedGrantTypes().add("custom_grant");
         this.setClient(client);

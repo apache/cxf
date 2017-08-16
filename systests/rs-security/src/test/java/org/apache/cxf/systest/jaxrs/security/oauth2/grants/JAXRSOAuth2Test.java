@@ -160,6 +160,19 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testPublicClientIdOnly() throws Exception {
+        String address = "http://localhost:" + BookServerOAuth2.PORT_PUBLIC + "/oauth2Public/token";
+        WebClient wc = WebClient.create(address);
+
+        
+        ClientAccessToken at = OAuthClientUtils.getAccessToken(wc,
+                                                               new Consumer("fredPublic"),
+                                                               new CustomGrant(),
+                                                               false);
+        assertNotNull(at.getTokenKey());
+    }
+    
+    @Test
     public void testTwoWayTLSAuthenticationCustomGrant() throws Exception {
         String address = "https://localhost:" + PORT + "/oauth2/token";
         WebClient wc = createWebClient(address);

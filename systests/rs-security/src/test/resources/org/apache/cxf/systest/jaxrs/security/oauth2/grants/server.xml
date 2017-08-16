@@ -88,6 +88,16 @@ under the License.
                 <ref bean="clientCredGrantHandler"/>
             </list>
         </property>
+        <property name="canSupportPublicClients" value="true"/>
+    </bean>
+    <bean id="serviceBeanPublic" class="org.apache.cxf.rs.security.oauth2.services.AccessTokenService">
+        <property name="dataProvider" ref="dataProvider"/>
+        <property name="grantHandlers">
+            <list>
+                <ref bean="customGrantHandler"/>
+            </list>
+        </property>
+        <property name="canSupportPublicClients" value="true"/>
     </bean>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-oauth2}/oauth2">
         <jaxrs:serviceBeans>
@@ -101,6 +111,11 @@ under the License.
             <entry key="rs.security.keystore.file" value="keys/alice.jks" />
             <entry key="rs.security.signature.algorithm" value="RS256" />
         </jaxrs:properties>
+    </jaxrs:server>
+    <jaxrs:server address="http://localhost:${testutil.ports.jaxrs-oauth2-public}/oauth2Public">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBeanPublic"/>
+        </jaxrs:serviceBeans>
     </jaxrs:server>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-oauth2}/oauth2-auth">
         <jaxrs:serviceBeans>
