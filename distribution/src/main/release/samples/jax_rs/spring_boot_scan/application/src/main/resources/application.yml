@@ -10,7 +10,7 @@ cxf:
     service-list-path: /info
   jaxrs:
     component-scan: true
-    classes-scan-packages: org.apache.cxf.jaxrs.swagger,org.apache.cxf.metrics
+    classes-scan-packages: org.apache.cxf.metrics
 
 eureka:
   client:
@@ -21,7 +21,7 @@ eureka:
     statusPageUrlPath: /services/helloservice/info
     healthCheckUrlPath: /system/health
     metadataMap:
-      instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}} 
+      instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}}
       servletPath: ${cxf.path}
 
 endpoints:
