@@ -31,10 +31,10 @@ $ mvn dockerfile:push
 
 Run the container:
 --
-docker run -p 8080:8080 -t ${username}/apachecxf:spring-boot-sample-rs-cxf
+docker run -p 8080:8080 -t ${username}/apachecxf:spring-boot-sample-rs
 --
 
-== Testing the server ==
+= Testing the server =
 
 ---- From the browser ----
 
@@ -45,6 +45,7 @@ will display "Hello ApacheCxfUser, Welcome to CXF RS Spring Boot World!!!"
 http://localhost:8080/services/helloservice/sayHello2/ApacheCxfUser
 
 will display "Hello2 ApacheCxfUser, Welcome to CXF RS Spring Boot World!!!"
+
 
 http://localhost:8080/services/helloservice/swagger.json will return a Swagger JSON
 description of services.

@@ -16,7 +16,7 @@ eureka:
   client:
     registerWithEureka: true
     serviceUrl:
-      defaultZone: http://127.0.0.1:8761/eureka/
+      defaultZone: ${EUREKA_SERVER_URI:http://${EUREKA_SERVER_USER:}:${EUREKA_SERVER_PASS:}@127.0.0.1:8761}/eureka/
   instance:
     statusPageUrlPath: /services/helloservice/info
     healthCheckUrlPath: /system/health

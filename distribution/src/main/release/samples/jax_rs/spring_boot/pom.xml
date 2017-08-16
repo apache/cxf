@@ -9,7 +9,7 @@
         <relativePath>../..</relativePath>
     </parent>
     <groupId>org.apache.cxf.samples</groupId> 
-    <artifactId>spring-boot-sample-rs-cxf</artifactId>
+    <artifactId>spring-boot-sample-rs</artifactId>
     <name>Spring Boot CXF REST Application</name>
     <description>Spring Boot CXF REST Application with Swagger UI</description>
     <dependencyManagement>
