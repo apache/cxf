@@ -100,7 +100,7 @@ public abstract class AbstractOutDatabindingInterceptor extends AbstractPhaseInt
 
         if (out != null
             && writeToOutputStream(message, operation.getBinding(), service)
-            && !MessageUtils.isTrue(message.getContextualProperty(DISABLE_OUTPUTSTREAM_OPTIMIZATION))) {
+            && !MessageUtils.getContextualBoolean(message, DISABLE_OUTPUTSTREAM_OPTIMIZATION, false)) {
             if (xmlWriter != null) {
                 try {
                     xmlWriter.writeCharacters("");
@@ -186,7 +186,7 @@ public abstract class AbstractOutDatabindingInterceptor extends AbstractPhaseInt
         DataWriter<T> writer = service.getDataBinding().createWriter(output);
 
         Collection<Attachment> atts = message.getAttachments();
-        if (MessageUtils.isTrue(message.getContextualProperty(Message.MTOM_ENABLED))
+        if (MessageUtils.getContextualBoolean(message, Message.MTOM_ENABLED, false)
               && atts == null) {
             atts = new ArrayList<>();
             message.setAttachments(atts);

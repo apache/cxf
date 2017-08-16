@@ -49,6 +49,7 @@ import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSession;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.jsse.SSLUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
@@ -182,7 +183,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             //the SSLSocketFactory.
             o = false;
         }
-        if (!MessageUtils.isTrue(o)) {
+        if (!PropertyUtils.isTrue(o)) {
             message.put(USE_ASYNC, Boolean.FALSE);
             super.setupConnection(message, addressChanged ? new Address(uriString, uri) : address, csPolicy);
             return;
@@ -307,7 +308,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         protected void setProtocolHeaders() throws IOException {
             Headers h = new Headers(outMessage);
             basicEntity.setContentType(h.determineContentType());
-            boolean addHeaders = MessageUtils.isTrue(outMessage.getContextualProperty(Headers.ADD_HEADERS_PROPERTY));
+            boolean addHeaders = MessageUtils.getContextualBoolean(outMessage, Headers.ADD_HEADERS_PROPERTY, false);
 
             for (Map.Entry<String, List<String>> header : h.headerMap().entrySet()) {
                 if (HttpHeaderHelper.CONTENT_TYPE.equalsIgnoreCase(header.getKey())) {

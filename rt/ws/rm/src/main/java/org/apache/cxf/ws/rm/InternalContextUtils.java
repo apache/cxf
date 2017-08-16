@@ -161,8 +161,7 @@ final class InternalContextUtils {
                 if (backChannel != null) {
                     partialResponse.put(Message.PARTIAL_RESPONSE_MESSAGE, Boolean.TRUE);
                     partialResponse.put(Message.EMPTY_PARTIAL_RESPONSE_MESSAGE, Boolean.TRUE);
-                    boolean robust =
-                        MessageUtils.isTrue(inMessage.getContextualProperty(Message.ROBUST_ONEWAY));
+                    boolean robust = MessageUtils.getContextualBoolean(inMessage, Message.ROBUST_ONEWAY, false);
 
                     if (robust) {
                         BindingOperationInfo boi = exchange.getBindingOperationInfo();

@@ -129,6 +129,9 @@ public final class MessageUtils {
         return PropertyUtils.isTrue(value);
     }
 
+    public static boolean getContextualBoolean(Message m, String key) {
+        return getContextualBoolean(m, key, false);
+    }
     public static boolean getContextualBoolean(Message m, String key, boolean defaultValue) {
         if (m != null) {
             Object o = m.getContextualProperty(key);

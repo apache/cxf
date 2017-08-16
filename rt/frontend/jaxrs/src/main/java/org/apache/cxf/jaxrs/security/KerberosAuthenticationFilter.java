@@ -40,12 +40,12 @@ import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.common.security.SimpleSecurityContext;
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.security.SecurityContext;
 import org.ietf.jgss.GSSContext;
 import org.ietf.jgss.GSSException;
@@ -128,7 +128,7 @@ public class KerberosAuthenticationFilter implements ContainerRequestFilter {
     }
 
     protected GSSContext createGSSContext() throws GSSException {
-        boolean useKerberosOid = MessageUtils.isTrue(
+        boolean useKerberosOid = PropertyUtils.isTrue(
             messageContext.getContextualProperty(PROPERTY_USE_KERBEROS_OID));
         Oid oid = new Oid(useKerberosOid ? KERBEROS_OID : SPNEGO_OID);
 

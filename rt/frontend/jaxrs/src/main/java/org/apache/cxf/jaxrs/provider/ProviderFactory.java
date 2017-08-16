@@ -293,7 +293,7 @@ public abstract class ProviderFactory {
 
         Class<?> mapperClass = ClassHelper.getRealClass(bus, em.getProvider());
         Type[] types = null;
-        if (m != null && MessageUtils.isTrue(m.getContextualProperty(IGNORE_TYPE_VARIABLES))) {
+        if (m != null && MessageUtils.getContextualBoolean(m, IGNORE_TYPE_VARIABLES)) {
             types = new Type[]{mapperClass};
         } else {
             types = getGenericInterfaces(mapperClass, expectedType);

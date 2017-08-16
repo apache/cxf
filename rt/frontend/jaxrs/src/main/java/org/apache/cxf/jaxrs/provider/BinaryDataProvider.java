@@ -49,6 +49,7 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import org.apache.cxf.annotations.UseNio;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.MessageDigestInputStream;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.helpers.FileUtils;
@@ -62,7 +63,6 @@ import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
 public class BinaryDataProvider<T> extends AbstractConfigurableProvider
@@ -243,7 +243,7 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
     protected boolean isRangeSupported() {
         Message message = PhaseInterceptorChain.getCurrentMessage();
         if (message != null) {
-            return MessageUtils.isTrue(message.get(HTTP_RANGE_PROPERTY));
+            return PropertyUtils.isTrue(message.get(HTTP_RANGE_PROPERTY));
         }
         return false;
     }

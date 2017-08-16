@@ -55,6 +55,7 @@ import org.apache.cxf.attachment.ByteDataSource;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PrimitiveUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
@@ -70,7 +71,6 @@ import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.multipart.AttachmentUtils;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
 
 @Provider
 @Consumes({"multipart/related", "multipart/mixed", "multipart/alternative", "multipart/form-data" })
@@ -131,7 +131,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
                 || Collection.class.isAssignableFrom(type)
                 || Map.class.isAssignableFrom(type) && type != MultivaluedMap.class
                 || AnnotationUtils.getAnnotation(anns, Multipart.class) != null
-                || MessageUtils.isTrue(mc.getContextualProperty(SUPPORT_TYPE_AS_MULTIPART)));
+                || PropertyUtils.isTrue(mc.getContextualProperty(SUPPORT_TYPE_AS_MULTIPART)));
     }
 
     protected void checkContentLength() {
@@ -171,7 +171,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
         if (multipart != null) {
             if (collectionExpected
                 && !mediaTypeSupported(multipart.getContentType())
-                && !MessageUtils.isTrue(mc.getContextualProperty(SINGLE_PART_IS_COLLECTION))) {
+                && !PropertyUtils.isTrue(mc.getContextualProperty(SINGLE_PART_IS_COLLECTION))) {
                 List<Attachment> allMultiparts = AttachmentUtils.getMatchingAttachments(id, infos);
                 return getAttachmentCollection(t, allMultiparts, anns);
             }
@@ -426,7 +426,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
             mimeType = id.type();
         }
         if (mimeType == null) {
-            if (MessageUtils.isTrue(mc.getContextualProperty(Message.MTOM_ENABLED))) {
+            if (PropertyUtils.isTrue(mc.getContextualProperty(Message.MTOM_ENABLED))) {
                 mimeType = "text/xml";
             } else {
                 mimeType = MediaType.APPLICATION_OCTET_STREAM;

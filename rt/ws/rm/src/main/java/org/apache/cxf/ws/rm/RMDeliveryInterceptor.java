@@ -56,7 +56,7 @@ public class RMDeliveryInterceptor extends AbstractRMInterceptor<Message> {
         LOG.entering(getClass().getName(), "handleMessage");
         Destination dest = getManager().getDestination(message);
         final boolean robust =
-            MessageUtils.isTrue(message.getContextualProperty(Message.ROBUST_ONEWAY));
+            MessageUtils.getContextualBoolean(message, Message.ROBUST_ONEWAY, false);
         if (robust) {
             message.remove(RMMessageConstants.DELIVERING_ROBUST_ONEWAY);
             dest.acknowledge(message);

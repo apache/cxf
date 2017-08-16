@@ -183,7 +183,7 @@ public class DestinationSequence extends AbstractSequence {
 
         if (updated) {
             RMStore store = destination.getManager().getStore();
-            if (null != store && !MessageUtils.isTrue(message.getContextualProperty(Message.ROBUST_ONEWAY))) {
+            if (null != store && !MessageUtils.getContextualBoolean(message, Message.ROBUST_ONEWAY, false)) {
                 try {
                     RMMessage msg = new RMMessage();
                     CachedOutputStream cos = (CachedOutputStream)message
@@ -272,10 +272,10 @@ public class DestinationSequence extends AbstractSequence {
         boolean robustDelivering = false;
         boolean inOrder = mn - nextInOrder == 1;
         if (message != null) {
-            robust = MessageUtils.isTrue(message.getContextualProperty(Message.ROBUST_ONEWAY));
+            robust = MessageUtils.getContextualBoolean(message, Message.ROBUST_ONEWAY, false);
             if (robust) {
                 robustDelivering =
-                    MessageUtils.isTrue(message.get(RMMessageConstants.DELIVERING_ROBUST_ONEWAY));
+                    MessageUtils.getContextualBoolean(message, RMMessageConstants.DELIVERING_ROBUST_ONEWAY, false);
             }
         }
         if (robust && !robustDelivering) {
