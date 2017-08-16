@@ -33,6 +33,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.continuations.SuspendedInvocationException;
@@ -183,7 +184,7 @@ public class DestinationSequence extends AbstractSequence {
 
         if (updated) {
             RMStore store = destination.getManager().getStore();
-            if (null != store && !MessageUtils.getContextualBoolean(message, Message.ROBUST_ONEWAY, false)) {
+            if (null != store && !MessageUtils.getContextualBoolean(message, Message.ROBUST_ONEWAY)) {
                 try {
                     RMMessage msg = new RMMessage();
                     CachedOutputStream cos = (CachedOutputStream)message
@@ -272,10 +273,10 @@ public class DestinationSequence extends AbstractSequence {
         boolean robustDelivering = false;
         boolean inOrder = mn - nextInOrder == 1;
         if (message != null) {
-            robust = MessageUtils.getContextualBoolean(message, Message.ROBUST_ONEWAY, false);
+            robust = MessageUtils.getContextualBoolean(message, Message.ROBUST_ONEWAY);
             if (robust) {
                 robustDelivering =
-                    MessageUtils.getContextualBoolean(message, RMMessageConstants.DELIVERING_ROBUST_ONEWAY, false);
+                    PropertyUtils.isTrue(message.get(RMMessageConstants.DELIVERING_ROBUST_ONEWAY));
             }
         }
         if (robust && !robustDelivering) {
