@@ -58,7 +58,6 @@ public class SEIGenerator extends AbstractJAXWSGenerator {
     }
 
     private boolean hasHandlerConfig(JavaInterface intf) {
-        // TODO : enbale handler chain
         return intf.getHandlerChains() != null;
 
     }

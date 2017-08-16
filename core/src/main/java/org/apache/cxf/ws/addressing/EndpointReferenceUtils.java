@@ -490,10 +490,6 @@ public final class EndpointReferenceUtils {
         if (null == wsdlLocation) {
             return null;
         }
-
-        //TODO The wsdlLocation inserted should be a valid URI
-        //before doing a split. So temporarily return the string
-        //return wsdlLocation.split(" ");
         return wsdlLocation;
     }
 
@@ -715,7 +711,6 @@ public final class EndpointReferenceUtils {
         EndpointReferenceType reference = new EndpointReferenceType();
         reference.setMetadata(new MetadataType());
         setServiceAndPortName(reference, serviceName, portName);
-        //TODO To Ensure it is a valid URI syntax.
         setWSDLLocation(reference, wsdlUrl.toString());
 
         return reference;

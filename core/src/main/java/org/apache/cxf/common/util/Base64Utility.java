@@ -188,8 +188,7 @@ public final class Base64Utility {
 
     public static byte[] decode(String id, boolean urlSafe) throws Base64Exception {
         if (urlSafe) {
-            //TODO: optimize further
-            id = id.replace("-", "+").replace('_', '/');
+            id = id.replace('-', '+').replace('_', '/');
             switch (id.length() % 4) {
             case 0:
                 break;

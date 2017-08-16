@@ -188,8 +188,6 @@ public class JavaToWSDLProcessor implements Processor {
             if (clz.getInterfaces().length == 1) {
                 context.put(ToolConstants.SEI_CLASS, clz.getInterfaces()[0].getName());
             }
-            //TODO: if it is simple frontend, and the impl class implments
-            //multiple interfaces
             context.put(ToolConstants.GEN_FROM_SEI, Boolean.FALSE);
         }
         builderFactory.setServiceClass(clz);

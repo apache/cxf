@@ -32,8 +32,6 @@ import org.apache.cxf.security.LoginSecurityContext;
  * SecurityContext which implements isUserInRole using the
  * following approach : skip the first Subject principal, and then checks
  * Groups the principal is a member of
- *
- * TODO : consider moving this class into a rt-core-security module
  */
 public class DefaultSecurityContext implements LoginSecurityContext {
 
