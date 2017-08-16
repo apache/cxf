@@ -74,7 +74,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     public void handleMessage(SoapMessage msg) throws Fault {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
         boolean enableStax =
-            MessageUtils.isTrue(msg.getContextualProperty(SecurityConstants.ENABLE_STREAMING_SECURITY));
+            MessageUtils.getContextualBoolean(msg, SecurityConstants.ENABLE_STREAMING_SECURITY);
         if (aim != null && !enableStax) {
             super.handleMessage(msg);
         }

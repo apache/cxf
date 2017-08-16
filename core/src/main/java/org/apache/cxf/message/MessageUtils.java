@@ -124,8 +124,8 @@ public final class MessageUtils {
      * @param value
      * @return true if value is either the String "true" or Boolean.TRUE
      */
+    @Deprecated
     public static boolean isTrue(Object value) {
-        // TODO - consider deprecation as this really belongs in PropertyUtils
         return PropertyUtils.isTrue(value);
     }
 

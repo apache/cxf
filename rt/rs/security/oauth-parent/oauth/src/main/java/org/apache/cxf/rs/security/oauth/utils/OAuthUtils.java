@@ -46,12 +46,12 @@ import net.oauth.OAuthValidator;
 import net.oauth.server.OAuthServlet;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.utils.FormUtils;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.oauth.data.Client;
 import org.apache.cxf.rs.security.oauth.data.RequestToken;
@@ -164,8 +164,8 @@ public final class OAuthUtils {
                                            Exception e,
                                            int status) {
         ResponseBuilder builder = Response.status(status);
-        if (MessageUtils.isTrue(mc.getContextualProperty(REPORT_FAILURE_DETAILS))) {
-            boolean asHeader = MessageUtils.isTrue(
+        if (PropertyUtils.isTrue(mc.getContextualProperty(REPORT_FAILURE_DETAILS))) {
+            boolean asHeader = PropertyUtils.isTrue(
                 mc.getContextualProperty(REPORT_FAILURE_DETAILS_AS_HEADER));
             String text = null;
             if (e instanceof OAuthProblemException) {

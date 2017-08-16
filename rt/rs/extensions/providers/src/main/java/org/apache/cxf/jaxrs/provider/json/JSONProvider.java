@@ -59,6 +59,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Document;
 
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
@@ -71,7 +72,6 @@ import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXBUtils;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.staxutils.DocumentDepthProperties;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
@@ -493,7 +493,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         OutputStream actualOs = os;
 
         MessageContext mc = getContext();
-        if (mc != null && MessageUtils.isTrue(mc.get(Marshaller.JAXB_FORMATTED_OUTPUT))) {
+        if (mc != null && PropertyUtils.isTrue(mc.get(Marshaller.JAXB_FORMATTED_OUTPUT))) {
             actualOs = new CachedOutputStream();
         }
         XMLStreamWriter writer = createWriter(actualObject, actualClass, genericType, enc,
@@ -603,7 +603,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         if (mc != null) {
             Object prop = mc.get(name);
             if (prop != null) {
-                return MessageUtils.isTrue(prop);
+                return PropertyUtils.isTrue(prop);
             }
         }
         return defaultValue;

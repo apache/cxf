@@ -619,7 +619,7 @@ public final class JAXRSUtils {
                 rb.header("Allow", "HEAD");
             }
         }
-        if (msg != null && MessageUtils.isTrue(msg.getContextualProperty(REPORT_FAULT_MESSAGE_PROPERTY))) {
+        if (msg != null && MessageUtils.getContextualBoolean(msg, REPORT_FAULT_MESSAGE_PROPERTY)) {
             rb.type(MediaType.TEXT_PLAIN_TYPE).entity(responseMessage);
         }
         return rb.build();
@@ -1536,8 +1536,7 @@ public final class JAXRSUtils {
 
         String subTypeAfterPlus1 = splitMediaSubType(subType1, true);
         String subTypeAfterPlus2 = splitMediaSubType(subType2, true);
-        if (message != null && MessageUtils.isTrue(
-            message.getContextualProperty(PARTIAL_HIERARCHICAL_MEDIA_SUBTYPE_CHECK))) {
+        if (message != null && MessageUtils.getContextualBoolean(message, PARTIAL_HIERARCHICAL_MEDIA_SUBTYPE_CHECK)) {
             if (subTypeAfterPlus1 != null || subTypeAfterPlus2 != null) {
                 boolean nullPossible = subTypeAfterPlus1 == null || subTypeAfterPlus2 == null;
                 isCompatible = subTypeAfterPlus1 == null && subTypeAfterPlus2.equals(subType1)

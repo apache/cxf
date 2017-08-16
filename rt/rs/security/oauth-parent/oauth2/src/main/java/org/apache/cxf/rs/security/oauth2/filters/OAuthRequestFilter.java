@@ -39,13 +39,13 @@ import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.security.SimplePrincipal;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.provider.FormEncodingProvider;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenValidation;
@@ -257,7 +257,7 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
         //used to handle preflights but local preflights (to be handled by the service code)
         // will be blocked by this filter unless CORS filter has done the initial validation
         // and set a message "local_preflight" property to true
-        return MessageUtils.isTrue(m.get("local_preflight"));
+        return PropertyUtils.isTrue(m.get("local_preflight"));
     }
 
     protected String validateAudiences(List<String> audiences) {

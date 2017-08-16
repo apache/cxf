@@ -42,7 +42,6 @@ import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
 
 public abstract class AbstractSearchConditionParser<T> implements SearchConditionParser<T> {
 
@@ -97,7 +96,7 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
         } catch (Exception e) {
             // continue
         }
-        if (typeInfo == null && !MessageUtils.isTrue(contextProperties.get(SearchUtils.LAX_PROPERTY_MATCH))) {
+        if (typeInfo == null && !PropertyUtils.isTrue(contextProperties.get(SearchUtils.LAX_PROPERTY_MATCH))) {
             throw new PropertyNotFoundException(name, value);
         }
         return typeInfo;

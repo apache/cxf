@@ -308,8 +308,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
 
     private void assertIsNotTextMessageAndMtom(final Message outMessage) {
         boolean isTextPayload = JMSConstants.TEXT_MESSAGE_TYPE.equals(jmsConfig.getMessageType());
-        if (isTextPayload && MessageUtils.isTrue(outMessage.getContextualProperty(
-            org.apache.cxf.message.Message.MTOM_ENABLED))
+        if (isTextPayload && MessageUtils.getContextualBoolean(outMessage, org.apache.cxf.message.Message.MTOM_ENABLED)
             && outMessage.getAttachments() != null && outMessage.getAttachments().size() > 0) {
             org.apache.cxf.common.i18n.Message msg =
                 new org.apache.cxf.common.i18n.Message("INVALID_MESSAGE_TYPE", LOG);

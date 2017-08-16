@@ -39,6 +39,7 @@ import javax.jms.Session;
 import javax.jms.TextMessage;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
@@ -216,7 +217,7 @@ final class JMSMessageUtils {
             .get(org.apache.cxf.message.Message.PROTOCOL_HEADERS));
         
         boolean isSoapMessage =
-            !MessageUtils.isTrue(outMessage.getExchange().get(org.apache.cxf.message.Message.REST_MESSAGE));
+            !PropertyUtils.isTrue(outMessage.getExchange().get(org.apache.cxf.message.Message.REST_MESSAGE));
         
         if (isSoapMessage) {
             if (!messageHeaders.isSetSOAPJMSTargetService()) {
@@ -366,7 +367,6 @@ final class JMSMessageUtils {
     }
 
     public static boolean isMtomEnabled(final org.apache.cxf.message.Message message) {
-        return MessageUtils.isTrue(message.getContextualProperty(
-                                                       org.apache.cxf.message.Message.MTOM_ENABLED));
+        return MessageUtils.getContextualBoolean(message, org.apache.cxf.message.Message.MTOM_ENABLED);
     }
 }

@@ -39,6 +39,7 @@ import javax.ws.rs.core.Application;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PrimitiveUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.helpers.CastUtils;
@@ -53,7 +54,6 @@ import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.invoker.Invoker;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 
@@ -525,7 +525,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
 
     protected boolean isIgnoreApplicationPath(ServletConfig servletConfig) {
         String ignoreParam = servletConfig.getInitParameter(IGNORE_APP_PATH_PARAM);
-        return ignoreParam == null || MessageUtils.isTrue(ignoreParam);
+        return ignoreParam == null || PropertyUtils.isTrue(ignoreParam);
     }
 
     protected void createServerFromApplication(ServletConfig servletConfig)

@@ -74,8 +74,7 @@ public abstract class AbstractSpnegoAuthSupplier {
         try {
             String spn = getCompleteServicePrincipalName(currentURI);
 
-            boolean useKerberosOid = MessageUtils.isTrue(
-                message.getContextualProperty(PROPERTY_USE_KERBEROS_OID));
+            boolean useKerberosOid = MessageUtils.getContextualBoolean(message, PROPERTY_USE_KERBEROS_OID);
             Oid oid = new Oid(useKerberosOid ? KERBEROS_OID : SPNEGO_OID);
 
             byte[] token = getToken(authPolicy, spn, oid, message);
@@ -151,8 +150,7 @@ public abstract class AbstractSpnegoAuthSupplier {
     }
 
     protected boolean isCredDelegationRequired(Message message) {
-        Object prop = message.getContextualProperty(PROPERTY_REQUIRE_CRED_DELEGATION);
-        return prop == null ? credDelegation : MessageUtils.isTrue(prop);
+        return MessageUtils.getContextualBoolean(message, PROPERTY_REQUIRE_CRED_DELEGATION, credDelegation);
     }
 
     protected String getCompleteServicePrincipalName(URI currentURI) {

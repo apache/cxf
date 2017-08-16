@@ -414,8 +414,7 @@ public abstract class AbstractClient implements Client {
         Map<String, List<Object>> protocolHeaders =
             CastUtils.cast((Map<?, ?>)responseMessage.get(Message.PROTOCOL_HEADERS));
 
-        boolean splitHeaders =
-            MessageUtils.isTrue(outMessage.getContextualProperty(HEADER_SPLIT_PROPERTY));
+        boolean splitHeaders = MessageUtils.getContextualBoolean(outMessage, HEADER_SPLIT_PROPERTY);
         for (Map.Entry<String, List<Object>> entry : protocolHeaders.entrySet()) {
             if (null == entry.getKey()) {
                 continue;
@@ -534,7 +533,7 @@ public abstract class AbstractClient implements Client {
 
     protected boolean responseStreamCanBeClosed(Message outMessage, Class<?> cls) {
         return !JAXRSUtils.isStreamingOutType(cls)
-            && MessageUtils.isTrue(outMessage.getContextualProperty("response.stream.auto.close"));
+            && MessageUtils.getContextualBoolean(outMessage, "response.stream.auto.close");
     }
 
     protected void completeExchange(Exchange exchange, boolean proxy) {
@@ -650,7 +649,7 @@ public abstract class AbstractClient implements Client {
         URI newBaseURI = URI.create(reqContext.get(Message.ENDPOINT_ADDRESS).toString());
         URI requestURI = URI.create(reqContext.get(Message.REQUEST_URI).toString());
         return calculateNewRequestURI(newBaseURI, requestURI,
-                MessageUtils.isTrue(reqContext.get(PROXY_PROPERTY)));
+                PropertyUtils.isTrue(reqContext.get(PROXY_PROPERTY)));
     }
 
     private URI calculateNewRequestURI(URI newBaseURI, URI requestURI, boolean proxy) {

@@ -43,6 +43,7 @@ import org.apache.cxf.binding.soap.interceptor.SoapActionInInterceptor;
 import org.apache.cxf.binding.soap.model.SoapOperationInfo;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientLifeCycleListener;
@@ -1115,7 +1116,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
             }
 
             if (!StringUtils.isEmpty(sa) && valid
-                && !MessageUtils.isTrue(message.get(MAPAggregator.ACTION_VERIFIED))) {
+                && !PropertyUtils.isTrue(message.get(MAPAggregator.ACTION_VERIFIED))) {
                 if (sa.startsWith("\"")) {
                     sa = sa.substring(1, sa.lastIndexOf('"'));
                 }
