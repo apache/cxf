@@ -73,8 +73,6 @@ public class CorbaStreamFaultInInterceptor extends AbstractPhaseInterceptor<Mess
 
             SystemException sysEx = message.getSystemException();
             if (sysEx != null) {
-                // TODO: Do we need anything else to handle system exceptions here...i.e. do
-                // we want to add a wrapper around this so that we can add some more information?
                 message.setContent(Exception.class, sysEx);
                 return;
             }

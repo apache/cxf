@@ -214,7 +214,6 @@ public final class CorbaUtils {
             } else if (obj instanceof Exception) {
                 Exception exceptType = (Exception)obj;
 
-                // TODO: check to see if this is a recursive type.
                 List<MemberType> list = exceptType.getMember();
                 StructMember[] members = new StructMember[list.size()];
                 for (int i = 0; i < members.length; ++i) {
@@ -244,7 +243,6 @@ public final class CorbaUtils {
             } else if (obj instanceof Struct) {
                 Struct structType = (Struct)obj;
 
-                // TODO: check to see if this is a recursive type.
                 if (seenTypes.contains(new QName(structType.getName()))) {
                     tc = orb.create_recursive_tc(structType.getRepositoryID());
                 } else {

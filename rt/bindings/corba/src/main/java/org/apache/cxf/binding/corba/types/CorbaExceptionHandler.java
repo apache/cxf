@@ -78,6 +78,4 @@ public class CorbaExceptionHandler extends CorbaObjectHandler {
             members.get(i).clear();
         }
     }
-
-    // TODO: Can we add the features that exist in the main package here?
 }
