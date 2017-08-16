@@ -110,6 +110,14 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
         client.getAllowedGrantTypes().add("urn:ietf:params:oauth:grant-type:jwt-bearer");
         client.getAllowedGrantTypes().add("custom_grant");
         this.setClient(client);
+        
+        client = new Client("fredNoPassword", null, true);
+        client.getAllowedGrantTypes().add("custom_grant");
+        this.setClient(client);
+        
+        client = new Client("fred", "password", true);
+        client.getAllowedGrantTypes().add("custom_grant");
+        this.setClient(client);
 
         Certificate cert = loadCert();
         String encodedCert = Base64Utility.encode(cert.getEncoded());
