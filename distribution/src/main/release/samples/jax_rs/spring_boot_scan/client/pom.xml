@@ -7,7 +7,7 @@
         <version>3.1.13-SNAPSHOT</version>
         <relativePath>../../..</relativePath>
     </parent>
-    <artifactId>spring-boot-sample-rs-cxf-scan-client</artifactId>
+    <artifactId>spring-boot-sample-rs-scan-client</artifactId>
     <name>Spring Boot CXF REST Scan Application Client</name>
     <description>Spring Boot CXF REST Scan Application Client</description>
 
