@@ -114,7 +114,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         // and this property is not already set. The async conduit is loaded in the tests module
         // but we do want to test HTTPUrlConnection reflection hence we set this property to false
         WebClient.getConfig(wc).getRequestContext().put("use.async.http.conduit", false);
-        
+        WebClient.getConfig(wc).getRequestContext().put("response.stream.auto.close", true);
         return wc.invoke("RETRIEVE", new Book("Retrieve", 123L), Book.class);
     }
     

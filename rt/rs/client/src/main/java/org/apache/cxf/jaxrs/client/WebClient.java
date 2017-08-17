@@ -1194,9 +1194,9 @@ public class WebClient extends AbstractClient {
                     entity = currentResponse.getEntity();
                 }
             }
-            rb = JAXRSUtils.fromResponse(currentResponse);
-            
-            rb.entity(entity instanceof Response 
+            rb = JAXRSUtils.fromResponse(currentResponse, false);
+
+            rb.entity(entity instanceof Response
                       ? ((Response)entity).getEntity() : entity);
             
             Response r = rb.build();
