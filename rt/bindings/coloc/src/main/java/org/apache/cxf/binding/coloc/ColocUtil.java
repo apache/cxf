@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.binding.coloc;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Iterator;
@@ -39,6 +37,7 @@ import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.interceptor.InterceptorProvider;
@@ -288,11 +287,9 @@ public final class ColocUtil {
         Object object = content.get(0);
         DataWriter<OutputStream> writer =
             message.getExchange().getService().getDataBinding().createWriter(OutputStream.class);
-        //TODO use a better conversion method to get a Source from a pojo.
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        LoadingByteArrayOutputStream bos = new LoadingByteArrayOutputStream();
         writer.write(object, bos);
-
-        content.set(0, new StreamSource(new ByteArrayInputStream(bos.toByteArray())));
+        content.set(0, new StreamSource(bos.createInputStream()));
     }
 
     private static MessageInfo getMessageInfo(Message message) {

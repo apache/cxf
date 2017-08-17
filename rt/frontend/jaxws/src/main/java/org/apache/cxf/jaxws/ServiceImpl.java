@@ -570,7 +570,9 @@ public class ServiceImpl extends ServiceDelegate {
     }
 
     private PortInfoImpl getPortInfo(QName portName) {
-        // TODO if the portName null ?
+        if (portName == null) {
+            return null;
+        }
         return portInfos.get(portName);
     }
 

@@ -186,7 +186,6 @@ public class BareInInterceptorTest extends Assert {
         assertEquals("TestSOAPOutputPMessage", greet.getResponseType());
     }
 
-    //TODO: remove duplicate code in setUpUsingHelloWorld and setUpUsingDocLit
     private void setUpUsingHelloWorld() throws Exception {
         String ns = "http://apache.org/hello_world_soap_http";
         WSDLServiceFactory factory = new WSDLServiceFactory(bus, getClass()

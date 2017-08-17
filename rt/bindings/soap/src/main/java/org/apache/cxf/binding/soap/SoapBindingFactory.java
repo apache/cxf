@@ -334,9 +334,6 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
     }
 
     public Binding createBinding(BindingInfo binding) {
-        // TODO what about the mix style/use?
-
-
         // The default style should be doc-lit wrapped.
         String parameterStyle = SoapBindingConstants.PARAMETER_STYLE_WRAPPED;
         String bindingStyle = SoapBindingConstants.BINDING_STYLE_DOC;

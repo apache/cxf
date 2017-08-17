@@ -304,8 +304,6 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
                 dataBinding = p.getDataBinding();
                 obj = p.getDataBinding().createReader(Node.class).read(elem);
             }
-            //TODO - add the interceptors
-
             SoapHeader shead = new SoapHeader(new QName(elem.getNamespaceURI(),
                                                         elem.getLocalName()),
                                                obj,

@@ -315,7 +315,6 @@ public final class WrapperClassGenerator extends ASMHelper {
                 ParameterizedType ptype = (ParameterizedType)genericType;
 
                 java.lang.reflect.Type[] types = ptype.getActualTypeArguments();
-                // TODO: more complex Parameterized type
                 if (types.length > 0) {
                     if (types[0] instanceof Class) {
                         fieldDescriptor = getClassCode(genericType);

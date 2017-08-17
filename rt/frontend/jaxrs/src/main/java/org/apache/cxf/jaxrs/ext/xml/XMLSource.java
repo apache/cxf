@@ -49,6 +49,7 @@ import org.w3c.dom.NodeList;
 
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -76,8 +77,7 @@ public class XMLSource {
             doc = StaxUtils.read(new StreamSource(stream));
             stream = null;
         } catch (XMLStreamException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new Fault(e); 
         }
     }
 

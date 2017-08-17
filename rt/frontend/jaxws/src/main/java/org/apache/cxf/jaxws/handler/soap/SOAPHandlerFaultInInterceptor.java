@@ -52,7 +52,6 @@ public class SOAPHandlerFaultInInterceptor extends
     }
 
     public Set<URI> getRoles() {
-        // TODO
         return new HashSet<>();
     }
 
@@ -150,6 +149,4 @@ public class SOAPHandlerFaultInInterceptor extends
         return xmlReader;
     }
 
-    public void handleFault(SoapMessage message) {
-    }
 }

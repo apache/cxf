@@ -86,7 +86,6 @@ public class SOAPHandlerInterceptor extends
     }
 
     public Set<URI> getRoles() {
-        //TODO
         return new HashSet<>();
     }
 

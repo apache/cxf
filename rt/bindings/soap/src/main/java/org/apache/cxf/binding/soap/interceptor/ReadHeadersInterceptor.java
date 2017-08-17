@@ -261,7 +261,6 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                                 dataReader.setProperty(Message.class.getName(), message);
                                 obj = dataReader.read(hel);
                             }
-                            // TODO - add the interceptors
 
                             SoapHeader shead = new SoapHeader(new QName(hel.getNamespaceURI(),
                                                                         hel.getLocalName()), obj, dataBinding);
