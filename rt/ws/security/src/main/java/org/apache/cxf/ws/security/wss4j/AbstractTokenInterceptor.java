@@ -81,7 +81,7 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
     public void handleMessage(SoapMessage message) throws Fault {
 
         boolean enableStax =
-            MessageUtils.isTrue(message.getContextualProperty(SecurityConstants.ENABLE_STREAMING_SECURITY));
+            MessageUtils.getContextualBoolean(message, SecurityConstants.ENABLE_STREAMING_SECURITY, false);
         if (enableStax) {
             return;
         }

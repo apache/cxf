@@ -124,11 +124,14 @@ public final class MessageUtils {
      * @param value
      * @return true if value is either the String "true" or Boolean.TRUE
      */
+    @Deprecated
     public static boolean isTrue(Object value) {
-        // TODO - consider deprecation as this really belongs in PropertyUtils
         return PropertyUtils.isTrue(value);
     }
 
+    public static boolean getContextualBoolean(Message m, String key) {
+        return getContextualBoolean(m, key, false);
+    }
     public static boolean getContextualBoolean(Message m, String key, boolean defaultValue) {
         if (m != null) {
             Object o = m.getContextualProperty(key);

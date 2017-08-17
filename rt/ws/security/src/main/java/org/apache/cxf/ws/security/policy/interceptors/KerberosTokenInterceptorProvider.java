@@ -163,7 +163,7 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
             // extract Assertion information
 
             boolean enableStax =
-                MessageUtils.isTrue(message.getContextualProperty(SecurityConstants.ENABLE_STREAMING_SECURITY));
+                MessageUtils.getContextualBoolean(message, SecurityConstants.ENABLE_STREAMING_SECURITY);
             if (aim != null && !enableStax) {
                 Collection<AssertionInfo> ais =
                     PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.KERBEROS_TOKEN);
@@ -225,7 +225,7 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
             // extract Assertion information
 
             boolean enableStax =
-                MessageUtils.isTrue(message.getContextualProperty(SecurityConstants.ENABLE_STREAMING_SECURITY));
+                MessageUtils.getContextualBoolean(message, SecurityConstants.ENABLE_STREAMING_SECURITY);
             if (aim != null && enableStax) {
                 Collection<AssertionInfo> ais =
                     PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.KERBEROS_TOKEN);

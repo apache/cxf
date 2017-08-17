@@ -75,7 +75,7 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
 
     public void handleMessage(SoapMessage mc) throws Fault {
         boolean enableStax =
-            MessageUtils.isTrue(mc.getContextualProperty(SecurityConstants.ENABLE_STREAMING_SECURITY));
+            MessageUtils.getContextualBoolean(mc, SecurityConstants.ENABLE_STREAMING_SECURITY);
         if (!enableStax) {
             if (mc.getContent(SOAPMessage.class) == null) {
                 saajOut.handleMessage(mc);

@@ -432,7 +432,6 @@ public class InTransformReader extends DepthXMLStreamReader {
             return null;
         }
         checkAttributeIndexRange(-1);
-        //TODO need reverse lookup
         return super.getAttributeValue(namespace, localName);
     }
 

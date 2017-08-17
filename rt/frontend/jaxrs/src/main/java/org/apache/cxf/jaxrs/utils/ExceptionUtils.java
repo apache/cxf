@@ -70,11 +70,9 @@ public final class ExceptionUtils {
         if (ex.getClass() == WebApplicationException.class) {
             WebApplicationException webEx = (WebApplicationException)ex;
             if (webEx.getResponse().hasEntity()
-                && webEx.getCause() == null) {
-                Object prop = inMessage.getContextualProperty(SUPPORT_WAE_SPEC_OPTIMIZATION);
-                if (prop == null || MessageUtils.isTrue(prop)) {
-                    response = webEx.getResponse();
-                }
+                && webEx.getCause() == null
+                && MessageUtils.getContextualBoolean(inMessage, SUPPORT_WAE_SPEC_OPTIMIZATION, true)) {
+                response = webEx.getResponse();
             }
         }
 

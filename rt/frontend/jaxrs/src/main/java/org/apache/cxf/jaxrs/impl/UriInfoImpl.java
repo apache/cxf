@@ -64,9 +64,9 @@ public class UriInfoImpl implements UriInfo {
         if (m != null) {
             this.stack = m.get(OperationResourceInfoStack.class);
             this.caseInsensitiveQueries =
-                MessageUtils.isTrue(m.getContextualProperty(CASE_INSENSITIVE_QUERIES));
+                MessageUtils.getContextualBoolean(m, CASE_INSENSITIVE_QUERIES);
             this.queryValueIsCollection =
-                MessageUtils.isTrue(m.getContextualProperty(PARSE_QUERY_VALUE_AS_COLLECTION));
+                MessageUtils.getContextualBoolean(m, PARSE_QUERY_VALUE_AS_COLLECTION);
         }
     }
 

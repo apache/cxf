@@ -163,7 +163,7 @@ public final class CorbaHandlerUtils {
                 break;
 
             default:
-               // TODO: Should we raise an exception or log?
+                //nothing to do, the Read/Write routines will throw exceptions
             }
         }
         return obj;

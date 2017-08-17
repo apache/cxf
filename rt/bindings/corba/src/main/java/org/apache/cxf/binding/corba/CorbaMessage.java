@@ -124,7 +124,6 @@ public class CorbaMessage extends AbstractWrappedMessage {
     }
 
     public void setStreamableReturnValue(CorbaObjectHandler data) {
-        // TODO: Handle case of the return parameter has not yet been initialized.
         returnParam.setObject(data);
     }
 
@@ -133,7 +132,6 @@ public class CorbaMessage extends AbstractWrappedMessage {
     }
 
     public void setStreamableExceptionValue(CorbaObjectHandler exData) {
-        // TODO: Handle case of the return parameter has not yet been initialized.
         except.setObject(exData);
     }
 

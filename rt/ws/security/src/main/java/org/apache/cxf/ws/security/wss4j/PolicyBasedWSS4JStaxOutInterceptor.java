@@ -47,7 +47,7 @@ public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor 
     public void handleMessage(SoapMessage msg) throws Fault {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
         boolean enableStax =
-            MessageUtils.isTrue(msg.getContextualProperty(SecurityConstants.ENABLE_STREAMING_SECURITY));
+            MessageUtils.getContextualBoolean(msg, SecurityConstants.ENABLE_STREAMING_SECURITY);
         if (aim != null && enableStax) {
             super.handleMessage(msg);
         }

@@ -1599,9 +1599,8 @@ public abstract class HTTPConduit
             // soap fault because of a HTTP 400 should be returned back to the client (SOAP 1.2 spec)
 
             if (rc >= 400 && rc != 500
-                && !MessageUtils.isTrue(outMessage.getContextualProperty(NO_IO_EXCEPTIONS))
-                && (rc > 400 || !MessageUtils.isTrue(outMessage
-                    .getContextualProperty(PROCESS_FAULT_ON_HTTP_400)))) {
+                && !MessageUtils.getContextualBoolean(outMessage, NO_IO_EXCEPTIONS)
+                && (rc > 400 || !MessageUtils.getContextualBoolean(outMessage, PROCESS_FAULT_ON_HTTP_400))) {
 
                 throw new HTTPException(rc, getResponseMessage(), url.toURL());
             }
@@ -1814,7 +1813,7 @@ public abstract class HTTPConduit
         if (newURL != null) {
             URI newUri = URI.create(newURL);
 
-            if (MessageUtils.isTrue(message.getContextualProperty(AUTO_REDIRECT_SAME_HOST_ONLY))) {
+            if (MessageUtils.getContextualBoolean(message, AUTO_REDIRECT_SAME_HOST_ONLY)) {
 
                 URI lastUri = URI.create(lastURL);
 
@@ -1848,7 +1847,7 @@ public abstract class HTTPConduit
                                                        Message message) throws IOException {
         if (newURL != null && !newURL.startsWith("http")) {
 
-            if (MessageUtils.isTrue(message.getContextualProperty(AUTO_REDIRECT_ALLOW_REL_URI))) {
+            if (MessageUtils.getContextualBoolean(message, AUTO_REDIRECT_ALLOW_REL_URI)) {
                 return URI.create(lastURL).resolve(newURL).toString();
             }
             String msg = "Relative Redirect detected on Conduit '"

@@ -114,7 +114,7 @@ public class SearchContextImpl implements SearchContext {
 
         String queryStr = (String)message.get(Message.QUERY_STRING);
         if (queryStr != null) {
-            if (MessageUtils.isTrue(message.getContextualProperty(USE_ALL_QUERY_COMPONENT))) {
+            if (MessageUtils.getContextualBoolean(message, USE_ALL_QUERY_COMPONENT)) {
                 return queryStr;
             }
             boolean encoded = PropertyUtils.isTrue(getKeepEncodedProperty());
@@ -130,7 +130,7 @@ public class SearchContextImpl implements SearchContext {
                     return params.getFirst(SHORT_SEARCH_QUERY);
                 }
                 return params.getFirst(SEARCH_QUERY);
-            } else if (MessageUtils.isTrue(message.getContextualProperty(USE_PLAIN_QUERY_PARAMETERS))) {
+            } else if (MessageUtils.getContextualBoolean(message, USE_PLAIN_QUERY_PARAMETERS)) {
                 return convertPlainQueriesToFiqlExp(params);
             }
         }

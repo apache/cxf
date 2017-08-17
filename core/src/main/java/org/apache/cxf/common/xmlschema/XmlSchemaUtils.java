@@ -233,7 +233,6 @@ public final class XmlSchemaUtils {
             return null;
         }
 
-        //TODO: the anyAttribute case.
         XmlSchemaComplexContentExtension ext = (XmlSchemaComplexContentExtension)content;
         return ext.getAttributes();
     }

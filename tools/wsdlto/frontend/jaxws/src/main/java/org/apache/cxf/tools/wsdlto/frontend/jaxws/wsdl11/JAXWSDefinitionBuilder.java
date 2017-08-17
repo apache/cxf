@@ -55,7 +55,6 @@ import org.apache.cxf.tools.wsdlto.core.WSDLDefinitionBuilder;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.CustomizationParser;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSBinding;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSBindingDeserializer;
-import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSBindingSerializer;
 import org.apache.cxf.wsdl.WSDLManager;
 
 public class JAXWSDefinitionBuilder extends AbstractWSDLBuilder {
@@ -100,7 +99,6 @@ public class JAXWSDefinitionBuilder extends AbstractWSDLBuilder {
     }
 
     private void registerJAXWSBinding(ExtensionRegistry registry, Class<?> clz) {
-        registry.registerSerializer(clz, ToolConstants.JAXWS_BINDINGS, new JAXWSBindingSerializer());
         registry.registerDeserializer(clz, ToolConstants.JAXWS_BINDINGS, new JAXWSBindingDeserializer());
         registry.mapExtensionTypes(clz, ToolConstants.JAXWS_BINDINGS, JAXWSBinding.class);
     }

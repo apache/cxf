@@ -585,7 +585,7 @@ public abstract class AbstractHTTPDestination
         }
         Object o = inMessage.get("cxf.io.cacheinput");
         DelegatingInputStream in = inMessage.getContent(DelegatingInputStream.class);
-        if (MessageUtils.isTrue(o)) {
+        if (PropertyUtils.isTrue(o)) {
             Collection<Attachment> atts = inMessage.getAttachments();
             if (atts != null) {
                 for (Attachment a : atts) {

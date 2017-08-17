@@ -51,7 +51,6 @@ import org.apache.cxf.tools.util.FileWriterUtil;
 import org.apache.cxf.tools.util.OutputStreamCreator;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSBinding;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSBindingDeserializer;
-import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSBindingSerializer;
 import org.apache.cxf.wsdl.WSDLConstants;
 
 public class XSDToWSDLProcessor implements Processor {
@@ -165,8 +164,6 @@ public class XSDToWSDLProcessor implements Processor {
     }
 
     private void registerJAXWSBinding(Class<?> clz) {
-        registry.registerSerializer(clz, ToolConstants.JAXWS_BINDINGS, new JAXWSBindingSerializer());
-
         registry.registerDeserializer(clz, ToolConstants.JAXWS_BINDINGS, new JAXWSBindingDeserializer());
         registry.mapExtensionTypes(clz, ToolConstants.JAXWS_BINDINGS, JAXWSBinding.class);
     }

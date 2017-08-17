@@ -84,8 +84,7 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
      */
     protected Conduit getInbuiltBackChannel(Message inMessage) {
         //with JMS, non-robust OneWays will never need to send back a response, even a "202" response.
-        boolean robust =
-            MessageUtils.isTrue(inMessage.getContextualProperty(Message.ROBUST_ONEWAY));
+        boolean robust = MessageUtils.getContextualBoolean(inMessage, Message.ROBUST_ONEWAY);
         if (inMessage.getExchange().isOneWay()
             && !robust) {
             return null;

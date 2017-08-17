@@ -34,6 +34,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -53,7 +54,6 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
@@ -247,7 +247,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         exchange.put(RESOURCE_OPERATION_NAME, plainOperationName);
 
         if (ori.isOneway()
-            || MessageUtils.isTrue(HttpUtils.getProtocolHeader(message, Message.ONE_WAY_REQUEST, null))) {
+            || PropertyUtils.isTrue(HttpUtils.getProtocolHeader(message, Message.ONE_WAY_REQUEST, null))) {
             exchange.setOneWay(true);
         }
         ResourceProvider rp = cri.getResourceProvider();

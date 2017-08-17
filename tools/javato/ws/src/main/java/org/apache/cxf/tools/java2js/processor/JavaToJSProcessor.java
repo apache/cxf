@@ -155,8 +155,6 @@ public class JavaToJSProcessor implements Processor {
             if (clz.getInterfaces().length == 1) {
                 context.put(ToolConstants.SEI_CLASS, clz.getInterfaces()[0].getName());
             }
-            // TODO: if it is simple frontend, and the impl class implements
-            // multiple interfaces
             context.put(ToolConstants.GEN_FROM_SEI, Boolean.FALSE);
         }
         builderFactory.setServiceClass(clz);

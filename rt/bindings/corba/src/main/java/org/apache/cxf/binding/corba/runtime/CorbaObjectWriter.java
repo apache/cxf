@@ -128,7 +128,8 @@ public class CorbaObjectWriter {
             this.writeObjectReference((CorbaObjectReferenceHandler)obj);
             break;
         default:
-        // TODO: Provide Implementation. Do we throw an exception.
+            throw new CorbaBindingException("CorbaObjectWriter: unhandled TypeCode.Kind: "
+                                            + obj.getTypeCode().kind().value());
         }
     }
 

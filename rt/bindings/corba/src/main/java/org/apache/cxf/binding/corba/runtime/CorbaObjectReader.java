@@ -143,7 +143,8 @@ public class CorbaObjectReader {
             this.readObjectReference((CorbaObjectReferenceHandler)obj);
             break;
         default:
-        // TODO: Provide Implementation. Do we throw an exception.
+            throw new CorbaBindingException("CorbaObjectReader: unhandled TypeCode.Kind: "
+                                            + obj.getTypeCode().kind().value());
         }
     }
 

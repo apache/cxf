@@ -47,6 +47,7 @@ import javax.xml.stream.events.XMLEvent;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
@@ -323,7 +324,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         WriterInterceptor last = writers.get(writers.size() - 1);
         MessageBodyWriter<Object> w = ((WriterInterceptorMBW)last).getMBW();
         Object outBuf = m.getContextualProperty(OUT_BUFFERING);
-        boolean enabled = MessageUtils.isTrue(outBuf);
+        boolean enabled = PropertyUtils.isTrue(outBuf);
         boolean configurableProvider = w instanceof AbstractConfigurableProvider;
         if (!enabled && outBuf == null && configurableProvider) {
             enabled = ((AbstractConfigurableProvider)w).getEnableBuffering();
@@ -485,7 +486,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     // method is modifiable. Thus we do need to know if the initial copy has already
     // occurred: for now we will just use to ensure the correct status is set
     private boolean isResponseHeadersCopied(Message message) {
-        return MessageUtils.isTrue(message.get(AbstractHTTPDestination.RESPONSE_HEADERS_COPIED));
+        return PropertyUtils.isTrue(message.get(AbstractHTTPDestination.RESPONSE_HEADERS_COPIED));
     }
 
     public void handleFault(Message message) {

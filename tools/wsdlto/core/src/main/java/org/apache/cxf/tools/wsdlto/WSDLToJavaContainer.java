@@ -169,9 +169,6 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
     }
 
     private void processWsdl() {
-        // TODO: After runtime support w3c EPR mapping ,this will be removed
-        //context.put(ToolConstants.CFG_NO_ADDRESS_BINDING,
-        //            ToolConstants.CFG_NO_ADDRESS_BINDING);
         validate(context);
         FrontEndProfile frontend = context.get(FrontEndProfile.class);
 

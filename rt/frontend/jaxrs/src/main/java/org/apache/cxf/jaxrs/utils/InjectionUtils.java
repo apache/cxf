@@ -409,8 +409,7 @@ public final class InjectionUtils {
         if (pType == ParameterType.PATH) {
             if (PathSegment.class.isAssignableFrom(pClass)) {
                 return pClass.cast(new PathSegmentImpl(value, decoded));
-            } else if (!MessageUtils.isTrue(
-                        message.getContextualProperty(IGNORE_MATRIX_PARAMETERS))) {
+            } else if (!MessageUtils.getContextualBoolean(message, IGNORE_MATRIX_PARAMETERS)) {
                 value = new PathSegmentImpl(value, false).getPath();
             }
         }

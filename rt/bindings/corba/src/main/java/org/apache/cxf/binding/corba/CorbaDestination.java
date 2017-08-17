@@ -312,7 +312,6 @@ public class CorbaDestination implements MultiplexDestination {
 
             populateEpr(orb.object_to_string(obj));
             LOG.info("Object Reference: " + orb.object_to_string(obj));
-            // TODO: Provide other export mechanisms?
             poaManager.activate();
         } catch (Exception ex) {
             throw new CorbaBindingException("Unable to activate CORBA servant", ex);

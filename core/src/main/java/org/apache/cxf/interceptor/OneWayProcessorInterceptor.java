@@ -147,9 +147,8 @@ public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message
                         "Executor queue is full, run the oneway invocation task in caller thread."
                         + "  Users can specify a larger executor queue to avoid this.");
                     // only block the thread if the prop is unset or set to false, otherwise let it go
-                    if (!MessageUtils.isTrue(
-                        message.getContextualProperty(
-                            "org.apache.cxf.oneway.rejected_execution_exception"))) {
+                    if (!MessageUtils.getContextualBoolean(message,
+                            "org.apache.cxf.oneway.rejected_execution_exception", false)) {
                         //the executor queue is full, so run the task in the caller thread
                         chain.unpause();
                     }

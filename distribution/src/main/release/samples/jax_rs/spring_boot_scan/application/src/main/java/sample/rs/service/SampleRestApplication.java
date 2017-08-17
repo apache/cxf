@@ -21,6 +21,7 @@ import java.util.Collections;
 
 import com.codahale.metrics.MetricRegistry;
 
+import org.apache.cxf.jaxrs.swagger.Swagger2Feature;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.endpoint.MetricReaderPublicMetrics;
 import org.springframework.boot.actuate.endpoint.MetricsEndpoint;
@@ -46,5 +47,18 @@ public class SampleRestApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(SampleRestApplication.class, args);
+    }
+
+    @Bean
+    public Swagger2Feature enhancedSwaggerDescription() {
+        Swagger2Feature swagger2Feature = new Swagger2Feature();
+        swagger2Feature.setPrettyPrint(true);
+        swagger2Feature.setTitle("Spring Boot CXF REST Scan Application");
+        swagger2Feature.setContact("The Apache CXF team");
+        swagger2Feature.setDescription("This sample project demonstrates how to use CXF JAX-RS services"
+                + " with Spring Boot. This demo has two JAX-RS class resources being auto-discovered"
+                + " and deployed in a single JAX-RS endpoint.");
+        swagger2Feature.setVersion("1.0.0");
+        return swagger2Feature;
     }
 }

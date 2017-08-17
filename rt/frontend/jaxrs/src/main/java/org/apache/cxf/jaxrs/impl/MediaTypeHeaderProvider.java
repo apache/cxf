@@ -175,7 +175,7 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
         }
         Message message = PhaseInterceptorChain.getCurrentMessage();
         if (message != null
-            && !MessageUtils.isTrue(message.getContextualProperty(STRICT_MEDIA_TYPE_CHECK))) {
+            && !MessageUtils.getContextualBoolean(message, STRICT_MEDIA_TYPE_CHECK, false)) {
             MediaType mt = null;
             if (mType.equals(MediaType.TEXT_PLAIN_TYPE.getType())) {
                 mt = MediaType.TEXT_PLAIN_TYPE;

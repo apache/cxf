@@ -64,7 +64,7 @@ public class RMCaptureInInterceptor extends AbstractRMInterceptor<Message> {
 
         // all messages are initially captured as they cannot be distinguished at this phase
         // Non application messages temp files are released (cos.releaseTempFileHold()) in RMInInterceptor
-        if (!isGET(message) && !MessageUtils.isTrue(message.getContextualProperty(Message.ROBUST_ONEWAY))
+        if (!isGET(message) && !MessageUtils.getContextualBoolean(message, Message.ROBUST_ONEWAY, false)
             && (getManager().getStore() != null || (getManager().getDestinationPolicy() != null && getManager()
                 .getDestinationPolicy().getRetryPolicy() != null))) {
 
@@ -163,7 +163,7 @@ public class RMCaptureInInterceptor extends AbstractRMInterceptor<Message> {
         public void handleMessage(Message message) {
             LOG.entering(getClass().getName(), "handleMessage");
             // Capturing the soap envelope. In case of WSS was activated, decrypted envelope is captured.
-            if (!MessageUtils.isTrue(message.getContextualProperty(Message.ROBUST_ONEWAY))
+            if (!MessageUtils.getContextualBoolean(message, Message.ROBUST_ONEWAY, false)
                 && isApplicationMessage(message)
                 && (getManager().getStore() != null || (getManager().getDestinationPolicy() != null && getManager()
                     .getDestinationPolicy().getRetryPolicy() != null))) {

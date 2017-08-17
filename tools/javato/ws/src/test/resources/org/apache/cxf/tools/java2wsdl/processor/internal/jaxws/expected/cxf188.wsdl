@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="DemoService" targetNamespace="http://apache.org/cxf" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://apache.org/cxf" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <wsdl:message name="sayHi">
+  </wsdl:message>
+  <wsdl:message name="sayHiResponse">
+  </wsdl:message>
+  <wsdl:portType name="Demo">
+    <wsdl:operation name="sayHi">
+      <wsdl:input name="sayHi" message="tns:sayHi">
+    </wsdl:input>
+      <wsdl:output name="sayHiResponse" message="tns:sayHiResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="DemoServiceSoapBinding" type="tns:Demo">
+    <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="sayHi">
+      <soap:operation soapAction="" style="rpc"/>
+      <wsdl:input name="sayHi">
+        <soap:body use="literal" namespace="http://apache.org/cxf"/>
+      </wsdl:input>
+      <wsdl:output name="sayHiResponse">
+        <soap:body use="literal" namespace="http://apache.org/cxf"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="DemoService">
+    <wsdl:port name="DemoPort" binding="tns:DemoServiceSoapBinding">
+      <soap:address location="http://localhost:9090"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -37,6 +37,7 @@ import org.apache.cxf.binding.soap.interceptor.StartBodyInterceptor;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.message.MessageUtils;
@@ -234,7 +235,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
         securityProperties.setSamlOneTimeUseReplayCache(samlCache);
 
         boolean enableRevocation =
-            MessageUtils.isTrue(SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENABLE_REVOCATION, msg));
+            PropertyUtils.isTrue(SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENABLE_REVOCATION, msg));
         securityProperties.setEnableRevocation(enableRevocation);
 
         // Crypto loading only applies for Map

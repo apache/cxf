@@ -145,7 +145,6 @@ public class JavaToProcessorTest extends ProcessorTestBase {
     }
 
     @Test
-    // TODO the generated wsdl has two faultDetail elements
     public void testSOAP12() throws Exception {
         env.put(ToolConstants.CFG_CLASSNAME, "org.apache.hello_world_soap12_http.Greeter");
         env.put(ToolConstants.CFG_SOAP12, "soap12");
@@ -473,7 +472,6 @@ public class JavaToProcessorTest extends ProcessorTestBase {
     }
 
     @Test
-    //  TODO: should suppor the XmlMimeType annotation in the SEI
     public void testMimeTypeInSEI() throws Exception {
         env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/send_image.wsdl");
         env.put(ToolConstants.CFG_CLASSNAME, org.apache.cxf.tools.fortest.ImageSender.class.getName());
