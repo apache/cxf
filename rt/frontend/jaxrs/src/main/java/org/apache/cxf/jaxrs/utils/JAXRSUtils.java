@@ -1730,8 +1730,14 @@ public final class JAXRSUtils {
     }
     
     public static ResponseBuilder fromResponse(Response response) {
+        return fromResponse(response, true);
+    }
+    
+    public static ResponseBuilder fromResponse(Response response, boolean copyEntity) {
         ResponseBuilder rb = toResponseBuilder(response.getStatus());
-        rb.entity(response.getEntity());
+        if (copyEntity) {
+            rb.entity(response.getEntity());
+        }
         for (Map.Entry<String, List<Object>> entry : response.getMetadata().entrySet()) {
             List<Object> values = entry.getValue();
             for (Object value : values) {
