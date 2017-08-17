@@ -169,8 +169,12 @@ public class DynamicRegistrationService {
         reg.setClientName(c.getApplicationName());
         reg.setGrantTypes(c.getAllowedGrantTypes());
         reg.setApplicationType(c.isConfidential() ? "web" : "native");
-        reg.setRedirectUris(c.getRedirectUris());
-        reg.setScope(OAuthUtils.convertListOfScopesToString(c.getRegisteredScopes()));
+        if (!c.getRedirectUris().isEmpty()) {
+            reg.setRedirectUris(c.getRedirectUris());
+        }
+        if (!c.getRegisteredScopes().isEmpty()) {
+            reg.setScope(OAuthUtils.convertListOfScopesToString(c.getRegisteredScopes()));
+        }
         if (c.getApplicationWebUri() != null) {
             reg.setClientUri(c.getApplicationWebUri());
         }
@@ -229,16 +233,13 @@ public class DynamicRegistrationService {
         
         List<String> grantTypes = request.getGrantTypes();
         if (grantTypes == null) {
-            grantTypes = Collections.singletonList("authorization_code");
+            grantTypes = Collections.singletonList(OAuthConstants.AUTHORIZATION_CODE_GRANT);
         }
         
         String tokenEndpointAuthMethod = request.getTokenEndpointAuthMethod();
         //TODO: default is expected to be set to OAuthConstants.TOKEN_ENDPOINT_AUTH_BASIC
         
-        boolean passwordRequired = !grantTypes.contains(OAuthConstants.IMPLICIT_GRANT)
-            && (tokenEndpointAuthMethod == null
-                || OAuthConstants.TOKEN_ENDPOINT_AUTH_BASIC.equals(tokenEndpointAuthMethod)
-                || OAuthConstants.TOKEN_ENDPOINT_AUTH_POST.equals(tokenEndpointAuthMethod));
+        boolean passwordRequired = isPasswordRequired(grantTypes, tokenEndpointAuthMethod);
 
         // Application Type
         // https://tools.ietf.org/html/rfc7591 has no this property but
@@ -253,7 +254,6 @@ public class DynamicRegistrationService {
 
         // Client Secret
         String clientSecret = passwordRequired ? generateClientSecret(request) : null;
-
             
         Client newClient = new Client(clientId, clientSecret, isConfidential, clientName);
         
@@ -316,6 +316,19 @@ public class DynamicRegistrationService {
         
         newClient.setRegisteredDynamically(true);
         return newClient;
+    }
+
+    protected boolean isPasswordRequired(List<String> grantTypes, String tokenEndpointAuthMethod) {
+        if (grantTypes.contains(OAuthConstants.IMPLICIT_GRANT)) {
+            return false;
+        }
+        if (tokenEndpointAuthMethod == null) {
+            return true;
+        }
+        
+        return !OAuthConstants.TOKEN_ENDPOINT_AUTH_NONE.equals(tokenEndpointAuthMethod)
+            && (OAuthConstants.TOKEN_ENDPOINT_AUTH_BASIC.equals(tokenEndpointAuthMethod)
+                || OAuthConstants.TOKEN_ENDPOINT_AUTH_POST.equals(tokenEndpointAuthMethod));
     }
 
     protected void validateRequestUri(String uri, String appType, List<String> grantTypes) {
