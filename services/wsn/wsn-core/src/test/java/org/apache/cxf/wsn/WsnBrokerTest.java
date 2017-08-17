@@ -152,15 +152,16 @@ public abstract class WsnBrokerTest extends Assert {
         TestConsumer callback = new TestConsumer();
         Consumer consumer = new Consumer(callback, "http://localhost:" + port2 + "/test/consumer");
 
-        //create subscription with InitialTerminationTime 20 sec, so that the
-        //subscription would be expired after 20 sec
-        Subscription subscription = notificationBroker.subscribe(consumer, "myTopic", null, false, "PT20S");
-        Thread.sleep(30000);
+        //create subscription with InitialTerminationTime 2 sec, so that the
+        //subscription would be expired after 2 sec
+        Subscription subscription = notificationBroker.subscribe(consumer, "myTopic", null, false, "PT02S");
+        Thread.sleep(5000);
         synchronized (callback.notifications) {
+            System.out.println("send notify");
             notificationBroker.notify("myTopic",
                                       new JAXBElement<String>(new QName("urn:test:org", "foo"),
                                           String.class, "bar"));
-            callback.notifications.wait(10000);
+            callback.notifications.wait(2000);
         }
         assertEquals(0, callback.notifications.size()); //the subscription is expired so can't get the notification
         subscription.renew("PT60S"); //renew another 60 sec to resend the notification

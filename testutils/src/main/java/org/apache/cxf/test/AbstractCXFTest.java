@@ -47,8 +47,7 @@ import org.junit.Before;
  * A basic test case meant for helping users unit test their services.
  * @see TestUtilities
  */
-@org.junit.Ignore
-public class AbstractCXFTest extends Assert {
+public abstract class AbstractCXFTest extends Assert {
 
     protected TestUtilities testUtilities;
     protected Bus bus;

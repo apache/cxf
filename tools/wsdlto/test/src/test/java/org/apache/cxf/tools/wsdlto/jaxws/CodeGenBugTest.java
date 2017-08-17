@@ -485,26 +485,24 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         assertFalse(orginal.exists());
     }
 
-    // @Ignore'd due to continually failing on Jenkins
     @Test
-    @org.junit.Ignore
     public void testHelloWorldExternalBindingFile() throws Exception {
         Server server = new Server(0);
-
-        ResourceHandler reshandler = new ResourceHandler();
-        reshandler.setResourceBase(getLocation("/wsdl2java_wsdl/"));
-        // this is the only handler we're supposed to need, so we don't need to
-        // 'add' it.
-        server.setHandler(reshandler);
-        server.start();
-        int port = ((NetworkConnector)server.getConnectors()[0]).getLocalPort();
-        env.put(ToolConstants.CFG_WSDLURL, "http://localhost:"
-            + port + "/hello_world.wsdl");
-        env.put(ToolConstants.CFG_BINDING, "http://localhost:"
-            + port + "/remote-hello_world_binding.xsd");
-        processor.setContext(env);
-        processor.execute();
         try {
+            ResourceHandler reshandler = new ResourceHandler();
+            reshandler.setResourceBase(getLocation("/wsdl2java_wsdl/"));
+            // this is the only handler we're supposed to need, so we don't need to
+            // 'add' it.
+            server.setHandler(reshandler);
+            server.start();
+            Thread.sleep(250); //give network connector a little time to spin up
+            int port = ((NetworkConnector)server.getConnectors()[0]).getLocalPort();
+            env.put(ToolConstants.CFG_WSDLURL, "http://localhost:"
+                + port + "/hello_world.wsdl");
+            env.put(ToolConstants.CFG_BINDING, "http://localhost:"
+                + port + "/remote-hello_world_binding.xsd");
+            processor.setContext(env);
+            processor.execute();
             reshandler.stop();
         } finally {
             server.stop();

@@ -283,7 +283,7 @@ public abstract class JmsSubscription extends AbstractSubscription implements Me
                     }
                 }
                 try {
-                    Thread.sleep(10000); // check if should terminate every 10 sec
+                    Thread.sleep(2000); // check if should terminate every 2 sec
                 } catch (InterruptedException e) {
                     LOGGER.log(Level.WARNING, "TerminationThread sleep interrupted", e);
                 }

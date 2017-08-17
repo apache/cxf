@@ -43,7 +43,6 @@ import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.GreeterImpl;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class EndpointReferenceTest extends AbstractJaxWsTest {
@@ -185,7 +184,6 @@ public class EndpointReferenceTest extends AbstractJaxWsTest {
     }
 
     @Test
-    @Ignore("Not implemented yet")
     public void testEndpointGetEndpointReferenceXMLBinding() throws Exception {
         org.apache.hello_world_xml_http.bare.Greeter greeter =
             new org.apache.hello_world_xml_http.bare.GreeterImpl();
