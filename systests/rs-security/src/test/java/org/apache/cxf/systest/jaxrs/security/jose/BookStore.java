@@ -81,7 +81,7 @@ public class BookStore {
         return book;
     }
     @POST
-    @Path("/books")
+    @Path("/booksModified")
     @Produces("multipart/related")
     @Consumes("multipart/related")
     @Multipart(type = "application/xml")
