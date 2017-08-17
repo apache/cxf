@@ -71,6 +71,8 @@ public class AbstractTokenService extends AbstractOAuthService {
                     client = getValidClient(clientId, params);
                     if (!isValidPublicClient(client, clientId)) {
                         client = null;
+                    } else {
+                        validateClientAuthenticationMethod(client, OAuthConstants.TOKEN_ENDPOINT_AUTH_NONE);
                     }
                 }
             }
