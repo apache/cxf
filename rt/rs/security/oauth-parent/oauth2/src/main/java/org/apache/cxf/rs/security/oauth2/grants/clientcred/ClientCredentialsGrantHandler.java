@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.oauth2.grants.clientcred;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rs.security.oauth2.common.OAuthError;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.grants.AbstractGrantHandler;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
@@ -38,6 +39,10 @@ public class ClientCredentialsGrantHandler extends AbstractGrantHandler {
 
     public ServerAccessToken createAccessToken(Client client, MultivaluedMap<String, String> params)
         throws OAuthServiceException {
+
+        if (!client.isConfidential()) {
+            throw new OAuthServiceException(new OAuthError(OAuthConstants.INVALID_CLIENT));
+        }
         
         ServerAccessToken at = doCreateAccessToken(client, client.getSubject(), params);
         if (at.getRefreshToken() != null) {
