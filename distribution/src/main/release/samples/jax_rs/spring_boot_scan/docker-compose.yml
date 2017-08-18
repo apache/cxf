@@ -1,0 +1,13 @@
+version: "3"
+services:
+  eureka:
+    image: sberyozkin/apachecxf:spring-boot-sample-rs-scan-eureka
+    ports:
+      - "8761:8761"
+  jaxrs:
+    image: sberyozkin/apachecxf:spring-boot-sample-rs-scan-app
+    ports:
+      - "8080:8080"
+    network_mode: "host" 
+
+
