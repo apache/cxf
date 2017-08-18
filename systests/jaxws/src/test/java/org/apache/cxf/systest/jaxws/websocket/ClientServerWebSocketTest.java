@@ -61,6 +61,7 @@ public class ClientServerWebSocketTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         // set up configuration to enable schema validation
+        //System.setProperty("org.apache.cxf.transport.websocket.atmosphere.disabled", "true");
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
         createStaticBus();
     }

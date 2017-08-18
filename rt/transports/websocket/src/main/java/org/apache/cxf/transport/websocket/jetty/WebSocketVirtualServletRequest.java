@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
@@ -54,6 +55,7 @@ import javax.servlet.http.Part;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.transport.websocket.InvalidPathException;
 import org.apache.cxf.transport.websocket.WebSocketUtils;
+import org.eclipse.jetty.websocket.api.Session;
 
 /**
  *
@@ -66,12 +68,18 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
     private Map<String, String> requestHeaders;
     private Map<String, Object> attributes;
 
-    public WebSocketVirtualServletRequest(WebSocketServletHolder websocket, InputStream in)
+    public WebSocketVirtualServletRequest(WebSocketServletHolder websocket, InputStream in, Session session)
         throws IOException {
         this.webSocketHolder = websocket;
         this.in = in;
 
+        Map<String, List<String>> ugHeaders = session.getUpgradeRequest().getHeaders();
         this.requestHeaders = WebSocketUtils.readHeaders(in);
+        for (Map.Entry<String, List<String>> ent : ugHeaders.entrySet()) {
+            if (!requestHeaders.containsKey(ent.getKey())) {
+                requestHeaders.put(ent.getKey(), ent.getValue().get(0));
+            }
+        }
         String path = requestHeaders.get(WebSocketUtils.URI_KEY);
         String origin = websocket.getRequestURI();
         if (!path.startsWith(origin)) {

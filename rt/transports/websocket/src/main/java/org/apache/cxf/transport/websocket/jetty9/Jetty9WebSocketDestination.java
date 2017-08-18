@@ -182,7 +182,7 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
                 try {
                     WebSocketServletHolder holder = new Jetty9WebSocketHolder(session);
                     response = createServletResponse(holder);
-                    request = createServletRequest(data, offset, length, holder);
+                    request = createServletRequest(data, offset, length, holder, session);
                     String reqid = request.getHeader(REQUEST_ID_KEY);
                     if (reqid != null) {
                         response.setHeader(RESPONSE_ID_KEY, reqid);
@@ -219,9 +219,10 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
         }
     }
     private WebSocketVirtualServletRequest createServletRequest(byte[] data, int offset, int length,
-                                                                WebSocketServletHolder holder)
+                                                                WebSocketServletHolder holder,
+                                                                Session session)
         throws IOException {
-        return new WebSocketVirtualServletRequest(holder, new ByteArrayInputStream(data, offset, length));
+        return new WebSocketVirtualServletRequest(holder, new ByteArrayInputStream(data, offset, length), session);
     }
 
     private WebSocketVirtualServletResponse createServletResponse(WebSocketServletHolder holder) throws IOException {
