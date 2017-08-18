@@ -71,19 +71,6 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
         return Collections.unmodifiableList(supportedGrants);
     }
 
-    @Deprecated
-    protected void checkIfGrantSupported(Client client) {
-        checkIfGrantSupported(client, getSingleGrantType());
-    }
-
-    private void checkIfGrantSupported(Client client, String requestedGrant) {
-        if (!OAuthUtils.isGrantSupportedForClient(client,
-                                                  canSupportPublicClients,
-                                                  requestedGrant)) {
-            throw new OAuthServiceException(OAuthConstants.UNAUTHORIZED_CLIENT);
-        }
-    }
-
     protected String getSingleGrantType() {
         if (supportedGrants.size() > 1) {
             String errorMessage = "Request grant type must be specified";
