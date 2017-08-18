@@ -46,7 +46,6 @@ public class QueryHandlerTest extends AbstractCXFSpringTest {
     private static final Logger LOG = LogUtils.getL7dLogger(QueryHandlerTest.class);
     private Endpoint hwEndpoint;
     private Endpoint dlbEndpoint;
-    private Endpoint hwgEndpoint;
 
     public QueryHandlerTest() throws Exception {
         super();
@@ -72,8 +71,6 @@ public class QueryHandlerTest extends AbstractCXFSpringTest {
     public void before() {
         ServerFactoryBean serverFactoryBean = getBean(ServerFactoryBean.class, "hw-service-endpoint");
         hwEndpoint = serverFactoryBean.create().getEndpoint();
-        serverFactoryBean = getBean(ServerFactoryBean.class, "hwg-service-endpoint");
-        hwgEndpoint = serverFactoryBean.create().getEndpoint();
         serverFactoryBean = getBean(ServerFactoryBean.class, "dlb-service-endpoint");
         dlbEndpoint = serverFactoryBean.create().getEndpoint();
     }
@@ -128,12 +125,4 @@ public class QueryHandlerTest extends AbstractCXFSpringTest {
         assertFalse(jsString.contains("function CxfApacheOrgUtil"));
     }
 
-    // this is in here since we need to use the query handler to perform the test.
-    @org.junit.Ignore
-    @Test
-    public void namespacePrefixTest() throws Exception {
-        URL endpointURL = new URL(hwgEndpoint.getEndpointInfo().getAddress()  + "?js");
-        String js = getStringFromURL(endpointURL);
-        assertTrue(js.contains("hg_Greeter"));
-    }
 }

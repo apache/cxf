@@ -98,7 +98,6 @@ import org.apache.cxf.message.MessageImpl;
 import org.easymock.EasyMock;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXBElementProviderTest extends Assert {
@@ -1230,14 +1229,12 @@ public class JAXBElementProviderTest extends Assert {
 
 
     @Test
-    @Ignore
     public void testReadQualifiedCollection() throws Exception {
         String data = "<ns1:tags xmlns:ns1=\"http://tags\"><ns1:thetag><group>B</group><name>A</name>"
             + "</ns1:thetag><ns1:thetag><group>D</group><name>C</name></ns1:thetag></ns1:tags>";
         doReadQualifiedCollection(data, false);
     }
 
-    @Ignore
     @Test
     public void testReadQualifiedArray() throws Exception {
         String data = "<ns1:tags xmlns:ns1=\"http://tags\"><ns1:thetag><group>B</group><name>A</name>"

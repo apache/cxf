@@ -21,7 +21,7 @@
     <import resource="classpath:META-INF/cxf/cxf.xml"/>
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     <bean id="rpc-service" class="org.apache.cxf.javascript.fortest.SimpleRPCImpl"/>
-    <jaxws:server id="rpc-service-endpoint" address="http://localhost:${testutil.ports.TestPort}/SimpleRPC">
+    <jaxws:server id="rpc-service-endpoint" address="http://localhost:${testutil.ports.RPCClientTest}/SimpleRPC">
         <jaxws:serviceBean>
             <ref bean="rpc-service"/>
         </jaxws:serviceBean>

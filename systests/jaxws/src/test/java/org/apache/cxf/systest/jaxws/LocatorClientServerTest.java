@@ -24,7 +24,6 @@ import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
-import javax.xml.ws.Holder;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 import javax.xml.ws.wsaddressing.W3CEndpointReferenceBuilder;
 
@@ -33,7 +32,6 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.locator.LocatorService;
 import org.apache.locator.LocatorService_Service;
-import org.apache.locator.types.QueryEndpoints;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -72,39 +70,6 @@ public class LocatorClientServerTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
-    @org.junit.Ignore("not legal if serviceName, portName, address all NULL")
-    public void testLocatorService() throws Exception {
-        URL wsdl = getClass().getResource("/wsdl/locator.wsdl");
-        assertNotNull(wsdl);
-
-        LocatorService_Service ss = new LocatorService_Service(wsdl, serviceName);
-        LocatorService port = ss.getLocatorServicePort();
-        updateAddressPort(port, PORT);
-        W3CEndpointReferenceBuilder builder = new  W3CEndpointReferenceBuilder();
-        W3CEndpointReference w3cEpr = builder.build();
-        port.registerPeerManager(w3cEpr,
-                                 new Holder<W3CEndpointReference>(),
-                                 new Holder<java.lang.String>());
-
-        port.deregisterPeerManager(new java.lang.String());
-
-
-        port.registerEndpoint(null, w3cEpr);
-
-
-        port.deregisterEndpoint(null, w3cEpr);
-
-
-
-        port.lookupEndpoint(new javax.xml.namespace.QName("", ""));
-
-        port.listEndpoints();
-
-        port.queryEndpoints(new QueryEndpoints());
-
-    }
-
-    @Test
     public void testLookupEndpointAndVerifyWsdlLocationAndNamespace() throws Exception {
         URL wsdl = getClass().getResource("/wsdl/locator.wsdl");
         assertNotNull(wsdl);
@@ -131,7 +96,6 @@ public class LocatorClientServerTest extends AbstractBusClientServerTestBase {
         W3CEndpointReference epr = port.lookupEndpoint(new QName("http://service/2", "Number"));
         String eprString = epr.toString();
         assertTrue(eprString.contains("Metadata"));
-        System.out.println(eprString);
         assertTrue(eprString.contains("wsdlLocation=\"wsdlLoc\""));
     }
 

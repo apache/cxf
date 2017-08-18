@@ -45,7 +45,8 @@ import org.junit.Test;
  */
 public class URIConfiguredConduitTest {
     private static final String SERVICE_QUEUE = "test";
-    private static final String BROKER_URI = "vm://URIConfiguredConduitTest?broker.persistent=false";
+    private static final String BROKER_URI 
+        = "vm://URIConfiguredConduitTest?broker.persistent=false&broker.useJmx=false";
     private static ConnectionFactory cf;
 
     private enum SyncType {
@@ -58,9 +59,7 @@ public class URIConfiguredConduitTest {
         cf = new ActiveMQConnectionFactory(BROKER_URI);
     }
 
-    // @Ignoring due to continually failing on Jenkins
     @Test
-    @org.junit.Ignore
     public void testSendReceive() throws Exception {
         sendAndReceive(SyncType.sync,
                        "jms:jndi:dynamicQueues/"
