@@ -57,6 +57,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.times;
@@ -65,25 +66,35 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SseEventSourceImplTest extends Assert {
-    private static final String EVENT = "    event\n"
+    private static final String EVENT = "event: event\n"
         + "id: 1\n"
         + "data: test data\n"
         + "retry: 10000\n"
         + ": test comment\n"
         + "\n";
     
-    private static final String EVENT_NO_RETRY = "    event\n"
+    private static final String EVENT_JUST_DATA = "\n"
+        + "data: just test data\n"
+        + "\n";
+    
+    private static final String EVENT_JUST_NAME = "\n"
+        + "event: just name\n";
+    
+    private static final String EVENT_NO_RETRY = "event: event\n"
         + "id: 1\n"
         + "data: test data\n"
         + ": test comment\n"
         + "\n";
     
-    private static final String EVENT_BAD_RETRY = "    event\n"
+    private static final String EVENT_BAD_RETRY = "event: event\n"
         + "id: 1\n"
         + "data: test data\n"
         + "retry: blba\n"
         + ": test comment\n"
         + "\n";
+    
+    private static final String EVENT_MIXED = EVENT_JUST_DATA + EVENT;
+    private static final String EVENT_BAD_NEW_LINES =  "\n\n\n\n\n\n";
     
     @Rule
     public ExpectedException exception = ExpectedException.none();
@@ -239,6 +250,104 @@ public class SseEventSourceImplTest extends Assert {
             assertThat(events.get(0).getId(), equalTo("1"));
             assertThat(events.get(0).getReconnectDelay(), equalTo(10000L));
             assertThat(events.get(0).getComment(), equalTo("test comment"));
+            assertThat(events.get(0).readData(), equalTo("test data"));
+        }
+    }
+    
+    @Test
+    public void testNoReconnectAndJustDataEventIsReceived() throws InterruptedException, IOException {
+        try (InputStream is = new ByteArrayInputStream(EVENT_JUST_DATA.getBytes(StandardCharsets.UTF_8))) {
+            when(response.getStatus()).thenReturn(200);
+            when(response.readEntity(InputStream.class)).thenReturn(is);
+            
+            final List<InboundSseEvent> events = new ArrayList<>();
+            try (SseEventSource eventSource = withNoReconnect()) {
+                eventSource.register(events::add);
+                eventSource.open();
+                
+                assertThat(eventSource.isOpen(), equalTo(true));
+                verify(response, times(1)).getStatus();
+                
+                // Allow the event processor to pull for events (150ms)
+                Thread.sleep(150);
+            }
+            
+            assertThat(events.size(), equalTo(1));
+            assertThat(events.get(0).getName(), nullValue());
+            assertThat(events.get(0).readData(), equalTo("just test data"));
+        }
+    }
+    
+    @Test
+    public void testNoReconnectAndJustEventNameIsReceived() throws InterruptedException, IOException {
+        try (InputStream is = new ByteArrayInputStream(EVENT_JUST_NAME.getBytes(StandardCharsets.UTF_8))) {
+            when(response.getStatus()).thenReturn(200);
+            when(response.readEntity(InputStream.class)).thenReturn(is);
+            
+            final List<InboundSseEvent> events = new ArrayList<>();
+            try (SseEventSource eventSource = withNoReconnect()) {
+                eventSource.register(events::add);
+                eventSource.open();
+                
+                assertThat(eventSource.isOpen(), equalTo(true));
+                verify(response, times(1)).getStatus();
+                
+                // Allow the event processor to pull for events (150ms)
+                Thread.sleep(150);
+            }
+            
+            assertThat(events.size(), equalTo(1));
+            assertThat(events.get(0).getName(), equalTo("just name"));
+        }
+    }
+    
+    @Test
+    public void testNoReconnectAndMixedEventsAreReceived() throws InterruptedException, IOException {
+        try (InputStream is = new ByteArrayInputStream(EVENT_MIXED.getBytes(StandardCharsets.UTF_8))) {
+            when(response.getStatus()).thenReturn(200);
+            when(response.readEntity(InputStream.class)).thenReturn(is);
+            
+            final List<InboundSseEvent> events = new ArrayList<>();
+            try (SseEventSource eventSource = withNoReconnect()) {
+                eventSource.register(events::add);
+                eventSource.open();
+                
+                assertThat(eventSource.isOpen(), equalTo(true));
+                verify(response, times(1)).getStatus();
+                
+                // Allow the event processor to pull for events (150ms)
+                Thread.sleep(150);
+            }
+            
+            assertThat(events.size(), equalTo(2));
+            assertThat(events.get(0).getName(), nullValue());
+            assertThat(events.get(0).readData(), equalTo("just test data"));
+            assertThat(events.get(1).getId(), equalTo("1"));
+            assertThat(events.get(1).getReconnectDelay(), equalTo(10000L));
+            assertThat(events.get(1).getComment(), equalTo("test comment"));
+            assertThat(events.get(1).readData(), equalTo("test data"));
+        }
+    }
+    
+    @Test
+    public void testNoReconnectAndNoEventsAreDetected() throws InterruptedException, IOException {
+        try (InputStream is = new ByteArrayInputStream(EVENT_BAD_NEW_LINES.getBytes(StandardCharsets.UTF_8))) {
+            when(response.getStatus()).thenReturn(200);
+            when(response.readEntity(InputStream.class)).thenReturn(is);
+            
+            final List<InboundSseEvent> events = new ArrayList<>();
+            try (SseEventSource eventSource = withNoReconnect()) {
+                eventSource.register(events::add);
+                eventSource.open();
+                
+                assertThat(eventSource.isOpen(), equalTo(true));
+                verify(response, times(1)).getStatus();
+                
+                // Allow the event processor to pull for events (150ms)
+                Thread.sleep(150);
+            }
+            
+            assertThat(events.size(), equalTo(0));
         }
     }
     
@@ -269,8 +378,10 @@ public class SseEventSourceImplTest extends Assert {
             assertThat(events.size(), equalTo(2));
             assertThat(events.get(0).getId(), equalTo("1"));
             assertThat(events.get(0).getComment(), equalTo("test comment"));
+            assertThat(events.get(0).readData(), equalTo("test data"));
             assertThat(events.get(1).getId(), equalTo("1"));
             assertThat(events.get(1).getComment(), equalTo("test comment"));
+            assertThat(events.get(1).readData(), equalTo("test data"));
         } finally {
             for (final InputStream is: closeables) {
                 is.close();
@@ -323,6 +434,7 @@ public class SseEventSourceImplTest extends Assert {
             assertThat(events.get(0).getId(), equalTo("1"));
             assertThat(events.get(0).getReconnectDelay(), equalTo(-1L));
             assertThat(events.get(0).getComment(), equalTo("test comment"));
+            assertThat(events.get(0).readData(), equalTo("test data"));
         }
     }
 

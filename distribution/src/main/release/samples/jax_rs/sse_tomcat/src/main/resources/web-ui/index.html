@@ -33,7 +33,7 @@
 	if( !!window.EventSource ) {
 	    var event = new EventSource("http://localhost:8686/rest/api/stats/sse/1");
 	
-	    event.addEventListener('message', function( event ) {	
+	    event.addEventListener('stats', function( event ) {	
 	    	var datapoint = jQuery.parseJSON( event.data );
 	    	 
 	    	chart.series[ 0 ].addPoint({

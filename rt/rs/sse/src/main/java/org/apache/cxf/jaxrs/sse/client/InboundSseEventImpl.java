@@ -50,18 +50,22 @@ public final class InboundSseEventImpl implements InboundSseEvent {
     static class Builder {
         private static final Logger LOG = LogUtils.getL7dLogger(Builder.class);
 
-        private final String name;
+        private String name; /* the default event type would be "message" */
         private String id;
         private String comment;
         private OptionalLong reconnectDelay = OptionalLong.empty();
         private String data;
 
-        Builder(String name) {
-            this.name = name;
+        Builder() {
         }
 
         Builder id(String i) {
             this.id = i;
+            return this;
+        }
+        
+        Builder name(String n) {
+            this.name = n;
             return this;
         }
 

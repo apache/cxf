@@ -35,6 +35,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.client.ClientProviderFactory;
 import org.apache.cxf.jaxrs.impl.ResponseImpl;
+import org.apache.cxf.jaxrs.sse.client.InboundSseEventImpl.Builder;
 import org.apache.cxf.message.Message;
 
 public class InboundSseEventProcessor {
@@ -42,7 +43,7 @@ public class InboundSseEventProcessor {
     public static final MediaType SERVER_SENT_EVENTS_TYPE = MediaType.valueOf(SERVER_SENT_EVENTS);
 
     private static final String COMMENT = ": ";
-    private static final String EVENT = "    ";
+    private static final String EVENT = "event: ";
     private static final String ID = "id: ";
     private static final String RETRY = "retry: ";
     private static final String DATA = "data: ";
@@ -82,23 +83,21 @@ public class InboundSseEventProcessor {
                 InboundSseEventImpl.Builder builder = null;
 
                 while (line != null && !Thread.interrupted() && !closed) {
-                    if (!StringUtils.isEmpty(line) && line.startsWith(EVENT)) {
-                        if (builder == null) {
-                            builder = new InboundSseEventImpl.Builder(line.substring(EVENT.length()));
-                        } else {
-                            final InboundSseEvent event = builder.build(factory, message);
-                            builder = new InboundSseEventImpl.Builder(line.substring(EVENT.length()));
-                            listener.onNext(event);
-                        }
-                    } else if (builder != null) {
-                        if (line.startsWith(ID)) {
-                            builder.id(line.substring(ID.length()));
+                    if (StringUtils.isEmpty(line) && builder != null) { /* empty new line */
+                        final InboundSseEvent event = builder.build(factory, message);
+                        builder = null; /* reset the builder for next event */
+                        listener.onNext(event);
+                    } else {
+                        if (line.startsWith(EVENT)) {
+                            builder = getOrCreate(builder).name(line.substring(EVENT.length()));
+                        } else if (line.startsWith(ID)) {
+                            builder = getOrCreate(builder).id(line.substring(ID.length()));
                         } else if (line.startsWith(COMMENT)) {
-                            builder.comment(line.substring(COMMENT.length()));
+                            builder = getOrCreate(builder).comment(line.substring(COMMENT.length()));
                         } else if (line.startsWith(RETRY)) {
-                            builder.reconnectDelay(line.substring(RETRY.length()));
+                            builder = getOrCreate(builder).reconnectDelay(line.substring(RETRY.length()));
                         } else if (line.startsWith(DATA)) {
-                            builder.data(line.substring(DATA.length()));
+                            builder = getOrCreate(builder).data(line.substring(DATA.length()));
                         }
                     }
                     line = reader.readLine();
@@ -139,5 +138,12 @@ public class InboundSseEventProcessor {
         } catch (final InterruptedException ex) {
             return false;
         }
+    }
+    
+    /**
+     * Create builder on-demand, without explicit event demarcation
+     */
+    private static Builder getOrCreate(final Builder builder) {
+        return (builder == null) ? new InboundSseEventImpl.Builder() : builder;
     }
 }
