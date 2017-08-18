@@ -179,13 +179,18 @@ public class AutomaticWorkQueueTest extends Assert {
                 }
             }
 
-            while (workqueue.getActiveCount() < DEFAULT_HIGH_WATER_MARK) {
+            int max = 0;
+            while (workqueue.getActiveCount() < DEFAULT_HIGH_WATER_MARK
+                && workqueue.getSize() > 0
+                && max < 10) {
                 try {
-                    Thread.sleep(250);
+                    //wait up to a second for all the threads to start and grab items
+                    Thread.sleep(100);
+                    max++;
                 } catch (InterruptedException ex) {
                     // ignore
                 }
-            }
+            }           
 
             for (int i = 0; i < DEFAULT_MAX_QUEUE_SIZE; i++) {
                 fillers[i] = new BlockingWorkItem();
