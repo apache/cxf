@@ -34,6 +34,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.AsyncHttpClientConfig;
+import com.ning.http.client.Realm.AuthScheme;
+import com.ning.http.client.Realm.RealmBuilder;
 import com.ning.http.client.ws.WebSocket;
 import com.ning.http.client.ws.WebSocketByteListener;
 import com.ning.http.client.ws.WebSocketTextListener;
@@ -41,6 +44,8 @@ import com.ning.http.client.ws.WebSocketUpgradeHandler;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.Address;
@@ -69,7 +74,6 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
 
     public AhcWebSocketConduit(Bus b, EndpointInfo ei, EndpointReferenceType t) throws IOException {
         super(b, ei, t);
-        ahcclient = new AsyncHttpClient();
     }
 
     @Override
@@ -94,11 +98,40 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
         final int rtimeout = determineReceiveTimeout(message, csPolicy);
         request.setReceiveTimeout(rtimeout);
         message.put(AhcWebSocketConduitRequest.class, request);
+
+
+    }
+    
+    private synchronized AsyncHttpClient getAsyncHttpClient(Message message) {
+        if (ahcclient == null) {
+            AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
+            AuthorizationPolicy ap = getEffectiveAuthPolicy(message);
+            if (ap != null 
+                && (!StringUtils.isEmpty(ap.getAuthorizationType())
+                    || !StringUtils.isEmpty(ap.getUserName()))) {
+                RealmBuilder rb = new RealmBuilder();
+                if (ap.getAuthorizationType() == null) {
+                    rb.setScheme(AuthScheme.BASIC);
+                } else {
+                    rb.setScheme(AuthScheme.valueOf(ap.getAuthorizationType().toUpperCase()));
+                }
+                rb.setUsePreemptiveAuth(true);
+                rb.setPassword(ap.getPassword())
+                    .setPrincipal(ap.getUserName());
+                builder.setRealm(rb.build());
+            }
+            
+            AsyncHttpClientConfig config = builder.build();
+            ahcclient = new AsyncHttpClient(config);
+        }
+        return ahcclient;
     }
 
     @Override
     protected OutputStream createOutputStream(Message message, boolean needToCacheRequest,
                                               boolean isChunking, int chunkThreshold) throws IOException {
+
+        
         AhcWebSocketConduitRequest entity = message.get(AhcWebSocketConduitRequest.class);
         return new AhcWebSocketWrappedOutputStream(message, needToCacheRequest, isChunking, chunkThreshold,
                                                    getConduitName(), entity.getUri());
@@ -270,7 +303,9 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
             LOG.log(Level.FINE, "connecting");
             if (websocket == null) {
                 try {
-                    websocket = ahcclient.prepareGet(url.toASCIIString()).execute(
+                    websocket = getAsyncHttpClient(outMessage)
+                        .prepareGet(url.toASCIIString())
+                        .execute(
                             new WebSocketUpgradeHandler.Builder()
                             .addWebSocketListener(new AhcWebSocketListener()).build()).get();
                     LOG.log(Level.FINE, "connected");
