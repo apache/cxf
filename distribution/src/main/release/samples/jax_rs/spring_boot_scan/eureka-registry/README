@@ -31,7 +31,7 @@ $ mvn dockerfile:push
 
 Run the container:
 --
-docker run -p 8080:8080 -t ${username}/apachecxf:spring-boot-sample-rs-scan-eureka
+docker run -p 8761:8761 -t ${username}/apachecxf:spring-boot-sample-rs-scan-eureka
 --
 
 = Testing the registry =
