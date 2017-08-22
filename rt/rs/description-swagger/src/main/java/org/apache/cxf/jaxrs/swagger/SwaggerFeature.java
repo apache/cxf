@@ -64,13 +64,46 @@ public class SwaggerFeature extends AbstractSwaggerFeature {
         
         BeanConfig beanConfig = new BeanConfig();
         beanConfig.setResourcePackage(getResourcePackage());
-        beanConfig.setVersion(getVersion());
+        String theVersion = getVersion();
+        if (theVersion == null) {
+            theVersion = "1.0.0";
+        }
+        beanConfig.setVersion(theVersion);
         beanConfig.setBasePath(getBasePath());
-        beanConfig.setTitle(getTitle());
-        beanConfig.setDescription(getDescription());
-        beanConfig.setContact(getContact());
-        beanConfig.setLicense(getLicense());
-        beanConfig.setLicenseUrl(getLicenseUrl());
+        // title
+        String theTitle = getTitle();
+        if (theTitle == null) {
+            theTitle = "Sample REST Application";
+        }
+        beanConfig.setTitle(theTitle);
+        String theDescription = getDescription();
+        if (theDescription == null) {
+            theDescription = "The Application";
+        }  
+        beanConfig.setDescription(theDescription);
+        
+        String theContact = getContact();
+        if (theContact == null) {
+            theContact = "users@cxf.apache.org";
+        }
+        beanConfig.setContact(theContact);
+
+        // license
+        String theLicense = getLicense();
+        if (theLicense == null) {
+            theLicense = DEFAULT_LICENSE_VALUE;
+        }
+        beanConfig.setLicense(theLicense);
+        
+        // license url
+        String theLicenseUrl = null;
+        if (!DEFAULT_LICENSE_VALUE.equals(theLicense)) {
+            theLicenseUrl = getLicenseUrl();
+        } else {
+            theLicenseUrl = DEFAULT_LICENSE_URL;
+        }
+        beanConfig.setLicenseUrl(theLicenseUrl);
+
         beanConfig.setTermsOfServiceUrl(getTermsOfServiceUrl());
         beanConfig.setScan(isScan());
         beanConfig.setFilterClass(getFilterClass());

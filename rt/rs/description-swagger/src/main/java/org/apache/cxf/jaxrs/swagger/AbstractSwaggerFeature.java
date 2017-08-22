@@ -31,6 +31,9 @@ import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 
 public abstract class AbstractSwaggerFeature extends AbstractFeature {
 
+    static final String DEFAULT_LICENSE_VALUE = "Apache 2.0 License";
+    static final String DEFAULT_LICENSE_URL = "http://www.apache.org/licenses/LICENSE-2.0.html";
+    
     private static final boolean SWAGGER_JAXRS_AVAILABLE;
     
     static {
@@ -41,14 +44,14 @@ public abstract class AbstractSwaggerFeature extends AbstractFeature {
     protected boolean runAsFilter;
     private boolean activateOnlyIfJaxrsSupported;
     private String resourcePackage;
-    private String version = "1.0.0";
+    private String version;
     // depending on swagger version basePath is set differently
     private String basePath;
-    private String title = "Sample REST Application";
-    private String description = "The Application";
-    private String contact = "users@cxf.apache.org";
-    private String license = "Apache 2.0 License";
-    private String licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0.html";
+    private String title;
+    private String description;
+    private String contact;
+    private String license;
+    private String licenseUrl;
     private String termsOfServiceUrl;
     private String filterClass;
     
