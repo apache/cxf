@@ -179,7 +179,7 @@ public class ServletController {
                     d = destinationRegistry.checkRestfulRequest(pathInfo);
                     if (d == null || d.getMessageObserver() == null) {
                         if (returnErrors) {
-                            LOG.warning("Can't find the the request for "
+                            LOG.warning("Can't find the request for "
                                 + request.getRequestURL() + "'s Observer ");
                             generateNotFound(request, res);
                         }
