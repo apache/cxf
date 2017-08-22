@@ -19,6 +19,7 @@
 package org.apache.cxf.jaxrs.swagger;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -53,6 +55,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.annotations.Provider;
 import org.apache.cxf.annotations.Provider.Scope;
 import org.apache.cxf.annotations.Provider.Type;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
@@ -62,6 +65,7 @@ import org.apache.cxf.jaxrs.model.ApplicationInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
+import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 
 import io.swagger.jaxrs.config.BeanConfig;
@@ -74,13 +78,27 @@ import io.swagger.models.auth.SecuritySchemeDefinition;
 
 @Provider(value = Type.Feature, scope = Scope.Server)
 public class Swagger2Feature extends AbstractSwaggerFeature {
+
+    private static final String DEFAULT_LICENSE_VALUE = "Apache 2.0 License";
+    private static final String DEFAULT_LICENSE_URL = "http://www.apache.org/licenses/LICENSE-2.0.html";
     
-    private String host;
-
-    private String[] schemes;
-
-    private boolean prettyPrint;
-
+    private static final String DEFAULT_PROPS_LOCATION = "/swagger.properties";
+    private static final String RESOURCE_PACKAGE_PROPERTY = "resource.package";
+    private static final String TITLE_PROPERTY = "title";
+    private static final String SCHEMES_PROPERTY = "schemes";
+    private static final String VERSION_PROPERTY = "version";
+    private static final String DESCRIPTION_PROPERTY = "description";
+    private static final String CONTACT_PROPERTY = "contact";
+    private static final String LICENSE_PROPERTY = "license";
+    private static final String LICENSE_URL_PROPERTY = "license.url";
+    private static final String TERMS_URL_PROPERTY = "terms.url";
+    private static final String PRETTY_PRINT_PROPERTY = "pretty.print";
+    private static final String FILTER_CLASS_PROPERTY = "filter.class";
+    private static final String HOST_PROPERTY = "host";
+    private static final String USE_PATH_CFG_PROPERTY = "use.path.based.config";
+    
+    private boolean runAsFilter;
+    
     private boolean scanAllResources;
 
     private String ignoreRoutes;
@@ -93,13 +111,18 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
 
     private Map<String, String> swaggerUiMediaTypes;
 
-    private boolean usePathBasedConfig;
-
     private boolean dynamicBasePath;
 
     private Map<String, SecuritySchemeDefinition> securityDefinitions;
     
     private Swagger2Customizer customizer;
+    
+    private String host;
+    private String[] schemes;
+    private Boolean prettyPrint;
+    private Boolean usePathBasedConfig;
+    
+    private String propertiesLocation = DEFAULT_PROPS_LOCATION;
 
     @Override
     protected void calculateDefaultBasePath(Server server) {
@@ -170,46 +193,159 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         customizer.setClassResourceInfos(cris);
         customizer.setDynamicBasePath(dynamicBasePath);
         
-        providers.add(new ReaderConfigFilter());
-
-        if (usePathBasedConfig) {
-            providers.add(new ServletConfigProvider());
-        }
-
-        ((ServerProviderFactory) server.getEndpoint().get(
-                ServerProviderFactory.class.getName())).setUserProviders(providers);
         BeanConfig beanConfig = appInfo == null
             ? new BeanConfig()
             : new ApplicationBeanConfig(appInfo.getProvider());
-        beanConfig.setResourcePackage(getResourcePackage());
-        beanConfig.setUsePathBasedConfig(isUsePathBasedConfig());
-        beanConfig.setVersion(getVersion());
-        String basePath = getBasePath();
-        beanConfig.setBasePath(basePath);
-        beanConfig.setHost(getHost());
-        beanConfig.setSchemes(getSchemes());
-        beanConfig.setTitle(getTitle());
-        beanConfig.setDescription(getDescription());
-        beanConfig.setContact(getContact());
-        beanConfig.setLicense(getLicense());
-        beanConfig.setLicenseUrl(getLicenseUrl());
-        beanConfig.setTermsOfServiceUrl(getTermsOfServiceUrl());
-        beanConfig.setScan(isScan());
-        beanConfig.setPrettyPrint(isPrettyPrint());
-        beanConfig.setFilterClass(getFilterClass());
+        initBeanConfig(bus, beanConfig);
 
         Swagger swagger = beanConfig.getSwagger();
         if (swagger != null && securityDefinitions != null) {
             swagger.setSecurityDefinitions(securityDefinitions);
         }
         customizer.setBeanConfig(beanConfig);
+        
+        providers.add(new ReaderConfigFilter());
+
+        if (beanConfig.isUsePathBasedConfig()) {
+            providers.add(new ServletConfigProvider());
+        }
+
+        ((ServerProviderFactory) server.getEndpoint().get(
+                ServerProviderFactory.class.getName())).setUserProviders(providers);
     }
 
-    public boolean isUsePathBasedConfig() {
+    protected void initBeanConfig(Bus bus, BeanConfig beanConfig) {
+        InputStream is = ResourceUtils.getClasspathResourceStream(propertiesLocation, 
+                                                 AbstractSwaggerFeature.class, 
+                                                 bus);
+        Properties props = null;
+        if (is != null) {
+            props = new Properties();
+            try {
+                props.load(is);
+            } catch (IOException ex) {
+                props = null;
+            }
+        }
+        // resource package
+        String theResourcePackage = getResourcePackage();
+        if (theResourcePackage == null && props != null) {
+            theResourcePackage = props.getProperty(RESOURCE_PACKAGE_PROPERTY);
+        }
+        beanConfig.setResourcePackage(theResourcePackage);
+        
+        // use path based configuration
+        Boolean theUsePathBasedConfig = isUsePathBasedConfig();
+        if (theUsePathBasedConfig == null && props != null) {
+            theUsePathBasedConfig = PropertyUtils.isTrue(props.get(USE_PATH_CFG_PROPERTY));
+        }
+        if (theUsePathBasedConfig == null) {
+            theUsePathBasedConfig = false;
+        }
+        beanConfig.setUsePathBasedConfig(theUsePathBasedConfig);
+        
+        // version 
+        String theVersion = getVersion();
+        if (theVersion == null && props != null) {
+            theVersion = props.getProperty(VERSION_PROPERTY);
+        }
+        beanConfig.setVersion(theVersion);
+        
+        // host
+        String theHost = getHost();
+        if (theHost == null && props != null) {
+            theHost = props.getProperty(HOST_PROPERTY);
+        }
+        beanConfig.setHost(theHost);
+        
+        // schemes
+        String[] theSchemes = getSchemes();
+        if (theSchemes == null && props != null && props.containsKey(SCHEMES_PROPERTY)) {
+            theSchemes = props.getProperty(SCHEMES_PROPERTY).split(",");
+        }
+        beanConfig.setSchemes(theSchemes);
+        
+        // title
+        String theTitle = getTitle();
+        if (theTitle == null && props != null) {
+            theTitle = props.getProperty(TITLE_PROPERTY);
+        }
+        beanConfig.setTitle(theTitle);
+        
+        // description
+        String theDescription = getDescription();
+        if (theDescription == null && props != null) {
+            theDescription = props.getProperty(DESCRIPTION_PROPERTY);
+        }
+        beanConfig.setDescription(theDescription);
+        
+        // contact
+        String theContact = getContact();
+        if (theContact == null && props != null) {
+            theContact = props.getProperty(CONTACT_PROPERTY);
+        }
+        beanConfig.setContact(theContact);
+        
+        // license
+        String theLicense = getLicense();
+        if (theLicense == null && props != null) {
+            theLicense = props.getProperty(LICENSE_PROPERTY);
+        }
+        if (theLicense == null) {
+            theLicense = DEFAULT_LICENSE_VALUE;
+        }
+        beanConfig.setLicense(theLicense);
+        
+        // license url
+        String theLicenseUrl = null;
+        if (!DEFAULT_LICENSE_VALUE.equals(theLicense)) {
+            theLicenseUrl = getLicenseUrl();
+            if (theLicenseUrl == null && props != null) {
+                theLicenseUrl = props.getProperty(LICENSE_URL_PROPERTY);
+            }
+        } else {
+            theLicenseUrl = DEFAULT_LICENSE_URL;
+        }
+        beanConfig.setLicenseUrl(theLicenseUrl);
+        
+        // terms of service url
+        String theTermsUrl = getTermsOfServiceUrl();
+        if (theTermsUrl == null && props != null) {
+            theContact = props.getProperty(TERMS_URL_PROPERTY);
+        }
+        beanConfig.setTermsOfServiceUrl(theTermsUrl);
+        
+        // pretty print
+        Boolean thePrettyPrint = isPrettyPrint();
+        if (thePrettyPrint == null && props != null) {
+            thePrettyPrint = PropertyUtils.isTrue(props.get(PRETTY_PRINT_PROPERTY));
+        }
+        if (thePrettyPrint == null) {
+            thePrettyPrint = false;
+        }
+        beanConfig.setPrettyPrint(thePrettyPrint);
+        
+        // filter class
+        String theFilterClass = getFilterClass();
+        if (theFilterClass == null && props != null) {
+            theFilterClass = props.getProperty(FILTER_CLASS_PROPERTY);
+        }
+        beanConfig.setFilterClass(theFilterClass);
+        
+        // scan 
+        //TODO: has no effect on Swagger which always scans and needs to be removed
+        beanConfig.setScan(isScan());
+        
+        // base path is calculated dynamically
+        beanConfig.setBasePath(getBasePath());
+        
+    }
+
+    public Boolean isUsePathBasedConfig() {
         return usePathBasedConfig;
     }
 
-    public void setUsePathBasedConfig(boolean usePathBasedConfig) {
+    public void setUsePathBasedConfig(Boolean usePathBasedConfig) {
         this.usePathBasedConfig = usePathBasedConfig;
     }
 
@@ -225,6 +361,18 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         return schemes;
     }
     
+    public void setSchemes(String[] schemes) {
+        this.schemes = schemes;
+    }
+
+    public Boolean isPrettyPrint() {
+        return prettyPrint;
+    }
+
+    public void setPrettyPrint(Boolean prettyPrint) {
+        this.prettyPrint = prettyPrint;
+    }
+    
     public Swagger2Customizer getCustomizer() {
         return customizer;
     }
@@ -232,19 +380,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     public void setCustomizer(Swagger2Customizer customizer) {
         this.customizer = customizer;
     }
-
-    public void setSchemes(String[] schemes) {
-        this.schemes = schemes;
-    }
-
-    public boolean isPrettyPrint() {
-        return prettyPrint;
-    }
-
-    public void setPrettyPrint(boolean prettyPrint) {
-        this.prettyPrint = prettyPrint;
-    }
-
+    
     public boolean isScanAllResources() {
         return scanAllResources;
     }
@@ -297,6 +433,14 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         this.securityDefinitions = securityDefinitions;
     }
 
+    public String getPropertiesLocation() {
+        return propertiesLocation;
+    }
+
+    public void setPropertiesLocation(String propertiesLocation) {
+        this.propertiesLocation = propertiesLocation;
+    }
+    
     private class ServletConfigProvider implements ContextProvider<ServletConfig> {
 
         @Override

@@ -56,9 +56,14 @@ import org.junit.Test;
 import org.yaml.snakeyaml.Yaml;
 
 public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBusClientServerTestBase {
-    private static final String CONTACT = "CXF unittest";
-    private static final String SECURITY_DEFINITION_NAME = "basicAuth";
-
+    static final String SECURITY_DEFINITION_NAME = "basicAuth";
+    
+    private static final String CONTACT = "cxf@apache.org";
+    private static final String TITLE = "CXF unittest";
+    private static final String DESCRIPTION = "API Description";
+    private static final String LICENSE = "API License";
+    private static final String LICENSE_URL = "API License URL";
+    
     @Ignore
     public abstract static class Server extends AbstractBusTestServerBase {
         protected final String port;
@@ -88,6 +93,10 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
             final Swagger2Feature feature = new Swagger2Feature();
             feature.setRunAsFilter(runAsFilter);
             feature.setContact(CONTACT);
+            feature.setTitle(TITLE);
+            feature.setDescription(DESCRIPTION);
+            feature.setLicense(LICENSE);
+            feature.setLicenseUrl(LICENSE_URL);
             feature.setSecurityDefinitions(Collections.singletonMap(SECURITY_DEFINITION_NAME,
                new io.swagger.models.auth.BasicAuthDefinition()));
             return feature;
@@ -155,6 +164,10 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
             assertEquals(ParameterType.PATH, delOpParams.get(0).getType());
 
             assertThat(swaggerJson, CoreMatchers.containsString(CONTACT));
+            assertThat(swaggerJson, CoreMatchers.containsString(TITLE));
+            assertThat(swaggerJson, CoreMatchers.containsString(DESCRIPTION));
+            assertThat(swaggerJson, CoreMatchers.containsString(LICENSE));
+            assertThat(swaggerJson, CoreMatchers.containsString(LICENSE_URL));
             assertThat(swaggerJson, CoreMatchers.containsString(SECURITY_DEFINITION_NAME));
         } finally {
             client.close();

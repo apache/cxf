@@ -47,8 +47,8 @@ public abstract class AbstractSwaggerFeature extends AbstractFeature {
     private String title;
     private String description;
     private String contact;
-    private String license = "Apache 2.0 License";
-    private String licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0.html";
+    private String license;
+    private String licenseUrl;
     private String termsOfServiceUrl;
     private String filterClass;
 
