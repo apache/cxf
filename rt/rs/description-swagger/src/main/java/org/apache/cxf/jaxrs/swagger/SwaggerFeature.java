@@ -45,16 +45,17 @@ import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 public class SwaggerFeature extends AbstractSwaggerFeature {
 
     @Override
+    @SuppressWarnings("deprecation")
     protected void addSwaggerResource(Server server, Bus bus) {
         ApiListingResourceJSON apiListingResource = new ApiListingResourceJSON();
-        if (!runAsFilter) {
+        if (!isRunAsFilter()) {
             List<Object> serviceBeans = new ArrayList<Object>();
             serviceBeans.add(apiListingResource);
             ((JAXRSServiceFactoryBean)server.getEndpoint().get(JAXRSServiceFactoryBean.class.getName())).
                 setResourceClassesFromBeans(serviceBeans);
         }
         List<Object> providers = new ArrayList<Object>();
-        if (runAsFilter) {
+        if (isRunAsFilter()) {
             providers.add(new SwaggerContainerRequestFilter(apiListingResource));
         }
         providers.add(new ResourceListingProvider());
