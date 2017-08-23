@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.ext.Provider;
@@ -33,6 +34,7 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ClasspathScanner;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
@@ -41,6 +43,7 @@ import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.model.UserResource;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanCreationException;
@@ -55,8 +58,9 @@ import org.springframework.context.ApplicationContextAware;
 
 
 public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefinitionParser {
-    
-    
+
+    private static final Logger LOG = LogUtils.getL7dLogger(JAXRSServerFactoryBeanDefinitionParser.class);
+
     public JAXRSServerFactoryBeanDefinitionParser() {
         super();
         setBeanClass(SpringJAXRSServerFactoryBean.class);
@@ -272,6 +276,8 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
             try {
                 bean = beanFactory.createBean(clazz, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
             } catch (Exception ex) {
+                String stackTrace = ExceptionUtils.getStackTrace(ex);
+                LOG.fine("Autowire failure for a " + clazz.getName() + " bean: " + stackTrace);
                 bean = beanFactory.createBean(clazz);
             }
             providers.add(bean);
