@@ -208,8 +208,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
             providers.add(new ServletConfigProvider());
         }
 
-        ((ServerProviderFactory) server.getEndpoint().get(
-                ServerProviderFactory.class.getName())).setUserProviders(providers);
+        factory.setUserProviders(providers);
     }
 
     protected void initBeanConfig(Bus bus, BeanConfig beanConfig) {
@@ -330,6 +329,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         }
         beanConfig.setFilterClass(theFilterClass);
         
+        // Without this call Swagger generator loses the JSON 'info'
         beanConfig.setScan(false);
         
         // base path is calculated dynamically
