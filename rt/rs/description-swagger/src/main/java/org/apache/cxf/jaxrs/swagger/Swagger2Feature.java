@@ -130,26 +130,23 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         super.calculateDefaultBasePath(server);
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     protected void addSwaggerResource(Server server, Bus bus) {
         JAXRSServiceFactoryBean sfb =
             (JAXRSServiceFactoryBean) server.getEndpoint().get(JAXRSServiceFactoryBean.class.getName());
 
-        ApplicationInfo appInfo = null;
-        if (!isScan()) {
-            ServerProviderFactory factory =
-                (ServerProviderFactory)server.getEndpoint().get(ServerProviderFactory.class.getName());
-            appInfo = factory.getApplicationProvider();
-            if (appInfo == null) {
-                Set<Class<?>> serviceClasses = new HashSet<>();
-                for (ClassResourceInfo cri : sfb.getClassResourceInfo()) {
-                    serviceClasses.add(cri.getServiceClass());
-                }
-                appInfo = new ApplicationInfo(new DefaultApplication(serviceClasses), bus);
-                server.getEndpoint().put(Application.class.getName(), appInfo);
+        ServerProviderFactory factory =
+            (ServerProviderFactory)server.getEndpoint().get(ServerProviderFactory.class.getName());
+        ApplicationInfo appInfo = factory.getApplicationProvider();
+        if (appInfo == null) {
+            Set<Class<?>> serviceClasses = new HashSet<>();
+            for (ClassResourceInfo cri : sfb.getClassResourceInfo()) {
+                serviceClasses.add(cri.getServiceClass());
             }
+            appInfo = new ApplicationInfo(new DefaultApplication(serviceClasses), bus);
+            server.getEndpoint().put(Application.class.getName(), appInfo);
         }
+        
 
         List<Object> swaggerResources = new LinkedList<>();
         
@@ -215,7 +212,6 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
                 ServerProviderFactory.class.getName())).setUserProviders(providers);
     }
 
-    @SuppressWarnings("deprecation")
     protected void initBeanConfig(Bus bus, BeanConfig beanConfig) {
         InputStream is = ResourceUtils.getClasspathResourceStream(propertiesLocation, 
                                                  AbstractSwaggerFeature.class, 
@@ -334,9 +330,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         }
         beanConfig.setFilterClass(theFilterClass);
         
-        // scan 
-        //TODO: has no effect on Swagger which always scans and needs to be removed
-        beanConfig.setScan(isScan());
+        beanConfig.setScan(false);
         
         // base path is calculated dynamically
         beanConfig.setBasePath(getBasePath());

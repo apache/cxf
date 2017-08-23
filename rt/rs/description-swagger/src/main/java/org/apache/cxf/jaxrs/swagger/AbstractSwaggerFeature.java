@@ -37,12 +37,10 @@ public abstract class AbstractSwaggerFeature extends AbstractFeature {
         SWAGGER_JAXRS_AVAILABLE = isSwaggerJaxRsAvailable();
     }
 
-    private boolean scan = true;
     private boolean runAsFilter;
     private boolean activateOnlyIfJaxrsSupported;
     private String resourcePackage;
     private String version;
-    // depending on swagger version basePath is set differently
     private String basePath;
     private String title;
     private String description;
@@ -159,14 +157,6 @@ public abstract class AbstractSwaggerFeature extends AbstractFeature {
     }
     public void setTermsOfServiceUrl(String termsOfServiceUrl) {
         this.termsOfServiceUrl = termsOfServiceUrl;
-    }
-    @Deprecated
-    public boolean isScan() {
-        return scan;
-    }
-    @Deprecated
-    public void setScan(boolean scan) {
-        this.scan = scan;
     }
     public String getFilterClass() {
         return filterClass;
