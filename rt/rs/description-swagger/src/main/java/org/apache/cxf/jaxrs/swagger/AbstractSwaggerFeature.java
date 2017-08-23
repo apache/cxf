@@ -37,8 +37,8 @@ public abstract class AbstractSwaggerFeature extends AbstractFeature {
         SWAGGER_JAXRS_AVAILABLE = isSwaggerJaxRsAvailable();
     }
 
-    protected boolean scan = true;
-    protected boolean runAsFilter;
+    private boolean scan = true;
+    private boolean runAsFilter;
     private boolean activateOnlyIfJaxrsSupported;
     private String resourcePackage;
     private String version;
@@ -160,9 +160,11 @@ public abstract class AbstractSwaggerFeature extends AbstractFeature {
     public void setTermsOfServiceUrl(String termsOfServiceUrl) {
         this.termsOfServiceUrl = termsOfServiceUrl;
     }
+    @Deprecated
     public boolean isScan() {
         return scan;
     }
+    @Deprecated
     public void setScan(boolean scan) {
         this.scan = scan;
     }

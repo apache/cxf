@@ -130,6 +130,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         super.calculateDefaultBasePath(server);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     protected void addSwaggerResource(Server server, Bus bus) {
         JAXRSServiceFactoryBean sfb =
@@ -214,6 +215,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
                 ServerProviderFactory.class.getName())).setUserProviders(providers);
     }
 
+    @SuppressWarnings("deprecation")
     protected void initBeanConfig(Bus bus, BeanConfig beanConfig) {
         InputStream is = ResourceUtils.getClasspathResourceStream(propertiesLocation, 
                                                  AbstractSwaggerFeature.class, 
