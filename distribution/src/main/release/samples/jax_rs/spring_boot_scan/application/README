@@ -37,8 +37,19 @@ $ mvn dockerfile:push
 --
 
 Run the container:
+
+By default it is expected that EUREKA_SERVER_URI environment variable is passed and set to 
+"http://{docker.host}" where you can find the value of {docker.host} by running 'ifconfig' and checking 
+the IP address of the docker bridge 'docker0'.
+
+--
+docker run -p 8080:8080 -e EUREKA_SERVER_URI='http://{docker.host}' -t ${username}/apachecxf:spring-boot-sample-rs-scan-app 
+--
+
+Alternatively you can run the docker in the 'host' network mode.
 --
 docker run -p 8080:8080 --network="host" -t ${username}/apachecxf:spring-boot-sample-rs-scan-app 
+--
 
 = Testing the server =
 
