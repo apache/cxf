@@ -147,6 +147,7 @@
         <cxf.servlet-api.group>javax.servlet</cxf.servlet-api.group>
         <cxf.servlet-api.artifact>javax.servlet-api</cxf.servlet-api.artifact>
         <cxf.servlet-api.version>3.1.0</cxf.servlet-api.version>
+        <cxf.snakeyaml.version>1.17</cxf.snakeyaml.version>
         <cxf.geronimo.servlet25.version>1.2</cxf.geronimo.servlet25.version>
         <cxf.servlet-api-2.5.artifact>geronimo-servlet_2.5_spec</cxf.servlet-api-2.5.artifact>
         <cxf.servlet-api-2.5.version>1.2</cxf.servlet-api-2.5.version>
@@ -1565,6 +1566,11 @@
                 <version>${cxf.jackson.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>${cxf.snakeyaml.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>${cxf.asm.groupId}</groupId>
                 <artifactId>${cxf.asm.artifactId}</artifactId>
                 <version>${cxf.asm.version}</version>
@@ -1637,7 +1643,7 @@
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-j2ee-management_1.1_spec</artifactId>
-                <version>1.0.1</version>
+                <version>${cxf.geronimo.j2ee.management.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
