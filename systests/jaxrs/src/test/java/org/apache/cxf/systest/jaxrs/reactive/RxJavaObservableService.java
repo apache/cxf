@@ -38,7 +38,7 @@ import rx.schedulers.Schedulers;
 
 
 @Path("/observable")
-public class ObservableService {
+public class RxJavaObservableService {
 
     @GET
     @Produces("text/plain")

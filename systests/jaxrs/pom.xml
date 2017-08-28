@@ -60,7 +60,12 @@
         <dependency>
           <groupId>io.reactivex</groupId>
           <artifactId>rxjava</artifactId>
-          <version>${cxf.rx.java.version}</version>
+          <version>${cxf.rxjava.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>io.reactivex.rxjava2</groupId>
+          <artifactId>rxjava</artifactId>
+          <version>${cxf.rxjava2.version}</version>
         </dependency>
         <!--
           <dependency>

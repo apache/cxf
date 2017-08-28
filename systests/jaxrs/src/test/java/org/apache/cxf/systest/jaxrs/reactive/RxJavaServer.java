@@ -33,11 +33,11 @@ import org.apache.cxf.jaxrs.rx.server.ObservableInvoker;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 
-public class ObservableServer extends AbstractBusTestServerBase {
-    public static final String PORT = allocatePort(ObservableServer.class);
+public class RxJavaServer extends AbstractBusTestServerBase {
+    public static final String PORT = allocatePort(RxJavaServer.class);
 
     org.apache.cxf.endpoint.Server server;
-    public ObservableServer() {
+    public RxJavaServer() {
     }
 
     protected void run() {
@@ -51,9 +51,9 @@ public class ObservableServer extends AbstractBusTestServerBase {
         streamProvider.setProduceMediaTypes(Collections.singletonList("application/json"));
         sf.setProvider(streamProvider);
         sf.getOutInterceptors().add(new LoggingOutInterceptor());
-        sf.setResourceClasses(ObservableService.class);
-        sf.setResourceProvider(ObservableService.class,
-                               new SingletonResourceProvider(new ObservableService(), true));
+        sf.setResourceClasses(RxJavaObservableService.class);
+        sf.setResourceProvider(RxJavaObservableService.class,
+                               new SingletonResourceProvider(new RxJavaObservableService(), true));
         sf.setAddress("http://localhost:" + PORT + "/");
         server = sf.create();
     }
@@ -66,7 +66,7 @@ public class ObservableServer extends AbstractBusTestServerBase {
 
     public static void main(String[] args) {
         try {
-            ObservableServer s = new ObservableServer();
+            RxJavaServer s = new RxJavaServer();
             s.start();
         } catch (Exception ex) {
             ex.printStackTrace();

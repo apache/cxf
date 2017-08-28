@@ -41,13 +41,13 @@ import org.junit.Test;
 
 import rx.Observable;
 
-public class JAXRSObservableTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = ObservableServer.PORT;
+public class JAXRSRxJavaTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = RxJavaServer.PORT;
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
         assertTrue("server did not launch correctly",
-                   launchServer(ObservableServer.class, true));
+                   launchServer(RxJavaServer.class, true));
         createStaticBus();
     }
     @Test

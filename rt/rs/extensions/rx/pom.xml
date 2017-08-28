@@ -48,6 +48,12 @@
           <optional>true</optional>
         </dependency>
         <dependency>
+          <groupId>io.reactivex.rxjava2</groupId>
+          <artifactId>rxjava</artifactId>
+          <scope>provided</scope>
+          <optional>true</optional>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
