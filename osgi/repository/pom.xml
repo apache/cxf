@@ -255,7 +255,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.servicemix.specs</groupId>
-			<artifactId>org.apache.servicemix.specs.jsr370-api-m1</artifactId>
+			<artifactId>org.apache.servicemix.specs.jaxrs-api-2.1</artifactId>
 			<version>${cxf.servicemix.specs.version}</version>
 		</dependency>
 	</dependencies>
