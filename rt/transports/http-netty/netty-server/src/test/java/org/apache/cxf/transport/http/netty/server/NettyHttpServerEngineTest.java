@@ -25,8 +25,12 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.configuration.Configurer;
+import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.easymock.EasyMock;
@@ -39,7 +43,9 @@ import org.junit.Test;
 public class NettyHttpServerEngineTest extends Assert {
     private static final int PORT1 
         = Integer.valueOf(TestUtil.getPortNumber(NettyHttpServerEngineTest.class, 1));
-    private static final int PORT3 
+    private static final int PORT2
+        = Integer.valueOf(TestUtil.getPortNumber(NettyHttpServerEngineTest.class, 2));
+    private static final int PORT3
         = Integer.valueOf(TestUtil.getPortNumber(NettyHttpServerEngineTest.class, 3));
     
 
@@ -138,6 +144,17 @@ public class NettyHttpServerEngineTest extends Assert {
         assertEquals("the netty http handler did not take effect", response, "test2");
 
         NettyHttpServerEngineFactory.destroyForPort(PORT3);
+    }
+
+    @Test
+    public void testHttps() throws Exception {
+        Map<String, TLSServerParameters> tlsParamsMap = new HashMap<>();
+        tlsParamsMap.put(Integer.toString(PORT2), new TLSServerParameters());
+        factory.setTlsServerParameters(tlsParamsMap);
+
+        factory.createNettyHttpServerEngine(PORT2, "https");
+
+        NettyHttpServerEngineFactory.destroyForPort(PORT2);
     }
 
     private String getResponse(String target) throws Exception {

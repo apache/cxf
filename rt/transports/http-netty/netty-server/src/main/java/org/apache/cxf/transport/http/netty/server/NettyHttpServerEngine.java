@@ -118,6 +118,11 @@ public class NettyHttpServerEngine implements ServerEngine {
      */
     public void setTlsServerParameters(TLSServerParameters params) {
         tlsServerParameters = params;
+        if (tlsServerParameters != null) {
+            protocol = "https";
+        } else {
+            protocol = "http";
+        }
     }
     
     /**
