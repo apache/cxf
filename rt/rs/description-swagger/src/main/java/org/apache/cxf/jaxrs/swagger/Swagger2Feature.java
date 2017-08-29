@@ -290,6 +290,8 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         }
         if (theLicense == null) {
             theLicense = DEFAULT_LICENSE_VALUE;
+        } else if (theLicense.isEmpty()) {
+            theLicense = null;
         }
         beanConfig.setLicense(theLicense);
         
