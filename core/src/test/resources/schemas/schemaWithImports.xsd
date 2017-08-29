@@ -1,0 +1,4 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <xsd:import namespace="http://www.log.org" schemaLocation="logSchema.xsd"/>
+    <xsd:import namespace="http://www.echo.org" schemaLocation="echoSchema.xsd"/>
+</xsd:schema>
