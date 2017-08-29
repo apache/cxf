@@ -111,8 +111,8 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         String address = "http://localhost:" + PORT + "/bookstore/retrieve";
         WebClient wc = WebClient.create(address);
         wc.type("application/xml").accept("application/xml");
-        if (useReflection) {
-            WebClient.getConfig(wc).getRequestContext().put("use.httpurlconnection.method.reflection", true);
+        if (!useReflection) {
+            WebClient.getConfig(wc).getRequestContext().put("use.httpurlconnection.method.reflection", false);
         }
         // CXF RS Client code will set this property to true if the http verb is unknown
         // and this property is not already set. The async conduit is loaded in the tests module
