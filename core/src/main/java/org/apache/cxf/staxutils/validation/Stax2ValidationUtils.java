@@ -25,14 +25,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import org.xml.sax.InputSource;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
@@ -41,6 +41,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaExternal;
 import org.codehaus.stax2.XMLStreamReader2;
@@ -185,15 +186,9 @@ class Stax2ValidationUtils {
     }
 
     private Element getElement(String path) throws XMLStreamException {
-        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-        try {
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(path);
-            return doc.getDocumentElement();
-        } catch (Exception e) {
-            throw new XMLStreamException("There was an error trying to get external schemas " + e.getMessage());
-        }
-
+        InputSource in = new InputSource(path);
+        Document doc = StaxUtils.read(in);
+        return doc.getDocumentElement();
     }
 
 }
