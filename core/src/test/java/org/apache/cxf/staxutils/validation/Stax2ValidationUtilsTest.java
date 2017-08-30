@@ -105,7 +105,7 @@ public class Stax2ValidationUtilsTest {
 
     @Parameterized.Parameters
     public static Collection<String[]> data() {
-        List<String[]> parameters = new ArrayList();
+        List<String[]> parameters = new ArrayList<>();
         parameters.add(new String[]{VALID_MESSAGE_ECHO, INVALID_MESSAGE_ECHO, ECHO_ERROR_MESSAGE, MULTI_IMPORT_SCHEMA});
         parameters.add(new String[]{VALID_MESSAGE_LOG, INVALID_MESSAGE_LOG, LOG_ERROR_MESSAGE, MULTI_IMPORT_SCHEMA});
         parameters.add(new String[]{VALID_MESSAGE_ECHO, INVALID_MESSAGE_ECHO, ECHO_ERROR_MESSAGE, ECHO_SCHEMA});
