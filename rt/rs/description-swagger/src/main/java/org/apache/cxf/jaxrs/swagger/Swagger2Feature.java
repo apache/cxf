@@ -93,6 +93,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     private static final String FILTER_CLASS_PROPERTY = "filter.class";
     private static final String HOST_PROPERTY = "host";
     private static final String USE_PATH_CFG_PROPERTY = "use.path.based.config";
+    private static final String SUPPORT_UI_PROPERTY = "support.swagger.ui";
     
     private boolean runAsFilter;
     
@@ -102,7 +103,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     
     private Swagger2Serializers swagger2Serializers;
 
-    private boolean supportSwaggerUi = true;
+    private Boolean supportSwaggerUi;
 
     private String swaggerUiVersion;
     
@@ -158,8 +159,9 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         if (runAsFilter) {
             providers.add(new SwaggerContainerRequestFilter(appInfo == null ? null : appInfo.getProvider()));
         }
-        
-        if (supportSwaggerUi) {
+
+        Properties swaggerProps = getSwaggerProperties(bus);
+        if (checkSupportSwaggerUiProp(swaggerProps)) {
             String swaggerUiRoot = SwaggerUiResolver.findSwaggerUiRoot(swaggerUiMavenGroupAndArtifact, 
                                                                        swaggerUiVersion);
             if (swaggerUiRoot != null) {
@@ -200,8 +202,8 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         BeanConfig beanConfig = appInfo == null 
             ? new BeanConfig() 
             : new ApplicationBeanConfig(appInfo.getProvider());
-        initBeanConfig(bus, beanConfig);
-        
+        initBeanConfig(beanConfig, swaggerProps);
+
         Swagger swagger = beanConfig.getSwagger();
         if (swagger != null && securityDefinitions != null) {
             swagger.setSecurityDefinitions(securityDefinitions);
@@ -223,8 +225,18 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
                 ServerProviderFactory.class.getName())).setUserProviders(providers);
     }
 
-    @SuppressWarnings("deprecation")
-    protected void initBeanConfig(Bus bus, BeanConfig beanConfig) {
+    protected boolean checkSupportSwaggerUiProp(Properties props) {
+        Boolean theSupportSwaggerUI = this.supportSwaggerUi;
+        if (theSupportSwaggerUI == null && props != null && props.containsKey(SUPPORT_UI_PROPERTY)) {
+            theSupportSwaggerUI = PropertyUtils.isTrue(props.get(SUPPORT_UI_PROPERTY));
+        }
+        if (theSupportSwaggerUI == null) {
+            theSupportSwaggerUI = true;
+        }
+        return theSupportSwaggerUI;
+    }
+
+    protected Properties getSwaggerProperties(Bus bus) {
         InputStream is = ResourceUtils.getClasspathResourceStream(propertiesLocation, 
                                                  AbstractSwaggerFeature.class, 
                                                  bus);
@@ -237,6 +249,12 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
                 props = null;
             }
         }
+        return props;
+    }
+
+    @SuppressWarnings("deprecation")
+    protected void initBeanConfig(BeanConfig beanConfig, Properties props) {
+        
         // resource package
         String theResourcePackage = getResourcePackage();
         if (theResourcePackage == null && props != null) {
@@ -357,7 +375,6 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         beanConfig.setFilterClass(theFilterClass);
         
         // scan 
-        //TODO: has no effect on Swagger which always scans and needs to be removed
         beanConfig.setScan(isScan());
         
         // base path is calculated dynamically

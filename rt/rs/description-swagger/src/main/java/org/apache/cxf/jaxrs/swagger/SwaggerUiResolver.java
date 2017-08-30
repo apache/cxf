@@ -52,14 +52,13 @@ public class SwaggerUiResolver {
                         return root;
                     }
                 }
-            } else {
-                Enumeration<URL> urls = cl.getResources(UI_RESOURCES_ROOT_START);
-                while (urls.hasMoreElements()) {
-                    String urlStr = urls.nextElement().toString().replace(UI_RESOURCES_ROOT_START, "");     
-                    String root = checkUiRoot(urlStr, swaggerUiMavenGroupAndArtifact, swaggerUiVersion);
-                    if (root != null) {
-                        return root;
-                    }
+            } 
+            Enumeration<URL> urls = cl.getResources(UI_RESOURCES_ROOT_START);
+            while (urls.hasMoreElements()) {
+                String urlStr = urls.nextElement().toString().replace(UI_RESOURCES_ROOT_START, "");     
+                String root = checkUiRoot(urlStr, swaggerUiMavenGroupAndArtifact, swaggerUiVersion);
+                if (root != null) {
+                    return root;
                 }
             }
         } catch (Throwable ex) {
