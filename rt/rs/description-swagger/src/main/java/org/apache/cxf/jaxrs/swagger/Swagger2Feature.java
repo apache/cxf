@@ -310,24 +310,24 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         
         // license
         String theLicense = getLicense();
-        if (theLicense == null && props != null) {
-            theLicense = props.getProperty(LICENSE_PROPERTY);
-        }
-        if (theLicense == null) {
-            theLicense = DEFAULT_LICENSE_VALUE;
-        } else if (theLicense.isEmpty()) {
-            theLicense = null;
+        if (theLicense == null && !licenseWasSet) {
+            if (props != null) {
+                theLicense = props.getProperty(LICENSE_PROPERTY);
+                if (theLicense.isEmpty()) {
+                    theLicense = null;
+                }
+            } else {
+                theLicense = DEFAULT_LICENSE_VALUE;
+            }
         }
         beanConfig.setLicense(theLicense);
         
         // license url
-        String theLicenseUrl = null;
-        if (!DEFAULT_LICENSE_VALUE.equals(theLicense)) {
-            theLicenseUrl = getLicenseUrl();
-            if (theLicenseUrl == null && props != null) {
-                theLicenseUrl = props.getProperty(LICENSE_URL_PROPERTY);
-            }
-        } else {
+        String theLicenseUrl = getLicenseUrl();
+        if (theLicenseUrl == null && props != null) {
+            theLicenseUrl = props.getProperty(LICENSE_URL_PROPERTY);
+        }
+        if (theLicenseUrl == null && DEFAULT_LICENSE_VALUE.equals(theLicense)) {
             theLicenseUrl = DEFAULT_LICENSE_URL;
         }
         beanConfig.setLicenseUrl(theLicenseUrl);
