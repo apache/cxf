@@ -37,6 +37,7 @@ public abstract class AbstractSwaggerFeature extends AbstractFeature {
         SWAGGER_JAXRS_AVAILABLE = isSwaggerJaxRsAvailable();
     }
 
+    protected boolean licenseWasSet;
     private boolean runAsFilter;
     private boolean activateOnlyIfJaxrsSupported;
     private String resourcePackage;
@@ -144,6 +145,7 @@ public abstract class AbstractSwaggerFeature extends AbstractFeature {
         return license;
     }
     public void setLicense(String license) {
+        this.licenseWasSet = true;
         this.license = license;
     }
     public String getLicenseUrl() {
