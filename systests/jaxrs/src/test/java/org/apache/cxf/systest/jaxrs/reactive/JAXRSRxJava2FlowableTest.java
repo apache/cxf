@@ -36,15 +36,12 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.rx2.client.FlowableRxInvoker;
 import org.apache.cxf.jaxrs.rx2.client.FlowableRxInvokerProvider;
-import org.apache.cxf.jaxrs.rx2.client.ObservableRxInvoker;
-import org.apache.cxf.jaxrs.rx2.client.ObservableRxInvokerProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import io.reactivex.Flowable;
-import io.reactivex.Observable;
 
 public class JAXRSRxJava2FlowableTest extends AbstractBusClientServerTestBase {
     public static final String PORT = RxJava2FlowableServer.PORT;
@@ -112,9 +109,9 @@ public class JAXRSRxJava2FlowableTest extends AbstractBusClientServerTestBase {
     public void testGetHelloWorldAsyncObservable() throws Exception {
         String address = "http://localhost:" + PORT + "/rx2/flowable/textAsync";
         WebClient wc = WebClient.create(address,
-                                        Collections.singletonList(new ObservableRxInvokerProvider()));
-        Observable<String> obs = wc.accept("text/plain")
-            .rx(ObservableRxInvoker.class)
+                                        Collections.singletonList(new FlowableRxInvokerProvider()));
+        Flowable<String> obs = wc.accept("text/plain")
+            .rx(FlowableRxInvoker.class)
             .get(String.class);
         
         Thread.sleep(2000);
@@ -128,9 +125,9 @@ public class JAXRSRxJava2FlowableTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetHelloWorldAsyncObservable404() throws Exception {
         String address = "http://localhost:" + PORT + "/rx2/flowable/textAsync404";
-        Invocation.Builder b = ClientBuilder.newClient().register(new ObservableRxInvokerProvider())
+        Invocation.Builder b = ClientBuilder.newClient().register(new FlowableRxInvokerProvider())
             .target(address).request();
-        b.rx(ObservableRxInvoker.class).get(String.class).subscribe(
+        b.rx(FlowableRxInvoker.class).get(String.class).subscribe(
             s -> {
                 fail("Exception expected");
             },
