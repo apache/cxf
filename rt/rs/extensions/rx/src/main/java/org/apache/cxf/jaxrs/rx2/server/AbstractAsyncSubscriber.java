@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.rx.server;
+package org.apache.cxf.jaxrs.rx2.server;
 
 import java.util.List;
 
@@ -24,9 +24,9 @@ import javax.ws.rs.container.AsyncResponse;
 
 import org.apache.cxf.jaxrs.ext.StreamingResponse;
 
-import rx.Subscriber;
+import io.reactivex.subscribers.DefaultSubscriber;
 
-public abstract class AbstractAsyncSubscriber<T> extends Subscriber<T> {
+public abstract class AbstractAsyncSubscriber<T> extends DefaultSubscriber<T> {
 
     private AsyncResponse ar;
 
@@ -52,5 +52,14 @@ public abstract class AbstractAsyncSubscriber<T> extends Subscriber<T> {
 
     protected AsyncResponse getAsyncResponse() {
         return ar;
+    }
+
+    @Override
+    public void onStart() {
+        requestNext();
+    }
+    
+    protected void requestNext() {
+        super.request(1);
     }
 }

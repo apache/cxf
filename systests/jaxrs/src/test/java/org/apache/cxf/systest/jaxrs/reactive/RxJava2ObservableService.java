@@ -27,7 +27,7 @@ import javax.ws.rs.Produces;
 import io.reactivex.Observable;
 
 
-@Path("/observable2")
+@Path("/rx2/observable")
 public class RxJava2ObservableService {
 
     
@@ -37,7 +37,6 @@ public class RxJava2ObservableService {
     public Observable<HelloWorldBean> getJson() {
         return Observable.just(new HelloWorldBean());
     }
-
 }
 
 

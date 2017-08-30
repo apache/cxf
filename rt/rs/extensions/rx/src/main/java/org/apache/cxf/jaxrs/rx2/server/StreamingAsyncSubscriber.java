@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.rx.server;
+package org.apache.cxf.jaxrs.rx2.server;
 
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
@@ -65,12 +65,13 @@ public class StreamingAsyncSubscriber<T> extends AbstractAsyncSubscriber<T> {
         if (asyncTimeout == 0) {
             resumeAsyncResponse();
         }
+        super.onStart();
     }
     private void resumeAsyncResponse() {
         super.resume(new StreamingResponseImpl());
     }
     @Override
-    public void onCompleted() {
+    public void onComplete() {
         completed = true;
     }
 
@@ -80,6 +81,7 @@ public class StreamingAsyncSubscriber<T> extends AbstractAsyncSubscriber<T> {
             resumeAsyncResponse();
         }
         queue.add(bean);
+        super.requestNext();
     }
     private class StreamingResponseImpl implements StreamingResponse<T> {
 

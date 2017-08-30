@@ -37,18 +37,18 @@ import org.junit.Test;
 
 import io.reactivex.Observable;
 
-public class JAXRSRxJava2Test extends AbstractBusClientServerTestBase {
-    public static final String PORT = RxJava2Server.PORT;
+public class JAXRSRxJava2ObservableTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = RxJava2ObservableServer.PORT;
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
         assertTrue("server did not launch correctly",
-                   launchServer(RxJava2Server.class, true));
+                   launchServer(RxJava2ObservableServer.class, true));
         createStaticBus();
     }
     @Test
     public void testGetHelloWorldJson() throws Exception {
-        String address = "http://localhost:" + PORT + "/observable2/textJson";
+        String address = "http://localhost:" + PORT + "/rx2/observable/textJson";
         List<Object> providers = new LinkedList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new ObservableRxInvokerProvider());
@@ -61,7 +61,7 @@ public class JAXRSRxJava2Test extends AbstractBusClientServerTestBase {
         obs.subscribe(v -> {
             holder.value = v;
         });
-        Thread.sleep(3000);
+        Thread.sleep(2000);
         assertEquals("Hello", holder.value.getGreeting());
         assertEquals("World", holder.value.getAudience());
     }

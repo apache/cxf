@@ -21,53 +21,38 @@ package org.apache.cxf.systest.jaxrs.reactive;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.GenericType;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
-import org.apache.cxf.jaxrs.rx.client.ObservableRxInvoker;
-import org.apache.cxf.jaxrs.rx.client.ObservableRxInvokerProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import rx.Observable;
-
-public class JAXRSRxJavaTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = RxJavaServer.PORT;
+public class JAXRSRxJavaObservableTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = RxJavaObservableServer.PORT;
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
         assertTrue("server did not launch correctly",
-                   launchServer(RxJavaServer.class, true));
+                   launchServer(RxJavaObservableServer.class, true));
         createStaticBus();
     }
     @Test
     public void testGetHelloWorldText() throws Exception {
-        String address = "http://localhost:" + PORT + "/observable/text";
+        String address = "http://localhost:" + PORT + "/rx/text";
         WebClient wc = WebClient.create(address);
         String text = wc.accept("text/plain").get(String.class);
         assertEquals("Hello, world!", text);
     }
-    @Test
-    public void testGetHelloWorldAsyncText() throws Exception {
-        String address = "http://localhost:" + PORT + "/observable/textAsync";
-        WebClient wc = WebClient.create(address);
-        String text = wc.accept("text/plain").get(String.class);
-        assertEquals("Hello, world!", text);
-    }
-
+    
     @Test
     public void testGetHelloWorldJson() throws Exception {
-        String address = "http://localhost:" + PORT + "/observable/textJson";
+        String address = "http://localhost:" + PORT + "/rx/textJson";
         WebClient wc = WebClient.create(address,
                                         Collections.singletonList(new JacksonJsonProvider()));
         HelloWorldBean bean = wc.accept("application/json").get(HelloWorldBean.class);
@@ -76,17 +61,7 @@ public class JAXRSRxJavaTest extends AbstractBusClientServerTestBase {
     }
     @Test
     public void testGetHelloWorldJsonList() throws Exception {
-        String address = "http://localhost:" + PORT + "/observable/textJsonList";
-        doTestGetHelloWorldJsonList(address);
-    }
-    @Test
-    public void testGetHelloWorldJsonImplicitListAsync() throws Exception {
-        String address = "http://localhost:" + PORT + "/observable/textJsonImplicitListAsync";
-        doTestGetHelloWorldJsonList(address);
-    }
-    @Test
-    public void testGetHelloWorldJsonImplicitListAsyncStream() throws Exception {
-        String address = "http://localhost:" + PORT + "/observable/textJsonImplicitListAsyncStream";
+        String address = "http://localhost:" + PORT + "/rx/textJsonList";
         doTestGetHelloWorldJsonList(address);
     }
     private void doTestGetHelloWorldJsonList(String address) throws Exception {
@@ -104,38 +79,5 @@ public class JAXRSRxJavaTest extends AbstractBusClientServerTestBase {
         assertEquals("World", beans.get(1).getAudience());
     }
 
-    @Test
-    public void testGetHelloWorldAsyncObservable() throws Exception {
-        String address = "http://localhost:" + PORT + "/observable/textAsync";
-        WebClient wc = WebClient.create(address,
-                                        Collections.singletonList(new ObservableRxInvokerProvider()));
-        Observable<String> obs = wc.accept("text/plain")
-            .rx(ObservableRxInvoker.class)
-            .get(String.class);
-        obs.map(s -> {
-            return s + s;
-        });
-
-        Thread.sleep(3000);
-
-        obs.subscribe(s -> assertDuplicateResponse(s));
-    }
-    @Test
-    public void testGetHelloWorldAsyncObservable404() throws Exception {
-        String address = "http://localhost:" + PORT + "/observable/textAsync404";
-        Invocation.Builder b = ClientBuilder.newClient().register(new ObservableRxInvokerProvider())
-            .target(address).request();
-        b.rx(ObservableRxInvoker.class).get(String.class).subscribe(
-            s -> {
-                fail("Exception expected");
-            },
-            t -> validateT((ExecutionException)t));
-    }
-
-    private void validateT(ExecutionException t) {
-        assertTrue(t.getCause() instanceof NotFoundException);
-    }
-    private void assertDuplicateResponse(String s) {
-        assertEquals("Hello, world!Hello, world!", s);
-    }
+    
 }

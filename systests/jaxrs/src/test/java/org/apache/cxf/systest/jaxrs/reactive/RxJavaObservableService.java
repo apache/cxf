@@ -26,18 +26,11 @@ import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.container.Suspended;
-
-import org.apache.cxf.jaxrs.rx.server.AbstractAsyncSubscriber;
-import org.apache.cxf.jaxrs.rx.server.JsonStreamingAsyncSubscriber;
-import org.apache.cxf.jaxrs.rx.server.ListAsyncSubscriber;
 
 import rx.Observable;
-import rx.schedulers.Schedulers;
 
 
-@Path("/observable")
+@Path("/rx")
 public class RxJavaObservableService {
 
     @GET
@@ -45,15 +38,6 @@ public class RxJavaObservableService {
     @Path("text")
     public Observable<String> getText() {
         return Observable.just("Hello, world!");
-    }
-
-    @GET
-    @Produces("text/plain")
-    @Path("textAsync")
-    public void getTextAsync(@Suspended final AsyncResponse ar) {
-        Observable.just("Hello, ").map(s -> s + "world!")
-            .subscribe(new StringAsyncSubscriber(ar));
-
     }
 
     @GET
@@ -65,33 +49,6 @@ public class RxJavaObservableService {
 
     @GET
     @Produces("application/json")
-    @Path("textJsonImplicitListAsync")
-    public void getJsonImplicitListAsync(@Suspended AsyncResponse ar) {
-        final HelloWorldBean bean1 = new HelloWorldBean();
-        final HelloWorldBean bean2 = new HelloWorldBean("Ciao");
-        new Thread(new Runnable() {
-            public void run() {
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException ex) {
-                    // ignore
-                }
-                Observable.just(bean1, bean2).subscribe(new ListAsyncSubscriber<HelloWorldBean>(ar));
-            }
-        }).start();
-
-    }
-    @GET
-    @Produces("application/json")
-    @Path("textJsonImplicitListAsyncStream")
-    public void getJsonImplicitListStreamingAsync(@Suspended AsyncResponse ar) {
-        Observable.just("Hello", "Ciao")
-            .map(s -> new HelloWorldBean(s))
-            .subscribeOn(Schedulers.computation())
-            .subscribe(new JsonStreamingAsyncSubscriber<HelloWorldBean>(ar));
-    }
-    @GET
-    @Produces("application/json")
     @Path("textJsonList")
     public Observable<List<HelloWorldBean>> getJsonList() {
         HelloWorldBean bean1 = new HelloWorldBean();
@@ -100,23 +57,7 @@ public class RxJavaObservableService {
         return Observable.just(Arrays.asList(bean1, bean2));
     }
 
-    private class StringAsyncSubscriber extends AbstractAsyncSubscriber<String> {
-
-        private StringBuilder sb = new StringBuilder();
-        StringAsyncSubscriber(AsyncResponse ar) {
-            super(ar);
-        }
-        @Override
-        public void onCompleted() {
-            super.resume(sb.toString());
-        }
-
-        @Override
-        public void onNext(String s) {
-            sb.append(s);
-        }
-
-    }
+    
 }
 
 
