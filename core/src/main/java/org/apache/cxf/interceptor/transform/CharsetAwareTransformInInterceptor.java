@@ -20,12 +20,6 @@
 package org.apache.cxf.interceptor.transform;
 
 
-import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
-
-import javax.xml.stream.XMLStreamReader;
-
 import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -33,37 +27,42 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.transform.TransformUtils;
 
+import javax.xml.stream.XMLStreamReader;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
+
 
 /**
  * Creates an XMLStreamReader from the InputStream on the Message.
  */
-@Deprecated /* please use CharsetAwareTransformInInterceptor instead */
-public class TransformInInterceptor extends AbstractPhaseInterceptor<Message> {
-    
+public class CharsetAwareTransformInInterceptor extends AbstractPhaseInterceptor<Message> {
+
     private List<String> inDropElements;
     private Map<String, String> inElementsMap;
     private Map<String, String> inAppendMap;
     private Map<String, String> inAttributesMap;
     private boolean blockOriginalReader = true;
     private String contextPropertyName;
-    
-    public TransformInInterceptor() {
+
+    public CharsetAwareTransformInInterceptor() {
         this(Phase.POST_STREAM);
         addBefore(StaxInInterceptor.class.getName());
     }
-    
-    public TransformInInterceptor(String phase) {
+
+    public CharsetAwareTransformInInterceptor(String phase) {
         super(phase);
     }
-    
-    public TransformInInterceptor(String phase, List<String> after) {
+
+    public CharsetAwareTransformInInterceptor(String phase, List<String> after) {
         super(phase);
         if (after != null) {
             addAfter(after);
         }
     }
-    
-    public TransformInInterceptor(String phase, List<String> before, List<String> after) {
+
+    public CharsetAwareTransformInInterceptor(String phase, List<String> before, List<String> after) {
         this(phase, after);
         if (before != null) {
             addBefore(before);
@@ -75,18 +74,24 @@ public class TransformInInterceptor extends AbstractPhaseInterceptor<Message> {
             && !MessageUtils.getContextualBoolean(message, contextPropertyName, false)) {
             return;
         }
+
+        String encoding = (String)message.getContextualProperty(Message.ENCODING);
+        if (encoding == null) {
+            encoding = StandardCharsets.UTF_8.name();
+        }
+
         XMLStreamReader reader = message.getContent(XMLStreamReader.class);
         InputStream is = message.getContent(InputStream.class);
         
-        XMLStreamReader transformReader = createTransformReaderIfNeeded(reader, is);
+        XMLStreamReader transformReader = createTransformReaderIfNeeded(reader, is, encoding);
         if (transformReader != null) {
             message.setContent(XMLStreamReader.class, transformReader);
         }
          
     }
 
-    protected XMLStreamReader createTransformReaderIfNeeded(XMLStreamReader reader, InputStream is) {
-        return TransformUtils.createTransformReaderIfNeeded(reader, is,
+    protected XMLStreamReader createTransformReaderIfNeeded(XMLStreamReader reader, InputStream is, String encoding) {
+        return TransformUtils.createTransformReaderIfNeeded(reader, is, encoding,
                                                             inDropElements,
                                                             inElementsMap,
                                                             inAppendMap,

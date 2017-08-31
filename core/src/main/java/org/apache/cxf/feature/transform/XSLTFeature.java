@@ -38,12 +38,12 @@ public class XSLTFeature extends AbstractFeature {
     @Override
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
         if (inXSLTPath != null) {
-            XSLTInInterceptor in = new XSLTInInterceptor(inXSLTPath);
+            CharsetAwareXSLTInInterceptor in = new CharsetAwareXSLTInInterceptor(inXSLTPath);
             provider.getInInterceptors().add(in);            
         }
         
         if (outXSLTPath != null) {
-            XSLTOutInterceptor out = new XSLTOutInterceptor(outXSLTPath);
+            CharsetAwareXSLTOutInterceptor out = new CharsetAwareXSLTOutInterceptor(outXSLTPath);
             provider.getOutInterceptors().add(out);            
             provider.getOutFaultInterceptors().add(out);            
         }

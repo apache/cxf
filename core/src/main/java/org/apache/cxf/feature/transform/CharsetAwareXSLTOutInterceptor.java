@@ -19,18 +19,6 @@
 
 package org.apache.cxf.feature.transform;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.io.Writer;
-import java.util.logging.Logger;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.Templates;
-import javax.xml.transform.stream.StreamSource;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
@@ -44,18 +32,25 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.Templates;
+import javax.xml.transform.stream.StreamSource;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.logging.Logger;
+
 /** Class provides XSLT transformation of outgoing message.
  * Actually it breaks streaming (can be fixed in further versions when XSLT engine supports XML stream)
  */
-@Deprecated // please use CharsetAwareXSLTOutInterceptor instead
-public class XSLTOutInterceptor extends AbstractXSLTInterceptor {
-    private static final Logger LOG = LogUtils.getL7dLogger(XSLTOutInterceptor.class);
+public class CharsetAwareXSLTOutInterceptor extends AbstractXSLTInterceptor {
+    private static final Logger LOG = LogUtils.getL7dLogger(CharsetAwareXSLTOutInterceptor.class);
 
-    public XSLTOutInterceptor(String xsltPath) {
+    public CharsetAwareXSLTOutInterceptor(String xsltPath) {
         super(Phase.PRE_STREAM, StaxOutInterceptor.class, null, xsltPath);
     }
 
-    public XSLTOutInterceptor(String phase, Class<?> before, Class<?> after, String xsltPath) {
+    public CharsetAwareXSLTOutInterceptor(String phase, Class<?> before, Class<?> after, String xsltPath) {
         super(phase, before, after, xsltPath);
     }
 
@@ -65,20 +60,25 @@ public class XSLTOutInterceptor extends AbstractXSLTInterceptor {
             return;
         }
 
+        String encoding = (String)message.getContextualProperty(Message.ENCODING);
+        if (encoding == null) {
+            encoding = StandardCharsets.UTF_8.name();
+        }
+
         // 1. Try to get and transform XMLStreamWriter message content
         XMLStreamWriter xWriter = message.getContent(XMLStreamWriter.class);
         if (xWriter != null) {
-            transformXWriter(message, xWriter);
+            transformXWriter(message, xWriter); /* The effective output encoding depends on the encoding of the xWriter */
         } else {
             // 2. Try to get and transform OutputStream message content
             OutputStream out = message.getContent(OutputStream.class);
             if (out != null) {
-                transformOS(message, out);
+                transformOS(message, out, encoding);
             } else {
                 // 3. Try to get and transform Writer message content (actually used for JMS TextMessage)
                 Writer writer = message.getContent(Writer.class);
                 if (writer != null) {
-                    transformWriter(message, writer);
+                    transformWriter(message, writer); /* The effective output encoding depends on the encoding of the xWriter */
                 }
             }
         }
@@ -93,9 +93,9 @@ public class XSLTOutInterceptor extends AbstractXSLTInterceptor {
                     Boolean.TRUE);
     }
 
-    protected void transformOS(Message message, OutputStream out) {
+    protected void transformOS(Message message, OutputStream out, String encoding) {
         CachedOutputStream wrapper = new CachedOutputStream();
-        CachedOutputStreamCallback callback = new XSLTCachedOutputStreamCallback(getXSLTTemplate(), out);
+        CachedOutputStreamCallback callback = new XSLTCachedOutputStreamCallback(getXSLTTemplate(), out, encoding);
         wrapper.registerCallback(callback);
         message.setContent(OutputStream.class, wrapper);
     }
@@ -148,10 +148,12 @@ public class XSLTOutInterceptor extends AbstractXSLTInterceptor {
     public static class XSLTCachedOutputStreamCallback implements CachedOutputStreamCallback {
         private final Templates xsltTemplate;
         private final OutputStream origStream;
+        private final String encoding;
 
-        public XSLTCachedOutputStreamCallback(Templates xsltTemplate, OutputStream origStream) {
+        public XSLTCachedOutputStreamCallback(Templates xsltTemplate, OutputStream origStream, String encoding) {
             this.xsltTemplate = xsltTemplate;
             this.origStream = origStream;
+            this.encoding = encoding;
         }
 
         @Override
@@ -162,7 +164,7 @@ public class XSLTOutInterceptor extends AbstractXSLTInterceptor {
         public void onClose(CachedOutputStream wrapper) {
             InputStream transformedStream = null;
             try {
-                transformedStream = XSLTUtils.transform(xsltTemplate, wrapper.getInputStream());
+                transformedStream = XSLTUtils.transform(xsltTemplate, wrapper.getInputStream(), encoding);
                 IOUtils.copyAndCloseInput(transformedStream, origStream);
             } catch (IOException e) {
                 throw new Fault("STREAM_COPY", LOG, e, e.getMessage());

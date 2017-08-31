@@ -22,6 +22,7 @@ package org.apache.cxf.feature.transform;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamReader;
@@ -50,10 +51,10 @@ public final class XSLTUtils {
 
     }
 
-    public static InputStream transform(Templates xsltTemplate, InputStream in) {
+    public static InputStream transform(Templates xsltTemplate, InputStream in, String encoding) {
         CachedOutputStream out = new CachedOutputStream();
         try {
-            XMLStreamReader reader = StaxUtils.createXMLStreamReader(in);
+            XMLStreamReader reader = StaxUtils.createXMLStreamReader(in, encoding);
             Source beforeSource = new StaxSource(reader);
 
             Transformer trans = xsltTemplate.newTransformer();
@@ -76,6 +77,9 @@ public final class XSLTUtils {
                 // ignore
             }
         }
+    }
+    public static InputStream transform(Templates xsltTemplate, InputStream in) {
+        return transform(xsltTemplate, in, StandardCharsets.UTF_8.name());
     }
 
     public static Reader transform(Templates xsltTemplate, Reader inReader) {

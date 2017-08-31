@@ -20,12 +20,6 @@
 package org.apache.cxf.interceptor.transform;
 
 
-import java.io.OutputStream;
-import java.util.List;
-import java.util.Map;
-
-import javax.xml.stream.XMLStreamWriter;
-
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.interceptor.StaxOutEndingInterceptor;
@@ -36,18 +30,23 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.transform.TransformUtils;
 
+import javax.xml.stream.XMLStreamWriter;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
+
 
 /**
  * Creates an XMLStreamWriter from the OutputStream on the Message.
  */
-@Deprecated /* please use CharsetAwareTransformOutInterceptor instead */
-public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
-    
-    private static final String OUTPUT_STREAM_HOLDER = 
-        TransformOutInterceptor.class.getName() + ".outputstream";
+public class CharsetAwareTransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
+
+    private static final String OUTPUT_STREAM_HOLDER =
+        CharsetAwareTransformOutInterceptor.class.getName() + ".outputstream";
     private static final String TRANSFORM_SKIP = "transform.skip";
     private static final StaxOutEndingInterceptor ENDING = new StaxOutEndingInterceptor(OUTPUT_STREAM_HOLDER);
-    
+
     private Map<String, String> outElementsMap;
     private Map<String, String> outAppendMap;
     private List<String> outDropElements;
@@ -56,12 +55,12 @@ public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
     private boolean skipOnFault;
     private String contextPropertyName;
     private String defaultNamespace;
-    
-    public TransformOutInterceptor() {
+
+    public CharsetAwareTransformOutInterceptor() {
         this(Phase.PRE_STREAM);
     }
-    
-    public TransformOutInterceptor(String phase) {
+
+    public CharsetAwareTransformOutInterceptor(String phase) {
         super(phase);
         addBefore(StaxOutInterceptor.class.getName());
         addAfter(LoggingOutInterceptor.class.getName());
@@ -92,11 +91,16 @@ public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
             || MessageUtils.isTrue(message.getContextualProperty(TRANSFORM_SKIP))) {
             return;
         }
-        
+
+        String encoding = (String)message.getContextualProperty(Message.ENCODING);
+        if (encoding == null) {
+            encoding = StandardCharsets.UTF_8.name();
+        }
+
         XMLStreamWriter writer = message.getContent(XMLStreamWriter.class);
         OutputStream out = message.getContent(OutputStream.class);
         
-        XMLStreamWriter transformWriter = createTransformWriterIfNeeded(writer, out);
+        XMLStreamWriter transformWriter = createTransformWriterIfNeeded(writer, out, encoding);
         if (transformWriter != null) {
             message.setContent(XMLStreamWriter.class, transformWriter);
             if (MessageUtils.isRequestor(message)) {
@@ -109,8 +113,8 @@ public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
         }
     }
    
-    protected XMLStreamWriter createTransformWriterIfNeeded(XMLStreamWriter writer, OutputStream os) {
-        return TransformUtils.createTransformWriterIfNeeded(writer, os, 
+    protected XMLStreamWriter createTransformWriterIfNeeded(XMLStreamWriter writer, OutputStream os, String encoding) {
+        return TransformUtils.createTransformWriterIfNeeded(writer, os, encoding,
                                                       outElementsMap,
                                                       outDropElements,
                                                       outAppendMap,

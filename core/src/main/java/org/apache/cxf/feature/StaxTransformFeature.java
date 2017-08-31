@@ -24,8 +24,8 @@ import java.util.Map;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.interceptor.InterceptorProvider;
-import org.apache.cxf.interceptor.transform.TransformInInterceptor;
-import org.apache.cxf.interceptor.transform.TransformOutInterceptor;
+import org.apache.cxf.interceptor.transform.CharsetAwareTransformInInterceptor;
+import org.apache.cxf.interceptor.transform.CharsetAwareTransformOutInterceptor;
 
 /**
  * <pre>
@@ -41,8 +41,8 @@ import org.apache.cxf.interceptor.transform.TransformOutInterceptor;
 @NoJSR250Annotations
 public class StaxTransformFeature extends AbstractFeature {
     
-    private TransformInInterceptor in = new TransformInInterceptor();
-    private TransformOutInterceptor out = new TransformOutInterceptor();
+    private CharsetAwareTransformInInterceptor in = new CharsetAwareTransformInInterceptor();
+    private CharsetAwareTransformOutInterceptor out = new CharsetAwareTransformOutInterceptor();
     
     public StaxTransformFeature() {
         //

@@ -26,8 +26,8 @@ import javax.xml.ws.Service;
 import javax.xml.ws.soap.SOAPBinding;
 
 import org.apache.cxf.endpoint.Client;
-import org.apache.cxf.feature.transform.XSLTInInterceptor;
-import org.apache.cxf.feature.transform.XSLTOutInterceptor;
+import org.apache.cxf.feature.transform.CharsetAwareXSLTInInterceptor;
+import org.apache.cxf.feature.transform.CharsetAwareXSLTOutInterceptor;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
@@ -56,7 +56,7 @@ public class TransformFeatureTest extends AbstractBusClientServerTestBase {
          
         Echo port = service.getPort(PORT_NAME, Echo.class);
         Client client = ClientProxy.getClient(port);
-        XSLTOutInterceptor outInterceptor = new XSLTOutInterceptor(XSLT_REQUEST_PATH);
+        CharsetAwareXSLTOutInterceptor outInterceptor = new CharsetAwareXSLTOutInterceptor(XSLT_REQUEST_PATH);
         client.getOutInterceptors().add(outInterceptor);
         String response = port.echo("test");
         Assert.assertTrue("Request was not transformed", response.contains(TRANSFORMED_CONSTANT));
@@ -70,7 +70,7 @@ public class TransformFeatureTest extends AbstractBusClientServerTestBase {
          
         Echo port = service.getPort(PORT_NAME, Echo.class);
         Client client = ClientProxy.getClient(port);
-        XSLTInInterceptor inInterceptor = new XSLTInInterceptor(XSLT_RESPONSE_PATH);
+        CharsetAwareXSLTInInterceptor inInterceptor = new CharsetAwareXSLTInInterceptor(XSLT_RESPONSE_PATH);
         client.getInInterceptors().add(inInterceptor);
         String response = port.echo("test");
         Assert.assertTrue(response.contains(TRANSFORMED_CONSTANT));
