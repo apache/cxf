@@ -46,6 +46,7 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Produces;
@@ -526,12 +527,32 @@ public final class JAXRSUtils {
                                                    mediaTypeToString(requestType),
                                                    convertTypesToString(acceptContentTypes));
         if (!"OPTIONS".equalsIgnoreCase(httpMethod)) {
-            LOG.warning(errorMsg.toString());
+            Level logLevel = getExceptionLogLevel(message, ClientErrorException.class);
+            LOG.log(logLevel == null ? Level.FINE : logLevel, errorMsg.toString());
         }
         Response response =
             createResponse(getRootResources(message), message, errorMsg.toString(), status, methodMatched == 0);
         throw ExceptionUtils.toHttpException(null, response);
 
+    }
+
+    
+    
+    private static Level getExceptionLogLevel(Message message, Class<? extends WebApplicationException> exClass) {
+        Level logLevel = null;
+        Object logLevelProp = message.get(exClass.getName() + ".log.level");
+        if (logLevelProp != null) {
+            if (logLevelProp instanceof Level) {
+                logLevel = (Level)logLevelProp;
+            } else {
+                try {
+                    logLevel = Level.parse(logLevelProp.toString());
+                } catch (Exception ex) {
+                    // ignore
+                }
+            }
+        }
+        return logLevel;
     }
 
     private static List<MediaType> intersectSortMediaTypes(List<MediaType> acceptTypes,
