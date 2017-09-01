@@ -20,6 +20,7 @@
 package org.apache.cxf.transport.websocket.atmosphere;
 
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -76,7 +77,35 @@ public class AtmosphereWebSocketServletDestination extends ServletDestination im
     
     @Override
     public void finalizeConfig() {
-        framework.init();
+        final ServletContext ctx = bus.getExtension(ServletContext.class);
+        if (ctx != null) {
+            try {
+                framework.init(new ServletConfig() {
+                    @Override
+                    public String getServletName() {
+                        return null;
+                    }
+                    @Override
+                    public ServletContext getServletContext() {
+                        return ctx;
+                    }
+                    @Override
+                    public String getInitParameter(String name) {
+                        return null;
+                    }
+
+                    @Override
+                    public Enumeration<String> getInitParameterNames() {
+                        return null;
+                    }
+                });
+            } catch (ServletException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        } else {
+            framework.init();
+        }
     }
 
     @Override

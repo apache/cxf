@@ -47,6 +47,9 @@ public class JettyHTTPHandler extends AbstractHandler {
         this.bus = bus;
     }
 
+    public ServletContext getServletContext() {
+        return servletContext;
+    }
     public void setServletContext(ServletContext sc) {
         servletContext = sc;
         if (jettyHTTPDestination != null) {
