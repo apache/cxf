@@ -23,16 +23,30 @@ import org.apache.cxf.jaxrs.impl.AsyncResponseImpl;
 import org.apache.cxf.message.Message;
 
 import io.reactivex.Flowable;
+import io.reactivex.Observable;
 
-public class FlowableInvoker extends JAXRSInvoker {
+//Work in Progress
+public class ReactiveIOInvoker extends JAXRSInvoker {
     protected AsyncResponseImpl checkFutureResponse(Message inMessage, Object result) {
         if (result instanceof Flowable) {
-            final Flowable<?> f = (Flowable<?>)result;
-            final AsyncResponseImpl asyncResponse = new AsyncResponseImpl(inMessage);
-            f.subscribe(v -> asyncResponse.resume(v), t -> handleThrowable(asyncResponse, t));
-            return asyncResponse;
+            return handleFlowable(inMessage, (Flowable<?>)result);
+        } else if (result instanceof Observable) {
+            return handleObservable(inMessage, (Observable<?>)result);
+        } else {
+            return null;
         }
-        return null;
+    }
+    
+    protected AsyncResponseImpl handleFlowable(Message inMessage, Flowable<?> f) {
+        final AsyncResponseImpl asyncResponse = new AsyncResponseImpl(inMessage);
+        f.subscribe(v -> asyncResponse.resume(v), t -> handleThrowable(asyncResponse, t));
+        return asyncResponse;
+    }
+    
+    protected AsyncResponseImpl handleObservable(Message inMessage, Observable<?> obs) {
+        final AsyncResponseImpl asyncResponse = new AsyncResponseImpl(inMessage);
+        obs.subscribe(v -> asyncResponse.resume(v), t -> handleThrowable(asyncResponse, t));
+        return asyncResponse;
     }
 
     private Object handleThrowable(AsyncResponseImpl asyncResponse, Throwable t) {

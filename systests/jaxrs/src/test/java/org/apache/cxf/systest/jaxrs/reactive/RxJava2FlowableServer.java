@@ -29,7 +29,7 @@ import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.provider.StreamingResponseProvider;
-import org.apache.cxf.jaxrs.rx2.server.FlowableInvoker;
+import org.apache.cxf.jaxrs.rx2.server.ReactiveIOInvoker;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 
@@ -45,7 +45,7 @@ public class RxJava2FlowableServer extends AbstractBusTestServerBase {
         // Make sure default JSONProvider is not loaded
         bus.setProperty("skip.default.json.provider.registration", true);
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
-        sf.setInvoker(new FlowableInvoker());
+        sf.setInvoker(new ReactiveIOInvoker());
         sf.setProvider(new JacksonJsonProvider());
         StreamingResponseProvider<HelloWorldBean> streamProvider = new StreamingResponseProvider<HelloWorldBean>();
         streamProvider.setProduceMediaTypes(Collections.singletonList("application/json"));
