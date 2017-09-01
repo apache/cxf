@@ -51,7 +51,6 @@ import org.atmosphere.cpr.AtmosphereResponseImpl;
 import org.atmosphere.handler.AbstractReflectorAtmosphereHandler;
 import org.atmosphere.util.VoidServletConfig;
 import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.util.DecoratedObjectFactory;
 import org.springframework.util.ClassUtils;
 
 
