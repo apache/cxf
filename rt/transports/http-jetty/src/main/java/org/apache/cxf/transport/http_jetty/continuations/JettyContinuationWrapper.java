@@ -29,6 +29,7 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.eclipse.jetty.continuation.ContinuationListener;
 import org.eclipse.jetty.continuation.ContinuationSupport;
 
+@SuppressWarnings("deprecation")
 public class JettyContinuationWrapper implements Continuation, ContinuationListener {
     volatile boolean isNew;
     volatile boolean isResumed;
