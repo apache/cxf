@@ -562,7 +562,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
     protected abstract Class<?> getForkClass();
 
     protected File getDoneFile(URI basedir, URI wsdlURI, String mojo) {
-        String doneFileName = wsdlURI.toString();
+        String doneFileName = mojo + wsdlURI.toString();
 
 
         try {
