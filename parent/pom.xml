@@ -223,6 +223,8 @@
         <cxf.brave.version>4.6.0</cxf.brave.version>
         <cxf.brave.zipkin.version>1.31.1</cxf.brave.zipkin.version>
         <cxf.brave.reporter.version>1.0.2</cxf.brave.reporter.version>
+        <cxf.opentracing.version>0.30.0</cxf.opentracing.version>
+        <cxf.jaeger.version>0.20.6</cxf.jaeger.version>
         <cxf.findbugs.version>3.0.2</cxf.findbugs.version>
         <cxf.checkstyle.extension />
         <cxf.jaxb.context.class />
@@ -2000,6 +2002,21 @@
                  <groupId>io.zipkin.brave</groupId>
                  <artifactId>brave-instrumentation-http</artifactId>
                  <version>${cxf.brave.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.opentracing</groupId>
+                <artifactId>opentracing-api</artifactId>
+                <version>${cxf.opentracing.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.opentracing</groupId>
+                <artifactId>opentracing-util</artifactId>
+                <version>${cxf.opentracing.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.uber.jaeger</groupId>
+                <artifactId>jaeger-core</artifactId>
+                <version>${cxf.jaeger.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.qi4j.library</groupId>

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jaxws.tracing.brave;
+package org.apache.cxf.systest.jaxws.tracing.opentracing;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -26,34 +26,27 @@ import javax.jws.WebMethod;
 import javax.jws.WebService;
 
 import org.apache.cxf.systest.Book;
-import org.apache.cxf.systest.brave.TestSpanReporter;
 import org.apache.cxf.systest.jaxws.tracing.BookStoreService;
 
-import brave.Span;
-import brave.Tracer.SpanInScope;
-import brave.Tracing;
+import io.opentracing.ActiveSpan;
+import io.opentracing.Tracer;
+import io.opentracing.util.GlobalTracer;
 
 @WebService(endpointInterface = "org.apache.cxf.systest.jaxws.tracing.BookStoreService", serviceName = "BookStore")
 public class BookStore implements BookStoreService {
-    private final Tracing brave;
+    private final Tracer tracer;
 
     public BookStore() {
-        brave = Tracing.newBuilder()
-            .localServiceName("book-store")
-            .reporter(new TestSpanReporter())
-            .build();
+        tracer = GlobalTracer.get();
     }
 
     @WebMethod
     public Collection< Book > getBooks() {
-        final Span span = brave.tracer().nextSpan().name("Get Books").start();
-        try (SpanInScope scope = brave.tracer().withSpanInScope(span)) {
+        try (ActiveSpan span = tracer.buildSpan("Get Books").startActive()) {
             return Arrays.asList(
                     new Book("Apache CXF in Action", UUID.randomUUID().toString()),
                     new Book("Mastering Apache CXF", UUID.randomUUID().toString())
                 );
-        } finally {
-            span.finish();
         }
     }
 

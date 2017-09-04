@@ -16,27 +16,35 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest;
+package org.apache.cxf.tracing.opentracing;
 
-import java.util.ArrayList;
-import java.util.List;
+import io.opentracing.ActiveSpan;
+import io.opentracing.ActiveSpan.Continuation;
 
-import zipkin.Span;
-import zipkin.reporter.Reporter;
-
-public class TestSpanReporter implements Reporter<Span> {
-    private static List<Span> spans = new ArrayList<>();
-
-    @Override
-    public void report(Span span) {
-        spans.add(span);
+public class TraceScope {
+    private final ActiveSpan span;
+    private final Continuation continuation;
+    private final boolean managed;
+    
+    TraceScope(final ActiveSpan span, final Continuation continuation) {
+        this(span, continuation, true);
     }
-
-    public static List<Span> getAllSpans() {
-        return spans;
+    
+    TraceScope(final ActiveSpan span, final Continuation continuation, final boolean managed) {
+        this.span = span;
+        this.continuation = continuation;
+        this.managed = managed;
     }
-
-    public static void clear() {
-        spans.clear();
+    
+    public ActiveSpan getSpan() {
+        return span;
+    }
+    
+    public Continuation getContinuation() {
+        return continuation;
+    }
+    
+    public boolean isManaged() {
+        return managed;
     }
 }

@@ -33,7 +33,7 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
-import org.apache.cxf.systest.TestSpanReceiver;
+import org.apache.cxf.systest.htrace.TestSpanReceiver;
 import org.apache.cxf.systest.jaxws.tracing.BookStoreService;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;

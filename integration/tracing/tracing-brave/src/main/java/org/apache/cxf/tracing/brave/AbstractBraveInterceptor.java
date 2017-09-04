@@ -19,7 +19,6 @@
 package org.apache.cxf.tracing.brave;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -32,6 +31,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptor;
+import org.apache.cxf.tracing.AbstractTracingProvider;
 
 import brave.http.HttpTracing;
 
@@ -52,37 +52,9 @@ public abstract class AbstractBraveInterceptor extends AbstractBraveProvider imp
             Object value = message.get(key);
             return (value instanceof String) ? value.toString() : null;
         }
-
-        private String getUriSt() {
-            String uri = safeGet(Message.REQUEST_URL);
-            if (uri == null) {
-                String address = safeGet(Message.ENDPOINT_ADDRESS);
-                uri = safeGet(Message.REQUEST_URI);
-                if (uri != null && uri.startsWith("/")) {
-                    if (address != null && !address.startsWith(uri)) {
-                        if (address.endsWith("/") && address.length() > 1) {
-                            address = address.substring(0, address.length());
-                        }
-                        uri = address + uri;
-                    }
-                } else {
-                    uri = address;
-                }
-            }
-            String query = safeGet(Message.QUERY_STRING);
-            if (query != null) {
-                return uri + "?" + query;
-            }
-            return uri;
-        }
-
+      
         URI getUri() {
-            try {
-                String uriSt = getUriSt();
-                return uriSt != null ? new URI(uriSt) : new URI("");
-            } catch (URISyntaxException e) {
-                throw new RuntimeException(e.getMessage(), e);
-            }
+            return AbstractTracingProvider.getUri(message);
         }
 
         Message getEffectiveMessage() {

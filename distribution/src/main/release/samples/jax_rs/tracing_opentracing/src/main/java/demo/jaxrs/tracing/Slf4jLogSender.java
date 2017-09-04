@@ -16,45 +16,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+package demo.jaxrs.tracing;
 
-import org.apache.htrace.core.HTraceConfiguration;
-import org.apache.htrace.core.Span;
-import org.apache.htrace.core.SpanReceiver;
+import com.uber.jaeger.Span;
+import com.uber.jaeger.exceptions.SenderException;
+import com.uber.jaeger.senders.Sender;
 
-/**
- * Test HTrace Span receiver
- */
-public class TestSpanReceiver extends SpanReceiver {
-    private static List<Span> spans = new ArrayList<>();
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-    public TestSpanReceiver(final HTraceConfiguration conf) {
-    }
-
-    public Collection<Span> getSpans() {
-        return spans;
+public class Slf4jLogSender implements Sender {
+    private static final Logger LOG = LoggerFactory.getLogger(Slf4jLogSender.class);
+    @Override
+    public int append(Span span) throws SenderException {
+        LOG.info("{}", span);
+        return 0;
     }
 
     @Override
-    public void close() throws IOException {
+    public int flush() throws SenderException {
+        return 0;
     }
 
     @Override
-    public void receiveSpan(Span span) {
-        spans.add(span);
+    public int close() throws SenderException {
+        return 0;
     }
-
-    public static void clear() {
-        spans.clear();
-    }
-
-    public static List<Span> getAllSpans() {
-        return spans;
-    }
-
 }
