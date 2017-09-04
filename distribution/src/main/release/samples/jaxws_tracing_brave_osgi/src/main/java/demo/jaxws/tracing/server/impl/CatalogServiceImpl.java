@@ -55,7 +55,7 @@ public class CatalogServiceImpl implements CatalogService {
 
         executor.submit(() -> {
             final Span span = brave.tracer().nextSpan().name("Inserting New Book").start();
-            try (final SpanInScope scope = brave.tracer().withSpanInScope(span)) {
+            try (SpanInScope scope = brave.tracer().withSpanInScope(span)) {
                 books.put(book.getId(), book);
                 handler.handleResponse(response);
             } finally {

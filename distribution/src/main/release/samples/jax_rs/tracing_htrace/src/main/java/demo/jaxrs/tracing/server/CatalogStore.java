@@ -55,7 +55,7 @@ public class CatalogStore {
     }
 
     public boolean remove(final String key) throws IOException {
-        try (final Table table = connection.getTable(TableName.valueOf(tableName))) {
+        try (Table table = connection.getTable(TableName.valueOf(tableName))) {
             if (get(key) != null) {
                 final Delete delete = new Delete(Bytes.toBytes(key));
                 table.delete(delete);
@@ -67,7 +67,7 @@ public class CatalogStore {
     }
 
     public JsonObject get(final String key) throws IOException {
-        try (final Table table = connection.getTable(TableName.valueOf(tableName))) {
+        try (Table table = connection.getTable(TableName.valueOf(tableName))) {
             final Get get = new Get(Bytes.toBytes(key));
             final Result result = table.get(get);
 
@@ -85,7 +85,7 @@ public class CatalogStore {
     }
 
     public void put(final String key, final String title) throws IOException {
-        try (final Table table = connection.getTable(TableName.valueOf(tableName))) {
+        try (Table table = connection.getTable(TableName.valueOf(tableName))) {
             final Put put = new Put(Bytes.toBytes(key));
             put.addColumn(Bytes.toBytes("c"), Bytes.toBytes("title"), Bytes.toBytes(title));
             table.put(put);
@@ -95,7 +95,7 @@ public class CatalogStore {
     public JsonArray scan() throws IOException {
         final JsonArrayBuilder builder = Json.createArrayBuilder();
 
-        try (final Table table = connection.getTable(TableName.valueOf(tableName))) {
+        try (Table table = connection.getTable(TableName.valueOf(tableName))) {
             final Scan scan = new Scan();
             final ResultScanner results = table.getScanner(scan);
             for (final Result result: results) {

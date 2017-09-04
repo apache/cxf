@@ -109,6 +109,7 @@ public class Catalog {
         initIndex();
     }
 
+    // CHECKSTYLE:OFF: ReturnCount 
     @POST
     @CrossOriginResourceSharing(allowAllOrigins = true)
     @Consumes("multipart/form-data")
@@ -156,6 +157,7 @@ public class Catalog {
             }
         });
     }
+    // CHECKSTYLE:ON: ReturnCount
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
