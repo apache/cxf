@@ -67,7 +67,7 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
                 List<String> sa = headers.get(SoapBindingConstants.SOAP_ACTION);
                 if (sa != null && sa.size() > 0) {
                     String action = sa.get(0);
-                    if (action.startsWith("\"")) {
+                    if (action.startsWith("\"") || action.startsWith("\'")) {
                         action = action.substring(1, action.length() - 1);
                     }
                     return action;
