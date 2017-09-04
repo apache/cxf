@@ -126,12 +126,19 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
     protected abstract String getExpectedFileYaml();
 
     protected void doTestApiListingIsProperlyReturnedJSON() throws Exception {
+        doTestApiListingIsProperlyReturnedJSON(false);
+    }
+    protected void doTestApiListingIsProperlyReturnedJSON(boolean useXForwarded) throws Exception {    
         final WebClient client = createWebClient("/swagger.json");
+        if (useXForwarded) {
+            client.header("USE_XFORWARDED", true);
+        }
         try {
             String swaggerJson = client.get(String.class);
             UserApplication ap = SwaggerParseUtils.getUserApplicationFromJson(swaggerJson);
             assertNotNull(ap);
-
+            assertEquals(useXForwarded ? "/reverse" : "/", ap.getBasePath());
+            
             List<UserResource> urs = ap.getResources();
             assertNotNull(urs);
             assertEquals(1, urs.size());

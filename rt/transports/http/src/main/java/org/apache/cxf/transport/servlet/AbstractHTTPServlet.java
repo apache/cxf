@@ -20,6 +20,7 @@ package org.apache.cxf.transport.servlet;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -83,9 +84,12 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
     private static final String USE_X_FORWARDED_HEADERS_PARAMETER = "use-x-forwarded-headers";
     private static final String X_FORWARDED_PROTO_HEADER = "X-Forwarded-Proto";
     private static final String X_FORWARDED_FOR_HEADER = "X-Forwarded-For";
+    private static final String X_FORWARDED_PREFIX_HEADER = "X-Forwarded-Prefix";
+    private static final String X_FORWARDED_HOST_HEADER = "X-Forwarded-Host";
+    private static final String X_FORWARDED_PORT_HEADER = "X-Forwarded-Port";
 
     private static final Map<String, String> DEFAULT_STATIC_CONTENT_TYPES;
-
+    
     static {
         DEFAULT_STATIC_CONTENT_TYPES = new HashMap<>();
         DEFAULT_STATIC_CONTENT_TYPES.put("html", "text/html");
@@ -95,7 +99,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
         DEFAULT_STATIC_CONTENT_TYPES.put("xsd", "application/xml");
         DEFAULT_STATIC_CONTENT_TYPES.put("js", "application/javascript");
     }
-
+    
     private List<Pattern> staticResourcesList;
     private String staticWelcomeFile;
     private List<Pattern> redirectList;
@@ -299,10 +303,18 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
 
     protected HttpServletRequest checkXForwardedHeaders(HttpServletRequest request) {
         if (useXForwardedHeaders) {
-            String originalProto = request.getHeader(X_FORWARDED_PROTO_HEADER);
-            String originalIp = request.getHeader(X_FORWARDED_FOR_HEADER);
-            if (originalProto != null || originalIp != null) {
-                return new HttpServletRequestXForwardedFilter(request, originalProto, originalIp);
+            String originalProtocol = request.getHeader(X_FORWARDED_PROTO_HEADER);
+            String originalRemoteAddr = request.getHeader(X_FORWARDED_FOR_HEADER);
+            String originalPrefix = request.getHeader(X_FORWARDED_PREFIX_HEADER);
+            String originalHost = request.getHeader(X_FORWARDED_HOST_HEADER);
+            String originalPort = request.getHeader(X_FORWARDED_PORT_HEADER);
+            if (originalProtocol != null || originalRemoteAddr != null) {
+                return new HttpServletRequestXForwardedFilter(request, 
+                                                              originalProtocol, 
+                                                              originalRemoteAddr,
+                                                              originalPrefix,
+                                                              originalHost,
+                                                              originalPort);
             }
         }
 
@@ -452,44 +464,113 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
     }
     private static class HttpServletRequestXForwardedFilter extends HttpServletRequestWrapper {
 
-        private String originalProto;
-        private String originalClientIp;
-
+        private String newProtocol;
+        private String newRemoteAddr;
+        
+        private String newContextPath;
+        private String newServletPath;
+        private String newRequestUri;
+        private StringBuffer newRequestUrl;
+        
         HttpServletRequestXForwardedFilter(HttpServletRequest request,
                                            String originalProto,
-                                           String originalIp) {
+                                           String originalRemoteAddr,
+                                           String originalPrefix,
+                                           String originalHost,
+                                           String originalPort) {
             super(request);
-            this.originalProto = originalProto;
-            if (originalIp != null) {
-                originalClientIp = (originalIp.split(",")[0]).trim();
+            this.newProtocol = originalProto;
+            if (newRemoteAddr != null) {
+                newRemoteAddr = (originalRemoteAddr.split(",")[0]).trim();
             }
+            newRequestUri = calculateNewRequestUri(request, originalPrefix);
+            newRequestUrl = calculateNewRequestUrl(request, 
+                                                   originalProto, 
+                                                   originalPrefix,
+                                                   originalHost,
+                                                   originalPort);
+            newContextPath = calculateNewContextPath(request, originalPrefix);
+            newServletPath = calculateNewServletPath(request, originalPrefix);
+        }
+        private static String calculateNewContextPath(HttpServletRequest request, String originalPrefix) {
+            if (originalPrefix != null) {
+                return originalPrefix;
+            } else {
+                return request.getContextPath();
+            }
+        }
+        private static String calculateNewServletPath(HttpServletRequest request, String originalPrefix) {
+            String servletPath = request.getServletPath();
+            if (originalPrefix != null) {
+                servletPath = request.getContextPath() + servletPath;
+            }
+            return servletPath;
+        }
+        private static String calculateNewRequestUri(HttpServletRequest request, String originalPrefix) {
+            String requestUri = request.getRequestURI();
+            if (originalPrefix != null) {
+                requestUri = originalPrefix + requestUri;
+            }
+            return requestUri;
+        }
+        private static StringBuffer calculateNewRequestUrl(HttpServletRequest request, 
+                                                           String originalProto,
+                                                           String originalPrefix, 
+                                                           String originalHost,
+                                                           String originalPort) {
+            URI uri = URI.create(request.getRequestURL().toString());
+            
+            StringBuffer sb = new StringBuffer();
+            
+            sb.append(originalProto != null ? originalProto : uri.getScheme())
+                .append("://")
+                .append(originalHost != null ? originalHost : uri.getHost())
+                .append(originalPort != null && !"-1".equals(originalPort) 
+                    ? ":" + originalPort : uri.getPort() != -1 ? ":" + uri.getPort() : "")
+                .append(originalPrefix != null ? originalPrefix : "")
+                .append(uri.getRawPath());
+                
+            String query = uri.getRawQuery();
+            if (query != null) {
+                sb.append('?').append(query);
+            }
+            
+            return sb;
         }
         @Override
         public boolean isSecure() {
-            if (originalProto != null) {
-                return "https".equals(originalProto);
+            if (newProtocol != null) {
+                return "https".equals(newProtocol);
             }
             return super.isSecure();
         }
         @Override
         public StringBuffer getRequestURL() {
-            StringBuffer buf = super.getRequestURL();
-            if (originalProto != null && isSecure()) {
-                String str = buf.toString();
-                if (str.startsWith("http:")) {
-                    buf = new StringBuffer();
-                    buf.append("https").append(str.substring(4));
-                }
-            }
-            return buf;
+            return newRequestUrl;
         }
         @Override
         public String getRemoteAddr() {
-            if (originalClientIp != null) {
-                return originalClientIp;
+            if (newRemoteAddr != null) {
+                return newRemoteAddr;
             }
             return super.getRemoteAddr();
         }
+        
+        @Override
+        public String getRequestURI() {
+            return newRequestUri;
+        }
+        
+        @Override
+        public String getContextPath() {
+            return newContextPath;
+        }
+        
+        @Override
+        public String getServletPath() {
+            return newServletPath;
+        }
+        
 
     }
 
