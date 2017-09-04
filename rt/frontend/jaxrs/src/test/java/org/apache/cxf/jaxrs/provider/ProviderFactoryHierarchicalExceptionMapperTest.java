@@ -20,9 +20,7 @@ package org.apache.cxf.jaxrs.provider;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
-import java.util.logging.Logger;
 
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.MessageImpl;
 
 import org.junit.Assert;
@@ -35,8 +33,6 @@ import org.junit.Test;
  */
 @Ignore("To be fixed in CXF-7473")
 public class ProviderFactoryHierarchicalExceptionMapperTest {
-    private static final Logger LOG = LogUtils.getL7dLogger(ProviderFactoryHierarchicalExceptionMapperTest.class);
-
     private ServerProviderFactory pf;
 
     @Before
