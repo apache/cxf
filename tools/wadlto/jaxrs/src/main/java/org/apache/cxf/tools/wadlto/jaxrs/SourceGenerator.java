@@ -226,7 +226,7 @@ public class SourceGenerator {
     private boolean validateWadl;    
     private SchemaCollection schemaCollection = new SchemaCollection();
     private String encoding;
-    private String namePassword;
+    private String authorization;
     private boolean createJavaDocs;
     
     public SourceGenerator() {
@@ -1874,10 +1874,10 @@ public class SourceGenerator {
             } 
             if (is == null) {
                 URL url = URI.create(href).toURL();
-                if (namePassword != null) {
+                if (authorization != null) {
                     HttpURLConnection conn = (HttpURLConnection)url.openConnection();
                     conn.setRequestMethod("GET");
-                    String encodedAuth = "Basic " + Base64Utility.encode(namePassword.getBytes());
+                    String encodedAuth = "Basic " + Base64Utility.encode(authorization.getBytes());
                     conn.setRequestProperty("Authorization", encodedAuth);
                     is = conn.getInputStream();
                 } else {
@@ -2048,8 +2048,8 @@ public class SourceGenerator {
         this.supportBeanValidation = supportBeanValidation;
     }
 
-    public void setNamePassword(String namePassword) {
-        this.namePassword = namePassword;
+    public void setAuthorization(String authorization) {
+        this.authorization = authorization;
     }
 
     private static class GrammarInfo {

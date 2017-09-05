@@ -126,7 +126,7 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         sg.setPackageName((String)context.get(WadlToolConstants.CFG_PACKAGENAME));
         sg.setResourceName((String)context.get(WadlToolConstants.CFG_RESOURCENAME));
         sg.setEncoding((String)context.get(WadlToolConstants.CFG_ENCODING));
-        sg.setNamePassword((String)context.get(WadlToolConstants.CFG_NAME_PASSWORD));
+        sg.setAuthorization((String)context.get(WadlToolConstants.CFG_AUTHORIZATION));
 
         String wadlNs = (String)context.get(WadlToolConstants.CFG_WADL_NAMESPACE);
         if (wadlNs != null) {
