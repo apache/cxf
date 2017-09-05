@@ -259,6 +259,16 @@ Examples:
                 <annotation>Convert WADL doc elements to JavaDocs</annotation>
                 <switch>javaDocs</switch>
             </option>
+            <option id="namePassword" maxOccurs="1">
+                <annotation>
+                    Specifies a colon separated user name and password for retrieving the
+                    remote WADL content from the servers requiring Basic authentication                      
+                </annotation>
+                <associatedArgument placement="afterSpace">
+                    <annotation>namePassword</annotation>
+                </associatedArgument>
+                <switch>namePassword</switch>
+            </option>
         </optionGroup>
         <optionGroup id="common_options">
             <option id="help" maxOccurs="1">
