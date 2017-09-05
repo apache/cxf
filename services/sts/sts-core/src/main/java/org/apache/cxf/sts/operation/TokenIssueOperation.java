@@ -75,7 +75,7 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 public class TokenIssueOperation extends AbstractOperation implements IssueOperation, IssueSingleOperation {
 
     static final Logger LOG = LogUtils.getL7dLogger(TokenIssueOperation.class);
-
+    
 
     public RequestSecurityTokenResponseCollectionType issue(
             RequestSecurityTokenType request,
@@ -354,10 +354,13 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
         }
 
         // Lifetime
-        LifetimeType lifetime = 
-            createLifetime(tokenResponse.getCreated(), tokenResponse.getExpires());
-        JAXBElement<LifetimeType> lifetimeType = QNameConstants.WS_TRUST_FACTORY.createLifetime(lifetime);
-        response.getAny().add(lifetimeType);
+        if (includeLifetimeElement) {
+            LifetimeType lifetime =
+                createLifetime(tokenResponse.getCreated(), tokenResponse.getExpires());
+            JAXBElement<LifetimeType> lifetimeType =
+                QNameConstants.WS_TRUST_FACTORY.createLifetime(lifetime);
+            response.getAny().add(lifetimeType);
+        }
 
         // KeySize
         long keySize = tokenResponse.getKeySize();

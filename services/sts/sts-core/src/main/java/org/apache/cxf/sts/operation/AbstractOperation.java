@@ -104,7 +104,8 @@ public abstract class AbstractOperation {
     protected List<TokenDelegationHandler> delegationHandlers = new ArrayList<>();
     protected TokenWrapper tokenWrapper = new DefaultTokenWrapper();
     protected boolean allowCustomContent;
-    
+    protected boolean includeLifetimeElement = true;
+
     public boolean isAllowCustomContent() {
         return allowCustomContent;
     }
@@ -179,6 +180,14 @@ public abstract class AbstractOperation {
 
     public void setClaimsManager(ClaimsManager claimsManager) {
         this.claimsManager = claimsManager;
+    }
+
+    public void setIncludeLifetimeElement(boolean value) {
+        this.includeLifetimeElement = value;
+    }
+
+    public boolean getIncludeLifetimeElement() {
+        return this.includeLifetimeElement;
     }
     
     /**
