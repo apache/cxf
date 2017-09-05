@@ -6,8 +6,9 @@ The 3.2.0 version of Apache CXF is a significant new version of CXF
 that provides several new features and enhancements.  
 
 New features include: 
-* JAX-RS 2.1 support
-* Enhance Swagger support including new java2swagger Maven plugin
+* JAX-RS 2.1 (JSR370) support including the implementation of Reactive Client 
+  and Server Sent Events API
+* Enhanced Swagger2 support including new java2swagger Maven plugin
 * WS-Transfer specification support
 * Enhanced Tracing support with Brave
 * Support for Spring Boot 2.x
@@ -19,8 +20,8 @@ New features include:
 Important notes:
 CXF 3.2.x no longer supports Java 7.   You must upgrade to Java 8 or later.
 
-Users are encourage to review the migration guide at:
-http://cxf.apache.org/docs/31-migration-guide.html
+Users are encouraged to review the migration guide at:
+http://cxf.apache.org/docs/32-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
 
