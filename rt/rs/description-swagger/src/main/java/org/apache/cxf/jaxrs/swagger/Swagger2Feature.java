@@ -331,7 +331,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         if (theLicense == null && !licenseWasSet) {
             if (props != null) {
                 theLicense = props.getProperty(LICENSE_PROPERTY);
-                if (theLicense.isEmpty()) {
+                if (theLicense != null && theLicense.isEmpty()) {
                     theLicense = null;
                 }
             } else {
