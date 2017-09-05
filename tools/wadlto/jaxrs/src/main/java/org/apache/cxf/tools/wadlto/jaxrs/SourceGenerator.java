@@ -28,6 +28,7 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.Writer;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -92,6 +93,7 @@ import org.apache.cxf.common.jaxb.JAXBUtils.JCodeModel;
 import org.apache.cxf.common.jaxb.JAXBUtils.S2JJAXBModel;
 import org.apache.cxf.common.jaxb.JAXBUtils.SchemaCompiler;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.ReflectionInvokationHandler;
 import org.apache.cxf.common.util.StringUtils;
@@ -225,6 +227,7 @@ public class SourceGenerator {
     private boolean validateWadl;
     private SchemaCollection schemaCollection = new SchemaCollection();
     private String encoding;
+    private String namePassword;
     private boolean createJavaDocs;
 
     public SourceGenerator() {
@@ -1855,9 +1858,18 @@ public class SourceGenerator {
             InputStream is = null;
             if (!href.startsWith("http")) {
                 is = ResourceUtils.getResourceStream(href, bus);
-            }
+            } 
             if (is == null) {
-                is = URI.create(href).toURL().openStream();
+                URL url = URI.create(href).toURL();
+                if (namePassword != null) {
+                    HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+                    conn.setRequestMethod("GET");
+                    String encodedAuth = "Basic " + Base64Utility.encode(namePassword.getBytes());
+                    conn.setRequestProperty("Authorization", encodedAuth);
+                    is = conn.getInputStream();
+                } else {
+                    is = url.openStream();
+                }
             }
             return readXmlDocument(new InputStreamReader(is, StandardCharsets.UTF_8));
         } catch (Exception ex) {
@@ -2021,6 +2033,10 @@ public class SourceGenerator {
 
     public void setSupportBeanValidation(boolean supportBeanValidation) {
         this.supportBeanValidation = supportBeanValidation;
+    }
+
+    public void setNamePassword(String namePassword) {
+        this.namePassword = namePassword;
     }
 
     private static class GrammarInfo {
