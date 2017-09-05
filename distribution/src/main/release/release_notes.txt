@@ -1,32 +1,24 @@
-Apache CXF 3.1.4 Release Notes
+Apache CXF 3.2.0 Release Notes
 
 1. Overview
 
-The 3.1.4 version of Apache CXF is a significant new version of CXF 
+The 3.2.0 version of Apache CXF is a significant new version of CXF
 that provides several new features and enhancements.  
 
 New features include: 
+* JAX-RS 2.1 support
+* Enhance Swagger support including new java2swagger Maven plugin
+* WS-Transfer specification support
+* Enhanced Tracing support with Brave
 
-* New Metrics feature for collecting metrics about a CXF services.  
-* New Throttling feature for easily throttling CXF services.  
-* New Logging feature for more advanced logging than the logging 
-  available in cxf-core
-* New Metadata service for SAML SSO to allow you to publish SAML SSO 
-  metadata for your service provider.
-* Enhancements to the code generator to be more "Java7" friendly
-* Update to OpenSAML 3.0
-* Support for Karaf 4, Jetty 9
 
 Important notes:
-CXF 3.1.x no longer supports Java 6.   You must upgrade to Java 7 or later.
+CXF 3.2.x no longer supports Java 7.   You must upgrade to Java 8 or later.
 
 Users are encourage to review the migration guide at:
 http://cxf.apache.org/docs/31-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
-
-3.1.4 fixes over 35 JIRA issues reported by users and the community.
-
 
 
 2. Installation Prerequisites 
@@ -34,7 +26,7 @@ versions of CXF.
 Before installing Apache CXF, make sure the following products,
 with the specified versions, are installed on your system:
 
-    * Java 7 Development Kit
+    * Java 8 Development Kit
     * Apache Maven 3.x to build the samples
 
 
@@ -63,55 +55,5 @@ http://issues.apache.org/jira/browse/CXF
 6. Migration notes:
 
 See the migration guide at:
-http://cxf.apache.org/docs/31-migration-guide.html
-for caveats when upgrading from CXF 2.7.x and 3.0.x
-to 3.1.
-
-
-
-7. Specific issues, features, and improvements fixed in this version
-
-** Bug
-    * [CXF-6347] - CXF bundle activators not called in Eclipse/Equinox
-    * [CXF-6493] - cxf-rt-transports-http-3.1.1.jar contains OSGi interface classes
-    * [CXF-6595] - CXF Karaf feature file: set dependency = true in the jta bundle for CXF
-    * [CXF-6599] - CXF ProxyHelper might cause OOM like conditions
-    * [CXF-6600] - Sudden repeating NPE on token request by STSClient
-    * [CXF-6601] - Swagger2Feature can hit a NPE when running in localtransport
-    * [CXF-6602] - Digest algorithms are not set properly when derived keys are used
-    * [CXF-6607] - Cached STS-issued tokens are not renewed on expiry in delegation scenario
-    * [CXF-6613] - java.lang.NoSuchFieldError: REFLECTION in CFX 3.1.4-SNAPSHOT
-    * [CXF-6614] - "Comparison method violates its general contract" in DestinationRegistryImpl.getSortedDestinations
-    * [CXF-6615] - the order of attributes in SubjectDN of certificate shouldn't be significant
-    * [CXF-6616] - need always close the CipherOutputStream when the encryption is done to get the complete content 
-    * [CXF-6620] - Fix DefaultSubjectProvider to support NameID formats other than “unspecified”
-    * [CXF-6621] - Schema imports are not handled correctly in generated WSDL and XSD files when using catalog rewrites
-    * [CXF-6629] - ConcurrentModificationException at AbstractResourceInfo.clearProxies()
-    * [CXF-6630] - Cannot call setAttribute with a null name
-    * [CXF-6632] - Memory leak due to literal keys in WSDLDefinition map
-    * [CXF-6637] - @GZIP and similar CXF annotations are not recognized if set on super classes
-    * [CXF-6638] - AsyncHTTPConduit does not allow body payloads with "PATCH" method
-    * [CXF-6642] - Memory Leak in ResponseImpl.readEntity()
-    * [CXF-6648] - Wildcard Content-Type is set for GET
-    * [CXF-6653] - NPE may result while generating a SequenceFault in WS-RM 1.1
-    * [CXF-6655] - Error Invalid address. Endpoint address cannot be null
-    * [CXF-6657] - CXF Failover using JAXRS prevents header retrieval from ResponseExceptionMappers
-
-** Improvement
-    * [CXF-5606] - WADL to Java code generator should translate wadl:doc into Java documentation
-    * [CXF-6623] - Add support for nested @BeanParam's
-    * [CXF-6625] - Wadl-to-Java should be able to generate custom method annotation classes
-    * [CXF-6633] - Enhance Swagger feature with optional dynamic basePath, tags and Javadocs handling
-    * [CXF-6634] - Move DocumentationProvider interface out of .model.wadl. package
-    * [CXF-6643] - Upgrade Apache HTrace to 4.0 
-    * [CXF-6644] - Move Basic JSON parser code into a dedicated module
-    * [CXF-6645] - Introduce a 'jose.debug' property
-    * [CXF-6649] - Add Karaf feature cxf-rs-description-swagger2
-    * [CXF-6658] - Make ServletContextResourceResolver optionally ignored 
-
-
-** Task
-    * [CXF-6503] - Investigate if WADL JavaDocProvider can report JavaDocs of inherited methods
-
-
-
+http://cxf.apache.org/docs/32-migration-guide.html
+for caveats when upgrading.
