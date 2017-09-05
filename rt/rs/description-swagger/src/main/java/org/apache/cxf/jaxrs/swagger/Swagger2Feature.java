@@ -327,7 +327,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         // terms of service url
         String theTermsUrl = getTermsOfServiceUrl();
         if (theTermsUrl == null && props != null) {
-            theContact = props.getProperty(TERMS_URL_PROPERTY);
+            theTermsUrl = props.getProperty(TERMS_URL_PROPERTY);
         }
         beanConfig.setTermsOfServiceUrl(theTermsUrl);
         
