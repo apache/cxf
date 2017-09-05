@@ -149,7 +149,7 @@ Examples:
                     which need to support suspended asynchronous invocations                     
                 </annotation>
                 <associatedArgument placement="immediate">
-                    <annotation> methodNames</annotation>
+                    <annotation>methodNames</annotation>
                 </associatedArgument>
                 <switch>async</switch>
             </option>
@@ -259,7 +259,7 @@ Examples:
                 <annotation>Convert WADL doc elements to JavaDocs</annotation>
                 <switch>javaDocs</switch>
             </option>
-            <option id="namePassword" maxOccurs="1">
+            <option id="authorization" maxOccurs="1">
                 <annotation>
                     Specifies a colon separated user name and password for retrieving the
                     remote WADL content from the servers requiring Basic authentication                      
