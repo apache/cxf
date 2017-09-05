@@ -149,7 +149,7 @@ Examples:
                     which need to support suspended asynchronous invocations                     
                 </annotation>
                 <associatedArgument placement="immediate">
-                    <annotation>methodNames</annotation>
+                    <annotation> methodNames</annotation>
                 </associatedArgument>
                 <switch>async</switch>
             </option>
