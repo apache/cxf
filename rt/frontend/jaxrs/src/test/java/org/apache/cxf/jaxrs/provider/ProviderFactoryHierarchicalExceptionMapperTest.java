@@ -81,6 +81,8 @@ public class ProviderFactoryHierarchicalExceptionMapperTest {
     }
 
     public class UnmappedRuntimeException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+
         public UnmappedRuntimeException(String message) {
             super(message);
         }
