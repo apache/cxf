@@ -47,7 +47,7 @@ public final class WadlToolConstants {
     
     public static final String CFG_CATALOG = ToolConstants.CFG_CATALOG;
     public static final String CFG_BINDING = ToolConstants.CFG_BINDING;
-    public static final String CFG_NAME_PASSWORD = "namePassword";
+    public static final String CFG_AUTHORIZATION = "authorization";
 
     public static final String CFG_NO_TYPES = ToolConstants.CFG_NO_TYPES;
     public static final String CFG_NO_VOID_FOR_EMPTY_RESPONSES = "noVoidForEmptyResponses";
