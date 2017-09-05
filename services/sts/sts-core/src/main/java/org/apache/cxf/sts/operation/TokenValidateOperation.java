@@ -229,12 +229,14 @@ public class TokenValidateOperation extends AbstractOperation implements Validat
             response.getAny().add(requestedToken);
             
             // Lifetime
-            LifetimeType lifetime = 
-                createLifetime(tokenProviderResponse.getCreated(), tokenProviderResponse.getExpires());
-            JAXBElement<LifetimeType> lifetimeType =
-                QNameConstants.WS_TRUST_FACTORY.createLifetime(lifetime);
-            response.getAny().add(lifetimeType);
-            
+            if (includeLifetimeElement) {
+                LifetimeType lifetime =
+                    createLifetime(tokenProviderResponse.getCreated(), tokenProviderResponse.getExpires());
+                JAXBElement<LifetimeType> lifetimeType =
+                    QNameConstants.WS_TRUST_FACTORY.createLifetime(lifetime);
+                response.getAny().add(lifetimeType);
+            }
+
             if (returnReferences) {
                 // RequestedAttachedReference
                 TokenReference attachedReference = tokenProviderResponse.getAttachedReference();
