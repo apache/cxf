@@ -53,6 +53,9 @@
         <cxf.export.service>
             org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://cxf.apache.org/transports/http/configuration"
         </cxf.export.service>
+        <cxf.public.suffix.list.url>
+            https://publicsuffix.org/list/effective_tld_names.dat
+        </cxf.public.suffix.list.url>
     </properties>
     <dependencies>
         <dependency>
@@ -228,7 +231,7 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
-                            <url>https://publicsuffix.org/list/effective_tld_names.dat</url>
+                            <url>${cxf.public.suffix.list.url}</url>
                             <outputDirectory>${project.build.outputDirectory}/mozilla</outputDirectory>
                             <outputFileName>public-suffix-list.txt</outputFileName>
                         </configuration>
