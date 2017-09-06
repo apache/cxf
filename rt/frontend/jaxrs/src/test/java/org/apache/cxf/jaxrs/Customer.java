@@ -371,8 +371,9 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     public void testQueryIntArray(@QueryParam("query") int[] query) {
         // complete
     }
-    
-    @Produces("text/xml")   
+
+    @Produces("text/xml")
+    //CHECKSTYLE:OFF
     public void testQueryAsList(
         @DefaultValue("default") @QueryParam("query") List<String> queryString,
         @QueryParam("query2") List<String> queryString2,
@@ -380,9 +381,12 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
         @QueryParam("query3") Integer[] queryString3Array,
         @QueryParam("query4") List<String> queryString4,
         @QueryParam("query5") List<String> queryString5,
-        @QueryParam("query3") List<MyType<Integer>> queryString6) {
+        @QueryParam("query3") List<MyType<Integer>> queryString6,
+        @QueryParam("query3") List<Long> queryString7,
+        @QueryParam("query3") List<Double> queryString8) {
         // complete
     }
+    //CHECKSTYLE:ON
     public static class MyType<T> {
         private T t;
         public MyType(T t) {
