@@ -895,8 +895,8 @@ public class JAXRSUtilsTest extends Assert {
     @SuppressWarnings("unchecked")
     @Test
     public void testQueryParamAsListWithDefaultValue() throws Exception {
-        Class<?>[] argType = {List.class, List.class, List.class, Integer[].class, 
-            List.class, List.class, List.class};
+        Class<?>[] argType = {List.class, List.class, List.class, Integer[].class,
+            List.class, List.class, List.class, List.class, List.class};
         Method m = Customer.class.getMethod("testQueryAsList", argType);
         Message messageImpl = createMessage();
         ProviderFactory.getInstance(messageImpl)
@@ -907,7 +907,7 @@ public class JAXRSUtilsTest extends Assert {
                                                                new ClassResourceInfo(Customer.class)),
                                                            null, 
                                                            messageImpl);
-        assertEquals(7, params.size());
+        assertEquals(9, params.size());
         List<String> queryList = (List<String>)params.get(0);
         assertNotNull(queryList);
         assertEquals(1, queryList.size());
@@ -945,6 +945,18 @@ public class JAXRSUtilsTest extends Assert {
         assertEquals(2, queryList6.size());
         assertEquals(Integer.valueOf(1), queryList6.get(0).get());
         assertEquals(Integer.valueOf(2), queryList6.get(1).get());
+        
+        List<Integer> queryList7 = (List<Integer>)params.get(7);
+        assertNotNull(queryList7);
+        assertEquals(2, queryList7.size());
+        assertEquals(Long.valueOf(1), queryList7.get(0));
+        assertEquals(Long.valueOf(2), queryList7.get(1));
+        
+        List<Integer> queryList8 = (List<Integer>)params.get(8);
+        assertNotNull(queryList8);
+        assertEquals(2, queryList8.size());
+        assertEquals(Double.valueOf(1), queryList8.get(0));
+        assertEquals(Double.valueOf(2), queryList8.get(1));
     }
     
     @Test
