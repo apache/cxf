@@ -108,6 +108,17 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     }
     
     @Test
+    public void testListOfLongAndDoubleQuery() throws Exception {
+        WebTarget echoEndpointTarget = ClientBuilder
+            .newClient()
+            .target("http://localhost:" + PORT + "/bookstore/listoflonganddouble")
+            .queryParam("value", 1, 0, 2, 3);
+
+        Book book = echoEndpointTarget.request().accept("text/xml").get(Book.class);
+        assertEquals(1023L, book.getId());
+    }
+    
+    @Test
     public void testGetGenericBook() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/genericbooks/123";
         doTestGetGenericBook(address, 124L, false);

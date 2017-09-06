@@ -50,6 +50,7 @@ import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
 import javax.ws.rs.HEAD;
 import javax.ws.rs.HeaderParam;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.MatrixParam;
 import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
@@ -164,6 +165,26 @@ public class BookStore {
     @Produces("application/json")
     public BookType getBookType() {
         return new BookType("root", 124L);
+    }
+    @GET
+    @Path("/listoflonganddouble")
+    @Produces("text/xml")
+    public Book getBookFromListOfLongAndDouble(@QueryParam("value") List<Long> lValue,
+                                               @QueryParam("value") List<Double> dValue) {
+        StringBuilder lBuilder = new StringBuilder();
+        for (Long v : lValue) {
+            lBuilder.append(v.longValue());
+        }
+        StringBuilder dBuilder = new StringBuilder();
+        for (Double v : dValue) {
+            dBuilder.append(v.longValue());
+        }
+        String lStr = lBuilder.toString();
+        String dStr = dBuilder.toString();
+        if (!lStr.equals(dStr)) {
+            throw new InternalServerErrorException();
+        }
+        return new Book("cxf", Long.parseLong(lStr));
     }
     @GET
     @Path("/")
