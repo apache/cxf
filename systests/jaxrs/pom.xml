@@ -67,13 +67,6 @@
           <artifactId>rxjava</artifactId>
           <version>${cxf.rxjava2.version}</version>
         </dependency>
-        <!--
-          <dependency>
-            <groupId>org.apache.bval</groupId>
-            <artifactId>bval-jsr</artifactId>
-            <version>1.1.0-alpha-SNAPSHOT</version>
-          </dependency>
-        -->
         <dependency>
             <groupId>javax.el</groupId>
             <artifactId>javax.el-api</artifactId>
