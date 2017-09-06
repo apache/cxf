@@ -20,7 +20,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.2.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cxf-parent</artifactId>
@@ -41,7 +41,7 @@
         <cxf.compile.show.deprecation>true</cxf.compile.show.deprecation>
         <cxf.codegenplugin.forkmode>once</cxf.codegenplugin.forkmode>
         <cxf.codegen.jvmArgs>-Djavax.xml.accessExternalSchema=file</cxf.codegen.jvmArgs>
-        <cxf.xjc.jvmArgs/>
+        <cxf.xjc.jvmArgs />
         <cxf.xjcplugin.forkmode>false</cxf.xjcplugin.forkmode>
         <cxf.eclipse.outputDirectory>${basedir}/target/classes</cxf.eclipse.outputDirectory>
         <!-- stuff related to ASM -->
