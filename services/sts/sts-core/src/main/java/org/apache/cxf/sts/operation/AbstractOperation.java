@@ -188,10 +188,9 @@ public abstract class AbstractOperation {
         this.includeLifetimeElement = value;
     }
 
-    public boolean getIncludeLifetimeElement() {
-        return this.includeLifetimeElement;
+    public boolean isIncludeLifetimeElement() {
+        return includeLifetimeElement;
     }
-    
 
     /**
      * Check the arguments from the STSProvider and parse the request.
