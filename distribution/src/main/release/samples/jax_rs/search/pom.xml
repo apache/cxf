@@ -132,18 +132,8 @@
         </dependency>                    
         <dependency>
             <groupId>org.apache.tika</groupId>
-            <artifactId>tika-core</artifactId>
-            <version>2.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tika</groupId>
-            <artifactId>tika-parser-pdf-module</artifactId>
-            <version>2.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tika</groupId>
-            <artifactId>tika-parser-office-module</artifactId>
-            <version>2.0-SNAPSHOT</version>
+            <artifactId>tika-parsers</artifactId>
+            <version>1.16</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -167,17 +157,4 @@
             <version>4.5.3</version>
         </dependency>    
     </dependencies>
-    <repositories>
-        <repository>
-            <id>apache-snapshots</id>
-            <url>http://repository.apache.org/snapshots</url>
-            <name>Apache Snapshots Repo</name>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
-    </repositories>
 </project>
