@@ -1,4 +1,4 @@
-Apache CXF 3.0.14 Release Notes
+Apache CXF 3.0.15 Release Notes
 
 1. Overview
 
@@ -22,7 +22,7 @@ Users are encourage to review the migration guide at:
 http://cxf.apache.org/docs/30-migration-guide.html
 for further information and requirements for upgrading from 2.7.x.
 
-3.0.14 fixes over 17 JIRA issues reported by users and the community.
+3.0.15 fixes over 14 JIRA issues reported by users and the community.
 
 
 
@@ -67,30 +67,23 @@ for caveats when upgrading from CXF 2.7.x to 3.0.0
 7. Specific issues, features, and improvements fixed in this version
 
 ** Bug
-* [CXF-6441] - JMS Subscription: pubSubNoLocal is not propagated into AbstractMessageListenerContainer
-* [CXF-6782] - Modifications to JAX-WS client request context leak the thread scope
-* [CXF-7178] - RMPolicyInterceptorProvider not initialized properly
-* [CXF-7318] - Continuation.suspend(-1) does not resume request
-* [CXF-7320] - Returned charset is not decoded properly
-* [CXF-7331] - javax.ws.rs.container.ResourceInfo#getResourceClass doesnt unwrap the class
-* [CXF-7350] - the exception should be able to return to client if retry is 0 with ws-rm
-* [CXF-7351] - JAXRS UriInfo.getMatchedURIs raises error for templated URI
-* [CXF-7352] - JAXRS UriInfo.getMatchedResources does return matched resource twice when CORS filter is used
-* [CXF-7356] - need consider SoapBinding has multiple default namespace when compare two bindingId
-* [CXF-7368] - JAXB provider is handling non-jaxb classes
-* [CXF-7381] - DateFormat in MapEventLogger in the STS is not thread safe
-* [CXF-7401] - CXF http-jetty fails to get private key if the jks keystore file contains multiple private keys with different password
-* [CXF-7417] - Updating relative paths after passing them to UriBuilder.fromUri does not work
-* [CXF-7429] - NPE in WriterInterceptorMBW when writer is null and Log is fine
+
+
+** Bug
+* [CXF-7389] - JAXRSUtils warning logs
+* [CXF-7412] -  PhaseInterceptorChain has thrown exception, unwinding now java.lang.NullPointerException: null at org.apache.cxf.binding.soap.saaj.SAAJUtils.getHeader(SAAJUtils.java:43)
+* [CXF-7430] - The logInputStream method of the LoggingInInterceptor fails if input stream size bigger than limit and PrettyPrint option is true.
+* [CXF-7438] - Xml validation error with MTOM
+* [CXF-7440] - VariantListBuilderImpl build() don't work without add method
+* [CXF-7443] - ClassCastException in org.apache.cxf.transport.http.Headers
+* [CXF-7447] - Java 2 security issues
+* [CXF-7453] - WebFaultOutInterceptor calls getFaultSubcodes() even in case of SOAP1.1 faults
+* [CXF-7454] - NullPointerException during wsdl validation
+* [CXF-7478] - Response entity can not be auto-closed if the entity is read implicitly
+* [CXF-7483] - JAXRSServerFactoryBeanDefinitionParser doesn't log autowire failures
 
 ** Improvement
-* [CXF-7327] - Improve logging for invalid enum values
-* [CXF-7424] - Remove redundant byte array conversion from BinaryDataProvider
-
-
-
-
-
-
-
+* [CXF-7419] - Support subresource locators returning the classes
+* [CXF-7436] - Enhance Search SQLPrinterVisitor to support hierarchical queries
+* [CXF-7492] - Add a new wadltojava 'authorization' option
 
