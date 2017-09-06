@@ -15,6 +15,7 @@ New features include:
 * JAX-WS - support for per-operation schema validation configuration
 * WSS4J Signatures can support MTOM attachments
 * Preliminary support for running on Java 9  (no module support yet)
+* New http-undertow transport
 
 
 Important notes:
