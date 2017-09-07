@@ -292,7 +292,7 @@ public abstract class ProviderFactory {
                                        boolean injectContext) {
 
         Class<?> mapperClass = ClassHelper.getRealClass(bus, em.getProvider());
-        Type[] types = null;
+        Type[] types;
         if (m != null && MessageUtils.getContextualBoolean(m, IGNORE_TYPE_VARIABLES)) {
             types = new Type[]{mapperClass};
         } else {
@@ -302,14 +302,13 @@ public abstract class ProviderFactory {
             if (t instanceof ParameterizedType) {
                 ParameterizedType pt = (ParameterizedType)t;
                 Type[] args = pt.getActualTypeArguments();
-                for (int i = 0; i < args.length; i++) {
-                    Type arg = args[i];
+                for (Type arg : args) {
                     if (arg instanceof TypeVariable) {
-                        TypeVariable<?> var = (TypeVariable<?>)arg;
+                        TypeVariable<?> var = (TypeVariable<?>) arg;
                         Type[] bounds = var.getBounds();
                         boolean isResolved = false;
-                        for (int j = 0; j < bounds.length; j++) {
-                            Class<?> cls = InjectionUtils.getRawType(bounds[j]);
+                        for (Type bound : bounds) {
+                            Class<?> cls = InjectionUtils.getRawType(bound);
                             if (cls != null && (cls == Object.class || cls.isAssignableFrom(expectedType))) {
                                 isResolved = true;
                                 break;
