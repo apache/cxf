@@ -31,7 +31,6 @@ import org.junit.Test;
 /**
  * Testcase for CXF-7473
  */
-@Ignore("To be fixed in CXF-7473")
 public class ProviderFactoryHierarchicalExceptionMapperTest {
     private ServerProviderFactory pf;
 
@@ -43,12 +42,29 @@ public class ProviderFactoryHierarchicalExceptionMapperTest {
     }
 
     @Test
-    public void testNearestSuperclassMatch() {
+    public void testExceptionMapperInHierarchy() {
+        ExceptionMapper<?> exceptionMapper = pf.createExceptionMapper(IllegalArgumentException.class,
+                new MessageImpl());
+        Assert.assertNotNull(exceptionMapper);
+        Assert.assertEquals("Wrong mapper found for IllegalArgumentException",
+                IllegalArgumentExceptionMapper.class, exceptionMapper.getClass());
+    }
+
+    @Test
+    public void testSimpleExceptionMapperWhenHierarchyPresent() {
+        ExceptionMapper<?> exceptionMapper = pf.createExceptionMapper(IllegalStateException.class,
+                new MessageImpl());
+        Assert.assertNotNull(exceptionMapper);
+        Assert.assertEquals("Wrong mapper found for IllegalStateException",
+                IllegalStateExceptionMapper.class, exceptionMapper.getClass());
+    }
+
+    @Ignore("To be fixed in CXF-7473")
+    @Test
+    public void testNoMatch() {
         ExceptionMapper<?> exceptionMapper = pf.createExceptionMapper(UnmappedRuntimeException.class,
                 new MessageImpl());
-        Assert.assertNotEquals("Wrong mapper found for UnmappedRuntimeException",
-                IllegalArgumentExceptionMapper.class,
-                exceptionMapper.getClass());
+        Assert.assertNull(exceptionMapper);
     }
 
     public abstract class AbstractExceptionMapper<E extends Throwable> implements ExceptionMapper<E> {
