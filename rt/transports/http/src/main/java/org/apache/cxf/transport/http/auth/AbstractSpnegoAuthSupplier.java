@@ -138,6 +138,8 @@ public abstract class AbstractSpnegoAuthSupplier {
             return context.initSecContext(token, 0, token.length);
         }
 
+        decorateSubject(subject);
+
         try {
             return Subject.doAs(subject, new CreateServiceTicketAction(context, token));
         } catch (PrivilegedActionException e) {
@@ -147,6 +149,11 @@ public abstract class AbstractSpnegoAuthSupplier {
             LOG.log(Level.SEVERE, "initSecContext", e);
             return null;
         }
+    }
+
+    // Allow subclasses to decorate the Subject if required.
+    protected void decorateSubject(Subject subject) {
+
     }
 
     protected boolean isCredDelegationRequired(Message message) {

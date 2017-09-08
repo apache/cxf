@@ -105,15 +105,13 @@ public class KerberosAuthenticationFilter implements ContainerRequestFilter {
             if (index > 0) {
                 simpleUserName = simpleUserName.substring(0, index);
             }
+            Message m = JAXRSUtils.getCurrentMessage();
+            m.put(SecurityContext.class, createSecurityContext(simpleUserName, complexUserName, gssContext));
+
             if (!gssContext.getCredDelegState()) {
                 gssContext.dispose();
                 gssContext = null;
             }
-            Message m = JAXRSUtils.getCurrentMessage();
-            m.put(SecurityContext.class,
-                new KerberosSecurityContext(new KerberosPrincipal(simpleUserName,
-                                                                  complexUserName),
-                                            gssContext));
 
         } catch (LoginException e) {
             LOG.fine("Unsuccessful JAAS login for the service principal: " + e.getMessage());
@@ -125,6 +123,11 @@ public class KerberosAuthenticationFilter implements ContainerRequestFilter {
             LOG.fine("PrivilegedActionException: " + e.getMessage());
             throw ExceptionUtils.toNotAuthorizedException(e, getFaultResponse());
         }
+    }
+
+    protected SecurityContext createSecurityContext(String simpleUserName, String complexUserName,
+                                                    GSSContext gssContext) {
+        return new KerberosSecurityContext(new KerberosPrincipal(simpleUserName, complexUserName), gssContext);
     }
 
     protected GSSContext createGSSContext() throws GSSException {

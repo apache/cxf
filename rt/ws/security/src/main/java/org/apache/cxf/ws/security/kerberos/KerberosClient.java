@@ -147,7 +147,7 @@ public class KerberosClient implements Configurable {
             LOG.fine("Requesting Kerberos ticket for " + serviceName
                     + " using JAAS Login Module: " + getContextName());
         }
-        KerberosSecurity bst = new KerberosSecurity(DOMUtils.createDocument());
+        KerberosSecurity bst = createKerberosSecurity();
         bst.retrieveServiceTicket(getContextName(), callbackHandler, serviceName,
                                   isUsernameServiceNameForm, requestCredentialDelegation,
                                   delegatedCredential);
@@ -168,6 +168,10 @@ public class KerberosClient implements Configurable {
         token.setTokenType(bst.getValueType());
 
         return token;
+    }
+
+    protected KerberosSecurity createKerberosSecurity() {
+        return new KerberosSecurity(DOMUtils.createDocument());
     }
 
     public boolean isUsernameServiceNameForm() {
