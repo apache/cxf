@@ -138,7 +138,9 @@ public abstract class AbstractSpnegoAuthSupplier {
         if (delegatedCred != null) {
             return context.initSecContext(token, 0, token.length);
         }
-        
+
+        decorateSubject(subject);
+
         try {
             return (byte[])Subject.doAs(subject, new CreateServiceTicketAction(context, token));
         } catch (PrivilegedActionException e) {
@@ -149,7 +151,12 @@ public abstract class AbstractSpnegoAuthSupplier {
             return null;
         }
     }
-    
+
+    // Allow subclasses to decorate the Subject if required.
+    protected void decorateSubject(Subject subject) {
+
+    }
+
     protected boolean isCredDelegationRequired(Message message) { 
         Object prop = message.getContextualProperty(PROPERTY_REQUIRE_CRED_DELEGATION);
         return prop == null ? credDelegation : MessageUtils.isTrue(prop);
