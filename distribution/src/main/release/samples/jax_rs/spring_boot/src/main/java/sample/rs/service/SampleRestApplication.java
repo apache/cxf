@@ -18,10 +18,10 @@
  */
 package sample.rs.service;
 import java.util.Arrays;
-import java.util.Collections;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.swagger.Swagger2Feature;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +47,7 @@ public class SampleRestApplication {
         endpoint.setBus(bus);
         endpoint.setServiceBeans(Arrays.<Object>asList(new HelloServiceImpl1(), new HelloServiceImpl2()));
         endpoint.setAddress("/");
-        endpoint.setFeatures(Collections.singletonList(createSwaggerFeature()));
+        endpoint.setFeatures(Arrays.asList(createSwaggerFeature(), new LoggingFeature()));
         return endpoint.create();
     }
 
