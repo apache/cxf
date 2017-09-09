@@ -22,8 +22,8 @@
     <category rdf:resource="http://projects.apache.org/category/network-server" />
     <repository>
       <GitRepository>
-        <location rdf:resource="https://git-wip-us.apache.org/repos/asf/cxf.git"/>
-        <browse rdf:resource="https://git-wip-us.apache.org/repos/asf?p=cxf.git"/>
+        <location rdf:resource="https://gitbox.apache.org/repos/asf/cxf.git"/>
+        <browse rdf:resource="https://gitbox.apache.org/repos/asf?p=cxf.git"/>
       </GitRepository>
     </repository>
     <maintainer>
