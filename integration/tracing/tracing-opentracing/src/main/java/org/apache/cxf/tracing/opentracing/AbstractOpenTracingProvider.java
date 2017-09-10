@@ -38,7 +38,8 @@ import io.opentracing.propagation.TextMapExtractAdapter;
 public abstract class AbstractOpenTracingProvider extends AbstractTracingProvider {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractOpenTracingProvider.class);
     protected static final String TRACE_SPAN = "org.apache.cxf.tracing.opentracing.span";
-
+    protected static final String HTTP_STATUS_TAG = "http.status";
+    
     protected final Tracer tracer;
     
     protected AbstractOpenTracingProvider(final Tracer tracer) {
@@ -97,6 +98,7 @@ public abstract class AbstractOpenTracingProvider extends AbstractTracingProvide
                 span = scope.getContinuation().activate();
             }
 
+            span.setTag(HTTP_STATUS_TAG, responseStatus);
             span.close();
         }
     }

@@ -36,7 +36,8 @@ import io.opentracing.propagation.Format.Builtin;
 public abstract class AbstractOpenTracingClientProvider extends AbstractTracingProvider {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractOpenTracingClientProvider.class);
     protected static final String TRACE_SPAN = "org.apache.cxf.tracing.client.opentracing.span";
-
+    protected static final String HTTP_STATUS_TAG = "http.status";
+    
     private final Tracer tracer;
 
     public AbstractOpenTracingClientProvider(final Tracer tracer) {
@@ -86,6 +87,7 @@ public abstract class AbstractOpenTracingClientProvider extends AbstractTracingP
                 span = scope.getContinuation().activate();
             }
 
+            span.setTag(HTTP_STATUS_TAG, responseStatus);
             if (scope.isManaged()) {
                 span.close();
             }
