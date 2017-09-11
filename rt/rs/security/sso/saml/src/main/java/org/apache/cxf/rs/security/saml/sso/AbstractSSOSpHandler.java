@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.saml.sso;
 
 import java.io.IOException;
+import java.sql.Date;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.Properties;
@@ -127,7 +128,8 @@ public class AbstractSSOSpHandler {
         // supported better than 'max-age' property by different browsers
         // (Firefox, IE, etc)
         Instant expires = Instant.ofEpochMilli(System.currentTimeMillis() + stateTimeToLive);
-        String cookieExpires = HttpUtils.getHttpDateFormat().format(expires.atZone(ZoneOffset.UTC));
+        String cookieExpires =
+            HttpUtils.getHttpDateFormat().format(Date.from(expires.atZone(ZoneOffset.UTC).toInstant()));
         contextCookie += ";Expires=" + cookieExpires;
         //TODO: Consider adding an 'HttpOnly' attribute
 
