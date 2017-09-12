@@ -94,7 +94,7 @@
         <cxf.httpcomponents.client.version>4.5.3</cxf.httpcomponents.client.version>
         <cxf.httpcomponents.core.version>4.4.6</cxf.httpcomponents.core.version>
         <cxf.httpcomponents.core.version.range>[4.3,4.5.0)</cxf.httpcomponents.core.version.range>
-        <cxf.jackson.version>2.8.10</cxf.jackson.version><!-- CXF-7461 2.9.x conflicts with swagger-core-->
+        <cxf.jackson.version>2.9.1</cxf.jackson.version>
         <cxf.james.mim4j.version>0.7.2</cxf.james.mim4j.version>
         <cxf.kerby.version>1.0.1</cxf.kerby.version>
         <cxf.logback.classic.version>1.2.3</cxf.logback.classic.version>
