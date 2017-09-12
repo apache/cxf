@@ -265,9 +265,9 @@ Examples:
                     remote WADL content from the servers requiring Basic authentication                      
                 </annotation>
                 <associatedArgument placement="afterSpace">
-                    <annotation>namePassword</annotation>
+                    <annotation>authorization</annotation>
                 </associatedArgument>
-                <switch>namePassword</switch>
+                <switch>authorization</switch>
             </option>
         </optionGroup>
         <optionGroup id="common_options">
