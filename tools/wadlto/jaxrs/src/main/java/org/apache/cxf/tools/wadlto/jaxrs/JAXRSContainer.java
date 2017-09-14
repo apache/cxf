@@ -21,6 +21,7 @@ package org.apache.cxf.tools.wadlto.jaxrs;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
@@ -113,9 +114,9 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
     private void processWadl() {
         File outDir = new File((String)context.get(WadlToolConstants.CFG_OUTPUTDIR));
         String wadlURL = getAbsoluteWadlURL();
-        
-        String wadl = readWadl(wadlURL);
-        
+        String authorization = (String)context.get(WadlToolConstants.CFG_AUTHORIZATION);
+        String wadl = readWadl(wadlURL, authorization);
+
         SourceGenerator sg = new SourceGenerator();
         sg.setBus(getBus());
 
@@ -127,7 +128,7 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         sg.setPackageName((String)context.get(WadlToolConstants.CFG_PACKAGENAME));
         sg.setResourceName((String)context.get(WadlToolConstants.CFG_RESOURCENAME));
         sg.setEncoding((String)context.get(WadlToolConstants.CFG_ENCODING));
-        sg.setAuthorization((String)context.get(WadlToolConstants.CFG_AUTHORIZATION));
+        sg.setAuthorization(authorization);
 
         String wadlNs = (String)context.get(WadlToolConstants.CFG_WADL_NAMESPACE);
         if (wadlNs != null) {
@@ -204,11 +205,17 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         }
 
     }
-    
-    protected String readWadl(String wadlURI) {
+
+    protected String readWadl(String wadlURI, String authorization) {
         try {
             URL url = new URL(wadlURI);
-            Reader reader = new InputStreamReader(url.openStream(), StandardCharsets.UTF_8);
+            InputStream is = null;
+            if (wadlURI.startsWith("https") && authorization != null) {
+                is = SecureConnectionHelper.getStreamFromSecureConnection(url, authorization);
+            } else {
+                is = url.openStream();
+            }
+            Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8);
             return IOUtils.toString(reader);
         } catch (IOException e) {
             throw new ToolException(e);
