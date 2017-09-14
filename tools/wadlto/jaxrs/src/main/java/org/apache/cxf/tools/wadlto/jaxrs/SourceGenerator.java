@@ -28,7 +28,6 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.Writer;
-import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -93,7 +92,6 @@ import org.apache.cxf.common.jaxb.JAXBUtils.JCodeModel;
 import org.apache.cxf.common.jaxb.JAXBUtils.S2JJAXBModel;
 import org.apache.cxf.common.jaxb.JAXBUtils.SchemaCompiler;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.ReflectionInvokationHandler;
 import org.apache.cxf.common.util.StringUtils;
@@ -1870,12 +1868,8 @@ public class SourceGenerator {
             } 
             if (is == null) {
                 URL url = URI.create(href).toURL();
-                if (authorization != null) {
-                    HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-                    conn.setRequestMethod("GET");
-                    String encodedAuth = "Basic " + Base64Utility.encode(authorization.getBytes());
-                    conn.setRequestProperty("Authorization", encodedAuth);
-                    is = conn.getInputStream();
+                if (href.startsWith("https") && authorization != null) {
+                    is = SecureConnectionHelper.getStreamFromSecureConnection(url, authorization);
                 } else {
                     is = url.openStream();
                 }
