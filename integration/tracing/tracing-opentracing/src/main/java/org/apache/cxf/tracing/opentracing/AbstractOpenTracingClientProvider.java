@@ -32,11 +32,11 @@ import io.opentracing.ActiveSpan;
 import io.opentracing.ActiveSpan.Continuation;
 import io.opentracing.Tracer;
 import io.opentracing.propagation.Format.Builtin;
+import io.opentracing.tag.Tags;
 
 public abstract class AbstractOpenTracingClientProvider extends AbstractTracingProvider {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractOpenTracingClientProvider.class);
     protected static final String TRACE_SPAN = "org.apache.cxf.tracing.client.opentracing.span";
-    protected static final String HTTP_STATUS_TAG = "http.status";
     
     private final Tracer tracer;
 
@@ -47,24 +47,29 @@ public abstract class AbstractOpenTracingClientProvider extends AbstractTracingP
     protected TraceScopeHolder<TraceScope> startTraceSpan(final Map<String, List<String>> requestHeaders,
             URI uri, String method) {
 
-        ActiveSpan span = tracer.activeSpan();
-        boolean managed = false;
-        if (span == null) {
+        final ActiveSpan parent = tracer.activeSpan();
+        ActiveSpan span = null; 
+        if (parent == null) {
             span = tracer.buildSpan(buildSpanDescription(uri.toString(), method)).startActive();
-            managed = true;
+        } else {
+            span = tracer.buildSpan(buildSpanDescription(uri.toString(), method)).asChildOf(parent).startActive();
         }
-        
-        tracer.inject(span.context(), Builtin.HTTP_HEADERS, new TextMapInjectAdapter(requestHeaders));
 
+        // Set additional tags 
+        span.setTag(Tags.HTTP_METHOD.getKey(), method);
+        span.setTag(Tags.HTTP_URL.getKey(), uri.toString());
+
+        tracer.inject(span.context(), Builtin.HTTP_HEADERS, new TextMapInjectAdapter(requestHeaders));
+        
         // In case of asynchronous client invocation, the span should be detached as JAX-RS
         // client request / response filters are going to be executed in different threads.
         Continuation continuation = null;
-        if (isAsyncInvocation() && managed) {
+        if (isAsyncInvocation()) {
             continuation = span.capture();
             span.deactivate();
         }
 
-        return new TraceScopeHolder<TraceScope>(new TraceScope(span, continuation, managed), 
+        return new TraceScopeHolder<TraceScope>(new TraceScope(span, continuation), 
             continuation != null /* detached */);
     }
 
@@ -87,10 +92,8 @@ public abstract class AbstractOpenTracingClientProvider extends AbstractTracingP
                 span = scope.getContinuation().activate();
             }
 
-            span.setTag(HTTP_STATUS_TAG, responseStatus);
-            if (scope.isManaged()) {
-                span.close();
-            }
+            span.setTag(Tags.HTTP_STATUS.getKey(), responseStatus);
+            span.close();
         }
     }
 }

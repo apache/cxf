@@ -24,16 +24,10 @@ import io.opentracing.ActiveSpan.Continuation;
 public class TraceScope {
     private final ActiveSpan span;
     private final Continuation continuation;
-    private final boolean managed;
     
     TraceScope(final ActiveSpan span, final Continuation continuation) {
-        this(span, continuation, true);
-    }
-    
-    TraceScope(final ActiveSpan span, final Continuation continuation, final boolean managed) {
         this.span = span;
         this.continuation = continuation;
-        this.managed = managed;
     }
     
     public ActiveSpan getSpan() {
@@ -42,9 +36,5 @@ public class TraceScope {
     
     public Continuation getContinuation() {
         return continuation;
-    }
-    
-    public boolean isManaged() {
-        return managed;
     }
 }

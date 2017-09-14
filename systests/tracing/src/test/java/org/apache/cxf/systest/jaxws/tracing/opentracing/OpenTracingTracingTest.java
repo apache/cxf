@@ -163,17 +163,22 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
             assertThat(service.getBooks().size(), equalTo(2));
             assertThat(tracer.activeSpan(), not(nullValue()));
 
-            assertThat(TestSender.getAllSpans().size(), equalTo(2));
+            assertThat(TestSender.getAllSpans().size(), equalTo(3));
             assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("Get Books"));
             assertThat(TestSender.getAllSpans().get(0).getReferences(), not(empty()));
             assertThat(TestSender.getAllSpans().get(1).getOperationName(), equalTo("POST /BookStore"));
+            assertThat(TestSender.getAllSpans().get(1).getReferences(), not(empty()));
+            assertThat(TestSender.getAllSpans().get(2).getOperationName(),
+                equalTo("POST http://localhost:" + PORT + "/BookStore"));
+            assertThat(TestSender.getAllSpans().get(2).getReferences(), not(empty()));
         }
 
         // Await till flush happens, usually every second
-        await().atMost(Duration.ONE_SECOND).until(()-> TestSender.getAllSpans().size() == 3);
+        await().atMost(Duration.ONE_SECOND).until(()-> TestSender.getAllSpans().size() == 4);
 
-        assertThat(TestSender.getAllSpans().size(), equalTo(3));
-        assertThat(TestSender.getAllSpans().get(2).getOperationName(), equalTo("test span"));
+        assertThat(TestSender.getAllSpans().size(), equalTo(4));
+        assertThat(TestSender.getAllSpans().get(3).getOperationName(), equalTo("test span"));
+        assertThat(TestSender.getAllSpans().get(3).getReferences(), empty());
     }
 
     @Test

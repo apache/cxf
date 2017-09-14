@@ -34,11 +34,11 @@ import io.opentracing.SpanContext;
 import io.opentracing.Tracer;
 import io.opentracing.propagation.Format.Builtin;
 import io.opentracing.propagation.TextMapExtractAdapter;
+import io.opentracing.tag.Tags;
 
 public abstract class AbstractOpenTracingProvider extends AbstractTracingProvider {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractOpenTracingProvider.class);
     protected static final String TRACE_SPAN = "org.apache.cxf.tracing.opentracing.span";
-    protected static final String HTTP_STATUS_TAG = "http.status";
     
     protected final Tracer tracer;
     
@@ -63,6 +63,10 @@ public abstract class AbstractOpenTracingProvider extends AbstractTracingProvide
         } else {
             scope = tracer.buildSpan(buildSpanDescription(uri.getPath(), method)).asChildOf(parent).startActive();
         }
+        
+        // Set additional tags
+        scope.setTag(Tags.HTTP_METHOD.getKey(), method);
+        scope.setTag(Tags.HTTP_URL.getKey(), uri.toString());
         
         // If the service resource is using asynchronous processing mode, the trace
         // scope will be closed in another thread and as such should be detached.
@@ -98,7 +102,7 @@ public abstract class AbstractOpenTracingProvider extends AbstractTracingProvide
                 span = scope.getContinuation().activate();
             }
 
-            span.setTag(HTTP_STATUS_TAG, responseStatus);
+            span.setTag(Tags.HTTP_STATUS.getKey(), responseStatus);
             span.close();
         }
     }
