@@ -72,7 +72,7 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
                             safeRollBack(session);
                         }
                     }
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     handleException(e);
                 }
             }
@@ -119,7 +119,7 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
                         LOG.log(Level.WARNING, "Exception while processing jms message in cxf. Rolling back", e);
                         safeRollBack(session);
                     }
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     handleException(e);
                 }
             }
@@ -129,7 +129,7 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
         protected void safeRollBack(Session session) {
             try {
                 transactionManager.rollback();
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 LOG.log(Level.WARNING, "Rollback of XA transaction failed", e);
             }
         }
@@ -144,7 +144,7 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
         return session.createConsumer(destination, messageSelector);
     }
     
-    protected void handleException(Exception e) {
+    protected void handleException(Throwable e) {
         running = false;
         JMSException wrapped;
         if (e  instanceof JMSException) {
