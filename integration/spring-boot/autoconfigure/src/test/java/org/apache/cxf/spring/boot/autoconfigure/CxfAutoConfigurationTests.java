@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.spring.boot.autoconfigure;
 
+import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,9 +30,9 @@ import org.springframework.mock.web.MockServletContext;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.hasItem;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -71,7 +72,7 @@ public class CxfAutoConfigurationTests {
     public void customPathWithTrailingSlash() {
         load(CxfAutoConfiguration.class, "cxf.path=/valid/");
         assertThat(this.context.getBean(ServletRegistrationBean.class).getUrlMappings(),
-                contains("/valid/*"));
+                (Matcher) hasItem("/valid/*"));
     }
 
     @Test
@@ -80,7 +81,7 @@ public class CxfAutoConfigurationTests {
         assertThat(this.context.getBeansOfType(ServletRegistrationBean.class).size(),
                 equalTo(1));
         assertThat(this.context.getBean(ServletRegistrationBean.class).getUrlMappings(),
-                contains("/valid/*"));
+                (Matcher) hasItem("/valid/*"));
     }
 
     @Test
