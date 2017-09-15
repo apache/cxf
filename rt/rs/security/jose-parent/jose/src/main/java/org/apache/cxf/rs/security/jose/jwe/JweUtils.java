@@ -361,7 +361,7 @@ public final class JweUtils {
         }
     }
     public static JweEncryptionProvider loadEncryptionProvider(boolean required) {
-        return loadEncryptionProvider(null, required);
+        return loadEncryptionProvider(new JweHeaders(), required);
     }
     
     public static JweEncryptionProvider loadEncryptionProvider(JweHeaders headers, boolean required) {
