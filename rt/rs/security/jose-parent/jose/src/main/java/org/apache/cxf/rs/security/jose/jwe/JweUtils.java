@@ -352,7 +352,7 @@ public final class JweUtils {
         throw new JweException(JweException.Error.INVALID_KEY_ALGORITHM);
     }
     public static JweEncryptionProvider loadEncryptionProvider(boolean required) {
-        return loadEncryptionProvider(null, required);
+        return loadEncryptionProvider(new JweHeaders(), required);
     }
 
     public static JweEncryptionProvider loadEncryptionProvider(JweHeaders headers, boolean required) {
