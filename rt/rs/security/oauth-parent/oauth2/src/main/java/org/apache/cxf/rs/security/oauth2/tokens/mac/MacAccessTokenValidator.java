@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth2.tokens.mac;
 
-import java.util.Arrays;
+import java.security.MessageDigest;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -92,7 +92,7 @@ public class MacAccessTokenValidator implements AccessTokenValidator {
                 macAccessToken.getMacKey(), hmacAlgo, normalizedString); 
                                                          
             byte[] clientMacData = Base64Utility.decode(clientMacString);
-            boolean validMac = Arrays.equals(serverMacData, clientMacData);
+            boolean validMac = MessageDigest.isEqual(serverMacData, clientMacData);
             if (!validMac) {
                 AuthorizationUtils.throwAuthorizationFailure(Collections
                     .singleton(OAuthConstants.MAC_AUTHORIZATION_SCHEME));
