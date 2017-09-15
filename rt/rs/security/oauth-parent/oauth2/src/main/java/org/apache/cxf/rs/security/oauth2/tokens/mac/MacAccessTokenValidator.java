@@ -18,6 +18,12 @@
  */
 package org.apache.cxf.rs.security.oauth2.tokens.mac;
 
+import java.security.MessageDigest;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.jaxrs.ext.MessageContext;
@@ -29,12 +35,6 @@ import org.apache.cxf.rs.security.oauth2.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.AuthorizationUtils;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
-
-import java.security.MessageDigest;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class MacAccessTokenValidator implements AccessTokenValidator {
     private OAuthDataProvider dataProvider;
