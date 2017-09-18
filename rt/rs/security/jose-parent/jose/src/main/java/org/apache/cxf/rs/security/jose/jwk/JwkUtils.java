@@ -244,7 +244,15 @@ public final class JwkUtils {
     }
     public static JsonWebKeys loadJwkSet(Message m, Properties props, PrivateKeyPasswordProvider cb) {
         String key = (String)props.get(JoseConstants.RSSEC_KEY_STORE_FILE);
-        JsonWebKeys jwkSet = key != null ? (JsonWebKeys)m.getExchange().get(key) : null;
+        JsonWebKeys jwkSet = null;
+        if (key != null) {
+            Object jwkSetProp = m.getExchange().get(key);
+            if (jwkSetProp != null && !(jwkSetProp instanceof JsonWebKeys)) {
+                throw new JwkException("Unexpected key store class: " + jwkSetProp.getClass().getName());
+            } else {
+                jwkSet = (JsonWebKeys)jwkSetProp;
+            }
+        }
         if (jwkSet == null) {
             jwkSet = loadJwkSet(props, m.getExchange().getBus(), cb);
             if (key != null) {
