@@ -402,4 +402,13 @@ public class CXFOSGiTestSupport {
         assertServicePublished(String.format("(&(objectClass=org.apache.aries.blueprint.NamespaceHandler)"
                                              + "(osgi.service.blueprint.namespace=%s))", namespace), timeout);
     }
+
+    protected InputStream classpath(String path) {
+        final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        if (path.startsWith("/")) {
+            return contextClassLoader.getResourceAsStream(path);
+        }
+        final String base = this.getClass().getPackage().getName().replace('.', '/');
+        return contextClassLoader.getResourceAsStream(base + "/" + path);
+    }
 }

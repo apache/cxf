@@ -1093,18 +1093,12 @@ public final class InjectionUtils {
         synchronized (instance) {        
             for (Map.Entry<Class<?>, Method> entry : cri.getContextMethods().entrySet()) {
                 Method method = entry.getValue();
-                Object value = method.getParameterTypes()[0] == Application.class 
-                    ? app : cri.getContextSetterProxy(method);
-                try {
-                    if (value == InjectionUtils.extractFromMethod(instance, 
-                                                                  getGetterFromSetter(method), 
-                                                                  false)) {
-                        continue;
-                    }
-                    
-                } catch (Throwable t) {
-                    // continue
+                final Object proxy = extractFromSetter(instance, method);
+                if (proxy instanceof ThreadLocalProxy) {
+                    continue;
                 }
+                Object value = method.getParameterTypes()[0] == Application.class
+                    ? app : cri.getContextSetterProxy(method);
                 InjectionUtils.injectThroughMethod(instance, method, value);
             }
             
@@ -1167,10 +1161,12 @@ public final class InjectionUtils {
                 if (!cri.isSingleton()) {
                     InjectionUtils.injectThroughMethod(requestObject, method, o, message);
                 } else {
-                    ThreadLocalProxy<Object> proxy 
-                        = (ThreadLocalProxy<Object>)cri.getContextSetterProxy(method);
+                    Object proxy = extractFromSetter(requestObject, method);
+                    if (!(proxy instanceof ThreadLocalProxy)) {
+                        proxy = cri.getContextSetterProxy(method);
+                    }
                     if (proxy != null) {
-                        proxy.set(o);
+                        ((ThreadLocalProxy) proxy).set(o);
                     }
                 }
                 
@@ -1474,5 +1470,17 @@ public final class InjectionUtils {
     
     public static Object getEntity(Object o) {
         return o instanceof GenericEntity ? ((GenericEntity<?>)o).getEntity() : o;
+    }
+
+    public static Object extractFromSetter(Object provider, Method m) {
+        if (provider == null) {
+            return null;
+        }
+        try {
+            final Method getter = getGetterFromSetter(m);
+            return extractFromMethod(provider, getter, false);
+        } catch (Throwable t) {
+            return null;
+        }
     }
 }

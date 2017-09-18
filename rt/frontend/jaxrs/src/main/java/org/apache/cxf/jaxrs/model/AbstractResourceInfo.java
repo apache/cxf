@@ -184,13 +184,7 @@ public abstract class AbstractResourceInfo {
         if (provider != null) {
             Object proxy = null;
             synchronized (provider) {
-                try {
-                    proxy = InjectionUtils.extractFromMethod(provider, 
-                                                             InjectionUtils.getGetterFromSetter(m), 
-                                                             false);
-                } catch (Throwable t) {
-                    // continue
-                }
+                proxy = InjectionUtils.extractFromSetter(provider, m);
                 if (!(proxy instanceof ThreadLocalProxy)) {
                     proxy = InjectionUtils.createThreadLocalProxy(m.getParameterTypes()[0]);
                     InjectionUtils.injectThroughMethod(provider, m, proxy);

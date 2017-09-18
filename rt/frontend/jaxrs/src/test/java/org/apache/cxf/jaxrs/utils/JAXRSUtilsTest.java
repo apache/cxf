@@ -1829,7 +1829,7 @@ public class JAXRSUtilsTest extends Assert {
                    ((ThreadLocalProxy<Providers>)c.getBodyWorkers()).get().getClass());
   
         assertSame(servletContextMock, 
-                   ((ThreadLocalProxy<ServletContext>)c.getThreadLocalServletContext()).get());
+                   ((ThreadLocalProxy<ServletContext>)c.getServletContext3()).get());
         assertSame(servletContextMock, 
                    ((ThreadLocalProxy<ServletContext>)c.getServletContext()).get());
         assertSame(servletContextMock, 
