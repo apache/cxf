@@ -51,6 +51,7 @@ import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.rs.security.jose.jwk.JwkException;
 import org.apache.cxf.rs.security.jose.jwk.KeyOperation;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.apache.cxf.rt.security.crypto.MessageDigestUtils;
@@ -285,7 +286,12 @@ public final class KeyManagementUtils {
                 throw new JoseException("No keystore file has been configured");
             }
             if (m != null) {
-                keyStore = (KeyStore)m.getExchange().get(props.get(JoseConstants.RSSEC_KEY_STORE_FILE));
+                Object keyStoreProp = m.getExchange().get(props.get(JoseConstants.RSSEC_KEY_STORE_FILE));
+                if (keyStoreProp != null && !(keyStoreProp instanceof KeyStore)) {
+                    throw new JwkException("Unexpected key store class: " + keyStoreProp.getClass().getName());
+                } else {
+                    keyStore = (KeyStore)keyStoreProp;
+                }
             }
         }
         
