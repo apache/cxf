@@ -28,6 +28,8 @@ import javax.enterprise.inject.spi.InjectionTarget;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
+import org.apache.cxf.common.util.ClassUnwrapper;
+import org.apache.cxf.common.util.SystemPropertyAction;
 
 final class CdiBusBean extends AbstractCXFBean< ExtensionManagerBus > {
     static final String CXF = "cxf";
@@ -63,6 +65,9 @@ final class CdiBusBean extends AbstractCXFBean< ExtensionManagerBus > {
     @Override
     public ExtensionManagerBus create(final CreationalContext< ExtensionManagerBus > ctx) {
         final ExtensionManagerBus instance = injectionTarget.produce(ctx);
+        if ("true".equals(SystemPropertyAction.getProperty("org.apache.cxf.cdi.unwrap.proxies", "true"))) {
+            instance.setProperty(ClassUnwrapper.class.getName(), new CdiClassUnwrapper());
+        }
         BusFactory.possiblySetDefaultBus(instance);
         instance.initialize();
 
