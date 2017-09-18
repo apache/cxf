@@ -117,7 +117,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
             + alreadyResolvedTsPathEnc.size();
 
         String thePath = buildPath();
-        URITemplate pathTempl = new URITemplate(thePath);
+        URITemplate pathTempl = URITemplate.createExactTemplate(thePath);
         thePath = substituteVarargs(pathTempl, alreadyResolvedTs, alreadyResolvedTsPathEnc,
                                     alreadyResolvedEncTs, values, 0, false, fromEncoded,
                                     allowUnresolved, encodePathSlash);
@@ -126,7 +126,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         String theQuery = buildQuery();
         int queryTemplateVarsSize = 0;
         if (theQuery != null) {
-            URITemplate queryTempl = new URITemplate(theQuery);
+            URITemplate queryTempl = URITemplate.createExactTemplate(theQuery);
             queryTemplateVarsSize = queryTempl.getVariables().size();
             if (queryTemplateVarsSize > 0) {
                 int lengthDiff = values.length + resolvedTsSize
@@ -140,7 +140,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
 
         String theFragment = fragment;
         if (theFragment != null) {
-            URITemplate fragmentTempl = new URITemplate(theFragment);
+            URITemplate fragmentTempl = URITemplate.createExactTemplate(theFragment);
             if (fragmentTempl.getVariables().size() > 0) {
                 int lengthDiff = values.length  + resolvedTsSize
                     - alreadyResolvedTs.size() - alreadyResolvedTsPathEnc.size() - alreadyResolvedEncTs.size()
@@ -338,7 +338,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
                                     boolean fromEncoded,
                                     boolean encodePathSlash) {
     //CHECKSTYLE:ON
-        URITemplate templ = new URITemplate(path);
+        URITemplate templ = URITemplate.createExactTemplate(path);
 
         Set<String> uniqueVars = new HashSet<>(templ.getVariables());
         if (varValueMap.size() + alreadyResolvedTs.size() + alreadyResolvedTsEnc.size()
@@ -522,7 +522,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
                 this.originalPathEmpty = StringUtils.isEmpty(uri.getPath());
                 uri(uri);
             } catch (IllegalArgumentException ex) {
-                if (!new URITemplate(path).getVariables().isEmpty()) {
+                if (!URITemplate.createExactTemplate(path).getVariables().isEmpty()) {
                     return uriAsTemplate(path);
                 }
                 String pathEncoded = HttpUtils.pathEncode(path);
@@ -662,7 +662,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
             PathSegment ps = iter.next();
             String p = ps.getPath();
             if (p.length() != 0 || !iter.hasNext()) {
-                p = new URITemplate(p).encodeLiteralCharacters(false);
+                p = URITemplate.createExactTemplate(p).encodeLiteralCharacters(false);
                 if (sb.length() == 0 && leadingSlash) {
                     sb.append('/');
                 } else if (!p.startsWith("/") && sb.length() > 0) {
@@ -848,7 +848,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
                         val = val.replaceAll("/", "%2F");
                     }
                 } else {
-                    val = new URITemplate(val).encodeLiteralCharacters(isQuery);
+                    val = URITemplate.createExactTemplate(val).encodeLiteralCharacters(isQuery);
                 }
                 b.append(entry.getKey());
                 if (val.length() != 0) {
@@ -890,7 +890,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         try {
             return uri(URI.create(uriTemplate));
         } catch (Exception ex) {
-            if (new URITemplate(uriTemplate).getVariables().isEmpty()) {
+            if (URITemplate.createExactTemplate(uriTemplate).getVariables().isEmpty()) {
                 throw new IllegalArgumentException(ex);
             }
             return uriAsTemplate(uriTemplate);
