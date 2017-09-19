@@ -36,6 +36,9 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 public class JwsJsonClientResponseFilter extends AbstractJwsJsonReaderProvider implements ClientResponseFilter {
     @Override
     public void filter(ClientRequestContext req, ClientResponseContext res) throws IOException {
+        if (isCheckEmptyStream() && IOUtils.isEmpty(res.getEntityStream())) {
+            return;
+        }
         JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier();
         JwsJsonConsumer c = new JwsJsonConsumer(IOUtils.readStringFromStream(res.getEntityStream()));
         validate(c, theSigVerifier);
