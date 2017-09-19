@@ -33,6 +33,7 @@ public class AbstractJwsReaderProvider {
     
     private JwsSignatureVerifier sigVerifier;
     private String defaultMediaType;
+    private boolean checkEmptyStream;
     
     public void setSignatureVerifier(JwsSignatureVerifier signatureVerifier) {
         this.sigVerifier = signatureVerifier;
@@ -69,4 +70,13 @@ public class AbstractJwsReaderProvider {
     public void setProtectedHttpHeaders(Set<String> protectedHttpHeaders) {
         this.protectedHttpHeaders = protectedHttpHeaders;
     }
+
+    public boolean isCheckEmptyStream() {
+        return checkEmptyStream;
+    }
+
+    public void setCheckEmptyStream(boolean checkEmptyStream) {
+        this.checkEmptyStream = checkEmptyStream;
+    }
+    
 }

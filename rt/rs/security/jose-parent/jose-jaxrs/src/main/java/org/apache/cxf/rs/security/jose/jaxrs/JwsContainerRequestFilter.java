@@ -41,7 +41,8 @@ import org.apache.cxf.security.SecurityContext;
 public class JwsContainerRequestFilter extends AbstractJwsReaderProvider implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext context) throws IOException {
-        if (HttpMethod.GET.equals(context.getMethod())) {
+        if (HttpMethod.GET.equals(context.getMethod())
+            || isCheckEmptyStream() && IOUtils.isEmpty(context.getEntityStream())) {
             return;
         }
         JwsCompactConsumer p = new JwsCompactConsumer(IOUtils.readStringFromStream(context.getEntityStream()));

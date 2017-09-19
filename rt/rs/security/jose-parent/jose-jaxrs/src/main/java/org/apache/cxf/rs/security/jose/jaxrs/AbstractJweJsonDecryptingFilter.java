@@ -42,6 +42,7 @@ public class AbstractJweJsonDecryptingFilter {
     private JweDecryptionProvider decryption;
     private String defaultMediaType;
     private Map<String, Object> recipientProperties;
+    private boolean checkEmptyStream;
     protected JweDecryptionOutput decrypt(InputStream is) throws IOException {
         JweJsonConsumer c = new JweJsonConsumer(new String(IOUtils.readBytesFromStream(is),
                                                                    StandardCharsets.UTF_8));
@@ -95,5 +96,13 @@ public class AbstractJweJsonDecryptingFilter {
     }
     public void setProtectedHttpHeaders(Set<String> protectedHttpHeaders) {
         this.protectedHttpHeaders = protectedHttpHeaders;
+    }
+
+    public boolean isCheckEmptyStream() {
+        return checkEmptyStream;
+    }
+
+    public void setCheckEmptyStream(boolean checkEmptyStream) {
+        this.checkEmptyStream = checkEmptyStream;
     }
 }

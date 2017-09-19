@@ -27,6 +27,7 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
 
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
 
@@ -35,7 +36,8 @@ import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
 public class JweContainerRequestFilter extends AbstractJweDecryptingFilter implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext context) throws IOException {
-        if (HttpMethod.GET.equals(context.getMethod())) {
+        if (HttpMethod.GET.equals(context.getMethod())
+            || isCheckEmptyStream() && IOUtils.isEmpty(context.getEntityStream())) {
             return;
         }
         JweDecryptionOutput out = decrypt(context.getEntityStream());
