@@ -38,6 +38,8 @@ public class AbstractJweDecryptingFilter {
     private boolean validateHttpHeaders;
     private JweDecryptionProvider decryption;
     private String defaultMediaType;
+    private boolean checkEmptyStream;
+    
     protected JweDecryptionOutput decrypt(InputStream is) throws IOException {
         JweCompactConsumer jwe = new JweCompactConsumer(new String(IOUtils.readBytesFromStream(is), 
                                                                    StandardCharsets.UTF_8));
@@ -83,4 +85,13 @@ public class AbstractJweDecryptingFilter {
     public void setProtectedHttpHeaders(Set<String> protectedHttpHeaders) {
         this.protectedHttpHeaders = protectedHttpHeaders;
     }
+
+    public boolean isCheckEmptyStream() {
+        return checkEmptyStream;
+    }
+
+    public void setCheckEmptyStream(boolean checkEmptyStream) {
+        this.checkEmptyStream = checkEmptyStream;
+    }
+    
 }
