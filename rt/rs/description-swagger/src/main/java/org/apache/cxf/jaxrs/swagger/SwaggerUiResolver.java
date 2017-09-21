@@ -47,7 +47,7 @@ public class SwaggerUiResolver {
             if (cl instanceof URLClassLoader) {
                 for (URL url : ((URLClassLoader)cl).getURLs()) {
                     String root = 
-                        checkUiRoot(url.toString(), swaggerUiMavenGroupAndArtifact, swaggerUiVersion);
+                        checkUiRoot(url.toString(), swaggerUiVersion);
                     if (root != null) {
                         return root;
                     }
@@ -56,7 +56,7 @@ public class SwaggerUiResolver {
             Enumeration<URL> urls = cl.getResources(UI_RESOURCES_ROOT_START);
             while (urls.hasMoreElements()) {
                 String urlStr = urls.nextElement().toString().replace(UI_RESOURCES_ROOT_START, "");     
-                String root = checkUiRoot(urlStr, swaggerUiMavenGroupAndArtifact, swaggerUiVersion);
+                String root = checkUiRoot(urlStr, swaggerUiVersion);
                 if (root != null) {
                     return root;
                 }
@@ -67,7 +67,7 @@ public class SwaggerUiResolver {
         return null;
     }
 
-    protected static String checkUiRoot(String urlStr, String swaggerUiMavenGroupAndArtifact, String swaggerUiVersion) {
+    protected static String checkUiRoot(String urlStr, String swaggerUiVersion) {
         int swaggerUiIndex = urlStr.lastIndexOf("/swagger-ui-");
         if (swaggerUiIndex != -1) {
             boolean urlEndsWithJarSep = urlStr.endsWith(".jar!/");
