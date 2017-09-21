@@ -56,6 +56,24 @@ public abstract class AbstractCdiSingleAppTest extends AbstractBusClientServerTe
     }
 
     @Test
+    public void testResponseHasBeenReceivedWhenQueringBooksById() {
+        final String id = UUID.randomUUID().toString();
+
+        Response r = createWebClient(getBasePath() + "/books").post(
+                new Form()
+                        .param("id", id)
+                        .param("name", "Book " + id));
+        r.close();
+        r = createWebClient(getBasePath() + "/byIds")
+                .query("ids", "1234")
+                .query("ids", UUID.randomUUID().toString())
+                .query("ids", id)
+                .get();
+        r.close();
+        assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
+    }
+
+    @Test
     public void testAddAndQueryOneBook() {
         final String id = UUID.randomUUID().toString();
 

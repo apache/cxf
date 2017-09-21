@@ -18,8 +18,9 @@
  */
 package org.apache.cxf.systest.jaxrs;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.ws.rs.ApplicationPath;
@@ -30,6 +31,7 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import org.apache.cxf.jaxrs.validation.JAXRSBeanValidationFeature;
 import org.apache.cxf.jaxrs.validation.ValidationExceptionMapper;
 import org.apache.cxf.systests.cdi.base.BookStore;
+import org.apache.cxf.systests.cdi.base.BookStoreByIds;
 
 @ApplicationPath("/v2")
 public class BookStoreCustomApplication extends Application {
@@ -44,6 +46,6 @@ public class BookStoreCustomApplication extends Application {
 
     @Override
     public Set<Class<?>> getClasses() {
-        return Collections.<Class<?>>singleton(BookStore.class);
+        return new LinkedHashSet<>(Arrays.asList(BookStore.class, BookStoreByIds.class));
     }
 }
