@@ -1,4 +1,4 @@
-JAX-RS Brave/OpenZipkin Tracing Demo 
+JAX-RS OpenTracing/Jaeger Demo 
 =================
 
 The demo shows a basic usage of OpenTracing API + Jaeger distributed tracer 
