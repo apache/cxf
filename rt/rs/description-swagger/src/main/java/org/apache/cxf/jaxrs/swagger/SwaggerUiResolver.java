@@ -22,26 +22,13 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Enumeration;
 
-public class SwaggerUiResolver {
+public final class SwaggerUiResolver {
     static final String UI_RESOURCES_ROOT_START = "META-INF/resources/webjars/swagger-ui/";
-    
-    static final SwaggerUiResolver HELPER;
-    static {
-        SwaggerUiResolver theHelper = null;
-        try {
-            theHelper = new OsgiSwaggerUiResolver();
-        } catch (Throwable ex) {
-            theHelper = new SwaggerUiResolver();
-        }
-        HELPER = theHelper;
+
+    private SwaggerUiResolver() {
     }
 
-
-    protected SwaggerUiResolver() {
-    }
-
-    protected String findSwaggerUiRootInternal(String swaggerUiMavenGroupAndArtifact,
-                                               String swaggerUiVersion) {
+    private String findSwaggerUiRootInternal(String swaggerUiVersion) {
         try {
             ClassLoader cl = AbstractSwaggerFeature.class.getClassLoader();
             if (cl instanceof URLClassLoader) {
@@ -67,7 +54,7 @@ public class SwaggerUiResolver {
         return null;
     }
 
-    protected static String checkUiRoot(String urlStr, String swaggerUiVersion) {
+    private static String checkUiRoot(String urlStr, String swaggerUiVersion) {
         int swaggerUiIndex = urlStr.lastIndexOf("/swagger-ui-");
         if (swaggerUiIndex != -1) {
             boolean urlEndsWithJarSep = urlStr.endsWith(".jar!/");
@@ -87,12 +74,22 @@ public class SwaggerUiResolver {
     }
 
     public static String findSwaggerUiRoot(String swaggerUiMavenGroupAndArtifact, 
-                                           String swaggerUiVersion) {
-        String root = HELPER.findSwaggerUiRootInternal(swaggerUiMavenGroupAndArtifact, 
-                                                       swaggerUiVersion);
-        if (root == null && HELPER.getClass() != SwaggerUiResolver.class) {
-            root = new SwaggerUiResolver().findSwaggerUiRootInternal(swaggerUiMavenGroupAndArtifact, 
-                                                                     swaggerUiVersion);
+                                           String swaggerUiName, String swaggerUiVersion) {
+        String root = null;
+        try {
+            root = new OsgiSwaggerUiResolver()
+                .findSwaggerUiRoot(swaggerUiMavenGroupAndArtifact, swaggerUiVersion);
+        } catch (Throwable e) {
+            // Ignore
+        }
+        try {
+            root = new OsgiSwaggerUiResolverByName()
+                .findSwaggerUiRoot(swaggerUiName, swaggerUiVersion);
+        } catch (Throwable e) {
+            // Ignore
+        }
+        if (root == null) {
+            root = new SwaggerUiResolver().findSwaggerUiRootInternal(swaggerUiVersion);
         }
         return root;
     }
