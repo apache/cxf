@@ -36,7 +36,7 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 public class JwsClientResponseFilter extends AbstractJwsReaderProvider implements ClientResponseFilter {
     @Override
     public void filter(ClientRequestContext req, ClientResponseContext res) throws IOException {
-        if (isCheckEmptyStream() && IOUtils.isEmpty(res.getEntityStream())) {
+        if (isCheckEmptyStream() && !res.hasEntity()) {
             return;
         }
         JwsCompactConsumer p = new JwsCompactConsumer(IOUtils.readStringFromStream(res.getEntityStream()));

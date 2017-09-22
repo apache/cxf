@@ -26,7 +26,6 @@ import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientResponseContext;
 import javax.ws.rs.client.ClientResponseFilter;
 
-import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
 
@@ -34,7 +33,7 @@ import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
 public class JweJsonClientResponseFilter extends AbstractJweJsonDecryptingFilter implements ClientResponseFilter {
     @Override
     public void filter(ClientRequestContext req, ClientResponseContext res) throws IOException {
-        if (isCheckEmptyStream() && IOUtils.isEmpty(res.getEntityStream())) {
+        if (isCheckEmptyStream() && !res.hasEntity()) {
             return;
         }
         JweDecryptionOutput out = decrypt(res.getEntityStream());
