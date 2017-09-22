@@ -61,7 +61,11 @@ public class ClientResponseContextImpl extends AbstractResponseContextImpl
     }
     
     @Override
-    public boolean hasEntity() { 
+    public boolean hasEntity() {
+        // Is Content-Length is explicitly set to 0 ?
+        if (HttpUtils.isPayloadEmpty(getHeaders())) {
+            return false;
+        }
         try {
             return !IOUtils.isEmpty(getEntityStream());
         } catch (IOException ex) {

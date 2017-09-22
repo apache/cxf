@@ -27,7 +27,7 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
 
-import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
@@ -38,8 +38,8 @@ import org.apache.cxf.rs.security.jose.jwe.JweException;
 public class JweJsonContainerRequestFilter extends AbstractJweJsonDecryptingFilter implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext context) throws IOException {
-        if (HttpMethod.GET.equals(context.getMethod())
-            || isCheckEmptyStream() && IOUtils.isEmpty(context.getEntityStream())) {
+        if (isMethodWithNoContent(context.getMethod())
+            || isCheckEmptyStream() && !context.hasEntity()) {
             return;
         }
         try {
@@ -59,4 +59,9 @@ public class JweJsonContainerRequestFilter extends AbstractJweJsonDecryptingFilt
             return;
         }
     }
+    
+    protected boolean isMethodWithNoContent(String method) {
+        return HttpMethod.DELETE.equals(method) || HttpUtils.isMethodWithNoContent(method);
+    }
+    
 }
