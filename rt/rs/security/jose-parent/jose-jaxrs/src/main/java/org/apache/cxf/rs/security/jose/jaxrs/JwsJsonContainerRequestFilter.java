@@ -28,6 +28,7 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
 
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsException;
@@ -40,8 +41,8 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 public class JwsJsonContainerRequestFilter extends AbstractJwsJsonReaderProvider implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext context) throws IOException {
-        if (HttpMethod.GET.equals(context.getMethod())
-            || isCheckEmptyStream() && IOUtils.isEmpty(context.getEntityStream())) {
+        if (isMethodWithNoContent(context.getMethod())
+            || isCheckEmptyStream() && !context.hasEntity()) {
             return;
         }
         JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier();
@@ -66,5 +67,9 @@ public class JwsJsonContainerRequestFilter extends AbstractJwsJsonReaderProvider
         if (super.isValidateHttpHeaders()) {
             super.validateHttpHeadersIfNeeded(context.getHeaders(), sigEntry.getProtectedHeader());
         }
+    }
+
+    protected boolean isMethodWithNoContent(String method) {
+        return HttpMethod.DELETE.equals(method) || HttpUtils.isMethodWithNoContent(method);
     }
 }

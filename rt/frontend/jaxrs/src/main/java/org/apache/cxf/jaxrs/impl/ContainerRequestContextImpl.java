@@ -68,10 +68,6 @@ public class ContainerRequestContextImpl extends AbstractRequestContextImpl
 
     @Override
     public boolean hasEntity() {
-        InputStream is = getEntityStream();
-        if (is == null) {
-            return false;
-        }
         // Is Content-Length is explicitly set to 0 ?
         if (HttpUtils.isPayloadEmpty(getHeaders())) {
             return false;

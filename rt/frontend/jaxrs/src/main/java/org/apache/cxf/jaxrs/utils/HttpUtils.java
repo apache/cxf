@@ -26,11 +26,14 @@ import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -91,6 +94,9 @@ public final class HttpUtils {
     // there are more of such characters, ex, '*' but '*' is not affected by UrlEncode
     private static final String PATH_RESERVED_CHARACTERS = "=@/:!$&\'(),;~";
     private static final String QUERY_RESERVED_CHARACTERS = "?/,";
+    
+    private static final Set<String> KNOWN_HTTP_VERBS_WITH_NO_CONTENT =
+        new HashSet<>(Arrays.asList(new String[]{"GET", "HEAD", "OPTIONS", "TRACE"}));
 
     private HttpUtils() {
     }
@@ -673,5 +679,9 @@ public final class HttpUtils {
         }
 
         return clazz.cast(value);
+    }
+
+    public static boolean isMethodWithNoContent(String method) {
+        return KNOWN_HTTP_VERBS_WITH_NO_CONTENT.contains(method);
     }
 }

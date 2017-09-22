@@ -48,37 +48,32 @@ public final class IOUtils {
         if (is == null) {
             return true;
         }
-        try {
-            // if available is 0 it does not mean it is empty; it can also throw IOException
-            if (is.available() > 0) {
-                return false;
-            }
-        } catch (IOException ex) {
-            // ignore
+        // if available is 0 it does not mean it is empty
+        if (is.available() > 0) {
+            return false;
         }
-
+        
         final byte[] bytes = new byte[1];
-        try {
-            if (is.markSupported()) {
-                is.mark(1);
-                try {
-                    return isEof(is.read(bytes));
-                } finally {
-                    is.reset();
-                }
+        if (is.markSupported()) {
+            is.mark(1);
+            try {
+                return isEof(is.read(bytes));
+            } finally {
+                is.reset();
             }
-        } catch (IOException ex) {
-            // ignore
         }
+        
         if (!(is instanceof PushbackInputStream)) {
             return false;
         }
+        
         // it may be an attachment stream
         PushbackInputStream pbStream = (PushbackInputStream)is;
         boolean isEmpty = isEof(pbStream.read(bytes));
         if (!isEmpty) {
             pbStream.unread(bytes);
         }
+        
         return isEmpty;
     }
     private static boolean isEof(int result) {
