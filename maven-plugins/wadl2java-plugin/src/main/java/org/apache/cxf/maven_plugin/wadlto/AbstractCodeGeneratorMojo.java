@@ -35,6 +35,7 @@ import java.util.Set;
 import org.apache.commons.lang.SystemUtils;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.common.util.CollectionUtils;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.maven_plugin.common.DocumentArtifact;
 import org.apache.cxf.maven_plugin.common.ForkOnceCodeGenerator;
@@ -200,8 +201,11 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
         request.setLocalRepository(mavenSession.getLocalRepository());
         request.setRemoteRepositories(mavenSession.getRequest().getRemoteRepositories());            
         ArtifactResolutionResult result = repositorySystem.resolve(request);
-            
-        return result.getOriginatingArtifact();
+        Artifact resolvedArtifact = result.getOriginatingArtifact();
+        if (resolvedArtifact == null && !CollectionUtils.isEmpty(result.getArtifacts())) {
+            resolvedArtifact = result.getArtifacts().iterator().next();
+        }
+        return resolvedArtifact;
     }
 
     protected void downloadRemoteDocs(List<WadlOption> effectiveOptions) throws MojoExecutionException {
