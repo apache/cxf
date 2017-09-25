@@ -336,6 +336,17 @@ public class JAXBDataBindingTest extends Assert {
 
     }
 
+    @Test
+    public void testClassInDefaultPackage() throws Exception {
+        Class<?> sampleClassInDefaultPackage = Class.forName("SampleClassInDefaultPackage");
+        Set<Class<?>> classes = new HashSet<>();
+        Collection<Object> typeReferences = new ArrayList<>();
+        Map<String, Object> props = new HashMap<>();
+        JAXBContextInitializer init = new JAXBContextInitializer(null, classes, typeReferences, props);
+        init.addClass(sampleClassInDefaultPackage);
+        assertEquals(1, classes.size());
+    }
+
     @XmlRootElement
     public static class Person {
         @XmlAttribute

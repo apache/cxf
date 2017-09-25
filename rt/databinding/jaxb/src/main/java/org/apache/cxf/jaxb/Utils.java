@@ -291,12 +291,15 @@ final class Utils {
             adapter = m.getReturnType().getAnnotation(XmlJavaTypeAdapter.class);
         }
         if (adapter == null) {
-            XmlJavaTypeAdapters adapters = m.getDeclaringClass().getPackage().getAnnotation(XmlJavaTypeAdapters.class);
-            if (adapters != null) {
-                for (XmlJavaTypeAdapter candidate : adapters.value()) {
-                    if (candidate != null && candidate.type().equals(m.getGenericReturnType())) {
-                        adapter = candidate;
-                        break;
+            Package packageDeclaration = m.getDeclaringClass().getPackage();
+            if (packageDeclaration != null) {
+                XmlJavaTypeAdapters adapters = packageDeclaration.getAnnotation(XmlJavaTypeAdapters.class);
+                if (adapters != null) {
+                    for (XmlJavaTypeAdapter candidate : adapters.value()) {
+                        if (candidate != null && candidate.type().equals(m.getGenericReturnType())) {
+                            adapter = candidate;
+                            break;
+                        }
                     }
                 }
             }
