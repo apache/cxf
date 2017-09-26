@@ -299,6 +299,12 @@
         <bundle start-level="35">mvn:io.zipkin.brave/brave-instrumentation-http/${cxf.brave.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-integration-tracing-brave/${project.version}</bundle>
     </feature>
+    <feature name="cxf-tracing-opentracing" version="${project.version}">
+        <feature version="${project.version}">cxf-core</feature>
+        <bundle start-level="35">wrap:mvn:io.opentracing/opentracing-api/${cxf.opentracing.version}</bundle>
+        <bundle start-level="35">wrap:mvn:io.opentracing/opentracing-util/${cxf.opentracing.version}</bundle>
+        <bundle start-level="40">mvn:org.apache.cxf/cxf-integration-tracing-opentracing/${project.version}</bundle>
+    </feature>
     <feature name="cxf-rs-description-swagger2" version="${project.version}">
         <feature version="${project.version}">cxf-jaxrs</feature>
         <feature version="${project.version}">cxf-jackson</feature>

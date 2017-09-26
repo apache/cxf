@@ -2,7 +2,7 @@ JAX-RS OpenTracing/Jaeger Demo
 =================
 
 The demo shows a basic usage of OpenTracing API + Jaeger distributed tracer 
-with REST based Web Services using  JAX-RS 2.0 (JSR-339). The REST server provides the 
+with REST based Web Services using JAX-RS 2.0 (JSR-339). The REST server provides the 
 following services at URL http://localhost:9000/catalog: 
 
  - GET to http://localhost:9000/catalog 

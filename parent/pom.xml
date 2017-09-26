@@ -2019,6 +2019,11 @@
                 <version>${cxf.jaeger.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.uber.jaeger</groupId>
+                <artifactId>jaeger-thrift</artifactId>
+                <version>${cxf.jaeger.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.qi4j.library</groupId>
                 <artifactId>org.qi4j.library.circuitbreaker</artifactId>
                 <version>${cxf.zest.version}</version>
