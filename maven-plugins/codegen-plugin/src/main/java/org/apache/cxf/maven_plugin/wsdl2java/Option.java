@@ -113,12 +113,12 @@ public class Option {
     Boolean wsdlList;
 
     /**
-     * Specifies the frontend. Default is JAXWS. Currently supports only JAXWS frontend.
+     * Specifies the frontend. Default is JAXWS. Currently supports "JAXWS" and "CXF" frontends.
      */
     String frontEnd;
 
     /**
-     * Specifies the databinding. Default is JAXB. Currently supports only JAXB databinding.
+     * Specifies the databinding. Default is JAXB.
      */
     String dataBinding;
 
