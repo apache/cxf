@@ -64,13 +64,12 @@
     </bean>
     
     <bean id="sender" class="com.uber.jaeger.senders.HttpSender">
-        <argument index="0" value="http://localhost:14268/api/traces" type="java.lang.String" />
+        <argument index="0" value="http://localhost:14268/api/traces" />
     </bean>
     
     <!-- Application resources -->
     <bean id="catalogResource" class="demo.jaxrs.tracing.server.Catalog" />
 
-    <!-- CXF BraveFeature -->  
     <cxf:bus>
         <cxf:features>
             <cxf:logging />
