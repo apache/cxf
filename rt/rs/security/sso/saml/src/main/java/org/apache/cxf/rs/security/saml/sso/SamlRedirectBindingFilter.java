@@ -159,7 +159,7 @@ public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
         signature.update(requestToSign.getBytes(StandardCharsets.UTF_8));
         byte[] signBytes = signature.sign();
 
-        String encodedSignature = Base64.getMimeEncoder().encodeToString(signBytes);
+        String encodedSignature = Base64.getEncoder().encodeToString(signBytes);
 
         ub.queryParam(SSOConstants.SIGNATURE, URLEncoder.encode(encodedSignature, StandardCharsets.UTF_8.name()));
 
