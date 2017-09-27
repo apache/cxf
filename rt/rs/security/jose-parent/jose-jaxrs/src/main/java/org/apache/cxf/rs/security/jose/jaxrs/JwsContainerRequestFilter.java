@@ -97,6 +97,6 @@ public class JwsContainerRequestFilter extends AbstractJwsReaderProvider impleme
     }
     
     protected boolean isMethodWithNoContent(String method) {
-        return HttpMethod.DELETE.equals(method) || HttpUtils.isMethodWithNoContent(method);
+        return HttpMethod.DELETE.equals(method) || HttpUtils.isMethodWithNoRequestContent(method);
     }
 }
