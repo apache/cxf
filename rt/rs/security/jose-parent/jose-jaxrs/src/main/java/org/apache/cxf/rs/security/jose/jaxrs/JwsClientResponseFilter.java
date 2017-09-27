@@ -22,11 +22,13 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import javax.annotation.Priority;
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientResponseContext;
 import javax.ws.rs.client.ClientResponseFilter;
 
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsCompactConsumer;
 import org.apache.cxf.rs.security.jose.jws.JwsException;
@@ -36,7 +38,8 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 public class JwsClientResponseFilter extends AbstractJwsReaderProvider implements ClientResponseFilter {
     @Override
     public void filter(ClientRequestContext req, ClientResponseContext res) throws IOException {
-        if (isCheckEmptyStream() && !res.hasEntity()) {
+        if (isMethodWithNoContent(req.getMethod())
+            || isCheckEmptyStream() && !res.hasEntity()) {
             return;
         }
         JwsCompactConsumer p = new JwsCompactConsumer(IOUtils.readStringFromStream(res.getEntityStream()));
@@ -58,4 +61,7 @@ public class JwsClientResponseFilter extends AbstractJwsReaderProvider implement
         }
     }
 
+    protected boolean isMethodWithNoContent(String method) {
+        return HttpMethod.DELETE.equals(method) || HttpUtils.isMethodWithNoResponseContent(method);
+    }
 }

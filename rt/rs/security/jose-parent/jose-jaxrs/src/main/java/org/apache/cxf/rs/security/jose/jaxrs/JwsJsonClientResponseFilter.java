@@ -22,11 +22,13 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import javax.annotation.Priority;
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientResponseContext;
 import javax.ws.rs.client.ClientResponseFilter;
 
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsJsonConsumer;
 import org.apache.cxf.rs.security.jose.jws.JwsJsonSignatureEntry;
@@ -36,7 +38,8 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 public class JwsJsonClientResponseFilter extends AbstractJwsJsonReaderProvider implements ClientResponseFilter {
     @Override
     public void filter(ClientRequestContext req, ClientResponseContext res) throws IOException {
-        if (isCheckEmptyStream() && !res.hasEntity()) {
+        if (isMethodWithNoContent(req.getMethod())
+            || isCheckEmptyStream() && !res.hasEntity()) {
             return;
         }
         JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier();
@@ -52,6 +55,10 @@ public class JwsJsonClientResponseFilter extends AbstractJwsJsonReaderProvider i
         if (ct != null) {
             res.getHeaders().putSingle("Content-Type", ct);
         }
+    }
+    
+    protected boolean isMethodWithNoContent(String method) {
+        return HttpMethod.DELETE.equals(method) || HttpUtils.isMethodWithNoResponseContent(method);
     }
 
 }
