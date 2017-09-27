@@ -95,8 +95,10 @@ public final class HttpUtils {
     private static final String PATH_RESERVED_CHARACTERS = "=@/:!$&\'(),;~";
     private static final String QUERY_RESERVED_CHARACTERS = "?/,";
     
-    private static final Set<String> KNOWN_HTTP_VERBS_WITH_NO_CONTENT =
+    private static final Set<String> KNOWN_HTTP_VERBS_WITH_NO_REQUEST_CONTENT =
         new HashSet<>(Arrays.asList(new String[]{"GET", "HEAD", "OPTIONS", "TRACE"}));
+    private static final Set<String> KNOWN_HTTP_VERBS_WITH_NO_RESPONSE_CONTENT =
+        new HashSet<>(Arrays.asList(new String[]{"HEAD", "OPTIONS"}));
 
     private HttpUtils() {
     }
@@ -681,7 +683,11 @@ public final class HttpUtils {
         return clazz.cast(value);
     }
 
-    public static boolean isMethodWithNoContent(String method) {
-        return KNOWN_HTTP_VERBS_WITH_NO_CONTENT.contains(method);
+    public static boolean isMethodWithNoRequestContent(String method) {
+        return KNOWN_HTTP_VERBS_WITH_NO_REQUEST_CONTENT.contains(method);
+    }
+    
+    public static boolean isMethodWithNoResponseContent(String method) {
+        return KNOWN_HTTP_VERBS_WITH_NO_RESPONSE_CONTENT.contains(method);
     }
 }
