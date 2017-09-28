@@ -131,7 +131,7 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
                     Node ch = nd.getFirstChild();
                     while (ch != null) {
                         nd.removeChild(ch);
-                        dw.getCurrentNode().appendChild(ch);
+                        dw.getCurrentNode().appendChild(org.apache.cxf.helpers.DOMUtils.getDomElement(ch));
                         ch = nd.getFirstChild();
                     }
                 } else if (nd.getOwnerDocument() == dw.getCurrentNode().getOwnerDocument()) {

@@ -232,6 +232,7 @@ public class LogicalMessageImpl implements LogicalMessage {
             Source s = getPayload();
             if (s instanceof DOMSource) {
                 DOMSource ds = (DOMSource)s;
+                ds.setNode(org.apache.cxf.helpers.DOMUtils.getDomElement(ds.getNode()));
                 Node parent = ds.getNode().getParentNode();
                 Node next = ds.getNode().getNextSibling();
                 if (parent instanceof DocumentFragment) {

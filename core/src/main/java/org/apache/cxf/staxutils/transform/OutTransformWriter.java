@@ -361,6 +361,18 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
         }
         super.writeCharacters(text);
     }
+    
+    @Override
+    public void writeCharacters(char[] text, int arg1, int arg2) throws XMLStreamException {
+        if (matchesDropped(false)) {
+            return;
+        }
+        if (replaceText != null) {
+            text = replaceText.toCharArray();
+            replaceText = null;
+        }
+        super.writeCharacters(text, arg1, arg2);
+    }
 
     private void write(QName qname, boolean replacePrefix) throws XMLStreamException {
         boolean writeNs = false;
