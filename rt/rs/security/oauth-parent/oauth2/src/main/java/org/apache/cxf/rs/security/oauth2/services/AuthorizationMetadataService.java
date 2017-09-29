@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth2.services;
 
+import java.net.URI;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -33,6 +34,7 @@ import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 @Path("oauth-authorization-server")
 public class AuthorizationMetadataService {
     private String issuer;
+    private boolean stripPathFromIssuerUri = true;
     // Required
     private String authorizationEndpointAddress;
     // Optional if only an implicit flow is used
@@ -62,7 +64,7 @@ public class AuthorizationMetadataService {
     
     protected void prepareConfigurationData(Map<String, Object> cfg, String baseUri) {
         // Issuer
-        cfg.put("issuer", issuer == null ? baseUri : issuer);
+        cfg.put("issuer", buildIssuerUri(baseUri));
         // Authorization Endpoint
         String theAuthorizationEndpointAddress = 
             calculateEndpointAddress(authorizationEndpointAddress, baseUri, "/idp/authorize");
@@ -169,5 +171,24 @@ public class AuthorizationMetadataService {
     public void setDynamicRegistrationEndpointAddress(String dynamicRegistrationEndpointAddress) {
         this.dynamicRegistrationEndpointAddress = dynamicRegistrationEndpointAddress;
     }
-    
+
+    private String buildIssuerUri(String baseUri) {
+        URI uri = issuer == null || !issuer.startsWith("/") ? URI.create(baseUri) 
+            : UriBuilder.fromUri(baseUri).path(issuer).build();
+        if (stripPathFromIssuerUri) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(uri.getScheme()).append("://").append(uri.getHost());
+            if (uri.getPort() != -1) {
+                sb.append(':').append(uri.getPort());
+            }
+            return sb.toString();
+        } else {
+            return uri.toString();
+        }
+    }
+
+    public void setStripPathFromIssuerUri(boolean stripPathFromIssuerUri) {
+        this.stripPathFromIssuerUri = stripPathFromIssuerUri;
+    }
+
 }
