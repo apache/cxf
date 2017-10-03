@@ -961,7 +961,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
             sb.append("aaaaaaaaaa");
         }
 
-        MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
+        MultivaluedMap<String, String> headers = new MultivaluedHashMap<String, String>();
         headers.putSingle("Content-ID", "root");
         headers.putSingle("Content-Type", "application/octet-stream");
         headers.putSingle("Content-Disposition", sb.toString());
@@ -992,7 +992,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
             sb.append("aaaaaaaaaa");
         }
 
-        MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
+        MultivaluedMap<String, String> headers = new MultivaluedHashMap<String, String>();
         headers.putSingle("Content-ID", "root");
         headers.putSingle("Content-Type", "application/octet-stream");
         headers.putSingle("Content-Disposition", sb.toString());

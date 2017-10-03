@@ -121,12 +121,7 @@ public class Attachment implements Transferable {
     }
 
     public MediaType getContentType() {
-<<<<<<< HEAD
         String value = handler != null ? handler.getContentType() : headers.getFirst("Content-Type");
-=======
-        String value = handler != null && handler.getContentType() != null ? handler.getContentType()
-            : headers.getFirst("Content-Type");
->>>>>>> 896bd961cb... CXF-7507 - Put a configurable limit on the size of attachment headers
         return value == null ? MediaType.TEXT_PLAIN_TYPE : JAXRSUtils.toMediaType(value);
     }
 
