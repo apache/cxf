@@ -45,6 +45,7 @@ import javax.ws.rs.ext.Providers;
 import org.apache.cxf.attachment.AttachmentDeserializer;
 import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.attachment.AttachmentUtil;
+import org.apache.cxf.attachment.HeaderSizeExceededException;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
@@ -64,6 +65,7 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.message.MessageUtils;
 
 public class MessageContextImpl implements MessageContext {
+
     private Message m;
     public MessageContextImpl(Message m) {
         this.m = m;
@@ -77,6 +79,8 @@ public class MessageContextImpl implements MessageContext {
                 return createAttachments(key.toString());
             } catch (CacheSizeExceededException e) {
                 m.getExchange().put("cxf.io.cacheinput", Boolean.FALSE);
+                throw new WebApplicationException(e, 413);
+            } catch (HeaderSizeExceededException e) {
                 throw new WebApplicationException(e, 413);
             }
         }
@@ -268,6 +272,8 @@ public class MessageContextImpl implements MessageContext {
                 m.getExchange().getInMessage().get(AttachmentDeserializer.ATTACHMENT_MEMORY_THRESHOLD));
             inMessage.put(AttachmentDeserializer.ATTACHMENT_MAX_SIZE,
                 m.getExchange().getInMessage().get(AttachmentDeserializer.ATTACHMENT_MAX_SIZE));
+            inMessage.put(AttachmentDeserializer.ATTACHMENT_MAX_HEADER_SIZE,
+                m.getExchange().getInMessage().get(AttachmentDeserializer.ATTACHMENT_MAX_HEADER_SIZE));
             inMessage.setContent(InputStream.class,
                 m.getExchange().getInMessage().get("org.apache.cxf.multipart.embedded.input"));
             inMessage.put(Message.CONTENT_TYPE,
@@ -281,6 +287,7 @@ public class MessageContextImpl implements MessageContext {
         try {
             Map<String, List<String>> headers
                 = CastUtils.cast((Map<?, ?>)inMessage.get(AttachmentDeserializer.ATTACHMENT_PART_HEADERS));
+
             Attachment first = new Attachment(AttachmentUtil.createAttachment(
                                      inMessage.getContent(InputStream.class),
                                      headers),

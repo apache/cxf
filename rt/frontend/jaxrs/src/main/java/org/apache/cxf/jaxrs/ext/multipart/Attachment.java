@@ -93,7 +93,7 @@ public class Attachment implements Transferable {
     public Attachment(String mediaType, Object object) {
         this(UUID.randomUUID().toString(), mediaType, object);
     }
-    
+
     public Attachment(String id, String mediaType, Object object) {
         this.object = object;
         if (id != null) {
@@ -111,7 +111,7 @@ public class Attachment implements Transferable {
         headers.putSingle("Content-Type", "application/octet-stream");
     }
 
-    Attachment(MultivaluedMap<String, String> headers, DataHandler handler, Object object) {
+    public Attachment(MultivaluedMap<String, String> headers, DataHandler handler, Object object) {
         this.headers = headers;
         this.handler = handler;
         this.object = object;
@@ -128,7 +128,7 @@ public class Attachment implements Transferable {
     }
 
     public MediaType getContentType() {
-        String value = handler != null && handler.getContentType() != null ? handler.getContentType() 
+        String value = handler != null && handler.getContentType() != null ? handler.getContentType()
             : headers.getFirst("Content-Type");
         return value == null ? MediaType.TEXT_PLAIN_TYPE : JAXRSUtils.toMediaType(value);
     }
