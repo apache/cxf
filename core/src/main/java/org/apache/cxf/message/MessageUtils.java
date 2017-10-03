@@ -19,8 +19,11 @@
 
 package org.apache.cxf.message;
 
+import java.util.logging.Logger;
+
 import org.w3c.dom.Node;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PropertyUtils;
 
 
@@ -28,6 +31,8 @@ import org.apache.cxf.common.util.PropertyUtils;
  * Holder for utility methods relating to messages.
  */
 public final class MessageUtils {
+
+    private static final Logger LOG = LogUtils.getL7dLogger(MessageUtils.class);
 
     /**
      * Prevents instantiation.
@@ -139,7 +144,24 @@ public final class MessageUtils {
         }
         return defaultValue;
     }
-    
+
+    public static int getContextualInteger(Message m, String key, int defaultValue) {
+        if (m != null) {
+            Object o = m.getContextualProperty(key);
+            if (o instanceof String) {
+                try {
+                    int i = Integer.parseInt((String)o);
+                    if (i > 0) {
+                        return i;
+                    }
+                } catch (NumberFormatException ex) {
+                    LOG.warning("Incorrect integer value of " + o + " specified for: " + key);
+                }
+            }
+        }
+        return defaultValue;
+    }
+
     public static Object getContextualProperty(Message m, String propPreferred, String propDefault) {
         Object prop = null;
         if (m != null) {

@@ -88,7 +88,7 @@ public class Attachment implements Transferable {
              new DataHandler(new InputStreamDataSource(is, headers.getFirst("Content-Type"))), 
              headers);
     }
-    
+
     public Attachment(String id, String mediaType, Object object) {
         this.object = object;
         headers.putSingle("Content-ID", id);
@@ -103,8 +103,8 @@ public class Attachment implements Transferable {
         headers.putSingle("Content-ID", id);
         headers.putSingle("Content-Type", "application/octet-stream");
     }
-    
-    Attachment(MultivaluedMap<String, String> headers, DataHandler handler, Object object) {
+
+    public Attachment(MultivaluedMap<String, String> headers, DataHandler handler, Object object) {
         this.headers = headers;
         this.handler = handler;
         this.object = object;
@@ -121,7 +121,12 @@ public class Attachment implements Transferable {
     }
 
     public MediaType getContentType() {
+<<<<<<< HEAD
         String value = handler != null ? handler.getContentType() : headers.getFirst("Content-Type");
+=======
+        String value = handler != null && handler.getContentType() != null ? handler.getContentType()
+            : headers.getFirst("Content-Type");
+>>>>>>> 896bd961cb... CXF-7507 - Put a configurable limit on the size of attachment headers
         return value == null ? MediaType.TEXT_PLAIN_TYPE : JAXRSUtils.toMediaType(value);
     }
 

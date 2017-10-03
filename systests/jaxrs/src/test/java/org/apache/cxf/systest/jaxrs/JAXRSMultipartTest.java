@@ -39,6 +39,7 @@ import javax.activation.DataHandler;
 import javax.imageio.ImageIO;
 import javax.mail.util.ByteArrayDataSource;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
@@ -62,6 +63,7 @@ import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
+import org.apache.cxf.jaxrs.ext.multipart.InputStreamDataSource;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.provider.json.JSONProvider;
@@ -942,6 +944,67 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         }
     }
 
+    // The large Content Disposition header will be rejected here
+    @Test
+    public void testLargeHeader() throws Exception {
+        InputStream is1 =
+            getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg");
+        String address = "http://localhost:" + PORT + "/bookstore/books/image";
+        WebClient client = WebClient.create(address);
+        client.type("multipart/mixed").accept("multipart/mixed");
+        WebClient.getConfig(client).getRequestContext().put("support.type.as.multipart",
+            "true");
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("form-data;");
+        for (int i = 0; i < 10000; i++) {
+            sb.append("aaaaaaaaaa");
+        }
+
+        MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
+        headers.putSingle("Content-ID", "root");
+        headers.putSingle("Content-Type", "application/octet-stream");
+        headers.putSingle("Content-Disposition", sb.toString());
+        DataHandler handler = new DataHandler(new InputStreamDataSource(is1, "application/octet-stream"));
+
+        Attachment att = new Attachment(headers, handler, null);
+        Response response = client.post(att);
+        assertEquals(response.getStatus(), 413);
+
+        client.close();
+    }
+
+    // The Content Disposition header will be accepted here, even though it is larger than the default,
+    // as we have configured a larger value on the service side
+    @Test
+    public void testLargerThanDefaultHeader() throws Exception {
+        InputStream is1 =
+            getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg");
+        String address = "http://localhost:" + PORT + "/bookstore/books/image";
+        WebClient client = WebClient.create(address);
+        client.type("multipart/mixed").accept("multipart/mixed");
+        WebClient.getConfig(client).getRequestContext().put("support.type.as.multipart",
+            "true");
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("form-data;");
+        for (int i = 0; i < 35; i++) {
+            sb.append("aaaaaaaaaa");
+        }
+
+        MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
+        headers.putSingle("Content-ID", "root");
+        headers.putSingle("Content-Type", "application/octet-stream");
+        headers.putSingle("Content-Disposition", sb.toString());
+        DataHandler handler = new DataHandler(new InputStreamDataSource(is1, "application/octet-stream"));
+
+        Attachment att = new Attachment(headers, handler, null);
+        Response response = client.post(att);
+        assertEquals(response.getStatus(), 200);
+
+        client.close();
+    }
+
     private void doAddBook(String address, String resourceName, int status) throws Exception {
         doAddBook("multipart/related", address, resourceName, status);
     }
@@ -1031,4 +1094,5 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         }
         return str;
     }
+
 }
