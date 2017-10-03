@@ -105,6 +105,8 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     private String ignoreRoutes;
 
     private Boolean supportSwaggerUi;
+    
+    private String swaggerUiName = "swagger-ui";
 
     private String swaggerUiVersion;
     
@@ -166,7 +168,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         Properties swaggerProps = getSwaggerProperties(bus);
         if (checkSupportSwaggerUiProp(swaggerProps)) {
             String swaggerUiRoot = SwaggerUiResolver.findSwaggerUiRoot(swaggerUiMavenGroupAndArtifact, 
-                                                                       swaggerUiVersion);
+                                                                       swaggerUiName, swaggerUiVersion);
             if (swaggerUiRoot != null) {
                 SwaggerUIService swaggerUiService = new SwaggerUIService(swaggerUiRoot, swaggerUiMediaTypes);
                 if (!runAsFilter) {
@@ -430,6 +432,10 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
      */
     public void setSwaggerUiMavenGroupAndArtifact(String swaggerUiMavenGroupAndArtifact) {
         this.swaggerUiMavenGroupAndArtifact = swaggerUiMavenGroupAndArtifact;
+    }
+    
+    public void setSwaggerUiName(String swaggerUiName) {
+        this.swaggerUiName = swaggerUiName;
     }
     
     public void setSwaggerUiVersion(String swaggerUiVersion) {
