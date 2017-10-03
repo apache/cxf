@@ -29,17 +29,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.activation.DataSource;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 
 public class AttachmentDeserializer {
     public static final String ATTACHMENT_PART_HEADERS = AttachmentDeserializer.class.getName() + ".headers";
@@ -49,6 +52,12 @@ public class AttachmentDeserializer {
 
     public static final String ATTACHMENT_MAX_SIZE = "attachment-max-size";
 
+    /**
+     * The maximum MIME Header Length. The default is 300.
+     */
+    public static final String ATTACHMENT_MAX_HEADER_SIZE = "attachment-max-header-size";
+    public static final int DEFAULT_MAX_HEADER_SIZE = 300;
+
     public static final int THRESHOLD = 1024 * 100; //100K (byte unit)
 
     private static final Pattern CONTENT_TYPE_BOUNDARY_PATTERN = Pattern.compile("boundary=\"?([^\";]*)");
@@ -57,6 +66,8 @@ public class AttachmentDeserializer {
     // It seems constricting to assume the boundary will start with ----=_Part_
     private static final Pattern INPUT_STREAM_BOUNDARY_PATTERN =
             Pattern.compile("^--(\\S*)$", Pattern.MULTILINE);
+
+    private static final Logger LOG = LogUtils.getL7dLogger(AttachmentDeserializer.class);
 
     private boolean lazyLoading = true;
 
@@ -79,6 +90,8 @@ public class AttachmentDeserializer {
     private Set<DelegatingInputStream> loaded = new HashSet<DelegatingInputStream>();
     private List<String> supportedTypes;
 
+    private int maxHeaderLength = DEFAULT_MAX_HEADER_SIZE;
+
     public AttachmentDeserializer(Message message) {
         this(message, Collections.singletonList("multipart/related"));
     }
@@ -86,6 +99,10 @@ public class AttachmentDeserializer {
     public AttachmentDeserializer(Message message, List<String> supportedTypes) {
         this.message = message;
         this.supportedTypes = supportedTypes;
+
+        // Get the maximum Header length from configuration
+        maxHeaderLength = MessageUtils.getContextualInteger(message, ATTACHMENT_MAX_HEADER_SIZE,
+                                                            DEFAULT_MAX_HEADER_SIZE);
     }
     
     public void initializeAttachments() throws IOException {
@@ -279,6 +296,7 @@ public class AttachmentDeserializer {
             new DelegatingInputStream(new MimeBodyPartInputStream(stream, boundary, pbAmount),
                                       this);
         createCount++;
+
         return AttachmentUtil.createAttachment(partStream, headers);
     }
 
@@ -327,6 +345,7 @@ public class AttachmentDeserializer {
         StringBuilder buffer = new StringBuilder(128);
         StringBuilder b = new StringBuilder(128);
         Map<String, List<String>> heads = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+
         // loop until we hit the end or a null line
         while (readLine(in, b)) {
             // lines beginning with white space get special handling
@@ -372,6 +391,11 @@ public class AttachmentDeserializer {
             } else {
                 // just add to the buffer
                 buffer.append((char)c);
+            }
+
+            if (buffer.length() > maxHeaderLength) {
+                LOG.fine("The attachment header size has exceeded the configured parameter: " + maxHeaderLength);
+                throw new HeaderSizeExceededException();
             }
         }
 
