@@ -992,7 +992,7 @@ public final class ResourceUtils {
                                           contextProperties);
             return ctx;
         } catch (JAXBException ex) {
-            LOG.log(Level.WARNING, "No JAXB context can be created", ex);
+            LOG.log(Level.SEVERE, "No JAXB context can be created", ex);
         }
         return null;
     }
