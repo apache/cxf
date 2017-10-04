@@ -47,6 +47,7 @@ public class OsgiSwaggerUiResolver extends SwaggerUiResolver {
             String[] locations = swaggerUiMavenGroupAndArtifact == null ? DEFAULT_LOCATIONS
                 : new String[]{"mvn:" + swaggerUiMavenGroupAndArtifact + "/",
                                "wrap:mvn:" + swaggerUiMavenGroupAndArtifact + "/"};
+            
             for (Bundle b : bundle.getBundleContext().getBundles()) {
                 String location = b.getLocation();
 
@@ -62,6 +63,12 @@ public class OsgiSwaggerUiResolver extends SwaggerUiResolver {
                         return getSwaggerUiRoot(b, swaggerUiVersion);
                     }
                 }
+                if (swaggerUiMavenGroupAndArtifact == null) {
+                    String rootCandidate = getSwaggerUiRoot(b, swaggerUiVersion);
+                    if (rootCandidate != null) {
+                        return rootCandidate;
+                    }
+                }
             }
         } catch (Throwable ex) {
             // ignore
@@ -70,6 +77,9 @@ public class OsgiSwaggerUiResolver extends SwaggerUiResolver {
     }
 
     private String getSwaggerUiRoot(Bundle b, String swaggerUiVersion) {
+        if (swaggerUiVersion == null) { 
+            swaggerUiVersion = "";
+        }
         URL entry = b.getEntry(SwaggerUiResolver.UI_RESOURCES_ROOT_START + swaggerUiVersion);
         if (entry != null) {
             return entry.toString() + "/";
