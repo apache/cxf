@@ -62,12 +62,12 @@ public final class DOMUtils {
     private static final Map<ClassLoader, DocumentBuilder> DOCUMENT_BUILDERS
         = Collections.synchronizedMap(new WeakHashMap<ClassLoader, DocumentBuilder>());
     private static final String XMLNAMESPACE = "xmlns";
-    
-    
-    
+
+
+
     static {
         if (System.getProperty("java.version").startsWith("9")) {
-            
+
             try {
                 Method[] methods = DOMUtils.class.getClassLoader().
                     loadClass("com.sun.xml.internal.messaging.saaj.soap.SOAPDocumentImpl").getMethods();
@@ -82,7 +82,7 @@ public final class DOMUtils {
                 LogUtils.getL7dLogger(DOMUtils.class).finest(
                     "can't load class com.sun.xml.internal.messaging.saaj.soap.SOAPDocumentImpl");
             }
-            
+
         }
     }
 
@@ -95,12 +95,16 @@ public final class DOMUtils {
             loader = getClassLoader(DOMUtils.class);
         }
         if (loader == null) {
-            return DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            DocumentBuilderFactory f = DocumentBuilderFactory.newInstance();
+            f.setNamespaceAware(true);
+            f.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            return f.newDocumentBuilder();
         }
         DocumentBuilder factory = DOCUMENT_BUILDERS.get(loader);
         if (factory == null) {
             DocumentBuilderFactory f2 = DocumentBuilderFactory.newInstance();
             f2.setNamespaceAware(true);
+            f2.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
             factory = f2.newDocumentBuilder();
             DOCUMENT_BUILDERS.put(loader, factory);
         }
@@ -682,9 +686,9 @@ public final class DOMUtils {
         findAllElementsByTagNameNS(elem, nameSpaceURI, localName, ret);
         return ret;
     }
-    
+
     /**
-     * Try to get the DOM Node from the SAAJ Node with JAVA9 
+     * Try to get the DOM Node from the SAAJ Node with JAVA9
      * @param node The original node we need check
      * @return The DOM node
      */
