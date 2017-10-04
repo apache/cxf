@@ -57,32 +57,6 @@ public final class DOMUtils {
     private static final Map<ClassLoader, DocumentBuilder> DOCUMENT_BUILDERS
         = Collections.synchronizedMap(new WeakHashMap<ClassLoader, DocumentBuilder>());
     private static final String XMLNAMESPACE = "xmlns";
-<<<<<<< HEAD
-=======
-
-
-
-    static {
-        if (System.getProperty("java.version").startsWith("9")) {
-
-            try {
-                Method[] methods = DOMUtils.class.getClassLoader().
-                    loadClass("com.sun.xml.internal.messaging.saaj.soap.SOAPDocumentImpl").getMethods();
-                for (Method method : methods) {
-                    if (method.getName().equals("register")) {
-                        //this is the SAAJ impl in JDK9
-                        setJava9SAAJ(true);
-                        break;
-                    }
-                }
-            } catch (ClassNotFoundException cnfe) {
-                LogUtils.getL7dLogger(DOMUtils.class).finest(
-                    "can't load class com.sun.xml.internal.messaging.saaj.soap.SOAPDocumentImpl");
-            }
-
-        }
-    }
->>>>>>> 959a067ef2... Setting secure processing to true for DOMUtils
 
     private DOMUtils() {
     }
@@ -660,29 +634,6 @@ public final class DOMUtils {
         findAllElementsByTagNameNS(elem, nameSpaceURI, localName, ret);
         return ret;
     }
-<<<<<<< HEAD
-=======
-
-    /**
-     * Try to get the DOM Node from the SAAJ Node with JAVA9
-     * @param node The original node we need check
-     * @return The DOM node
-     */
-    public static Node getDomElement(Node node) {
-        if (node != null && isJava9SAAJ()) {
-            //java9 hack since EA 159
-            try {
-                Method method = node.getClass().getMethod("getDomElement");
-                node = (Node)method.invoke(node);
-            } catch (NoSuchMethodException e) {
-                //best effort to try, do nothing if NoSuchMethodException
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return node;
-    }
->>>>>>> 959a067ef2... Setting secure processing to true for DOMUtils
 
     private static void findAllElementsByTagNameNS(Element el, String nameSpaceURI, String localName,
                                                    List<Element> elementList) {
