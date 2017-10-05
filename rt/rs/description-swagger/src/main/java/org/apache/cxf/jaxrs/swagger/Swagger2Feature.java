@@ -98,8 +98,6 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     private static final String USE_PATH_CFG_PROPERTY = "use.path.based.config";
     private static final String SUPPORT_UI_PROPERTY = "support.swagger.ui";
     
-    private boolean runAsFilter;
-    
     private boolean scanAllResources;
 
     private String ignoreRoutes;
@@ -158,7 +156,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         swaggerResources.add(apiListingResource);
 
         List<Object> providers = new ArrayList<>();
-        if (runAsFilter) {
+        if (isRunAsFilter()) {
             providers.add(new SwaggerContainerRequestFilter(appInfo == null ? null : appInfo.getProvider(),
                                                             customizer));
         }
@@ -169,7 +167,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
                                                                        swaggerUiVersion);
             if (swaggerUiRoot != null) {
                 SwaggerUIService swaggerUiService = new SwaggerUIService(swaggerUiRoot, swaggerUiMediaTypes);
-                if (!runAsFilter) {
+                if (!isRunAsFilter()) {
                     swaggerResources.add(swaggerUiService);
                 } else {
                     providers.add(new SwaggerUIServiceFilter(swaggerUiService));
@@ -183,7 +181,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         sfb.setResourceClassesFromBeans(swaggerResources);
 
         List<ClassResourceInfo> cris = sfb.getClassResourceInfo();
-        if (!runAsFilter) {
+        if (!isRunAsFilter()) {
             for (ClassResourceInfo cri : cris) {
                 if (ApiListingResource.class.isAssignableFrom(cri.getResourceClass())) {
                     InjectionUtils.injectContextProxies(cri, apiListingResource);
