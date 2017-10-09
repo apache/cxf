@@ -13,7 +13,7 @@
     
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <cxf.jetty9.version>9.3.5.v20151012</cxf.jetty9.version>
+        <cxf.jetty9.version>9.4.6.v20170531</cxf.jetty9.version>
     </properties>
 
     <dependencies>

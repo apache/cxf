@@ -18,27 +18,9 @@
  */
 package demo.jaxrs.sse;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.inject.Inject;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-
-import org.apache.cxf.jaxrs.sse.SseFeature;
-
 @ApplicationPath("api")
 public class StatsApplication extends Application {
-    @Inject private StatsRestServiceImpl statsRestService;
-
-    @Override
-    public Set<Object> getSingletons() {
-        final Set<Object> singletons = new HashSet<>();
-        singletons.add(new SseFeature());
-        singletons.add(statsRestService);
-        singletons.add(new JacksonJsonProvider());
-        return singletons;
-    }
 }

@@ -22,6 +22,7 @@ package org.apache.cxf.transport.sse.atmosphere;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -61,21 +62,87 @@ public class AtmosphereSseServletDestination extends ServletDestination {
             EndpointInfo ei, String path) throws IOException {
         super(bus, registry, ei, path);
 
-        framework = new AtmosphereFramework(true, false);
-        framework.interceptor(new SseAtmosphereInterceptor());
-        framework.addInitParameter(ApplicationConfig.PROPERTY_NATIVE_COMETSUPPORT, "true");
-        framework.addInitParameter(ApplicationConfig.WEBSOCKET_SUPPORT, "true");
-        framework.addInitParameter(ApplicationConfig.DISABLE_ATMOSPHEREINTERCEPTOR, "true");
-        framework.addInitParameter(ApplicationConfig.CLOSE_STREAM_ON_CANCEL, "true");
-        // Atmosphere does not limit amount of threads and application can crash in no time
-        // https://github.com/Atmosphere/atmosphere/wiki/Configuring-Atmosphere-for-Performance
-        framework.addInitParameter(ApplicationConfig.BROADCASTER_MESSAGE_PROCESSING_THREADPOOL_MAXSIZE, "20");
-        framework.addInitParameter(ApplicationConfig.BROADCASTER_ASYNC_WRITE_THREADPOOL_MAXSIZE, "20");
-        framework.setBroadcasterCacheClassName(UUIDBroadcasterCache.class.getName());
-        framework.addAtmosphereHandler("/", new DestinationHandler());
-        framework.init();
+        framework = create();
 
         bus.getFeatures().add(new SseFeature());
+    }
+
+    private AtmosphereFramework create() {
+        final AtmosphereFramework instance = new AtmosphereFramework(true, false);
+        
+        instance.interceptor(new SseAtmosphereInterceptor());
+        instance.addInitParameter(ApplicationConfig.PROPERTY_NATIVE_COMETSUPPORT, "true");
+        instance.addInitParameter(ApplicationConfig.WEBSOCKET_SUPPORT, "true");
+        instance.addInitParameter(ApplicationConfig.DISABLE_ATMOSPHEREINTERCEPTOR, "true");
+        instance.addInitParameter(ApplicationConfig.CLOSE_STREAM_ON_CANCEL, "true");
+        // Atmosphere does not limit amount of threads and application can crash in no time
+        // https://github.com/Atmosphere/atmosphere/wiki/Configuring-Atmosphere-for-Performance
+        instance.addInitParameter(ApplicationConfig.BROADCASTER_MESSAGE_PROCESSING_THREADPOOL_MAXSIZE, "20");
+        instance.addInitParameter(ApplicationConfig.BROADCASTER_ASYNC_WRITE_THREADPOOL_MAXSIZE, "20");
+        // workaround for atmosphere's jsr356 initialization requiring servletConfig
+        instance.addInitParameter(ApplicationConfig.WEBSOCKET_SUPPRESS_JSR356, "true");
+
+        instance.setBroadcasterCacheClassName(UUIDBroadcasterCache.class.getName());
+        instance.addAtmosphereHandler("/", new DestinationHandler());
+        
+        return instance;
+    }
+    
+    @Override
+    public void onServletConfigAvailable(ServletConfig config) throws ServletException {
+        // Very likely there is JSR-356 implementation available, let us reconfigure the Atmosphere framework
+        // to use it since ServletConfig instance is already available.
+        final Object container = config.getServletContext()
+            .getAttribute("javax.websocket.server.ServerContainer");
+
+        if (container != null) {
+            if (framework.initialized()) {
+                framework.destroy();
+            }
+            
+            framework = create();
+            framework.addInitParameter(ApplicationConfig.PROPERTY_NATIVE_COMETSUPPORT, "false");
+            framework.addInitParameter(ApplicationConfig.WEBSOCKET_SUPPRESS_JSR356, "false");
+            
+            framework.init(config);
+        }
+    }
+    
+    @Override
+    public void finalizeConfig() {
+        if (framework.initialized()) {
+            return;
+        }
+        
+        final ServletContext ctx = bus.getExtension(ServletContext.class);
+        if (ctx != null) {
+            try {
+                framework.init(new ServletConfig() {
+                    @Override
+                    public String getServletName() {
+                        return null;
+                    }
+                    @Override
+                    public ServletContext getServletContext() {
+                        return ctx;
+                    }
+                    @Override
+                    public String getInitParameter(String name) {
+                        return null;
+                    }
+
+                    @Override
+                    public Enumeration<String> getInitParameterNames() {
+                        return null;
+                    }
+                });
+            } catch (ServletException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        } else {
+            framework.init();
+        }
     }
 
     @Override

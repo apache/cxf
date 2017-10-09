@@ -52,6 +52,7 @@ public final class StatsServer {
 
         final Wrapper cxfServlet = Tomcat.addServlet(context, "cxfServlet", new CXFServlet());
         cxfServlet.addInitParameter(CXFServlet.TRANSPORT_ID, SseHttpTransportFactory.TRANSPORT_ID);
+        cxfServlet.setAsyncSupported(true);
         context.addServletMapping("/rest/*", "cxfServlet");
 
         final Context staticContext = server.addWebapp("/static", base.getAbsolutePath());

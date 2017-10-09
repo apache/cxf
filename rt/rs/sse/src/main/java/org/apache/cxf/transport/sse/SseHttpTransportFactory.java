@@ -52,6 +52,9 @@ public class SseHttpTransportFactory extends HTTPTransportFactory
 
     @Override
     public Destination getDestination(EndpointInfo endpointInfo, Bus bus) throws IOException {
-        return new AtmosphereSseServletDestination(bus, getRegistry(), endpointInfo, endpointInfo.getAddress());
+        final AtmosphereSseServletDestination destination = new AtmosphereSseServletDestination(bus, getRegistry(), 
+            endpointInfo, endpointInfo.getAddress());
+        destination.finalizeConfig();
+        return destination;
     }
 }
