@@ -98,6 +98,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     private static final String USE_PATH_CFG_PROPERTY = "use.path.based.config";
     private static final String SUPPORT_UI_PROPERTY = "support.swagger.ui";
     
+    private boolean scan;
     private boolean scanAllResources;
 
     private String ignoreRoutes;
@@ -136,14 +137,17 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
 
         ServerProviderFactory factory =
             (ServerProviderFactory)server.getEndpoint().get(ServerProviderFactory.class.getName());
-        ApplicationInfo appInfo = factory.getApplicationProvider();
-        if (appInfo == null) {
-            Set<Class<?>> serviceClasses = new HashSet<>();
-            for (ClassResourceInfo cri : sfb.getClassResourceInfo()) {
-                serviceClasses.add(cri.getServiceClass());
+        ApplicationInfo appInfo = null;
+        if (!isScan()) {    
+            appInfo = factory.getApplicationProvider();
+            if (appInfo == null) {
+                Set<Class<?>> serviceClasses = new HashSet<>();
+                for (ClassResourceInfo cri : sfb.getClassResourceInfo()) {
+                    serviceClasses.add(cri.getServiceClass());
+                }
+                appInfo = new ApplicationInfo(new DefaultApplication(serviceClasses), bus);
+                server.getEndpoint().put(Application.class.getName(), appInfo);
             }
-            appInfo = new ApplicationInfo(new DefaultApplication(serviceClasses), bus);
-            server.getEndpoint().put(Application.class.getName(), appInfo);
         }
         
 
@@ -346,8 +350,8 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         }
         beanConfig.setFilterClass(theFilterClass);
         
-        // Without this call Swagger generator loses the JSON 'info'
-        beanConfig.setScan(false);
+        // scan
+        beanConfig.setScan(isScan());
         
         // base path is calculated dynamically
         beanConfig.setBasePath(getBasePath());
@@ -454,6 +458,14 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         this.propertiesLocation = propertiesLocation;
     }
     
+    public boolean isScan() {
+        return scan;
+    }
+
+    public void setScan(boolean scan) {
+        this.scan = scan;
+    }
+
     private class ServletConfigProvider implements ContextProvider<ServletConfig> {
 
         @Override
