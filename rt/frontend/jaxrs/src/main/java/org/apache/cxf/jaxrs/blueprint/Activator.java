@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.jaxrs.blueprint;
 
+import javax.ws.rs.ext.RuntimeDelegate;
+
 import org.apache.cxf.bus.blueprint.BlueprintNameSpaceHandlerFactory;
 import org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer;
 import org.osgi.framework.BundleActivator;
@@ -44,7 +46,7 @@ public class Activator implements BundleActivator {
 
     @Override
     public void stop(BundleContext context) throws Exception {
-
+        RuntimeDelegate.setInstance(null);
     }
 
 }
