@@ -51,7 +51,22 @@ class ServletExporter implements ManagedService {
     @Override
     public void updated(Dictionary properties) throws ConfigurationException {
         if (alias != null) {
-            httpService.unregister(alias);
+            try {
+                LOG.log(Level.INFO, "Unregistering previous instance of \"" + alias + "\" servlet");
+                httpService.unregister(alias);
+            } catch (IllegalArgumentException e) {
+                // NOTE: pax-web specific...
+                if (e.getMessage() != null && e.getMessage().contains("was never registered")) {
+                    LOG.log(Level.INFO, "CXF OSGi servlet was not unregistered: " + e.getMessage());
+                } else {
+                    LOG.log(Level.SEVERE, e.getMessage(), e);
+                }
+                if (properties == null) {
+                    // we're simply stopping. if we couldn't unregister, that means we had to little time to register
+                    // otherwise, we'll try to register the servlet
+                    return;
+                }
+            }
             alias = null;
         }
         if (properties == null) {
@@ -105,6 +120,7 @@ class ServletExporter implements ManagedService {
         alias = (String)getProp(properties, CXF_SERVLET_PREFIX + "context", "/cxf");
         HttpContext context = httpService.createDefaultHttpContext();
         try {
+            LOG.log(Level.INFO, "Registering new instance of \"" + alias + "\" servlet");
             httpService.registerServlet(alias, servlet, sprops, context);
         } catch (Exception e) {
             LOG.log(Level.WARNING, "Error registering CXF OSGi servlet " + e.getMessage(), e);
