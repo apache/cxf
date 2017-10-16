@@ -96,7 +96,7 @@ public class PersistenceUtilsTest extends Assert {
         // update rmmessage
         PersistenceUtils.encodeRMContent(rmmsg, messageImpl, bis);
 
-        assertStartsWith(rmmsg.getContent().getInputStream(), "--uuid:");
+        assertStartsWith(rmmsg.getContent().getInputStream(), "\r\n--uuid:");
         assertNotNull(rmmsg.getContentType());
         assertTrue(rmmsg.getContentType().startsWith("multipart/related"));
     }
