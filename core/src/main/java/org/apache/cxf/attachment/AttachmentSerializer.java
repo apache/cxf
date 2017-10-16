@@ -157,6 +157,7 @@ public class AttachmentSerializer {
             encoding = StandardCharsets.UTF_8.name();
         }
         StringWriter writer = new StringWriter();
+        writer.write("\r\n");
         writer.write("--");
         writer.write(bodyBoundary);
 
