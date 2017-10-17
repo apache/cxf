@@ -360,8 +360,8 @@ public class JAXRSCdiResourceExtension implements Extension {
             final JAXRSServerFactoryCustomizationExtension extension =
                 (JAXRSServerFactoryCustomizationExtension)beanManager.getReference(
                     extensionBean,
-                    extensionBean.getBeanClass(),
-                    beanManager.createCreationalContext(extensionBean)
+                    JAXRSServerFactoryCustomizationExtension.class,
+                    createCreationalContext(beanManager, extensionBean)
                 );
             extension.customize(bean);
         }
