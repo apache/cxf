@@ -101,6 +101,8 @@ class ServletExporter implements ManagedService {
                    getProp(properties, CXF_SERVLET_PREFIX + "service-list-page-authenticate-realm", "karaf"));
         sprops.put("use-x-forwarded-headers",
                    getProp(properties, CXF_SERVLET_PREFIX + "use-x-forwarded-headers", "false"));
+        sprops.put("async-supported", 
+                   getProp(properties, CXF_SERVLET_PREFIX + "async-supported", "true"));
 
         // Accept extra properties by default, can be disabled if it is really needed
         if (Boolean.valueOf(getProp(properties, CXF_SERVLET_PREFIX + "support.extra.properties", "true").toString())) {
