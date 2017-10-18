@@ -33,7 +33,9 @@ import java.util.Map;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
+import javax.annotation.Priority;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -820,6 +822,43 @@ public class ProviderFactoryTest extends Assert {
         assertNotNull("schema can not be read from classpath", s);
     }
 
+    @Test
+    public void testSortByPriority() {
+        ProviderFactory pf = ServerProviderFactory.getInstance();
+        List<Object> providers = new ArrayList<>();
+        BookReaderWriter bookHandler = new BookReaderWriter();
+        providers.add(bookHandler);
+        HighPriorityBookReaderWriter highPriorityBookHandler = new HighPriorityBookReaderWriter();
+        providers.add(highPriorityBookHandler);
+        pf.setUserProviders(providers);
+        assertSame(highPriorityBookHandler,
+                   pf.createMessageBodyReader(Book.class, Book.class, new Annotation[]{},
+                                              MediaType.APPLICATION_XML_TYPE, new MessageImpl()));
+        assertSame(highPriorityBookHandler,
+                   pf.createMessageBodyWriter(Book.class, Book.class, new Annotation[]{},
+                                              MediaType.APPLICATION_XML_TYPE, new MessageImpl()));
+    }
+
+    @Test
+    public void testSortByPriorityReversed() {
+        // do the same thing again but add the providers in the reverse order to ensure add order
+        // isn't responsible for our success so far.
+        ProviderFactory pf = ServerProviderFactory.getInstance();
+        List<Object> providers = new ArrayList<>();
+        HighPriorityBookReaderWriter highPriorityBookHandler = new HighPriorityBookReaderWriter();
+        providers.add(highPriorityBookHandler);
+        BookReaderWriter bookHandler = new BookReaderWriter();
+        providers.add(bookHandler);
+        pf.setUserProviders(providers);
+        assertSame(highPriorityBookHandler,
+                   pf.createMessageBodyReader(Book.class, Book.class, new Annotation[]{},
+                                              MediaType.APPLICATION_XML_TYPE, new MessageImpl()));
+        assertSame(highPriorityBookHandler,
+                   pf.createMessageBodyWriter(Book.class, Book.class, new Annotation[]{},
+                                              MediaType.APPLICATION_XML_TYPE, new MessageImpl()));
+        
+    }
+
     private static class TestRuntimeExceptionMapper implements ExceptionMapper<RuntimeException> {
 
         public Response toResponse(RuntimeException exception) {
@@ -828,6 +867,40 @@ public class ProviderFactoryTest extends Assert {
 
     }
 
+    @Priority(Priorities.USER - 10)
+    @Produces("application/xml")
+    @Consumes("application/xml")
+    private static class HighPriorityBookReaderWriter
+        implements MessageBodyReader<Book>, MessageBodyWriter<Book> {
+
+        public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations,
+                                  MediaType mediaType) {
+            return true;
+        }
+
+        public Book readFrom(Class<Book> arg0, Type arg1, Annotation[] arg2,
+                             MediaType arg3, MultivaluedMap<String, String> arg4, InputStream arg5)
+            throws IOException, WebApplicationException {
+            return null;
+        }
+
+        public long getSize(Book t, Class<?> type, Type genericType, Annotation[] annotations,
+                            MediaType mediaType) {
+            return 0;
+        }
+
+        public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations,
+                                   MediaType mediaType) {
+            return true;
+        }
+
+        public void writeTo(Book arg0, Class<?> arg1, Type arg2, Annotation[] arg3,
+                            MediaType arg4, MultivaluedMap<String, Object> arg5, OutputStream arg6)
+            throws IOException, WebApplicationException {
+
+        }
+    }
+    
     @Produces("application/xml")
     @Consumes("application/xml")
     private static class BookReaderWriter

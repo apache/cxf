@@ -808,7 +808,11 @@ public abstract class ProviderFactory {
             if (result != 0) {
                 return result;
             }
-            return compareCustomStatus(p1, p2);
+            result = compareCustomStatus(p1, p2);
+            if (result != 0) {
+                return result;
+            }
+            return comparePriorityStatus(p1, p2);
         }
     }
 
@@ -833,7 +837,12 @@ public abstract class ProviderFactory {
             if (result != 0) {
                 return result;
             }
-            return compareCustomStatus(p1, p2);
+            result = compareCustomStatus(p1, p2);
+            if (result != 0) {
+                return result;
+            }
+            
+            return comparePriorityStatus(p1, p2);
         }
     }
 
@@ -847,6 +856,12 @@ public abstract class ProviderFactory {
             result = busGlobal1.compareTo(busGlobal2);
         }
         return result;
+    }
+
+    private static int comparePriorityStatus(ProviderInfo<?> p1, ProviderInfo<?> p2) {
+        Integer value1 = AnnotationUtils.getBindingPriority(p1.getProvider().getClass());
+        Integer value2 = AnnotationUtils.getBindingPriority(p2.getProvider().getClass());
+        return value1.compareTo(value2);
     }
 
     private static class ContextResolverComparator
