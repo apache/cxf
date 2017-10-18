@@ -102,7 +102,7 @@ public class ServiceModelPolicyUpdater {
     }
 
     private void addPolicyRef(Extensible ext, Policy p) {
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element el = doc.createElementNS(p.getNamespace(), Constants.ELEM_POLICY_REF);
         el.setPrefix(Constants.ATTR_WSP);
         el.setAttribute(Constants.ATTR_URI, "#" + p.getId());

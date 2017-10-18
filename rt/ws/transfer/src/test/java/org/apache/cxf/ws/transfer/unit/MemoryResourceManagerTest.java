@@ -107,7 +107,7 @@ public class MemoryResourceManagerTest {
     @Test(expected = UnknownResource.class)
     public void deleteUnknownReferenceParamsTest() {
         ReferenceParametersType refParams = new ReferenceParametersType();
-        Element uuid = DOMUtils.createDocument().createElementNS(
+        Element uuid = DOMUtils.getEmptyDocument().createElementNS(
                 MemoryResourceManager.REF_NAMESPACE, MemoryResourceManager.REF_LOCAL_NAME);
         uuid.setTextContent("123456");
         refParams.getAny().add(uuid);

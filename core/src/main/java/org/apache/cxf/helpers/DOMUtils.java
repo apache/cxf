@@ -62,6 +62,7 @@ public final class DOMUtils {
     private static final Map<ClassLoader, DocumentBuilder> DOCUMENT_BUILDERS
         = Collections.synchronizedMap(new WeakHashMap<ClassLoader, DocumentBuilder>());
     private static final String XMLNAMESPACE = "xmlns";
+    private static volatile Document emptyDocument;
 
 
 
@@ -148,6 +149,30 @@ public final class DOMUtils {
         } catch (ParserConfigurationException e) {
             throw new RuntimeException(e);
         }
+    }
+    
+    private static synchronized Document createEmptyDocument() {
+        if (emptyDocument == null) {
+            emptyDocument = createDocument();
+        }
+        return emptyDocument;
+    }
+    /**
+     * Returns a static Document that should always be "empty".  It's useful as a factory for 
+     * for creating Elements and other nodes that will be traversed later and don't need to 
+     * be attached into a document 
+     * @return
+     */
+    public static Document getEmptyDocument() {
+        Document doc = emptyDocument;
+        if (doc == null) {
+            doc = createEmptyDocument();
+        }
+        if (emptyDocument.getDocumentElement() != null) {
+            // doc = createEmptyDocument();
+            throw new IllegalStateException("Document should be empty");
+        }
+        return doc;
     }
 
 

@@ -55,7 +55,7 @@ public class FragmentPutAddTest extends IntegrationBaseTest {
         expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
         expression.setMode(FragmentDialectConstants.FRAGMENT_MODE_ADD);
         expression.getContent().add("/");
-        Element addedElement = DOMUtils.createDocument().createElement("a");
+        Element addedElement = DOMUtils.getEmptyDocument().createElement("a");
         ValueType value = new ValueType();
         value.getContent().add(addedElement);
         fragment.setExpression(expression);
@@ -84,7 +84,7 @@ public class FragmentPutAddTest extends IntegrationBaseTest {
         expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
         expression.setMode(FragmentDialectConstants.FRAGMENT_MODE_ADD);
         expression.getContent().add("/");
-        Element addedElement = DOMUtils.createDocument().createElement("b");
+        Element addedElement = DOMUtils.getEmptyDocument().createElement("b");
         ValueType value = new ValueType();
         value.getContent().add(addedElement);
         fragment.setExpression(expression);
@@ -140,7 +140,7 @@ public class FragmentPutAddTest extends IntegrationBaseTest {
         expression.setMode(FragmentDialectConstants.FRAGMENT_MODE_ADD);
         expression.getContent().add("/a");
 
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element addedAttr = doc.createElementNS(
                 FragmentDialectConstants.FRAGMENT_2011_03_IRI,
                 FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME
@@ -181,7 +181,7 @@ public class FragmentPutAddTest extends IntegrationBaseTest {
         expression.setMode(FragmentDialectConstants.FRAGMENT_MODE_ADD);
         expression.getContent().add("/a");
 
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element addedAttr = doc.createElementNS(
                 FragmentDialectConstants.FRAGMENT_2011_03_IRI,
                 FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME
@@ -218,7 +218,7 @@ public class FragmentPutAddTest extends IntegrationBaseTest {
         expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
         expression.setMode(FragmentDialectConstants.FRAGMENT_MODE_ADD);
         expression.getContent().add("/a");
-        Element addedElement = DOMUtils.createDocument().createElement("c");
+        Element addedElement = DOMUtils.getEmptyDocument().createElement("c");
         ValueType value = new ValueType();
         value.getContent().add(addedElement);
         fragment.setExpression(expression);

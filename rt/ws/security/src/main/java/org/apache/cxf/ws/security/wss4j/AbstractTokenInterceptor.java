@@ -163,7 +163,7 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
         if (!create) {
             return null;
         }
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element el = doc.createElementNS(WSS4JConstants.WSSE_NS, "wsse:Security");
         el.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:wsse", WSS4JConstants.WSSE_NS);
         SoapHeader sh = new SoapHeader(new QName(WSS4JConstants.WSSE_NS, "Security"), el);

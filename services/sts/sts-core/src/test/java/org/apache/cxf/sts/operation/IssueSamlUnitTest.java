@@ -1284,7 +1284,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         String secondaryParticipant = "http://secondary.participant/";
 
         ParticipantType primary = new ParticipantType();
-        Document doc = DOMUtils.newDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         primary.setAny(createEndpointReference(doc, primaryParticipant));
 
         ParticipantType secondary = new ParticipantType();
@@ -1376,7 +1376,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         String secondaryParticipant = "http://secondary.participant/";
 
         ParticipantType primary = new ParticipantType();
-        Document doc = DOMUtils.newDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         primary.setAny(createEndpointReference(doc, primaryParticipant));
 
         ParticipantType secondary = new ParticipantType();
@@ -1447,7 +1447,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
      * Mock up an AppliesTo element using the supplied address
      */
     private Element createAppliesToElement(String addressUrl) {
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element appliesTo = doc.createElementNS(STSConstants.WSP_NS, "wsp:AppliesTo");
         appliesTo.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:wsp", STSConstants.WSP_NS);
         appliesTo.appendChild(createEndpointReference(doc, addressUrl));
@@ -1455,7 +1455,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
     }
 
     private Element createAppliesToURIElement(String addressUrl) {
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element appliesTo = doc.createElementNS(STSConstants.WSP_NS, "wsp:AppliesTo");
         appliesTo.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:wsp", STSConstants.WSP_NS);
 
@@ -1484,7 +1484,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias(alias);
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element x509Data = doc.createElementNS(WSS4JConstants.SIG_NS, "ds:X509Data");
         x509Data.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:ds", WSS4JConstants.SIG_NS);
         Element x509Cert = doc.createElementNS(WSS4JConstants.SIG_NS, "ds:X509Certificate");

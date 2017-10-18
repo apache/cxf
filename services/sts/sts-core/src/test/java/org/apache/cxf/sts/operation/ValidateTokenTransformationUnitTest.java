@@ -780,7 +780,7 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
      * Mock up a DOM Element containing some claims
      */
     private JAXBElement<ClaimsType> createClaimsElement() {
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
 
         Element claimType = createClaimsType(doc);
 
@@ -797,7 +797,7 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
      * Mock up a SecondaryParameters DOM Element containing some claims
      */
     private Element createClaimsElementInSecondaryParameters() {
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element secondary = doc.createElementNS(STSConstants.WST_NS_05_12, "SecondaryParameters");
         secondary.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns", STSConstants.WST_NS_05_12);
 

@@ -120,7 +120,7 @@ public class MemoryResourceManager implements ResourceManager {
             storage.put(uuid, StaxUtils.toString(representationEl));
         }
 
-        Element uuidEl = DOMUtils.createDocument().createElementNS(REF_NAMESPACE, REF_LOCAL_NAME);
+        Element uuidEl = DOMUtils.getEmptyDocument().createElementNS(REF_NAMESPACE, REF_LOCAL_NAME);
         uuidEl.setTextContent(uuid);
 
         // Create referenceParameter

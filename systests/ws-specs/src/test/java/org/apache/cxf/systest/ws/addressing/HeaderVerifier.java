@@ -102,7 +102,7 @@ public class HeaderVerifier extends AbstractSoapInterceptor {
         try {
             // add piggybacked wsa:From header to partial response
             List<Header> header = message.getHeaders();
-            Document doc = DOMUtils.createDocument();
+            Document doc = DOMUtils.getEmptyDocument();
             SoapVersion ver = message.getVersion();
             Element hdr = doc.createElementNS(ver.getHeader().getNamespaceURI(),
                 ver.getHeader().getLocalPart());

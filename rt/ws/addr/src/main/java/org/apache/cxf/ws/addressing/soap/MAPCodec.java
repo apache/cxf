@@ -912,7 +912,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
         if (headerFactory == null) {
             headerFactory = new HeaderFactory() {
                 public Element getHeader(SoapVersion soapversion) {
-                    Document doc = DOMUtils.createDocument();
+                    Document doc = DOMUtils.getEmptyDocument();
                     return doc.createElementNS(soapversion.getHeader().getNamespaceURI(),
                             soapversion.getHeader().getLocalPart());
                 }

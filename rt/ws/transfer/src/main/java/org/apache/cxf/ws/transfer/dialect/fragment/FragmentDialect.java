@@ -208,7 +208,7 @@ public class FragmentDialect implements Dialect {
      * @return
      */
     private JAXBElement<ValueType> generateGetResponseNode(Node node) {
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         ValueType resultValue = new ValueType();
         if (node.getNodeType() == Node.ATTRIBUTE_NODE) {
             Element attrNodeEl = doc.createElementNS(

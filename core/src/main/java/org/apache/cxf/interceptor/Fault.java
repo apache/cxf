@@ -166,7 +166,7 @@ public class Fault extends UncheckedException {
      */
     public Element getOrCreateDetail() {
         if (detail == null) {
-            detail = DOMUtils.createDocument().createElement("detail");
+            detail = DOMUtils.getEmptyDocument().createElement("detail");
         }
         return detail;
     }
