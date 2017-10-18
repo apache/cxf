@@ -163,7 +163,8 @@ public class ResponseTimeMessageInInterceptorTest extends AbstractMessageRespons
         EasyMock.verify(exchange);
         
     }
-    
+
+    @Test
     public void testIsClient() {
         Message message1 = null;
         Message message2 = new MessageImpl();

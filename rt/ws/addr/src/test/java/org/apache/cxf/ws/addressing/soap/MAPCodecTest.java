@@ -140,6 +140,7 @@ public class MAPCodecTest extends Assert {
         verifyMessage(message, false, true, false);
     }
 
+    @Test
     public void testRequestorOutbound() throws Exception {
         SoapMessage message = setUpMessage(true, true);
         codec.handleMessage(message);

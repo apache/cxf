@@ -74,7 +74,7 @@ public class TikaLuceneContentExtractor {
      */
     public TikaLuceneContentExtractor(final Parser parser, 
                                       final LuceneDocumentMetadata documentMetadata) {
-        this(parser, false, new LuceneDocumentMetadata());
+        this(parser, false, documentMetadata);
     }
     
     /**

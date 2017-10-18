@@ -200,15 +200,9 @@ public class SAMLProviderActAsTest extends org.junit.Assert {
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
         assertTrue(tokenString.contains("AttributeStatement"));
         assertTrue(tokenString.contains("bob"));
-        
-        try {
-            assertTrue(tokenString.contains("CustomActAs"));
-            fail("Failure expected as the default AttributeProvider does not create this attribute");
-        } catch (AssertionError ex) {
-            // expected on the wrong attribute provider
-        }
-        
-        List<AttributeStatementProvider> customProviderList = new ArrayList<AttributeStatementProvider>();
+        assertFalse(tokenString.contains("CustomActAs"));
+
+        List<AttributeStatementProvider> customProviderList = new ArrayList<>();
         customProviderList.add(new CustomAttributeProvider());
         ((SAMLTokenProvider)samlTokenProvider).setAttributeStatementProviders(customProviderList);
         

@@ -49,7 +49,8 @@ public class AtomFeedProviderTest extends Assert {
         assertEquals("Wrong feed title", "Example Feed", simple.getTitle());
         
     }
-    
+
+    @Test
     public void testWriteTo() throws Exception {
         InputStream is = getClass().getResourceAsStream("atomFeed.xml");
         Feed simple = afd.readFrom(Feed.class, null, null, null, null, is);

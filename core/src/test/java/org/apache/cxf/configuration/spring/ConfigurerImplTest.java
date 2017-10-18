@@ -82,9 +82,9 @@ public class ConfigurerImplTest extends Assert {
                      Short.valueOf((short)4), sb.getShortAttr());
         assertEquals("Unexpected value for attribute decimalAttr", 
                      new BigDecimal("5"), sb.getDecimalAttr());
-        assertEquals("Unexpected value for attribute floatAttr", 
-                     new Float(6F), sb.getFloatAttr());
-        assertEquals("Unexpected value for attribute doubleAttr", 
+        assertEquals("Unexpected value for attribute floatAttr",
+                     Float.valueOf(6F), sb.getFloatAttr());
+        assertEquals("Unexpected value for attribute doubleAttr",
                      Double.valueOf(7.0D), sb.getDoubleAttr());
         assertEquals("Unexpected value for attribute byteAttr", 
                      Byte.valueOf((byte)8), sb.getByteAttr());
@@ -149,9 +149,9 @@ public class ConfigurerImplTest extends Assert {
                      Short.valueOf((short)14), sb.getShortAttr());
         assertEquals("Unexpected value for attribute decimalAttr", 
                      new BigDecimal("15"), sb.getDecimalAttr());
-        assertEquals("Unexpected value for attribute floatAttr", 
-                     new Float(16F), sb.getFloatAttr());
-        assertEquals("Unexpected value for attribute doubleAttr", 
+        assertEquals("Unexpected value for attribute floatAttr",
+                     Float.valueOf(16F), sb.getFloatAttr());
+        assertEquals("Unexpected value for attribute doubleAttr",
                      Double.valueOf(17D), sb.getDoubleAttr());
         assertEquals("Unexpected value for attribute byteAttr", 
                      Byte.valueOf((byte)18), sb.getByteAttr());
@@ -250,7 +250,7 @@ public class ConfigurerImplTest extends Assert {
         private Long longAttr = Long.valueOf(3);
         private Short shortAttr = Short.valueOf((short)4);
         private BigDecimal decimalAttr = new BigDecimal("5");
-        private Float floatAttr = new Float(6F);
+        private Float floatAttr = Float.valueOf(6F);
         private Double doubleAttr = Double.valueOf(7D);
         private Byte byteAttr = Byte.valueOf((byte)8);
         private QName qnameAttr = new QName("http://www.w3.org/2001/XMLSchema", "schema", "xs");

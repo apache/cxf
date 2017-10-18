@@ -344,7 +344,7 @@ public abstract class AbstractTypeTestClient
         BigInteger valueSets[][] = {{new BigInteger("0"), new BigInteger("1")},
                                     {new BigInteger("1"), new BigInteger("0")},
                                     {new BigInteger("0"),
-                                     new BigInteger(String.valueOf(Long.MAX_VALUE * Long.MAX_VALUE))}};
+                                     new BigInteger(String.valueOf(Long.MAX_VALUE))}};
 
         for (int i = 0; i < valueSets.length; i++) {
             BigInteger x = valueSets[i][0];
@@ -1156,8 +1156,8 @@ public abstract class AbstractTypeTestClient
             return;
         }
         BigInteger valueSets[][] = {{new BigInteger("-1234567890"), new BigInteger("1234567890")},
-                                    {new BigInteger("-" + String.valueOf(Long.MAX_VALUE * Long.MAX_VALUE)),
-                                     new BigInteger(String.valueOf(Long.MAX_VALUE * Long.MAX_VALUE))}};
+                                    {new BigInteger("-" + String.valueOf(Long.MAX_VALUE)),
+                                     new BigInteger(String.valueOf(Long.MAX_VALUE))}};
 
         for (int i = 0; i < valueSets.length; i++) {
             BigInteger x = valueSets[i][0];
@@ -1187,8 +1187,8 @@ public abstract class AbstractTypeTestClient
             return;
         }
         BigInteger valueSets[][] = {{new BigInteger("1"), new BigInteger("1234567890")},
-                                    {new BigInteger(String.valueOf(Integer.MAX_VALUE * Integer.MAX_VALUE)),
-                                     new BigInteger(String.valueOf(Long.MAX_VALUE * Long.MAX_VALUE))}};
+                                    {new BigInteger(String.valueOf(Integer.MAX_VALUE)),
+                                     new BigInteger(String.valueOf(Long.MAX_VALUE))}};
 
         for (int i = 0; i < valueSets.length; i++) {
             BigInteger x = valueSets[i][0];
@@ -1283,10 +1283,8 @@ public abstract class AbstractTypeTestClient
         }
         BigInteger valueSets[][] = {{new BigInteger("0"),
                                         new BigInteger("1234567890")},
-                                    {new BigInteger(String.valueOf(Integer.MAX_VALUE
-                                                                   * Integer.MAX_VALUE)),
-                                     new BigInteger(String.valueOf(Long.MAX_VALUE
-                                                                   * Long.MAX_VALUE))}};
+                                    {new BigInteger(String.valueOf(Integer.MAX_VALUE)),
+                                     new BigInteger(String.valueOf(Long.MAX_VALUE))}};
 
         for (int i = 0; i < valueSets.length; i++) {
             BigInteger x = valueSets[i][0];

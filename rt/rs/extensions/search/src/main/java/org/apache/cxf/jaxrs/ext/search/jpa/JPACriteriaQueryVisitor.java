@@ -44,7 +44,7 @@ public class JPACriteriaQueryVisitor<T, E> extends AbstractJPATypedQueryVisitor<
                                    Class<T> tClass,
                                    Class<E> queryClass,
                                    List<String> joinProps) {
-        this(em, tClass, queryClass, null, null);
+        this(em, tClass, queryClass, null, joinProps);
     }
     
     public JPACriteriaQueryVisitor(EntityManager em, 

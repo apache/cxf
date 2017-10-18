@@ -211,7 +211,9 @@ public class JSONProviderTest extends Assert {
             + "\"state\":\"\",\"superId\":124}]}";
         assertEquals(expected, bos.toString());
     }
-    
+
+    @Test
+    @org.junit.Ignore
     public void testWriteCollectionAsPureArray() throws Exception {
         JSONProvider<ReportDefinition> provider 
             = new JSONProvider<ReportDefinition>();

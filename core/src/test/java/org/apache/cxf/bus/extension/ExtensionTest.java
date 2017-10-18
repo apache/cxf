@@ -50,7 +50,8 @@ public class ExtensionTest extends Assert {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         e.setClassname("no.such.Extension");        
         try {
-            e.load(cl, null);                  
+            e.load(cl, null);
+            fail("Failure expected");
         } catch (ExtensionException ex) {
             assertTrue("ExtensionException does not wrap ClassNotFoundException",
                        ex.getCause() instanceof ClassNotFoundException);
@@ -58,14 +59,16 @@ public class ExtensionTest extends Assert {
 
         e.setClassname("java.lang.System");
         try {
-            e.load(cl, null);                  
+            e.load(cl, null);
+            fail("Failure expected");
         } catch (ExtensionException ex) {
             assertTrue("ExtensionException does not wrap NoSuchMethodException " + ex.getCause(),
                        ex.getCause() instanceof NoSuchMethodException);
         } 
         e.setClassname(MyServiceConstructorThrowsException.class.getName());
         try {
-            e.load(cl, null);                  
+            e.load(cl, null);
+            fail("Failure expected");
         } catch (ExtensionException ex) {
             assertTrue("ExtensionException does not wrap IllegalArgumentException",
                        ex.getCause() instanceof IllegalArgumentException);
@@ -81,7 +84,8 @@ public class ExtensionTest extends Assert {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         e.setInterfaceName("no.such.Extension");        
         try {
-            e.loadInterface(cl);                  
+            e.loadInterface(cl);
+            fail("Failure expected");
         } catch (ExtensionException ex) {
             assertTrue("ExtensionException does not wrap ClassNotFoundException",
                        ex.getCause() instanceof ClassNotFoundException);
