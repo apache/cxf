@@ -48,32 +48,28 @@ public class UrlUtilsTest extends Assert {
         try {
             UrlUtils.urlDecode("%");
             fail();
-        } catch (Throwable e) {
-            assertTrue(e instanceof IllegalArgumentException);
+        } catch (IllegalArgumentException e) {
             assertTrue(e.getMessage().startsWith("Invalid URL encoding"));
         }
 
         try {
             UrlUtils.urlDecode("a%%%%");
             fail();
-        } catch (Throwable e) {
-            assertTrue(e instanceof IllegalArgumentException);
+        } catch (IllegalArgumentException e) {
             assertTrue(e.getMessage().startsWith("Invalid URL encoding"));
         }
 
         try {
             UrlUtils.urlDecode("a%2B%");
             fail();
-        } catch (Throwable e) {
-            assertTrue(e instanceof IllegalArgumentException);
+        } catch (IllegalArgumentException e) {
             assertTrue(e.getMessage().startsWith("Invalid URL encoding"));
         }
 
         try {
             UrlUtils.urlDecode("%2");
             fail();
-        } catch (Throwable e) {
-            assertTrue(e instanceof IllegalArgumentException);
+        } catch (IllegalArgumentException e) {
             assertTrue(e.getMessage().startsWith("Invalid URL encoding"));
         }
     }
@@ -83,8 +79,7 @@ public class UrlUtilsTest extends Assert {
         try {
             UrlUtils.urlDecode("%2$");
             fail();
-        } catch (Throwable e) {
-            assertTrue(e instanceof IllegalArgumentException);
+        } catch (IllegalArgumentException e) {
             assertTrue(e.getMessage().startsWith("Invalid URL encoding"));
         }
     }

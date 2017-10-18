@@ -176,8 +176,8 @@ public class ModelMBeanAssemblerTest extends  Assert {
     @Test
     public void testOperationInvocation() throws Exception {
         Object result = getServer().invoke(ton, "add",
-                                new Object[] {new Integer(20), new Integer(30)}, new String[] {"int", "int"});
-        assertEquals("Incorrect result", new Integer(50), result);
+                                new Object[] {Integer.valueOf(20), Integer.valueOf(30)}, new String[] {"int", "int"});
+        assertEquals("Incorrect result", Integer.valueOf(50), result);
     }
 
     @Test

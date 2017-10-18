@@ -290,6 +290,7 @@ public class CorbaServerConduitTest extends Assert {
         control.verify();
     }
 
+    @Test
     public void testGetTarget()  {
         CorbaServerConduit conduit = setupCorbaServerConduit(false);
         EndpointReferenceType endpoint = conduit.getTarget();

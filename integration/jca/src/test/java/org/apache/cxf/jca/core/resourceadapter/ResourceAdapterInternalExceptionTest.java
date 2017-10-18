@@ -46,8 +46,7 @@ public class ResourceAdapterInternalExceptionTest extends Assert {
 
     @Test
     public void testMessage() {
-        final String msg = "msg1";
-        msg.intern();
+        final String msg = "msg1".intern();
 
         Exception e = new ResourceAdapterInternalException(msg);
         assertTrue(e.toString().indexOf(msg) != -1);
@@ -57,8 +56,7 @@ public class ResourceAdapterInternalExceptionTest extends Assert {
 
     @Test
     public void testMessageWithNullTx() {
-        final String msg = "msg1";
-        msg.intern();
+        final String msg = "msg1".intern();
 
         javax.resource.spi.ResourceAdapterInternalException e = new ResourceAdapterInternalException(msg,
                                                                                                      null);

@@ -114,7 +114,7 @@ public class OutgoingChainInterceptor extends AbstractPhaseInterceptor<Message> 
                 ex.put(ConduitSelector.class,
                        new PreexistingConduitSelector(conduit, ex.getEndpoint()));
             } catch (IOException e) {
-                new Fault(e);
+                throw new Fault(e);
             }
         }
         return conduit;

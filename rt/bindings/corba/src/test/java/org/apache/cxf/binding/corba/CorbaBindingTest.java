@@ -25,6 +25,7 @@ import java.util.List;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,6 +45,7 @@ public class CorbaBindingTest extends Assert {
         orb = ORB.init(new String[0], props);
     }
 
+    @After
     public void tearDown() {
         if (orb != null) {
             try {

@@ -304,8 +304,7 @@ public class JPATypedQueryVisitorODataTest extends AbstractJPATypedQueryVisitorT
     public void testLessEqualQuery() throws Exception {
         List<Book> books = queryBooks("id le 10");
         assertEquals(2, books.size());
-        assertTrue(9 == books.get(0).getId() && 10 == books.get(1).getId()
-            || 9 == books.get(0).getId() && 10 == books.get(1).getId());
+        assertTrue(9 == books.get(0).getId() && 10 == books.get(1).getId());
     }
 
     @Test

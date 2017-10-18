@@ -212,6 +212,8 @@ public class JSONProviderTest extends Assert {
         assertEquals(expected, bos.toString());
     }
 
+    @Test
+    @org.junit.Ignore
     public void testWriteCollectionAsPureArray() throws Exception {
         JSONProvider<ReportDefinition> provider
             = new JSONProvider<ReportDefinition>();

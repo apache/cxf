@@ -109,6 +109,8 @@ public class LogicalHandlerInterceptorTest extends Assert {
     //direction is reversed during processing of a request message then the message
     //becomes a response message.
     //NOTE: commented out as this has been covered by other tests.
+    @Test
+    @org.junit.Ignore
     public void xtestReturnFalseClientSide() throws Exception {
         @SuppressWarnings("rawtypes")
         List<Handler> list = new ArrayList<>();

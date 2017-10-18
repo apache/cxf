@@ -41,7 +41,7 @@ public class StreamingAsyncSubscriber<T> extends AbstractAsyncSubscriber<T> {
     private volatile boolean completed;
     private AtomicBoolean firstWriteDone = new AtomicBoolean();
     public StreamingAsyncSubscriber(AsyncResponse ar, String openTag, String closeTag, String sep) {
-        this(ar, openTag, closeTag, "", 1000);
+        this(ar, openTag, closeTag, sep, 1000);
     }
     public StreamingAsyncSubscriber(AsyncResponse ar, String openTag, String closeTag, String sep,
                                     long pollTimeout) {

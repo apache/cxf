@@ -130,7 +130,7 @@ public class ServerCachingTest extends AbstractBusClientServerTestBase {
         try {
             doubleIt(port, 30);
             fail("Failure expected as the STSClient on the server side is null");
-        } catch (Throwable ex) {
+        } catch (Exception ex) {
             // expected
         }
         // Try again using the original SAML token - this should work as it should be cached by the service

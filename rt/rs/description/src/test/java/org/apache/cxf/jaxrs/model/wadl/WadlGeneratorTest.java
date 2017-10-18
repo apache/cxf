@@ -861,7 +861,7 @@ public class WadlGeneratorTest extends Assert {
         }
 
         Param(String name, String type, String schemaType, String docs) {
-            this(name, type, schemaType, false, null);
+            this(name, type, schemaType, false, docs);
         }
 
 

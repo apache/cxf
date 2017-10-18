@@ -81,7 +81,7 @@ public class TestBean3 {
                 return false;
             }
         } else {
-            if (!base64Item.equals(other.base64Item)) {
+            if (!Arrays.equals(base64Item, other.base64Item)) {
                 return false;
             }
         }

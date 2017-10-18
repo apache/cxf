@@ -50,6 +50,7 @@ public class AtomFeedProviderTest extends Assert {
 
     }
 
+    @Test
     public void testWriteTo() throws Exception {
         InputStream is = getClass().getResourceAsStream("atomFeed.xml");
         Feed simple = afd.readFrom(Feed.class, null, null, null, null, is);

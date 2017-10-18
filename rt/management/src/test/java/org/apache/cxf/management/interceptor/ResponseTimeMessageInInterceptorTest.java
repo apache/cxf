@@ -164,6 +164,7 @@ public class ResponseTimeMessageInInterceptorTest extends AbstractMessageRespons
 
     }
 
+    @Test
     public void testIsClient() {
         Message message1 = null;
         Message message2 = new MessageImpl();

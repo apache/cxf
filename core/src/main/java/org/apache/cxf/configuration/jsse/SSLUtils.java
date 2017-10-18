@@ -319,7 +319,7 @@ public final class SSLUtils {
         // then just use the defaults
         if ((defaultCipherSuites != null && defaultCipherSuites.length != 0)
             && (filters == null || !(filters.isSetInclude() || filters.isSetExclude()))) {
-            LogUtils.log(log, Level.FINE, "CIPHERSUITES_SET", defaultCipherSuites.toString());
+            LogUtils.log(log, Level.FINE, "CIPHERSUITES_SET", Arrays.toString(defaultCipherSuites));
             return defaultCipherSuites;
         }
 

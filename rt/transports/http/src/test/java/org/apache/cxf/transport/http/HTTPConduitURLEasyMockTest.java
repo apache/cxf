@@ -169,6 +169,8 @@ public class HTTPConduitURLEasyMockTest extends Assert {
         return message;
     }
 
+    @Test
+    @org.junit.Ignore
     public void testSendWithHeadersCheckErrorStream() throws Exception {
         control = EasyMock.createNiceControl();
         HTTPConduit conduit = setUpConduit(true, false, "POST");

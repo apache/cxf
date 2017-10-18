@@ -29,10 +29,12 @@ public class SimplePrincipalTest extends Assert {
         new SimplePrincipal(null);
     }
 
+    @Test
     public void testEquals() {
         assertEquals(new SimplePrincipal("barry"), new SimplePrincipal("barry"));
     }
 
+    @Test
     public void testNotEquals() {
         assertFalse(new SimplePrincipal("barry").equals(new SimplePrincipal("john")));
     }

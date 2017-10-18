@@ -22,6 +22,7 @@ package org.apache.cxf.systest.http_undertow.websocket;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -134,7 +135,7 @@ class WebSocketTestClient {
         }
 
         public void onFragment(byte[] fragment, boolean last) {
-            LOG.info("[ws] received fragment bytes (last?" + last + ") --> " + fragment);
+            LOG.info("[ws] received fragment bytes (last?" + last + ") --> " + Arrays.toString(fragment));
             processFragments(fragment, last);
         }
 

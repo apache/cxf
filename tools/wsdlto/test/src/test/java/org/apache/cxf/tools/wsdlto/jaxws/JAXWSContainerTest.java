@@ -222,6 +222,7 @@ public class JAXWSContainerTest extends ProcessorTestBase {
         }
     }
 
+    @Test
     public void testGetServceValidator() throws Exception {
         JAXWSContainer container = new JAXWSContainer(null);
         List<ServiceValidator> validators = container.getServiceValidators();
