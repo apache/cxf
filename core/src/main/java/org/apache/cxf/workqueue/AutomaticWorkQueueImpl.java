@@ -211,22 +211,15 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
             }
             mainLock = l;
 
-            try {
-                //java 5/6
-                addWorkerMethod = ThreadPoolExecutor.class.getDeclaredMethod("addIfUnderMaximumPoolSize",
-                                                                             Runnable.class);
-                addWorkerArgs = new Object[] {null};
-            } catch (Throwable t) {
-                try {
-                    //java 7
-                    addWorkerMethod = ThreadPoolExecutor.class.getDeclaredMethod("addWorker",
-                                                                                 Runnable.class, Boolean.TYPE);
-                    addWorkerArgs = new Object[] {null, Boolean.FALSE};
-                } catch (Throwable t2) {
-                    //nothing we cando
-                }
-            }
 
+            try {
+                //java 7
+                addWorkerMethod = ThreadPoolExecutor.class.getDeclaredMethod("addWorker",
+                                                                             Runnable.class, Boolean.TYPE);
+                addWorkerArgs = new Object[] {null, Boolean.FALSE};
+            } catch (Throwable t2) {
+                //nothing we cando
+            }
         }
         return executor;
     }
