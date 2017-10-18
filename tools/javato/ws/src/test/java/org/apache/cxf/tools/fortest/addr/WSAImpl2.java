@@ -40,7 +40,7 @@ public class WSAImpl2 {
     @Action(input = "inputAction", output = "outputAction")
     public int addNumbers(Holder<String> testname, int number1, int number2) {
         if (number1 < 0 || number2 < 0) {
-            new AddressingFeatureException("One of the numbers received was negative:" 
+            throw new AddressingFeatureException("One of the numbers received was negative:"
                                            + number1 + ", " + number2);
         }
         return number1 + number2;

@@ -87,6 +87,7 @@ public class ManagedConnectionImplTest extends ManagedConnectionTestBase {
         assertTrue("Checking implementation of passed interface", o instanceof Greeter);
     }
 
+    @Test
     @Ignore
     public void testGetConnectionWithNoPortReturnsConnection() throws Exception {
 

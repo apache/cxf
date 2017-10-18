@@ -526,8 +526,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
 
     private FaultInfo getFaultInfo(final OperationInfo operation, final Class<?> expClass) {
         for (FaultInfo fault : operation.getFaults()) {
-            if (fault.getProperty(Class.class.getName()) == expClass
-                || fault.getProperty(Class.class.getName()) == expClass) {
+            if (fault.getProperty(Class.class.getName()) == expClass) {
                 return fault;
             }
         }

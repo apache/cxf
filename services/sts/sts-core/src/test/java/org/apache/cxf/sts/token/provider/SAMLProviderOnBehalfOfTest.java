@@ -153,15 +153,10 @@ public class SAMLProviderOnBehalfOfTest extends org.junit.Assert {
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
         assertTrue(tokenString.contains("AttributeStatement"));
         assertTrue(tokenString.contains("bob"));
-        
-        try {
-            assertTrue(tokenString.contains("CustomOnBehalfOf"));
-            fail("Failure expected as the default AttributeProvider does not create this attribute");
-        } catch (AssertionError ex) {
-            // expected on the wrong attribute provider
-        }
-        
-        List<AttributeStatementProvider> customProviderList = new ArrayList<AttributeStatementProvider>();
+
+        assertFalse(tokenString.contains("CustomOnBehalfOf"));
+
+        List<AttributeStatementProvider> customProviderList = new ArrayList<>();
         customProviderList.add(new CustomAttributeProvider());
         ((SAMLTokenProvider)samlTokenProvider).setAttributeStatementProviders(customProviderList);
         

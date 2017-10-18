@@ -36,6 +36,8 @@ import org.junit.Test;
 public class X509UtilsTest extends BasicValidationTest {
     private static final String CERT_DN = "CN=www.anothersts.com, L=CGN, ST=NRW, C=DE, O=AnotherSTS";
 
+    @Test
+    @org.junit.Ignore
     public void extractValidatingCertsOK() throws JAXBException {
         InputStream is = this.getClass().getResourceAsStream("/validateRequestOK.xml");
         @SuppressWarnings("unchecked")

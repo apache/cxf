@@ -1125,6 +1125,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
             env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/invalid_mep.wsdl"));
             processor.setContext(env);
             processor.execute();
+            fail("Failure expected");
         } catch (Exception e) {
             String expectedMsg = "Invalid WSDL, Operation notify in PortType " 
                 + "{http://services.medial.com.br/echo}EchoNotification not request-response or one-way";
@@ -1261,6 +1262,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
             env.put(ToolConstants.CFG_VALIDATE_WSDL, ToolConstants.CFG_VALIDATE_WSDL);
             processor.setContext(env);
             processor.execute();
+            fail("Failure expected");
         } catch (Exception e) {
             boolean english = "en".equals(java.util.Locale.getDefault().getLanguage());
             if (english) {
@@ -1373,6 +1375,8 @@ public class CodeGenTest extends AbstractCodeGenTest {
         assertNotNull("GreetMe class from schema targetNamespace could not be found", tc);
     }
 
+    @Test
+    @org.junit.Ignore
     public void testW3CEPR() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/w3c-epr.wsdl"));
         processor.setContext(env);
