@@ -144,6 +144,15 @@ public class AutomaticWorkQueueTest extends Assert {
         assertEquals(0, workqueue.getSize());
     }
 
+    int numRunning(BlockingWorkItem[] workItems) {
+        int count = 0;
+        for (BlockingWorkItem item : workItems) {
+            if (item.isRunning()) {
+                count++;
+            }
+        }
+        return count;
+    }
     @Test
     @Ignore("The test is failed on openjdk")
     public void testEnqueueImmediate() {
@@ -181,14 +190,22 @@ public class AutomaticWorkQueueTest extends Assert {
                 }
             }
 
-            while (workqueue.getActiveCount() < DEFAULT_HIGH_WATER_MARK) {
+            int max = 0;
+            int numRun = numRunning(workItems);
+            while ((workqueue.getActiveCount() < DEFAULT_HIGH_WATER_MARK 
+                    || numRun < DEFAULT_HIGH_WATER_MARK 
+                    || workqueue.getSize() > 0)
+                && max < 10) {
                 try {
                     Thread.sleep(250);
                 } catch (InterruptedException ex) {
                     // ignore
                 }
+                numRun = numRunning(workItems);
             }
-            
+            numRun = numRunning(workItems);
+            assertEquals(DEFAULT_HIGH_WATER_MARK, numRun);
+
             for (int i = 0; i < DEFAULT_MAX_QUEUE_SIZE; i++) {
                 fillers[i] = new BlockingWorkItem();
                 try {
@@ -196,13 +213,6 @@ public class AutomaticWorkQueueTest extends Assert {
                 } catch (RejectedExecutionException ex) {
                     fail("failed on filler[" + i + "] with: " + ex);
                 }
-            }
-
-            // give threads a chance to start executing the work items
-            try {
-                Thread.sleep(250);
-            } catch (InterruptedException ex) {
-                // ignore
             }
 
             assertTrue(workqueue.toString(), workqueue.isFull());
@@ -462,9 +472,12 @@ public class AutomaticWorkQueueTest extends Assert {
     }
 
     public class BlockingWorkItem implements Runnable {
+        volatile boolean running;
+        
         private boolean unblocked;
 
         public void run() {
+            running = true;
             synchronized (this) {
                 while (!unblocked) {
                     try {
@@ -476,6 +489,9 @@ public class AutomaticWorkQueueTest extends Assert {
             }
         }
 
+        boolean isRunning() {
+            return running;
+        }
         void unblock() {
             synchronized (this) {
                 unblocked = true;
