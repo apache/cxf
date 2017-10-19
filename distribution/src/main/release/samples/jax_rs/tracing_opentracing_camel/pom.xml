@@ -31,7 +31,6 @@
     
     <properties>
         <cxf.version>${project.version}</cxf.version>
-        <cxf.spring.boot.version>1.5.7.RELEASE</cxf.spring.boot.version>
         <cxf.camel.version>2.19.2</cxf.camel.version>
     </properties>
     
@@ -112,7 +111,7 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>${cxf.spring.boot.version}</version>
+                <version>${spring.boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
