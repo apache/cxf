@@ -79,7 +79,12 @@ public class Java2WADLMojo extends AbstractMojo {
      */
     private String docProvider;
     
-    
+    /**
+     * @parameter
+     */
+    private String customWadlGenerator;
+
+
     /**
      * Attach the generated wadl file to the list of files to be deployed
      * on install. This means the wadl file will be copied to the repository
@@ -231,7 +236,19 @@ public class Java2WADLMojo extends AbstractMojo {
         System.setProperty("org.apache.cxf.JDKBugHacks.defaultUsesCaches", "true");
         List<Class<?>> resourceClasses = loadResourceClasses();
         initClassResourceInfoList(resourceClasses);
-        WadlGenerator wadlGenerator = new WadlGenerator(getBus());
+        WadlGenerator wadlGenerator = null;
+        if (customWadlGenerator != null) {
+            try {
+                wadlGenerator = (WadlGenerator)getClassLoader().loadClass(customWadlGenerator).
+                    getConstructor(new Class[] {Bus.class}).
+                    newInstance(new Object[] {getBus()});
+            } catch (Throwable e) {
+                getLog().debug("Custom WADLGenerator can not be created, using the default one");
+            }
+        }
+        if (wadlGenerator == null) {
+            wadlGenerator = new WadlGenerator(getBus());
+        }
         DocumentationProvider documentationProvider = null;
         if (docProvider != null) {
             try {
