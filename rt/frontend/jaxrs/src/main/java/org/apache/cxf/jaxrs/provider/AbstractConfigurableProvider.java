@@ -49,7 +49,7 @@ public abstract class AbstractConfigurableProvider {
      * @param b
      */
     public void setBus(Bus b) {
-        if (bus != null) {
+        if (b != null) {
             bus = b;
         }
     }
