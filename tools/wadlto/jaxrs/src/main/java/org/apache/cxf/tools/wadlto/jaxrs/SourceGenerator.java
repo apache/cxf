@@ -225,7 +225,7 @@ public class SourceGenerator {
     private boolean validateWadl;
     private SchemaCollection schemaCollection = new SchemaCollection();
     private String encoding;
-    private String authorization;
+    private String authentication;
     private boolean createJavaDocs;
 
     public SourceGenerator() {
@@ -1859,8 +1859,8 @@ public class SourceGenerator {
             } 
             if (is == null) {
                 URL url = URI.create(href).toURL();
-                if (href.startsWith("https") && authorization != null) {
-                    is = SecureConnectionHelper.getStreamFromSecureConnection(url, authorization);
+                if (href.startsWith("https") && authentication != null) {
+                    is = SecureConnectionHelper.getStreamFromSecureConnection(url, authentication);
                 } else {
                     is = url.openStream();
                 }
@@ -2029,8 +2029,8 @@ public class SourceGenerator {
         this.supportBeanValidation = supportBeanValidation;
     }
 
-    public void setAuthorization(String authorization) {
-        this.authorization = authorization;
+    public void setAuthentication(String authentication) {
+        this.authentication = authentication;
     }
 
     private static class GrammarInfo {
