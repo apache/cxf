@@ -43,7 +43,7 @@ public class ResourceFactoryTest extends IntegrationBaseTest {
 
     private ReferenceParametersType createReferenceParameters() {
         ReferenceParametersType refParam = new ReferenceParametersType();
-        Element uuidEl = DOMUtils.createDocument().createElementNS(
+        Element uuidEl = DOMUtils.getEmptyDocument().createElementNS(
                 REF_PARAM_NAMESPACE, REF_PARAM_LOCAL_NAME);
         uuidEl.setTextContent(RESOURCE_UUID);
         refParam.getAny().add(uuidEl);

@@ -305,14 +305,13 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
     }
 
     protected Element createElement(String namespace, String name, String namespacePrefix) {
+        //The Aegis tests use xpaths that require the created element be the root of a doc
         Document doc = DOMUtils.createDocument();
-
         Element element = doc.createElementNS(namespace, name);
         if (namespacePrefix != null) {
             element.setPrefix(namespacePrefix);
             DOMUtils.addNamespacePrefix(element, namespace, namespacePrefix);
         }
-
         doc.appendChild(element);
         return element;
     }

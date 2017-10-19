@@ -54,7 +54,7 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
         ExpressionType expression = new ExpressionType();
         expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
         expression.getContent().add("/root/a");
-        Element replacedElement = DOMUtils.createDocument().createElement("b");
+        Element replacedElement = DOMUtils.getEmptyDocument().createElement("b");
         replacedElement.setTextContent("Better text");
         ValueType value = new ValueType();
         value.getContent().add(replacedElement);
@@ -84,7 +84,7 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
         ExpressionType expression = new ExpressionType();
         expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
         expression.getContent().add("/a");
-        Element replacedElement = DOMUtils.createDocument().createElement("b");
+        Element replacedElement = DOMUtils.getEmptyDocument().createElement("b");
         ValueType value = new ValueType();
         value.getContent().add(replacedElement);
         fragment.setExpression(expression);
@@ -142,7 +142,7 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
         ExpressionType expression = new ExpressionType();
         expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
         expression.getContent().add("/root/a/@foo");
-        Element replacedAttr = DOMUtils.createDocument().createElementNS(
+        Element replacedAttr = DOMUtils.getEmptyDocument().createElementNS(
                 FragmentDialectConstants.FRAGMENT_2011_03_IRI,
                 FragmentDialectConstants.FRAGMENT_ATTR_NODE_NAME
         );
@@ -181,7 +181,7 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
         ExpressionType expression = new ExpressionType();
         expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
         expression.getContent().add("/");
-        Element replacedElement = DOMUtils.createDocument().createElement("a");
+        Element replacedElement = DOMUtils.getEmptyDocument().createElement("a");
         ValueType value = new ValueType();
         value.getContent().add(replacedElement);
         fragment.setExpression(expression);
@@ -209,7 +209,7 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
         ExpressionType expression = new ExpressionType();
         expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
         expression.getContent().add("/");
-        Element replacedElement = DOMUtils.createDocument().createElement("b");
+        Element replacedElement = DOMUtils.getEmptyDocument().createElement("b");
         ValueType value = new ValueType();
         value.getContent().add(replacedElement);
         fragment.setExpression(expression);
@@ -237,7 +237,7 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
         ExpressionType expression = new ExpressionType();
         expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
         expression.getContent().add("/*");
-        Element replacedElement = DOMUtils.createDocument().createElement("b");
+        Element replacedElement = DOMUtils.getEmptyDocument().createElement("b");
         ValueType value = new ValueType();
         value.getContent().add(replacedElement);
         fragment.setExpression(expression);
@@ -265,7 +265,7 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
         ExpressionType expression = new ExpressionType();
         expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
         expression.getContent().add("/a/b[1]");
-        Element replacedElement = DOMUtils.createDocument().createElement("c");
+        Element replacedElement = DOMUtils.getEmptyDocument().createElement("c");
         ValueType value = new ValueType();
         value.getContent().add(replacedElement);
         fragment.setExpression(expression);
@@ -294,7 +294,7 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
         ExpressionType expression = new ExpressionType();
         expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
         expression.getContent().add("/a/b");
-        Element replacedElement = DOMUtils.createDocument().createElement("c");
+        Element replacedElement = DOMUtils.getEmptyDocument().createElement("c");
         ValueType value = new ValueType();
         value.getContent().add(replacedElement);
         fragment.setExpression(expression);
@@ -323,7 +323,7 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
         ExpressionType expression = new ExpressionType();
         expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
         expression.getContent().add("/a/b");
-        Element replacedElement = DOMUtils.createDocument().createElement("b");
+        Element replacedElement = DOMUtils.getEmptyDocument().createElement("b");
         ValueType value = new ValueType();
         value.getContent().add(replacedElement);
         fragment.setExpression(expression);
@@ -351,7 +351,7 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
         ExpressionType expression = new ExpressionType();
         expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
         expression.getContent().add("/a");
-        Element replacedElement = DOMUtils.createDocument().createElement("a");
+        Element replacedElement = DOMUtils.getEmptyDocument().createElement("a");
         ValueType value = new ValueType();
         value.getContent().add(replacedElement);
         fragment.setExpression(expression);
@@ -379,7 +379,7 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
         ExpressionType expression = new ExpressionType();
         expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
         expression.getContent().add("//b");
-        Element replacedElement = DOMUtils.createDocument().createElement("b");
+        Element replacedElement = DOMUtils.getEmptyDocument().createElement("b");
         ValueType value = new ValueType();
         value.getContent().add(replacedElement);
         fragment.setExpression(expression);
@@ -405,7 +405,7 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
         ExpressionType expression = new ExpressionType();
         expression.setLanguage(FragmentDialectConstants.XPATH10_LANGUAGE_IRI);
         expression.getContent().add("/a/[local-name() = 'b'");
-        Element replacedElement = DOMUtils.createDocument().createElement("b");
+        Element replacedElement = DOMUtils.getEmptyDocument().createElement("b");
         ValueType value = new ValueType();
         value.getContent().add(replacedElement);
         fragment.setExpression(expression);

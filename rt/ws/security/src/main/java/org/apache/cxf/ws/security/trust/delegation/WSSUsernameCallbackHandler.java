@@ -55,7 +55,7 @@ public class WSSUsernameCallbackHandler implements CallbackHandler {
                     if (contentNode != null) {
                         doc = contentNode.getOwnerDocument();
                     } else {
-                        doc = DOMUtils.createDocument();
+                        doc = DOMUtils.getEmptyDocument();
                     }
                     UsernameToken usernameToken = createWSSEUsernameToken(username, doc);
                     callback.setToken(usernameToken.getElement());

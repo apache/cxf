@@ -362,7 +362,7 @@ public abstract class AbstractOperation {
             }
         }
 
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
 
         WSSecEncryptedKey builder = new WSSecEncryptedKey(doc);
         builder.setUserInfo(name);

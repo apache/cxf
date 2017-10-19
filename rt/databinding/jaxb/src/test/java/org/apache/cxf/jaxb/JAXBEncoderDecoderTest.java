@@ -415,7 +415,7 @@ public class JAXBEncoderDecoderTest extends Assert {
         part.setTypeClass(Class.forName(wrapperAnnotation.className()));
 
 
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element elNode = doc.createElementNS(elName.getNamespaceURI(),
                                              elName.getLocalPart());
         Element rtEl = doc.createElementNS(elName.getNamespaceURI(), "requestType");
@@ -454,7 +454,7 @@ public class JAXBEncoderDecoderTest extends Assert {
         part.setElementQName(elName);
         part.setTypeClass(Class.forName("org.apache.hello_world_soap_http.types.StringStruct"));
 
-        doc = DOMUtils.createDocument();
+        doc = DOMUtils.getEmptyDocument();
         elNode = doc.createElementNS(elName.getNamespaceURI(),
                                              elName.getLocalPart());
         rtEl = doc.createElementNS(elName.getNamespaceURI(), "arg1");
@@ -483,7 +483,7 @@ public class JAXBEncoderDecoderTest extends Assert {
         QName elName = new QName(wrapperAnnotation.targetNamespace(),
                                  wrapperAnnotation.localName());
 
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element elNode = doc.createElementNS(elName.getNamespaceURI(),
                                              elName.getLocalPart());
         Element rtEl = doc.createElementNS(elName.getNamespaceURI(), "requestType");
@@ -501,7 +501,7 @@ public class JAXBEncoderDecoderTest extends Assert {
 
     @Test
     public void testMarshallExceptionWithOrder() throws Exception {
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element elNode = doc.createElementNS("http://cxf.apache.org",  "ExceptionRoot");
 
         OrderException exception = new OrderException("Mymessage");

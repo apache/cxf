@@ -171,7 +171,7 @@ public class KerberosClient implements Configurable {
     }
 
     protected KerberosSecurity createKerberosSecurity() {
-        return new KerberosSecurity(DOMUtils.createDocument());
+        return new KerberosSecurity(DOMUtils.getEmptyDocument());
     }
 
     public boolean isUsernameServiceNameForm() {

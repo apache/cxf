@@ -214,7 +214,7 @@ public class JexlIssueSamlClaimsTest extends org.junit.Assert {
         ClaimsType claimsType = new ClaimsType();
         claimsType.setDialect(STSConstants.IDT_NS_05_05);
 
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element claimType = createClaimsType(doc, ClaimTypes.LASTNAME);
         claimsType.getAny().add(claimType);
 

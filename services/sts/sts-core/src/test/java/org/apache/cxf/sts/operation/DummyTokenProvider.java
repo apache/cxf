@@ -50,7 +50,7 @@ public class DummyTokenProvider implements TokenProvider {
 
     public TokenProviderResponse createToken(TokenProviderParameters tokenParameters) {
         try {
-            Document doc = DOMUtils.createDocument();
+            Document doc = DOMUtils.getEmptyDocument();
 
             // Mock up a dummy BinarySecurityToken
             String id = "BST-1234";

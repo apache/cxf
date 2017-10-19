@@ -26,7 +26,6 @@ import java.util.Properties;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
@@ -105,8 +104,6 @@ public class ValidateSCTUnitTest extends org.junit.Assert {
         // Get a SecurityContextToken via the SCTProvider
         TokenProviderResponse providerResponse = createSCT();
         Element sct = (Element)providerResponse.getToken();
-        Document doc = sct.getOwnerDocument();
-        sct = (Element)doc.appendChild(sct);
         ValidateTargetType validateTarget = new ValidateTargetType();
         validateTarget.setAny(sct);
 

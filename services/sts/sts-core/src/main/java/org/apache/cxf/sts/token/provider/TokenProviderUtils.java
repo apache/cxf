@@ -29,6 +29,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -151,7 +152,8 @@ public final class TokenProviderUtils {
         }
 
         Document doc = element.getOwnerDocument();
-        doc.appendChild(element);
+        DocumentFragment frag = doc.createDocumentFragment();
+        frag.appendChild(element);
 
         WSSecEncrypt builder = new WSSecEncrypt(doc);
         if (ConfigurationConstants.USE_REQ_SIG_CERT.equals(name)) {
@@ -170,8 +172,8 @@ public final class TokenProviderUtils {
 
         builder.prepare(stsProperties.getEncryptionCrypto());
         builder.encryptForRef(null, Collections.singletonList(encryptionPart));
-
-        return doc.getDocumentElement();
+        
+        return (Element)frag.getFirstChild();
     }
 
     /**

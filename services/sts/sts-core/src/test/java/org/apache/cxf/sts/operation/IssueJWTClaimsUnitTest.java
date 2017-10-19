@@ -32,6 +32,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
@@ -246,7 +247,7 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
         // Add a ClaimsType
         ClaimsType claimsType = new ClaimsType();
         claimsType.setDialect(STSConstants.IDT_NS_05_05);
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element claimType = createClaimsType(doc);
         claimsType.getAny().add(claimType);
 
@@ -347,7 +348,7 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
         ClaimsType claimsType = new ClaimsType();
         claimsType.setDialect(STSConstants.IDT_NS_05_05);
 
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element claimType = createClaimsType(doc);
         claimsType.getAny().add(claimType);
 
@@ -364,6 +365,9 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
         Element samlToken =
             createSAMLAssertion(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
                     callbackHandler, realms);
+        
+        DocumentFragment f = samlToken.getOwnerDocument().createDocumentFragment();
+        f.appendChild(samlToken);
         Document docToken = samlToken.getOwnerDocument();
         samlToken = (Element)docToken.appendChild(samlToken);
         String samlString = DOM2Writer.nodeToString(samlToken);
@@ -499,8 +503,7 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
         ClaimsType claimsType = new ClaimsType();
         claimsType.setDialect(STSConstants.IDT_NS_05_05);
 
-        Document doc = DOMUtils.createDocument();
-        Element claimType = createClaimsType(doc);
+        Element claimType = createClaimsType(DOMUtils.getEmptyDocument());
         claimsType.getAny().add(claimType);
 
         JAXBElement<ClaimsType> claimsTypeJaxb =
@@ -637,7 +640,7 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
      * Mock up a SecondaryParameters DOM Element containing some claims
      */
     private Element createSecondaryParameters() {
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element secondary = doc.createElementNS(STSConstants.WST_NS_05_12, "SecondaryParameters");
         secondary.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns", STSConstants.WST_NS_05_12);
 

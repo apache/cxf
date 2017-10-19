@@ -118,7 +118,7 @@ public class SCTProvider implements TokenProvider {
         keyHandler.createSymmetricKey();
 
         try {
-            Document doc = DOMUtils.createDocument();
+            Document doc = DOMUtils.getEmptyDocument();
             SecurityContextToken sct =
                 new SecurityContextToken(getWSCVersion(tokenRequirements.getTokenType()), doc);
             WSSConfig wssConfig = WSSConfig.getNewInstance();

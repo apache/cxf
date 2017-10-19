@@ -43,7 +43,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -221,9 +221,9 @@ public abstract class JmsSubscription extends AbstractSubscription implements Me
                 NotificationMessageHolderType h = ith.next();
                 Object content = h.getMessage().getAny();
                 if (!(content instanceof Element)) {
-                    Document doc = DOMUtils.createDocument();
+                    DocumentFragment doc = DOMUtils.getEmptyDocument().createDocumentFragment();
                     jaxbContext.createMarshaller().marshal(content, doc);
-                    content = doc.getDocumentElement();
+                    content = DOMUtils.getFirstElement(doc);
                 }
                 if (!doFilter((Element) content)) {
                     ith.remove();

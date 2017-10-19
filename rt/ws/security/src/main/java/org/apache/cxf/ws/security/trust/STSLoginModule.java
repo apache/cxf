@@ -345,7 +345,7 @@ public class STSLoginModule implements LoginModule {
     private UsernameToken convertToToken(String username, String password)
         throws Exception {
 
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         UsernameToken token = new UsernameToken(false, doc,
                                                 WSS4JConstants.PASSWORD_TEXT);
         token.setName(username);

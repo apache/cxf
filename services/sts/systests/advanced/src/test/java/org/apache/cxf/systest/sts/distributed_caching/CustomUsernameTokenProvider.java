@@ -48,7 +48,7 @@ public class CustomUsernameTokenProvider implements TokenProvider {
 
     public TokenProviderResponse createToken(TokenProviderParameters tokenParameters) {
         try {
-            Document doc = DOMUtils.createDocument();
+            Document doc = DOMUtils.getEmptyDocument();
 
             // Mock up a UsernameToken
             UsernameToken usernameToken = new UsernameToken(true, doc, WSS4JConstants.PASSWORD_TEXT);

@@ -361,7 +361,7 @@ public class STSStaxTokenValidator
     private Element convertToDOM(
         String username, String password, String passwordType, String id
     ) {
-        Document doc = DOMUtils.newDocument();
+        Document doc = DOMUtils.getEmptyDocument();
 
         UsernameToken usernameToken = new UsernameToken(true, doc, passwordType);
         usernameToken.setName(username);
@@ -534,7 +534,7 @@ public class STSStaxTokenValidator
             BinarySecurityTokenType binarySecurityTokenType,
             byte[] securityTokenData
         ) throws WSSecurityException {
-            Document doc = DOMUtils.newDocument();
+            Document doc = DOMUtils.getEmptyDocument();
             BinarySecurity binarySecurity = null;
             if (WSSConstants.NS_X509_V3_TYPE.equals(binarySecurityTokenType.getValueType())) {
                 binarySecurity = new X509Security(doc);

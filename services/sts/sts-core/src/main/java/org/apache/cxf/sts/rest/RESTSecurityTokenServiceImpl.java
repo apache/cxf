@@ -211,7 +211,7 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
         if (STSConstants.PUBLIC_KEY_KEYTYPE.equals(desiredKeyType)) {
             X509Certificate clientCert = getTLSClientCertificate();
             if (clientCert != null) {
-                Document doc = DOMUtils.createDocument();
+                Document doc = DOMUtils.getEmptyDocument();
                 Element keyInfoElement = doc.createElementNS("http://www.w3.org/2000/09/xmldsig#", "KeyInfo");
 
                 try {

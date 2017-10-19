@@ -48,7 +48,7 @@ public class CallbackHandlerLoginHandler implements ResourceOwnerLoginHandler {
 
     @Override
     public UserSubject createSubject(Client client, String user, String pass) {
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         UsernameToken token = new UsernameToken(false, doc,
                                                 WSS4JConstants.PASSWORD_TEXT);
         token.setName(user);

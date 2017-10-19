@@ -154,6 +154,23 @@ public final class DOMUtils {
     private static synchronized Document createEmptyDocument() {
         if (emptyDocument == null) {
             emptyDocument = createDocument();
+            
+            // uncomment this to see if anything is actually setting anything into the empty doc
+            /*
+            final Document doc  = createDocument();
+            emptyDocument = (Document)org.apache.cxf.common.util.ProxyHelper.getProxy(
+                DOMUtils.class.getClassLoader(), 
+                new Class<?>[] {Document.class}, 
+                new java.lang.reflect.InvocationHandler() {
+                    @Override
+                    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                        if (method.getName().contains("create")) {
+                            return method.invoke(doc, args);
+                        }
+                        throw new IllegalStateException("Cannot modify factory document");
+                    }
+                });
+             */
         }
         return emptyDocument;
     }
@@ -167,10 +184,6 @@ public final class DOMUtils {
         Document doc = emptyDocument;
         if (doc == null) {
             doc = createEmptyDocument();
-        }
-        if (emptyDocument.getDocumentElement() != null) {
-            // doc = createEmptyDocument();
-            throw new IllegalStateException("Document should be empty");
         }
         return doc;
     }

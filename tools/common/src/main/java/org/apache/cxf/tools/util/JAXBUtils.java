@@ -112,7 +112,7 @@ public final class JAXBUtils {
      * @return file
      */
     public static File getPackageMappingSchemaBindingFile(String namespace, String pkgName) {
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element rootElement = doc.createElementNS(ToolConstants.SCHEMA_URI, "schema");
         rootElement.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, "xmlns", ToolConstants.SCHEMA_URI);
         rootElement.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, "xmlns:jaxb", ToolConstants.NS_JAXB_BINDINGS);

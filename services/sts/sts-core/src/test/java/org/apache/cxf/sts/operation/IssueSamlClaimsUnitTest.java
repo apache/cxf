@@ -840,7 +840,7 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
      * Mock up a SecondaryParameters DOM Element containing a custom claim dialect.
      */
     private Element createCustomSecondaryParameters() {
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element secondary = doc.createElementNS(STSConstants.WST_NS_05_12, "SecondaryParameters");
         secondary.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns", STSConstants.WST_NS_05_12);
 

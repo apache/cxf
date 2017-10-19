@@ -226,7 +226,7 @@ public class IssueSCTUnitTest extends org.junit.Assert {
         String tokenString = DOM2Writer.nodeToString(securityContextToken);
         assertFalse(tokenString.contains("SecurityContextToken"));
         assertFalse(tokenString.contains("Identifier"));
-        assertTrue(tokenString.contains("EncryptedData"));
+        assertTrue(tokenString, tokenString.contains("EncryptedData"));
     }
 
     /**

@@ -96,7 +96,7 @@ public abstract class WSS4JBasicAuthValidator {
 
     protected UsernameToken convertPolicyToToken(AuthorizationPolicy policy) {
 
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         UsernameToken token = new UsernameToken(false, doc,
                                                 WSS4JConstants.PASSWORD_TEXT);
         token.setName(policy.getUserName());

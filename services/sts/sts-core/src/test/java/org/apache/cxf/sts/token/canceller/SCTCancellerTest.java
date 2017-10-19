@@ -92,7 +92,7 @@ public class SCTCancellerTest extends org.junit.Assert {
         TokenRequirements tokenRequirements = cancellerParameters.getTokenRequirements();
 
         // Create a CancelTarget consisting of a SecurityContextToken
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         SecurityContextToken sct = new SecurityContextToken(doc);
         ReceivedToken cancelTarget = new ReceivedToken(sct.getElement());
         tokenRequirements.setCancelTarget(cancelTarget);

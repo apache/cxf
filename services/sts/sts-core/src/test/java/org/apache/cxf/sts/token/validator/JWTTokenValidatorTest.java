@@ -428,7 +428,7 @@ public class JWTTokenValidatorTest extends org.junit.Assert {
     }
 
     private Element createTokenWrapper(String token) {
-        Document doc = DOMUtils.newDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element tokenWrapper = doc.createElementNS(null, "TokenWrapper");
         tokenWrapper.setTextContent(token);
         return tokenWrapper;

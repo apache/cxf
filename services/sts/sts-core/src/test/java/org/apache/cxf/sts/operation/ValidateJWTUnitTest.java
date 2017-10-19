@@ -96,8 +96,6 @@ public class ValidateJWTUnitTest extends org.junit.Assert {
         // Get a JWTToken via the JWTTokenProvider
         TokenProviderResponse providerResponse = createJWT();
         Element wrapper = createTokenWrapper((String)providerResponse.getToken());
-        Document doc = wrapper.getOwnerDocument();
-        wrapper = (Element)doc.appendChild(wrapper);
         ValidateTargetType validateTarget = new ValidateTargetType();
         validateTarget.setAny(wrapper);
 
@@ -123,7 +121,7 @@ public class ValidateJWTUnitTest extends org.junit.Assert {
     }
 
     private Element createTokenWrapper(String token) {
-        Document doc = DOMUtils.newDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element tokenWrapper = doc.createElementNS(null, "TokenWrapper");
         tokenWrapper.setTextContent(token);
         return tokenWrapper;

@@ -49,7 +49,7 @@ public class CustomBSTTokenProvider implements TokenProvider {
 
     public TokenProviderResponse createToken(TokenProviderParameters tokenParameters) {
         try {
-            Document doc = DOMUtils.createDocument();
+            Document doc = DOMUtils.getEmptyDocument();
 
             // Mock up a BinarySecurityToken
             String id = "BST-1234";
