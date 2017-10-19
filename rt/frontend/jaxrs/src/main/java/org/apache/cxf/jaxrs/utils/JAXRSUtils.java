@@ -832,7 +832,11 @@ public final class JAXRSUtils {
                                            OperationResourceInfo ori)
         throws IOException, WebApplicationException {
         InputStream is = message.getContent(InputStream.class);
-
+        if (is == null) {
+            //may use the jms transport so check the Reader;
+            Reader reader = message.getContent(Reader.class);
+            is = new ReaderInputStream(reader);
+        }
         if (parameter.getType() == ParameterType.REQUEST_BODY) {
 
             if (parameterClass == AsyncResponse.class) {
