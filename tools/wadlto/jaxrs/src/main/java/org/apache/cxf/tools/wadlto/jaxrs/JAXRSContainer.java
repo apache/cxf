@@ -114,8 +114,8 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
     private void processWadl() {
         File outDir = new File((String)context.get(WadlToolConstants.CFG_OUTPUTDIR));
         String wadlURL = getAbsoluteWadlURL();
-        String authorization = (String)context.get(WadlToolConstants.CFG_AUTHORIZATION);
-        String wadl = readWadl(wadlURL, authorization);
+        String authentication = (String)context.get(WadlToolConstants.CFG_AUTHENTICATION);
+        String wadl = readWadl(wadlURL, authentication);
 
         SourceGenerator sg = new SourceGenerator();
         sg.setBus(getBus());
@@ -128,7 +128,7 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         sg.setPackageName((String)context.get(WadlToolConstants.CFG_PACKAGENAME));
         sg.setResourceName((String)context.get(WadlToolConstants.CFG_RESOURCENAME));
         sg.setEncoding((String)context.get(WadlToolConstants.CFG_ENCODING));
-        sg.setAuthorization(authorization);
+        sg.setAuthentication(authentication);
 
         String wadlNs = (String)context.get(WadlToolConstants.CFG_WADL_NAMESPACE);
         if (wadlNs != null) {
@@ -206,12 +206,12 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
 
     }
 
-    protected String readWadl(String wadlURI, String authorization) {
+    protected String readWadl(String wadlURI, String authentication) {
         try {
             URL url = new URL(wadlURI);
             InputStream is = null;
-            if (wadlURI.startsWith("https") && authorization != null) {
-                is = SecureConnectionHelper.getStreamFromSecureConnection(url, authorization);
+            if (wadlURI.startsWith("https") && authentication != null) {
+                is = SecureConnectionHelper.getStreamFromSecureConnection(url, authentication);
             } else {
                 is = url.openStream();
             }
