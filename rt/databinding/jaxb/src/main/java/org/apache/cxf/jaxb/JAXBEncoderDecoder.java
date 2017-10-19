@@ -72,7 +72,7 @@ import javax.xml.stream.util.StreamReaderDelegate;
 import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Attr;
-import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -385,14 +385,14 @@ public final class JAXBEncoderDecoder {
                     QName fname = new QName(attNs, StringUtils.isEmpty(at.name()) ? f.getName() : at.name());
                     ReflectionUtil.setAccessible(f);
                     Object o = Utils.getFieldValue(f, elValue);
-                    Document doc = DOMUtils.newDocument();
-                    writeObject(marshaller, doc, newJAXBElement(fname, String.class, o));
+                    DocumentFragment frag = DOMUtils.getEmptyDocument().createDocumentFragment();
+                    writeObject(marshaller, frag, newJAXBElement(fname, String.class, o));
 
                     if (attNs != null) {
                         writer.writeAttribute(attNs, fname.getLocalPart(),
-                                              DOMUtils.getAllContent(doc.getDocumentElement()));
+                                              DOMUtils.getAllContent(frag));
                     } else {
-                        writer.writeAttribute(fname.getLocalPart(), DOMUtils.getAllContent(doc.getDocumentElement()));
+                        writer.writeAttribute(fname.getLocalPart(), DOMUtils.getAllContent(frag));
                     }
                 }
             }
@@ -405,14 +405,14 @@ public final class JAXBEncoderDecoder {
                     name = Character.toLowerCase(name.charAt(0)) + name.substring(1);
                     XmlAttribute at = m.getAnnotation(XmlAttribute.class);
                     QName mname = new QName(namespace, StringUtils.isEmpty(at.name()) ? name : at.name());
-                    Document doc = DOMUtils.newDocument();
+                    DocumentFragment frag = DOMUtils.getEmptyDocument().createDocumentFragment();
                     Object o = Utils.getMethodValue(m, elValue);
-                    writeObject(marshaller, doc, newJAXBElement(mname, String.class, o));
+                    writeObject(marshaller, frag, newJAXBElement(mname, String.class, o));
                     if (attNs != null) {
                         writer.writeAttribute(attNs, mname.getLocalPart(),
-                                              DOMUtils.getAllContent(doc.getDocumentElement()));
+                                              DOMUtils.getAllContent(frag));
                     } else {
-                        writer.writeAttribute(mname.getLocalPart(), DOMUtils.getAllContent(doc.getDocumentElement()));
+                        writer.writeAttribute(mname.getLocalPart(), DOMUtils.getAllContent(frag));
                     }
                 }
             }

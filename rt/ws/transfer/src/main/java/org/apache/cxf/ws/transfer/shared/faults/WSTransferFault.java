@@ -35,7 +35,7 @@ public abstract class WSTransferFault extends SoapFault {
     public WSTransferFault(String reason, String detail, QName faultCode) {
         super(reason, faultCode);
         if (detail != null) {
-            Document doc = DOMUtils.createDocument();
+            Document doc = DOMUtils.getEmptyDocument();
             Element detailEl = doc.createElement("detail");
             detailEl.setTextContent(detail);
             setDetail(detailEl);

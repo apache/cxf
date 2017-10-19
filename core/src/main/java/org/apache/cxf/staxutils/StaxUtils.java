@@ -1328,7 +1328,7 @@ public final class StaxUtils {
                     return;
                 }
                 parent = stack.pop();
-                if (parent instanceof Document) {
+                if (parent instanceof Document || parent instanceof DocumentFragment) {
                     return;
                 }
                 break;
@@ -1487,7 +1487,7 @@ public final class StaxUtils {
                     return;
                 }
                 parent = context.popFromStack();
-                if (parent instanceof Document) {
+                if (parent instanceof Document || parent instanceof DocumentFragment) {
                     return;
                 }
                 break;
@@ -1569,7 +1569,7 @@ public final class StaxUtils {
                 return parent;
             }
             parent = context.popFromStack();
-            if (parent instanceof Document) {
+            if (parent instanceof Document || parent instanceof DocumentFragment) {
                 return parent;
             }
             break;

@@ -148,7 +148,7 @@ public class X509TokenValidator implements TokenValidator {
             //
             // Turn the received JAXB object into a DOM element
             //
-            Document doc = DOMUtils.createDocument();
+            Document doc = DOMUtils.getEmptyDocument();
             binarySecurity = new X509Security(doc);
             binarySecurity.setEncodingType(encodingType);
             binarySecurity.setValueType(binarySecurityType.getValueType());
@@ -158,7 +158,7 @@ public class X509TokenValidator implements TokenValidator {
             binarySecurity.getElement().appendChild(textNode);
         } else if (validateTarget.isDOMElement()) {
             try {
-                Document doc = DOMUtils.createDocument();
+                Document doc = DOMUtils.getEmptyDocument();
                 binarySecurity = new X509Security(doc);
                 binarySecurity.setEncodingType(BASE64_ENCODING);
                 X509Data x509Data = new X509Data((Element)validateTarget.getToken(), "");

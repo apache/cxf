@@ -146,7 +146,7 @@ public class UsernameTokenValidator implements TokenValidator {
             JAXBContext jaxbContext = cache.getContext();
 
             Marshaller marshaller = jaxbContext.createMarshaller();
-            Document doc = DOMUtils.createDocument();
+            Document doc = DOMUtils.getEmptyDocument();
             Element rootElement = doc.createElement("root-element");
             JAXBElement<UsernameTokenType> tokenType =
                 new JAXBElement<UsernameTokenType>(

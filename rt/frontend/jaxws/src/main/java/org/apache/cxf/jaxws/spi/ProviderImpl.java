@@ -45,7 +45,7 @@ import javax.xml.ws.spi.Invoker;
 import javax.xml.ws.spi.ServiceDelegate;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
-import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
@@ -190,10 +190,10 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
 
             Unmarshaller um = null;
             try {
-                Document doc = DOMUtils.newDocument();
-                DOMResult result = new DOMResult(doc);
+                DocumentFragment frag = DOMUtils.getEmptyDocument().createDocumentFragment();
+                DOMResult result = new DOMResult(frag);
                 external.writeTo(result);
-                W3CDOMStreamReader reader = new W3CDOMStreamReader(doc.getDocumentElement());
+                W3CDOMStreamReader reader = new W3CDOMStreamReader(frag);
 
                 // CXF internal 2005/08 EndpointReferenceType should be
                 // compatible with W3CEndpointReference

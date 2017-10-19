@@ -100,7 +100,7 @@ public abstract class AbstractSoapInterceptor extends AbstractPhaseInterceptor<S
             Element detail = fault.getDetail();
             String soapNamespace = message.getVersion().getNamespace();
             if (detail == null) {
-                Document doc = DOMUtils.newDocument();
+                Document doc = DOMUtils.getEmptyDocument();
                 Element stackTrace = doc.createElementNS(
                     Fault.STACKTRACE_NAMESPACE, Fault.STACKTRACE);
                 stackTrace.setTextContent(sb.toString());
