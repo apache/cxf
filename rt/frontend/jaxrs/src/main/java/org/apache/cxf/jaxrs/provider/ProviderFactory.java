@@ -236,7 +236,7 @@ public abstract class ProviderFactory {
         } else if (candidates.size() == 1) {
             return candidates.get(0);
         } else {
-            Collections.sort(candidates, new ClassComparator());
+            Collections.sort(candidates, new PriorityBasedClassComparator());
             return new ContextResolverProxy<T>(candidates);
         }
 
@@ -812,7 +812,7 @@ public abstract class ProviderFactory {
             if (result != 0) {
                 return result;
             }
-            return comparePriorityStatus(p1, p2);
+            return comparePriorityStatus(p1.getProvider().getClass(), p2.getProvider().getClass());
         }
     }
 
@@ -842,7 +842,7 @@ public abstract class ProviderFactory {
                 return result;
             }
             
-            return comparePriorityStatus(p1, p2);
+            return comparePriorityStatus(p1.getProvider().getClass(), p2.getProvider().getClass());
         }
     }
 
@@ -858,9 +858,9 @@ public abstract class ProviderFactory {
         return result;
     }
 
-    private static int comparePriorityStatus(ProviderInfo<?> p1, ProviderInfo<?> p2) {
-        Integer value1 = AnnotationUtils.getBindingPriority(p1.getProvider().getClass());
-        Integer value2 = AnnotationUtils.getBindingPriority(p2.getProvider().getClass());
+    private static int comparePriorityStatus(Class<?> cl1, Class<?> cl2) {
+        Integer value1 = AnnotationUtils.getBindingPriority(cl1);
+        Integer value2 = AnnotationUtils.getBindingPriority(cl2);
         return value1.compareTo(value2);
     }
 
@@ -1013,6 +1013,25 @@ public abstract class ProviderFactory {
             int result = comp.compare(p1.getProvider(), p2.getProvider());
             if (result == 0 && defaultComp) {
                 result = compareCustomStatus(p1, p2);
+            }
+            return result;
+        }
+    }
+
+    static class PriorityBasedClassComparator extends ClassComparator {
+        PriorityBasedClassComparator() {
+            super();
+        }
+
+        PriorityBasedClassComparator(Class<?> expectedCls) {
+            super(expectedCls);
+        }
+
+        @Override
+        public int compare(Object em1, Object em2) {
+            int result = super.compare(em1, em2);
+            if (result == 0) {
+                result = comparePriorityStatus(em1.getClass(), em2.getClass());
             }
             return result;
         }

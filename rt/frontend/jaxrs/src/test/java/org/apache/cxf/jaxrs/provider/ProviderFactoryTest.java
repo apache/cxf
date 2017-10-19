@@ -856,7 +856,34 @@ public class ProviderFactoryTest extends Assert {
         assertSame(highPriorityBookHandler,
                    pf.createMessageBodyWriter(Book.class, Book.class, new Annotation[]{},
                                               MediaType.APPLICATION_XML_TYPE, new MessageImpl()));
-        
+    }
+
+    @Test
+    public void testSortContextResolverByPriority() {
+        ProviderFactory pf = ServerProviderFactory.getInstance();
+        List<Object> providers = new ArrayList<>();
+        LowPriorityContextResolver lowResolver = new LowPriorityContextResolver();
+        providers.add(lowResolver);
+        HighPriorityContextResolver highResolver = new HighPriorityContextResolver();
+        providers.add(highResolver);
+        pf.setUserProviders(providers);
+        Message m = new MessageImpl();
+        assertEquals(highResolver.getContext(null),
+                   pf.createContextResolver(String.class, m, MediaType.TEXT_PLAIN_TYPE).getContext(null));
+    }
+
+    @Test
+    public void testSortContextResolverByPriorityReversed() {
+        ProviderFactory pf = ServerProviderFactory.getInstance();
+        List<Object> providers = new ArrayList<>();
+        HighPriorityContextResolver highResolver = new HighPriorityContextResolver();
+        providers.add(highResolver);
+        LowPriorityContextResolver lowResolver = new LowPriorityContextResolver();
+        providers.add(lowResolver);
+        pf.setUserProviders(providers);
+        Message m = new MessageImpl();
+        assertEquals(highResolver.getContext(null),
+                   pf.createContextResolver(String.class, m, MediaType.TEXT_PLAIN_TYPE).getContext(null));
     }
 
     private static class TestRuntimeExceptionMapper implements ExceptionMapper<RuntimeException> {
@@ -865,6 +892,24 @@ public class ProviderFactoryTest extends Assert {
             return null;
         }
 
+    }
+
+    @Priority(100)
+    private static class LowPriorityContextResolver implements ContextResolver<String> {
+
+        @Override
+        public String getContext(Class<?> paramClass) {
+            return "low";
+        }
+    }
+
+    @Priority(1)
+    private static class HighPriorityContextResolver implements ContextResolver<String> {
+
+        @Override
+        public String getContext(Class<?> paramClass) {
+            return "high";
+        }
     }
 
     @Priority(Priorities.USER - 10)
