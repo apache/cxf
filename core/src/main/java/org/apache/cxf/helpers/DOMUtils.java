@@ -153,10 +153,10 @@ public final class DOMUtils {
     
     private static synchronized Document createEmptyDocument() {
         if (emptyDocument == null) {
-            //emptyDocument = createDocument();
+            emptyDocument = createDocument();
             
             // uncomment this to see if anything is actually setting anything into the empty doc
-            
+            /*
             final Document doc  = createDocument();
             emptyDocument = (Document)org.apache.cxf.common.util.ProxyHelper.getProxy(
                 DOMUtils.class.getClassLoader(), 
@@ -170,7 +170,7 @@ public final class DOMUtils {
                         throw new IllegalStateException("Cannot modify factory document");
                     }
                 });
-             
+            */
         }
         return emptyDocument;
     }
