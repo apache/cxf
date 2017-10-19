@@ -58,6 +58,7 @@ import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.jaxrs.utils.ReaderInputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 
@@ -352,6 +353,10 @@ public final class ResponseImpl extends Response {
             entityStreamAvailable = entityStream != null;
         } else if (entity instanceof InputStream) {
             entityStream = InputStream.class.cast(entity);
+        } else {
+            Message inMessage = getResponseMessage();
+            Reader reader = inMessage.getContent(Reader.class);
+            entityStream = InputStream.class.cast(new ReaderInputStream(reader));
         }
         
         // we need to check for readers even if no IS is set - the readers may still do it
