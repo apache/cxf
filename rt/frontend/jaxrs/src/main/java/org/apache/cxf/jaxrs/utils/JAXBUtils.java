@@ -120,9 +120,6 @@ public final class JAXBUtils {
                                     boolean marshal,
                                     Object defaultValue) {
         if (typeAdapter != null) {
-            if (InjectionUtils.isSupportedCollectionOrArray(typeAdapter.value().getClass())) {
-                return obj;
-            }
             try {
                 @SuppressWarnings("rawtypes")
                 XmlAdapter xmlAdapter = typeAdapter.value().newInstance();
