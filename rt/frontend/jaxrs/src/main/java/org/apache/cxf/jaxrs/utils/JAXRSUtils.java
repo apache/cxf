@@ -89,6 +89,7 @@ import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.io.ReaderInputStream;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.ext.ContextProvider;
 import org.apache.cxf.jaxrs.ext.DefaultMethod;
@@ -834,9 +835,10 @@ public final class JAXRSUtils {
         throws IOException, WebApplicationException {
         InputStream is = message.getContent(InputStream.class);
         if (is == null) {
-            //may use the jms transport so check the Reader;
             Reader reader = message.getContent(Reader.class);
-            is = new ReaderInputStream(reader);
+            if (reader != null) {
+                is = new ReaderInputStream(reader);
+            }
         }
         if (parameter.getType() == ParameterType.REQUEST_BODY) {
             
