@@ -598,7 +598,11 @@ public final class ServerProviderFactory extends ProviderFactory {
                     return -1;
                 }
             }
-            return super.compare(p1, p2);
+            int result = super.compare(p1, p2);
+            if (result == 0) {
+                result = comparePriorityStatus(p1.getProvider().getClass(), p2.getProvider().getClass());
+            }
+            return result;
         }
     }
 
