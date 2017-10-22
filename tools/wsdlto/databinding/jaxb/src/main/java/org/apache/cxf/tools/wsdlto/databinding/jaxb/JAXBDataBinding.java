@@ -437,24 +437,21 @@ public class JAXBDataBinding implements DataBindingProfile {
                 throw new ToolException(e);
             }
         }
-        addSchemas(opts, schemaCompiler, schemas);
-        addBindingFiles(opts, jaxbBindings, schemas);
 
-
-        for (String ns : context.getNamespacePackageMap().keySet()) {
-            File file = JAXBUtils.getPackageMappingSchemaBindingFile(ns, context.mapPackageName(ns));
+        if (context.optionSet(ToolConstants.CFG_SUPRESS_GENERATED_DATE)) {
+            // Prevents dumping current date as part of @Generated annotation as well as part
+            // of the javadocs of the Java files generated. This is done by passing
+            // '-supress-generated-date' attribute to jaxb xjc.
             try {
-                InputSource ins = new InputSource(file.toURI().toString());
-                schemaCompiler.parseSchema(ins);
-            } finally {
-                FileUtils.delete(file);
+                opts.parseArgument(new String[] {"-supress-generated-date" }, 0);
+            } catch (BadCommandLineException e) {
+                LOG.log(Level.SEVERE, e.getMessage());
+                throw new ToolException(e);
             }
         }
-
-        if (context.getPackageName() != null) {
-            schemaCompiler.setDefaultPackageName(context.getPackageName());
-        }
-
+        addSchemas(opts, schemaCompiler, schemas);
+        addBindingFiles(opts, jaxbBindings, schemas);
+        parseSchemas(schemaCompiler);
 
         rawJaxbModelGenCode = schemaCompiler.bind();
 
@@ -478,6 +475,22 @@ public class JAXBDataBinding implements DataBindingProfile {
         }
 
         initialized = true;
+    }
+
+    private void parseSchemas(SchemaCompiler schemaCompiler) {
+        for (String ns : context.getNamespacePackageMap().keySet()) {
+            File file = JAXBUtils.getPackageMappingSchemaBindingFile(ns, context.mapPackageName(ns));
+            try {
+                InputSource ins = new InputSource(file.toURI().toString());
+                schemaCompiler.parseSchema(ins);
+            } finally {
+                FileUtils.delete(file);
+            }
+        }
+
+        if (context.getPackageName() != null) {
+            schemaCompiler.setDefaultPackageName(context.getPackageName());
+        }
     }
 
     private boolean isJAXB22() {

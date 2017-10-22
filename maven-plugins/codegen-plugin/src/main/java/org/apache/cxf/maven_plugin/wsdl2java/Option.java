@@ -170,6 +170,12 @@ public class Option {
     Boolean markGenerated;
 
     /**
+     * Prevents dumping current date as part of @Generated annotation as well as part of
+     * the javadocs of the Java files generated.
+     */
+    Boolean supressGeneratedDate;
+
+    /**
      * The WSDL service name to use for the generated code
      */
     String serviceName;
@@ -411,6 +417,14 @@ public class Option {
         this.markGenerated = markGenerated;
     }
 
+    public Boolean isSupressGeneratedDate() {
+        return supressGeneratedDate;
+    }
+
+    public void setSupressGeneratedDate(Boolean supressGeneratedDate) {
+        this.supressGeneratedDate = supressGeneratedDate;
+    }
+
     public Boolean getDefaultExcludesNamespace() {
         return defaultExcludesNamespace;
     }
@@ -481,6 +495,7 @@ public class Option {
         destination.setNoTypes(isNoTypes());
         destination.setFaultSerialVersionUID(getFaultSerialVersionUID());
         destination.setMarkGenerated(isMarkGenerated());
+        destination.setSupressGeneratedDate(isSupressGeneratedDate());
         destination.setAllowElementRefs(isAllowElementRefs());
         if (isSetWsdlLocation()) {
             destination.setWsdlLocation(getWsdlLocation());
@@ -509,6 +524,7 @@ public class Option {
         faultSerialVersionUID = setIfNull(faultSerialVersionUID,
             defaultOptions.faultSerialVersionUID);
         markGenerated = setIfNull(markGenerated, defaultOptions.markGenerated);
+        supressGeneratedDate = setIfNull(supressGeneratedDate, defaultOptions.supressGeneratedDate);
         autoNameResolution = setIfNull(autoNameResolution, defaultOptions.autoNameResolution);
         noAddressBinding = setIfNull(noAddressBinding, defaultOptions.noAddressBinding);
         allowElementRefs = setIfNull(allowElementRefs, defaultOptions.allowElementRefs);
