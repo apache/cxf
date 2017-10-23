@@ -29,6 +29,8 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -131,7 +133,15 @@ public final class ResourceUtils {
     }
 
     private ResourceUtils() {
+    }
 
+    private static Method[] getDeclaredMethods(final Class<?> c) {
+        return AccessController.doPrivileged(new PrivilegedAction<Method[]>() {
+            @Override
+            public Method[] run() {
+                return c.getDeclaredMethods();
+            }
+        });
     }
     public static Method findPostConstructMethod(Class<?> c) {
         return findPostConstructMethod(c, null);
@@ -140,7 +150,7 @@ public final class ResourceUtils {
         if (Object.class == c || null == c) {
             return null;
         }
-        for (Method m : c.getDeclaredMethods()) {
+        for (Method m : getDeclaredMethods(c)) {
             if (name != null) {
                 if (m.getName().equals(name)) {
                     return m;
@@ -170,7 +180,7 @@ public final class ResourceUtils {
         if (Object.class == c || null == c) {
             return null;
         }
-        for (Method m : c.getDeclaredMethods()) {
+        for (Method m : getDeclaredMethods(c)) {
             if (name != null) {
                 if (m.getName().equals(name)) {
                     return m;
