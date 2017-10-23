@@ -446,7 +446,9 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
             // get the path part
             URI u = URI.create(address);
             setBasePath(u.getPath());
-            setHost(u.getPort() < 0 ? u.getHost() : u.getHost() + ":" + u.getPort());
+            if (getHost() == null) {
+                setHost(u.getPort() < 0 ? u.getHost() : u.getHost() + ":" + u.getPort());
+            }
         } else {
             setBasePath(address);
         }
