@@ -1406,9 +1406,9 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                         if (!found.contains(el)) {
                             found.add(el);
                             WSEncryptionPart part = null;
-                            boolean saml1 = WSS4JConstants.SAML_NS.equals(el.getNamespaceURI())
+                            boolean saml1 = WSConstants.SAML_NS.equals(el.getNamespaceURI())
                                 && "Assertion".equals(el.getLocalName());
-                            boolean saml2 = WSS4JConstants.SAML2_NS.equals(el.getNamespaceURI())
+                            boolean saml2 = WSConstants.SAML2_NS.equals(el.getNamespaceURI())
                                 && "Assertion".equals(el.getLocalName());
 
                             if (useSTRTransform && (saml1 || saml2)) {
