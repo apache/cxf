@@ -216,7 +216,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                 storeBytesInAttachment = false;
             }
         }
-        
+
         Element soapBody = SAAJUtils.getBody(saaj);
         if (soapBody != null) {
             callbackLookup = new CXFCallbackLookup(soapBody.getOwnerDocument(), soapBody);
@@ -575,7 +575,6 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         
         return ret;
     }
-    
     protected void handleUsernameTokenSupportingToken(
         UsernameToken token, boolean endorse, boolean encryptedToken, List<SupportingToken> ret
     ) throws WSSecurityException {
@@ -1380,6 +1379,11 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         List<WSEncryptionPart> result = new ArrayList<>();
         
         if (xpaths != null && !xpaths.isEmpty()) {
+            boolean useSTRTransform =
+                MessageUtils.getContextualBoolean(
+                    message, SecurityConstants.USE_STR_TRANSFORM, true
+                );
+
             XPathFactory factory = XPathFactory.newInstance();
             for (org.apache.wss4j.policy.model.XPath xPath : xpaths) {
                 XPath xpath = factory.newXPath();
@@ -1401,10 +1405,27 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                         
                         if (!found.contains(el)) {
                             found.add(el);
-                            String id = setIdOnElement(el, forceId);
-                            WSEncryptionPart part = 
-                                new WSEncryptionPart(id, encryptionModifier);
-                            part.setElement(el);
+                            WSEncryptionPart part = null;
+                            boolean saml1 = WSS4JConstants.SAML_NS.equals(el.getNamespaceURI())
+                                && "Assertion".equals(el.getLocalName());
+                            boolean saml2 = WSS4JConstants.SAML2_NS.equals(el.getNamespaceURI())
+                                && "Assertion".equals(el.getLocalName());
+
+                            if (useSTRTransform && (saml1 || saml2)) {
+                                String id = saml2 ? el.getAttributeNS(null, "ID")
+                                    : el.getAttributeNS(null, "AssertionID");
+                                SecurityTokenReference secRef =
+                                    createSTRForSamlAssertion(el.getOwnerDocument(), id, saml1, false);
+                                Element clone = cloneElement(secRef.getElement());
+                                addSupportingElement(clone);
+                                part = new WSEncryptionPart("STRTransform", null, "Element");
+                                part.setId(secRef.getID());
+                                part.setElement(clone);
+                            } else {
+                                String id = setIdOnElement(el, forceId);
+                                part = new WSEncryptionPart(id, encryptionModifier);
+                                part.setElement(el);
+                            }
                             part.setXpath(xPath.getXPath());
                             
                             result.add(part);
