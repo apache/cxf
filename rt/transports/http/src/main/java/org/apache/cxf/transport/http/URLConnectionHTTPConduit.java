@@ -30,6 +30,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.logging.Level;
 
 import org.apache.cxf.Bus;
@@ -329,7 +332,20 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
             }
         }
         protected int getResponseCode() throws IOException {
-            return connection.getResponseCode();
+            try {
+                return AccessController.doPrivileged(new PrivilegedExceptionAction<Integer>() {
+
+                    @Override
+                    public Integer run() throws IOException {
+                        return connection.getResponseCode();
+                    } });
+            } catch (PrivilegedActionException e) {
+                Throwable t = e.getCause();
+                if (t instanceof IOException) {
+                    throw (IOException) t;
+                }
+                throw new RuntimeException(t);
+            }
         }
         protected String getResponseMessage() throws IOException {
             return connection.getResponseMessage();
