@@ -886,6 +886,52 @@ public class ProviderFactoryTest extends Assert {
                    pf.createContextResolver(String.class, m, MediaType.TEXT_PLAIN_TYPE).getContext(null));
     }
 
+    @Test
+    public void testSortExceptionMapperByPriority() {
+        ServerProviderFactory pf = ServerProviderFactory.getInstance();
+        List<Object> providers = new ArrayList<>();
+        LowPriorityExceptionMapper lowMapper = new LowPriorityExceptionMapper();
+        providers.add(lowMapper);
+        HighPriorityExceptionMapper highMapper = new HighPriorityExceptionMapper();
+        providers.add(highMapper);
+        pf.setUserProviders(providers);
+        Message m = new MessageImpl();
+        assertEquals(Response.ok().build().getStatus(),
+                     pf.createExceptionMapper(RuntimeException.class, m).toResponse(null).getStatus());
+    }
+
+    @Test
+    public void testSortExceptionMapperByPriorityReversed() {
+        ServerProviderFactory pf = ServerProviderFactory.getInstance();
+        List<Object> providers = new ArrayList<>();
+        HighPriorityExceptionMapper highMapper = new HighPriorityExceptionMapper();
+        providers.add(highMapper);
+        LowPriorityExceptionMapper lowMapper = new LowPriorityExceptionMapper();
+        providers.add(lowMapper);
+        pf.setUserProviders(providers);
+        Message m = new MessageImpl();
+        assertEquals(Response.ok().build().getStatus(),
+                   pf.createExceptionMapper(RuntimeException.class, m).toResponse(null).getStatus());
+    }
+
+    @Priority(1001)
+    private static class HighPriorityExceptionMapper implements ExceptionMapper<Exception> {
+
+        @Override
+        public Response toResponse(Exception exception) {
+            return Response.ok().build();
+        }
+    }
+
+    @Priority(2001)
+    private static class LowPriorityExceptionMapper implements ExceptionMapper<Exception> {
+
+        @Override
+        public Response toResponse(Exception exception) {
+            return Response.noContent().build();
+        }
+    }
+
     private static class TestRuntimeExceptionMapper implements ExceptionMapper<RuntimeException> {
 
         public Response toResponse(RuntimeException exception) {
