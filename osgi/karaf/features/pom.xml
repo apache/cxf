@@ -140,6 +140,60 @@
                 <groupId>org.apache.karaf.tooling</groupId>
                 <artifactId>karaf-maven-plugin</artifactId>
                 <version>${cxf.karaf.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>javax.xml.bind</groupId>
+                        <artifactId>jaxb-api</artifactId>
+                        <version>2.3.0</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>javax.activation</groupId>
+                        <artifactId>activation</artifactId>
+                        <version>1.1.1</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.sun.xml.bind</groupId>
+                        <artifactId>jaxb-core</artifactId>
+                        <version>${cxf.jaxb.core.version}</version>
+                        <exclusions>
+                            <exclusion>
+                                <groupId>org.glassfish.jaxb</groupId>
+                                <artifactId>jaxb-core</artifactId>
+                            </exclusion>
+                            <exclusion>
+                                <groupId>org.glassfish.jaxb</groupId>
+                                <artifactId>txw2</artifactId>
+                            </exclusion>
+                        </exclusions>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.sun.xml.bind</groupId>
+                        <artifactId>jaxb-impl</artifactId>
+                        <version>${cxf.jaxb.impl.version}</version>
+                        <exclusions>
+                            <exclusion>
+                                <groupId>javax.xml.bind</groupId>
+                                <artifactId>jsr173_api</artifactId>
+                            </exclusion>
+                            <exclusion>
+                                <groupId>javax.xml</groupId>
+                                <artifactId>jsr173</artifactId>
+                            </exclusion>
+                            <exclusion>
+                                <groupId>javax.activation</groupId>
+                                <artifactId>activation</artifactId>
+                            </exclusion>
+                            <exclusion>
+                                <groupId>javax.xml.bind</groupId>
+                                <artifactId>activation</artifactId>
+                            </exclusion>
+                            <exclusion>
+                                <groupId>javax.xml.bind</groupId>
+                                <artifactId>jaxb-api</artifactId>
+                            </exclusion>
+                        </exclusions>
+                    </dependency>
+                </dependencies>
                 <executions>
                     <execution>
                         <id>verify</id>
