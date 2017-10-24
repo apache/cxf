@@ -566,7 +566,7 @@ public class CachedOutputStream extends OutputStream {
 
     public static void setDefaultMaxSize(long l) {
         if (l == -1) {
-            String s = System.getProperty("org.apache.cxf.io.CachedOutputStream.MaxSize",
+            String s = SystemPropertyAction.getProperty("org.apache.cxf.io.CachedOutputStream.MaxSize",
                     "-1");
             l = Long.parseLong(s);
         }
