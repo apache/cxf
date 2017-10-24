@@ -121,7 +121,7 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
                 LOG.warning("Unsupported algorithm: " + state.keyProps.getKeyAlgo());
                 throw new JweException(JweException.Error.INVALID_CONTENT_ALGORITHM);
             }
-            throw new JweException(JweException.Error.CONTENT_ENCRYPTION_FAILURE);
+            throw new JweException(JweException.Error.CONTENT_ENCRYPTION_FAILURE, ex);
         }
     }
     protected byte[] getActualCipher(byte[] cipher) {
