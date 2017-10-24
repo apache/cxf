@@ -138,6 +138,12 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
      */
     @Parameter(defaultValue = "false")
     String fork;
+    
+    /**
+     * Sets the JVM arguments (i.e. <code>-Xms128m -Xmx128m</code>) if fork is set to <code>true</code>.
+     */
+    @Parameter
+    String additionalJvmArgs;
 
     /**
      * The Maven session.
@@ -158,12 +164,7 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
     @Parameter(defaultValue = "${java.home}/bin/java")
     private String javaExecutable;
 
-    /**
-     * Sets the JVM arguments (i.e. <code>-Xms128m -Xmx128m</code>) if fork is set to <code>true</code>.
-     */
-    @Parameter
-    private String additionalJvmArgs;
-
+    
     @Component
     private RepositorySystem repositorySystem;
 
