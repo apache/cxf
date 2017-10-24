@@ -409,7 +409,8 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
                                   @QueryParam("query3") Long queryString3,
                                   @QueryParam("query4") boolean queryBoolean4,
                                   @QueryParam("query5") char queryChar5,
-                                  @QueryParam("query6") String queryString6) {
+                                  @QueryParam("query6") String queryString6,
+                                  @QueryParam("query7") Boolean queryString7) {
         // complete
     }
     
