@@ -436,6 +436,10 @@ public final class InjectionUtils {
             //pass empty string to boxed number type will result in 404
             return null;
         }
+        if (Boolean.class == pClass) {
+            // allow == checks for Boolean object
+            pClass = (Class<T>) Boolean.TYPE;
+        }
         if (pClass.isPrimitive()) {
             try {
                 // cannot us pClass.cast as the pClass is something like
