@@ -305,7 +305,7 @@ public final class LogUtils {
             }
         }
     }
-    
+
     private static void setContextClassLoader(final ClassLoader classLoader) {
         final SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
@@ -344,6 +344,31 @@ public final class LogUtils {
         return clazz.getClassLoader();
     }
 
+    private static ClassLoader getContextClassLoader() {
+        final SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                @Override
+                public ClassLoader run() {
+                    return Thread.currentThread().getContextClassLoader();
+                }
+            });
+        }
+        return Thread.currentThread().getContextClassLoader();
+    }
+
+    private static ClassLoader getClassLoader(final Class<?> clazz) {
+        final SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                @Override
+                public ClassLoader run() {
+                    return clazz.getClassLoader();
+                }
+            });
+        }
+        return clazz.getClassLoader();
+    }
     /**
      * Allows both parameter substitution and a typed Throwable to be logged.
      *
