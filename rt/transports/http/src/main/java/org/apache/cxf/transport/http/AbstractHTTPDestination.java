@@ -648,9 +648,9 @@ public abstract class AbstractHTTPDestination
         if (hasNoResponseContent(outMessage)) {
             response.setContentLength(0);
             response.flushBuffer();
-            response.getOutputStream().close();
+            closeResponseOutputStream(response);
         } else if (!getStream) {
-            response.getOutputStream().close();
+            closeResponseOutputStream(response);
         } else {
             responseStream = response.getOutputStream();
         }
@@ -659,6 +659,14 @@ public abstract class AbstractHTTPDestination
             outMessage.remove(HTTP_RESPONSE);
         }
         return responseStream;
+    }
+
+    private void closeResponseOutputStream(HttpServletResponse response) throws IOException {
+        try {
+            response.getOutputStream().close();
+        } catch (IllegalStateException ex) {
+            // response.getWriter() has already been called
+        }
     }
 
     private int getReponseCodeFromMessage(Message message) {
