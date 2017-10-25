@@ -80,10 +80,12 @@ public class JweOutputStream extends FilterOutputStream {
     
     private void encryptAndWrite(byte[] chunk, int off, int len) throws IOException {
         byte[] encrypted = encryptingCipher.update(chunk, off, len);
-        if (authTagProducer != null) {
-            authTagProducer.update(encrypted, 0, encrypted.length);
+        if (encrypted != null) {
+            if (authTagProducer != null) {
+                authTagProducer.update(encrypted, 0, encrypted.length);
+            }
+            encodeAndWrite(encrypted, 0, encrypted.length, false);
         }
-        encodeAndWrite(encrypted, 0, encrypted.length, false);
     }
     private void encodeAndWrite(byte[] encryptedChunk, int off, int len, boolean finalWrite) throws IOException {
         byte[] theChunk = lastEncryptedDataChunk;
