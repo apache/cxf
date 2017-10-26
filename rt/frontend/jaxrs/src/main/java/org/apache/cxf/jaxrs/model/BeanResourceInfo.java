@@ -41,13 +41,12 @@ package org.apache.cxf.jaxrs.model;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 
 public abstract class BeanResourceInfo extends AbstractResourceInfo {
@@ -80,7 +79,7 @@ public abstract class BeanResourceInfo extends AbstractResourceInfo {
         if (Object.class == cls || cls == null) {
             return;
         }
-        for (Field f : getDeclaredFields(cls)) {
+        for (Field f : ReflectionUtil.getDeclaredFields(cls)) {
             for (Annotation a : f.getAnnotations()) {
                 if (AnnotationUtils.isParamAnnotationClass(a.annotationType())) {
                     if (paramFields == null) {
@@ -130,14 +129,5 @@ public abstract class BeanResourceInfo extends AbstractResourceInfo {
     public List<Field> getParameterFields() {
         return paramFields == null ? Collections.<Field>emptyList()
                                     : Collections.unmodifiableList(paramFields);
-    }
-    
-    private static Field[] getDeclaredFields(final Class<?> cls) {
-        return AccessController.doPrivileged(new PrivilegedAction<Field[]>() {
-
-            @Override
-            public Field[] run() {
-                return cls.getDeclaredFields();
-            } });
     }
 }
