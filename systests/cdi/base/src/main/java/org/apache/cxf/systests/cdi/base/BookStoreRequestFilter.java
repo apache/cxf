@@ -17,19 +17,23 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.jaxrs.cdi;
+package org.apache.cxf.systests.cdi.base;
 
-import javax.ws.rs.core.Feature;
-import javax.ws.rs.core.FeatureContext;
+import java.io.IOException;
 
-import org.apache.cxf.jaxrs.provider.atom.AtomFeedProvider;
-import org.apache.cxf.systests.cdi.base.BookStoreRequestFilter;
+import javax.inject.Inject;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
-public class SampleFeature implements Feature {
+public class BookStoreRequestFilter implements ContainerRequestFilter {
+    @Inject private BookStoreAuthenticator authenticator;
+    
     @Override
-    public boolean configure(FeatureContext context) {
-        context.register(AtomFeedProvider.class);
-        context.register(BookStoreRequestFilter.class);
-        return false;
+    public void filter(ContainerRequestContext requestContext) throws IOException {
+        if (!authenticator.authenticated()) {
+            requestContext.abortWith(Response.status(Status.UNAUTHORIZED).build());
+        }
     }
 }

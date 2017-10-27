@@ -52,6 +52,7 @@ import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.cdi.extension.JAXRSServerFactoryCustomizationExtension;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.provider.ServerConfigurableFactory;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 /**
@@ -138,6 +139,11 @@ public class JAXRSCdiResourceExtension implements Extension {
                 busBean,
                 Bus.class,
                 beanManager.createCreationalContext(busBean));
+        
+        // Adding the extension for dynamic providers registration and instantiation
+        if (bus.getExtension(ServerConfigurableFactory.class) == null) {
+            bus.setExtension(new CdiServerConfigurableFactory(beanManager), ServerConfigurableFactory.class);
+        }
 
         for (final Bean< ? > application: applicationBeans) {
             final Application instance = (Application)beanManager.getReference(

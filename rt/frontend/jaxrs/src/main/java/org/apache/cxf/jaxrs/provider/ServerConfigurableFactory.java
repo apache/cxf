@@ -17,19 +17,26 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.jaxrs.cdi;
+package org.apache.cxf.jaxrs.provider;
 
-import javax.ws.rs.core.Feature;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.FeatureContext;
+import javax.ws.rs.ext.ReaderInterceptor;
+import javax.ws.rs.ext.WriterInterceptor;
 
-import org.apache.cxf.jaxrs.provider.atom.AtomFeedProvider;
-import org.apache.cxf.systests.cdi.base.BookStoreRequestFilter;
-
-public class SampleFeature implements Feature {
-    @Override
-    public boolean configure(FeatureContext context) {
-        context.register(AtomFeedProvider.class);
-        context.register(BookStoreRequestFilter.class);
-        return false;
-    }
+/**
+ * Manages the creation of server-side Configurable<FeatureContext> depending on 
+ * the presence of managed runtime (like CDI f.e.). 
+ */
+public interface ServerConfigurableFactory {
+    Class<?>[] SERVER_FILTER_INTERCEPTOR_CLASSES = new Class<?>[] {
+        ContainerRequestFilter.class,
+        ContainerResponseFilter.class,
+        ReaderInterceptor.class,
+        WriterInterceptor.class 
+    };
+    
+    Configurable<FeatureContext> create(FeatureContext context);
 }
