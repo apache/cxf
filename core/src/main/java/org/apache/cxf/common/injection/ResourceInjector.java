@@ -79,7 +79,11 @@ public class ResourceInjector extends AbstractAnnotationVisitor {
             return null;
         }
         try {
-            return ReflectionUtil.getDeclaredField(cls, name);
+            Field f = ReflectionUtil.getDeclaredField(cls, name);
+            if (f == null) {
+                f = getField(cls.getSuperclass(), name);
+            }
+            return f;
         } catch (Exception ex) {
             return getField(cls.getSuperclass(), name);
         }
