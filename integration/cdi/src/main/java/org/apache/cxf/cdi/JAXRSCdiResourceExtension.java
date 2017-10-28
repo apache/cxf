@@ -49,8 +49,10 @@ import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
+import org.apache.cxf.cdi.event.DisposableCreationalContext;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.provider.ServerConfigurableFactory;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 /**
@@ -137,6 +139,11 @@ public class JAXRSCdiResourceExtension implements Extension {
                 busBean, 
                 Bus.class,
                 beanManager.createCreationalContext(busBean));
+        
+        // Adding the extension for dynamic providers registration and instantiation
+        if (bus.getExtension(ServerConfigurableFactory.class) == null) {
+            bus.setExtension(new CdiServerConfigurableFactory(beanManager), ServerConfigurableFactory.class);
+        }
 
         for (final Bean< ? > application: applicationBeans) {
             final Application instance = (Application)beanManager.getReference(
@@ -179,11 +186,22 @@ public class JAXRSCdiResourceExtension implements Extension {
     }
     
     /**
-     * Releases created CreationalContext instances 
+     * Registers created CreationalContext instances for disposal
+     */
+    public void registerCreationalContextForDisposal(@Observes final DisposableCreationalContext event) {
+        synchronized (disposableCreationalContexts) {
+            disposableCreationalContexts.add(event.getContext());
+        }
+    }
+    
+    /**
+     * Releases created CreationalContext instances
      */
     public void release(@Observes final BeforeShutdown event) {
-        for (final CreationalContext<?> disposableCreationalContext: disposableCreationalContexts) {
-            disposableCreationalContext.release();
+        synchronized (disposableCreationalContexts) {
+            for (final CreationalContext<?> disposableCreationalContext: disposableCreationalContexts) {
+                disposableCreationalContext.release();
+            }
         }
     }
     
@@ -352,9 +370,13 @@ public class JAXRSCdiResourceExtension implements Extension {
      */
     private<T> CreationalContext< T > createCreationalContext(final BeanManager beanManager, Bean< T > bean) {
         final CreationalContext< T > creationalContext = beanManager.createCreationalContext(bean);
+        
         if (!(bean instanceof DefaultApplicationBean)) {
-            disposableCreationalContexts.add(creationalContext);
+            synchronized (disposableCreationalContexts) {
+                disposableCreationalContexts.add(creationalContext);
+            }
         }
+        
         return creationalContext;
     }
 

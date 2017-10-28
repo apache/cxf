@@ -31,8 +31,20 @@ import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 
 public class ConfigurableImpl<C extends Configurable<C>> implements Configurable<C> {
     private ConfigurationImpl config;
-    private C configurable;
-    private Class<?>[] supportedProviderClasses;
+    private final C configurable;
+    private final Class<?>[] supportedProviderClasses;
+
+    private final Instantiator instantiator = new Instantiator() {
+        @Override
+        public <T> Object create(Class<T> cls) {
+            return ConfigurationImpl.createProvider(cls);
+        }
+    };
+    
+    public interface Instantiator {
+        <T> Object create(Class<T> cls);
+    }
+    
     public ConfigurableImpl(C configurable, RuntimeType rt, Class<?>[] supportedProviderClasses) {
         this(configurable, supportedProviderClasses, new ConfigurationImpl(rt));
     }
@@ -98,8 +110,7 @@ public class ConfigurableImpl<C extends Configurable<C>> implements Configurable
 
     @Override
     public C register(Class<?> providerClass, int bindingPriority) {
-        return doRegister(ConfigurationImpl.createProvider(providerClass), 
-                          bindingPriority, supportedProviderClasses);
+        return doRegister(getInstantiator().create(providerClass), bindingPriority, supportedProviderClasses);
     }
 
     @Override
@@ -109,7 +120,11 @@ public class ConfigurableImpl<C extends Configurable<C>> implements Configurable
 
     @Override
     public C register(Class<?> providerClass, Map<Class<?>, Integer> contracts) {
-        return register(ConfigurationImpl.createProvider(providerClass), contracts);
+        return register(getInstantiator().create(providerClass), contracts);
+    }
+    
+    protected Instantiator getInstantiator() {
+        return instantiator;
     }
     
     private C doRegister(Object provider, int bindingPriority, Class<?>... contracts) {

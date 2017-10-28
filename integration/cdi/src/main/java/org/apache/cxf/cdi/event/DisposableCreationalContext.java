@@ -17,19 +17,18 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.jaxrs.cdi;
+package org.apache.cxf.cdi.event;
 
-import javax.ws.rs.core.Feature;
-import javax.ws.rs.core.FeatureContext;
+import javax.enterprise.context.spi.CreationalContext;
 
-import org.apache.cxf.jaxrs.provider.atom.AtomFeedProvider;
-import org.apache.cxf.systests.cdi.base.BookStoreRequestFilter;
-
-public class SampleFeature implements Feature {
-    @Override
-    public boolean configure(FeatureContext context) {
-        context.register(AtomFeedProvider.class);
-        context.register(BookStoreRequestFilter.class);
-        return false;
+public class DisposableCreationalContext {
+    private final CreationalContext<?> context;
+    
+    public DisposableCreationalContext(CreationalContext<?> context) {
+        this.context = context;
+    }
+    
+    public CreationalContext<?> getContext() {
+        return context;
     }
 }
