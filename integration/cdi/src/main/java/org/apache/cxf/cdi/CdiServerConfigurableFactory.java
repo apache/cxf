@@ -28,6 +28,7 @@ import javax.ws.rs.RuntimeType;
 import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.FeatureContext;
 
+import org.apache.cxf.cdi.event.DisposableCreationalContext;
 import org.apache.cxf.jaxrs.impl.ConfigurableImpl;
 import org.apache.cxf.jaxrs.impl.ConfigurableImpl.Instantiator;
 import org.apache.cxf.jaxrs.provider.ServerConfigurableFactory;
@@ -65,6 +66,11 @@ public class CdiServerConfigurableFactory implements ServerConfigurableFactory {
             final BeanAttributes<T> attributes = beanManager.createBeanAttributes(annotatedType);
             final Bean<T> bean = beanManager.createBean(attributes, cls, injectionTargetFactory);
             final CreationalContext<?> context = beanManager.createCreationalContext(bean);
+            
+            if (!beanManager.isNormalScope(bean.getScope())) {
+                beanManager.fireEvent(new DisposableCreationalContext(context));
+            }
+            
             return beanManager.getReference(bean, cls, context);
         }
     }
