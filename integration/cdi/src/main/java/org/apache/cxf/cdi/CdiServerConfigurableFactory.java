@@ -18,12 +18,11 @@
  */
 package org.apache.cxf.cdi;
 
+import java.util.Set;
+
 import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanAttributes;
 import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.InjectionTargetFactory;
 import javax.ws.rs.RuntimeType;
 import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.FeatureContext;
@@ -31,6 +30,7 @@ import javax.ws.rs.core.FeatureContext;
 import org.apache.cxf.cdi.event.DisposableCreationalContext;
 import org.apache.cxf.jaxrs.impl.ConfigurableImpl;
 import org.apache.cxf.jaxrs.impl.ConfigurableImpl.Instantiator;
+import org.apache.cxf.jaxrs.impl.ConfigurationImpl;
 import org.apache.cxf.jaxrs.provider.ServerConfigurableFactory;
 
 /** 
@@ -49,7 +49,8 @@ public class CdiServerConfigurableFactory implements ServerConfigurableFactory {
     }
     
     /** 
-     * Instantiates the instance of the provider using CDI/BeanManager 
+     * Instantiates the instance of the provider using CDI/BeanManager (or fall back
+     * to default strategy of CDI bean is not available).
      */
     private static class CdiInstantiator implements Instantiator {
         private final BeanManager beanManager;
@@ -60,18 +61,21 @@ public class CdiServerConfigurableFactory implements ServerConfigurableFactory {
         
         @Override
         public <T> Object create(Class<T> cls) {
-            final AnnotatedType<T> annotatedType = beanManager.createAnnotatedType(cls);
-            final InjectionTargetFactory<T> injectionTargetFactory = 
-                beanManager.getInjectionTargetFactory(annotatedType);
-            final BeanAttributes<T> attributes = beanManager.createBeanAttributes(annotatedType);
-            final Bean<T> bean = beanManager.createBean(attributes, cls, injectionTargetFactory);
-            final CreationalContext<?> context = beanManager.createCreationalContext(bean);
-            
-            if (!beanManager.isNormalScope(bean.getScope())) {
-                beanManager.fireEvent(new DisposableCreationalContext(context));
+            final Set<Bean<?>> candidates = beanManager.getBeans(cls);
+            final Bean<?> bean = beanManager.resolve(candidates);
+
+            if (bean != null) {
+                final CreationalContext<?> context = beanManager.createCreationalContext(bean);
+                
+                if (!beanManager.isNormalScope(bean.getScope())) {
+                    beanManager.fireEvent(new DisposableCreationalContext(context));
+                }
+
+                return beanManager.getReference(bean, cls, context);
+            } else {
+                // No CDI bean available, falling back to default instantiation strategy
+                return ConfigurationImpl.createProvider(cls);
             }
-            
-            return beanManager.getReference(bean, cls, context);
         }
     }
     
