@@ -21,27 +21,24 @@ package org.apache.cxf.systests.cdi.base;
 
 import java.io.IOException;
 
+import javax.enterprise.inject.Vetoed;
 import javax.inject.Inject;
 import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.container.ResourceInfo;
-import javax.ws.rs.core.Context;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
-public class BookStoreRequestFilter implements ContainerRequestFilter {
+@Vetoed
+public class BookStoreResponseFilter implements ContainerResponseFilter {
     @Inject private BookStoreAuthenticator authenticator;
-    @Context private ResourceInfo resourceInfo;
     
     @Override
-    public void filter(ContainerRequestContext requestContext) throws IOException {
-        // Contextual instances should be injected independently
-        if (resourceInfo == null || resourceInfo.getResourceMethod() == null) {
-            requestContext.abortWith(Response.serverError().build());
-        }
-        
-        if (!authenticator.authenticated()) {
-            requestContext.abortWith(Response.status(Status.UNAUTHORIZED).build());
+    public void filter(ContainerRequestContext requestContext,
+            ContainerResponseContext responseContext) throws IOException {
+        if (authenticator != null) {
+            // This filter should not be created using CDI runtime (it is vetoed) as 
+            // such the injection should not be performed.
+            responseContext.setStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
         }
     }
 }
