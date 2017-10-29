@@ -24,14 +24,22 @@ import java.io.IOException;
 import javax.inject.Inject;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.ResourceInfo;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 public class BookStoreRequestFilter implements ContainerRequestFilter {
     @Inject private BookStoreAuthenticator authenticator;
+    @Context private ResourceInfo resourceInfo;
     
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
+        // Contextual instances should be injected independently
+        if (resourceInfo == null || resourceInfo.getResourceMethod() == null) {
+            requestContext.abortWith(Response.serverError().build());
+        }
+        
         if (!authenticator.authenticated()) {
             requestContext.abortWith(Response.status(Status.UNAUTHORIZED).build());
         }

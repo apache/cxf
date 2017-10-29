@@ -49,7 +49,8 @@ public class CdiServerConfigurableFactory implements ServerConfigurableFactory {
     }
     
     /** 
-     * Instantiates the instance of the provider using CDI/BeanManager 
+     * Instantiates the instance of the provider using CDI/BeanManager (or fall back
+     * to default strategy of CDI bean is not available).
      */
     private static class CdiInstantiator implements Instantiator {
         private final BeanManager beanManager;
@@ -58,11 +59,10 @@ public class CdiServerConfigurableFactory implements ServerConfigurableFactory {
             this.beanManager = beanManager;
         }
         
-        @SuppressWarnings("unchecked")
         @Override
         public <T> Object create(Class<T> cls) {
             final Set<Bean<?>> candidates = beanManager.getBeans(cls);
-            final Bean<T> bean = (Bean<T>)beanManager.resolve(candidates);
+            final Bean<?> bean = beanManager.resolve(candidates);
 
             if (bean != null) {
                 final CreationalContext<?> context = beanManager.createCreationalContext(bean);
