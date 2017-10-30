@@ -27,8 +27,11 @@ import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.WriterInterceptor;
 
 /**
- * Manages the creation of server-side Configurable<FeatureContext> depending on 
+ * Manages the creation of server-side {@code Configurable<FeatureContext>} depending on 
  * the presence of managed runtime (like CDI f.e.). 
+ * 
+ * <b>Note:</b> this interface may change in the future without a prior 
+ * notice, please be aware of that. 
  */
 public interface ServerConfigurableFactory {
     Class<?>[] SERVER_FILTER_INTERCEPTOR_CLASSES = new Class<?>[] {
