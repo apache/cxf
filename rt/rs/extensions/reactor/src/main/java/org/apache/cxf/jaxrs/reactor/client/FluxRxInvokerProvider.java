@@ -18,8 +18,22 @@
  */
 package org.apache.cxf.jaxrs.reactor.client;
 
-import javax.ws.rs.client.RxInvoker;
-import org.reactivestreams.Publisher;
+import org.apache.cxf.jaxrs.client.SyncInvokerImpl;
 
-public interface ReactorRxInvoker extends RxInvoker<Publisher<?>> {
+import javax.ws.rs.client.RxInvokerProvider;
+import javax.ws.rs.client.SyncInvoker;
+import javax.ws.rs.ext.Provider;
+import java.util.concurrent.ExecutorService;
+
+@Provider
+public class FluxRxInvokerProvider implements RxInvokerProvider<FluxRxInvoker> {
+    @Override
+    public boolean isProviderFor(Class<?> invokerType) {
+        return FluxRxInvoker.class.isAssignableFrom(invokerType);
+    }
+
+    @Override
+    public FluxRxInvoker getRxInvoker(SyncInvoker syncInvoker, ExecutorService executorService) {
+        return new FluxRxInvokerImpl(((SyncInvokerImpl)syncInvoker).getWebClient(), executorService);
+    }
 }

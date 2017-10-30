@@ -42,9 +42,9 @@ public class ReactorServer extends AbstractBusTestServerBase {
         sf.setInvoker(new ReactorInvoker());
         sf.setProvider(new JacksonJsonProvider());
         sf.getOutInterceptors().add(new LoggingOutInterceptor());
-//        sf.setResourceClasses(RxJava2ObservableService.class);
-//        sf.setResourceProvider(RxJava2ObservableService.class,
-//                new SingletonResourceProvider(new RxJava2ObservableService(), true));
+        sf.setResourceClasses(FluxService.class);
+        sf.setResourceProvider(FluxService.class,
+                new SingletonResourceProvider(new FluxService(), true));
         sf.setAddress("http://localhost:" + PORT + "/");
         server = sf.create();
     }
@@ -54,5 +54,12 @@ public class ReactorServer extends AbstractBusTestServerBase {
         server.stop();
         server.destroy();
         server = null;
+    }
+
+    public static void main(String[] args) {
+        ReactorServer server = new ReactorServer();
+        System.out.println("Go to http://localhost:" + PORT + "/reactor/flux/textJsonImplicitListAsyncStream");
+        server.start();
+
     }
 }

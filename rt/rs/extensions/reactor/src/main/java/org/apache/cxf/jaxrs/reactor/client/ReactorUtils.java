@@ -18,21 +18,22 @@
  */
 package org.apache.cxf.jaxrs.reactor.client;
 
-import java.util.concurrent.ExecutorService;
-import javax.ws.rs.client.RxInvokerProvider;
-import javax.ws.rs.client.SyncInvoker;
-import javax.ws.rs.ext.Provider;
-import org.apache.cxf.jaxrs.client.SyncInvokerImpl;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
-@Provider
-public class ReactorRxInvokerProvider implements RxInvokerProvider<ReactorRxInvoker> {
-    @Override
-    public boolean isProviderFor(Class<?> invokerType) {
-        return ReactorRxInvoker.class.isAssignableFrom(invokerType);
+class ReactorUtils {
+    static final String TRACE = "TRACE";
+    private ReactorUtils() {
+
     }
-
-    @Override
-    public ReactorRxInvoker getRxInvoker(SyncInvoker syncInvoker, ExecutorService executorService) {
-        return new ReactorRxInvokerImpl(((SyncInvokerImpl)syncInvoker).getWebClient(), executorService);
+    static <R> CompletableFuture<R> toCompletableFuture(Future<R> future) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                return future.get();
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 }

@@ -21,44 +21,37 @@ package org.apache.cxf.jaxrs.reactor.server;
 import org.apache.cxf.jaxrs.JAXRSInvoker;
 import org.apache.cxf.jaxrs.impl.AsyncResponseImpl;
 import org.apache.cxf.message.Message;
-import org.reactivestreams.Publisher;
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.util.function.Consumer;
 
 public class ReactorInvoker extends JAXRSInvoker {
     @Override
     protected AsyncResponseImpl checkFutureResponse(Message inMessage, Object result) {
-        if (result instanceof Publisher) {
-            final Publisher<?> publisher = (Publisher<?>) result;
+        if (result instanceof Flux) {
+            final Flux<?> flux = (Flux<?>) result;
             final AsyncResponseImpl asyncResponse = new AsyncResponseImpl(inMessage);
-            publisher.subscribe(new Subscriber<Object>() {
-                @Override
-                public void onSubscribe(Subscription subscription) {
-                }
-
-                @Override
-                public void onNext(Object o) {
+            flux.doOnNext(asyncResponse::resume)
+                    .doOnError(asyncResponse::resume)
+                    .doOnComplete(asyncResponse::onComplete)
+                    .subscribe();
+            return asyncResponse;
+        } else if (result instanceof Mono) {
+            // mono is only 0 or 1 element, so when something comes in need to complete the async
+            final Mono<?> flux = (Mono<?>) result;
+            final AsyncResponseImpl asyncResponse = new AsyncResponseImpl(inMessage);
+            flux.doOnNext((Consumer<Object>) o -> {
                     asyncResponse.resume(o);
-                }
-
-                @Override
-                public void onError(Throwable throwable) {
-                    asyncResponse.onError(throwable);
-                }
-
-                @Override
-                public void onComplete() {
                     asyncResponse.onComplete();
-                }
-            });
+                })
+                .doOnError((Consumer<Throwable>) throwable -> {
+                    asyncResponse.resume(throwable);
+                    asyncResponse.onComplete();
+                })
+                .subscribe();
             return asyncResponse;
         }
-        return null;
-    }
-
-    private Object handleThrowable(AsyncResponseImpl asyncResponse, Throwable t) {
-        //TODO: if it is a Cancelation exception => asyncResponse.cancel();
-        asyncResponse.resume(t);
         return null;
     }
 }
