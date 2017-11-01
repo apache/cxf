@@ -282,7 +282,7 @@ public class DoMerges {
     }
         
     private static void doMerge(String ver) throws Exception {
-        Process p = Runtime.getRuntime().exec(getCommandLine(new String[] {"git", "cherry-pick", ver}));
+        Process p = Runtime.getRuntime().exec(getCommandLine(new String[] {"git", "cherry-pick", "-x", ver}));
         if (runProcess(p, false) != 0) {
             p = Runtime.getRuntime().exec(getCommandLine(new String[] {"git", "status"}));
             runProcess(p);
