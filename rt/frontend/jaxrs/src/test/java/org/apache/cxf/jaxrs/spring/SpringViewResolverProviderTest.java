@@ -20,7 +20,6 @@ package org.apache.cxf.jaxrs.spring;
 
 import java.io.Closeable;
 import java.lang.annotation.Annotation;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -35,16 +34,13 @@ import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedHashMap;
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.interceptor.AbstractAttributedInterceptorProvider;
-import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxrs.ext.MessageContextImpl;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.message.ExchangeImpl;
-import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
@@ -244,30 +240,6 @@ public class SpringViewResolverProviderTest extends EasyMockSupport {
         TWO
     }
 
-    @SuppressWarnings("unused")
-    private static final class TestView implements View {
-
-        private String viewName;
-
-        TestView(String viewName) {
-            this.viewName = viewName;
-        }
-
-        @Override
-        public String getContentType() {
-            return null;
-        }
-
-        @Override
-        public void render(Map<String, ?> model, HttpServletRequest request, HttpServletResponse response)
-                throws Exception {
-        }
-
-        public String getViewName() {
-            return viewName;
-        }
-    }
-
     private static final class MockEndpoint extends AbstractAttributedInterceptorProvider implements Endpoint {
 
         private static final long serialVersionUID = 1L;
@@ -319,95 +291,6 @@ public class SpringViewResolverProviderTest extends EasyMockSupport {
         }
 
         public List<Closeable> getCleanupHooks() {
-            return null;
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private static class MockBus implements Bus {
-
-        @Override
-        public <T> T getExtension(Class<T> extensionType) {
-            return null;
-        }
-
-        @Override
-        public <T> void setExtension(T extension, Class<T> extensionType) {
-
-        }
-
-        @Override
-        public boolean hasExtensionByName(String name) {
-            return false;
-        }
-
-        @Override
-        public String getId() {
-            return null;
-        }
-
-        @Override
-        public void setId(String i) {
-
-        }
-
-        @Override
-        public void shutdown(boolean wait) {
-
-        }
-
-        @Override
-        public void setProperty(String s, Object o) {
-
-        }
-
-        @Override
-        public Object getProperty(String s) {
-            return null;
-        }
-
-        @Override
-        public Map<String, Object> getProperties() {
-            return null;
-        }
-
-        @Override
-        public void setProperties(Map<String, Object> properties) {
-
-        }
-
-        @Override
-        public Collection<Feature> getFeatures() {
-            return null;
-        }
-
-        @Override
-        public void setFeatures(Collection<? extends Feature> features) {
-
-        }
-
-        @Override
-        public BusState getState() {
-            return null;
-        }
-
-        @Override
-        public List<Interceptor<? extends Message>> getInInterceptors() {
-            return null;
-        }
-
-        @Override
-        public List<Interceptor<? extends Message>> getOutInterceptors() {
-            return null;
-        }
-
-        @Override
-        public List<Interceptor<? extends Message>> getInFaultInterceptors() {
-            return null;
-        }
-
-        @Override
-        public List<Interceptor<? extends Message>> getOutFaultInterceptors() {
             return null;
         }
     }
