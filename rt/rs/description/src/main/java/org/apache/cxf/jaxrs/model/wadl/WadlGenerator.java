@@ -1074,7 +1074,8 @@ public class WadlGenerator implements ContainerRequestFilter {
                 } else {
                     theActualType = ResourceUtils.getActualJaxbType(type, opMethod, inbound);
                 }
-                if (theActualType == Object.class && !(genericType instanceof Class)) {
+                if ((theActualType == Object.class && !(genericType instanceof Class))
+					|| (genericType instanceof TypeVariable)) {
                     Type theType = InjectionUtils.processGenericTypeIfNeeded(
                         ori.getClassResourceInfo().getServiceClass(), Object.class, genericType);
                     theActualType = InjectionUtils.getActualType(theType);
