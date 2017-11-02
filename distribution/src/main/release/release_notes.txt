@@ -1,4 +1,4 @@
-Apache CXF 3.1.13 Release Notes
+Apache CXF 3.1.14 Release Notes
 
 1. Overview
 
@@ -25,7 +25,7 @@ http://cxf.apache.org/docs/31-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
 
-3.1.13 fixes over 34 JIRA issues reported by users and the community.
+3.1.14 fixes over 24 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -72,46 +72,35 @@ to 3.1.
 
 
 ** Bug
-* [CXF-7067] - cxf-codegen-plugin version 3.1.x fails to download wsdlArtifact
-* [CXF-7165] - JAXBUtils.nameToIdentifier(ELEMENT_NAME, IdentifierType.CLASS) returns incorrect result if ELEMENT_NAME starts with Upper Case
-* [CXF-7306] - Namespace Prefix for Subcode Value is ignored
-* [CXF-7371] - Error creating a webservice with lambdas in the implementing class
-* [CXF-7389] - JAXRSUtils warning logs
-* [CXF-7412] -  PhaseInterceptorChain has thrown exception, unwinding now java.lang.NullPointerException: null at org.apache.cxf.binding.soap.saaj.SAAJUtils.getHeader(SAAJUtils.java:43)
-* [CXF-7430] - The logInputStream method of the LoggingInInterceptor fails if input stream size bigger than limit and PrettyPrint option is true.
-* [CXF-7435] - Logger conflict
-* [CXF-7437] - OSGI 'Uses constraint violation' when deploying org.apache.cxf.cxf-rt-rs-service-description-swagger
-* [CXF-7440] - VariantListBuilderImpl build() don't work without add method
-* [CXF-7441] - Type from extended XmlAdapter isn't resolved correctly
-* [CXF-7443] - ClassCastException in org.apache.cxf.transport.http.Headers
-* [CXF-7447] - Java 2 security issues
-* [CXF-7453] - WebFaultOutInterceptor calls getFaultSubcodes() even in case of SOAP1.1 faults
-* [CXF-7454] - NullPointerException during wsdl validation
-* [CXF-7459] - JAX-RS WebClient.invoke() do not respect Content-Type setting in HTTP-Conduit
-* [CXF-7467] - WSDLManagerImpl requires privileged actions in order to work under a security manager
-* [CXF-7474] - Swagger2Feature - Swagger UI not working with JBoss
-* [CXF-7476] - AccessTokenService lost the ability to process the requests from public clients
-* [CXF-7478] - Response entity can not be auto-closed if the entity is read implicitly
-* [CXF-7479] - JOSE Multipart tests started failing in 3.1.x
-* [CXF-7483] - JAXRSServerFactoryBeanDefinitionParser doesn't log autowire failures
-* [CXF-7485] - Reverse proxy url is not reflected in Swagger UI response
-* [CXF-7488] - Protocol Mismatch when using Netty with TLS
+* [CXF-6454] - Orphaned JMS connections created in endless loop
+* [CXF-6672] - PollingMessageListenerContainer does fail silently upon java.lang.Error
+* [CXF-7493] - Cannot define a List<Double> or List<Long> as a query param
+* [CXF-7501] - Cannot inject field in ContainerRequestFilter
+* [CXF-7503] - JwsJsonContainerRequestFilter throws exception in case of DELETE method invocation with empty payload
+* [CXF-7504] - NPE in oauth2 module for jose auth code tokens
+* [CXF-7505] - Oauth2 keystore loading inconsistent with jwt keys
+* [CXF-7507] - Put a configurable limit on the attachment header sizes
+* [CXF-7509] - The authSupplier property is ignored in case of OSGi http conduit configuration
+* [CXF-7511] - cxf-wadl2java-plugin version 3.1.x and 3.2.0 fails to download wadlArtifact
+* [CXF-7515] - Beans created with no package are throwing nullpointer exception
+* [CXF-7524] - runAsFilter is shadowed in Swagger2Feature, should use AbstractSwaggerFeature
+* [CXF-7529] - [osgi] Stale CXF's javax.ws.rs.ext.RuntimeDelegate after refreshing rt-frontend-jaxrs bundle
+* [CXF-7530] - AttachmentSerializer miss a CRLF before the multipart-body per spec rfc2046
+* [CXF-7532] - REST on JMS transport can't handle the request message with text messageType
+* [CXF-7533] - Setter setBus in AbstractConfigurableProvider does nothing
+* [CXF-7534] - Bus set on jaxws-endpoint is not honored anymore
+* [CXF-7536] - STRTransform TransformException when manually adding SAML Assertion via SAMLCallback.setAssertionElement()
+* [CXF-7541] - IllegalStateException can escape from AbstractHttpDestination
+* [CXF-7542] - Resources cannot be injected into fields declared in superclasses
+* [CXF-7545] - Problem to generate WADL when a implementation of generic type is used
 
 
 ** Improvement
-* [CXF-7419] - Support subresource locators returning the classes
-* [CXF-7434] - Improve JweJson and JwsJson filter support
-* [CXF-7436] - Enhance Search SQLPrinterVisitor to support hierarchical queries
-* [CXF-7444] - Add the ability to configure custom SAML audience restriction values
-* [CXF-7449] - introduce a property to set an informative message for the reason phrase when it's null in the response message
-* [CXF-7460] - Support Spring Boot 2.x
-* [CXF-7482] - Let users customize Swagger2Feature with the external properties file
-* [CXF-7492] - Add a new wadltojava 'authorization' option
+* [CXF-7528] - [osgi] rt-transports-http should not fail during servlet unregistration
+* [CXF-7531] - add async-supported init parameter configuration for the cxf-osgi-transport-servlet
+* [CXF-7539] - Provide Boolean wrapper object for == comparation
 
 
-** Task
-* [CXF-7477] - DynamicRegistrationService needs to support "none" authentication method property
-* [CXF-7480] - ClientCredentialsGRantHandler must enforce the client is confidential
 
 
 
