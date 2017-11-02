@@ -1,8 +1,8 @@
-Apache CXF 3.2.0 Release Notes
+Apache CXF 3.2.1 Release Notes
 
 1. Overview
 
-The 3.2.0 version of Apache CXF is a significant new version of CXF
+The 3.2.x versios of Apache CXF is a significant new version of CXF
 that provides several new features and enhancements.  
 
 New features include: 
@@ -16,6 +16,8 @@ New features include:
 * WSS4J Signatures can support MTOM attachments
 * Preliminary support for running on Java 9  (no module support yet)
 * New http-undertow transport
+
+3.2.1 fixes over 32 JIRA issues reported by users and the community
 
 
 Important notes:
@@ -63,3 +65,62 @@ http://issues.apache.org/jira/browse/CXF
 See the migration guide at:
 http://cxf.apache.org/docs/32-migration-guide.html
 for caveats when upgrading.
+
+
+7. Specific issues, features, and improvements fixed in this version
+
+** Bug
+* [CXF-6454] - Orphaned JMS connections created in endless loop
+* [CXF-6672] - PollingMessageListenerContainer does fail silently upon java.lang.Error
+* [CXF-7388] - Problem with MTOM in Camel-CXF
+* [CXF-7473] - ExceptionMapper class hierarchies: incompatible ExceptionMapper selected
+* [CXF-7493] - Cannot define a List<Double> or List<Long> as a query param
+* [CXF-7498] - Problem running cxf-java2swagger-plugin:3.2.0-SNAPSHOT:java2swagger
+* [CXF-7501] - Cannot inject field in ContainerRequestFilter
+* [CXF-7503] - JwsJsonContainerRequestFilter throws exception in case of DELETE method invocation with empty payload
+* [CXF-7504] - NPE in oauth2 module for jose auth code tokens
+* [CXF-7505] - Oauth2 keystore loading inconsistent with jwt keys
+* [CXF-7507] - Put a configurable limit on the attachment header sizes
+* [CXF-7509] - The authSupplier property is ignored in case of OSGi http conduit configuration
+* [CXF-7510] - SSE integration in CDI abruptly fails with no indication why
+* [CXF-7511] - cxf-wadl2java-plugin version 3.1.x and 3.2.0 fails to download wadlArtifact
+* [CXF-7514] - IOUtils.isEmpty returns false if isAvailable is zero and no marks are supported
+* [CXF-7515] - Beans created with no package are throwing nullpointer exception
+* [CXF-7517] - Codegen fails when using JDK9 with maven and cxf-plugin
+* [CXF-7519] - The cxf-rt-transports-http-jetty should not rely on the old blueprint compatibility bundle
+* [CXF-7524] - runAsFilter is shadowed in Swagger2Feature, should use AbstractSwaggerFeature
+* [CXF-7529] - [osgi] Stale CXF's javax.ws.rs.ext.RuntimeDelegate after refreshing rt-frontend-jaxrs bundle
+* [CXF-7530] - AttachmentSerializer miss a CRLF before the multipart-body per spec rfc2046
+* [CXF-7532] - REST on JMS transport can't handle the request message with text messageType
+* [CXF-7533] - Setter setBus in AbstractConfigurableProvider does nothing
+* [CXF-7534] - Bus set on jaxws-endpoint is not honored anymore
+* [CXF-7536] - STRTransform TransformException when manually adding SAML Assertion via SAMLCallback.setAssertionElement()
+* [CXF-7541] - IllegalStateException can escape from AbstractHttpDestination
+* [CXF-7542] - Resources cannot be injected into fields declared in superclasses
+* [CXF-7545] - Problem to generate WADL when a implementation of generic type is used
+
+** Improvement
+* [CXF-6316] - Provide a utility support for encrypting SAML assertions into OAuth2 tokens
+* [CXF-6355] - Add visitors for Solr and ElasticSearch queries
+* [CXF-6727] - Make Claim based access control interceptors/annotations usable with JWT tokens
+* [CXF-6829] - JOSE Key management code should be encapsulated as a default strategy
+* [CXF-7274] - Improve OAuth2 incremental authorization support
+* [CXF-7297] - Improve the way CXF endpoint metrics are shown in Spring Boot
+* [CXF-7439] - Support OpenTracing Tracer API
+* [CXF-7461] - Update jackson to 2.9.1
+* [CXF-7462] - OutboundSseEventImpl could use some minor tweaks
+* [CXF-7500] - AbstractSSOSpHandler throws IllegalArgumentException when creating a cookie
+* [CXF-7528] - [osgi] rt-transports-http should not fail during servlet unregistration
+* [CXF-7531] - add async-supported init parameter configuration for the cxf-osgi-transport-servlet
+* [CXF-7539] - Provide Boolean wrapper object for == comparation
+
+** New Feature
+* [CXF-6349] - Introduce HTTP/2 Transport
+* [CXF-6362] - CXF and BigData platform integration
+* [CXF-6526] - Support JSR 371 (MVC) spec
+* [CXF-6532] - Consider implementing Json Clear Signature spec
+
+** Task
+* [CXF-6487] - OIDC RP code needs to pass a verification test
+* [CXF-6911] - Create JWE JSON streaming out interceptor
+
