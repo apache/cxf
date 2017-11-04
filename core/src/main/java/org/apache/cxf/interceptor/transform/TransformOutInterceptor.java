@@ -21,6 +21,7 @@ package org.apache.cxf.interceptor.transform;
 
 
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -40,7 +41,6 @@ import org.apache.cxf.staxutils.transform.TransformUtils;
 /**
  * Creates an XMLStreamWriter from the OutputStream on the Message.
  */
-@Deprecated /* please use CharsetAwareTransformOutInterceptor instead */
 public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
     
     private static final String OUTPUT_STREAM_HOLDER = 
@@ -92,11 +92,16 @@ public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
             || MessageUtils.isTrue(message.getContextualProperty(TRANSFORM_SKIP))) {
             return;
         }
-        
+
+        String encoding = (String)message.getContextualProperty(Message.ENCODING);
+        if (encoding == null) {
+            encoding = StandardCharsets.UTF_8.name();
+        }
+
         XMLStreamWriter writer = message.getContent(XMLStreamWriter.class);
         OutputStream out = message.getContent(OutputStream.class);
         
-        XMLStreamWriter transformWriter = createTransformWriterIfNeeded(writer, out);
+        XMLStreamWriter transformWriter = createTransformWriterIfNeeded(writer, out, encoding);
         if (transformWriter != null) {
             message.setContent(XMLStreamWriter.class, transformWriter);
             if (MessageUtils.isRequestor(message)) {
@@ -109,8 +114,8 @@ public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
         }
     }
    
-    protected XMLStreamWriter createTransformWriterIfNeeded(XMLStreamWriter writer, OutputStream os) {
-        return TransformUtils.createTransformWriterIfNeeded(writer, os, 
+    protected XMLStreamWriter createTransformWriterIfNeeded(XMLStreamWriter writer, OutputStream os, String encoding) {
+        return TransformUtils.createTransformWriterIfNeeded(writer, os, encoding,
                                                       outElementsMap,
                                                       outDropElements,
                                                       outAppendMap,

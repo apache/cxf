@@ -70,6 +70,7 @@ public final class TransformUtils {
                 outElementsMap, outDropElements, outAppendMap, attributesToElements, defaultNamespace);
     }
 
+    //CHECKSTYLE:OFF ParameterNumber
     public static XMLStreamWriter createTransformWriterIfNeeded(XMLStreamWriter writer,
                                                                 OutputStream os,
                                                                 String encoding,
@@ -86,6 +87,7 @@ public final class TransformUtils {
         }
         return writer;
     }
+    //CHECKSTYLE:ON
 
     //CHECKSTYLE:OFF ParameterNumber
     @Deprecated // please provide explicitly the desired charset encoding
@@ -101,7 +103,9 @@ public final class TransformUtils {
                 outElementsMap, outDropElements, outAppendMap, outAttributesMap,
                 attributesToElements, defaultNamespace);
     }
+    //CHECKSTYLE:ON
 
+    //CHECKSTYLE:OFF ParameterNumber
     public static XMLStreamWriter createTransformWriterIfNeeded(XMLStreamWriter writer,
                                                                 OutputStream os,
                                                                 String encoding,
@@ -155,6 +159,7 @@ public final class TransformUtils {
                 inDropElements, inElementsMap, inAppendMap, inAttributesMap, blockOriginalReader);
     }
 
+    //CHECKSTYLE:OFF ParameterNumber
     public static XMLStreamReader createTransformReaderIfNeeded(XMLStreamReader reader,
                                                                 InputStream is,
                                                                 String encoding,
@@ -172,7 +177,8 @@ public final class TransformUtils {
 
         return reader;
     }
-    
+    //CHECKSTYLE:ON
+
     protected static void convertToQNamesMap(Map<String, String> map,
                                              QNamesMap elementsMap,
                                              Map<String, String> nsMap) {
