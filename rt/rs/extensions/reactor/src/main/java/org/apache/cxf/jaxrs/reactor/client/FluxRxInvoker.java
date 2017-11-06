@@ -18,12 +18,11 @@
  */
 package org.apache.cxf.jaxrs.reactor.client;
 
-import reactor.core.publisher.Flux;
-
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.RxInvoker;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
+import reactor.core.publisher.Flux;
 
 @SuppressWarnings("rawtypes")
 public interface FluxRxInvoker extends RxInvoker<Flux> {

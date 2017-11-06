@@ -18,33 +18,33 @@
  */
 package org.apache.cxf.jaxrs.reactor.client;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.Response;
 import org.apache.cxf.jaxrs.client.WebClient;
+import static org.apache.cxf.jaxrs.reactor.client.ReactorUtils.toCompletableFuture;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.Response;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-
-import static org.apache.cxf.jaxrs.reactor.client.ReactorUtils.toCompletableFuture;
-
 public class FluxRxInvokerImpl implements FluxRxInvoker {
     private static final String TRACE = "TRACE";
     private final WebClient webClient;
     private final Scheduler scheduler;
+    private final ExecutorService executorService;
 
     FluxRxInvokerImpl(WebClient webClient, ExecutorService executorService) {
         this.webClient = webClient;
+        this.executorService = executorService;
         this.scheduler = executorService == null ? null : Schedulers.fromExecutorService(executorService);
     }
 
     @Override
-    public Flux get() {
+    public Flux<Response> get() {
         return method(HttpMethod.GET);
     }
 
@@ -169,7 +169,7 @@ public class FluxRxInvokerImpl implements FluxRxInvoker {
     }
 
     private <R> Flux<R> flux(Future<R> future) {
-        Flux<R> flux = Flux.from(Mono.fromFuture(toCompletableFuture(future)));
+        Flux<R> flux = Flux.from(Mono.fromFuture(toCompletableFuture(future, executorService)));
         if (scheduler != null) {
             flux = flux.subscribeOn(scheduler);
         }

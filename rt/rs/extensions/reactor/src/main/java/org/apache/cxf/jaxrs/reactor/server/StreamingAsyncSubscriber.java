@@ -18,17 +18,16 @@
  */
 package org.apache.cxf.jaxrs.reactor.server;
 
-import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.jaxrs.ext.StreamingResponse;
-import org.reactivestreams.Subscription;
-
-import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.container.TimeoutHandler;
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.TimeoutHandler;
+import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.jaxrs.ext.StreamingResponse;
+import org.reactivestreams.Subscription;
 
 public class StreamingAsyncSubscriber<T> extends AbstractSubscriber<T> {
     private BlockingQueue<T> queue = new LinkedBlockingQueue<T>();

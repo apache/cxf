@@ -21,16 +21,16 @@ package org.apache.cxf.extensions.reactor.test;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.core.GenericType;
+import javax.xml.ws.Holder;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
-import org.apache.cxf.jaxrs.reactor.client.FluxRxInvoker;
-import org.apache.cxf.jaxrs.reactor.client.FluxRxInvokerProvider;
+import org.apache.cxf.jaxrs.reactor.client.MonoRxInvoker;
+import org.apache.cxf.jaxrs.reactor.client.MonoRxInvokerProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class FluxReactorTest extends AbstractBusClientServerTestBase {
+public class MonoReactorTest extends AbstractBusClientServerTestBase {
     public static final String PORT = ReactorServer.PORT;
     @BeforeClass
     public static void startServers() throws Exception {
@@ -41,42 +41,56 @@ public class FluxReactorTest extends AbstractBusClientServerTestBase {
     }
     @Test
     public void testGetHelloWorldJson() throws Exception {
-        String address = "http://localhost:" + PORT + "/reactor/flux/textJson";
-        List<HelloWorldBean> collector = new ArrayList<>();
+        String address = "http://localhost:" + PORT + "/reactor/mono/textJson";
+        List<HelloWorldBean> holder = new ArrayList<>();
         ClientBuilder.newClient()
                 .register(new JacksonJsonProvider())
-                .register(new FluxRxInvokerProvider())
+                .register(new MonoRxInvokerProvider())
                 .target(address)
                 .request("application/json")
-                .rx(FluxRxInvoker.class)
+                .rx(MonoRxInvoker.class)
                 .get(HelloWorldBean.class)
-                .doOnNext(collector::add)
+                .doOnNext(holder::add)
                 .subscribe();
         Thread.sleep(500);
-        assertEquals(1, collector.size());
-        HelloWorldBean bean = collector.get(0);
+        assertEquals(1, holder.size());
+        HelloWorldBean bean = holder.get(0);
         assertEquals("Hello", bean.getGreeting());
         assertEquals("World", bean.getAudience());
     }
 
     @Test
     public void testTextJsonImplicitListAsyncStream() throws Exception {
-        String address = "http://localhost:" + PORT + "/reactor/flux/textJsonImplicitListAsyncStream";
-//        Holder<String> holder = new Holder<>();
+        String address = "http://localhost:" + PORT + "/reactor/mono/textJsonImplicitListAsyncStream";
+        Holder<HelloWorldBean> holder = new Holder<>();
         ClientBuilder.newClient()
                 .register(new JacksonJsonProvider())
-                .register(new FluxRxInvokerProvider())
+                .register(new MonoRxInvokerProvider())
                 .target(address)
                 .request("application/json")
-                .rx(FluxRxInvoker.class)
-                .get(new GenericType<List<String>>() { })
-                .doOnNext(System.out::println)
-//                .doOnNext(msg -> holder.value = msg)
+                .rx(MonoRxInvoker.class)
+                .get(HelloWorldBean.class)
+                .doOnNext(helloWorldBean -> holder.value = helloWorldBean)
                 .subscribe();
+        Thread.sleep(2000);
+        assertEquals("Hello", holder.value.getGreeting());
+        assertEquals("World", holder.value.getAudience());
+    }
+
+    @Test
+    public void testGetString() throws Exception {
+        String address = "http://localhost:" + PORT + "/reactor/mono/textAsync";
+        Holder<String> holder = new Holder<>();
+        ClientBuilder.newClient()
+                .register(new MonoRxInvokerProvider())
+                .target(address)
+                .request("text/plain")
+                .rx(MonoRxInvoker.class)
+                .get(String.class)
+                .doOnNext(msg -> holder.value = msg)
+                .subscribe();
+
         Thread.sleep(500);
-//        System.out.println(holder.value);
-//        assertEquals(1, holder.value.size());
-//        assertEquals("Hello", holder.value.getGreeting());
-//        assertEquals("World", holder.value.getAudience());
+        assertEquals("Hello, world!", holder.value);
     }
 }

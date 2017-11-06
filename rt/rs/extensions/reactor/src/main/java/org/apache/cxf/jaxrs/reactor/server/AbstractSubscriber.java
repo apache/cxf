@@ -18,12 +18,11 @@
  */
 package org.apache.cxf.jaxrs.reactor.server;
 
+import java.util.List;
+import javax.ws.rs.container.AsyncResponse;
 import org.apache.cxf.jaxrs.ext.StreamingResponse;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
-
-import javax.ws.rs.container.AsyncResponse;
-import java.util.List;
 
 public abstract class AbstractSubscriber<T> implements Subscriber<T> {
 
@@ -51,8 +50,8 @@ public abstract class AbstractSubscriber<T> implements Subscriber<T> {
     }
 
     @Override
-    public void onSubscribe(Subscription subscription) {
-        this.subscription = subscription;
+    public void onSubscribe(Subscription inSubscription) {
+        this.subscription = inSubscription;
         requestAll();
     }
 

@@ -23,27 +23,43 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
+import org.apache.cxf.jaxrs.reactor.server.AbstractSubscriber;
 import org.apache.cxf.jaxrs.reactor.server.JsonStreamingAsyncSubscriber;
-import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
-@Path("/reactor/flux")
-public class FluxService {
+@Path("/reactor/mono")
+public class MonoService {
 
     @GET
     @Produces("application/json")
     @Path("textJson")
-    public Flux<HelloWorldBean> getJson() {
-        return Flux.just(new HelloWorldBean());
+    public Mono<HelloWorldBean> getJson() {
+        return Mono.just(new HelloWorldBean());
     }
 
     @GET
     @Produces("application/json")
     @Path("textJsonImplicitListAsyncStream")
     public void getJsonImplicitListStreamingAsync(@Suspended AsyncResponse ar) {
-        Flux.just("Hello", "Ciao")
+        Mono.just("Hello")
                 .map(HelloWorldBean::new)
-                .subscribeOn(Schedulers.parallel())
-                .subscribe(new JsonStreamingAsyncSubscriber<>(ar));
+                .subscribeOn(Schedulers.elastic())
+                .subscribe(new JsonStreamingAsyncSubscriber<>(ar, null, null, null, 1000, 0));
+    }
+
+    @GET
+    @Produces("text/plain")
+    @Path("textAsync")
+    public void getTextAsync(@Suspended final AsyncResponse ar) {
+        Mono.just("Hello, ").map(s -> s + "world!")
+                .subscribe(new StringAsyncSubscriber(ar));
+
+    }
+
+    private static class StringAsyncSubscriber extends AbstractSubscriber<String> {
+        StringAsyncSubscriber(AsyncResponse ar) {
+            super(ar);
+        }
     }
 }

@@ -18,13 +18,12 @@
  */
 package org.apache.cxf.jaxrs.reactor.server;
 
+import java.util.function.Consumer;
 import org.apache.cxf.jaxrs.JAXRSInvoker;
 import org.apache.cxf.jaxrs.impl.AsyncResponseImpl;
 import org.apache.cxf.message.Message;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.function.Consumer;
 
 public class ReactorInvoker extends JAXRSInvoker {
     @Override
@@ -42,13 +41,13 @@ public class ReactorInvoker extends JAXRSInvoker {
             final Mono<?> flux = (Mono<?>) result;
             final AsyncResponseImpl asyncResponse = new AsyncResponseImpl(inMessage);
             flux.doOnNext((Consumer<Object>) o -> {
-                    asyncResponse.resume(o);
-                    asyncResponse.onComplete();
-                })
-                .doOnError((Consumer<Throwable>) throwable -> {
-                    asyncResponse.resume(throwable);
-                    asyncResponse.onComplete();
-                })
+                asyncResponse.resume(o);
+                asyncResponse.onComplete();
+            })
+            .doOnError((Consumer<Throwable>) throwable -> {
+                asyncResponse.resume(throwable);
+                asyncResponse.onComplete();
+            })
                 .subscribe();
             return asyncResponse;
         }

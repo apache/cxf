@@ -20,20 +20,27 @@ package org.apache.cxf.jaxrs.reactor.client;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
+import java.util.function.Supplier;
 
-class ReactorUtils {
+final class ReactorUtils {
     static final String TRACE = "TRACE";
     private ReactorUtils() {
 
     }
-    static <R> CompletableFuture<R> toCompletableFuture(Future<R> future) {
-        return CompletableFuture.supplyAsync(() -> {
+    static <R> CompletableFuture<R> toCompletableFuture(Future<R> future, Executor executor) {
+        Supplier<R> supplier = () -> {
             try {
                 return future.get();
             } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
             }
-        });
+        };
+        if (executor != null) {
+            return CompletableFuture.supplyAsync(supplier, executor);
+        } else {
+            return CompletableFuture.supplyAsync(supplier);
+        }
     }
 }
