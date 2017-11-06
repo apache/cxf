@@ -35,8 +35,8 @@ import org.apache.cxf.greeter_control.GreeterService;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
-import org.apache.cxf.interceptor.transform.CharsetAwareTransformInInterceptor;
-import org.apache.cxf.interceptor.transform.CharsetAwareTransformOutInterceptor;
+import org.apache.cxf.interceptor.transform.TransformInInterceptor;
+import org.apache.cxf.interceptor.transform.TransformOutInterceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.systest.interceptor.GreeterImpl;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -59,8 +59,8 @@ public class StaxTransformFeatureTest extends AbstractBusClientServerTestBase {
     
     private static TestLoggingInInterceptor serverlogIn = new TestLoggingInInterceptor();
     private static TestLoggingOutInterceptor serverlogOut = new TestLoggingOutInterceptor();
-    private static CharsetAwareTransformInInterceptor servertransIn = new CharsetAwareTransformInInterceptor();
-    private static CharsetAwareTransformOutInterceptor servertransOut = new CharsetAwareTransformOutInterceptor();
+    private static TransformInInterceptor servertransIn = new TransformInInterceptor();
+    private static TransformOutInterceptor servertransOut = new TransformOutInterceptor();
     
     private Greeter greeter;
 
