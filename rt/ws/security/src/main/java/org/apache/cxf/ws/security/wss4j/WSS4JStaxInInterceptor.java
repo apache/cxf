@@ -74,18 +74,21 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
 
     public WSS4JStaxInInterceptor(WSSSecurityProperties securityProperties) {
         super(securityProperties);
+        WSSec.init();
         setPhase(Phase.POST_STREAM);
         getAfter().add(StaxInInterceptor.class.getName());
     }
 
     public WSS4JStaxInInterceptor(Map<String, Object> props) {
         super(props);
+        WSSec.init();
         setPhase(Phase.POST_STREAM);
         getAfter().add(StaxInInterceptor.class.getName());
     }
 
     public WSS4JStaxInInterceptor() {
         super();
+        WSSec.init();
         setPhase(Phase.POST_STREAM);
         getAfter().add(StaxInInterceptor.class.getName());
     }
