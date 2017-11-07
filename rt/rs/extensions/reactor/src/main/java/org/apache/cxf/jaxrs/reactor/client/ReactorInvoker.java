@@ -26,8 +26,7 @@ import javax.ws.rs.core.Response;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@SuppressWarnings("rawtypes")
-public interface ReactorInvoker extends RxInvoker<Mono> {
+public interface ReactorInvoker extends RxInvoker<Mono<?>> {
     @Override
     Mono<Response> get();
 
