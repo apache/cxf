@@ -36,6 +36,8 @@ import javax.activation.DataSource;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Feature;
+import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -86,6 +88,41 @@ public class ProviderFactoryTest extends Assert {
     @Test
     public void testMultipleFactories() {
         assertNotSame(ServerProviderFactory.getInstance(), ServerProviderFactory.getInstance());
+    }
+    
+    @Test
+    public void testRegisterInFeature() {
+        ServerProviderFactory pf = ServerProviderFactory.getInstance();
+        final Object provider = new WebApplicationExceptionMapper();
+        pf.registerUserProvider(new Feature() {
+            public boolean configure(FeatureContext context) {
+                context.register(provider);
+                return true;
+            }
+        });
+        ExceptionMapper<WebApplicationException> em =
+            pf.createExceptionMapper(WebApplicationException.class, new MessageImpl());
+        assertSame(provider, em);
+    }
+    
+    @Test
+    public void testRegisterFeatureInFeature() {
+        ServerProviderFactory pf = ServerProviderFactory.getInstance();
+        final Object provider = new WebApplicationExceptionMapper();
+        pf.registerUserProvider(new Feature() {
+            public boolean configure(FeatureContext context) {
+                context.register(new Feature() {
+                    public boolean configure(FeatureContext context2) {
+                        context2.register(provider);
+                        return true;
+                    }
+                });
+                return true;
+            }
+        });
+        ExceptionMapper<WebApplicationException> em =
+            pf.createExceptionMapper(WebApplicationException.class, new MessageImpl());
+        assertSame(provider, em);
     }
     
     @Test
