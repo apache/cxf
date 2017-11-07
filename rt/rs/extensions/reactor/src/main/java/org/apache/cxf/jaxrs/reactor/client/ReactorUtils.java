@@ -19,6 +19,7 @@
 package org.apache.cxf.jaxrs.reactor.client;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
@@ -34,7 +35,7 @@ final class ReactorUtils {
             try {
                 return future.get();
             } catch (InterruptedException | ExecutionException e) {
-                throw new RuntimeException(e);
+                throw new CompletionException(e);
             }
         };
         if (executor != null) {

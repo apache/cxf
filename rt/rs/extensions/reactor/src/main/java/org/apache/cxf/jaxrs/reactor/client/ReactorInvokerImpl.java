@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.reactor.client;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -34,18 +35,14 @@ import static org.apache.cxf.jaxrs.reactor.client.ReactorUtils.toCompletableFutu
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
-import reactor.core.scheduler.Schedulers;
 
 public class ReactorInvokerImpl implements ReactorInvoker {
     private final WebClient webClient;
-    private final Scheduler scheduler;
     private final ExecutorService executorService;
 
     ReactorInvokerImpl(WebClient webClient, ExecutorService executorService) {
         this.webClient = webClient;
         this.executorService = executorService;
-        this.scheduler = executorService == null ? null : Schedulers.fromExecutorService(executorService);
     }
 
     @Override
@@ -216,11 +213,7 @@ public class ReactorInvokerImpl implements ReactorInvoker {
     }
 
     private <R> Mono<R> mono(Future<R> future) {
-        Mono<R> mono = Mono.fromFuture(toCompletableFuture(future, executorService));
-        if (scheduler != null) {
-            mono = mono.subscribeOn(scheduler);
-        }
-        return mono;
+        return Mono.fromFuture(toCompletableFuture(future, executorService));
     }
 
     private <R> Iterable<R> toIterable(Future<Response> futureResponse, Class<R> type) {
@@ -229,7 +222,7 @@ public class ReactorInvokerImpl implements ReactorInvoker {
             GenericType<List<R>> rGenericType = new GenericType<>(new WrappedType<R>(type));
             return response.readEntity(rGenericType);
         } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
+            throw new CompletionException(e);
         }
     }
 
