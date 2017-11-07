@@ -18,6 +18,10 @@
  */
 package org.apache.cxf.jaxrs.reactor.client;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import javax.ws.rs.HttpMethod;
@@ -27,16 +31,18 @@ import javax.ws.rs.core.Response;
 import org.apache.cxf.jaxrs.client.WebClient;
 import static org.apache.cxf.jaxrs.reactor.client.ReactorUtils.TRACE;
 import static org.apache.cxf.jaxrs.reactor.client.ReactorUtils.toCompletableFuture;
+
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
-public class MonoRxInvokerImpl implements MonoRxInvoker {
+public class ReactorInvokerImpl implements ReactorInvoker {
     private final WebClient webClient;
     private final Scheduler scheduler;
     private final ExecutorService executorService;
 
-    MonoRxInvokerImpl(WebClient webClient, ExecutorService executorService) {
+    ReactorInvokerImpl(WebClient webClient, ExecutorService executorService) {
         this.webClient = webClient;
         this.executorService = executorService;
         this.scheduler = executorService == null ? null : Schedulers.fromExecutorService(executorService);
@@ -50,6 +56,11 @@ public class MonoRxInvokerImpl implements MonoRxInvoker {
     @Override
     public <R> Mono<R> get(Class<R> responseType) {
         return method(HttpMethod.GET, responseType);
+    }
+
+    @Override
+    public <T> Flux<T> getFlux(Class<T> responseType) {
+        return flux(HttpMethod.GET, responseType);
     }
 
     @Override
@@ -68,6 +79,11 @@ public class MonoRxInvokerImpl implements MonoRxInvoker {
     }
 
     @Override
+    public <T> Flux<T> putFlux(Entity<?> entity, Class<T> responseType) {
+        return flux(HttpMethod.PUT, entity, responseType);
+    }
+
+    @Override
     public <R> Mono<R> put(Entity<?> entity, GenericType<R> genericType) {
         return method(HttpMethod.PUT, entity, genericType);
     }
@@ -83,6 +99,11 @@ public class MonoRxInvokerImpl implements MonoRxInvoker {
     }
 
     @Override
+    public <T> Flux<T> postFlux(Entity<?> entity, Class<T> responseType) {
+        return flux(HttpMethod.POST, entity, responseType);
+    }
+
+    @Override
     public <R> Mono<R> post(Entity<?> entity, GenericType<R> genericType) {
         return method(HttpMethod.POST, entity, genericType);
     }
@@ -95,6 +116,11 @@ public class MonoRxInvokerImpl implements MonoRxInvoker {
     @Override
     public <R> Mono<R> delete(Class<R> responseType) {
         return method(HttpMethod.DELETE, responseType);
+    }
+
+    @Override
+    public <T> Flux<T> deleteFlux(Class<T> responseType) {
+        return flux(HttpMethod.DELETE, responseType);
     }
 
     @Override
@@ -118,6 +144,11 @@ public class MonoRxInvokerImpl implements MonoRxInvoker {
     }
 
     @Override
+    public <T> Flux<T> optionsFlux(Class<T> responseType) {
+        return flux(HttpMethod.OPTIONS, responseType);
+    }
+
+    @Override
     public <R> Mono<R> options(GenericType<R> genericType) {
         return method(HttpMethod.OPTIONS, genericType);
     }
@@ -130,6 +161,11 @@ public class MonoRxInvokerImpl implements MonoRxInvoker {
     @Override
     public <R> Mono<R> trace(Class<R> responseType) {
         return method(TRACE, responseType);
+    }
+
+    @Override
+    public <T> Flux<T> traceFlux(Class<T> responseType) {
+        return flux(TRACE, responseType);
     }
 
     @Override
@@ -163,6 +199,18 @@ public class MonoRxInvokerImpl implements MonoRxInvoker {
     }
 
     @Override
+    public <T> Flux<T> flux(String name, Entity<?> entity, Class<T> responseType) {
+        Future<Response> futureResponse = webClient.async().method(name, entity);
+        return Flux.fromIterable(toIterable(futureResponse, responseType));
+    }
+
+    @Override
+    public <T> Flux<T> flux(String name, Class<T> responseType) {
+        Future<Response> futureResponse = webClient.async().method(name);
+        return Flux.fromIterable(toIterable(futureResponse, responseType));
+    }
+
+    @Override
     public <R> Mono<R> method(String name, Entity<?> entity, GenericType<R> genericType) {
         return mono(webClient.async().method(name, entity, genericType));
     }
@@ -173,5 +221,38 @@ public class MonoRxInvokerImpl implements MonoRxInvoker {
             mono = mono.subscribeOn(scheduler);
         }
         return mono;
+    }
+
+    private <R> Iterable<R> toIterable(Future<Response> futureResponse, Class<R> type) {
+        try {
+            Response response = futureResponse.get();
+            GenericType<List<R>> rGenericType = new GenericType<>(new WrappedType<R>(type));
+            return response.readEntity(rGenericType);
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private class WrappedType<R> implements ParameterizedType {
+        private final Class<R> rClass;
+
+        WrappedType(Class<R> rClass) {
+            this.rClass = rClass;
+        }
+
+        @Override
+        public Type[] getActualTypeArguments() {
+            return new Type[]{rClass };
+        }
+
+        @Override
+        public Type getRawType() {
+            return List.class;
+        }
+
+        @Override
+        public Type getOwnerType() {
+            return List.class;
+        }
     }
 }

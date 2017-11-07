@@ -21,11 +21,11 @@ package org.apache.cxf.extensions.reactor.test;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.core.GenericType;
+
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
-import org.apache.cxf.jaxrs.reactor.client.FluxRxInvoker;
-import org.apache.cxf.jaxrs.reactor.client.FluxRxInvokerProvider;
+import org.apache.cxf.jaxrs.reactor.client.ReactorInvoker;
+import org.apache.cxf.jaxrs.reactor.client.ReactorInvokerProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -45,10 +45,10 @@ public class FluxReactorTest extends AbstractBusClientServerTestBase {
         List<HelloWorldBean> collector = new ArrayList<>();
         ClientBuilder.newClient()
                 .register(new JacksonJsonProvider())
-                .register(new FluxRxInvokerProvider())
+                .register(new ReactorInvokerProvider())
                 .target(address)
                 .request("application/json")
-                .rx(FluxRxInvoker.class)
+                .rx(ReactorInvoker.class)
                 .get(HelloWorldBean.class)
                 .doOnNext(collector::add)
                 .subscribe();
@@ -62,21 +62,20 @@ public class FluxReactorTest extends AbstractBusClientServerTestBase {
     @Test
     public void testTextJsonImplicitListAsyncStream() throws Exception {
         String address = "http://localhost:" + PORT + "/reactor/flux/textJsonImplicitListAsyncStream";
-//        Holder<String> holder = new Holder<>();
+        List<HelloWorldBean> holder = new ArrayList<>();
         ClientBuilder.newClient()
                 .register(new JacksonJsonProvider())
-                .register(new FluxRxInvokerProvider())
+                .register(new ReactorInvokerProvider())
                 .target(address)
                 .request("application/json")
-                .rx(FluxRxInvoker.class)
-                .get(new GenericType<List<String>>() { })
-                .doOnNext(System.out::println)
-//                .doOnNext(msg -> holder.value = msg)
+                .rx(ReactorInvoker.class)
+                .getFlux(HelloWorldBean.class)
+                .doOnNext(holder::add)
                 .subscribe();
         Thread.sleep(500);
-//        System.out.println(holder.value);
-//        assertEquals(1, holder.value.size());
-//        assertEquals("Hello", holder.value.getGreeting());
-//        assertEquals("World", holder.value.getAudience());
+        assertEquals(2, holder.size());
+        assertEquals("Hello", holder.get(0).getGreeting());
+        assertEquals("World", holder.get(0).getAudience());
+        assertEquals("Ciao", holder.get(1).getGreeting());
     }
 }

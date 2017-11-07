@@ -25,14 +25,14 @@ import javax.ws.rs.ext.Provider;
 import org.apache.cxf.jaxrs.client.SyncInvokerImpl;
 
 @Provider
-public class FluxRxInvokerProvider implements RxInvokerProvider<FluxRxInvoker> {
+public class ReactorInvokerProvider implements RxInvokerProvider<ReactorInvoker> {
     @Override
     public boolean isProviderFor(Class<?> invokerType) {
-        return FluxRxInvoker.class.isAssignableFrom(invokerType);
+        return ReactorInvoker.class.isAssignableFrom(invokerType);
     }
 
     @Override
-    public FluxRxInvoker getRxInvoker(SyncInvoker syncInvoker, ExecutorService executorService) {
-        return new FluxRxInvokerImpl(((SyncInvokerImpl)syncInvoker).getWebClient(), executorService);
+    public ReactorInvoker getRxInvoker(SyncInvoker syncInvoker, ExecutorService executorService) {
+        return new ReactorInvokerImpl(((SyncInvokerImpl)syncInvoker).getWebClient(), executorService);
     }
 }

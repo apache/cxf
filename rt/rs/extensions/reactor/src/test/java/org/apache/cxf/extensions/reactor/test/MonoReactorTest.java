@@ -24,8 +24,8 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.xml.ws.Holder;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
-import org.apache.cxf.jaxrs.reactor.client.MonoRxInvoker;
-import org.apache.cxf.jaxrs.reactor.client.MonoRxInvokerProvider;
+import org.apache.cxf.jaxrs.reactor.client.ReactorInvoker;
+import org.apache.cxf.jaxrs.reactor.client.ReactorInvokerProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -45,10 +45,10 @@ public class MonoReactorTest extends AbstractBusClientServerTestBase {
         List<HelloWorldBean> holder = new ArrayList<>();
         ClientBuilder.newClient()
                 .register(new JacksonJsonProvider())
-                .register(new MonoRxInvokerProvider())
+                .register(new ReactorInvokerProvider())
                 .target(address)
                 .request("application/json")
-                .rx(MonoRxInvoker.class)
+                .rx(ReactorInvoker.class)
                 .get(HelloWorldBean.class)
                 .doOnNext(holder::add)
                 .subscribe();
@@ -65,10 +65,10 @@ public class MonoReactorTest extends AbstractBusClientServerTestBase {
         Holder<HelloWorldBean> holder = new Holder<>();
         ClientBuilder.newClient()
                 .register(new JacksonJsonProvider())
-                .register(new MonoRxInvokerProvider())
+                .register(new ReactorInvokerProvider())
                 .target(address)
                 .request("application/json")
-                .rx(MonoRxInvoker.class)
+                .rx(ReactorInvoker.class)
                 .get(HelloWorldBean.class)
                 .doOnNext(helloWorldBean -> holder.value = helloWorldBean)
                 .subscribe();
@@ -82,10 +82,10 @@ public class MonoReactorTest extends AbstractBusClientServerTestBase {
         String address = "http://localhost:" + PORT + "/reactor/mono/textAsync";
         Holder<String> holder = new Holder<>();
         ClientBuilder.newClient()
-                .register(new MonoRxInvokerProvider())
+                .register(new ReactorInvokerProvider())
                 .target(address)
                 .request("text/plain")
-                .rx(MonoRxInvoker.class)
+                .rx(ReactorInvoker.class)
                 .get(String.class)
                 .doOnNext(msg -> holder.value = msg)
                 .subscribe();

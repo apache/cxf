@@ -22,15 +22,19 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.RxInvoker;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
+
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @SuppressWarnings("rawtypes")
-public interface MonoRxInvoker extends RxInvoker<Mono> {
+public interface ReactorInvoker extends RxInvoker<Mono> {
     @Override
     Mono<Response> get();
 
     @Override
     <T> Mono<T> get(Class<T> responseType);
+
+    <T> Flux<T> getFlux(Class<T> responseType);
 
     @Override
     <T> Mono<T> get(GenericType<T> responseType);
@@ -41,6 +45,8 @@ public interface MonoRxInvoker extends RxInvoker<Mono> {
     @Override
     <T> Mono<T> put(Entity<?> entity, Class<T> clazz);
 
+    <T> Flux<T> putFlux(Entity<?> entity, Class<T> responseType);
+
     @Override
     <T> Mono<T> put(Entity<?> entity, GenericType<T> type);
 
@@ -50,6 +56,8 @@ public interface MonoRxInvoker extends RxInvoker<Mono> {
     @Override
     <T> Mono<T> post(Entity<?> entity, Class<T> clazz);
 
+    <T> Flux<T> postFlux(Entity<?> entity, Class<T> clazz);
+
     @Override
     <T> Mono<T> post(Entity<?> entity, GenericType<T> type);
 
@@ -58,6 +66,8 @@ public interface MonoRxInvoker extends RxInvoker<Mono> {
 
     @Override
     <T> Mono<T> delete(Class<T> responseType);
+
+    <T> Flux<T> deleteFlux(Class<T> responseType);
 
     @Override
     <T> Mono<T> delete(GenericType<T> responseType);
@@ -71,6 +81,8 @@ public interface MonoRxInvoker extends RxInvoker<Mono> {
     @Override
     <T> Mono<T> options(Class<T> responseType);
 
+    <T> Flux<T> optionsFlux(Class<T> responseType);
+
     @Override
     <T> Mono<T> options(GenericType<T> responseType);
 
@@ -79,6 +91,8 @@ public interface MonoRxInvoker extends RxInvoker<Mono> {
 
     @Override
     <T> Mono<T> trace(Class<T> responseType);
+
+    <T> Flux<T> traceFlux(Class<T> responseType);
 
     @Override
     <T> Mono<T> trace(GenericType<T> responseType);
@@ -100,4 +114,8 @@ public interface MonoRxInvoker extends RxInvoker<Mono> {
 
     @Override
     <T> Mono<T> method(String name, Entity<?> entity, GenericType<T> responseType);
+
+    <T> Flux<T> flux(String name, Class<T> responseType);
+
+    <T> Flux<T> flux(String name, Entity<?> entity, Class<T> responseType);
 }
