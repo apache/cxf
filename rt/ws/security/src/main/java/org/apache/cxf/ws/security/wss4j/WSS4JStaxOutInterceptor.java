@@ -68,6 +68,7 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
     
     public WSS4JStaxOutInterceptor(WSSSecurityProperties securityProperties) {
         super(securityProperties);
+        WSSec.init();
         setPhase(Phase.PRE_STREAM);
         getBefore().add(StaxOutInterceptor.class.getName());
         
@@ -76,6 +77,7 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
 
     public WSS4JStaxOutInterceptor(Map<String, Object> props) {
         super(props);
+        WSSec.init();
         setPhase(Phase.PRE_STREAM);
         getBefore().add(StaxOutInterceptor.class.getName());
         getAfter().add(LoggingOutInterceptor.class.getName());
@@ -84,6 +86,7 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
     
     public WSS4JStaxOutInterceptor() {
         super();
+        WSSec.init();
         setPhase(Phase.PRE_STREAM);
         getBefore().add(StaxOutInterceptor.class.getName());
         getAfter().add(LoggingOutInterceptor.class.getName());

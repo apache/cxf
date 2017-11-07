@@ -103,6 +103,42 @@ public class FaultTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
+    public void testSoap11StAX() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = FaultTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = FaultTest.class.getResource("DoubleItFault.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSoap11Port");
+        DoubleItPortType utPort =
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(utPort, PORT);
+
+        // Make a successful invocation
+        SecurityTestUtil.enableStreaming(utPort);
+        ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "alice");
+        utPort.doubleIt(25);
+/*
+        // Now make an invocation using another username
+        ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "bob");
+        ((BindingProvider)utPort).getRequestContext().put("security.password", "password");
+        try {
+            utPort.doubleIt(25);
+            fail("Expected failure on bob");
+        } catch (Exception ex) {
+            assertTrue(ex.getMessage().contains("This is a fault"));
+        }
+*/
+        ((java.io.Closeable)utPort).close();
+        bus.shutdown(true);
+    }
+
+    @org.junit.Test
     public void testSoap12() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = FaultTest.class.getResource("client.xml");
