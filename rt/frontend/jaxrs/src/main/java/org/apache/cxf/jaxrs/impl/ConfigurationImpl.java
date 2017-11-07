@@ -91,7 +91,11 @@ public class ConfigurationImpl implements Configuration {
     public Map<Class<?>, Integer> getContracts(Class<?> cls) {
         for (Object o : getInstances()) {
             if (cls.isAssignableFrom(o.getClass())) {
-                return Collections.unmodifiableMap(providers.get(o));
+                if (o instanceof Feature) {
+                    return Collections.emptyMap();
+                } else {
+                    return providers.get(o);
+                }
             }
         }
         return Collections.emptyMap();

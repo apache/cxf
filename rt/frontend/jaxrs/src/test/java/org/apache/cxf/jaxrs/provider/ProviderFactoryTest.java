@@ -38,6 +38,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -90,6 +91,35 @@ public class ProviderFactoryTest extends Assert {
         assertNotSame(ServerProviderFactory.getInstance(), ServerProviderFactory.getInstance());
     }
 
+    @Test
+    public void testRegisterInFeature() {
+        ServerProviderFactory pf = ServerProviderFactory.getInstance();
+        final Object provider = new WebApplicationExceptionMapper();
+        pf.registerUserProvider((Feature)(context) -> {
+            context.register(provider);
+            return true;
+        });
+        ExceptionMapper<WebApplicationException> em =
+            pf.createExceptionMapper(WebApplicationException.class, new MessageImpl());
+        assertSame(provider, em);
+    }
+    
+    @Test
+    public void testRegisterFeatureInFeature() {
+        ServerProviderFactory pf = ServerProviderFactory.getInstance();
+        final Object provider = new WebApplicationExceptionMapper();
+        pf.registerUserProvider((Feature)(context) -> {
+            context.register((Feature) context2-> {
+                context2.register(provider);
+                return true;
+            });
+            return true;
+        });
+        ExceptionMapper<WebApplicationException> em =
+            pf.createExceptionMapper(WebApplicationException.class, new MessageImpl());
+        assertSame(provider, em);
+    }
+    
     @Test
     public void testOrderOfProvidersWithSameProperties() {
         ProviderFactory pf = ServerProviderFactory.getInstance();
