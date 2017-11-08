@@ -131,6 +131,12 @@
         <wsdl:port name="DoubleItJavaFirstPort" binding="tns:DoubleItSoap11NoPolicyBinding">
             <soap12:address location="http://localhost:9009/DoubleItJavaFirst"/>
         </wsdl:port>
+        <wsdl:port name="DoubleItSoap11UnsecuredPort" binding="tns:DoubleItSoap11NoPolicyBinding">
+            <soap:address location="http://localhost:9009/DoubleItSoap11Unsecured"/>
+        </wsdl:port>
+        <wsdl:port name="DoubleItSoap11UnsecuredPort2" binding="tns:DoubleItSoap11NoPolicyBinding">
+            <soap:address location="http://localhost:9009/DoubleItSoap11Unsecured2"/>
+        </wsdl:port>
     </wsdl:service>
     <wsp:Policy wsu:Id="DoubleItPlaintextPolicy">
         <wsp:ExactlyOne>

@@ -99,32 +99,14 @@ public class FaultTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             assertTrue(ex.getMessage().contains("This is a fault"));
         }
-        ((java.io.Closeable)utPort).close();
-        bus.shutdown(true);
-    }
-    
-    @org.junit.Test
-    public void testSoap11StAX() throws Exception {
 
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = FaultTest.class.getResource("client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
-
-        URL wsdl = FaultTest.class.getResource("DoubleItFault.wsdl");
-        Service service = Service.create(wsdl, SERVICE_QNAME);
-        QName portQName = new QName(NAMESPACE, "DoubleItSoap11Port");
-        DoubleItPortType utPort =
-                service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(utPort, PORT);
+        // Switch to the StAX stack
+        SecurityTestUtil.enableStreaming(utPort);
 
         // Make a successful invocation
-        SecurityTestUtil.enableStreaming(utPort);
         ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "alice");
         utPort.doubleIt(25);
-/*
+
         // Now make an invocation using another username
         ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "bob");
         ((BindingProvider)utPort).getRequestContext().put("security.password", "password");
@@ -132,9 +114,9 @@ public class FaultTest extends AbstractBusClientServerTestBase {
             utPort.doubleIt(25);
             fail("Expected failure on bob");
         } catch (Exception ex) {
-            assertTrue(ex.getMessage().contains("This is a fault"));
+            // TODO assertTrue(ex.getMessage().contains("This is a fault"));
         }
-*/
+
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
@@ -328,6 +310,62 @@ public class FaultTest extends AbstractBusClientServerTestBase {
             assertTrue(ex.getMessage().contains("This is a fault"));
         }
         
+        ((java.io.Closeable)utPort).close();
+        bus.shutdown(true);
+    }
+
+    @org.junit.Test
+    public void testUnsecuredSoap11Action() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = FaultTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = FaultTest.class.getResource("DoubleItFault.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSoap11UnsecuredPort");
+        DoubleItPortType utPort =
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(utPort, PORT);
+
+        try {
+            utPort.doubleIt(25);
+            fail("Expected failure on bob");
+        } catch (Exception ex) {
+            assertTrue(ex.getMessage().contains("This is a fault"));
+        }
+
+        ((java.io.Closeable)utPort).close();
+        bus.shutdown(true);
+    }
+
+    @org.junit.Test
+    public void testUnsecuredSoap11ActionStAX() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = FaultTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = FaultTest.class.getResource("DoubleItFault.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSoap11UnsecuredPort2");
+        DoubleItPortType utPort =
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(utPort, PORT);
+
+        try {
+            utPort.doubleIt(25);
+            fail("Expected failure on bob");
+        } catch (Exception ex) {
+            assertTrue(ex.getMessage().contains("This is a fault"));
+        }
+
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }

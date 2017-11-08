@@ -58,10 +58,8 @@ import org.apache.wss4j.stax.setup.InboundWSSec;
 import org.apache.wss4j.stax.setup.WSSec;
 import org.apache.wss4j.stax.validate.Validator;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.securityEvent.AbstractSecuredElementSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
-import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 
 public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
     
@@ -191,10 +189,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
         final SecurityEventListener securityEventListener = new SecurityEventListener() {
             @Override
             public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
-                if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.TIMESTAMP
-                    || securityEvent.getSecurityEventType() == WSSecurityEventConstants.SignatureValue
-                    || securityEvent instanceof TokenSecurityEvent
-                    || securityEvent instanceof AbstractSecuredElementSecurityEvent) {
+                if (securityEvent.getSecurityEventType() != WSSecurityEventConstants.AlgorithmSuite) {
                     // Store events required for the security context setup, or the crypto coverage checker
                     incomingSecurityEventList.add(securityEvent);
                 }
