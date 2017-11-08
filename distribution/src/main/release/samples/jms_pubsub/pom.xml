@@ -144,13 +144,15 @@
             <artifactId>cxf-rt-transports-jms</artifactId>
             <version>3.2.2-SNAPSHOT</version>
         </dependency>
+        
         <dependency>
             <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-broker</artifactId>
+            <artifactId>artemis-cli</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-kahadb-store</artifactId>
+            <artifactId>artemis-openwire-protocol</artifactId>
         </dependency>
+
     </dependencies>
 </project>
