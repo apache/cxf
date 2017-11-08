@@ -16,12 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.extensions.reactor.test;
+
+package org.apache.cxf.systest.jaxrs.reactor;
 
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.client.ClientBuilder;
-import javax.xml.ws.Holder;
+
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.reactor.client.ReactorInvoker;
@@ -30,18 +31,37 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class MonoReactorTest extends AbstractBusClientServerTestBase {
+public class FluxReactorTest extends AbstractBusClientServerTestBase {
     public static final String PORT = ReactorServer.PORT;
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
-        assertTrue("server did not launch correctly",
-                launchServer(ReactorServer.class, true));
+        assertTrue("server did not launch correctly", launchServer(ReactorServer.class, true));
         createStaticBus();
     }
     @Test
     public void testGetHelloWorldJson() throws Exception {
-        String address = "http://localhost:" + PORT + "/reactor/mono/textJson";
+        String address = "http://localhost:" + PORT + "/reactor/flux/textJson";
+        List<HelloWorldBean> collector = new ArrayList<>();
+        ClientBuilder.newClient()
+                .register(new JacksonJsonProvider())
+                .register(new ReactorInvokerProvider())
+                .target(address)
+                .request("application/json")
+                .rx(ReactorInvoker.class)
+                .get(HelloWorldBean.class)
+                .doOnNext(collector::add)
+                .subscribe();
+        Thread.sleep(500);
+        assertEquals(1, collector.size());
+        HelloWorldBean bean = collector.get(0);
+        assertEquals("Hello", bean.getGreeting());
+        assertEquals("World", bean.getAudience());
+    }
+
+    @Test
+    public void testTextJsonImplicitListAsyncStream() throws Exception {
+        String address = "http://localhost:" + PORT + "/reactor/flux/textJsonImplicitListAsyncStream";
         List<HelloWorldBean> holder = new ArrayList<>();
         ClientBuilder.newClient()
                 .register(new JacksonJsonProvider())
@@ -49,48 +69,13 @@ public class MonoReactorTest extends AbstractBusClientServerTestBase {
                 .target(address)
                 .request("application/json")
                 .rx(ReactorInvoker.class)
-                .get(HelloWorldBean.class)
+                .getFlux(HelloWorldBean.class)
                 .doOnNext(holder::add)
                 .subscribe();
         Thread.sleep(500);
-        assertEquals(1, holder.size());
-        HelloWorldBean bean = holder.get(0);
-        assertEquals("Hello", bean.getGreeting());
-        assertEquals("World", bean.getAudience());
-    }
-
-    @Test
-    public void testTextJsonImplicitListAsyncStream() throws Exception {
-        String address = "http://localhost:" + PORT + "/reactor/mono/textJsonImplicitListAsyncStream";
-        Holder<HelloWorldBean> holder = new Holder<>();
-        ClientBuilder.newClient()
-                .register(new JacksonJsonProvider())
-                .register(new ReactorInvokerProvider())
-                .target(address)
-                .request("application/json")
-                .rx(ReactorInvoker.class)
-                .get(HelloWorldBean.class)
-                .doOnNext(helloWorldBean -> holder.value = helloWorldBean)
-                .subscribe();
-        Thread.sleep(500);
-        assertEquals("Hello", holder.value.getGreeting());
-        assertEquals("World", holder.value.getAudience());
-    }
-
-    @Test
-    public void testGetString() throws Exception {
-        String address = "http://localhost:" + PORT + "/reactor/mono/textAsync";
-        Holder<String> holder = new Holder<>();
-        ClientBuilder.newClient()
-                .register(new ReactorInvokerProvider())
-                .target(address)
-                .request("text/plain")
-                .rx(ReactorInvoker.class)
-                .get(String.class)
-                .doOnNext(msg -> holder.value = msg)
-                .subscribe();
-
-        Thread.sleep(500);
-        assertEquals("Hello, world!", holder.value);
+        assertEquals(2, holder.size());
+        assertEquals("Hello", holder.get(0).getGreeting());
+        assertEquals("World", holder.get(0).getAudience());
+        assertEquals("Ciao", holder.get(1).getGreeting());
     }
 }

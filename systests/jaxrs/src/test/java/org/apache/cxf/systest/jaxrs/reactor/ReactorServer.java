@@ -16,7 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.extensions.reactor.test;
+
+package org.apache.cxf.systest.jaxrs.reactor;
 
 import java.util.Collections;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;

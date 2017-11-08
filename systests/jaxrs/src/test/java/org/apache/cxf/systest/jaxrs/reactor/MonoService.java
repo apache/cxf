@@ -16,7 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.extensions.reactor.test;
+
+package org.apache.cxf.systest.jaxrs.reactor;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
