@@ -539,7 +539,7 @@ public final class JAXRSUtils {
 
     
     
-    private static Level getExceptionLogLevel(Message message, Class<? extends WebApplicationException> exClass) {
+    public static Level getExceptionLogLevel(Message message, Class<? extends WebApplicationException> exClass) {
         Level logLevel = null;
         Object logLevelProp = message.get(exClass.getName() + ".log.level");
         if (logLevelProp != null) {
