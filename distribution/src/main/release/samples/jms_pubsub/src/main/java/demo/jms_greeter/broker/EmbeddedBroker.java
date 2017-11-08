@@ -21,6 +21,7 @@ package demo.jms_greeter.broker;
 
 import java.io.File;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.activemq.artemis.api.core.TransportConfiguration;
 import org.apache.activemq.artemis.core.config.Configuration;
@@ -35,7 +36,7 @@ public final class EmbeddedBroker {
 
     public static void main(String[] args) throws Exception {
         Configuration config = new ConfigurationImpl();
-        HashSet<TransportConfiguration> transports = new HashSet<TransportConfiguration>();
+        Set<TransportConfiguration> transports = new HashSet<TransportConfiguration>();
         transports.add(new TransportConfiguration(NettyAcceptorFactory.class.getName()));
         transports.add(new TransportConfiguration(InVMAcceptorFactory.class.getName()));
         config.setAcceptorConfigurations(transports); 
