@@ -145,6 +145,34 @@ public class RequestImplTest extends Assert {
         assertSame(var3, new RequestImpl(m).selectVariant(list));
     }
 
+    @Test
+    public void testMultipleVariantsBestMatchMediaTypeQualityFactors() {
+        metadata.putSingle(HttpHeaders.ACCEPT, "a/b;q=0.6, c/d;q=0.5, e/f+json");
+        metadata.putSingle(HttpHeaders.ACCEPT_LANGUAGE, "en-us");
+        metadata.putSingle(HttpHeaders.ACCEPT_ENCODING, "gzip;q=1.0, compress");
+
+        List<Variant> list = new ArrayList<Variant>();
+        Variant var1 = new Variant(MediaType.valueOf("a/b"), new Locale("en"), "gzip");
+        Variant var2 = new Variant(MediaType.valueOf("x/z"), new Locale("en"), "gzip");
+        Variant var3 = new Variant(MediaType.valueOf("e/f+json"), new Locale("en"), "gzip");
+        Variant var4 = new Variant(MediaType.valueOf("c/d"), new Locale("en"), "gzip");
+        list.add(var1);
+        list.add(var2);
+        list.add(var3);
+        list.add(var4);
+        assertSame(var3, new RequestImpl(m).selectVariant(list));
+
+        list.clear();
+        list.add(var1);
+        list.add(var4);
+        assertSame(var1, new RequestImpl(m).selectVariant(list));
+
+        list.clear();
+        list.add(var2);
+        list.add(var4);
+        assertSame(var4, new RequestImpl(m).selectVariant(list));
+    }
+
     private void assertSameVariant(MediaType mt, Locale lang, String enc) {
         Variant var = new Variant(mt, lang, enc);
         List<Variant> list = new ArrayList<>();
