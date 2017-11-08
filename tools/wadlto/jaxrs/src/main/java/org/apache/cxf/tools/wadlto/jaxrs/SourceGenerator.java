@@ -793,7 +793,7 @@ public class SourceGenerator {
                                                           suspendedAsync);
 
                 String genMethodName = id + suffixName;
-                if (methodNameLowerCase.equals(genMethodName)) {
+                if (methodNameLowerCase.equals(genMethodName) && methodNameLowerCase == id) {
                     List<PathSegment> segments = JAXRSUtils.getPathSegments(currentPath, true, true);
                     StringBuilder sb = new StringBuilder();
                     for (PathSegment ps : segments) {
