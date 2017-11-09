@@ -29,8 +29,9 @@ import javax.ws.rs.container.TimeoutHandler;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.StreamingResponse;
+import org.reactivestreams.Subscription;
 
-public class StreamingAsyncSubscriber<T> extends AbstractAsyncSubscriber<T> {
+public class StreamingAsyncSubscriber<T> extends AbstractSubscriber<T> {
 
     private BlockingQueue<T> queue = new LinkedBlockingQueue<T>();
     private String openTag;
@@ -61,11 +62,11 @@ public class StreamingAsyncSubscriber<T> extends AbstractAsyncSubscriber<T> {
         }
     }
     @Override
-    public void onStart() {
+    public void onSubscribe(Subscription subscription) {
         if (asyncTimeout == 0) {
             resumeAsyncResponse();
         }
-        super.onStart();
+        super.onSubscribe(subscription);
     }
     private void resumeAsyncResponse() {
         super.resume(new StreamingResponseImpl());

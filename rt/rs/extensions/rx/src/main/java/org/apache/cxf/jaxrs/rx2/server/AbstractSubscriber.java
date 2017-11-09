@@ -23,14 +23,17 @@ import java.util.List;
 import javax.ws.rs.container.AsyncResponse;
 
 import org.apache.cxf.jaxrs.ext.StreamingResponse;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 
 import io.reactivex.subscribers.DefaultSubscriber;
 
-public abstract class AbstractAsyncSubscriber<T> extends DefaultSubscriber<T> {
+public abstract class AbstractSubscriber<T> implements Subscriber<T> {
 
     private AsyncResponse ar;
+    private Subscription subscription;
 
-    protected AbstractAsyncSubscriber(AsyncResponse ar) {
+    protected AbstractSubscriber(AsyncResponse ar) {
         this.ar = ar;
     }
     public void resume(T response) {
@@ -50,16 +53,38 @@ public abstract class AbstractAsyncSubscriber<T> extends DefaultSubscriber<T> {
         ar.resume(t);
     }
 
+    @Override
+    public void onSubscribe(Subscription inSubscription) {
+        this.subscription = inSubscription;
+        requestAll();
+    }
+
+    @Override
+    public void onNext(T t) {
+        resume(t);
+    }
+
+    @Override
+    public void onComplete() {
+    }
+
     protected AsyncResponse getAsyncResponse() {
         return ar;
     }
 
-    @Override
-    public void onStart() {
-        requestNext();
+    protected Subscription getSubscription() {
+        return subscription;
     }
-    
+
     protected void requestNext() {
-        super.request(1);
+        request(1);
+    }
+
+    protected void requestAll() {
+        request(Long.MAX_VALUE);
+    }
+
+    protected final void request(long elements) {
+        this.subscription.request(elements);
     }
 }
