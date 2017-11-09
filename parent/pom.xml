@@ -234,6 +234,7 @@
         <cxf.downloadSources>true</cxf.downloadSources>
         <cxf.pmd.eclipse.ruleset.ext />
         <cxf.resources.base.path />
+        <cxf.reactor.version>3.1.0.RELEASE</cxf.reactor.version>
     </properties>
     <build>
         <resources>
@@ -827,6 +828,11 @@
                 <groupId>io.reactivex.rxjava2</groupId>
                 <artifactId>rxjava</artifactId>
                 <version>${cxf.rxjava2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.projectreactor</groupId>
+                <artifactId>reactor-core</artifactId>
+                <version>${cxf.reactor.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
