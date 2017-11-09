@@ -17,3 +17,4 @@ velocity.log
 bin/
 node_modules/
 derby.log
+.pmdruleset.xml
