@@ -157,7 +157,7 @@ public final class HttpAuthHeader {
     }
 
     public boolean authTypeIsNegotiate() {
-        return AUTH_TYPE_DIGEST.equals(this.authType);
+        return AUTH_TYPE_NEGOTIATE.equals(this.authType);
     }
 
     public String getAuthType() {
