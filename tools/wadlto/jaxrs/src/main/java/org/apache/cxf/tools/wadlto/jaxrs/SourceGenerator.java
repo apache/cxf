@@ -721,7 +721,9 @@ public class SourceGenerator {
         
         String methodName = methodEl.getAttribute("name");
         final String methodNameLowerCase = methodName.toLowerCase();
-        String id = getMethodId(methodEl, methodNameLowerCase);
+        String idAttribute = methodEl.getAttribute("id");
+        final String id = idAttribute.isEmpty() ? methodNameLowerCase : idAttribute;
+        
         final boolean responseRequired = isMethodMatched(responseMethods, methodNameLowerCase, id);
         final boolean suspendedAsync = responseRequired ? false
             : isMethodMatched(suspendedAsyncMethods, methodNameLowerCase, id);
@@ -797,7 +799,7 @@ public class SourceGenerator {
                                                           suspendedAsync);
                 
                 String genMethodName = id + suffixName;
-                if (methodNameLowerCase.equals(genMethodName)) {
+                if (methodNameLowerCase.equals(genMethodName) && idAttribute.isEmpty()) {
                     List<PathSegment> segments = JAXRSUtils.getPathSegments(currentPath, true, true);
                     StringBuilder sb = new StringBuilder();
                     for (PathSegment ps : segments) {
@@ -845,16 +847,8 @@ public class SourceGenerator {
         finalizeMethodDocs(doCreateJavaDocs, sbCode, sbMethodDocs, sbMethodRespDocs, sbMethodCode);
         
     }
-    
-    private String getMethodId(Element methodEl, String methodNameLowerCase) {
-        String id = methodEl.getAttribute("id");
-        if (id.length() == 0) {
-            id = methodNameLowerCase;
-        }
-        return id;
-    }
 
-    private void finalizeMethodDocs(boolean doCreateJavaDocs, StringBuilder sbCode, StringBuilder sbJavaDocs, 
+    private void finalizeMethodDocs(boolean doCreateJavaDocs, StringBuilder sbCode, StringBuilder sbJavaDocs,
                                     StringBuilder sbRespDocs, StringBuilder sbMethodCode) {
         if (doCreateJavaDocs) {
             sbJavaDocs.append(sbRespDocs);
