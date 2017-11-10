@@ -60,7 +60,7 @@ public class JAXRSUriInfoMatchTest extends AbstractClientServerTestBase {
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(100000000L);
         wc.accept("text/plain");
         String data = wc.get(String.class);
-        assertEquals("/my/resource/1/matched/uris,/my/resource/1", data);
+        assertEquals("my/resource/1/matched/uris,my/resource/1", data);
     }
     @Test
     public void testMatchedUrisParam() throws Exception {
@@ -69,7 +69,7 @@ public class JAXRSUriInfoMatchTest extends AbstractClientServerTestBase {
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(100000000L);
         wc.accept("text/plain");
         String data = wc.get(String.class);
-        assertEquals("/my/resource/1/matched/uris/param,/my/resource/1", data);
+        assertEquals("my/resource/1/matched/uris/param,my/resource/1", data);
     }
     @Test
     public void testMatchedUrisParam2() throws Exception {
@@ -78,7 +78,7 @@ public class JAXRSUriInfoMatchTest extends AbstractClientServerTestBase {
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(100000000L);
         wc.accept("text/plain");
         String data = wc.get(String.class);
-        assertEquals("/my/resource/1/matched/uris/param/2,/my/resource/1", data);
+        assertEquals("my/resource/1/matched/uris/param/2,my/resource/1", data);
     }
     @Test
     public void testMatchedResources() throws Exception {
