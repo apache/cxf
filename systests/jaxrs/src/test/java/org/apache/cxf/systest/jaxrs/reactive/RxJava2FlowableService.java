@@ -29,7 +29,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 
-import org.apache.cxf.jaxrs.rx2.server.AbstractAsyncSubscriber;
+import org.apache.cxf.jaxrs.rx2.server.AbstractSubscriber;
 import org.apache.cxf.jaxrs.rx2.server.JsonStreamingAsyncSubscriber;
 
 import io.reactivex.Flowable;
@@ -84,7 +84,7 @@ public class RxJava2FlowableService {
 
     }
     
-    private static class StringAsyncSubscriber extends AbstractAsyncSubscriber<String> {
+    private static class StringAsyncSubscriber extends AbstractSubscriber<String> {
 
         private StringBuilder sb = new StringBuilder();
         StringAsyncSubscriber(AsyncResponse ar) {
@@ -103,7 +103,7 @@ public class RxJava2FlowableService {
 
     }
     
-    private static class ListAsyncSubscriber<T> extends AbstractAsyncSubscriber<T> {
+    private static class ListAsyncSubscriber<T> extends AbstractSubscriber<T> {
 
         private List<T> beans = new LinkedList<T>();
         ListAsyncSubscriber(AsyncResponse ar) {
