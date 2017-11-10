@@ -189,13 +189,15 @@ public class UriInfoImpl implements UriInfo {
                     }
                     uris.add(0, createMatchedPath(paths[0].getValue(), rootObjects, decode));
                 }
-                for (URITemplate t : paths) {
-                    if (t != null) {
-                        sumPath.append("/").append(t.getValue());
+                if (paths[1] != null && paths[1].getValue().length() > 1) {
+                    for (URITemplate t : paths) {
+                        if (t != null) {
+                            sumPath.append("/").append(t.getValue());
+                        }
                     }
+                    objects.addAll(templateObjects);
+                    uris.add(0, createMatchedPath(sumPath.toString(), objects, decode));
                 }
-                objects.addAll(templateObjects);
-                uris.add(0, createMatchedPath(sumPath.toString(), objects, decode));
             }
             return uris;
         }
@@ -205,7 +207,11 @@ public class UriInfoImpl implements UriInfo {
 
     private static String createMatchedPath(String uri, List<? extends Object> vars, boolean decode) {
         String uriPath = UriBuilder.fromPath(uri).buildFromEncoded(vars.toArray()).getRawPath();
-        return decode ? HttpUtils.pathDecode(uriPath) : uriPath;
+        uriPath = decode ? HttpUtils.pathDecode(uriPath) : uriPath;
+        if (uriPath.startsWith("/")) {
+            uriPath = uriPath.substring(1);
+        }
+        return uriPath;
     }
     private String doGetPath(boolean decode, boolean addSlash) {
         String path = HttpUtils.getPathToMatch(message, addSlash);
