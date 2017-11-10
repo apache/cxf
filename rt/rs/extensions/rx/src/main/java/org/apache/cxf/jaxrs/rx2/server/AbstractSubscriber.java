@@ -26,8 +26,6 @@ import org.apache.cxf.jaxrs.ext.StreamingResponse;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
-import io.reactivex.subscribers.DefaultSubscriber;
-
 public abstract class AbstractSubscriber<T> implements Subscriber<T> {
 
     private AsyncResponse ar;
