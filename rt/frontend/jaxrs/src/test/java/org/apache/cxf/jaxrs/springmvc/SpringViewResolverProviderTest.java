@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.spring;
+package org.apache.cxf.jaxrs.springmvc;
 
 import java.io.Closeable;
 import java.lang.annotation.Annotation;
