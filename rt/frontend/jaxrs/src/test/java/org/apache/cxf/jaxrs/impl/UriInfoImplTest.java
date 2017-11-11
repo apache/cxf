@@ -468,11 +468,7 @@ public class UriInfoImplTest extends Assert {
     }
 
     private static List<String> getMatchedURIs(UriInfo u) {
-        List<String> matchedUris = u.getMatchedURIs();
-        //        for (String s : matchedUris) {
-        //            System.out.println(s);
-        //        }
-        return matchedUris;
+        return u.getMatchedURIs();
     }
 
     @Test
