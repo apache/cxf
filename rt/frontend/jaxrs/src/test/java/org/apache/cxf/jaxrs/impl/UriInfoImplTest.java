@@ -19,14 +19,24 @@
 
 package org.apache.cxf.jaxrs.impl;
 
+import java.lang.reflect.Method;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.model.MethodInvocationInfo;
+import org.apache.cxf.jaxrs.model.OperationResourceInfo;
+import org.apache.cxf.jaxrs.model.OperationResourceInfoStack;
 import org.apache.cxf.jaxrs.model.URITemplate;
+import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -408,6 +418,151 @@ public class UriInfoImplTest extends Assert {
         
     }
     
+    @Path("foo")
+    public static class RootResource {
+        
+        @GET
+        public Response get() {
+            return null;
+        }
+        
+        @GET
+        @Path("bar")
+        public Response getSubMethod() {
+            return null;
+        }
+        
+        @Path("sub")
+        public SubResource getSubResourceLocator() {
+            return new SubResource();
+        }
+    }
+    
+    public static class SubResource {
+        @GET
+        public Response getFromSub() {
+            return null;
+        }
+        
+        @GET
+        @Path("subSub")
+        public Response getFromSubSub() {
+            return null;
+        }
+    }
+    
+    private static ClassResourceInfo getCri(Class<?> clazz, boolean setUriTemplate) {
+        ClassResourceInfo cri = new ClassResourceInfo(clazz);
+        Path path = AnnotationUtils.getClassAnnotation(clazz, Path.class);
+        if (setUriTemplate) {
+            cri.setURITemplate(URITemplate.createTemplate(path));
+        }
+        return cri;
+    }
+    
+    private static OperationResourceInfo getOri(ClassResourceInfo cri, String methodName) throws Exception {
+        Method method = cri.getResourceClass().getMethod(methodName);
+        OperationResourceInfo ori = new OperationResourceInfo(method, cri);
+        ori.setURITemplate(URITemplate.createTemplate(AnnotationUtils.getMethodAnnotation(method, Path.class)));
+        return ori;
+    }
+    
+    private static List<String> getMatchedURIs(UriInfo u) {
+        List<String> matchedUris = u.getMatchedURIs();
+//        for (String s : matchedUris) {
+//            System.out.println(s);
+//        }
+        return matchedUris;
+    }
+    
+    @Test
+    public void testGetMatchedURIsRoot() throws Exception {
+        System.out.println("testGetMatchedURIsRoot");
+        Message m = mockMessage("http://localhost:8080/app", "/foo");
+        OperationResourceInfoStack oriStack = new OperationResourceInfoStack();
+        ClassResourceInfo cri = getCri(RootResource.class, true);
+        OperationResourceInfo ori = getOri(cri, "get");
+        
+        MethodInvocationInfo miInfo = new MethodInvocationInfo(ori, RootResource.class, new ArrayList<String>());
+        oriStack.push(miInfo);
+        m.put(OperationResourceInfoStack.class, oriStack);
+        
+        UriInfoImpl u = new UriInfoImpl(m);
+        List<String> matchedUris = getMatchedURIs(u);
+        assertEquals(1, matchedUris.size());
+        assertTrue(matchedUris.contains("foo"));
+    }
+    
+    @Test
+    public void testGetMatchedURIsRootSub() throws Exception {
+        System.out.println("testGetMatchedURIsRootSub");
+        Message m = mockMessage("http://localhost:8080/app", "/foo/bar");
+        OperationResourceInfoStack oriStack = new OperationResourceInfoStack();
+        ClassResourceInfo cri = getCri(RootResource.class, true);
+        OperationResourceInfo ori = getOri(cri, "getSubMethod");
+        
+        MethodInvocationInfo miInfo = new MethodInvocationInfo(ori, RootResource.class, new ArrayList<String>());
+        oriStack.push(miInfo);
+        m.put(OperationResourceInfoStack.class, oriStack);
+        
+        UriInfoImpl u = new UriInfoImpl(m);
+        List<String> matchedUris = getMatchedURIs(u);
+        assertEquals(2, matchedUris.size());
+        assertEquals("foo/bar", matchedUris.get(0));
+        assertEquals("foo", matchedUris.get(1));
+    }
+    
+    @Test
+    public void testGetMatchedURIsSubResourceLocator() throws Exception {
+        System.out.println("testGetMatchedURIsSubResourceLocator");
+        Message m = mockMessage("http://localhost:8080/app", "/foo/sub");
+        OperationResourceInfoStack oriStack = new OperationResourceInfoStack();
+        ClassResourceInfo rootCri = getCri(RootResource.class, true);
+        OperationResourceInfo rootOri = getOri(rootCri, "getSubResourceLocator");
+        
+        MethodInvocationInfo miInfo = new MethodInvocationInfo(rootOri, RootResource.class, new ArrayList<String>());
+        oriStack.push(miInfo);
+        
+        ClassResourceInfo subCri = getCri(SubResource.class, false);
+        OperationResourceInfo subOri = getOri(subCri, "getFromSub");
+        
+        miInfo = new MethodInvocationInfo(subOri, SubResource.class, new ArrayList<String>());
+        oriStack.push(miInfo);
+        m.put(OperationResourceInfoStack.class, oriStack);
+        
+        UriInfoImpl u = new UriInfoImpl(m);
+        List<String> matchedUris = getMatchedURIs(u);
+        assertEquals(2, matchedUris.size());
+        assertEquals("foo/sub", matchedUris.get(0));
+        assertEquals("foo", matchedUris.get(1));
+    }
+    
+    @Test
+    public void testGetMatchedURIsSubResourceLocatorSubPath() throws Exception {
+        System.out.println("testGetMatchedURIsSubResourceLocatorSubPath");
+        Message m = mockMessage("http://localhost:8080/app", "/foo/sub/subSub");
+        OperationResourceInfoStack oriStack = new OperationResourceInfoStack();
+        ClassResourceInfo rootCri = getCri(RootResource.class, true);
+        OperationResourceInfo rootOri = getOri(rootCri, "getSubResourceLocator");
+        
+        MethodInvocationInfo miInfo = new MethodInvocationInfo(rootOri, RootResource.class, new ArrayList<String>());
+        oriStack.push(miInfo);
+        
+        ClassResourceInfo subCri = getCri(SubResource.class, false);
+        OperationResourceInfo subOri = getOri(subCri, "getFromSubSub");
+        
+        miInfo = new MethodInvocationInfo(subOri, SubResource.class, new ArrayList<String>());
+        oriStack.push(miInfo);
+        m.put(OperationResourceInfoStack.class, oriStack);
+        
+        UriInfoImpl u = new UriInfoImpl(m);
+        List<String> matchedUris = getMatchedURIs(u);
+        assertEquals(3, matchedUris.size());
+        assertEquals("foo/sub/subSub", matchedUris.get(0));
+        assertEquals("foo/sub", matchedUris.get(1));
+        assertEquals("foo", matchedUris.get(2));
+    }
+
     private Message mockMessage(String baseAddress, String pathInfo) {
         return mockMessage(baseAddress, pathInfo, null, null);
     }
