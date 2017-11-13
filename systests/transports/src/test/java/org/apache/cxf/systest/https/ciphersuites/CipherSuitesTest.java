@@ -239,14 +239,10 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testRC4Included() throws Exception {
         String version = System.getProperty("java.version");
-        try {
-            if (1.8D == Double.parseDouble(version.substring(0, 3))) {
-                // RC4 not supported in JDK8
-                return;
-            }
-        } catch (Exception e) {
+        if (version.length() > 1 && 1.8D <= Double.parseDouble(version.substring(0, 3))
+            || version.length() == 1 && 9 <= Integer.parseInt(version.substring(0, 1))) {
+            // RC4 not supported since JDK8
             return;
-            //java9
         }
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = CipherSuitesTest.class.getResource("ciphersuites-rc4-client.xml");
@@ -273,14 +269,10 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testRC4IncludedAsync() throws Exception {
         String version = System.getProperty("java.version");
-        try {
-            if (1.8D == Double.parseDouble(version.substring(0, 3))) {
-                // RC4 not supported in JDK8
-                return;
-            }
-        } catch (Exception e) {
+        if (version.length() > 1 && 1.8D <= Double.parseDouble(version.substring(0, 3))
+            || version.length() == 1 && 9 <= Integer.parseInt(version.substring(0, 1))) {
+            // RC4 not supported since JDK8
             return;
-            //java9
         }
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = CipherSuitesTest.class.getResource("ciphersuites-rc4-client.xml");
