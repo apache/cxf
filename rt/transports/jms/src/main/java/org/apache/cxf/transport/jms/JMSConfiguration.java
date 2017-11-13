@@ -100,7 +100,7 @@ public class JMSConfiguration {
     // For jms spec. Do not configure manually
     private String targetService;
     private String requestURI;
-    private int retryInterval;
+    private int retryInterval = 5000;
 
     public void ensureProperlyConfigured() {
         ConnectionFactory cf = getConnectionFactory();
