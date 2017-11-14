@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.reactor.server;
+package org.apache.cxf.jaxrs.reactivestreams.server;
 
 import javax.ws.rs.container.AsyncResponse;
 
@@ -28,10 +28,11 @@ public class JsonStreamingAsyncSubscriber<T> extends StreamingAsyncSubscriber<T>
         this(ar, pollTimeout, 0);
     }
     public JsonStreamingAsyncSubscriber(AsyncResponse ar, long pollTimeout, long asyncTimeout) {
-        this(ar, "[", "]", ",", pollTimeout, asyncTimeout);
+        super(ar, "[", "]", ",", pollTimeout, asyncTimeout);
     }
+
     public JsonStreamingAsyncSubscriber(AsyncResponse ar, String prefix, String suffix, String separator, 
-            long pollTimeout, long asyncTimeout) {
-            super(ar, prefix, suffix, separator, pollTimeout, asyncTimeout);
+                                        long pollTimeout, long asyncTimeout) {
+        super(ar, prefix, suffix, separator, pollTimeout, asyncTimeout);
     }
 }
