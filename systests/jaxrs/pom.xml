@@ -66,10 +66,6 @@
           <artifactId>rxjava</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.projectreactor</groupId>
-            <artifactId>reactor-core</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-extension-reactivestreams</artifactId>
             <version>${project.version}</version>
