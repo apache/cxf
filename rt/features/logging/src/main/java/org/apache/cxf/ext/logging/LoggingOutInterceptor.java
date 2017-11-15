@@ -85,10 +85,17 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             // make the limit for the cache greater than the limit for the truncated payload in the log event, 
             // this is necessary for finding out that the payload was truncated 
             //(see boolean isTruncated = cos.size() > limit && limit != -1;)  in method copyPayload
-            newOut.setCacheLimit(limit + 1);
+            newOut.setCacheLimit(getCacheLimit());
         }
         newOut.registerCallback(callback);
         return newOut;
+    }
+    
+     private int getCacheLimit() {
+        if (limit == Integer.MAX_VALUE) {
+            return limit;
+        }
+        return limit +1;
     }
 
     private class LogEventSendingWriter extends FilterWriter {
