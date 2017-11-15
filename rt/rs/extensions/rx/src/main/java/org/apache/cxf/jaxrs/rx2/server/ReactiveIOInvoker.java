@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.jaxrs.rx2.server;
 
+import java.util.concurrent.CancellationException;
+
 import org.apache.cxf.jaxrs.JAXRSInvoker;
 import org.apache.cxf.jaxrs.impl.AsyncResponseImpl;
 import org.apache.cxf.message.Message;
@@ -50,8 +52,11 @@ public class ReactiveIOInvoker extends JAXRSInvoker {
     }
 
     private Object handleThrowable(AsyncResponseImpl asyncResponse, Throwable t) {
-        //TODO: if it is a Cancelation exception => asyncResponse.cancel(); 
-        asyncResponse.resume(t);
+        if (t instanceof CancellationException) {
+            asyncResponse.cancel();
+        } else {
+            asyncResponse.resume(t);
+        }
         return null;
     }
 }
