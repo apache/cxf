@@ -48,20 +48,21 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
         LoggingInFaultInterceptor() {
             super(Phase.RECEIVE);
         }
+
         @Override
         public void handleMessage(Message message) throws Fault {
         }
+
         @Override
         public void handleFault(Message message) throws Fault {
             LoggingInInterceptor.this.handleMessage(message);
         }
     }
-    
-    
+
     public LoggingInInterceptor() {
         this(new Slf4jVerboseEventSender());
     }
-    
+
     public LoggingInInterceptor(PrintWriter writer) {
         this(new PrintWriterEventSender(writer));
     }
@@ -69,11 +70,10 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
     public LoggingInInterceptor(LogEventSender sender) {
         super(Phase.PRE_INVOKE, sender);
     }
-    
 
     public Collection<PhaseInterceptor<? extends Message>> getAdditionalInterceptors() {
         Collection<PhaseInterceptor<? extends Message>> ret = new ArrayList<>();
-        ret.add(new WireTapIn(limit, threshold));
+        ret.add(new WireTapIn(getWireTabLimit(), threshold));
         ret.add(new LoggingInFaultInterceptor());
         return ret;
     }
@@ -109,7 +109,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
     }
 
     private void handleOutputStream(final LogEvent event, Message message, CachedOutputStream cos) throws IOException {
-        String encoding = (String)message.get(Message.ENCODING);
+        String encoding = (String) message.get(Message.ENCODING);
         if (StringUtils.isEmpty(encoding)) {
             encoding = StandardCharsets.UTF_8.name();
         }
@@ -131,5 +131,19 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
         event.setFullContentFile(writer.getTempFile());
     }
 
+    int getWireTabLimit() {
+        if (limit == -1) {
+            return -1;
+        } else if (limit == Integer.MAX_VALUE) {
+            return limit;
+        } else {
+            // add limit +1 as limit for the wiretab in order to read one byte more, so that truncated
+            // is correctly calculated in LogginInIntecepteor! 
+            // See code line :  boolean isTruncated = cos.size() > limit && limit != -1; 
+            // cos is here the outputstream read by the wiretab which will return for cos.size() the 
+            // limit in the truncated case!
+            return limit + 1;
+        }
+    }
 
 }

@@ -82,7 +82,10 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             newOut.setThreshold(threshold);
         }
         if (limit > 0) {
-            newOut.setCacheLimit(limit);
+            // make the limit for the cache greater than the limit for the truncated payload in the log event, 
+            // this is necessary for finding out that the payload was truncated 
+            //(see boolean isTruncated = cos.size() > limit && limit != -1;)  in method copyPayload
+            newOut.setCacheLimit(limit + 1);
         }
         newOut.registerCallback(callback);
         return newOut;
@@ -144,23 +147,24 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
         }
 
         private String getPayload(final LogEvent event, StringWriter w2) {
-            String ct = (String)message.get(Message.CONTENT_TYPE);
             StringBuilder payload = new StringBuilder();
             try {
-                writePayload(payload, w2, ct);
+                writePayload(payload, w2, event);
             } catch (Exception ex) {
                 // ignore
             }
             return payload.toString();
         }
 
-        protected void writePayload(StringBuilder builder, StringWriter stringWriter, String contentType)
+        protected void writePayload(StringBuilder builder, StringWriter stringWriter,  LogEvent event)
             throws Exception {
             StringBuffer buffer = stringWriter.getBuffer();
             if (buffer.length() > lim) {
                 builder.append(buffer.subSequence(0, lim));
+                event.setTruncated(true);
             } else {
                 builder.append(buffer);
+                event.setTruncated(false);
             }
         }
     }
@@ -208,6 +212,8 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
                 StringBuilder payload = new StringBuilder();
                 writePayload(payload, cos, encoding, event.getContentType());
                 event.setPayload(payload.toString());
+                boolean isTruncated = cos.size() > limit && limit != -1;
+                event.setTruncated(isTruncated);
             } catch (Exception ex) {
                 // ignore
             }
