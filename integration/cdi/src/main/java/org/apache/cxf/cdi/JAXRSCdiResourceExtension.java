@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
@@ -38,10 +39,13 @@ import javax.enterprise.inject.spi.BeforeShutdown;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.InjectionTarget;
 import javax.enterprise.inject.spi.ProcessBean;
+import javax.enterprise.inject.spi.ProcessInjectionTarget;
 import javax.enterprise.inject.spi.ProcessProducerField;
 import javax.enterprise.inject.spi.ProcessProducerMethod;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.Path;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
@@ -51,6 +55,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.cdi.event.DisposableCreationalContext;
 import org.apache.cxf.cdi.extension.JAXRSServerFactoryCustomizationExtension;
+import org.apache.cxf.cdi.inject.ContextInjectionTarget;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.provider.ServerConfigurableFactory;
@@ -119,6 +124,21 @@ public class JAXRSCdiResourceExtension implements Extension {
         } else if (CdiBusBean.CXF.equals(event.getBean().getName())
                 && Bus.class.isAssignableFrom(event.getBean().getBeanClass())) {
             hasBus = true;
+        }
+    }
+    
+    public <X> void processInjectionTarget(@Observes final ProcessInjectionTarget<X> target, 
+            final BeanManager beanManager) {
+        
+        final InjectionTarget<X> injectionTarget = target.getInjectionTarget();
+        final AnnotatedType<X> type = target.getAnnotatedType();
+        
+        // The beans annotated with @ApplicationScoped will be very likely proxified.
+        boolean isApplicationScoped = type.isAnnotationPresent(ApplicationScoped.class);
+        if (isApplicationScoped && isProvider(type)) {
+            // Limit the scope to providers for now
+            final InjectionTarget<X> contextual = new ContextInjectionTarget<>(injectionTarget, type.getJavaClass());
+            target.setInjectionTarget(contextual);
         }
     }
     
@@ -421,4 +441,16 @@ public class JAXRSCdiResourceExtension implements Extension {
         }
     }
 
+    /**
+     * Tries to detect of a particular annotated type corresponds to provider
+     * @param type annotated type 
+     * @return "true" if annotated type corresponds to provider, "false" otherwise
+     */
+    private boolean isProvider(final AnnotatedType<?> type) {
+        return type.isAnnotationPresent(Provider.class) 
+            || ContainerRequestFilter.class.isAssignableFrom(type.getJavaClass()) 
+            || ContainerResponseFilter.class.isAssignableFrom(type.getJavaClass()) 
+            || MessageBodyWriter.class.isAssignableFrom(type.getJavaClass()) 
+            || MessageBodyReader.class.isAssignableFrom(type.getJavaClass());
+    }
 }

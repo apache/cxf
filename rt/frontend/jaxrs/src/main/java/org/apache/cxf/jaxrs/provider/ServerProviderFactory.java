@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,6 +50,7 @@ import javax.ws.rs.ext.WriterInterceptor;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.ClassHelper;
+import org.apache.cxf.common.util.ClassUnwrapper;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.impl.ConfigurableImpl;
@@ -267,6 +269,32 @@ public final class ServerProviderFactory extends ProviderFactory {
         injectContextProxies(exceptionMappers,
             postMatchContainerRequestFilters.values(), preMatchContainerRequestFilters,
             containerResponseFilters.values());
+    }
+
+    /**
+     * Injects the context proxies into the provider identified by a particular 
+     * provider class, using the provider instance supplied. This method is used when
+     * the instance inside ProviderInfo class is pointing out to proxy, not a real class
+     * instance. In this case the contextual properties are not injected properly
+     * (f.e. in case of CDI).
+     * @param providerClass provider class
+     * @param instance provider instance
+     */
+    public void injectContextProxiesIntoProvider(Class<?> providerClass, Object instance) {
+        final ClassUnwrapper unwrapper = (ClassUnwrapper)getBus().getProperty(ClassUnwrapper.class.getName());
+        
+        final Collection<ProviderInfo<?>> infos = findProviderByClass(unwrapper, providerClass,
+            exceptionMappers, postMatchContainerRequestFilters.values(), 
+                preMatchContainerRequestFilters, containerResponseFilters.values());
+        
+        // We may end up with a multiple providers but we don't know exactly which one
+        // is being referenced by provider class.
+        for (final ProviderInfo<?> info: infos) {
+            if (info.contextsAvailable()) {
+                InjectionUtils.injectContextProxiesAndApplication(info, instance, 
+                    application == null ? null : application.getProvider(), this);
+            }
+        }
     }
 
     @Override
@@ -602,4 +630,28 @@ public final class ServerProviderFactory extends ProviderFactory {
         }
     }
 
+    /**
+     * Finds the providers which correspond to a particular provider class. 
+     */
+    protected Collection<ProviderInfo<?>> findProviderByClass(final ClassUnwrapper unwrapper, 
+            final Class<?> providerClass, final Collection<?> ... providerLists) {
+        
+        final Set<ProviderInfo<?>> providers = new HashSet<>();
+        
+        for (final Collection<?> list: providerLists) {
+            final Collection<ProviderInfo<?>> l2 = CastUtils.cast(list);
+            
+            for (final ProviderInfo<?> pi : l2) {
+                final Class<?> clazz = (unwrapper != null) 
+                    ? unwrapper.getRealClass(pi.getProvider())
+                        : pi.getProvider().getClass();
+                    
+                if (providerClass.equals(clazz)) {
+                    providers.add(pi);
+                }
+            }
+        }
+        
+        return providers;
+    }
 }

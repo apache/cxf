@@ -22,8 +22,18 @@ import java.util.regex.Pattern;
 
 import org.apache.cxf.common.util.ClassUnwrapper;
 
+/**
+ * Unwraps the CDI proxy classes into real classes.
+ */
 class CdiClassUnwrapper implements ClassUnwrapper {
-    private static final Pattern PROXY_PATTERN = Pattern.compile(".+\\$\\$.+Proxy");
+    /**
+     * Known proxy patterns for OWB and Weld:
+     * 
+     *  Xxx$$OwbNormalScopeProxy0
+     *  Xxx$Proxy$_$$_WeldClientProxy
+     *  
+     */
+    private static final Pattern PROXY_PATTERN = Pattern.compile(".+\\$\\$.+Proxy\\d*");
 
     CdiClassUnwrapper() {
 
