@@ -67,6 +67,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
     //
     // Encryption tests
     //
+
     @org.junit.Test
     public void testEncryptionProperties() throws Exception {
 
@@ -260,10 +261,62 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         assertNotEquals(response.getStatus(), 200);
     }
 
+    @org.junit.Test
+    public void testManualEncryption() throws Exception {
+
+        URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
+
+        List<Object> providers = new ArrayList<>();
+        providers.add(new JacksonJsonProvider());
+
+        String address = "http://localhost:" + PORT + "/jweoaepgcm/bookstore/books";
+        WebClient client =
+            WebClient.create(address, providers, busFile.toString());
+        client.type("application/json").accept("application/json");
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("rs.security.encryption.properties",
+                       "org/apache/cxf/systest/jaxrs/security/bob.jwk.properties");
+        WebClient.getConfig(client).getRequestContext().putAll(properties);
+
+        String header = "eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkExMjhHQ00iLCJjdHkiOiJqc29uIn0";
+        String encryptedKey = "f_Njrwn8fLxvIfftV27lSqEgvyIvkfx5tcI6xJdzXqxSL-Xssaq9TFwbhiJIU6k23i1uLFDd3r7rL"
+            + "V9THMcAo80C-m_SIbA6X4daeIm7ANmREZ9sw9QkD0URis6MAuZkoYIRB6z9g7TDmPTdrpTUWJbwYaBAe-_VYaoVBwRv_A"
+            + "ikPdKJEUWSMxouJEq4TZUVveNjI_tflZpudz1mYXKv9Lw_5byYpwgIB9crI9BR0kfCK9x3BXVFMZHJAg0yIuAKDkcs9Ts"
+            + "TIV0jLXRnb50Uc62OuJ6VFGQw-AL3tNHLRKYXjwDnE492wAZmsaxefql9wbv7b8BLmRUNeKER-26tdA";
+        String iv = "rqUxWbEenVnC3QFx";
+        String cipherText = "8iE2vM79BkXVJ0afH6fbig5uFpQ71nxc-i2SbokQtZO7";
+        String authnTag = "bZk8RwVMZgawyFNSOkMLaw";
+
+
+        // Successful test
+        Response response = client.post(header + "." + encryptedKey + "." + iv + "." + cipherText + "." + authnTag);
+        assertEquals(response.getStatus(), 200);
+
+        // Tamper with the values
+        response = client.post(header + "xyz." + encryptedKey + "." + iv + "." + cipherText + "." + authnTag);
+        assertNotEquals(response.getStatus(), 200);
+
+        response =  client.post(header + "." + encryptedKey + "xyz." + iv + "." + cipherText + "." + authnTag);
+        assertNotEquals(response.getStatus(), 200);
+
+        response = client.post(header + "." + encryptedKey + "." + iv + "xyz." + cipherText + "." + authnTag);
+        assertNotEquals(response.getStatus(), 200);
+
+        response = client.post(header + "." + encryptedKey + "." + iv + "." + cipherText + "xyz." + authnTag);
+        assertNotEquals(response.getStatus(), 200);
+
+        response = client.post(header + "." + encryptedKey + "." + iv + "." + cipherText + "." + authnTag + "xyz");
+        assertNotEquals(response.getStatus(), 200);
+
+        response = client.post(header + "." + encryptedKey + "." + iv + "." + cipherText + ".");
+        assertNotEquals(response.getStatus(), 200);
+    }
+
     //
     // Signature tests
     //
-    
+
     @org.junit.Test
     public void testSignatureProperties() throws Exception {
 
