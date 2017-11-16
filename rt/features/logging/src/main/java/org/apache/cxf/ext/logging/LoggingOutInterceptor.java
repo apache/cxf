@@ -49,7 +49,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
     public LoggingOutInterceptor() {
         this(new Slf4jVerboseEventSender());
     }
-    
+
     public LoggingOutInterceptor(PrintWriter writer) {
         this(new PrintWriterEventSender(writer));
     }
@@ -90,12 +90,12 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
         newOut.registerCallback(callback);
         return newOut;
     }
-    
-     private int getCacheLimit() {
+
+    private int getCacheLimit() {
         if (limit == Integer.MAX_VALUE) {
             return limit;
         }
-        return limit +1;
+        return limit + 1;
     }
 
     private class LogEventSendingWriter extends FilterWriter {
@@ -143,7 +143,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             final LogEvent event = new DefaultLogEventMapper().map(message);
             StringWriter w2 = out2;
             if (w2 == null) {
-                w2 = (StringWriter)out;
+                w2 = (StringWriter) out;
             }
 
             String payload = shouldLogContent(event) ? getPayload(event, w2) : CONTENT_SUPPRESSED;
@@ -163,8 +163,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             return payload.toString();
         }
 
-        protected void writePayload(StringBuilder builder, StringWriter stringWriter,  LogEvent event)
-            throws Exception {
+        protected void writePayload(StringBuilder builder, StringWriter stringWriter, LogEvent event) throws Exception {
             StringBuffer buffer = stringWriter.getBuffer();
             if (buffer.length() > lim) {
                 builder.append(buffer.subSequence(0, lim));
@@ -215,7 +214,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
 
         private void copyPayload(CachedOutputStream cos, final LogEvent event) {
             try {
-                String encoding = (String)message.get(Message.ENCODING);
+                String encoding = (String) message.get(Message.ENCODING);
                 StringBuilder payload = new StringBuilder();
                 writePayload(payload, cos, encoding, event.getContentType());
                 event.setPayload(payload.toString());
@@ -226,8 +225,8 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             }
         }
 
-        protected void writePayload(StringBuilder builder, CachedOutputStream cos, String encoding,
-                                    String contentType) throws Exception {
+        protected void writePayload(StringBuilder builder, CachedOutputStream cos, String encoding, String contentType)
+                throws Exception {
             if (StringUtils.isEmpty(encoding)) {
                 cos.writeCacheTo(builder, lim);
             } else {
