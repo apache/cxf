@@ -313,9 +313,70 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         assertNotEquals(response.getStatus(), 200);
     }
 
+    @org.junit.Test
+    public void testEncryptionPBES() throws Exception {
+
+        URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
+
+        List<Object> providers = new ArrayList<>();
+        providers.add(new JacksonJsonProvider());
+        providers.add(new JweWriterInterceptor());
+
+        String address = "http://localhost:" + PORT + "/jwepbes/bookstore/books";
+        WebClient client =
+            WebClient.create(address, providers, busFile.toString());
+        client.type("application/json").accept("application/json");
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("rs.security.encryption.content.algorithm", "A128GCM");
+        properties.put("rs.security.encryption.key.algorithm", "PBES2-HS256+A128KW");
+        String password = "123456789123456789";
+        properties.put("rs.security.key.password.provider", new PrivateKeyPasswordProviderImpl(password));
+        WebClient.getConfig(client).getRequestContext().putAll(properties);
+
+        Response response = client.post(new Book("book", 123L));
+        assertEquals(response.getStatus(), 200);
+
+        Book returnedBook = response.readEntity(Book.class);
+        assertEquals(returnedBook.getName(), "book");
+        assertEquals(returnedBook.getId(), 123L);
+    }
+
+    @org.junit.Test
+    public void testEncryptionPBESDifferentCount() throws Exception {
+
+        URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
+
+        List<Object> providers = new ArrayList<>();
+        providers.add(new JacksonJsonProvider());
+        providers.add(new JweWriterInterceptor());
+
+        String address = "http://localhost:" + PORT + "/jwepbes/bookstore/books";
+        WebClient client =
+            WebClient.create(address, providers, busFile.toString());
+        client.type("application/json").accept("application/json");
+
+        Map<String, Object> properties = new HashMap<>();
+        String password = "123456789123456789";
+        properties.put("rs.security.encryption.content.algorithm", "A128GCM");
+        properties.put("rs.security.encryption.key.algorithm", "PBES2-HS256+A128KW");
+        properties.put("rs.security.key.password.provider", new PrivateKeyPasswordProviderImpl(password));
+        properties.put("rs.security.encryption.pbes2.count", "1000");
+        WebClient.getConfig(client).getRequestContext().putAll(properties);
+
+        Response response = client.post(new Book("book", 123L));
+        assertEquals(response.getStatus(), 200);
+
+        Book returnedBook = response.readEntity(Book.class);
+        assertEquals(returnedBook.getName(), "book");
+        assertEquals(returnedBook.getId(), 123L);
+    }
+
+
     //
     // Signature tests
     //
+
     @org.junit.Test
     public void testSignatureProperties() throws Exception {
 
