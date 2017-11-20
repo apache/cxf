@@ -33,6 +33,14 @@
             <ref bean="cors-filter"/>
         </jaxrs:providers>
     </jaxrs:server>
+    <jaxrs:server id="ann-cors-service2" address="/antest2">
+        <jaxrs:serviceBeans>
+            <ref bean="ann-cors-server2"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="cors-filter"/>
+        </jaxrs:providers>
+    </jaxrs:server>
     <jaxrs:server id="config-service" address="/config">
         <jaxrs:serviceBeans>
             <ref bean="config-server"/>
@@ -46,4 +54,5 @@
     </bean>
     <bean id="unann-cors-server" scope="prototype" class="org.apache.cxf.systest.jaxrs.cors.UnannotatedCorsServer"/>
     <bean id="ann-cors-server" scope="prototype" class="org.apache.cxf.systest.jaxrs.cors.AnnotatedCorsServer"/>
+    <bean id="ann-cors-server2" scope="prototype" class="org.apache.cxf.systest.jaxrs.cors.AnnotatedCorsServer2"/>
 </beans>
