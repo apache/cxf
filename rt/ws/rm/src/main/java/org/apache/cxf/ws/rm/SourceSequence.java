@@ -271,13 +271,13 @@ public class SourceSequence extends AbstractSequence {
      * 
      * @param to
      */
-    synchronized void setTarget(EndpointReferenceType to) {
+    public synchronized void setTarget(EndpointReferenceType to) {
         if (target == null && !ContextUtils.isGenericAddress(to)) {
             target = to;
         }
     }
 
-    synchronized EndpointReferenceType getTarget() {
+    public synchronized EndpointReferenceType getTarget() {
         return target;
     }
 
