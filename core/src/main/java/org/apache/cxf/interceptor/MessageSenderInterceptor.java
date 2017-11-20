@@ -20,6 +20,7 @@
 package org.apache.cxf.interceptor;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import org.apache.cxf.common.i18n.BundleUtils;
@@ -61,7 +62,8 @@ public class MessageSenderInterceptor extends AbstractPhaseInterceptor<Message> 
             try {
                 getConduit(message).close(message);
             } catch (IOException e) {
-                throw new Fault(new org.apache.cxf.common.i18n.Message("COULD_NOT_SEND", BUNDLE), e);
+                final Boolean isSynchronous = Optional.ofNullable(message.getExchange()).map(Exchange::isSynchronous).orElse(false);
+                throw new Fault(new org.apache.cxf.common.i18n.Message(isSynchronous ? "COULD_NOT_COMLETE" : "COULD_NOT_SEND", BUNDLE), e);
             }
         }
     }
