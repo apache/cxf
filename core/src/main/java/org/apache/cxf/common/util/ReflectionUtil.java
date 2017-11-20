@@ -275,6 +275,27 @@ public final class ReflectionUtil {
         if (annotation != null) {
             return annotation;
         }
-        return m.getDeclaringClass().getAnnotation(annotationType);
+        annotation = m.getDeclaringClass().getAnnotation(annotationType);
+        if (annotation != null) {
+            return annotation;
+        }
+        for (Class<?> intf : m.getDeclaringClass().getInterfaces()) {
+            annotation = getAnnotationForInterface(intf, annotationType);
+            if (annotation != null) {
+                return annotation;
+            }
+        }
+        return null;
+    }
+    
+    private static <T extends Annotation> T getAnnotationForInterface(Class<?> intf, Class<T> annotationType) {
+        T annotation = intf.getAnnotation(annotationType);
+        if (annotation != null) {
+            return annotation;
+        }
+        for (Class<?> intf2 : intf.getInterfaces()) {
+            return getAnnotationForInterface(intf2, annotationType);
+        }
+        return null;
     }
 }
