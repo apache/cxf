@@ -63,7 +63,7 @@ public class MessageSenderInterceptor extends AbstractPhaseInterceptor<Message> 
                 getConduit(message).close(message);
             } catch (IOException e) {
                 final Boolean isSynchronous = Optional.ofNullable(message.getExchange()).map(Exchange::isSynchronous).orElse(false);
-                throw new Fault(new org.apache.cxf.common.i18n.Message(isSynchronous ? "COULD_NOT_COMLETE" : "COULD_NOT_SEND", BUNDLE), e);
+                throw new Fault(new org.apache.cxf.common.i18n.Message(isSynchronous ? "COULD_NOT_COMPLETE" : "COULD_NOT_SEND", BUNDLE), e);
             }
         }
     }
