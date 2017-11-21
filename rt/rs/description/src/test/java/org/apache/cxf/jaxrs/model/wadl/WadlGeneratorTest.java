@@ -1000,32 +1000,36 @@ public class WadlGeneratorTest extends Assert {
                                                                 Constants.URI_2001_SCHEMA_XSD,
                                                                 "schema");
         assertEquals(2, schemasEls.size());
-        assertEquals("http://example.com", schemasEls.get(0).getAttribute("targetNamespace"));
-        assertEquals("http://example.com", schemasEls.get(1).getAttribute("targetNamespace"));
-
+        
         List<Element> importEls = DOMUtils.getChildrenWithName(schemasEls.get(0),
-                Constants.URI_2001_SCHEMA_XSD,
-                "import");
-        assertEquals(1, importEls.size());
+                                                               Constants.URI_2001_SCHEMA_XSD,
+                                                               "import");
+        int schemaElementsIndex = importEls.size() > 0 ? 0 : 1;
+        int schemaTypesIndex = schemaElementsIndex == 0 ? 1 : 0;
+        
+        checkGenericImplSchemaWithTypes(schemasEls.get(schemaTypesIndex));
+        checkGenericImplSchemaWithElements(schemasEls.get(schemaElementsIndex));
 
-        List<Element> typeEls = DOMUtils.getChildrenWithName(schemasEls.get(0),
-                Constants.URI_2001_SCHEMA_XSD,
-                "element");
-        assertEquals(2, typeEls.size());
-        assertEquals("actual", typeEls.get(0).getAttribute("name"));
-        assertEquals("actual", typeEls.get(0).getAttribute("type"));
-        assertEquals("super", typeEls.get(1).getAttribute("name"));
-        assertEquals("super", typeEls.get(1).getAttribute("type"));
+        List<Element> reps = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
+                                       WadlGenerator.WADL_NS, "representation");
+        assertEquals(2, reps.size());
+        assertEquals("ns1:actual", reps.get(0).getAttribute("element"));
+        assertEquals("ns1:actual", reps.get(1).getAttribute("element"));
 
-        List<Element> complexTypeEls = DOMUtils.getChildrenWithName(schemasEls.get(1),
-                Constants.URI_2001_SCHEMA_XSD,
-                "complexType");
+    }
+
+    private void checkGenericImplSchemaWithTypes(Element schemaEl) {
+        List<Element> complexTypeEls = DOMUtils.getChildrenWithName(schemaEl,
+                                                                    Constants.URI_2001_SCHEMA_XSD,
+                                                                    "complexType");
         assertEquals(2, complexTypeEls.size());
-        assertEquals("actual", complexTypeEls.get(0).getAttribute("name"));
-        assertEquals("super", complexTypeEls.get(1).getAttribute("name"));
-
+        int actualTypeIndex = "actual".equals(complexTypeEls.get(0).getAttribute("name")) ? 0 : 1;
+        int superTypeIndex = actualTypeIndex == 0 ? 1 : 0;
+        
+        assertEquals("actual", complexTypeEls.get(actualTypeIndex).getAttribute("name"));
+        
         Element ccActualElement =
-                (Element)complexTypeEls.get(0).getElementsByTagNameNS(Constants.URI_2001_SCHEMA_XSD,
+                (Element)complexTypeEls.get(actualTypeIndex).getElementsByTagNameNS(Constants.URI_2001_SCHEMA_XSD,
                                                   "complexContent").item(0);
         Element extensionActualElement =
             (Element)ccActualElement.getElementsByTagNameNS(Constants.URI_2001_SCHEMA_XSD,
@@ -1036,8 +1040,10 @@ public class WadlGeneratorTest extends Assert {
         assertEquals("super", extensionActualElement.getAttribute("base"));
         assertEquals(0, sequenceActualElement.getChildNodes().getLength());
 
+        assertEquals("super", complexTypeEls.get(superTypeIndex).getAttribute("name"));
+
         Element sequenceSuperElement =
-                (Element)complexTypeEls.get(1).getElementsByTagNameNS(Constants.URI_2001_SCHEMA_XSD,
+                (Element)complexTypeEls.get(superTypeIndex).getElementsByTagNameNS(Constants.URI_2001_SCHEMA_XSD,
                                                   "sequence").item(0);
         List<Element> superEls = DOMUtils.getChildrenWithName(sequenceSuperElement,
                 Constants.URI_2001_SCHEMA_XSD,
@@ -1047,13 +1053,27 @@ public class WadlGeneratorTest extends Assert {
         assertEquals("xs:int", superEls.get(0).getAttribute("type"));
         assertEquals("name", superEls.get(1).getAttribute("name"));
         assertEquals("xs:string", superEls.get(1).getAttribute("type"));
+        
+    }
 
-        List<Element> reps = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
-                                       WadlGenerator.WADL_NS, "representation");
-        assertEquals(2, reps.size());
-        assertEquals("ns1:actual", reps.get(0).getAttribute("element"));
-        assertEquals("ns1:actual", reps.get(1).getAttribute("element"));
+    private void checkGenericImplSchemaWithElements(Element schemaEl) {
+        assertEquals("http://example.com", schemaEl.getAttribute("targetNamespace"));
 
+        List<Element> importEls = DOMUtils.getChildrenWithName(schemaEl,
+                                                               Constants.URI_2001_SCHEMA_XSD,
+                                                               "import");
+                                                       
+        assertEquals(1, importEls.size());
+
+        List<Element> typeEls = DOMUtils.getChildrenWithName(schemaEl,
+                Constants.URI_2001_SCHEMA_XSD,
+                "element");
+        assertEquals(2, typeEls.size());
+        assertEquals("actual", typeEls.get(0).getAttribute("name"));
+        assertEquals("actual", typeEls.get(0).getAttribute("type"));
+        assertEquals("super", typeEls.get(1).getAttribute("name"));
+        assertEquals("super", typeEls.get(1).getAttribute("type"));
+        
     }
 
 }
