@@ -27,6 +27,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.AccessController;
@@ -696,7 +697,8 @@ public final class ResourceUtils {
             type = InjectionUtils.getActualType(genericType);
             isCollection = true;
         }
-        if (type == Object.class && !(genericType instanceof Class)) {
+        if (type == Object.class && !(genericType instanceof Class)
+            || genericType instanceof TypeVariable) {
             Type theType = InjectionUtils.processGenericTypeIfNeeded(serviceClass,
                                                       Object.class,
                                                       genericType);
