@@ -315,8 +315,8 @@ public class JavaFirstSchemaValidationTest extends Assert {
             fail("Expected exception");
         } catch (WebServiceException e) {
             final String exMessage = e.getMessage();
-            assertTrue(exMessage.contains("Could not send Message") || 
-                    exMessage.contains("Could not complete Exchange"));
+            assertTrue(exMessage.contains("Could not send Message") 
+                       || exMessage.contains("Could not complete Exchange"));
         }
     }
 
