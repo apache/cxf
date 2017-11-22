@@ -314,6 +314,7 @@ public class JavaFirstSchemaValidationTest extends Assert {
             disconnectedClient.saveValidateOut(person);
             fail("Expected exception");
         } catch (WebServiceException e) {
+            final String exMessage = e.getMessage();
             assertTrue(exMessage.contains("Could not send Message") || 
                     exMessage.contains("Could not complete Exchange"));
         }
