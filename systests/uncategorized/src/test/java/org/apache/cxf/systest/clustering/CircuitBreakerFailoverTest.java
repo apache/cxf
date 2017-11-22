@@ -23,6 +23,8 @@ import javax.xml.ws.WebServiceException;
 import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.greeter_control.Greeter;
+import org.hamcrest.Matcher;
+import org.hamcrest.collection.IsIn;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -33,6 +35,9 @@ import static org.hamcrest.CoreMatchers.equalTo;
 public class CircuitBreakerFailoverTest extends FailoverTest {
     private static final String FAILOVER_CONFIG =
             "org/apache/cxf/systest/clustering/circuit_breaker_failover.xml";
+
+    private final Matcher<String> isFaultMessage = 
+            new IsIn<>(new String[] {"Could not send Message.", "Could not complete Exchange."});
 
     protected String getConfig() {
         return FAILOVER_CONFIG;
@@ -46,7 +51,7 @@ public class CircuitBreakerFailoverTest extends FailoverTest {
             g.greetMe("fred");
             fail("Expecting communication exception");
         } catch (WebServiceException ex) {
-            assertThat(ex.getMessage(), equalTo("Could not send Message."));
+            assertThat(ex.getMessage(), isFaultMessage);
         }
 
         try {
@@ -73,7 +78,7 @@ public class CircuitBreakerFailoverTest extends FailoverTest {
             g.greetMe("fred");
             fail("Expecting no alternative endpoints exception");
         } catch (WebServiceException ex) {
-            assertThat(ex.getMessage(), equalTo("Could not send Message."));
+            assertThat(ex.getMessage(), isFaultMessage);
         }
     }
 }
