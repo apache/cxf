@@ -1260,8 +1260,9 @@ public class WebClient extends AbstractClient {
 
     // Link to JAX-RS 2.1 CompletionStageRxInvoker
     public CompletionStageRxInvoker rx() {
-        return rx((ExecutorService)null);
+        return rx(lookUpExecutorService());
     }
+    
     public CompletionStageRxInvoker rx(ExecutorService ex) {
         return new CompletionStageRxInvokerImpl(this, ex);
     }
@@ -1297,4 +1298,16 @@ public class WebClient extends AbstractClient {
         }
     }
 
+    private ExecutorService lookUpExecutorService() {
+        try {
+            javax.naming.InitialContext ic = new javax.naming.InitialContext();
+            Object execService = ic.lookup("java:comp/DefaultManagedExecutorService");
+            if (execService != null) {
+                return (ExecutorService)execService; 
+            }
+        } catch (Throwable ex) {
+            // ignore
+        }
+        return null;
+    }
 }
