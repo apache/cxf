@@ -59,6 +59,9 @@ import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.ws.addressing.MAPAggregator;
 
+import org.hamcrest.Matcher;
+import org.hamcrest.collection.IsIn;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -75,6 +78,8 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
     private static final QName SOAP_FAULT_CODE = new QName("http://schemas.xmlsoap.org/soap/envelope/",
                                                            "Server");
     private static final String FAULT_MESSAGE = "Could not send Message.";
+
+    private static final String COMPLETE_EXCHANGE_FAULT_MESSAGE = "Could not complete Exchange.";
 
     private static final String CONTROL_PORT_ADDRESS =
         "http://localhost:" + PORT + "/SoapContext/ControlPort";
@@ -135,6 +140,9 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
     private List<Phase> inPhases;
     private PhaseComparator comparator;
     private Phase postUnMarshalPhase;
+
+    private final Matcher<String> isFaultMessage = 
+            new IsIn<>(new String[] {FAULT_MESSAGE, COMPLETE_EXCHANGE_FAULT_MESSAGE});
 
 
 
@@ -313,7 +321,7 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
             if (!expectOnewayFault) {
                 fail("Oneway operation unexpectedly failed.");
             }
-            assertEquals(FAULT_MESSAGE, ex.getMessage());
+            assertThat(ex.getMessage(), isFaultMessage);
         }
 
         String expectedMsg = getExpectedInterceptorFaultMessage(location.getPhase());
