@@ -61,7 +61,8 @@ public class MessageSenderInterceptor extends AbstractPhaseInterceptor<Message> 
             try {
                 getConduit(message).close(message);
             } catch (IOException e) {
-                throw new Fault(new org.apache.cxf.common.i18n.Message("COULD_NOT_SEND", BUNDLE), e);
+                final String errMsg = message.getExchange().isSynchronous() ? "COULD_NOT_COMPLETE" : "COULD_NOT_SEND";
+                throw new Fault(new org.apache.cxf.common.i18n.Message(errMsg, BUNDLE), e);
             }
         }
     }
