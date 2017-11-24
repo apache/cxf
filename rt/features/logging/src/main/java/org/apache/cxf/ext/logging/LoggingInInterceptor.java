@@ -73,7 +73,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
 
     public Collection<PhaseInterceptor<? extends Message>> getAdditionalInterceptors() {
         Collection<PhaseInterceptor<? extends Message>> ret = new ArrayList<>();
-        ret.add(new WireTapIn(getWireTabLimit(), threshold));
+        ret.add(new WireTapIn(getWireTapLimit(), threshold));
         ret.add(new LoggingInFaultInterceptor());
         return ret;
     }
@@ -131,7 +131,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
         event.setFullContentFile(writer.getTempFile());
     }
 
-    int getWireTabLimit() {
+    int getWireTapLimit() {
         if (limit == -1) {
             return -1;
         } else if (limit == Integer.MAX_VALUE) {
