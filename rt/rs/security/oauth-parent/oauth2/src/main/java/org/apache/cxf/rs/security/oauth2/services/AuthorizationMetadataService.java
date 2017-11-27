@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.oauth2.services;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -49,59 +50,64 @@ public class AuthorizationMetadataService {
     // Optional
     private boolean dynamicRegistrationEndpointNotAvailable;
     private String dynamicRegistrationEndpointAddress;
-    
+
     @GET
     @Produces("application/json")
     public String getConfiguration(@Context UriInfo ui) {
         Map<String, Object> cfg = new LinkedHashMap<String, Object>();
         String baseUri = getBaseUri(ui);
         prepareConfigurationData(cfg, baseUri);
-        
+
         JsonMapObjectReaderWriter writer = new JsonMapObjectReaderWriter();
         writer.setFormat(true);
         return writer.toJson(cfg);
     }
-    
+
     protected void prepareConfigurationData(Map<String, Object> cfg, String baseUri) {
         // Issuer
         cfg.put("issuer", buildIssuerUri(baseUri));
         // Authorization Endpoint
-        String theAuthorizationEndpointAddress = 
-            calculateEndpointAddress(authorizationEndpointAddress, baseUri, "/idp/authorize");
+        String theAuthorizationEndpointAddress =
+                calculateEndpointAddress(authorizationEndpointAddress, baseUri, "/idp/authorize");
         cfg.put("authorization_endpoint", theAuthorizationEndpointAddress);
         // Token Endpoint
         if (!isTokenEndpointNotAvailable()) {
-            String theTokenEndpointAddress = 
-                calculateEndpointAddress(tokenEndpointAddress, baseUri, "/oauth2/token");
+            String theTokenEndpointAddress =
+                    calculateEndpointAddress(tokenEndpointAddress, baseUri, "/oauth2/token");
             cfg.put("token_endpoint", theTokenEndpointAddress);
         }
         // Token Revocation Endpoint
         if (!isTokenRevocationEndpointNotAvailable()) {
-            String theTokenRevocationEndpointAddress = 
-                calculateEndpointAddress(tokenRevocationEndpointAddress, baseUri, "/oauth2/revoke");
+            String theTokenRevocationEndpointAddress =
+                    calculateEndpointAddress(tokenRevocationEndpointAddress, baseUri, "/oauth2/revoke");
             cfg.put("revocation_endpoint", theTokenRevocationEndpointAddress);
         }
         // Jwks Uri Endpoint
         if (!isJwkEndpointNotAvailable()) {
-            String theJwkEndpointAddress = 
-                calculateEndpointAddress(jwkEndpointAddress, baseUri, "/jwk/keys");
+            String theJwkEndpointAddress =
+                    calculateEndpointAddress(jwkEndpointAddress, baseUri, "/jwk/keys");
             cfg.put("jwks_uri", theJwkEndpointAddress);
         }
         // Dynamic Registration Endpoint
         if (!isDynamicRegistrationEndpointNotAvailable()) {
-            String theDynamicRegistrationEndpointAddress = 
-                calculateEndpointAddress(dynamicRegistrationEndpointAddress, baseUri, "/dynamic/register");
+            String theDynamicRegistrationEndpointAddress =
+                    calculateEndpointAddress(dynamicRegistrationEndpointAddress, baseUri, "/dynamic/register");
             cfg.put("registration_endpoint", theDynamicRegistrationEndpointAddress);
         }
     }
 
     protected static String calculateEndpointAddress(String endpointAddress, String baseUri, String defRelAddress) {
         endpointAddress = endpointAddress != null ? endpointAddress : defRelAddress;
-        if (endpointAddress.startsWith("https")) {
+        if (isAbsoluteUri(endpointAddress)) {
             return endpointAddress;
         } else {
-            return UriBuilder.fromUri(baseUri).path(endpointAddress).build().toString(); 
+            URI uri = UriBuilder.fromUri(baseUri).path(endpointAddress).build();
+            return removeDefaultPort(uri).toString();
         }
+    }
+
+    private static boolean isAbsoluteUri(String endpointAddress) {
+        return endpointAddress.startsWith("http://") || endpointAddress.startsWith("https://");
     }
 
     private String getBaseUri(UriInfo ui) {
@@ -143,7 +149,7 @@ public class AuthorizationMetadataService {
     public void setJwkEndpointNotAvailable(boolean jwkEndpointNotAvailable) {
         this.jwkEndpointNotAvailable = jwkEndpointNotAvailable;
     }
-    
+
     public boolean isJwkEndpointNotAvailable() {
         return jwkEndpointNotAvailable;
     }
@@ -173,8 +179,14 @@ public class AuthorizationMetadataService {
     }
 
     private String buildIssuerUri(String baseUri) {
-        URI uri = issuer == null || !issuer.startsWith("/") ? URI.create(baseUri) 
-            : UriBuilder.fromUri(baseUri).path(issuer).build();
+        URI uri;
+        if (isAbsoluteUri(issuer)) {
+            uri = UriBuilder.fromUri(issuer).build();
+        } else {
+            uri = issuer == null || !issuer.startsWith("/") ? URI.create(baseUri)
+                    : UriBuilder.fromUri(baseUri).path(issuer).build();
+        }
+        uri = removeDefaultPort(uri);
         if (stripPathFromIssuerUri) {
             StringBuilder sb = new StringBuilder();
             sb.append(uri.getScheme()).append("://").append(uri.getHost());
@@ -185,6 +197,20 @@ public class AuthorizationMetadataService {
         } else {
             return uri.toString();
         }
+    }
+
+    private static URI removeDefaultPort(URI uri) {
+        if (("http".equals(uri.getScheme()) && uri.getPort() == 80)
+                || ("https".equals(uri.getScheme()) && uri.getPort() == 443)) {
+            try {
+                URI newURI = new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), -1,
+                        uri.getPath(), uri.getQuery(), uri.getFragment());
+                return newURI;
+            } catch (URISyntaxException e) {
+                throw new IllegalArgumentException("Invalid URI " + uri + " : " + e.toString(), e);
+            }
+        }
+        return uri;
     }
 
     public void setStripPathFromIssuerUri(boolean stripPathFromIssuerUri) {
