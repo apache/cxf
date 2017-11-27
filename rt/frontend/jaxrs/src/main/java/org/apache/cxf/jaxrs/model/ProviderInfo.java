@@ -35,7 +35,16 @@ public class ProviderInfo<T> extends AbstractResourceInfo {
     }
     
     public ProviderInfo(T provider, Bus bus, boolean checkContexts, boolean custom) {
-        this(provider, null, bus, checkContexts, custom);
+        this(provider.getClass(), provider.getClass(), provider, bus, true, custom);
+    }
+
+    public ProviderInfo(Class<?> resourceClass, Class<?> serviceClass, T provider, Bus bus, boolean custom) {
+        this(resourceClass, serviceClass, provider, bus, true, custom);
+    }
+
+    public ProviderInfo(Class<?> resourceClass, Class<?> serviceClass, T provider, Bus bus, 
+            boolean checkContexts, boolean custom) {
+        this(resourceClass, serviceClass, provider, null, bus, checkContexts, custom);
     }
     
     public ProviderInfo(T provider, 
@@ -44,15 +53,25 @@ public class ProviderInfo<T> extends AbstractResourceInfo {
                         boolean custom) {
         this(provider, constructorProxies, bus, true, custom);
     }
-    
-    public ProviderInfo(T provider, 
-                        Map<Class<?>, ThreadLocalProxy<?>> constructorProxies, 
+
+    public ProviderInfo(Class<?> resourceClass, 
+            Class<?> serviceClass,
+            T provider,
+            Map<Class<?>, ThreadLocalProxy<?>> constructorProxies,
+            Bus bus,
+            boolean checkContexts,
+            boolean custom) {
+        super(resourceClass, serviceClass, true, checkContexts, constructorProxies, bus, provider);
+        this.provider = provider;
+        this.custom = custom;
+    }
+
+    public ProviderInfo(T provider,
+                        Map<Class<?>, ThreadLocalProxy<?>> constructorProxies,
                         Bus bus,
                         boolean checkContexts,
                         boolean custom) {
-        super(provider.getClass(), provider.getClass(), true, checkContexts, constructorProxies, bus, provider);
-        this.provider = provider;
-        this.custom = custom;
+        this(provider.getClass(), provider.getClass(), provider, constructorProxies, bus, checkContexts, custom);
     }
     
     @Override

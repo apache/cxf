@@ -209,7 +209,11 @@ public final class ServerProviderFactory extends ProviderFactory {
                 for (Object featureProvider : cfg.getInstances()) {
                     Map<Class<?>, Integer> contracts = cfg.getContracts(featureProvider.getClass());
                     if (contracts != null && !contracts.isEmpty()) {
-                        allProviders.add(new FilterProviderInfo<Object>(featureProvider, 
+                        Class<?> providerCls = ClassHelper.getRealClass(getBus(), featureProvider);
+                        
+                        allProviders.add(new FilterProviderInfo<Object>(featureProvider.getClass(),
+                                                                        providerCls,
+                                                                        featureProvider,
                                                                         getBus(),
                                                                         contracts));
                     } else {
@@ -372,7 +376,10 @@ public final class ServerProviderFactory extends ProviderFactory {
                 for (Object provider : cfg.getInstances()) {
                     Map<Class<?>, Integer> contracts = cfg.getContracts(provider.getClass());
                     if (contracts != null && !contracts.isEmpty()) {
-                        registerUserProvider(new FilterProviderInfo<Object>(provider, 
+                        Class<?> providerCls = ClassHelper.getRealClass(getBus(), provider);
+                        registerUserProvider(new FilterProviderInfo<Object>(provider.getClass(),
+                            providerCls,
+                            provider,
                             getBus(),
                             nameBinding,
                             true,
@@ -596,5 +603,4 @@ public final class ServerProviderFactory extends ProviderFactory {
             return super.compare(p1, p2);
         }
     }
-    
 }
