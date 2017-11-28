@@ -159,7 +159,7 @@
         <cxf.spring.osgi.version>1.2.1</cxf.spring.osgi.version>
         <cxf.spring.ldap.version>2.3.1.RELEASE</cxf.spring.ldap.version>
         <cxf.spring.mock>spring-test</cxf.spring.mock>
-        <cxf.swagger2.version>1.5.16</cxf.swagger2.version>
+        <cxf.swagger2.version>1.5.17</cxf.swagger2.version>
         <cxf.swagger.ui.version>3.5.0</cxf.swagger.ui.version>
         <cxf.velocity.version>2.0</cxf.velocity.version>
         <cxf.woodstox.core.version>5.0.3</cxf.woodstox.core.version>
