@@ -107,6 +107,9 @@ public class AuthorizationMetadataService {
     }
 
     private static boolean isAbsoluteUri(String endpointAddress) {
+        if (endpointAddress == null) {
+            return false;
+        }
         return endpointAddress.startsWith("http://") || endpointAddress.startsWith("https://");
     }
 
