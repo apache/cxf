@@ -28,6 +28,8 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
+import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKeys;
 import org.apache.cxf.rs.security.jose.jwk.KeyType;
@@ -36,6 +38,20 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class JwsUtilsTest extends Assert {
+
+    @Test
+    public void testSignatureAlgorithm() {
+        assertTrue(AlgorithmUtils.isRsaSign(SignatureAlgorithm.RS256));
+        assertFalse(AlgorithmUtils.isRsaSign(SignatureAlgorithm.NONE));
+
+        try {
+            AlgorithmUtils.RSA_SHA_SIGN_SET.add(SignatureAlgorithm.NONE.getJwaName());
+            fail("Failure expected on trying to modify the algorithm lists");
+        } catch (UnsupportedOperationException ex) {
+            // expected
+        }
+    }
+
     @Test
     public void testLoadSignatureProviderFromJKS() throws Exception {
         Properties p = new Properties();

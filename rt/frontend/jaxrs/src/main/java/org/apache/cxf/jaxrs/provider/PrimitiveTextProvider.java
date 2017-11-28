@@ -44,7 +44,7 @@ public class PrimitiveTextProvider<T> extends AbstractConfigurableProvider
     implements MessageBodyReader<T>, MessageBodyWriter<T> {
 
     private static boolean isSupported(Class<?> type, MediaType mt) {
-        boolean isPrimitive = InjectionUtils.isPrimitiveOnly(type);
+        boolean isPrimitive = InjectionUtils.isPrimitiveOnly(type) || Enum.class.isAssignableFrom(type);
         return isPrimitive && mt.isCompatible(MediaType.TEXT_PLAIN_TYPE);
     }
 

@@ -29,14 +29,14 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 
-import org.apache.cxf.jaxrs.rx2.server.AbstractSubscriber;
-import org.apache.cxf.jaxrs.rx2.server.JsonStreamingAsyncSubscriber;
+import org.apache.cxf.jaxrs.reactivestreams.server.AbstractSubscriber;
+import org.apache.cxf.jaxrs.reactivestreams.server.JsonStreamingAsyncSubscriber;
 
 import io.reactivex.Flowable;
 import io.reactivex.schedulers.Schedulers;
 
 
-@Path("/rx2/flowable")
+@Path("/flowable")
 public class RxJava2FlowableService {
 
     
@@ -73,6 +73,13 @@ public class RxJava2FlowableService {
             .map(s -> new HelloWorldBean(s))
             .subscribeOn(Schedulers.computation())
             .subscribe(new JsonStreamingAsyncSubscriber<HelloWorldBean>(ar));
+    }
+    
+    @GET
+    @Produces("application/json")
+    @Path("textJsonImplicitList")
+    public Flowable<HelloWorldBean> getJsonImplicitList() {
+        return Flowable.just("Hello", "Ciao").map(HelloWorldBean::new);
     }
     
     @GET

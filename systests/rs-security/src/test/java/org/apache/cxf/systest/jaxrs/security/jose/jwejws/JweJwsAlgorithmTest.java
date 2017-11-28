@@ -33,6 +33,7 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jaxrs.JweWriterInterceptor;
 import org.apache.cxf.rs.security.jose.jaxrs.JwsWriterInterceptor;
+import org.apache.cxf.rs.security.jose.jws.NoneJwsSignatureProvider;
 import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.systest.jaxrs.security.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -66,6 +67,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
     //
     // Encryption tests
     //
+
     @org.junit.Test
     public void testEncryptionProperties() throws Exception {
 
@@ -258,6 +260,118 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         Response response = client.post(new Book("book", 123L));
         assertNotEquals(response.getStatus(), 200);
     }
+
+    @org.junit.Test
+    public void testManualEncryption() throws Exception {
+
+        URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
+
+        List<Object> providers = new ArrayList<>();
+        providers.add(new JacksonJsonProvider());
+
+        String address = "http://localhost:" + PORT + "/jweoaepgcm/bookstore/books";
+        WebClient client =
+            WebClient.create(address, providers, busFile.toString());
+        client.type("application/json").accept("application/json");
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("rs.security.encryption.properties",
+                       "org/apache/cxf/systest/jaxrs/security/bob.jwk.properties");
+        WebClient.getConfig(client).getRequestContext().putAll(properties);
+
+        String header = "eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkExMjhHQ00iLCJjdHkiOiJqc29uIn0";
+        String encryptedKey = "f_Njrwn8fLxvIfftV27lSqEgvyIvkfx5tcI6xJdzXqxSL-Xssaq9TFwbhiJIU6k23i1uLFDd3r7rL"
+            + "V9THMcAo80C-m_SIbA6X4daeIm7ANmREZ9sw9QkD0URis6MAuZkoYIRB6z9g7TDmPTdrpTUWJbwYaBAe-_VYaoVBwRv_A"
+            + "ikPdKJEUWSMxouJEq4TZUVveNjI_tflZpudz1mYXKv9Lw_5byYpwgIB9crI9BR0kfCK9x3BXVFMZHJAg0yIuAKDkcs9Ts"
+            + "TIV0jLXRnb50Uc62OuJ6VFGQw-AL3tNHLRKYXjwDnE492wAZmsaxefql9wbv7b8BLmRUNeKER-26tdA";
+        String iv = "rqUxWbEenVnC3QFx";
+        String cipherText = "8iE2vM79BkXVJ0afH6fbig5uFpQ71nxc-i2SbokQtZO7";
+        String authnTag = "bZk8RwVMZgawyFNSOkMLaw";
+
+
+        // Successful test
+        Response response = client.post(header + "." + encryptedKey + "." + iv + "." + cipherText + "." + authnTag);
+        assertEquals(response.getStatus(), 200);
+
+        // Tamper with the values
+        response = client.post(header + "xyz." + encryptedKey + "." + iv + "." + cipherText + "." + authnTag);
+        assertNotEquals(response.getStatus(), 200);
+
+        response =  client.post(header + "." + encryptedKey + "xyz." + iv + "." + cipherText + "." + authnTag);
+        assertNotEquals(response.getStatus(), 200);
+
+        response = client.post(header + "." + encryptedKey + "." + iv + "xyz." + cipherText + "." + authnTag);
+        assertNotEquals(response.getStatus(), 200);
+
+        response = client.post(header + "." + encryptedKey + "." + iv + "." + cipherText + "xyz." + authnTag);
+        assertNotEquals(response.getStatus(), 200);
+
+        response = client.post(header + "." + encryptedKey + "." + iv + "." + cipherText + "." + authnTag + "xyz");
+        assertNotEquals(response.getStatus(), 200);
+
+        response = client.post(header + "." + encryptedKey + "." + iv + "." + cipherText + ".");
+        assertNotEquals(response.getStatus(), 200);
+    }
+
+    @org.junit.Test
+    public void testEncryptionPBES() throws Exception {
+
+        URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
+
+        List<Object> providers = new ArrayList<>();
+        providers.add(new JacksonJsonProvider());
+        providers.add(new JweWriterInterceptor());
+
+        String address = "http://localhost:" + PORT + "/jwepbes/bookstore/books";
+        WebClient client =
+            WebClient.create(address, providers, busFile.toString());
+        client.type("application/json").accept("application/json");
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("rs.security.encryption.content.algorithm", "A128GCM");
+        properties.put("rs.security.encryption.key.algorithm", "PBES2-HS256+A128KW");
+        String password = "123456789123456789";
+        properties.put("rs.security.key.password.provider", new PrivateKeyPasswordProviderImpl(password));
+        WebClient.getConfig(client).getRequestContext().putAll(properties);
+
+        Response response = client.post(new Book("book", 123L));
+        assertEquals(response.getStatus(), 200);
+
+        Book returnedBook = response.readEntity(Book.class);
+        assertEquals(returnedBook.getName(), "book");
+        assertEquals(returnedBook.getId(), 123L);
+    }
+
+    @org.junit.Test
+    public void testEncryptionPBESDifferentCount() throws Exception {
+
+        URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
+
+        List<Object> providers = new ArrayList<>();
+        providers.add(new JacksonJsonProvider());
+        providers.add(new JweWriterInterceptor());
+
+        String address = "http://localhost:" + PORT + "/jwepbes/bookstore/books";
+        WebClient client =
+            WebClient.create(address, providers, busFile.toString());
+        client.type("application/json").accept("application/json");
+
+        Map<String, Object> properties = new HashMap<>();
+        String password = "123456789123456789";
+        properties.put("rs.security.encryption.content.algorithm", "A128GCM");
+        properties.put("rs.security.encryption.key.algorithm", "PBES2-HS256+A128KW");
+        properties.put("rs.security.key.password.provider", new PrivateKeyPasswordProviderImpl(password));
+        properties.put("rs.security.encryption.pbes2.count", "1000");
+        WebClient.getConfig(client).getRequestContext().putAll(properties);
+
+        Response response = client.post(new Book("book", 123L));
+        assertEquals(response.getStatus(), 200);
+
+        Book returnedBook = response.readEntity(Book.class);
+        assertEquals(returnedBook.getName(), "book");
+        assertEquals(returnedBook.getId(), 123L);
+    }
+
 
     //
     // Signature tests
@@ -499,6 +613,34 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.file",
             "org/apache/cxf/systest/jaxrs/security/certs/smallkeysize.jks");
         properties.put("rs.security.signature.algorithm", "RS256");
+        WebClient.getConfig(client).getRequestContext().putAll(properties);
+
+        Response response = client.post(new Book("book", 123L));
+        assertNotEquals(response.getStatus(), 200);
+    }
+
+    @org.junit.Test
+    public void testUnsignedTokenFailure() throws Exception {
+
+        URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
+
+        List<Object> providers = new ArrayList<>();
+        providers.add(new JacksonJsonProvider());
+        JwsWriterInterceptor writerInterceptor = new JwsWriterInterceptor();
+        writerInterceptor.setSignatureProvider(new NoneJwsSignatureProvider());
+        providers.add(writerInterceptor);
+
+        String address = "http://localhost:" + PORT + "/jws/bookstore/books";
+        WebClient client =
+            WebClient.create(address, providers, busFile.toString());
+        client.type("application/json").accept("application/json");
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("rs.security.keystore.type", "jwk");
+        properties.put("rs.security.keystore.alias", "2011-04-29");
+        properties.put("rs.security.keystore.file",
+                       "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
+        properties.put("rs.security.signature.algorithm", "none");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("book", 123L));

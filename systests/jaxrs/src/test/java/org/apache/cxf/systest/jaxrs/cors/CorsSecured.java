@@ -16,22 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.reactor.server;
+package org.apache.cxf.systest.jaxrs.cors;
 
-import javax.ws.rs.container.AsyncResponse;
+public interface CorsSecured extends CorsSecuredBase {
 
-public class JsonStreamingAsyncSubscriber<T> extends StreamingAsyncSubscriber<T> {
-    public JsonStreamingAsyncSubscriber(AsyncResponse ar) {
-        this(ar, 1000);
-    }
-    public JsonStreamingAsyncSubscriber(AsyncResponse ar, long pollTimeout) {
-        this(ar, pollTimeout, 0);
-    }
-    public JsonStreamingAsyncSubscriber(AsyncResponse ar, long pollTimeout, long asyncTimeout) {
-        this(ar, "[", "]", ",", pollTimeout, asyncTimeout);
-    }
-    public JsonStreamingAsyncSubscriber(AsyncResponse ar, String prefix, String suffix, String separator, 
-            long pollTimeout, long asyncTimeout) {
-            super(ar, prefix, suffix, separator, pollTimeout, asyncTimeout);
-    }
 }

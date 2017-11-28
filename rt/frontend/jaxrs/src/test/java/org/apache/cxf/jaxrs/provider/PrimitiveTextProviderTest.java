@@ -210,4 +210,25 @@ public class PrimitiveTextProviderTest extends Assert {
                 new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8)));
         assertEquals(value, value);
     }
+
+    public enum TestEnum {
+        TEST
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @Test
+    public void testEnum() throws Exception {
+        PrimitiveTextProvider p = new PrimitiveTextProvider<Object>();
+
+        assertTrue(p.isWriteable(TestEnum.class, null, null, MediaType.TEXT_PLAIN_TYPE));
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        p.writeTo(TestEnum.TEST, null, null, null, MediaType.TEXT_PLAIN_TYPE, null, os);
+        assertTrue(Arrays.equals(TestEnum.TEST.toString().getBytes(), os.toByteArray()));
+
+        assertTrue(p.isReadable(TestEnum.class, null, null, MediaType.TEXT_PLAIN_TYPE));
+        TestEnum valueRead = (TestEnum) p.readFrom(TestEnum.class, null, null, null, null,
+                new ByteArrayInputStream(os.toByteArray()));
+        assertSame(TestEnum.TEST, valueRead);
+    }
+
 }

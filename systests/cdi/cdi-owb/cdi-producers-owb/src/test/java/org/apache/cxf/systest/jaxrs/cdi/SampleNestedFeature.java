@@ -16,19 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.rx2.server;
 
-import javax.ws.rs.container.AsyncResponse;
+package org.apache.cxf.systest.jaxrs.cdi;
 
-public class JsonStreamingAsyncSubscriber<T> extends StreamingAsyncSubscriber<T> {
-    public JsonStreamingAsyncSubscriber(AsyncResponse ar) {
-        this(ar, 1000);
-    }
-    public JsonStreamingAsyncSubscriber(AsyncResponse ar, long pollTimeout) {
-        this(ar, pollTimeout, 0);
-    }
-    public JsonStreamingAsyncSubscriber(AsyncResponse ar, long pollTimeout, long asyncTimeout) {
-        super(ar, "[", "]", ",", pollTimeout, asyncTimeout);
-    }
+import javax.ws.rs.core.Feature;
+import javax.ws.rs.core.FeatureContext;
 
+import org.apache.cxf.systests.cdi.base.BookStorePreMatchingRequestFilter;
+
+public class SampleNestedFeature implements Feature {
+    @Override
+    public boolean configure(FeatureContext context) {
+        context.register(BookStorePreMatchingRequestFilter.class);
+        return false;
+    }
 }

@@ -482,6 +482,24 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
             ((Closeable)httpclient).close();
         }
     }
+    
+    @Test
+    public void testAnnotatedClassCorrectOrigin2() throws Exception {
+        HttpClient httpclient = HttpClientBuilder.create().build();
+        HttpGet httpget = new HttpGet("http://localhost:" + PORT + "/antest2/simpleGet/HelloThere");
+        httpget.addHeader("Origin", "http://area51.mil:31415");
+
+        HttpResponse response = httpclient.execute(httpget);
+        assertEquals(200, response.getStatusLine().getStatusCode());
+        HttpEntity entity = response.getEntity();
+        String e = IOUtils.toString(entity.getContent(), "utf-8");
+
+        assertEquals("HelloThere", e); // ensure that we didn't bust the operation itself.
+        assertOriginResponse(false, new String[] {"http://area51.mil:31415" }, true, response);
+        if (httpclient instanceof Closeable) {
+            ((Closeable)httpclient).close();
+        }
+    }
 
     @Test
     public void testAnnotatedClassWrongOrigin() throws Exception {

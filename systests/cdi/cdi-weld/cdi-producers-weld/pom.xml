@@ -45,5 +45,11 @@
              <groupId>org.apache.abdera</groupId>
              <artifactId>abdera-parser</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.jboss.weld.se</groupId>
+            <artifactId>weld-se-core</artifactId>
+            <version>${cxf.jboss.weld.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

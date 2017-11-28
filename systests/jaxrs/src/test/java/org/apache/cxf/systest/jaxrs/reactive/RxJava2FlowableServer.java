@@ -37,6 +37,7 @@ public class RxJava2FlowableServer extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(RxJava2FlowableServer.class);
 
     org.apache.cxf.endpoint.Server server;
+    org.apache.cxf.endpoint.Server server2;
     public RxJava2FlowableServer() {
     }
 
@@ -44,8 +45,16 @@ public class RxJava2FlowableServer extends AbstractBusTestServerBase {
         Bus bus = BusFactory.getDefaultBus();
         // Make sure default JSONProvider is not loaded
         bus.setProperty("skip.default.json.provider.registration", true);
+        server = createFactoryBean(bus, false, "/rx2").create();
+        server = createFactoryBean(bus, true, "/rx22").create();
+    }
+
+    private JAXRSServerFactoryBean createFactoryBean(Bus bus, boolean useStreamingSubscriber,
+                                                     String relAddress) {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
-        sf.setInvoker(new ReactiveIOInvoker());
+        ReactiveIOInvoker invoker = new ReactiveIOInvoker();
+        invoker.setUseStreamingSubscriberIfPossible(useStreamingSubscriber);
+        sf.setInvoker(invoker);
         sf.setProvider(new JacksonJsonProvider());
         StreamingResponseProvider<HelloWorldBean> streamProvider = new StreamingResponseProvider<HelloWorldBean>();
         streamProvider.setProduceMediaTypes(Collections.singletonList("application/json"));
@@ -54,8 +63,8 @@ public class RxJava2FlowableServer extends AbstractBusTestServerBase {
         sf.setResourceClasses(RxJava2FlowableService.class);
         sf.setResourceProvider(RxJava2FlowableService.class,
                                new SingletonResourceProvider(new RxJava2FlowableService(), true));
-        sf.setAddress("http://localhost:" + PORT + "/");
-        server = sf.create();
+        sf.setAddress("http://localhost:" + PORT + relAddress);
+        return sf;
     }
 
     public void tearDown() throws Exception {

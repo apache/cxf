@@ -67,6 +67,7 @@
         <module>jax_rs/description_swagger2_spring</module>
         <module>jax_rs/basic_oidc</module>
         <module>jax_rs/big_query</module>
+        <module>jax_rs/odata</module>
         <module>callback</module>
         <module>wsdl_first_pure_xml</module>
         <module>jaxws_dispatch_provider</module>

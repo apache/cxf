@@ -16,9 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.rx2.server;
+package org.apache.cxf.jaxrs.reactivestreams.server;
 
 import java.util.List;
+import java.util.concurrent.CancellationException;
 
 import javax.ws.rs.container.AsyncResponse;
 
@@ -48,7 +49,11 @@ public abstract class AbstractSubscriber<T> implements Subscriber<T> {
 
     @Override
     public void onError(Throwable t) {
-        ar.resume(t);
+        if (t instanceof CancellationException) {
+            ar.cancel();
+        } else {
+            ar.resume(t);
+        }
     }
 
     @Override

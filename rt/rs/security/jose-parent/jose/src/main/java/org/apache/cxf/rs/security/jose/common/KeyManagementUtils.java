@@ -439,7 +439,7 @@ public final class KeyManagementUtils {
         if (props == null) {
             if (required) {
                 LOG.warning("Properties resource is not identified");
-                throw new JoseException();
+                throw new JoseException("Properties resource is not identified");
             }
             props = new Properties();
         }
@@ -509,7 +509,7 @@ public final class KeyManagementUtils {
 
         return null;
     }
-    
+
     public static void setSha1DigestHeader(JoseHeaders headers, Message m, Properties props) {
         String digest = loadDigestAndEncodeX509Certificate(m, props, MessageDigestUtils.ALGO_SHA_1);
         if (digest != null) {

@@ -20,6 +20,7 @@
 package org.apache.cxf.rs.security.jose.jwa;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -94,39 +95,60 @@ public final class AlgorithmUtils {
     public static final String ES_SHA_384_JAVA = "SHA384withECDSA";
     public static final String ES_SHA_512_JAVA = "SHA512withECDSA";
 
-    public static final Set<String> HMAC_SIGN_SET = new HashSet<>(Arrays.asList(HMAC_SHA_256_ALGO,
-                                                                                      HMAC_SHA_384_ALGO,
-                                                                                      HMAC_SHA_512_ALGO));
-    public static final Set<String> RSA_SHA_SIGN_SET = new HashSet<>(Arrays.asList(RS_SHA_256_ALGO,
-                                                                      RS_SHA_384_ALGO,
-                                                                      RS_SHA_512_ALGO));
-    public static final Set<String> RSA_SHA_PS_SIGN_SET = new HashSet<>(Arrays.asList(PS_SHA_256_ALGO,
-                                        PS_SHA_384_ALGO,
-                                        PS_SHA_512_ALGO));
-    public static final Set<String> EC_SHA_SIGN_SET = new HashSet<>(Arrays.asList(ES_SHA_256_ALGO,
-                                                                       ES_SHA_384_ALGO,
-                                                                       ES_SHA_512_ALGO));
-    public static final Set<String> RSA_CEK_SET = new HashSet<>(Arrays.asList(RSA_OAEP_ALGO,
-                                                                                  RSA_OAEP_256_ALGO,
-                                                                                  RSA1_5_ALGO));
-    public static final Set<String> AES_GCM_CEK_SET = new HashSet<>(Arrays.asList(A128GCM_ALGO,
-                                                                                      A192GCM_ALGO,
-                                                                                      A256GCM_ALGO));
-    public static final Set<String> AES_GCM_KW_SET = new HashSet<>(Arrays.asList(A128GCMKW_ALGO,
-                                                                                      A192GCMKW_ALGO,
-                                                                                      A256GCMKW_ALGO));
-    public static final Set<String> AES_KW_SET = new HashSet<>(Arrays.asList(A128KW_ALGO,
-                                                                                   A192KW_ALGO,
-                                                                                   A256KW_ALGO));
-    public static final Set<String> ACBC_HS_SET = new HashSet<>(Arrays.asList(A128CBC_HS256_ALGO,
-                                        A192CBC_HS384_ALGO,
-                                        A256CBC_HS512_ALGO));
-    public static final Set<String> PBES_HS_SET = new HashSet<>(Arrays.asList(PBES2_HS256_A128KW_ALGO,
-                                          PBES2_HS384_A192KW_ALGO,
-                                          PBES2_HS512_A256KW_ALGO));
-    public static final Set<String> ECDH_ES_WRAP_SET = new HashSet<>(Arrays.asList(ECDH_ES_A128KW_ALGO,
-                      ECDH_ES_A192KW_ALGO,
-                      ECDH_ES_A256KW_ALGO));
+    public static final Set<String> HMAC_SIGN_SET =
+        Collections.unmodifiableSet(new HashSet<>(Arrays.asList(HMAC_SHA_256_ALGO,
+                                                                HMAC_SHA_384_ALGO,
+                                                                HMAC_SHA_512_ALGO)));
+
+    public static final Set<String> RSA_SHA_SIGN_SET =
+        Collections.unmodifiableSet(new HashSet<>(Arrays.asList(RS_SHA_256_ALGO,
+                                                                RS_SHA_384_ALGO,
+                                                                RS_SHA_512_ALGO)));
+
+    public static final Set<String> RSA_SHA_PS_SIGN_SET =
+        Collections.unmodifiableSet(new HashSet<>(Arrays.asList(PS_SHA_256_ALGO,
+                                                                PS_SHA_384_ALGO,
+                                                                PS_SHA_512_ALGO)));
+
+    public static final Set<String> EC_SHA_SIGN_SET =
+        Collections.unmodifiableSet(new HashSet<>(Arrays.asList(ES_SHA_256_ALGO,
+                                                                ES_SHA_384_ALGO,
+                                                                ES_SHA_512_ALGO)));
+
+    public static final Set<String> RSA_CEK_SET =
+        Collections.unmodifiableSet(new HashSet<>(Arrays.asList(RSA_OAEP_ALGO,
+                                                                RSA_OAEP_256_ALGO,
+                                                                RSA1_5_ALGO)));
+
+    public static final Set<String> AES_GCM_CEK_SET =
+        Collections.unmodifiableSet(new HashSet<>(Arrays.asList(A128GCM_ALGO,
+                                                                A192GCM_ALGO,
+                                                                A256GCM_ALGO)));
+
+    public static final Set<String> AES_GCM_KW_SET =
+        Collections.unmodifiableSet(new HashSet<>(Arrays.asList(A128GCMKW_ALGO,
+                                                                A192GCMKW_ALGO,
+                                                                A256GCMKW_ALGO)));
+
+    public static final Set<String> AES_KW_SET =
+        Collections.unmodifiableSet(new HashSet<>(Arrays.asList(A128KW_ALGO,
+                                                                A192KW_ALGO,
+                                                                A256KW_ALGO)));
+
+    public static final Set<String> ACBC_HS_SET =
+        Collections.unmodifiableSet(new HashSet<>(Arrays.asList(A128CBC_HS256_ALGO,
+                                                                A192CBC_HS384_ALGO,
+                                                                A256CBC_HS512_ALGO)));
+
+    public static final Set<String> PBES_HS_SET =
+        Collections.unmodifiableSet(new HashSet<>(Arrays.asList(PBES2_HS256_A128KW_ALGO,
+                                                                PBES2_HS384_A192KW_ALGO,
+                                                                PBES2_HS512_A256KW_ALGO)));
+
+    public static final Set<String> ECDH_ES_WRAP_SET =
+        Collections.unmodifiableSet(new HashSet<>(Arrays.asList(ECDH_ES_A128KW_ALGO,
+                                                                ECDH_ES_A192KW_ALGO,
+                                                                ECDH_ES_A256KW_ALGO)));
 
     private static final Map<String, String> JAVA_TO_JWA_NAMES;
     private static final Map<String, String> JWA_TO_JAVA_NAMES;

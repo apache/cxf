@@ -32,6 +32,7 @@ public class SampleFeature implements Feature {
         context.register(AtomFeedProvider.class);
         context.register(BookStoreRequestFilter.class);
         context.register(BookStoreResponseFilter.class);
+        context.register(SampleNestedFeature.class);
         return false;
     }
 }

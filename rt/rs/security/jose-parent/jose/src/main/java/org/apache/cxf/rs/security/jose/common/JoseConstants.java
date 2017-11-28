@@ -173,7 +173,7 @@ public final class JoseConstants {
      * Include the X.509 certificate SHA-1 digest for signature in the "x5t" header.
      */
     public static final String RSSEC_SIGNATURE_INCLUDE_CERT_SHA1 = "rs.security.signature.include.cert.sha1";
-    
+
     /**
      * Include the X.509 certificate SHA-256 digest for signature in the "x5t#S256" header.
      */
@@ -241,11 +241,16 @@ public final class JoseConstants {
      * Include the X.509 certificate SHA-1 digest for encryption in the "x5t" header.
      */
     public static final String RSSEC_ENCRYPTION_INCLUDE_CERT_SHA1 = "rs.security.encryption.include.cert.sha1";
-    
+
     /**
      * Include the X.509 certificate SHA-256 digest for encryption in the "x5t#S256" header.
      */
     public static final String RSSEC_ENCRYPTION_INCLUDE_CERT_SHA256 = "rs.security.encryption.include.cert.sha256";
+
+    /**
+     * The value to be used for the "p2c" (PBES2 count) Header Parameter. The default is 4096.
+     */
+    public static final String RSSEC_ENCRYPTION_PBES2_COUNT = "rs.security.encryption.pbes2.count";
 
     //
     // JWT specific configuration

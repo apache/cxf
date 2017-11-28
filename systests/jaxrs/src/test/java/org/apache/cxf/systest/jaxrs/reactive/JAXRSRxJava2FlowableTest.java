@@ -90,6 +90,11 @@ public class JAXRSRxJava2FlowableTest extends AbstractBusClientServerTestBase {
         String address = "http://localhost:" + PORT + "/rx2/flowable/textJsonImplicitListAsyncStream";
         doTestGetHelloWorldJsonList(address);
     }
+    @Test
+    public void testGetHelloWorldJsonImplicitList() throws Exception {
+        String address = "http://localhost:" + PORT + "/rx22/flowable/textJsonImplicitList";
+        doTestGetHelloWorldJsonList(address);
+    }
     private void doTestGetHelloWorldJsonList(String address) throws Exception {
         WebClient wc = WebClient.create(address,
                                         Collections.singletonList(new JacksonJsonProvider()));

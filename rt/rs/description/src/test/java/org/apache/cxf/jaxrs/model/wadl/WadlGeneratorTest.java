@@ -44,6 +44,7 @@ import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.impl.ContainerRequestContextImpl;
+import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
@@ -936,4 +937,143 @@ public class WadlGeneratorTest extends Assert {
             return transfer;
         }
     }
+
+    @XmlRootElement(namespace = "http://example.com")
+    public static class Super {
+        private int id;
+        private String name;
+        public int getId() {
+            return id;
+        }
+        public void setId(int id) {
+            this.id = id;
+        }
+        public String getName() {
+            return name;
+        }
+        public void setName(String name) {
+            this.name = name;
+        }
+    }
+
+    public static class SuperResource<T extends Super> {
+
+        @PUT
+        @Path("set")
+        @Produces("application/xml")
+        @Consumes("application/xml")
+        public T set(T transfer) {
+            return transfer;
+        }
+
+    }
+
+    @XmlRootElement(namespace = "http://example.com")
+    public static class Actual extends Super { }
+
+    public static class ActualResource extends SuperResource<Actual> { }
+
+    private void setUpGenericImplementationTest() {
+        ServerProviderFactory.getInstance().clearProviders();
+        AbstractResourceInfo.clearAllMaps();
+    }
+
+    @Test
+    public void testGenericImplementation() throws Exception {
+        setUpGenericImplementationTest();
+
+        WadlGenerator wg = new WadlGenerator();
+        wg.setApplicationTitle("My Application");
+        wg.setNamespacePrefix("ns");
+        ClassResourceInfo cri =
+            ResourceUtils.createClassResourceInfo(ActualResource.class, ActualResource.class, true, true);
+        Message m = mockMessage("http://example.com", "/", WadlGenerator.WADL_QUERY, cri);
+        Response r = handleRequest(wg, m);
+        checkResponse(r);
+        Document doc = StaxUtils.read(new StringReader(r.getEntity().toString()));
+        checkDocs(doc.getDocumentElement(), "My Application", "", "");
+        List<Element> grammarEls = DOMUtils.getChildrenWithName(doc.getDocumentElement(),
+                                                                WadlGenerator.WADL_NS,
+                                                                "grammars");
+        assertEquals(1, grammarEls.size());
+        List<Element> schemasEls = DOMUtils.getChildrenWithName(grammarEls.get(0),
+                                                                Constants.URI_2001_SCHEMA_XSD,
+                                                                "schema");
+        assertEquals(2, schemasEls.size());
+        
+        List<Element> importEls = DOMUtils.getChildrenWithName(schemasEls.get(0),
+                                                               Constants.URI_2001_SCHEMA_XSD,
+                                                               "import");
+        int schemaElementsIndex = importEls.size() > 0 ? 0 : 1;
+        int schemaTypesIndex = schemaElementsIndex == 0 ? 1 : 0;
+        
+        checkGenericImplSchemaWithTypes(schemasEls.get(schemaTypesIndex));
+        checkGenericImplSchemaWithElements(schemasEls.get(schemaElementsIndex));
+
+        List<Element> reps = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
+                                       WadlGenerator.WADL_NS, "representation");
+        assertEquals(2, reps.size());
+        assertEquals("ns1:actual", reps.get(0).getAttribute("element"));
+        assertEquals("ns1:actual", reps.get(1).getAttribute("element"));
+
+    }
+
+    private void checkGenericImplSchemaWithTypes(Element schemaEl) {
+        List<Element> complexTypeEls = DOMUtils.getChildrenWithName(schemaEl,
+                                                                    Constants.URI_2001_SCHEMA_XSD,
+                                                                    "complexType");
+        assertEquals(2, complexTypeEls.size());
+        int actualTypeIndex = "actual".equals(complexTypeEls.get(0).getAttribute("name")) ? 0 : 1;
+        int superTypeIndex = actualTypeIndex == 0 ? 1 : 0;
+        
+        assertEquals("actual", complexTypeEls.get(actualTypeIndex).getAttribute("name"));
+        
+        Element ccActualElement =
+                (Element)complexTypeEls.get(actualTypeIndex).getElementsByTagNameNS(Constants.URI_2001_SCHEMA_XSD,
+                                                  "complexContent").item(0);
+        Element extensionActualElement =
+            (Element)ccActualElement.getElementsByTagNameNS(Constants.URI_2001_SCHEMA_XSD,
+                                              "extension").item(0);
+        Element sequenceActualElement =
+                (Element)ccActualElement.getElementsByTagNameNS(Constants.URI_2001_SCHEMA_XSD,
+                                                  "sequence").item(0);
+        assertEquals("super", extensionActualElement.getAttribute("base"));
+        assertEquals(0, sequenceActualElement.getChildNodes().getLength());
+
+        assertEquals("super", complexTypeEls.get(superTypeIndex).getAttribute("name"));
+
+        Element sequenceSuperElement =
+                (Element)complexTypeEls.get(superTypeIndex).getElementsByTagNameNS(Constants.URI_2001_SCHEMA_XSD,
+                                                  "sequence").item(0);
+        List<Element> superEls = DOMUtils.getChildrenWithName(sequenceSuperElement,
+                Constants.URI_2001_SCHEMA_XSD,
+                "element");
+        assertEquals(2, superEls.size());
+        assertEquals("id", superEls.get(0).getAttribute("name"));
+        assertEquals("xs:int", superEls.get(0).getAttribute("type"));
+        assertEquals("name", superEls.get(1).getAttribute("name"));
+        assertEquals("xs:string", superEls.get(1).getAttribute("type"));
+        
+    }
+
+    private void checkGenericImplSchemaWithElements(Element schemaEl) {
+        assertEquals("http://example.com", schemaEl.getAttribute("targetNamespace"));
+
+        List<Element> importEls = DOMUtils.getChildrenWithName(schemaEl,
+                                                               Constants.URI_2001_SCHEMA_XSD,
+                                                               "import");
+                                                       
+        assertEquals(1, importEls.size());
+
+        List<Element> typeEls = DOMUtils.getChildrenWithName(schemaEl,
+                Constants.URI_2001_SCHEMA_XSD,
+                "element");
+        assertEquals(2, typeEls.size());
+        assertEquals("actual", typeEls.get(0).getAttribute("name"));
+        assertEquals("actual", typeEls.get(0).getAttribute("type"));
+        assertEquals("super", typeEls.get(1).getAttribute("name"));
+        assertEquals("super", typeEls.get(1).getAttribute("type"));
+        
+    }
+
 }

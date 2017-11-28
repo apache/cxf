@@ -18,8 +18,11 @@
  */
 package org.apache.cxf.jaxrs.rx2.server;
 
+import javax.ws.rs.core.MediaType;
+
 import org.apache.cxf.jaxrs.JAXRSInvoker;
 import org.apache.cxf.jaxrs.impl.AsyncResponseImpl;
+import org.apache.cxf.jaxrs.reactivestreams.server.JsonStreamingAsyncSubscriber;
 import org.apache.cxf.message.Message;
 
 import io.reactivex.Flowable;
@@ -27,6 +30,7 @@ import io.reactivex.Observable;
 
 //Work in Progress
 public class ReactiveIOInvoker extends JAXRSInvoker {
+    private boolean useStreamingSubscriberIfPossible;
     protected AsyncResponseImpl checkFutureResponse(Message inMessage, Object result) {
         if (result instanceof Flowable) {
             return handleFlowable(inMessage, (Flowable<?>)result);
@@ -39,10 +43,18 @@ public class ReactiveIOInvoker extends JAXRSInvoker {
     
     protected AsyncResponseImpl handleFlowable(Message inMessage, Flowable<?> f) {
         final AsyncResponseImpl asyncResponse = new AsyncResponseImpl(inMessage);
-        f.subscribe(v -> asyncResponse.resume(v), t -> handleThrowable(asyncResponse, t));
+        if (isUseStreamingSubscriberIfPossible() && isJsonResponse(inMessage)) {
+            f.subscribe(new JsonStreamingAsyncSubscriber<>(asyncResponse));
+        } else {
+            f.subscribe(v -> asyncResponse.resume(v), t -> handleThrowable(asyncResponse, t));
+        }
         return asyncResponse;
     }
     
+    protected boolean isJsonResponse(Message inMessage) {
+        return MediaType.APPLICATION_JSON.equals(inMessage.getExchange().get(Message.CONTENT_TYPE));
+    }
+
     protected AsyncResponseImpl handleObservable(Message inMessage, Observable<?> obs) {
         final AsyncResponseImpl asyncResponse = new AsyncResponseImpl(inMessage);
         obs.subscribe(v -> asyncResponse.resume(v), t -> handleThrowable(asyncResponse, t));
@@ -53,5 +65,13 @@ public class ReactiveIOInvoker extends JAXRSInvoker {
         //TODO: if it is a Cancelation exception => asyncResponse.cancel(); 
         asyncResponse.resume(t);
         return null;
+    }
+
+    public boolean isUseStreamingSubscriberIfPossible() {
+        return useStreamingSubscriberIfPossible;
+    }
+
+    public void setUseStreamingSubscriberIfPossible(boolean useStreamingSubscriberIfPossible) {
+        this.useStreamingSubscriberIfPossible = useStreamingSubscriberIfPossible;
     }
 }
