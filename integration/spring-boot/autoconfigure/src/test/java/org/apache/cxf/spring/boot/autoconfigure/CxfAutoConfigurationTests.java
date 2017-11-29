@@ -33,6 +33,8 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasItem;
+
+
 import static org.junit.Assert.assertThat;
 
 /**
@@ -72,7 +74,7 @@ public class CxfAutoConfigurationTests {
     public void customPathWithTrailingSlash() {
         load(CxfAutoConfiguration.class, "cxf.path=/valid/");
         assertThat(this.context.getBean(ServletRegistrationBean.class).getUrlMappings(),
-                (Matcher) hasItem("/valid/*"));
+                (Matcher<Iterable<? super String>>) hasItem("/valid/*"));
     }
 
     @Test
@@ -81,7 +83,7 @@ public class CxfAutoConfigurationTests {
         assertThat(this.context.getBeansOfType(ServletRegistrationBean.class).size(),
                 equalTo(1));
         assertThat(this.context.getBean(ServletRegistrationBean.class).getUrlMappings(),
-                (Matcher) hasItem("/valid/*"));
+                (Matcher<Iterable<? super String>>) hasItem("/valid/*"));
     }
 
     @Test

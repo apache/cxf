@@ -60,6 +60,7 @@ public class JaxRs2Extension extends AbstractSwaggerExtension {
 
     private final ObjectMapper mapper = Json.mapper();
 
+    @SuppressWarnings("deprecation")
     @Override
     public List<Parameter> extractParameters(
             final List<Annotation> annotations,
