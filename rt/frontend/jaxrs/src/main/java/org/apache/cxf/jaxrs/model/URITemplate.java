@@ -33,6 +33,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
@@ -46,7 +47,7 @@ public final class URITemplate {
     private static final String SLASH = "/";
     private static final String SLASH_QUOTE = "/;";
     private static final int MAX_URI_TEMPLATE_CACHE_SIZE = 
-        Integer.getInteger("org.apache.cxf.jaxrs.max_uri_template_cache_size", 2000);
+        SystemPropertyAction.getInteger("org.apache.cxf.jaxrs.max_uri_template_cache_size", 2000);
     private static final Map<String, URITemplate> URI_TEMPLATE_CACHE = new ConcurrentHashMap<>();
     
     private final String template;

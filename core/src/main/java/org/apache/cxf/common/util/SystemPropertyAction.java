@@ -78,4 +78,23 @@ public final class SystemPropertyAction implements PrivilegedAction<String> {
             return null;
         }
     }
+    
+    /**
+     * Get the integer system property via the AccessController, but if a SecurityException is
+     * raised, just return the default;
+     * @param name - system property name
+     * @param def - the default value if the system property does not exist or cannot be acquired
+     */
+    public static int getInteger(String name, int def) {
+        try {
+            return AccessController.doPrivileged(new PrivilegedAction<Integer>() {
+                @Override
+                public Integer run() {
+                    return Integer.getInteger(name, def);
+                } });
+        } catch (SecurityException ex) {
+            LOG.log(Level.FINE, "SecurityException raised getting property " + name, ex);
+            return def;
+        }
+    }
 }
