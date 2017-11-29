@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.oauth2.services;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -97,10 +98,19 @@ public class AuthorizationMetadataService {
 
     protected static String calculateEndpointAddress(String endpointAddress, String baseUri, String defRelAddress) {
         endpointAddress = endpointAddress != null ? endpointAddress : defRelAddress;
-        if (endpointAddress.startsWith("https")) {
+        if (isAbsoluteUri(endpointAddress)) {
             return endpointAddress;
+        } else {
+            URI uri = UriBuilder.fromUri(baseUri).path(endpointAddress).build();
+            return removeDefaultPort(uri).toString();
         }
-        return UriBuilder.fromUri(baseUri).path(endpointAddress).build().toString();
+    }
+
+    private static boolean isAbsoluteUri(String endpointAddress) {
+        if (endpointAddress == null) {
+            return false;
+        }
+        return endpointAddress.startsWith("http://") || endpointAddress.startsWith("https://");
     }
 
     private String getBaseUri(UriInfo ui) {
@@ -172,8 +182,14 @@ public class AuthorizationMetadataService {
     }
 
     private String buildIssuerUri(String baseUri) {
-        URI uri = issuer == null || !issuer.startsWith("/") ? URI.create(baseUri) 
-            : UriBuilder.fromUri(baseUri).path(issuer).build();
+        URI uri;
+        if (isAbsoluteUri(issuer)) {
+            uri = UriBuilder.fromUri(issuer).build();
+        } else {
+            uri = issuer == null || !issuer.startsWith("/") ? URI.create(baseUri)
+                    : UriBuilder.fromUri(baseUri).path(issuer).build();
+        }
+        uri = removeDefaultPort(uri);
         if (stripPathFromIssuerUri) {
             StringBuilder sb = new StringBuilder();
             sb.append(uri.getScheme()).append("://").append(uri.getHost());
@@ -184,6 +200,20 @@ public class AuthorizationMetadataService {
         } else {
             return uri.toString();
         }
+    }
+
+    private static URI removeDefaultPort(URI uri) {
+        if ((uri.getPort() == 80 && "http".equals(uri.getScheme()))
+                || (uri.getPort() == 443 && "https".equals(uri.getScheme()))) {
+            try {
+                URI newURI = new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), -1,
+                        uri.getPath(), uri.getQuery(), uri.getFragment());
+                return newURI;
+            } catch (URISyntaxException e) {
+                throw new IllegalArgumentException("Invalid URI " + uri + " : " + e.toString(), e);
+            }
+        }
+        return uri;
     }
 
     public void setStripPathFromIssuerUri(boolean stripPathFromIssuerUri) {
