@@ -206,9 +206,8 @@ public class AuthorizationMetadataService {
         if ((uri.getPort() == 80 && "http".equals(uri.getScheme()))
                 || (uri.getPort() == 443 && "https".equals(uri.getScheme()))) {
             try {
-                URI newURI = new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), -1,
+                return new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), -1,
                         uri.getPath(), uri.getQuery(), uri.getFragment());
-                return newURI;
             } catch (URISyntaxException e) {
                 throw new IllegalArgumentException("Invalid URI " + uri + " : " + e.toString(), e);
             }
