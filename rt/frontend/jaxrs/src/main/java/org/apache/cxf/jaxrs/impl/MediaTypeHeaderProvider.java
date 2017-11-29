@@ -35,6 +35,7 @@ import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -47,8 +48,8 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
         Pattern.compile("(([\\w-]+=\"[^\"]*\")|([\\w-]+=[\\w-/\\+]+))");
     
     private static Map<String, MediaType> map = new ConcurrentHashMap<String, MediaType>();
-    private static final int MAX_MT_CACHE_SIZE = 
-        Integer.getInteger("org.apache.cxf.jaxrs.max_mediatype_cache_size", 200);
+    private static final int MAX_MT_CACHE_SIZE =
+        SystemPropertyAction.getInteger("org.apache.cxf.jaxrs.max_mediatype_cache_size", 200);
 
     public MediaType fromString(String mType) {
         
