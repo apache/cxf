@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxrs.json.basic;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -48,6 +49,9 @@ public class JsonMapObject implements Serializable {
             count = count == null ? 2 : count++;
             updateCount.put(name, count);
         }
+        if (value instanceof JsonMapObject) {
+            value = ((JsonMapObject)value).asMap();
+        }
         values.put(name, value);
     }
 
@@ -63,6 +67,14 @@ public class JsonMapObject implements Serializable {
         Object value = getProperty(name);
         if (value != null) {
             return CastUtils.cast((Map<?, ?>)value);
+        }
+        return null;
+    }
+    
+    public JsonMapObject getJsonMapProperty(String name) {
+        Map<String, Object> value = getMapProperty(name);
+        if (value != null) {
+            return new JsonMapObject(value);
         }
         return null;
     }
@@ -105,6 +117,18 @@ public class JsonMapObject implements Serializable {
         }
         return null;
     }
+    public List<JsonMapObject> getListJsonMapProperty(String name) {
+        Object value = getProperty(name);
+        if (value != null) {
+            List<Map<String, Object>> list = CastUtils.cast((List<?>)value);
+            List<JsonMapObject> newList = new ArrayList<>(list.size());
+            for (Map<String, Object> map : list) {
+                newList.add(new JsonMapObject(map));
+            }
+            return newList;
+        }
+        return null;
+    }
     public int hashCode() {
         return values.hashCode();
     }
@@ -112,6 +136,11 @@ public class JsonMapObject implements Serializable {
     public boolean equals(Object obj) {
         return obj instanceof JsonMapObject && ((JsonMapObject)obj).values.equals(this.values);
     }
+    
+    public int size() {
+        return values.size();
+    }
+    
     public Map<String, Object> getUpdateCount() {
         return updateCount == null ? null : Collections.<String, Object>unmodifiableMap(updateCount);
     }
