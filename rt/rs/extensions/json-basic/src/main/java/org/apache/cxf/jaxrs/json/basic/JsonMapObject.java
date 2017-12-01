@@ -20,7 +20,6 @@
 package org.apache.cxf.jaxrs.json.basic;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -117,17 +116,13 @@ public class JsonMapObject implements Serializable {
         }
         return null;
     }
-    public List<JsonMapObject> getListJsonMapProperty(String name) {
+    public List<Map<String, Object>> getListMapProperty(String name) {
         Object value = getProperty(name);
+        List<Map<String, Object>> list = null;
         if (value != null) {
-            List<Map<String, Object>> list = CastUtils.cast((List<?>)value);
-            List<JsonMapObject> newList = new ArrayList<>(list.size());
-            for (Map<String, Object> map : list) {
-                newList.add(new JsonMapObject(map));
-            }
-            return newList;
+            list = CastUtils.cast((List<?>)value);
         }
-        return null;
+        return list;
     }
     public int hashCode() {
         return values.hashCode();

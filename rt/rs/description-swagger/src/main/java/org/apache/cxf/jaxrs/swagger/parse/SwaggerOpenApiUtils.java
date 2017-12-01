@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -81,7 +81,7 @@ public final class SwaggerOpenApiUtils {
         }
         
         // "tags"
-        List<JsonMapObject> tagsObject = sw2.getListJsonMapProperty("tags");
+        List<Map<String, Object>> tagsObject = sw2.getListMapProperty("tags");
         if (tagsObject != null) {
             sw3.setProperty("tags", tagsObject);
         }
@@ -119,8 +119,8 @@ public final class SwaggerOpenApiUtils {
     private static void setPathsProperty(JsonMapObject sw2, JsonMapObject sw3) {
         JsonMapObject sw2Paths = sw2.getJsonMapProperty("paths");
         for (Map.Entry<String, Object> sw2PathEntries : sw2Paths.asMap().entrySet()) {
-            Map<String, Object> sw2PathVerbs = CastUtils.cast((Map<?, ?>)sw2PathEntries.getValue());
-            for (Map.Entry<String, Object> sw2PathVerbEntries : sw2PathVerbs.entrySet()) {
+            JsonMapObject sw2PathVerbs = new JsonMapObject(CastUtils.cast((Map<?, ?>)sw2PathEntries.getValue()));
+            for (Map.Entry<String, Object> sw2PathVerbEntries : sw2PathVerbs.asMap().entrySet()) {
                 JsonMapObject sw2PathVerbProps =
                     new JsonMapObject(CastUtils.cast((Map<?, ?>)sw2PathVerbEntries.getValue()));
                 
@@ -130,11 +130,12 @@ public final class SwaggerOpenApiUtils {
                     CastUtils.cast((List<?>)sw2PathVerbProps.removeProperty("produces"));
                 
                 JsonMapObject sw3RequestBody = null;
-                List<JsonMapObject> sw2PathVerbParamsList =
-                    sw2PathVerbProps.getListJsonMapProperty("parameters");
+                List<JsonMapObject> sw3formBody = null;
+                List<Map<String, Object>> sw2PathVerbParamsList =
+                    sw2PathVerbProps.getListMapProperty("parameters");
                 if (sw2PathVerbParamsList != null) {
-                    for (Iterator<JsonMapObject> it = sw2PathVerbParamsList.iterator(); it.hasNext();) {
-                        JsonMapObject sw2PathVerbParamMap = it.next();
+                    for (Iterator<Map<String, Object>> it = sw2PathVerbParamsList.iterator(); it.hasNext();) {
+                        JsonMapObject sw2PathVerbParamMap = new JsonMapObject(it.next());
                         if ("body".equals(sw2PathVerbParamMap.getStringProperty("in"))) {
                             it.remove();
                             
@@ -155,12 +156,40 @@ public final class SwaggerOpenApiUtils {
                                 }
                                 
                             }
-                            break;
+                        } else if ("formData".equals(sw2PathVerbParamMap.getStringProperty("in"))) {
+                            it.remove();
+                            if (sw3formBody == null) {
+                                sw3formBody = new LinkedList<>();
+                                sw3RequestBody = new JsonMapObject();
+                            }
+                            sw2PathVerbParamMap.removeProperty("in");
+                            sw2PathVerbParamMap.removeProperty("required");
+                            sw3formBody.add(sw2PathVerbParamMap);
+                        } else if ("array".equals(sw2PathVerbParamMap.getStringProperty("type"))) {
+                            sw2PathVerbParamMap.removeProperty("type");
+                            sw2PathVerbParamMap.removeProperty("collectionFormat");
+                            sw2PathVerbParamMap.setProperty("explode", true);
+                            JsonMapObject items = sw2PathVerbParamMap.getJsonMapProperty("items");
+                            sw2PathVerbParamMap.removeProperty("items");
+                            JsonMapObject schema = new JsonMapObject();
+                            schema.setProperty("type", "array");
+                            schema.setProperty("items", items);
+                            sw2PathVerbParamMap.setProperty("schema", schema);
+                        } else {
+                            String type = (String)sw2PathVerbParamMap.removeProperty("type");
+                            String format = (String)sw2PathVerbParamMap.removeProperty("format");
+                            JsonMapObject schema = new JsonMapObject();
+                            schema.setProperty("type", type);
+                            schema.setProperty("format", format);
+                            sw2PathVerbParamMap.setProperty("schema", schema);
                         }
                     }
                 }
                 if (sw2PathVerbParamsList.isEmpty()) {
                     sw2PathVerbProps.removeProperty("parameters");
+                }
+                if (sw3formBody != null) {
+                    sw3RequestBody.setProperty("content", prepareFormContent(sw3formBody));
                 }
                 if (sw3RequestBody != null) {
                     // Inline for now, or the map of requestBodies can be created instead 
@@ -168,33 +197,34 @@ public final class SwaggerOpenApiUtils {
                     sw2PathVerbProps.setProperty("requestBody", sw3RequestBody);
                 }
                 
-                Map<String, Object> sw3PathVerbResps = null;
+                JsonMapObject sw3PathVerbResps = null;
                 JsonMapObject sw2PathVerbResps = sw2PathVerbProps.getJsonMapProperty("responses");
                 if (sw2PathVerbResps != null) {
-                    sw3PathVerbResps = new LinkedHashMap<>();
-                    for (Map.Entry<String, Object> entry : sw2PathVerbResps.asMap().entrySet()) {
-                        String statusCode = entry.getKey();
-                        if ("200".equals(statusCode)) {
-                            JsonMapObject responseMap = new JsonMapObject(CastUtils.cast((Map<?, ?>)entry.getValue()));
-                            JsonMapObject okResp = new JsonMapObject();
-                            String description = responseMap.getStringProperty("description");
-                            if (description != null) {
-                                okResp.setProperty("description", description);
+                    sw3PathVerbResps = new JsonMapObject();
+                    
+                    JsonMapObject okResp = null;
+                    if (sw2PathVerbResps.containsProperty("200")) {
+                        okResp = new JsonMapObject(CastUtils.cast((Map<?, ?>)sw2PathVerbResps.removeProperty("200")));
+                        JsonMapObject newOkResp = new JsonMapObject();
+                        String description = okResp.getStringProperty("description");
+                        if (description != null) {
+                            newOkResp.setProperty("description", description);
+                        }
+                        
+                        JsonMapObject schema = okResp.getJsonMapProperty("schema");
+                        if (schema != null) {
+                            JsonMapObject content = prepareContentFromSchema(schema, sw2PathVerbProduces);
+                            if (content != null) {
+                                newOkResp.setProperty("content", content);
                             }
                             
-                            JsonMapObject schema = responseMap.getJsonMapProperty("schema");
-                            if (schema != null) {
-                                JsonMapObject content = prepareContentFromSchema(schema, sw2PathVerbProduces);
-                                if (content != null) {
-                                    okResp.setProperty("content", content);
-                                }
-                                
-                            }
-                            sw3PathVerbResps.put("200", okResp);
-                            continue;
-                        } 
-                        sw3PathVerbResps.put(entry.getKey(), entry.getValue());
+                        }
+                        sw3PathVerbResps.setProperty("200", newOkResp);
                     }
+                    for (Map.Entry<String, Object> entry : sw2PathVerbResps.asMap().entrySet()) {
+                        sw3PathVerbResps.setProperty(entry.getKey(), entry.getValue());
+                    }
+                    sw2PathVerbProps.setProperty("responses", sw3PathVerbResps);
                 }
             }
         }
@@ -203,15 +233,31 @@ public final class SwaggerOpenApiUtils {
         
         
     }
+    
+    private static JsonMapObject prepareFormContent(List<JsonMapObject> formList) {
+        JsonMapObject content = new JsonMapObject();
+        JsonMapObject formType = new JsonMapObject();
+        JsonMapObject schema = new JsonMapObject();
+        schema.setProperty("type", "object");
+        JsonMapObject props = new JsonMapObject();
+        for (JsonMapObject prop : formList) {
+            String name = (String)prop.removeProperty("name");
+            props.setProperty(name, prop);
+        }
+        schema.setProperty("properties", props);
+        formType.setProperty("schema", schema);
+        content.setProperty("application/x-www-form-urlencoded", formType);
+        return content;
+    }
     private static JsonMapObject prepareContentFromSchema(JsonMapObject schema,
                                                           List<String> mediaTypes) {
         JsonMapObject content = null;
         String type = schema.getStringProperty("type");
         String ref = null;
-        Map<String, Object> items = null;
+        JsonMapObject items = null;
         if ("array".equals(type)) {
-            items = schema.getMapProperty("items");
-            ref = (String)items.get("$ref");
+            items = schema.getJsonMapProperty("items");
+            ref = (String)items.getProperty("$ref");
         } else {
             ref = schema.getStringProperty("$ref");
         }
@@ -223,7 +269,7 @@ public final class SwaggerOpenApiUtils {
             if (items == null) {
                 schema.setProperty("$ref", "#components/schemas/" + modelName);
             } else {
-                items.put("$ref", "#components/schemas/" + modelName);
+                items.setProperty("$ref", "#components/schemas/" + modelName);
             }
             
             List<String> mediaTypesList = mediaTypes == null 
