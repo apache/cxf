@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -41,6 +40,7 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CachedOutputStreamCallback;
 import org.apache.cxf.io.CachedWriter;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -65,25 +65,20 @@ public class XSLTOutInterceptor extends AbstractXSLTInterceptor {
             return;
         }
 
-        String encoding = (String)message.getContextualProperty(Message.ENCODING);
-        if (encoding == null) {
-            encoding = StandardCharsets.UTF_8.name();
-        }
-
         // 1. Try to get and transform XMLStreamWriter message content
         XMLStreamWriter xWriter = message.getContent(XMLStreamWriter.class);
         if (xWriter != null) {
-            transformXWriter(message, xWriter); // The effective output encoding depends on the encoding of the xWriter
+            transformXWriter(message, xWriter);
         } else {
             // 2. Try to get and transform OutputStream message content
             OutputStream out = message.getContent(OutputStream.class);
             if (out != null) {
-                transformOS(message, out, encoding);
+                transformOS(message, out);
             } else {
                 // 3. Try to get and transform Writer message content (actually used for JMS TextMessage)
                 Writer writer = message.getContent(Writer.class);
                 if (writer != null) {
-                    transformWriter(message, writer); // The effective output encoding depends xWriter's encoding
+                    transformWriter(message, writer);
                 }
             }
         }
@@ -98,9 +93,10 @@ public class XSLTOutInterceptor extends AbstractXSLTInterceptor {
                     Boolean.TRUE);
     }
 
-    protected void transformOS(Message message, OutputStream out, String encoding) {
+    protected void transformOS(Message message, OutputStream out) {
         CachedOutputStream wrapper = new CachedOutputStream();
-        CachedOutputStreamCallback callback = new XSLTCachedOutputStreamCallback(getXSLTTemplate(), out, encoding);
+        CachedOutputStreamCallback callback = new XSLTCachedOutputStreamCallback(getXSLTTemplate(), out,
+                MessageUtils.getMessageEncoding(message));
         wrapper.registerCallback(callback);
         message.setContent(OutputStream.class, wrapper);
     }

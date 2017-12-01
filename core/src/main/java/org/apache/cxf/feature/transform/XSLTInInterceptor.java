@@ -23,7 +23,6 @@ package org.apache.cxf.feature.transform;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.nio.charset.StandardCharsets;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -34,6 +33,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.StaxUtils;
 
@@ -58,34 +58,30 @@ public class XSLTInInterceptor extends AbstractXSLTInterceptor {
             return;
         }
 
-        String encoding = (String)message.getContextualProperty(Message.ENCODING);
-        if (encoding == null) {
-            encoding = StandardCharsets.UTF_8.name();
-        }
-
-
         // 1. Try to get and transform XMLStreamReader message content
         XMLStreamReader xReader = message.getContent(XMLStreamReader.class);
         if (xReader != null) {
-            transformXReader(message, xReader, encoding);
+            transformXReader(message, xReader);
         } else {
             // 2. Try to get and transform InputStream message content
             InputStream is = message.getContent(InputStream.class);
             if (is != null) {
-                transformIS(message, is, encoding);
+                transformIS(message, is);
             } else {
                 // 3. Try to get and transform Reader message content (actually used for JMS TextMessage)
                 Reader reader = message.getContent(Reader.class);
                 if (reader != null) {
-                    transformReader(message, reader); // reader already encapulates encoding
+                    transformReader(message, reader);
                 }
             }
         }
     }
 
-    protected void transformXReader(Message message, XMLStreamReader xReader, String encoding) {
+    protected void transformXReader(Message message, XMLStreamReader xReader) {
         CachedOutputStream cachedOS = new CachedOutputStream();
         try {
+            final String encoding = MessageUtils.getMessageEncoding(message);
+
             StaxUtils.copy(xReader, cachedOS, encoding);
             InputStream transformedIS = XSLTUtils.transform(getXSLTTemplate(), cachedOS.getInputStream(), encoding);
             XMLStreamReader transformedReader = StaxUtils.createXMLStreamReader(transformedIS, encoding);
@@ -108,9 +104,10 @@ public class XSLTInInterceptor extends AbstractXSLTInterceptor {
         }
     }
     
-    protected void transformIS(Message message, InputStream is, String encoding) {
+    protected void transformIS(Message message, InputStream is) {
         try {
-            InputStream transformedIS = XSLTUtils.transform(getXSLTTemplate(), is, encoding);
+            InputStream transformedIS = XSLTUtils.transform(getXSLTTemplate(), is,
+                    MessageUtils.getMessageEncoding(message));
             message.setContent(InputStream.class, transformedIS);
         } finally {
             try {

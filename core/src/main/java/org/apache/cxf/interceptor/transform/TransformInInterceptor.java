@@ -21,7 +21,6 @@ package org.apache.cxf.interceptor.transform;
 
 
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -76,14 +75,10 @@ public class TransformInInterceptor extends AbstractPhaseInterceptor<Message> {
             return;
         }
 
-        String encoding = (String)message.getContextualProperty(Message.ENCODING);
-        if (encoding == null) {
-            encoding = StandardCharsets.UTF_8.name();
-        }
-
         XMLStreamReader reader = message.getContent(XMLStreamReader.class);
         InputStream is = message.getContent(InputStream.class);
-        
+
+        final String encoding = MessageUtils.getMessageEncoding(message);
         XMLStreamReader transformReader = createTransformReaderIfNeeded(reader, is, encoding);
         if (transformReader != null) {
             message.setContent(XMLStreamReader.class, transformReader);
