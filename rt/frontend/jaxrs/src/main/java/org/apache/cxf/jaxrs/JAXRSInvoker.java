@@ -232,7 +232,7 @@ public class JAXRSInvoker extends AbstractInvoker {
 
                 Class<?> subResponseType = null;
                 if (result.getClass() == Class.class) {
-                    ResourceContext rc = new ResourceContextImpl(inMessage, ori);
+                    ResourceContext rc = new ResourceContextImpl(inMessage, ori, exchange.getBus());
                     result = rc.getResource((Class<?>)result);
                     subResponseType = InjectionUtils.getActualType(methodToInvoke.getGenericReturnType());
                 } else {

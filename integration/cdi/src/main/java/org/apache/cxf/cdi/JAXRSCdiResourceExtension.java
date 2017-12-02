@@ -37,12 +37,15 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.BeforeShutdown;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.InjectionTarget;
+import javax.enterprise.inject.spi.ProcessAnnotatedType;
 import javax.enterprise.inject.spi.ProcessBean;
 import javax.enterprise.inject.spi.ProcessProducerField;
 import javax.enterprise.inject.spi.ProcessProducerMethod;
+import javax.enterprise.inject.spi.WithAnnotations;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
@@ -69,6 +72,7 @@ public class JAXRSCdiResourceExtension implements Extension {
     private final List< Bean< ? extends Feature > > featureBeans = new ArrayList< Bean< ? extends Feature > >();
     private final List< CreationalContext< ? > > disposableCreationalContexts =
         new ArrayList< CreationalContext< ? > >();
+    private final Set< Type > contextTypes = new LinkedHashSet<>();
 
     /**
      * Holder of the classified resource classes, converted to appropriate instance
@@ -102,6 +106,14 @@ public class JAXRSCdiResourceExtension implements Extension {
         public List<CdiResourceProvider> getResourceProviders() {
             return resourceProviders;
         }
+    }
+
+    public <X> void convertContextsToCdi(@Observes @WithAnnotations({Context.class})
+                                             ProcessAnnotatedType<X> processAnnotatedType) {
+        AnnotatedType<X> annotatedType = processAnnotatedType.getAnnotatedType();
+        DelegateContextAnnotatedType<X> type = new DelegateContextAnnotatedType<>(annotatedType);
+        contextTypes.addAll(type.getContextFieldTypes());
+        processAnnotatedType.setAnnotatedType(type);
     }
 
     @SuppressWarnings("unchecked")
@@ -186,6 +198,7 @@ public class JAXRSCdiResourceExtension implements Extension {
             applicationBeans.add(applicationBean);
             event.addBean(applicationBean);
         }
+        contextTypes.forEach(t -> event.addBean(new ContextProducerBean(t)));
     }
 
     /**
