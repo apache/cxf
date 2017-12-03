@@ -19,15 +19,17 @@
 package org.apache.cxf.cdi;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Set;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.spi.InjectionPoint;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 
 public class ContextProducerBean extends AbstractCXFBean<Object> {
-    private static final ResourceProducer PRODUCER = new ResourceProducer();
     private final Type type;
 
     ContextProducerBean(Type type) {
@@ -46,22 +48,12 @@ public class ContextProducerBean extends AbstractCXFBean<Object> {
 
     @Override
     public Class<?> getBeanClass() {
-        return ResourceProducer.class;
-    }
-
-    @Override
-    public Set<InjectionPoint> getInjectionPoints() {
-        return Collections.emptySet();
+        return CXFCdiServlet.class;
     }
 
     @Override
     public Object create(CreationalContext<Object> creationalContext) {
-        return PRODUCER.createContextValue(type);
-    }
-
-    @Override
-    public void destroy(Object instance, CreationalContext<Object> creationalContext) {
-
+        return createContextValue();
     }
 
     @Override
@@ -78,6 +70,23 @@ public class ContextProducerBean extends AbstractCXFBean<Object> {
 
     @Override
     public String getName() {
-        return "CXFResourceProducerFor" + type;
+        return "CxfContextProducer" + type;
+    }
+
+    private Object createContextValue() {
+        Message currentMessage = PhaseInterceptorChain.getCurrentMessage();
+        if (currentMessage == null) {
+            return null;
+        }
+        Type genericType = null;
+        Class<?> contextType;
+        if (type instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType)type;
+            genericType = parameterizedType.getActualTypeArguments()[0];
+            contextType = (Class<?>)parameterizedType.getRawType();
+        } else {
+            contextType = (Class<?>)type;
+        }
+        return JAXRSUtils.createContextValue(currentMessage, genericType, contextType);
     }
 }
