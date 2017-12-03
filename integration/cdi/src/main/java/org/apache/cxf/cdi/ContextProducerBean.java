@@ -23,7 +23,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Set;
-import javax.enterprise.context.Dependent;
+import javax.enterprise.context.RequestScoped;
 import javax.enterprise.context.spi.CreationalContext;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
@@ -43,12 +43,12 @@ public class ContextProducerBean extends AbstractCXFBean<Object> {
 
     @Override
     public Class<? extends Annotation> getScope() {
-        return Dependent.class;
+        return RequestScoped.class;
     }
 
     @Override
     public Class<?> getBeanClass() {
-        return CXFCdiServlet.class;
+        return (Class<?>)type;
     }
 
     @Override
@@ -75,9 +75,6 @@ public class ContextProducerBean extends AbstractCXFBean<Object> {
 
     private Object createContextValue() {
         Message currentMessage = PhaseInterceptorChain.getCurrentMessage();
-        if (currentMessage == null) {
-            return null;
-        }
         Type genericType = null;
         Class<?> contextType;
         if (type instanceof ParameterizedType) {

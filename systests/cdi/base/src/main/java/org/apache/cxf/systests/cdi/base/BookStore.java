@@ -19,7 +19,6 @@
 package org.apache.cxf.systests.cdi.base;
 
 import java.util.Collection;
-
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -39,6 +38,7 @@ import javax.ws.rs.core.UriInfo;
 public class BookStore {
     @Inject private BookStoreService service;
     @Inject private BookStoreVersion bookStoreVersion;
+    @Context private UriInfo uriInfo;
 
     @Path("/version")
     public BookStoreVersion getVersion() {
@@ -64,8 +64,7 @@ public class BookStore {
     @POST
     @Path("/books")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response addBook(@Context final UriInfo uriInfo,
-                            @NotNull @Size(min = 1, max = 50) @FormParam("id") String id,
+    public Response addBook(@NotNull @Size(min = 1, max = 50) @FormParam("id") String id,
                             @NotNull @FormParam("name") String name) {
         final Book book = service.store(id, name);
         return Response.created(uriInfo.getRequestUriBuilder().path(id).build()).entity(book).build();

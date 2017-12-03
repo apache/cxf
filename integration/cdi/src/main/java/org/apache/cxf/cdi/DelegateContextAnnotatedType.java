@@ -50,7 +50,7 @@ final class DelegateContextAnnotatedType<X> implements AnnotatedType<X> {
 
     Set<Type> getContextFieldTypes() {
         return replacedFields.stream()
-                .filter(f -> f.isAnnotationPresent(Context.class))
+                .filter(f -> f.isAnnotationPresent(Context.class) || f.isAnnotationPresent(ContextResolved.class))
                 .map(f -> f.getJavaMember().getAnnotatedType().getType())
                 .collect(toSet());
     }

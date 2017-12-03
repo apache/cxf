@@ -108,7 +108,7 @@ public class JAXRSCdiResourceExtension implements Extension {
         }
     }
 
-    public <X> void convertContextsToCdi(@Observes @WithAnnotations({Context.class})
+    public <X> void convertContextsToCdi(@Observes @WithAnnotations({Context.class, ContextResolved.class})
                                              ProcessAnnotatedType<X> processAnnotatedType) {
         AnnotatedType<X> annotatedType = processAnnotatedType.getAnnotatedType();
         DelegateContextAnnotatedType<X> type = new DelegateContextAnnotatedType<>(annotatedType);
