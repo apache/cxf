@@ -21,7 +21,7 @@ package org.apache.cxf.cdi;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.context.spi.CreationalContext;
@@ -38,7 +38,10 @@ public class ContextProducerBean extends AbstractCXFBean<Object> {
 
     @Override
     public Set<Annotation> getQualifiers() {
-        return Collections.singleton(ContextResolved.LITERAL);
+        Set<Annotation> qualifiers = new HashSet<>(2);
+        qualifiers.add(ContextResolved.LITERAL);
+        qualifiers.add(DEFAULT);
+        return qualifiers;
     }
 
     @Override

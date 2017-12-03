@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.Set;
 
@@ -57,6 +58,7 @@ import org.apache.cxf.cdi.extension.JAXRSServerFactoryCustomizationExtension;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.provider.ServerConfigurableFactory;
+import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 /**
@@ -198,6 +200,12 @@ public class JAXRSCdiResourceExtension implements Extension {
             applicationBeans.add(applicationBean);
             event.addBean(applicationBean);
         }
+        // always add the standard context classes
+        InjectionUtils.STANDARD_CONTEXT_CLASSES.stream()
+                .map(this::toClass)
+                .filter(Objects::nonNull)
+                .forEach(contextTypes::add);
+        // register all of the context types
         contextTypes.forEach(t -> event.addBean(new ContextProducerBean(t)));
     }
 
@@ -218,6 +226,14 @@ public class JAXRSCdiResourceExtension implements Extension {
             for (final CreationalContext<?> disposableCreationalContext: disposableCreationalContexts) {
                 disposableCreationalContext.release();
             }
+        }
+    }
+
+    private Class<?> toClass(String name) {
+        try {
+            return Class.forName(name);
+        } catch (Exception e) {
+            return null;
         }
     }
 
