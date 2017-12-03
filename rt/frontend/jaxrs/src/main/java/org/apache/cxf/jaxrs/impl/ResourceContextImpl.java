@@ -20,8 +20,6 @@ package org.apache.cxf.jaxrs.impl;
 
 import javax.ws.rs.container.ResourceContext;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.common.util.ClassUnwrapper;
 import org.apache.cxf.jaxrs.ext.ResourceContextProvider;
 import org.apache.cxf.jaxrs.lifecycle.PerRequestResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
@@ -32,15 +30,13 @@ import org.apache.cxf.message.Message;
 
 public class ResourceContextImpl implements ResourceContext {
     private static final String CONTEXT_PROVIDER_PROP = "org.apache.cxf.jaxrs.resource.context.provider";
-    private final ClassUnwrapper classUnwrapper;
     private final ClassResourceInfo cri;
     private final Class<?> subClass;
     private final Message m;
-    public ResourceContextImpl(Message m, OperationResourceInfo ori, Bus bus) {
+    public ResourceContextImpl(Message m, OperationResourceInfo ori) {
         this.m = m;
         this.cri = ori.getClassResourceInfo();
         this.subClass = ori.getMethodToInvoke().getReturnType();
-        this.classUnwrapper = (ClassUnwrapper)bus.getProperty(ClassUnwrapper.class.getName());
     }
 
     @Override
@@ -59,11 +55,7 @@ public class ResourceContextImpl implements ResourceContext {
 
     @Override
     public <T> T initResource(T resource) {
-        Class<?> resourceClass = resource.getClass();
-        if (classUnwrapper != null) {
-            resourceClass = classUnwrapper.getRealClass(resource);
-        }
-        return doInitResource(resourceClass, resource);
+        return doInitResource(resource.getClass(), resource);
     }
 
     private <T> T doInitResource(Class<?> cls, T resource) {
