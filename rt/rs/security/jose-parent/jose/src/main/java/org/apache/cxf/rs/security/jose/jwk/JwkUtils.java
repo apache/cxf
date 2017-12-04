@@ -276,7 +276,9 @@ public final class JwkUtils {
                 if (is == null) {
                     throw new JwkException("Error in loading keystore location: " + keyStoreLoc);
                 }
-                keyContent = IOUtils.readStringFromStream(is);
+                try (InputStream isResource = is) {
+                    keyContent = IOUtils.readStringFromStream(isResource);
+                }
             } catch (Exception ex) {
                 throw new JwkException(ex);
             }
