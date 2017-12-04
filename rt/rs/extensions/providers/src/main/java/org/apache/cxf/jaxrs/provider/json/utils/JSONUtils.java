@@ -107,7 +107,7 @@ public final class JSONUtils {
             namespaceMap.putIfAbsent(XSI_URI, XSI_PREFIX);
         }
         Configuration c = new Configuration(namespaceMap);
-        c.setSuppressAtAttributes(attributesAsElements);
+        c.setSupressAtAttributes(attributesAsElements);
         if (converter != null) {
             c.setTypeConverter(converter);
         }
