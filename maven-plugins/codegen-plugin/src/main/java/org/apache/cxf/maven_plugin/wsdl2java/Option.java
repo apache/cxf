@@ -173,7 +173,7 @@ public class Option {
      * Prevents dumping current date as part of @Generated annotation as well as part of
      * the javadocs of the Java files generated.
      */
-    Boolean supressGeneratedDate;
+    Boolean suppressGeneratedDate;
 
     /**
      * The WSDL service name to use for the generated code
@@ -417,12 +417,12 @@ public class Option {
         this.markGenerated = markGenerated;
     }
 
-    public Boolean isSupressGeneratedDate() {
-        return supressGeneratedDate;
+    public Boolean isSuppressGeneratedDate() {
+        return suppressGeneratedDate;
     }
 
-    public void setSupressGeneratedDate(Boolean supressGeneratedDate) {
-        this.supressGeneratedDate = supressGeneratedDate;
+    public void setSuppressGeneratedDate(Boolean suppressGeneratedDate) {
+        this.suppressGeneratedDate = suppressGeneratedDate;
     }
 
     public Boolean getDefaultExcludesNamespace() {
@@ -495,7 +495,7 @@ public class Option {
         destination.setNoTypes(isNoTypes());
         destination.setFaultSerialVersionUID(getFaultSerialVersionUID());
         destination.setMarkGenerated(isMarkGenerated());
-        destination.setSupressGeneratedDate(isSupressGeneratedDate());
+        destination.setSuppressGeneratedDate(isSuppressGeneratedDate());
         destination.setAllowElementRefs(isAllowElementRefs());
         if (isSetWsdlLocation()) {
             destination.setWsdlLocation(getWsdlLocation());
@@ -524,7 +524,7 @@ public class Option {
         faultSerialVersionUID = setIfNull(faultSerialVersionUID,
             defaultOptions.faultSerialVersionUID);
         markGenerated = setIfNull(markGenerated, defaultOptions.markGenerated);
-        supressGeneratedDate = setIfNull(supressGeneratedDate, defaultOptions.supressGeneratedDate);
+        suppressGeneratedDate = setIfNull(suppressGeneratedDate, defaultOptions.suppressGeneratedDate);
         autoNameResolution = setIfNull(autoNameResolution, defaultOptions.autoNameResolution);
         noAddressBinding = setIfNull(noAddressBinding, defaultOptions.noAddressBinding);
         allowElementRefs = setIfNull(allowElementRefs, defaultOptions.allowElementRefs);

@@ -101,7 +101,7 @@ public final class ToolConstants {
     public static final String CFG_EXCEPTION_SUPER = "exceptionSuper";
     public static final String CFG_SEI_SUPER = "seiSuper";
     public static final String CFG_MARK_GENERATED = "mark-generated";
-    public static final String CFG_SUPRESS_GENERATED_DATE = "supress-generated-date";
+    public static final String CFG_SUPPRESS_GENERATED_DATE = "suppress-generated-date";
 
     //Internal Flag to generate
     public static final String CFG_IMPL_CLASS = "implClass";

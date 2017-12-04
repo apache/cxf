@@ -369,11 +369,11 @@ Examples:
                 </annotation>
                 <switch>mark-generated</switch>
             </option>
-            <option id="supressGeneratedDate" maxOccurs="1">
+            <option id="suppressGeneratedDate" maxOccurs="1">
                 <annotation>
-                    Prevents dumping current date as part of @Generated annotation as well as part of the javadocs of the Java files generated.
+                    Prevents dumping current date as part of javadocs of the Java files generated.
                 </annotation>
-                <switch>supress-generated-date</switch>
+                <switch>suppress-generated-date</switch>
             </option>
         </optionGroup>
         <optionGroup id="common_options">

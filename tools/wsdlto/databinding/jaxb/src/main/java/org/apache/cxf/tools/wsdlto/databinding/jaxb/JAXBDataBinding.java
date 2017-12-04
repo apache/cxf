@@ -438,12 +438,11 @@ public class JAXBDataBinding implements DataBindingProfile {
             }
         }
 
-        if (context.optionSet(ToolConstants.CFG_SUPRESS_GENERATED_DATE)) {
-            // Prevents dumping current date as part of @Generated annotation as well as part
-            // of the javadocs of the Java files generated. This is done by passing
-            // '-supress-generated-date' attribute to jaxb xjc.
+        if (context.optionSet(ToolConstants.CFG_SUPPRESS_GENERATED_DATE)) {
+            // Prevents dumping current date as part of javadocs of the Java files generated.
+            // This is done by passing '-suppress-generated-date' attribute to jaxb xjc.
             try {
-                opts.parseArgument(new String[] {"-supress-generated-date" }, 0);
+                opts.parseArgument(new String[] {"-suppress-generated-date" }, 0);
             } catch (BadCommandLineException e) {
                 LOG.log(Level.SEVERE, e.getMessage());
                 throw new ToolException(e);

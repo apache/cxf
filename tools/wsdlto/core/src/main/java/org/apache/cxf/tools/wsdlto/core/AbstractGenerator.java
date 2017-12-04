@@ -117,7 +117,7 @@ public abstract class AbstractGenerator implements FrontEndGenerator {
         setAttributes("fullversion", Version.getCompleteVersionString());
         setAttributes("name", Version.getName());
         setAttributes("markGenerated", env.optionSet(ToolConstants.CFG_MARK_GENERATED));
-        setAttributes("supressGeneratedDate", env.optionSet(ToolConstants.CFG_SUPRESS_GENERATED_DATE));
+        setAttributes("suppressGeneratedDate", env.optionSet(ToolConstants.CFG_SUPPRESS_GENERATED_DATE));
         if (env.optionSet(ToolConstants.CFG_FRONTEND)) {
             setAttributes("frontend", env.get(ToolConstants.CFG_FRONTEND));
         }
