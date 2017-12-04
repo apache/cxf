@@ -311,6 +311,16 @@ public class StaxTransportBindingHandler extends AbstractStaxBindingHandler {
             SecurityToken securityToken = getSecurityToken();
             addIssuedToken(token, securityToken, false, true);
             signPartsAndElements(wrapper.getSignedParts(), wrapper.getSignedElements());
+
+            WSSSecurityProperties properties = getProperties();
+            if (securityToken != null && securityToken.getSecret() != null) {
+                properties.setSignatureAlgorithm(tbinding.getAlgorithmSuite().getSymmetricSignature());
+            } else {
+                properties.setSignatureAlgorithm(tbinding.getAlgorithmSuite().getAsymmetricSignature());
+            }
+            properties.setSignatureCanonicalizationAlgorithm(tbinding.getAlgorithmSuite().getC14n().getValue());
+            AlgorithmSuiteType algType = tbinding.getAlgorithmSuite().getAlgorithmSuiteType();
+            properties.setSignatureDigestAlgorithm(algType.getDigest());
         } else if (token instanceof SecureConversationToken
             || token instanceof SecurityContextToken || token instanceof SpnegoContextToken) {
             SecurityToken securityToken = getSecurityToken();
