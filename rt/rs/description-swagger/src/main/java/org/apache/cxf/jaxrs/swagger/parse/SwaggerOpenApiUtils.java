@@ -177,11 +177,15 @@ public final class SwaggerOpenApiUtils {
                             sw2PathVerbParamMap.setProperty("schema", schema);
                         } else {
                             String type = (String)sw2PathVerbParamMap.removeProperty("type");
-                            String format = (String)sw2PathVerbParamMap.removeProperty("format");
-                            JsonMapObject schema = new JsonMapObject();
-                            schema.setProperty("type", type);
-                            schema.setProperty("format", format);
-                            sw2PathVerbParamMap.setProperty("schema", schema);
+                            if (type != null) {
+                                JsonMapObject schema = new JsonMapObject();
+                                schema.setProperty("type", type);
+                                String format = (String)sw2PathVerbParamMap.removeProperty("format");
+                                if (format != null) {
+                                    schema.setProperty("format", format);
+                                }
+                                sw2PathVerbParamMap.setProperty("schema", schema);
+                            }
                         }
                     }
                 }
@@ -189,7 +193,7 @@ public final class SwaggerOpenApiUtils {
                     sw2PathVerbProps.removeProperty("parameters");
                 }
                 if (sw3formBody != null) {
-                    sw3RequestBody.setProperty("content", prepareFormContent(sw3formBody));
+                    sw3RequestBody.setProperty("content", prepareFormContent(sw3formBody, sw2PathVerbConsumes));
                 }
                 if (sw3RequestBody != null) {
                     // Inline for now, or the map of requestBodies can be created instead 
@@ -234,7 +238,9 @@ public final class SwaggerOpenApiUtils {
         
     }
     
-    private static JsonMapObject prepareFormContent(List<JsonMapObject> formList) {
+    private static JsonMapObject prepareFormContent(List<JsonMapObject> formList, List<String> mediaTypes) {
+        String mediaType = StringUtils.isEmpty(mediaTypes)
+            ? "application/x-www-form-urlencoded" : mediaTypes.get(0); 
         JsonMapObject content = new JsonMapObject();
         JsonMapObject formType = new JsonMapObject();
         JsonMapObject schema = new JsonMapObject();
@@ -243,10 +249,16 @@ public final class SwaggerOpenApiUtils {
         for (JsonMapObject prop : formList) {
             String name = (String)prop.removeProperty("name");
             props.setProperty(name, prop);
+            if ("file".equals(prop.getProperty("type"))) {
+                prop.setProperty("type", "string");
+                if (!prop.containsProperty("format")) {
+                    prop.setProperty("format", "binary");
+                }
+            }
         }
         schema.setProperty("properties", props);
         formType.setProperty("schema", schema);
-        content.setProperty("application/x-www-form-urlencoded", formType);
+        content.setProperty(mediaType, formType);
         return content;
     }
     private static JsonMapObject prepareContentFromSchema(JsonMapObject schema,

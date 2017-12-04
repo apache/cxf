@@ -54,6 +54,8 @@ public class SwaggerOpenApiUtilsTest extends Assert {
         verifyPetFindByTagsPath(paths);
         // /pet/{petId}
         verifyPetIdPath(paths);
+        // "/pet/{petId}/uploadImage"
+        verifyPetIdUploadImagePath(paths);
     }
 
     private void verifyPetPath(JsonMapObject paths) {
@@ -83,6 +85,15 @@ public class SwaggerOpenApiUtilsTest extends Assert {
         JsonMapObject pet = paths.getJsonMapProperty("/pet/{petId}");
         assertEquals(3, pet.size());
         verifyPetIdPathPost(pet);
+        verifyPetIdPathGet(pet);
+        verifyPetIdPathDelete(pet);
+    }
+    
+    private void verifyPetIdUploadImagePath(JsonMapObject paths) {
+        // /pet/{petId}/uploadImage
+        JsonMapObject pet = paths.getJsonMapProperty("/pet/{petId}/uploadImage");
+        assertEquals(1, pet.size());
+        verifyPetIdUploadImagePathPost(pet);
     }
     
     private void verifyPetFindByStatusOrTags(JsonMapObject pet, String opId) {
@@ -123,13 +134,92 @@ public class SwaggerOpenApiUtilsTest extends Assert {
             assertTrue(petGet.getBooleanProperty("deprecated"));
         }
     }
+    private void verifyPetIdUploadImagePathPost(JsonMapObject pet) {
+        JsonMapObject petPost = pet.getJsonMapProperty("post");
+        assertEquals(8, petPost.size());
+        testCommonVerbProps(petPost, "uploadFile");
+        List<Map<String, Object>> parameters = petPost.getListMapProperty("parameters");
+        assertEquals(1, parameters.size());
+        JsonMapObject pathIdParam = new JsonMapObject(parameters.get(0));
+        verifyPetIdParameter(pathIdParam);
+        
+        verifyPetFormContent(petPost, "multipart/form-data",
+                             "additionalMetadata", "file");
+        JsonMapObject responses = petPost.getJsonMapProperty("responses");
+        assertEquals(1, responses.size());
+        JsonMapObject okResp = responses.getJsonMapProperty("200");
+        assertEquals(2, okResp.size());
+        assertNotNull(okResp.getProperty("description"));
+        JsonMapObject content = okResp.getJsonMapProperty("content");
+        assertEquals(1, content.size());
+        verifySimpleContent(content, "application/json", "ApiResponse");
+        
+    }
     private void verifyPetIdPathPost(JsonMapObject pet) {
         JsonMapObject petPost = pet.getJsonMapProperty("post");
         assertEquals(8, petPost.size());
         testCommonVerbProps(petPost, "updatePetWithForm");
         List<Map<String, Object>> parameters = petPost.getListMapProperty("parameters");
         assertEquals(1, parameters.size());
-        JsonMapObject param = new JsonMapObject(parameters.get(0));
+        JsonMapObject pathIdParam = new JsonMapObject(parameters.get(0));
+        verifyPetIdParameter(pathIdParam);
+        
+        verifyPetFormContent(petPost, "application/x-www-form-urlencoded",
+                             "name", "status");
+        JsonMapObject responses = petPost.getJsonMapProperty("responses");
+        assertEquals(1, responses.size());
+        assertNotNull(responses.getProperty("405"));
+        
+    }
+    private void verifyPetIdPathGet(JsonMapObject pet) {
+        JsonMapObject petGet = pet.getJsonMapProperty("get");
+        assertEquals(7, petGet.size());
+        testCommonVerbProps(petGet, "getPetById");
+        List<Map<String, Object>> parameters = petGet.getListMapProperty("parameters");
+        assertEquals(1, parameters.size());
+        JsonMapObject pathIdParam = new JsonMapObject(parameters.get(0));
+        verifyPetIdParameter(pathIdParam);
+        
+        assertNull(petGet.getJsonMapProperty("requestBody"));
+        JsonMapObject responses = petGet.getJsonMapProperty("responses");
+        assertEquals(3, responses.size());
+        JsonMapObject okResp = responses.getJsonMapProperty("200");
+        assertEquals(2, okResp.size());
+        JsonMapObject content = okResp.getJsonMapProperty("content");
+        assertEquals(2, content.size());
+        verifySimpleContent(content, "application/json", "Pet");
+        verifySimpleContent(content, "application/xml", "Pet");
+        assertNotNull(responses.getProperty("400"));
+        assertNotNull(responses.getProperty("404"));
+        
+    }
+    
+    private void verifyPetIdPathDelete(JsonMapObject pet) {
+        JsonMapObject petDel = pet.getJsonMapProperty("delete");
+        assertEquals(7, petDel.size());
+        testCommonVerbProps(petDel, "deletePet");
+        List<Map<String, Object>> parameters = petDel.getListMapProperty("parameters");
+        assertEquals(2, parameters.size());
+        JsonMapObject apiKeyParam = new JsonMapObject(parameters.get(0));
+        assertEquals("api_key", apiKeyParam.getProperty("name"));
+        assertEquals("header", apiKeyParam.getProperty("in"));
+        assertNull(apiKeyParam.getProperty("type"));
+        assertNull(apiKeyParam.getProperty("format"));
+        assertFalse(apiKeyParam.getBooleanProperty("required"));
+        JsonMapObject schema = apiKeyParam.getJsonMapProperty("schema");
+        assertEquals(1, schema.size());
+        assertEquals("string", schema.getProperty("type"));
+        JsonMapObject pathIdParam = new JsonMapObject(parameters.get(1));
+        verifyPetIdParameter(pathIdParam);
+        assertNull(petDel.getJsonMapProperty("requestBody"));
+        JsonMapObject responses = petDel.getJsonMapProperty("responses");
+        assertEquals(2, responses.size());
+        assertNotNull(responses.getProperty("400"));
+        assertNotNull(responses.getProperty("404"));
+        
+    }
+    
+    private void verifyPetIdParameter(JsonMapObject param) {
         assertEquals("petId", param.getProperty("name"));
         assertEquals("path", param.getProperty("in"));
         assertNull(param.getProperty("type"));
@@ -139,17 +229,8 @@ public class SwaggerOpenApiUtilsTest extends Assert {
         assertEquals(2, schema.size());
         assertEquals("integer", schema.getProperty("type"));
         assertEquals("int64", schema.getProperty("format"));
-        
-        JsonMapObject requestBody = petPost.getJsonMapProperty("requestBody");
-        assertEquals(1, requestBody.size());
-        JsonMapObject content = requestBody.getJsonMapProperty("content");
-        assertEquals(1, content.size());
-        verifyPetFormContent(content);
-        JsonMapObject responses = petPost.getJsonMapProperty("responses");
-        assertEquals(1, responses.size());
-        assertNotNull(responses.getProperty("405"));
-        
     }
+
     private void verifyPetPathPost(JsonMapObject pet) {
         JsonMapObject petPost = pet.getJsonMapProperty("post");
         assertEquals(7, petPost.size());
@@ -195,20 +276,32 @@ public class SwaggerOpenApiUtilsTest extends Assert {
         assertEquals(1, schema.size());
         assertEquals("#components/schemas/" + modelName, schema.getStringProperty("$ref"));
     }
-    private void verifyPetFormContent(JsonMapObject contentMap) {
-        JsonMapObject content = contentMap.getJsonMapProperty("application/x-www-form-urlencoded");
+    private void verifyPetFormContent(JsonMapObject petPost,
+                                      String mediaType,
+                                      String firstPropName,
+                                      String secondPropName) {
+        JsonMapObject requestBody = petPost.getJsonMapProperty("requestBody");
+        assertEquals(1, requestBody.size());
+        JsonMapObject contentMap = requestBody.getJsonMapProperty("content");
+        assertEquals(1, contentMap.size());
+               
+        
+        JsonMapObject content = contentMap.getJsonMapProperty(mediaType);
         assertEquals(1, content.size());
         JsonMapObject schema = content.getJsonMapProperty("schema");
         assertEquals(2, schema.size());
         assertEquals("object", schema.getStringProperty("type"));
         JsonMapObject props = schema.getJsonMapProperty("properties");
         assertEquals(2, props.size());
-        JsonMapObject nameProp = props.getJsonMapProperty("name");
-        assertNotNull(nameProp.getProperty("description"));
-        assertEquals("string", nameProp.getProperty("type"));
-        JsonMapObject statusProp = props.getJsonMapProperty("name");
-        assertNotNull(statusProp.getProperty("description"));
-        assertEquals("string", statusProp.getProperty("type"));
+        JsonMapObject firstProp = props.getJsonMapProperty(firstPropName);
+        assertNotNull(firstProp.getProperty("description"));
+        assertEquals("string", firstProp.getProperty("type"));
+        JsonMapObject secondProp = props.getJsonMapProperty(secondPropName);
+        assertNotNull(secondProp.getProperty("description"));
+        assertEquals("string", secondProp.getProperty("type"));
+        if ("file".equals(secondPropName)) {
+            assertEquals("binary", secondProp.getProperty("format"));
+        }
     }
     private void verifyArrayContent(JsonMapObject contentMap, String mediaType, String modelName) {
         JsonMapObject content = contentMap.getJsonMapProperty(mediaType);
