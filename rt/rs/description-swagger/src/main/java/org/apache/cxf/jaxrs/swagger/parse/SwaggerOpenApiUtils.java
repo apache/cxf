@@ -20,6 +20,7 @@ package org.apache.cxf.jaxrs.swagger.parse;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -39,6 +40,10 @@ import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 public final class SwaggerOpenApiUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(SwaggerOpenApiUtils.class);
+    
+    private static final List<String> SIMPLE_TYPE_RELATED_PROPS =
+        Arrays.asList("format", "minimum", "maximum"); 
+    
     private SwaggerOpenApiUtils() {
         
     }
@@ -124,112 +129,9 @@ public final class SwaggerOpenApiUtils {
                 JsonMapObject sw2PathVerbProps =
                     new JsonMapObject(CastUtils.cast((Map<?, ?>)sw2PathVerbEntries.getValue()));
                 
-                List<String> sw2PathVerbConsumes =
-                    CastUtils.cast((List<?>)sw2PathVerbProps.removeProperty("consumes"));
-                List<String> sw2PathVerbProduces =
-                    CastUtils.cast((List<?>)sw2PathVerbProps.removeProperty("produces"));
+                prepareRequestBody(sw2PathVerbProps);
+                prepareResponses(sw2PathVerbProps);
                 
-                JsonMapObject sw3RequestBody = null;
-                List<JsonMapObject> sw3formBody = null;
-                List<Map<String, Object>> sw2PathVerbParamsList =
-                    sw2PathVerbProps.getListMapProperty("parameters");
-                if (sw2PathVerbParamsList != null) {
-                    for (Iterator<Map<String, Object>> it = sw2PathVerbParamsList.iterator(); it.hasNext();) {
-                        JsonMapObject sw2PathVerbParamMap = new JsonMapObject(it.next());
-                        if ("body".equals(sw2PathVerbParamMap.getStringProperty("in"))) {
-                            it.remove();
-                            
-                            sw3RequestBody = new JsonMapObject();
-                            String description = sw2PathVerbParamMap.getStringProperty("description");
-                            if (description != null) {
-                                sw3RequestBody.setProperty("description", description);
-                            }
-                            Boolean required = sw2PathVerbParamMap.getBooleanProperty("required");
-                            if (required != null) {
-                                sw3RequestBody.setProperty("required", required);
-                            }
-                            JsonMapObject schema = sw2PathVerbParamMap.getJsonMapProperty("schema");
-                            if (schema != null) {
-                                JsonMapObject content = prepareContentFromSchema(schema, sw2PathVerbConsumes);
-                                if (content != null) {
-                                    sw3RequestBody.setProperty("content", content);
-                                }
-                                
-                            }
-                        } else if ("formData".equals(sw2PathVerbParamMap.getStringProperty("in"))) {
-                            it.remove();
-                            if (sw3formBody == null) {
-                                sw3formBody = new LinkedList<>();
-                                sw3RequestBody = new JsonMapObject();
-                            }
-                            sw2PathVerbParamMap.removeProperty("in");
-                            sw2PathVerbParamMap.removeProperty("required");
-                            sw3formBody.add(sw2PathVerbParamMap);
-                        } else if ("array".equals(sw2PathVerbParamMap.getStringProperty("type"))) {
-                            sw2PathVerbParamMap.removeProperty("type");
-                            sw2PathVerbParamMap.removeProperty("collectionFormat");
-                            sw2PathVerbParamMap.setProperty("explode", true);
-                            JsonMapObject items = sw2PathVerbParamMap.getJsonMapProperty("items");
-                            sw2PathVerbParamMap.removeProperty("items");
-                            JsonMapObject schema = new JsonMapObject();
-                            schema.setProperty("type", "array");
-                            schema.setProperty("items", items);
-                            sw2PathVerbParamMap.setProperty("schema", schema);
-                        } else {
-                            String type = (String)sw2PathVerbParamMap.removeProperty("type");
-                            if (type != null) {
-                                JsonMapObject schema = new JsonMapObject();
-                                schema.setProperty("type", type);
-                                String format = (String)sw2PathVerbParamMap.removeProperty("format");
-                                if (format != null) {
-                                    schema.setProperty("format", format);
-                                }
-                                sw2PathVerbParamMap.setProperty("schema", schema);
-                            }
-                        }
-                    }
-                }
-                if (sw2PathVerbParamsList.isEmpty()) {
-                    sw2PathVerbProps.removeProperty("parameters");
-                }
-                if (sw3formBody != null) {
-                    sw3RequestBody.setProperty("content", prepareFormContent(sw3formBody, sw2PathVerbConsumes));
-                }
-                if (sw3RequestBody != null) {
-                    // Inline for now, or the map of requestBodies can be created instead 
-                    // and added to the /components
-                    sw2PathVerbProps.setProperty("requestBody", sw3RequestBody);
-                }
-                
-                JsonMapObject sw3PathVerbResps = null;
-                JsonMapObject sw2PathVerbResps = sw2PathVerbProps.getJsonMapProperty("responses");
-                if (sw2PathVerbResps != null) {
-                    sw3PathVerbResps = new JsonMapObject();
-                    
-                    JsonMapObject okResp = null;
-                    if (sw2PathVerbResps.containsProperty("200")) {
-                        okResp = new JsonMapObject(CastUtils.cast((Map<?, ?>)sw2PathVerbResps.removeProperty("200")));
-                        JsonMapObject newOkResp = new JsonMapObject();
-                        String description = okResp.getStringProperty("description");
-                        if (description != null) {
-                            newOkResp.setProperty("description", description);
-                        }
-                        
-                        JsonMapObject schema = okResp.getJsonMapProperty("schema");
-                        if (schema != null) {
-                            JsonMapObject content = prepareContentFromSchema(schema, sw2PathVerbProduces);
-                            if (content != null) {
-                                newOkResp.setProperty("content", content);
-                            }
-                            
-                        }
-                        sw3PathVerbResps.setProperty("200", newOkResp);
-                    }
-                    for (Map.Entry<String, Object> entry : sw2PathVerbResps.asMap().entrySet()) {
-                        sw3PathVerbResps.setProperty(entry.getKey(), entry.getValue());
-                    }
-                    sw2PathVerbProps.setProperty("responses", sw3PathVerbResps);
-                }
             }
         }
         
@@ -238,6 +140,128 @@ public final class SwaggerOpenApiUtils {
         
     }
     
+    private static void prepareResponses(JsonMapObject sw2PathVerbProps) {
+        List<String> sw2PathVerbProduces =
+            CastUtils.cast((List<?>)sw2PathVerbProps.removeProperty("produces"));
+        
+        JsonMapObject sw3PathVerbResps = null;
+        JsonMapObject sw2PathVerbResps = sw2PathVerbProps.getJsonMapProperty("responses");
+        if (sw2PathVerbResps != null) {
+            sw3PathVerbResps = new JsonMapObject();
+            
+            JsonMapObject okResp = null;
+            if (sw2PathVerbResps.containsProperty("200")) {
+                okResp = new JsonMapObject(CastUtils.cast((Map<?, ?>)sw2PathVerbResps.removeProperty("200")));
+                JsonMapObject newOkResp = new JsonMapObject();
+                String description = okResp.getStringProperty("description");
+                if (description != null) {
+                    newOkResp.setProperty("description", description);
+                }
+                JsonMapObject schema = okResp.getJsonMapProperty("schema");
+                if (schema != null) {
+                    JsonMapObject content = prepareContentFromSchema(schema, sw2PathVerbProduces);
+                    if (content != null) {
+                        newOkResp.setProperty("content", content);
+                    }
+                    
+                }
+                JsonMapObject headers = okResp.getJsonMapProperty("headers");
+                if (headers != null) {
+                    newOkResp.setProperty("headers", headers);
+                }
+                sw3PathVerbResps.setProperty("200", newOkResp);
+            }
+            for (Map.Entry<String, Object> entry : sw2PathVerbResps.asMap().entrySet()) {
+                sw3PathVerbResps.setProperty(entry.getKey(), entry.getValue());
+            }
+            sw2PathVerbProps.setProperty("responses", sw3PathVerbResps);
+        }
+        
+    }
+
+    private static void prepareRequestBody(JsonMapObject sw2PathVerbProps) {
+        List<String> sw2PathVerbConsumes =
+            CastUtils.cast((List<?>)sw2PathVerbProps.removeProperty("consumes"));
+        
+        JsonMapObject sw3RequestBody = null;
+        List<JsonMapObject> sw3formBody = null;
+        List<Map<String, Object>> sw2PathVerbParamsList =
+            sw2PathVerbProps.getListMapProperty("parameters");
+        if (sw2PathVerbParamsList != null) {
+            for (Iterator<Map<String, Object>> it = sw2PathVerbParamsList.iterator(); it.hasNext();) {
+                JsonMapObject sw2PathVerbParamMap = new JsonMapObject(it.next());
+                if ("body".equals(sw2PathVerbParamMap.getStringProperty("in"))) {
+                    it.remove();
+                    
+                    sw3RequestBody = new JsonMapObject();
+                    String description = sw2PathVerbParamMap.getStringProperty("description");
+                    if (description != null) {
+                        sw3RequestBody.setProperty("description", description);
+                    }
+                    Boolean required = sw2PathVerbParamMap.getBooleanProperty("required");
+                    if (required != null) {
+                        sw3RequestBody.setProperty("required", required);
+                    }
+                    JsonMapObject schema = sw2PathVerbParamMap.getJsonMapProperty("schema");
+                    if (schema != null) {
+                        JsonMapObject content = prepareContentFromSchema(schema, sw2PathVerbConsumes);
+                        if (content != null) {
+                            sw3RequestBody.setProperty("content", content);
+                        }
+                        
+                    }
+                } else if ("formData".equals(sw2PathVerbParamMap.getStringProperty("in"))) {
+                    it.remove();
+                    if (sw3formBody == null) {
+                        sw3formBody = new LinkedList<>();
+                        sw3RequestBody = new JsonMapObject();
+                    }
+                    sw2PathVerbParamMap.removeProperty("in");
+                    sw2PathVerbParamMap.removeProperty("required");
+                    sw3formBody.add(sw2PathVerbParamMap);
+                } else if ("array".equals(sw2PathVerbParamMap.getStringProperty("type"))) {
+                    sw2PathVerbParamMap.removeProperty("type");
+                    sw2PathVerbParamMap.removeProperty("collectionFormat");
+                    sw2PathVerbParamMap.setProperty("explode", true);
+                    JsonMapObject items = sw2PathVerbParamMap.getJsonMapProperty("items");
+                    sw2PathVerbParamMap.removeProperty("items");
+                    JsonMapObject schema = new JsonMapObject();
+                    schema.setProperty("type", "array");
+                    schema.setProperty("items", items);
+                    sw2PathVerbParamMap.setProperty("schema", schema);
+                } else {
+                    String type = (String)sw2PathVerbParamMap.removeProperty("type");
+                    if (type != null) {
+                        JsonMapObject schema = new JsonMapObject();
+                        schema.setProperty("type", type);
+                        for (String prop : SIMPLE_TYPE_RELATED_PROPS) {
+                            Object value = sw2PathVerbParamMap.removeProperty(prop);
+                            if (value != null) {
+                                schema.setProperty(prop, value);
+                            }
+                        }
+                        if ("password".equals(sw2PathVerbParamMap.getProperty("name"))) {
+                            schema.setProperty("format", "password");
+                        }
+                        sw2PathVerbParamMap.setProperty("schema", schema);
+                    }
+                }
+            }
+        }
+        if (sw2PathVerbParamsList.isEmpty()) {
+            sw2PathVerbProps.removeProperty("parameters");
+        }
+        if (sw3formBody != null) {
+            sw3RequestBody.setProperty("content", prepareFormContent(sw3formBody, sw2PathVerbConsumes));
+        }
+        if (sw3RequestBody != null) {
+            // Inline for now, or the map of requestBodies can be created instead 
+            // and added to the /components
+            sw2PathVerbProps.setProperty("requestBody", sw3RequestBody);
+        }
+        
+    }
+
     private static JsonMapObject prepareFormContent(List<JsonMapObject> formList, List<String> mediaTypes) {
         String mediaType = StringUtils.isEmpty(mediaTypes)
             ? "application/x-www-form-urlencoded" : mediaTypes.get(0); 
@@ -263,35 +287,37 @@ public final class SwaggerOpenApiUtils {
     }
     private static JsonMapObject prepareContentFromSchema(JsonMapObject schema,
                                                           List<String> mediaTypes) {
-        JsonMapObject content = null;
         String type = schema.getStringProperty("type");
-        String ref = null;
-        JsonMapObject items = null;
-        if ("array".equals(type)) {
-            items = schema.getJsonMapProperty("items");
-            ref = (String)items.getProperty("$ref");
-        } else {
-            ref = schema.getStringProperty("$ref");
-        }
-        if (ref != null) {
-            content = new JsonMapObject();
-            
-            int index = ref.lastIndexOf("/");
-            String modelName = ref.substring(index + 1);
-            if (items == null) {
-                schema.setProperty("$ref", "#components/schemas/" + modelName);
+        if (!"object".equals(type) || !"string".equals(type)) {
+            String ref = null;
+            JsonMapObject items = null;
+            if ("array".equals(type)) {
+                items = schema.getJsonMapProperty("items");
+                ref = (String)items.getProperty("$ref");
             } else {
-                items.setProperty("$ref", "#components/schemas/" + modelName);
+                ref = schema.getStringProperty("$ref");
             }
-            
-            List<String> mediaTypesList = mediaTypes == null 
-                ? Collections.singletonList("*/*") : mediaTypes;
-            
-            for (String mediaType : mediaTypesList) {
-                content.setProperty(mediaType, 
-                            Collections.singletonMap("schema", schema));
+            if (ref != null) {
+                int index = ref.lastIndexOf("/");
+                String modelName = ref.substring(index + 1);
+                if (items == null) {
+                    schema.setProperty("$ref", "#components/schemas/" + modelName);
+                } else {
+                    items.setProperty("$ref", "#components/schemas/" + modelName);
+                }
+                
                 
             }
+        }
+        JsonMapObject content = new JsonMapObject();
+        
+        List<String> mediaTypesList = mediaTypes == null 
+            ? Collections.singletonList("application/json") : mediaTypes;
+        
+        for (String mediaType : mediaTypesList) {
+            content.setProperty(mediaType, 
+                        Collections.singletonMap("schema", schema));
+            
         }
         return content;
     }

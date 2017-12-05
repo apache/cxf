@@ -56,6 +56,24 @@ public class SwaggerOpenApiUtilsTest extends Assert {
         verifyPetIdPath(paths);
         // "/pet/{petId}/uploadImage"
         verifyPetIdUploadImagePath(paths);
+        // "/store/inventory"
+        verifyStoreInventoryPath(paths);
+        // "/store/order"
+        verifyStoreOrderPath(paths);
+        // "/store/order/{orderId}"
+        verifyStoreOrderIdPath(paths);
+        // "/user"
+        verifyUserPath(paths);
+        // "/user/createWithArray"
+        verifyUserCreateWithArrayPath(paths);
+        // "/user/createWithList"        
+        verifyUserCreateWithListPath(paths);
+        // "/user/login"        
+        verifyUserLoginPath(paths);
+        // "/user/logout"        
+        verifyUserLogoutPath(paths);
+        // "/user/{username}"        
+        verifyUserUsernamePath(paths);
     }
 
     private void verifyPetPath(JsonMapObject paths) {
@@ -94,6 +112,276 @@ public class SwaggerOpenApiUtilsTest extends Assert {
         JsonMapObject pet = paths.getJsonMapProperty("/pet/{petId}/uploadImage");
         assertEquals(1, pet.size());
         verifyPetIdUploadImagePathPost(pet);
+    }
+    
+    private void verifyStoreInventoryPath(JsonMapObject paths) {
+        // /store/inventory
+        JsonMapObject store = paths.getJsonMapProperty("/store/inventory");
+        assertEquals(1, store.size());
+        verifyStoreInventoryPathGet(store);
+    }
+    
+    private void verifyStoreOrderPath(JsonMapObject paths) {
+        // /store/order
+        JsonMapObject store = paths.getJsonMapProperty("/store/order");
+        assertEquals(1, store.size());
+        verifyStoreOrderPathPost(store);
+    }
+    
+    private void verifyStoreOrderIdPath(JsonMapObject paths) {
+        // /store/order/{orderId}
+        JsonMapObject store = paths.getJsonMapProperty("/store/order/{orderId}");
+        assertEquals(2, store.size());
+        verifyStoreOrderIdPathGet(store);
+        verifyStoreOrderIdPathDelete(store);
+    }
+    
+    private void verifyUserPath(JsonMapObject paths) {
+        // /user
+        JsonMapObject user = paths.getJsonMapProperty("/user");
+        assertEquals(1, user.size());
+        verifyUserPathPost(user);
+    }
+    
+    private void verifyUserCreateWithArrayPath(JsonMapObject paths) {
+        // /user/createWithArray
+        JsonMapObject user = paths.getJsonMapProperty("/user/createWithArray");
+        assertEquals(1, user.size());
+        verifyUserCreateWithArrayPathPost(user);
+    }
+    
+    private void verifyUserCreateWithListPath(JsonMapObject paths) {
+        // /user/createWithList
+        JsonMapObject user = paths.getJsonMapProperty("/user/createWithList");
+        assertEquals(1, user.size());
+        verifyUserCreateWithListPathPost(user);
+    }
+    
+    private void verifyUserLoginPath(JsonMapObject paths) {
+        // /user/login
+        JsonMapObject user = paths.getJsonMapProperty("/user/login");
+        assertEquals(1, user.size());
+        verifyUserLoginPathPost(user);
+    }
+    
+    private void verifyUserLogoutPath(JsonMapObject paths) {
+        // /user/logout
+        JsonMapObject user = paths.getJsonMapProperty("/user/logout");
+        assertEquals(1, user.size());
+        verifyUserLogoutPathGet(user);
+    }
+    
+    private void verifyUserUsernamePath(JsonMapObject paths) {
+        // /user/{username}
+        JsonMapObject user = paths.getJsonMapProperty("/user/{username}");
+        assertEquals(3, user.size());
+        verifyUserUsernamePathGet(user);
+        verifyUserUsernamePathPut(user);
+        verifyUserUsernamePathDelete(user);
+    }
+    
+    private void verifyUserLoginPathPost(JsonMapObject user) {
+        JsonMapObject userPost = user.getJsonMapProperty("get");
+        assertEquals(6, userPost.size());
+        testCommonVerbPropsExceptSec(userPost, "loginUser");
+        assertNull(userPost.getProperty("requestBody"));
+        List<Map<String, Object>> parameters = userPost.getListMapProperty("parameters");
+        assertEquals(2, parameters.size());
+        verifyUserNameParameter(new JsonMapObject(parameters.get(0)), "username", "query");
+        verifyPasswordParameter(new JsonMapObject(parameters.get(1)), "password");
+        JsonMapObject responses = userPost.getJsonMapProperty("responses");
+        assertEquals(2, responses.size());
+        assertNotNull(responses.getJsonMapProperty("400"));
+        JsonMapObject okResp = responses.getJsonMapProperty("200");
+        assertEquals(3, okResp.size());
+        assertNotNull(okResp.getProperty("description"));
+        assertNotNull(okResp.getProperty("headers"));
+        JsonMapObject content = okResp.getJsonMapProperty("content");
+        assertEquals(2, content.size());
+        verifySimpleStringContent(content, "application/json");
+        verifySimpleStringContent(content, "application/xml");
+    }
+    
+    private void verifyUserLogoutPathGet(JsonMapObject user) {
+        JsonMapObject userGet = user.getJsonMapProperty("get");
+        assertEquals(5, userGet.size());
+        testCommonVerbPropsExceptSec(userGet, "logoutUser");
+        assertNull(userGet.getListMapProperty("parameters"));
+        assertNull(userGet.getProperty("requestBody"));
+        JsonMapObject responses = userGet.getJsonMapProperty("responses");
+        assertEquals(1, responses.size());
+        testDefaultResponse(userGet);
+    }
+    
+    private void verifyUserUsernamePathGet(JsonMapObject user) {
+        JsonMapObject userGet = user.getJsonMapProperty("get");
+        assertEquals(6, userGet.size());
+        testCommonVerbPropsExceptSec(userGet, "getUserByName");
+        List<Map<String, Object>> parameters = userGet.getListMapProperty("parameters");
+        assertEquals(1, parameters.size());
+        JsonMapObject userParam = new JsonMapObject(parameters.get(0));
+        verifyUserNameParameter(userParam, "username", "path");
+        assertNull(userGet.getProperty("requestBody"));
+        JsonMapObject responses = userGet.getJsonMapProperty("responses");
+        assertEquals(3, responses.size());
+        assertNotNull(responses.getProperty("400"));
+        assertNotNull(responses.getProperty("404"));
+        JsonMapObject okResp = responses.getJsonMapProperty("200");
+        assertEquals(2, okResp.size());
+        assertNotNull(okResp.getProperty("description"));
+        JsonMapObject content = okResp.getJsonMapProperty("content");
+        assertEquals(2, content.size());
+        verifySimpleContent(content, "application/json", "User");
+        verifySimpleContent(content, "application/xml", "User");
+    }
+    
+    private void verifyUserUsernamePathPut(JsonMapObject user) {
+        JsonMapObject userPut = user.getJsonMapProperty("put");
+        assertEquals(7, userPut.size());
+        testCommonVerbPropsExceptSec(userPut, "updateUser");
+        List<Map<String, Object>> parameters = userPut.getListMapProperty("parameters");
+        assertEquals(1, parameters.size());
+        JsonMapObject userParam = new JsonMapObject(parameters.get(0));
+        verifyUserNameParameter(userParam, "username", "path");
+        JsonMapObject requestBody = userPut.getJsonMapProperty("requestBody");
+        assertEquals(3, requestBody.size());
+        assertNotNull(requestBody.getProperty("description"));
+        assertTrue(requestBody.getBooleanProperty("required"));
+        JsonMapObject content = requestBody.getJsonMapProperty("content");
+        assertEquals(1, content.size());
+        verifySimpleContent(content, "application/json", "User");
+        
+        JsonMapObject responses = userPut.getJsonMapProperty("responses");
+        assertEquals(2, responses.size());
+        assertNotNull(responses.getProperty("400"));
+        assertNotNull(responses.getProperty("404"));
+    }
+    
+    private void verifyUserUsernamePathDelete(JsonMapObject user) {
+        JsonMapObject usetDelete = user.getJsonMapProperty("delete");
+        assertEquals(6, usetDelete.size());
+        testCommonVerbPropsExceptSec(usetDelete, "deleteUser");
+        List<Map<String, Object>> parameters = usetDelete.getListMapProperty("parameters");
+        assertEquals(1, parameters.size());
+        JsonMapObject userParam = new JsonMapObject(parameters.get(0));
+        verifyUserNameParameter(userParam, "username", "path");
+        assertNull(usetDelete.getJsonMapProperty("requestBody"));
+        JsonMapObject responses = usetDelete.getJsonMapProperty("responses");
+        assertEquals(2, responses.size());
+        assertNotNull(responses.getProperty("400"));
+        assertNotNull(responses.getProperty("404"));
+        
+        
+    }
+    
+    private void verifyStoreOrderIdPathGet(JsonMapObject store) {
+        JsonMapObject storeGet = store.getJsonMapProperty("get");
+        assertEquals(6, storeGet.size());
+        testCommonVerbPropsExceptSec(storeGet, "getOrderById");
+        List<Map<String, Object>> parameters = storeGet.getListMapProperty("parameters");
+        assertEquals(1, parameters.size());
+        JsonMapObject orderIdParam = new JsonMapObject(parameters.get(0));
+        verifyOrderIdParameter(orderIdParam, false);
+        assertNull(storeGet.getJsonMapProperty("requestBody"));
+        JsonMapObject responses = storeGet.getJsonMapProperty("responses");
+        assertEquals(3, responses.size());
+        assertNotNull(responses.getProperty("400"));
+        assertNotNull(responses.getProperty("404"));
+        JsonMapObject okResp = responses.getJsonMapProperty("200");
+        assertEquals(2, okResp.size());
+        assertNotNull(okResp.getProperty("description"));
+        JsonMapObject content = okResp.getJsonMapProperty("content");
+        assertEquals(2, content.size());
+        verifySimpleContent(content, "application/json", "Order");
+        verifySimpleContent(content, "application/xml", "Order");
+    }
+    
+    private void verifyStoreOrderIdPathDelete(JsonMapObject store) {
+        JsonMapObject storeGet = store.getJsonMapProperty("delete");
+        assertEquals(6, storeGet.size());
+        testCommonVerbPropsExceptSec(storeGet, "deleteOrder");
+        List<Map<String, Object>> parameters = storeGet.getListMapProperty("parameters");
+        assertEquals(1, parameters.size());
+        JsonMapObject orderIdParam = new JsonMapObject(parameters.get(0));
+        verifyOrderIdParameter(orderIdParam, true);
+        assertNull(storeGet.getJsonMapProperty("requestBody"));
+        JsonMapObject responses = storeGet.getJsonMapProperty("responses");
+        assertEquals(2, responses.size());
+        assertNotNull(responses.getProperty("400"));
+        assertNotNull(responses.getProperty("404"));
+    }
+    
+    private void verifyStoreOrderPathPost(JsonMapObject store) {
+        JsonMapObject storePost = store.getJsonMapProperty("post");
+        assertEquals(6, storePost.size());
+        testCommonVerbPropsExceptSec(storePost, "placeOrder");
+        assertNull(storePost.getProperty("parameters"));
+        JsonMapObject contentIn = verifyRequestBodyGetContent(storePost);
+        assertEquals(1, contentIn.size());
+        verifySimpleContent(contentIn, "application/json", "Order");
+        JsonMapObject responses = storePost.getJsonMapProperty("responses");
+        assertEquals(2, responses.size());
+        assertNotNull(responses.getJsonMapProperty("400"));
+        JsonMapObject okResp = responses.getJsonMapProperty("200");
+        assertEquals(2, okResp.size());
+        assertNotNull(okResp.getProperty("description"));
+        JsonMapObject contentOut = okResp.getJsonMapProperty("content");
+        assertEquals(2, contentOut.size());
+        verifySimpleContent(contentOut, "application/json", "Order");
+        verifySimpleContent(contentOut, "application/xml", "Order");
+    }
+    
+    private void verifyUserPathPost(JsonMapObject store) {
+        JsonMapObject userPost = store.getJsonMapProperty("post");
+        assertEquals(6, userPost.size());
+        testCommonVerbPropsExceptSec(userPost, "createUser");
+        assertNull(userPost.getProperty("parameters"));
+        JsonMapObject contentIn = verifyRequestBodyGetContent(userPost);
+        assertEquals(1, contentIn.size());
+        verifySimpleContent(contentIn, "application/json", "User");
+        testDefaultResponse(userPost);
+    }
+    
+    private void testDefaultResponse(JsonMapObject json) {
+        JsonMapObject responses = json.getJsonMapProperty("responses");
+        assertEquals(1, responses.size());
+        assertNotNull(responses.getProperty("default"));
+        
+    }
+
+    private void verifyUserCreateWithArrayPathPost(JsonMapObject store) {
+        verifyUserCreateWithListOrArrayPathPost(store, "createUsersWithArrayInput");
+    }
+    
+    private void verifyUserCreateWithListPathPost(JsonMapObject store) {
+        verifyUserCreateWithListOrArrayPathPost(store, "createUsersWithListInput");
+    }
+    
+    private void verifyUserCreateWithListOrArrayPathPost(JsonMapObject store, String opId) {
+        JsonMapObject userPost = store.getJsonMapProperty("post");
+        assertEquals(6, userPost.size());
+        testCommonVerbPropsExceptSec(userPost, opId);
+        assertNull(userPost.getProperty("parameters"));
+        JsonMapObject contentIn = verifyRequestBodyGetContent(userPost);
+        assertEquals(1, contentIn.size());
+        verifyArrayContent(contentIn, "application/json", "User");
+        testDefaultResponse(userPost);
+    }
+    
+    private void verifyStoreInventoryPathGet(JsonMapObject store) {
+        JsonMapObject storeGet = store.getJsonMapProperty("get");
+        assertEquals(6, storeGet.size());
+        testCommonVerbProps(storeGet, "getInventory");
+        assertNull(storeGet.getProperty("parameters"));
+        assertNull(storeGet.getJsonMapProperty("requestBody"));
+        JsonMapObject responses = storeGet.getJsonMapProperty("responses");
+        assertEquals(1, responses.size());
+        JsonMapObject okResp = responses.getJsonMapProperty("200");
+        assertEquals(2, okResp.size());
+        assertNotNull(okResp.getProperty("description"));
+        JsonMapObject content = okResp.getJsonMapProperty("content");
+        assertEquals(1, content.size());
+        verifyMapContent(content, "application/json", "integer", "int32");
     }
     
     private void verifyPetFindByStatusOrTags(JsonMapObject pet, String opId) {
@@ -224,11 +512,52 @@ public class SwaggerOpenApiUtilsTest extends Assert {
         assertEquals("path", param.getProperty("in"));
         assertNull(param.getProperty("type"));
         assertNull(param.getProperty("format"));
+        assertNotNull(param.getProperty("description"));
         assertTrue(param.getBooleanProperty("required"));
         JsonMapObject schema = param.getJsonMapProperty("schema");
         assertEquals(2, schema.size());
         assertEquals("integer", schema.getProperty("type"));
         assertEquals("int64", schema.getProperty("format"));
+    }
+    
+    private void verifyUserNameParameter(JsonMapObject param, String name, String inType) {
+        verifyStringParameter(param, "username", inType);
+        
+    }
+    
+    private void verifyPasswordParameter(JsonMapObject param, String name) {
+        verifyStringParameter(param, "password", "query");
+        assertEquals("password", 
+                     param.getJsonMapProperty("schema").getProperty("format"));    
+    }
+    
+    private void verifyStringParameter(JsonMapObject param, String name, String inType) {
+        assertEquals(name, param.getProperty("name"));
+        assertEquals(inType, param.getProperty("in"));
+        assertNull(param.getProperty("type"));
+        assertNull(param.getProperty("format"));
+        assertNotNull(param.getProperty("description"));
+        assertTrue(param.getBooleanProperty("required"));
+        JsonMapObject schema = param.getJsonMapProperty("schema");
+        assertEquals("password".equals(name) ? 2 : 1, schema.size());
+        assertEquals("string", schema.getProperty("type"));
+    }
+    
+    private void verifyOrderIdParameter(JsonMapObject param, boolean minOnly) {
+        assertEquals("orderId", param.getProperty("name"));
+        assertEquals("path", param.getProperty("in"));
+        assertNull(param.getProperty("type"));
+        assertNull(param.getProperty("format"));
+        assertNotNull(param.getProperty("description"));
+        assertTrue(param.getBooleanProperty("required"));
+        JsonMapObject schema = param.getJsonMapProperty("schema");
+        
+        assertEquals(minOnly ? 3 : 4, schema.size());
+        assertEquals("integer", schema.getProperty("type"));
+        assertNotNull(schema.getProperty("minimum"));
+        if (!minOnly) {
+            assertNotNull(schema.getProperty("maximum"));
+        }
     }
 
     private void verifyPetPathPost(JsonMapObject pet) {
@@ -236,11 +565,7 @@ public class SwaggerOpenApiUtilsTest extends Assert {
         assertEquals(7, petPost.size());
         testCommonVerbProps(petPost, "addPet");
         assertNull(petPost.getProperty("parameters"));
-        JsonMapObject requestBody = petPost.getJsonMapProperty("requestBody");
-        assertEquals(3, requestBody.size());
-        assertNotNull(requestBody.getProperty("description"));
-        assertTrue(requestBody.getBooleanProperty("required"));
-        JsonMapObject content = requestBody.getJsonMapProperty("content");
+        JsonMapObject content = verifyRequestBodyGetContent(petPost);
         assertEquals(2, content.size());
         verifySimpleContent(content, "application/json", "Pet");
         verifySimpleContent(content, "application/xml", "Pet");
@@ -248,16 +573,20 @@ public class SwaggerOpenApiUtilsTest extends Assert {
         assertEquals(1, responses.size());
         assertNotNull(responses.getProperty("405"));
     }
+    private JsonMapObject verifyRequestBodyGetContent(JsonMapObject json) {
+        JsonMapObject requestBody = json.getJsonMapProperty("requestBody");
+        assertEquals(3, requestBody.size());
+        assertNotNull(requestBody.getProperty("description"));
+        assertTrue(requestBody.getBooleanProperty("required"));
+        return requestBody.getJsonMapProperty("content");
+    }
+
     private void verifyPetPathPut(JsonMapObject pet) {
         JsonMapObject petPut = pet.getJsonMapProperty("put");
         assertEquals(7, petPut.size());
         testCommonVerbProps(petPut, "updatePet");
         assertNull(petPut.getProperty("parameters"));
-        JsonMapObject requestBody = petPut.getJsonMapProperty("requestBody");
-        assertEquals(3, requestBody.size());
-        assertNotNull(requestBody.getProperty("description"));
-        assertTrue(requestBody.getBooleanProperty("required"));
-        JsonMapObject content = requestBody.getJsonMapProperty("content");
+        JsonMapObject content = verifyRequestBodyGetContent(petPut);
         assertEquals(2, content.size());
         verifySimpleContent(content, "application/json", "Pet");
         verifySimpleContent(content, "application/xml", "Pet");
@@ -275,6 +604,23 @@ public class SwaggerOpenApiUtilsTest extends Assert {
         JsonMapObject schema = content.getJsonMapProperty("schema");
         assertEquals(1, schema.size());
         assertEquals("#components/schemas/" + modelName, schema.getStringProperty("$ref"));
+    }
+    private void verifySimpleStringContent(JsonMapObject contentMap, String mediaType) {
+        JsonMapObject content = contentMap.getJsonMapProperty(mediaType);
+        assertEquals(1, content.size());
+        JsonMapObject schema = content.getJsonMapProperty("schema");
+        assertEquals(1, schema.size());
+        assertEquals("string", schema.getStringProperty("type"));
+    }
+    private void verifyMapContent(JsonMapObject contentMap, String mediaType, String type, String format) {
+        JsonMapObject content = contentMap.getJsonMapProperty(mediaType);
+        assertEquals(1, content.size());
+        JsonMapObject schema = content.getJsonMapProperty("schema");
+        assertEquals(2, schema.size());
+        assertEquals("object", schema.getStringProperty("type"));
+        JsonMapObject additionalProps = schema.getJsonMapProperty("additionalProperties");
+        assertEquals(type, additionalProps.getStringProperty("type"));
+        assertEquals(format, additionalProps.getStringProperty("format"));
     }
     private void verifyPetFormContent(JsonMapObject petPost,
                                       String mediaType,
@@ -343,10 +689,13 @@ public class SwaggerOpenApiUtilsTest extends Assert {
     }
 
     private void testCommonVerbProps(JsonMapObject method, String opId) {
+        testCommonVerbPropsExceptSec(method, opId);
+        assertNotNull(method.getProperty("security"));
+    }
+    private void testCommonVerbPropsExceptSec(JsonMapObject method, String opId) {
         assertNotNull(method.getProperty("tags"));
         assertNotNull(method.getProperty("summary"));
         assertNotNull(method.getProperty("description"));
-        assertNotNull(method.getProperty("security"));
         assertEquals(opId, method.getStringProperty("operationId"));
         assertNull(method.getProperty("produces"));
         assertNull(method.getProperty("consumes"));
