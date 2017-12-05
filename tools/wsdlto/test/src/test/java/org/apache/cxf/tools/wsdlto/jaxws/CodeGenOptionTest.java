@@ -360,7 +360,7 @@ public class CodeGenOptionTest extends AbstractCodeGenTest {
         str = IOUtils.readStringFromStream(new FileInputStream(new File(types, "SayHi.java")));
         assertFalse(currentDatePresent(str));
         str = IOUtils.readStringFromStream(new FileInputStream(new File(types, "SayHiResponse.java")));
-        assertTrue(currentDatePresent(str));
+        assertFalse(currentDatePresent(str));
     }
 
     private boolean currentDatePresent(String str) {
