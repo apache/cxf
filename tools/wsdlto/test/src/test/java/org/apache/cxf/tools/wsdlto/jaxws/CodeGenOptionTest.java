@@ -381,18 +381,6 @@ public class CodeGenOptionTest extends AbstractCodeGenTest {
         return false;
     }
 
-    private boolean generatedAnnotationPresent(String str) {
-        String[] lines = str.split(System.getProperty("line.separator"));
-
-        for (String line : lines) {
-            if (line.contains("@Generated") && line.contains(" date = ")) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     @Test
     public void testResourceURLForWsdlLocation() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world.wsdl"));
