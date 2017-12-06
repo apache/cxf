@@ -44,5 +44,6 @@
         <module>sse</module>
         <module>description-openapi-v3</module>
         <module>description-swagger-ui</module>
+        <module>microprofile-client</module>
     </modules>
 </project>
