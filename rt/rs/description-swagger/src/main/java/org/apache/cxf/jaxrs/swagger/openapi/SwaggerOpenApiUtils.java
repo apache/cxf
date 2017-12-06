@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.swagger.parse;
+package org.apache.cxf.jaxrs.swagger.openapi;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,7 +42,7 @@ public final class SwaggerOpenApiUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(SwaggerOpenApiUtils.class);
     
     private static final List<String> SIMPLE_TYPE_RELATED_PROPS =
-        Arrays.asList("format", "minimum", "maximum"); 
+        Arrays.asList("format", "minimum", "maximum", "default"); 
     
     private SwaggerOpenApiUtils() {
         

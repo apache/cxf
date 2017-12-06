@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.swagger.parse;
+package org.apache.cxf.jaxrs.swagger.openapi;
 
 import java.util.List;
 import java.util.Map;
