@@ -18,7 +18,9 @@
  */
 package org.apache.cxf.microprofile.client;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Configuration;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
@@ -34,6 +36,10 @@ public class MicroProfileClientFactoryBean extends JAXRSClientFactoryBean {
         super.setAddress(baseUri);
         super.setServiceClass(aClass);
         super.setProviderComparator(new ContractComparator());
+        List<Object> providerClasses = new ArrayList<>();
+        providerClasses.addAll(configuration.getClasses());
+        providerClasses.addAll(configuration.getInstances());
+        super.setProviders(providerClasses);
     }
 
     private class ContractComparator implements Comparator<Object> {
@@ -41,7 +47,7 @@ public class MicroProfileClientFactoryBean extends JAXRSClientFactoryBean {
         public int compare(Object o1, Object o2) {
             int left = getPriority(o1.getClass());
             int right = getPriority(o2.getClass());
-            return right - left;
+            return left - right;
         }
 
         private int getPriority(Class<?> clazz) {
