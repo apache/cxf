@@ -44,8 +44,8 @@ public class CxfTypeSafeClientBuilderTest extends Assert {
 
     }
 
-    @Ignore
     @Test
+    @Ignore
     public void testConfigPriorityOverrides() throws Exception {
         RestClientBuilder builder = RestClientBuilder.newBuilder();
         builder.register(HighPriorityClientReqFilter.class); // annotation priority of 10
