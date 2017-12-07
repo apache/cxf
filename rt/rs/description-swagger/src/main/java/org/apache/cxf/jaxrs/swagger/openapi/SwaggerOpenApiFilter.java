@@ -35,6 +35,8 @@ public final class SwaggerOpenApiFilter implements ContainerRequestFilter, Conta
     private static final String SWAGGER_PATH = "swagger.json";
     private static final String OPEN_API_PATH = "openapi.json";
     private static final String OPEN_API_PROPERTY = "openapi";
+    
+    private OpenApiConfiguration openApiConfig;
     @Override
     public void filter(ContainerRequestContext reqCtx) throws IOException {
         String path = reqCtx.getUriInfo().getPath();
@@ -49,8 +51,16 @@ public final class SwaggerOpenApiFilter implements ContainerRequestFilter, Conta
     public void filter(ContainerRequestContext reqCtx, ContainerResponseContext respCtx) throws IOException {
         if (Boolean.TRUE == reqCtx.getProperty(OPEN_API_PROPERTY)) {
             String swaggerJson = (String)respCtx.getEntity();
-            String openApiJson = SwaggerOpenApiUtils.getOpenApiFromSwaggerJson(swaggerJson);
+            String openApiJson = SwaggerOpenApiUtils.getOpenApiFromSwaggerJson(swaggerJson, openApiConfig);
             respCtx.setEntity(openApiJson);
         }
+    }
+
+    public OpenApiConfiguration getOpenApiConfig() {
+        return openApiConfig;
+    }
+
+    public void setOpenApiConfig(OpenApiConfiguration openApiConfig) {
+        this.openApiConfig = openApiConfig;
     }
 }
