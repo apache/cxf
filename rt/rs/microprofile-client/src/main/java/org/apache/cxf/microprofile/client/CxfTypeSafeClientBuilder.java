@@ -19,22 +19,17 @@
 package org.apache.cxf.microprofile.client;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.Configuration;
-import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
-import org.apache.cxf.jaxrs.client.spec.ClientConfigurableImpl;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.eclipse.microprofile.rest.client.annotation.RegisterProviders;
 
-public class CxfTypeSafeClientBuilder implements RestClientBuilder {
+public class CxfTypeSafeClientBuilder implements RestClientBuilder, Configurable<RestClientBuilder> {
     private String baseUri;
-    private final Configurable<CxfTypeSafeClientBuilder> configImpl =
-        new ClientConfigurableImpl(this);
+    private final MicroProfileClientConfigurableImpl<RestClientBuilder> configImpl =
+            new MicroProfileClientConfigurableImpl<>(this);
 
     @Override
     public RestClientBuilder baseUrl(URL url) {
@@ -48,18 +43,16 @@ public class CxfTypeSafeClientBuilder implements RestClientBuilder {
             throw new IllegalStateException("baseUrl not set");
         }
         RegisterProviders providers = aClass.getAnnotation(RegisterProviders.class);
-        List<Object> providerClasses = new ArrayList<>();
         Configuration config = configImpl.getConfiguration();
-        providerClasses.addAll(config.getClasses());
-        providerClasses.addAll(config.getInstances());
         if (providers != null) {
-            providerClasses.addAll(Arrays.asList(providers.value()));
+            for (Class<?> c : providers.value()) {
+                if (!config.isRegistered(c)) {
+                    register(c);
+                }
+            }
         }
-        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
-        bean.setAddress(baseUri);
-        bean.setServiceClass(aClass);
-        bean.setProviders(providerClasses);
-        bean.setProperties(config.getProperties());
+        MicroProfileClientFactoryBean bean = new MicroProfileClientFactoryBean(getConfiguration(),
+                baseUri, aClass);
         return bean.create(aClass);
     }
 
