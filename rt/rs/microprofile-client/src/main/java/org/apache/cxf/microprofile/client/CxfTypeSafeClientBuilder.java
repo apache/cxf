@@ -21,24 +21,20 @@ package org.apache.cxf.microprofile.client;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.Configuration;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
+import org.apache.cxf.jaxrs.client.spec.ClientConfigurableImpl;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.eclipse.microprofile.rest.client.annotation.RegisterProviders;
 
 public class CxfTypeSafeClientBuilder implements RestClientBuilder {
     private String baseUri;
-    private Map<String, Object> properties;
-    private List<Object> jaxrsProviders;
-
-    public CxfTypeSafeClientBuilder() {
-        this.properties = new HashMap<>();
-        this.jaxrsProviders = new ArrayList<>();
-    }
+    private final Configurable<CxfTypeSafeClientBuilder> configImpl =
+        new ClientConfigurableImpl(this);
 
     @Override
     public RestClientBuilder baseUrl(URL url) {
@@ -48,9 +44,14 @@ public class CxfTypeSafeClientBuilder implements RestClientBuilder {
 
     @Override
     public <T> T build(Class<T> aClass) {
+        if (baseUri == null) {
+            throw new IllegalStateException("baseUrl not set");
+        }
         RegisterProviders providers = aClass.getAnnotation(RegisterProviders.class);
         List<Object> providerClasses = new ArrayList<>();
-        providerClasses.addAll(this.jaxrsProviders);
+        Configuration config = configImpl.getConfiguration();
+        providerClasses.addAll(config.getClasses());
+        providerClasses.addAll(config.getInstances());
         if (providers != null) {
             providerClasses.addAll(Arrays.asList(providers.value()));
         }
@@ -58,60 +59,67 @@ public class CxfTypeSafeClientBuilder implements RestClientBuilder {
         bean.setAddress(baseUri);
         bean.setServiceClass(aClass);
         bean.setProviders(providerClasses);
-        bean.setProperties(properties);
+        bean.setProperties(config.getProperties());
         return bean.create(aClass);
     }
 
     @Override
     public Configuration getConfiguration() {
-        return null;
+        return configImpl.getConfiguration();
     }
 
     @Override
-    public RestClientBuilder property(String s, Object o) {
-        this.properties.put(s, o);
+    public RestClientBuilder property(String key, Object value) {
+        configImpl.property(key, value);
         return this;
     }
 
     @Override
-    public RestClientBuilder register(Class<?> providerClass) {
-        this.jaxrsProviders.add(providerClass);
+    public RestClientBuilder register(Class<?> componentClass) {
+        configImpl.register(componentClass);
         return this;
     }
 
     @Override
-    public RestClientBuilder register(Class<?> aClass, int i) {
+    public RestClientBuilder register(Object component) {
+        configImpl.register(component);
         return this;
     }
 
     @Override
-    public RestClientBuilder register(Class<?> aClass, Class<?>... classes) {
+    public RestClientBuilder register(Class<?> componentClass, int priority) {
+        configImpl.register(componentClass, priority);
         return this;
     }
 
     @Override
-    public RestClientBuilder register(Class<?> aClass, Map<Class<?>, Integer> map) {
+    public RestClientBuilder register(Class<?> componentClass, Class<?>... contracts) {
+        configImpl.register(componentClass, contracts);
         return this;
     }
 
     @Override
-    public RestClientBuilder register(Object o) {
-        this.jaxrsProviders.add(o);
+    public RestClientBuilder register(Class<?> componentClass, Map<Class<?>, Integer> contracts) {
+        configImpl.register(componentClass, contracts);
         return this;
     }
 
     @Override
-    public RestClientBuilder register(Object o, int i) {
+    public RestClientBuilder register(Object component, int priority) {
+        configImpl.register(component, priority);
         return this;
     }
 
     @Override
-    public RestClientBuilder register(Object o, Class<?>... classes) {
+    public RestClientBuilder register(Object component, Class<?>... contracts) {
+        configImpl.register(component, contracts);
         return this;
     }
 
     @Override
-    public RestClientBuilder register(Object o, Map<Class<?>, Integer> map) {
+    public RestClientBuilder register(Object component, Map<Class<?>, Integer> contracts) {
+        configImpl.register(component, contracts);
         return this;
     }
+
 }
