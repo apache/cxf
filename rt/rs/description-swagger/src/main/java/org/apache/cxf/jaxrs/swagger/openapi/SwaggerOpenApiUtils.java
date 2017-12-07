@@ -49,15 +49,20 @@ public final class SwaggerOpenApiUtils {
     }
     
     public static String getOpenApiFromSwaggerLoc(String loc) {
-        return getOpenApiFromSwaggerLoc(loc, BusFactory.getThreadDefaultBus());
+        return getOpenApiFromSwaggerLoc(loc, null);
     }
-    public static String getOpenApiFromSwaggerLoc(String loc, Bus bus) {
+    
+    public static String getOpenApiFromSwaggerLoc(String loc, OpenApiConfiguration cfg) {
+        return getOpenApiFromSwaggerLoc(loc, cfg, BusFactory.getThreadDefaultBus());
+    }
+    
+    public static String getOpenApiFromSwaggerLoc(String loc, OpenApiConfiguration cfg, Bus bus) {
         try {
             InputStream is = ResourceUtils.getResourceStream(loc, bus);
             if (is == null) {
                 return null;
             }
-            return getOpenApiFromSwaggerStream(is);
+            return getOpenApiFromSwaggerStream(is, cfg);
         } catch (Exception ex) {
             LOG.warning("Problem with processing a user model at " + loc);
         }
@@ -65,10 +70,18 @@ public final class SwaggerOpenApiUtils {
     }
     
     public static String getOpenApiFromSwaggerStream(InputStream is) throws IOException {
-        return getOpenApiFromSwaggerJson(IOUtils.readStringFromStream(is));
+        return getOpenApiFromSwaggerStream(is, null);
+    }
+    
+    public static String getOpenApiFromSwaggerStream(InputStream is, OpenApiConfiguration cfg) throws IOException {
+        return getOpenApiFromSwaggerJson(IOUtils.readStringFromStream(is), cfg);
     }
     
     public static String getOpenApiFromSwaggerJson(String json) throws IOException {
+        return getOpenApiFromSwaggerJson(json, null);
+    }
+    
+    public static String getOpenApiFromSwaggerJson(String json, OpenApiConfiguration cfg) throws IOException {
         JsonMapObjectReaderWriter readerWriter = new JsonMapObjectReaderWriter();
         JsonMapObject sw2 = readerWriter.fromJsonToJsonObject(json);
         JsonMapObject sw3 = new JsonMapObject();
