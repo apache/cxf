@@ -27,12 +27,12 @@ import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class SwaggerOpenApiUtilsTest extends Assert {
+public class SwaggerToOpenApiConversionUtilsTest extends Assert {
 
     @Test
     public void testConvertFromSwaggerToOpenApi() {
         
-        String s = SwaggerOpenApiUtils.getOpenApiFromSwaggerLoc("/swagger2petShop.json");
+        String s = SwaggerToOpenApiConversionUtils.getOpenApiFromSwaggerLoc("/swagger2petShop.json");
         JsonMapObjectReaderWriter readerWriter = new JsonMapObjectReaderWriter();
         JsonMapObject sw3 = readerWriter.fromJsonToJsonObject(s);
         assertEquals("3.0.0", sw3.getStringProperty("openapi"));

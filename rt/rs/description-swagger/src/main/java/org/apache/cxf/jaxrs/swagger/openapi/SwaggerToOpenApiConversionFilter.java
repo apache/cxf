@@ -30,7 +30,7 @@ import javax.ws.rs.ext.Provider;
 
 @Provider
 @PreMatching
-public final class SwaggerOpenApiFilter implements ContainerRequestFilter, ContainerResponseFilter {
+public final class SwaggerToOpenApiConversionFilter implements ContainerRequestFilter, ContainerResponseFilter {
 
     private static final String SWAGGER_PATH = "swagger.json";
     private static final String OPEN_API_PATH = "openapi.json";
@@ -51,7 +51,7 @@ public final class SwaggerOpenApiFilter implements ContainerRequestFilter, Conta
     public void filter(ContainerRequestContext reqCtx, ContainerResponseContext respCtx) throws IOException {
         if (Boolean.TRUE == reqCtx.getProperty(OPEN_API_PROPERTY)) {
             String swaggerJson = (String)respCtx.getEntity();
-            String openApiJson = SwaggerOpenApiUtils.getOpenApiFromSwaggerJson(swaggerJson, openApiConfig);
+            String openApiJson = SwaggerToOpenApiConversionUtils.getOpenApiFromSwaggerJson(swaggerJson, openApiConfig);
             respCtx.setEntity(openApiJson);
         }
     }

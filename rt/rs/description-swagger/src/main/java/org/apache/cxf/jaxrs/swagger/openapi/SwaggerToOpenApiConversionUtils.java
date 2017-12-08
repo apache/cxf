@@ -40,13 +40,13 @@ import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
-public final class SwaggerOpenApiUtils {
-    private static final Logger LOG = LogUtils.getL7dLogger(SwaggerOpenApiUtils.class);
+public final class SwaggerToOpenApiConversionUtils {
+    private static final Logger LOG = LogUtils.getL7dLogger(SwaggerToOpenApiConversionUtils.class);
     
     private static final List<String> SIMPLE_TYPE_RELATED_PROPS =
         Arrays.asList("format", "minimum", "maximum", "default"); 
     
-    private SwaggerOpenApiUtils() {
+    private SwaggerToOpenApiConversionUtils() {
         
     }
     

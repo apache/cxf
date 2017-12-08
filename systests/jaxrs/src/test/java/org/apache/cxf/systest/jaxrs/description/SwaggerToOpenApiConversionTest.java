@@ -32,7 +32,7 @@ import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.swagger.Swagger2Feature;
-import org.apache.cxf.jaxrs.swagger.openapi.SwaggerOpenApiFilter;
+import org.apache.cxf.jaxrs.swagger.openapi.SwaggerToOpenApiConversionFilter;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
@@ -58,7 +58,7 @@ public class SwaggerToOpenApiConversionTest extends AbstractBusClientServerTestB
             sf.setResourceClasses(BookStoreSwagger2.class);
             sf.setResourceProvider(BookStoreSwagger2.class,
                 new SingletonResourceProvider(new BookStoreSwagger2()));
-            sf.setProvider(new SwaggerOpenApiFilter());
+            sf.setProvider(new SwaggerToOpenApiConversionFilter());
             final Swagger2Feature feature = createSwagger2Feature();
             sf.setFeatures(Arrays.asList(feature));
             sf.setAddress("http://localhost:" + PORT + "/");
