@@ -35,6 +35,7 @@ import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.jaxrs.model.UserOperation;
 import org.apache.cxf.jaxrs.model.UserResource;
 import org.apache.cxf.jaxrs.resources.Book;
+import org.apache.cxf.jaxrs.resources.BookInterface;
 import org.apache.cxf.jaxrs.resources.BookStore;
 import org.apache.cxf.jaxrs.resources.BookStoreSubresourcesOnly;
 import org.apache.cxf.message.Message;
@@ -194,7 +195,25 @@ public class JAXRSClientFactoryBeanTest extends Assert {
         assertNotNull(productResourceElement);
     }
 
-    private class TestFeature extends AbstractFeature {
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvokePathNull() throws Exception {
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress("http://bar");
+        bean.setResourceClass(BookInterface.class);
+        BookInterface store = bean.create(BookInterface.class);
+        store.getBook(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvokePathEmpty() throws Exception {
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress("http://bar");
+        bean.setResourceClass(BookInterface.class);
+        BookInterface store = bean.create(BookInterface.class);
+        store.getBook("");
+    }
+
+    private static class TestFeature extends AbstractFeature {
         private TestInterceptor testInterceptor;
 
         @Override
@@ -208,7 +227,7 @@ public class JAXRSClientFactoryBeanTest extends Assert {
         }
     }
 
-    private class TestInterceptor extends AbstractPhaseInterceptor<Message> {
+    private static class TestInterceptor extends AbstractPhaseInterceptor<Message> {
         private boolean isInitialized;
 
         TestInterceptor() {

@@ -45,6 +45,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
+import javax.ws.rs.PathParam;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.InvocationCallback;
@@ -82,6 +83,7 @@ import org.apache.cxf.jaxrs.impl.UriBuilderImpl;
 import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
@@ -807,7 +809,14 @@ public abstract class AbstractClient implements Client {
                 }
             }
         }
-        return pValue == null ? null : pValue.toString();
+        final String v = pValue == null ? null : pValue.toString();
+        if (null == v || v.isEmpty()) {
+            final PathParam pp = AnnotationUtils.getAnnotation(anns, PathParam.class);
+            if (null != pp) {
+                throw new IllegalArgumentException("Value for " + pp.value() + " is not specified");
+            }
+        }
+        return v;
     }
 
     protected static void reportMessageHandlerProblem(String name, Class<?> cls, MediaType ct, Throwable ex) {
