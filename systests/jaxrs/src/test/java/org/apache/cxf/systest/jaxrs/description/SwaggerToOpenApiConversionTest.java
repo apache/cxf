@@ -40,8 +40,8 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class OpenApiServiceDescriptionTest extends AbstractBusClientServerTestBase {
-    static final String PORT = allocatePort(OpenApiServiceDescriptionTest.class);
+public class SwaggerToOpenApiConversionTest extends AbstractBusClientServerTestBase {
+    static final String PORT = allocatePort(SwaggerToOpenApiConversionTest.class);
     static final String SECURITY_DEFINITION_NAME = "basicAuth";
     
     private static final String CONTACT = "cxf@apache.org";
