@@ -284,7 +284,7 @@ public final class SwaggerToOpenApiConversionUtils {
             sw3RequestBody.setProperty("content", prepareFormContent(sw3formBody, sw2PathVerbConsumes));
         }
         if (sw3RequestBody != null) {
-            if (requestBodies == null) {
+            if (requestBodies == null || sw3formBody != null) {
                 sw2PathVerbProps.setProperty("requestBody", sw3RequestBody);
             } else {
                 JsonMapObject content = sw3RequestBody.getJsonMapProperty("content");
@@ -292,6 +292,9 @@ public final class SwaggerToOpenApiConversionUtils {
                     String requestBodyName = (String)content.removeProperty("requestBodyName");
                     if (requestBodyName != null) {
                         requestBodies.put(requestBodyName, sw3RequestBody);
+                        String ref = "#components/requestBodies/" + requestBodyName;
+                        sw2PathVerbProps.setProperty("requestBody",
+                                                     Collections.singletonMap("$ref", ref));
                     }
                 }
             }

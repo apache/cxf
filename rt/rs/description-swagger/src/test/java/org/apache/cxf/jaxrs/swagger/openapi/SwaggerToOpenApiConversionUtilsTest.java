@@ -31,7 +31,7 @@ public class SwaggerToOpenApiConversionUtilsTest extends Assert {
 
     @Test
     public void testConvertFromSwaggerToOpenApi() {
-        
+        OpenApiConfiguration cfg = new OpenApiConfiguration();
         String s = SwaggerToOpenApiConversionUtils.getOpenApiFromSwaggerLoc("/swagger2petShop.json");
         JsonMapObjectReaderWriter readerWriter = new JsonMapObjectReaderWriter();
         JsonMapObject sw3 = readerWriter.fromJsonToJsonObject(s);
@@ -39,15 +39,30 @@ public class SwaggerToOpenApiConversionUtilsTest extends Assert {
         verifyServersProperty(sw3);
         verifyInfoProperty(sw3);
         verifyTagsProperty(sw3);
-        verifyPathsProperty(sw3);
-        verifyComponentsProperty(sw3);
+        verifyPathsProperty(sw3, cfg);
+        verifyComponentsProperty(sw3, cfg);
+    }
+    
+    @Test
+    public void testConvertFromSwaggerToOpenApiWithRequestBodies() {
+        OpenApiConfiguration cfg = new OpenApiConfiguration();
+        cfg.setCreateRequestBodies(true);
+        String s = SwaggerToOpenApiConversionUtils.getOpenApiFromSwaggerLoc("/swagger2petShop.json", cfg);
+        JsonMapObjectReaderWriter readerWriter = new JsonMapObjectReaderWriter();
+        JsonMapObject sw3 = readerWriter.fromJsonToJsonObject(s);
+        assertEquals("3.0.0", sw3.getStringProperty("openapi"));
+        verifyServersProperty(sw3);
+        verifyInfoProperty(sw3);
+        verifyTagsProperty(sw3);
+        verifyPathsProperty(sw3, cfg);
+        verifyComponentsProperty(sw3, cfg);
     }
 
-    private void verifyPathsProperty(JsonMapObject sw3) {
+    private void verifyPathsProperty(JsonMapObject sw3, OpenApiConfiguration cfg) {
         JsonMapObject paths = sw3.getJsonMapProperty("paths");
         assertEquals(14, paths.size());
         // /pet
-        verifyPetPath(paths);
+        verifyPetPath(paths, cfg);
         // /pet/findByStatus
         verifyPetFindByStatusPath(paths);
         // /pet/findByTags
@@ -59,29 +74,29 @@ public class SwaggerToOpenApiConversionUtilsTest extends Assert {
         // "/store/inventory"
         verifyStoreInventoryPath(paths);
         // "/store/order"
-        verifyStoreOrderPath(paths);
+        verifyStoreOrderPath(paths, cfg);
         // "/store/order/{orderId}"
         verifyStoreOrderIdPath(paths);
         // "/user"
-        verifyUserPath(paths);
+        verifyUserPath(paths, cfg);
         // "/user/createWithArray"
-        verifyUserCreateWithArrayPath(paths);
+        verifyUserCreateWithArrayPath(paths, cfg);
         // "/user/createWithList"        
-        verifyUserCreateWithListPath(paths);
+        verifyUserCreateWithListPath(paths, cfg);
         // "/user/login"        
         verifyUserLoginPath(paths);
         // "/user/logout"        
         verifyUserLogoutPath(paths);
         // "/user/{username}"        
-        verifyUserUsernamePath(paths);
+        verifyUserUsernamePath(paths, cfg);
     }
 
-    private void verifyPetPath(JsonMapObject paths) {
+    private void verifyPetPath(JsonMapObject paths, OpenApiConfiguration cfg) {
         // /pet
         JsonMapObject pet = paths.getJsonMapProperty("/pet");
         assertEquals(2, pet.size());
-        verifyPetPathPost(pet);
-        verifyPetPathPut(pet);
+        verifyPetPathPost(pet, cfg);
+        verifyPetPathPut(pet, cfg);
     }
     
     private void verifyPetFindByStatusPath(JsonMapObject paths) {
@@ -121,11 +136,11 @@ public class SwaggerToOpenApiConversionUtilsTest extends Assert {
         verifyStoreInventoryPathGet(store);
     }
     
-    private void verifyStoreOrderPath(JsonMapObject paths) {
+    private void verifyStoreOrderPath(JsonMapObject paths, OpenApiConfiguration cfg) {
         // /store/order
         JsonMapObject store = paths.getJsonMapProperty("/store/order");
         assertEquals(1, store.size());
-        verifyStoreOrderPathPost(store);
+        verifyStoreOrderPathPost(store, cfg);
     }
     
     private void verifyStoreOrderIdPath(JsonMapObject paths) {
@@ -136,25 +151,25 @@ public class SwaggerToOpenApiConversionUtilsTest extends Assert {
         verifyStoreOrderIdPathDelete(store);
     }
     
-    private void verifyUserPath(JsonMapObject paths) {
+    private void verifyUserPath(JsonMapObject paths, OpenApiConfiguration cfg) {
         // /user
         JsonMapObject user = paths.getJsonMapProperty("/user");
         assertEquals(1, user.size());
-        verifyUserPathPost(user);
+        verifyUserPathPost(user, cfg);
     }
     
-    private void verifyUserCreateWithArrayPath(JsonMapObject paths) {
+    private void verifyUserCreateWithArrayPath(JsonMapObject paths, OpenApiConfiguration cfg) {
         // /user/createWithArray
         JsonMapObject user = paths.getJsonMapProperty("/user/createWithArray");
         assertEquals(1, user.size());
-        verifyUserCreateWithArrayPathPost(user);
+        verifyUserCreateWithArrayPathPost(user, cfg);
     }
     
-    private void verifyUserCreateWithListPath(JsonMapObject paths) {
+    private void verifyUserCreateWithListPath(JsonMapObject paths, OpenApiConfiguration cfg) {
         // /user/createWithList
         JsonMapObject user = paths.getJsonMapProperty("/user/createWithList");
         assertEquals(1, user.size());
-        verifyUserCreateWithListPathPost(user);
+        verifyUserCreateWithListPathPost(user, cfg);
     }
     
     private void verifyUserLoginPath(JsonMapObject paths) {
@@ -171,12 +186,12 @@ public class SwaggerToOpenApiConversionUtilsTest extends Assert {
         verifyUserLogoutPathGet(user);
     }
     
-    private void verifyUserUsernamePath(JsonMapObject paths) {
+    private void verifyUserUsernamePath(JsonMapObject paths, OpenApiConfiguration cfg) {
         // /user/{username}
         JsonMapObject user = paths.getJsonMapProperty("/user/{username}");
         assertEquals(3, user.size());
         verifyUserUsernamePathGet(user);
-        verifyUserUsernamePathPut(user);
+        verifyUserUsernamePathPut(user, cfg);
         verifyUserUsernamePathDelete(user);
     }
     
@@ -235,7 +250,7 @@ public class SwaggerToOpenApiConversionUtilsTest extends Assert {
         verifySimpleContent(content, "application/xml", "User");
     }
     
-    private void verifyUserUsernamePathPut(JsonMapObject user) {
+    private void verifyUserUsernamePathPut(JsonMapObject user, OpenApiConfiguration cfg) {
         JsonMapObject userPut = user.getJsonMapProperty("put");
         assertEquals(7, userPut.size());
         testCommonVerbPropsExceptSec(userPut, "updateUser");
@@ -243,13 +258,17 @@ public class SwaggerToOpenApiConversionUtilsTest extends Assert {
         assertEquals(1, parameters.size());
         JsonMapObject userParam = new JsonMapObject(parameters.get(0));
         verifyUserNameParameter(userParam, "username", "path");
-        JsonMapObject requestBody = userPut.getJsonMapProperty("requestBody");
-        assertEquals(3, requestBody.size());
-        assertNotNull(requestBody.getProperty("description"));
-        assertTrue(requestBody.getBooleanProperty("required"));
-        JsonMapObject content = requestBody.getJsonMapProperty("content");
-        assertEquals(1, content.size());
-        verifySimpleContent(content, "application/json", "User");
+        if (cfg.isCreateRequestBodies()) {
+            verifyRequestBodyRef(userPut, "User");
+        } else {
+            JsonMapObject requestBody = userPut.getJsonMapProperty("requestBody");
+            assertEquals(3, requestBody.size());
+            assertNotNull(requestBody.getProperty("description"));
+            assertTrue(requestBody.getBooleanProperty("required"));
+            JsonMapObject content = requestBody.getJsonMapProperty("content");
+            assertEquals(1, content.size());
+            verifySimpleContent(content, "application/json", "User");
+        }
         
         JsonMapObject responses = userPut.getJsonMapProperty("responses");
         assertEquals(2, responses.size());
@@ -311,14 +330,19 @@ public class SwaggerToOpenApiConversionUtilsTest extends Assert {
         assertNotNull(responses.getProperty("404"));
     }
     
-    private void verifyStoreOrderPathPost(JsonMapObject store) {
+    private void verifyStoreOrderPathPost(JsonMapObject store, OpenApiConfiguration cfg) {
         JsonMapObject storePost = store.getJsonMapProperty("post");
         assertEquals(6, storePost.size());
         testCommonVerbPropsExceptSec(storePost, "placeOrder");
         assertNull(storePost.getProperty("parameters"));
-        JsonMapObject contentIn = verifyRequestBodyGetContent(storePost);
-        assertEquals(1, contentIn.size());
-        verifySimpleContent(contentIn, "application/json", "Order");
+        
+        if (cfg.isCreateRequestBodies()) {
+            verifyRequestBodyRef(storePost, "Order");
+        } else {
+            JsonMapObject contentIn = verifyRequestBodyContent(storePost);
+            assertEquals(1, contentIn.size());
+            verifySimpleContent(contentIn, "application/json", "Order");
+        }
         JsonMapObject responses = storePost.getJsonMapProperty("responses");
         assertEquals(2, responses.size());
         assertNotNull(responses.getJsonMapProperty("400"));
@@ -331,14 +355,18 @@ public class SwaggerToOpenApiConversionUtilsTest extends Assert {
         verifySimpleContent(contentOut, "application/xml", "Order");
     }
     
-    private void verifyUserPathPost(JsonMapObject store) {
+    private void verifyUserPathPost(JsonMapObject store, OpenApiConfiguration cfg) {
         JsonMapObject userPost = store.getJsonMapProperty("post");
         assertEquals(6, userPost.size());
         testCommonVerbPropsExceptSec(userPost, "createUser");
         assertNull(userPost.getProperty("parameters"));
-        JsonMapObject contentIn = verifyRequestBodyGetContent(userPost);
-        assertEquals(1, contentIn.size());
-        verifySimpleContent(contentIn, "application/json", "User");
+        if (cfg.isCreateRequestBodies()) {
+            verifyRequestBodyRef(userPost, "User");
+        } else {
+            JsonMapObject contentIn = verifyRequestBodyContent(userPost);
+            assertEquals(1, contentIn.size());
+            verifySimpleContent(contentIn, "application/json", "User");
+        }
         testDefaultResponse(userPost);
     }
     
@@ -349,22 +377,27 @@ public class SwaggerToOpenApiConversionUtilsTest extends Assert {
         
     }
 
-    private void verifyUserCreateWithArrayPathPost(JsonMapObject store) {
-        verifyUserCreateWithListOrArrayPathPost(store, "createUsersWithArrayInput");
+    private void verifyUserCreateWithArrayPathPost(JsonMapObject store, OpenApiConfiguration cfg) {
+        verifyUserCreateWithListOrArrayPathPost(store, "createUsersWithArrayInput", cfg);
     }
     
-    private void verifyUserCreateWithListPathPost(JsonMapObject store) {
-        verifyUserCreateWithListOrArrayPathPost(store, "createUsersWithListInput");
+    private void verifyUserCreateWithListPathPost(JsonMapObject store, OpenApiConfiguration cfg) {
+        verifyUserCreateWithListOrArrayPathPost(store, "createUsersWithListInput", cfg);
     }
     
-    private void verifyUserCreateWithListOrArrayPathPost(JsonMapObject store, String opId) {
+    private void verifyUserCreateWithListOrArrayPathPost(JsonMapObject store, String opId,
+                                                         OpenApiConfiguration cfg) {
         JsonMapObject userPost = store.getJsonMapProperty("post");
         assertEquals(6, userPost.size());
         testCommonVerbPropsExceptSec(userPost, opId);
         assertNull(userPost.getProperty("parameters"));
-        JsonMapObject contentIn = verifyRequestBodyGetContent(userPost);
-        assertEquals(1, contentIn.size());
-        verifyArrayContent(contentIn, "application/json", "User");
+        if (cfg.isCreateRequestBodies()) {
+            verifyRequestBodyRef(userPost, "UserArray");
+        } else {
+            JsonMapObject contentIn = verifyRequestBodyContent(userPost);
+            assertEquals(1, contentIn.size());
+            verifyArrayContent(contentIn, "application/json", "User");
+        }
         testDefaultResponse(userPost);
     }
     
@@ -560,36 +593,53 @@ public class SwaggerToOpenApiConversionUtilsTest extends Assert {
         }
     }
 
-    private void verifyPetPathPost(JsonMapObject pet) {
+    private void verifyPetPathPost(JsonMapObject pet, OpenApiConfiguration cfg) {
         JsonMapObject petPost = pet.getJsonMapProperty("post");
         assertEquals(7, petPost.size());
         testCommonVerbProps(petPost, "addPet");
         assertNull(petPost.getProperty("parameters"));
-        JsonMapObject content = verifyRequestBodyGetContent(petPost);
-        assertEquals(2, content.size());
-        verifySimpleContent(content, "application/json", "Pet");
-        verifySimpleContent(content, "application/xml", "Pet");
+        if (cfg.isCreateRequestBodies()) {
+            verifyRequestBodyRef(petPost, "Pet");
+        } else {
+            JsonMapObject content = verifyRequestBodyContent(petPost);
+            assertEquals(2, content.size());
+            verifySimpleContent(content, "application/json", "Pet");
+            verifySimpleContent(content, "application/xml", "Pet");
+        }
         JsonMapObject responses = petPost.getJsonMapProperty("responses");
         assertEquals(1, responses.size());
         assertNotNull(responses.getProperty("405"));
     }
-    private JsonMapObject verifyRequestBodyGetContent(JsonMapObject json) {
-        JsonMapObject requestBody = json.getJsonMapProperty("requestBody");
+    private JsonMapObject verifyRequestBodyContent(JsonMapObject json) {
+        return verifyRequestBodyContent(json, "requestBody");
+    }
+    private JsonMapObject verifyRequestBodyContent(JsonMapObject json, String propName) {
+        JsonMapObject requestBody = json.getJsonMapProperty(propName);
         assertEquals(3, requestBody.size());
         assertNotNull(requestBody.getProperty("description"));
         assertTrue(requestBody.getBooleanProperty("required"));
         return requestBody.getJsonMapProperty("content");
     }
+    private void verifyRequestBodyRef(JsonMapObject json, String refName) {
+        JsonMapObject requestBody = json.getJsonMapProperty("requestBody");
+        assertEquals(1, requestBody.size());
+        assertEquals("#components/requestBodies/" + refName,
+                     requestBody.getProperty("$ref"));
+    }
 
-    private void verifyPetPathPut(JsonMapObject pet) {
+    private void verifyPetPathPut(JsonMapObject pet, OpenApiConfiguration cfg) {
         JsonMapObject petPut = pet.getJsonMapProperty("put");
         assertEquals(7, petPut.size());
         testCommonVerbProps(petPut, "updatePet");
         assertNull(petPut.getProperty("parameters"));
-        JsonMapObject content = verifyRequestBodyGetContent(petPut);
-        assertEquals(2, content.size());
-        verifySimpleContent(content, "application/json", "Pet");
-        verifySimpleContent(content, "application/xml", "Pet");
+        if (cfg.isCreateRequestBodies()) {
+            verifyRequestBodyRef(petPut, "Pet");
+        } else {
+            JsonMapObject content = verifyRequestBodyContent(petPut);
+            assertEquals(2, content.size());
+            verifySimpleContent(content, "application/json", "Pet");
+            verifySimpleContent(content, "application/xml", "Pet");
+        }
         JsonMapObject responses = petPut.getJsonMapProperty("responses");
         assertEquals(3, responses.size());
         assertNotNull(responses.getProperty("400"));
@@ -678,11 +728,32 @@ public class SwaggerToOpenApiConversionUtilsTest extends Assert {
         assertNotNull(sw3.getListMapProperty("tags"));
     }
     
-    private void verifyComponentsProperty(JsonMapObject sw3) {
+    private void verifyComponentsProperty(JsonMapObject sw3, OpenApiConfiguration cfg) {
         JsonMapObject comps = sw3.getJsonMapProperty("components");
         assertEquals(3, comps.size());
         JsonMapObject requestBodies = comps.getJsonMapProperty("requestBodies");
-        assertEquals(0, requestBodies.size());
+        if (cfg.isCreateRequestBodies()) {
+            assertEquals(4, requestBodies.size());
+            // UserArray
+            JsonMapObject userArrayContent = verifyRequestBodyContent(requestBodies, "UserArray");
+            assertEquals(1, userArrayContent.size());
+            verifyArrayContent(userArrayContent, "application/json", "User");
+            // Pet
+            JsonMapObject petContent = verifyRequestBodyContent(requestBodies, "Pet");
+            assertEquals(2, petContent.size());
+            verifySimpleContent(petContent, "application/json", "Pet");
+            verifySimpleContent(petContent, "application/xml", "Pet");
+            // User
+            JsonMapObject userContent = verifyRequestBodyContent(requestBodies, "User");
+            assertEquals(1, userContent.size());
+            verifySimpleContent(userContent, "application/json", "User");
+            // Order
+            JsonMapObject orderContent = verifyRequestBodyContent(requestBodies, "Order");
+            assertEquals(1, orderContent.size());
+            verifySimpleContent(orderContent, "application/json", "Order");
+        } else {
+            assertEquals(0, requestBodies.size());
+        }
         assertNotNull(comps.getJsonMapProperty("schemas"));
         assertNotNull(comps.getJsonMapProperty("securitySchemes"));
         
