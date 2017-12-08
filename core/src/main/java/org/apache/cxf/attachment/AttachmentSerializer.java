@@ -278,7 +278,9 @@ public class AttachmentSerializer {
                              headers, writer);
                 out.write(writer.getBuffer().toString().getBytes(encoding));
                 if ("base64".equals(contentTransferEncoding)) {
-                    encodeBase64(handler.getInputStream(), out, IOUtils.DEFAULT_BUFFER_SIZE);
+                    try (InputStream inputStream = handler.getInputStream()) {
+                        encodeBase64(inputStream, out, IOUtils.DEFAULT_BUFFER_SIZE);
+                    }
                 } else {
                     handler.writeTo(out);
                 }
@@ -308,7 +310,7 @@ public class AttachmentSerializer {
             if (n == 0) {
                 throw new IOException("0 bytes read in violation of InputStream.read(byte[])");
             }
-            Base64Utility.encodeAndStream(buffer, 0, n, out);
+            Base64Utility.encodeAndStream(buffer, 0, n, output);
             total += n;
             n = input.read(buffer);
         }
