@@ -27,6 +27,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.ProxyClassLoader;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.feature.Feature;
@@ -35,6 +36,7 @@ import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.jaxrs.model.UserOperation;
 import org.apache.cxf.jaxrs.model.UserResource;
 import org.apache.cxf.jaxrs.resources.Book;
+import org.apache.cxf.jaxrs.resources.BookInterface;
 import org.apache.cxf.jaxrs.resources.BookStore;
 import org.apache.cxf.jaxrs.resources.BookStoreSubresourcesOnly;
 import org.apache.cxf.message.Message;
@@ -42,6 +44,7 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.http.HTTPConduit;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -194,6 +197,37 @@ public class JAXRSClientFactoryBeanTest extends Assert {
         assertNotNull(productResourceElement);
     }
     
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvokePathNull() throws Exception {
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress("http://bar");
+        bean.setResourceClass(BookInterface.class);
+        BookInterface store = bean.create(BookInterface.class);
+        store.getBook(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvokePathEmpty() throws Exception {
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress("http://bar");
+        bean.setResourceClass(BookInterface.class);
+        BookInterface store = bean.create(BookInterface.class);
+        store.getBook("");
+    }
+    
+    @Test
+    public void testInvokePathEmptyAllowed() throws Exception {
+        Bus bus = BusFactory.newInstance().createBus();
+        bus.setProperty("allow.empty.path.template.value", true);
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setBus(bus);
+        bean.setAddress("http://bar");
+        bean.setResourceClass(BookInterface.class);
+        BookInterface store = bean.create(BookInterface.class);
+        assertNotNull(store.getBook(""));
+    }
+
+
     private class TestFeature extends AbstractFeature {
         private TestInterceptor testInterceptor;
 
