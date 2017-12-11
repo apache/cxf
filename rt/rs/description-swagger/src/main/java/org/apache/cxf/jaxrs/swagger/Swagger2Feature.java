@@ -21,9 +21,7 @@ package org.apache.cxf.jaxrs.swagger;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -31,24 +29,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.regex.Pattern;
 
-import javax.annotation.Priority;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
-import javax.ws.rs.GET;
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.Bus;
@@ -77,7 +66,7 @@ import io.swagger.models.Swagger;
 import io.swagger.models.auth.SecuritySchemeDefinition;
 
 @Provider(value = Type.Feature, scope = Scope.Server)
-public class Swagger2Feature extends AbstractSwaggerFeature {
+public class Swagger2Feature extends AbstractSwaggerFeature implements SwaggerUiSupport {
 
     private static final String DEFAULT_LICENSE_VALUE = "Apache 2.0 License";
     private static final String DEFAULT_LICENSE_URL = "http://www.apache.org/licenses/LICENSE-2.0.html";
@@ -96,7 +85,6 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     private static final String FILTER_CLASS_PROPERTY = "filter.class";
     private static final String HOST_PROPERTY = "host";
     private static final String USE_PATH_CFG_PROPERTY = "use.path.based.config";
-    private static final String SUPPORT_UI_PROPERTY = "support.swagger.ui";
     
     private boolean scan;
     private boolean scanAllResources;
@@ -165,23 +153,14 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
                                                             customizer));
         }
 
-        Properties swaggerProps = getSwaggerProperties(bus);
-        if (checkSupportSwaggerUiProp(swaggerProps)) {
-            String swaggerUiRoot = SwaggerUiResolver.findSwaggerUiRoot(swaggerUiMavenGroupAndArtifact, 
-                                                                       swaggerUiVersion);
-            if (swaggerUiRoot != null) {
-                SwaggerUIService swaggerUiService = new SwaggerUIService(swaggerUiRoot, swaggerUiMediaTypes);
-                if (!isRunAsFilter()) {
-                    swaggerResources.add(swaggerUiService);
-                } else {
-                    providers.add(new SwaggerUIServiceFilter(swaggerUiService));
-                }
-                providers.add(new SwaggerUIResourceFilter());
-
-                bus.setProperty("swagger.service.ui.available", "true");
-            }
-        }
-
+        final Properties swaggerProps = getSwaggerProperties(bus);
+        final Registration swaggerUiRegistration = getSwaggerUi(bus, swaggerProps, isRunAsFilter());
+        
+        if (!isRunAsFilter()) {
+            swaggerResources.addAll(swaggerUiRegistration.getResources());
+        } 
+            
+        providers.addAll(swaggerUiRegistration.getProviders());
         sfb.setResourceClassesFromBeans(swaggerResources);
 
         List<ClassResourceInfo> cris = sfb.getClassResourceInfo();
@@ -213,17 +192,6 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         }
 
         factory.setUserProviders(providers);
-    }
-
-    protected boolean checkSupportSwaggerUiProp(Properties props) {
-        Boolean theSupportSwaggerUI = this.supportSwaggerUi;
-        if (theSupportSwaggerUI == null && props != null && props.containsKey(SUPPORT_UI_PROPERTY)) {
-            theSupportSwaggerUI = PropertyUtils.isTrue(props.get(SUPPORT_UI_PROPERTY));
-        }
-        if (theSupportSwaggerUI == null) {
-            theSupportSwaggerUI = true;
-        }
-        return theSupportSwaggerUI;
     }
 
     protected Properties getSwaggerProperties(Bus bus) {
@@ -444,10 +412,20 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         this.supportSwaggerUi = supportSwaggerUi;
     }
 
+    @Override
+    public Boolean isSupportSwaggerUi() {
+        return supportSwaggerUi;
+    }
+
     public void setSwaggerUiMediaTypes(Map<String, String> swaggerUiMediaTypes) {
         this.swaggerUiMediaTypes = swaggerUiMediaTypes;
     }
-
+    
+    @Override
+    public Map<String, String> getSwaggerUiMediaTypes() {
+        return swaggerUiMediaTypes;
+    }
+    
     public void setSecurityDefinitions(Map<String, SecuritySchemeDefinition> securityDefinitions) {
         this.securityDefinitions = securityDefinitions;
     }
@@ -466,6 +444,11 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
 
     public void setScan(boolean scan) {
         this.scan = scan;
+    }
+    
+    @Override
+    public String findSwaggerUiRoot() {
+        return SwaggerUi.findSwaggerUiRoot(swaggerUiMavenGroupAndArtifact, swaggerUiVersion);
     }
 
     private class ServletConfigProvider implements ContextProvider<ServletConfig> {
@@ -560,114 +543,6 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         }
     }
 
-    @Path("api-docs")
-    public static class SwaggerUIService {
-        private static final String FAVICON = "favicon";
-        private static final Map<String, String> DEFAULT_MEDIA_TYPES;
-
-        static {
-            DEFAULT_MEDIA_TYPES = new HashMap<>();
-            DEFAULT_MEDIA_TYPES.put("html", "text/html");
-            DEFAULT_MEDIA_TYPES.put("png", "image/png");
-            DEFAULT_MEDIA_TYPES.put("gif", "image/gif");
-            DEFAULT_MEDIA_TYPES.put("css", "text/css");
-            DEFAULT_MEDIA_TYPES.put("js", "application/javascript");
-            DEFAULT_MEDIA_TYPES.put("eot", "application/vnd.ms-fontobject");
-            DEFAULT_MEDIA_TYPES.put("ttf", "application/font-sfnt");
-            DEFAULT_MEDIA_TYPES.put("svg", "image/svg+xml");
-            DEFAULT_MEDIA_TYPES.put("woff", "application/font-woff");
-            DEFAULT_MEDIA_TYPES.put("woff2", "application/font-woff2");
-        }
-
-        private final String swaggerUiRoot;
-
-        private final Map<String, String> mediaTypes;
-
-        public SwaggerUIService(String swaggerUiRoot, Map<String, String> mediaTypes) {
-            this.swaggerUiRoot = swaggerUiRoot;
-            this.mediaTypes = mediaTypes;
-        }
-
-        @GET
-        @Path("{resource:.*}")
-        public Response getResource(@Context UriInfo uriInfo, @PathParam("resource") String resourcePath) {
-            if (StringUtils.isEmpty(resourcePath) || "/".equals(resourcePath)) {
-                resourcePath = "index.html";
-            }
-            if (resourcePath.contains(FAVICON)) {
-                return Response.status(404).build();
-            }
-            if (resourcePath.startsWith("/")) {
-                resourcePath = resourcePath.substring(1);
-            }
-
-            try {
-                URL resourceURL = URI.create(swaggerUiRoot + resourcePath).toURL();
-
-                String mediaType = null;
-                int ind = resourcePath.lastIndexOf('.');
-                if (ind != -1 && ind < resourcePath.length()) {
-                    String resourceExt = resourcePath.substring(ind + 1);
-                    if (mediaTypes != null && mediaTypes.containsKey(resourceExt)) {
-                        mediaType = mediaTypes.get(resourceExt);
-                    } else {
-                        mediaType = DEFAULT_MEDIA_TYPES.get(resourceExt);
-                    }
-                }
-
-                ResponseBuilder rb = Response.ok(resourceURL.openStream());
-                if (mediaType != null) {
-                    rb.type(mediaType);
-                }
-                return rb.build();
-            } catch (IOException ex) {
-                throw new NotFoundException(ex);
-            }
-        }
-
-    }
-    @PreMatching
-    @Priority(Priorities.USER)
-    protected static class SwaggerUIResourceFilter implements ContainerRequestFilter {
-        private static final Pattern PATTERN =
-            Pattern.compile(
-                  ".*[.]js|.*[.]gz|.*[.]map|oauth2*[.]html|.*[.]png|.*[.]css|.*[.]ico|"
-                  + "/css/.*|/images/.*|/lib/.*|/fonts/.*"
-            );
-
-        @Override
-        public void filter(ContainerRequestContext rc) throws IOException {
-            if (HttpMethod.GET.equals(rc.getRequest().getMethod())) {
-                UriInfo ui = rc.getUriInfo();
-                String path = "/" + ui.getPath();
-                if (PATTERN.matcher(path).matches()) {
-                    rc.setRequestUri(URI.create("api-docs" + path));
-                }
-            }
-        }
-    }
-    @PreMatching
-    @Priority(Priorities.USER + 1)
-    protected static class SwaggerUIServiceFilter implements ContainerRequestFilter {
-        private SwaggerUIService uiService;
-        SwaggerUIServiceFilter(SwaggerUIService uiService) {
-            this.uiService = uiService;
-        }
-        @Override
-        public void filter(ContainerRequestContext rc) throws IOException {
-            if (HttpMethod.GET.equals(rc.getRequest().getMethod())) {
-                UriInfo ui = rc.getUriInfo();
-                String path = ui.getPath();
-                int uiPathIndex = path.lastIndexOf("api-docs");
-                if (uiPathIndex >= 0) {
-                    String resourcePath = uiPathIndex + 8 < path.length()
-                        ? path.substring(uiPathIndex + 8) : "";
-                    rc.abortWith(uiService.getResource(ui, resourcePath));
-                }
-            }
-
-        }
-    }
     protected static class DefaultApplication extends Application {
         Set<Class<?>> serviceClasses;
         DefaultApplication(Set<Class<?>> serviceClasses) {

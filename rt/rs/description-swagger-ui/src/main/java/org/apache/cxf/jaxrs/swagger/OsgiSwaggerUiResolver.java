@@ -18,12 +18,11 @@
  */
 package org.apache.cxf.jaxrs.swagger;
 
+import java.lang.annotation.Annotation;
 import java.net.URL;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
-
-import io.swagger.annotations.Api;
 
 public class OsgiSwaggerUiResolver extends SwaggerUiResolver {
     private static final String DEFAULT_COORDINATES = "org.webjars/swagger-ui";
@@ -31,16 +30,20 @@ public class OsgiSwaggerUiResolver extends SwaggerUiResolver {
         "mvn:" + DEFAULT_COORDINATES + "/",
         "wrap:mvn:" + DEFAULT_COORDINATES + "/"
     };
+    
+    private final Class<? extends Annotation> annotationBundle;
 
-    OsgiSwaggerUiResolver() throws Exception {
+    public OsgiSwaggerUiResolver(Class<? extends Annotation> annotationBundle) throws Exception {
+        super(annotationBundle.getClassLoader());
         Class.forName("org.osgi.framework.FrameworkUtil");
+        this.annotationBundle = annotationBundle;
     }
 
     @Override
-    protected String findSwaggerUiRootInternal(String swaggerUiMavenGroupAndArtifact,
+    public String findSwaggerUiRootInternal(String swaggerUiMavenGroupAndArtifact,
                                                String swaggerUiVersion) {
         try {
-            Bundle bundle = FrameworkUtil.getBundle(Api.class);
+            Bundle bundle = FrameworkUtil.getBundle(annotationBundle);
             if (bundle == null) {
                 return null;
             }

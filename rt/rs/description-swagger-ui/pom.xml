@@ -7,9 +7,9 @@
   to you under the Apache License, Version 2.0 (the
   "License"); you may not use this file except in compliance
   with the License. You may obtain a copy of the License at
- 
+
   http://www.apache.org/licenses/LICENSE-2.0
- 
+
   Unless required by applicable law or agreed to in writing,
   software distributed under the License is distributed on an
   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -19,30 +19,34 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>cxf-rt-rs</artifactId>
-    <packaging>pom</packaging>
-    <name>Apache CXF Rest Runtime</name>
-    <description>Apache CXF Rest Runtime</description>
+    <artifactId>cxf-rt-rs-service-description-swagger-ui</artifactId>
+    <packaging>bundle</packaging>
+    <name>Apache CXF JAX-RS Service Description Swagger UI integration</name>
+    <description>Apache CXF JAX-RS Service Description Swagger UI integration</description>
     <url>http://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
-        <artifactId>cxf-rt</artifactId>
+        <artifactId>cxf-parent</artifactId>
         <version>3.2.2-SNAPSHOT</version>
+        <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
-    <modules>
-        <module>client</module>
-        <module>http-sci</module>
-        <module>description</module>
-        <module>description-swagger</module>
-        <module>extensions/json-basic</module>
-        <module>extensions/providers</module>
-        <module>extensions/search</module>
-        <module>extensions/rx</module>
-        <module>extensions/reactor</module>
-        <module>extensions/reactivestreams</module>
-        <module>security</module>
-        <module>sse</module>
-        <module>description-openapi-v3</module>
-        <module>description-swagger-ui</module>
-    </modules>
+    <dependencies>
+        <dependency>
+            <groupId>${cxf.servlet-api.group}</groupId>
+            <artifactId>${cxf.servlet-api.artifact}</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
 </project>

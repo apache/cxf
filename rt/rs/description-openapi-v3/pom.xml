@@ -19,7 +19,7 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>cxf-rt-rs-service-description-swagger</artifactId>
+    <artifactId>cxf-rt-rs-service-description-openapi-v3</artifactId>
     <packaging>bundle</packaging>
     <name>Apache CXF JAX-RS Service Description Swagger</name>
     <description>Apache CXF JAX-RS Service Description Swagger</description>
@@ -59,32 +59,14 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.swagger</groupId>
-            <artifactId>swagger-jaxrs</artifactId>
-            <exclusions>
-                <exclusion>
-                     <groupId>javax.ws.rs</groupId>
-                     <artifactId>jsr311-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-rs-json-basic</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-            <optional>true</optional>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-jaxrs2</artifactId>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
             <scope>provided</scope>
             <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.easymock</groupId>
-            <artifactId>easymock</artifactId>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

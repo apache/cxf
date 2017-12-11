@@ -23,27 +23,16 @@ import java.net.URLClassLoader;
 import java.util.Enumeration;
 
 public class SwaggerUiResolver {
-    static final String UI_RESOURCES_ROOT_START = "META-INF/resources/webjars/swagger-ui/";
+    protected static final String UI_RESOURCES_ROOT_START = "META-INF/resources/webjars/swagger-ui/";
+    private final ClassLoader cl;
     
-    static final SwaggerUiResolver HELPER;
-    static {
-        SwaggerUiResolver theHelper = null;
-        try {
-            theHelper = new OsgiSwaggerUiResolver();
-        } catch (Throwable ex) {
-            theHelper = new SwaggerUiResolver();
-        }
-        HELPER = theHelper;
+    public SwaggerUiResolver(ClassLoader cl) {
+        this.cl = cl;
     }
 
-
-    protected SwaggerUiResolver() {
-    }
-
-    protected String findSwaggerUiRootInternal(String swaggerUiMavenGroupAndArtifact,
+    public String findSwaggerUiRootInternal(String swaggerUiMavenGroupAndArtifact,
                                                String swaggerUiVersion) {
         try {
-            ClassLoader cl = AbstractSwaggerFeature.class.getClassLoader();
             if (cl instanceof URLClassLoader) {
                 for (URL url : ((URLClassLoader)cl).getURLs()) {
                     String root = 
@@ -84,16 +73,5 @@ public class SwaggerUiResolver {
             }
         }
         return null;
-    }
-
-    public static String findSwaggerUiRoot(String swaggerUiMavenGroupAndArtifact, 
-                                           String swaggerUiVersion) {
-        String root = HELPER.findSwaggerUiRootInternal(swaggerUiMavenGroupAndArtifact, 
-                                                       swaggerUiVersion);
-        if (root == null && HELPER.getClass() != SwaggerUiResolver.class) {
-            root = new SwaggerUiResolver().findSwaggerUiRootInternal(swaggerUiMavenGroupAndArtifact, 
-                                                                     swaggerUiVersion);
-        }
-        return root;
     }
 }
