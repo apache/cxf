@@ -102,8 +102,8 @@
         <cxf.log4j.version>1.2.17</cxf.log4j.version>
         <cxf.lucene.version>4.9.0</cxf.lucene.version>
         <cxf.mina.version>2.0.14</cxf.mina.version>
-        <cxf.rxjava.version>1.3.0</cxf.rxjava.version>
-        <cxf.rxjava2.version>2.1.3</cxf.rxjava2.version>
+        <cxf.rxjava.version>1.3.4</cxf.rxjava.version>
+        <cxf.rxjava2.version>2.1.7</cxf.rxjava2.version>
         <cxf.javax.annotation-api.version>1.3</cxf.javax.annotation-api.version>
         <cxf.jcache.version>1.0.0</cxf.jcache.version>
         <cxf.geronimo.jms.version>1.1.1</cxf.geronimo.jms.version>
