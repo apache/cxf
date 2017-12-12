@@ -46,7 +46,7 @@ public interface SwaggerUiSupport {
         }
         
         public List<Object> getProviders() {
-            return resources;
+            return providers;
         }
     }
     

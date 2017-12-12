@@ -32,10 +32,12 @@ import javax.ws.rs.core.UriInfo;
 @PreMatching
 @Priority(Priorities.USER + 1)
 class SwaggerUiServiceFilter implements ContainerRequestFilter {
-    private SwaggerUiService uiService;
+    private final SwaggerUiService uiService;
+    
     SwaggerUiServiceFilter(SwaggerUiService uiService) {
         this.uiService = uiService;
     }
+    
     @Override
     public void filter(ContainerRequestContext rc) throws IOException {
         if (HttpMethod.GET.equals(rc.getRequest().getMethod())) {
