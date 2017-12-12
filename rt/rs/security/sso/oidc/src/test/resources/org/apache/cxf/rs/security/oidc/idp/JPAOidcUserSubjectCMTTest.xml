@@ -38,6 +38,7 @@ under the License.
     <bean id="oauthProvider"
           class="org.apache.cxf.rs.security.oauth2.grants.code.JPACMTCodeDataProvider"
           init-method="init" destroy-method="close">
+        <property name="entityManager" ref="entityManager"/>
     </bean>
 
 
@@ -58,6 +59,10 @@ under the License.
         </tx:attributes>
     </tx:advice>
 
+    <bean name="entityManager" class="org.springframework.orm.jpa.support.SharedEntityManagerBean">
+        <property name="entityManagerFactory" ref="entityManagerFactory"/>
+    </bean>
+    
     <beans profile="hibernate">
         <bean id="entityManagerFactory"
               class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
