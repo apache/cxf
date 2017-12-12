@@ -199,7 +199,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         reqData.setEncryptionSerializer(new StaxSerializer());
         
         // Add Audience Restrictions for SAML
-        reqData.setAudienceRestrictions(SAMLUtils.getAudienceRestrictions(msg));
+        reqData.setAudienceRestrictions(SAMLUtils.getAudienceRestrictions(msg, true));
 
         SOAPMessage doc = getSOAPMessage(msg);
         

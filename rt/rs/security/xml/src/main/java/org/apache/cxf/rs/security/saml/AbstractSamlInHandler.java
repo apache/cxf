@@ -192,7 +192,7 @@ public abstract class AbstractSamlInHandler implements ContainerRequestFilter {
     }
     
     protected void configureAudienceRestriction(Message msg, RequestData reqData) {
-        reqData.setAudienceRestrictions(SAMLUtils.getAudienceRestrictions(msg));
+        reqData.setAudienceRestrictions(SAMLUtils.getAudienceRestrictions(msg, false));
     }
     
     protected SAMLKeyInfo createKeyInfoFromDefaultAlias(Crypto sigCrypto) throws WSSecurityException {
