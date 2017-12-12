@@ -143,10 +143,11 @@ public final class SAMLUtils {
         return ((SamlAssertionWrapper)assertion).getElement();
     }
 
-    public static List<String> getAudienceRestrictions(Message msg) {
+    public static List<String> getAudienceRestrictions(Message msg, boolean enableByDefault) {
         // Add Audience Restrictions for SAML
         boolean enableAudienceRestriction =
-            SecurityUtils.getSecurityPropertyBoolean(SecurityConstants.AUDIENCE_RESTRICTION_VALIDATION, msg, true);
+            SecurityUtils.getSecurityPropertyBoolean(SecurityConstants.AUDIENCE_RESTRICTION_VALIDATION,
+                                                     msg, enableByDefault);
         if (enableAudienceRestriction) {
             List<String> audiences = new ArrayList<>();
             // See if we have custom audience restriction values specified first

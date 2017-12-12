@@ -276,7 +276,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
         }
 
         // Add Audience Restrictions for SAML
-        securityProperties.setAudienceRestrictions(SAMLUtils.getAudienceRestrictions(msg));
+        securityProperties.setAudienceRestrictions(SAMLUtils.getAudienceRestrictions(msg, true));
     }
 
     /**

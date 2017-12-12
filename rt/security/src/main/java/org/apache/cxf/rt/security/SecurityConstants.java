@@ -181,7 +181,7 @@ public class SecurityConstants {
     /**
      * Enable SAML AudienceRestriction validation. If this is set to "true", then IF the
      * SAML Token contains Audience Restriction URIs, one of them must match one of the values of the
-     * AUDIENCE_RESTRICTIONS property. The default is "true".
+     * AUDIENCE_RESTRICTIONS property. The default is "true" for SOAP services, "false" for REST services.
      */
     public static final String AUDIENCE_RESTRICTION_VALIDATION = "security.validate.audience-restriction";
 
