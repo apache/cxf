@@ -48,6 +48,9 @@ public class JsonMapObject implements Serializable {
             count = count == null ? 2 : count++;
             updateCount.put(name, count);
         }
+        if (value instanceof JsonMapObject) {
+            value = ((JsonMapObject)value).asMap();
+        }
         values.put(name, value);
     }
     
@@ -66,6 +69,14 @@ public class JsonMapObject implements Serializable {
         } else {
             return null;
         }
+    }
+
+    public JsonMapObject getJsonMapProperty(String name) {
+        Map<String, Object> value = getMapProperty(name);
+        if (value != null) {
+            return new JsonMapObject(value);
+        }
+        return null;
     }
 
     public Map<String, Object> asMap() {
@@ -111,6 +122,16 @@ public class JsonMapObject implements Serializable {
             return null;
         }
     }
+
+    public List<Map<String, Object>> getListMapProperty(String name) {
+        Object value = getProperty(name);
+        List<Map<String, Object>> list = null;
+        if (value != null) {
+            list = CastUtils.cast((List<?>)value);
+        }
+        return list;
+    }
+
     public int hashCode() { 
         return values.hashCode();
     }
@@ -118,6 +139,11 @@ public class JsonMapObject implements Serializable {
     public boolean equals(Object obj) {
         return obj instanceof JsonMapObject && ((JsonMapObject)obj).values.equals(this.values);
     }
+
+    public int size() {
+        return values.size();
+    }
+
     public Map<String, Object> getUpdateCount() {
         return updateCount == null ? null : Collections.<String, Object>unmodifiableMap(updateCount);
     }
