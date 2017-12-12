@@ -532,7 +532,7 @@ public class JettyHTTPServerEngine implements ServerEngine {
         ServletContext sc = context.getServletContext();
         handler.setServletContext(sc);
 
-        final String smap = HttpUriMapper.getResourceBase(url.getPath());
+        final String smap = getHandlerName(url, context);
         handler.setName(smap);
 
         if (contexts.isStarted()) {
@@ -545,6 +545,19 @@ public class JettyHTTPServerEngine implements ServerEngine {
 
         registedPaths.add(url.getPath());
         ++servantCount;
+    }
+
+    private String getHandlerName(URL url, ContextHandler context) {
+        String contextPath = context.getContextPath();
+        String path = url.getPath();
+        if (path.startsWith(contextPath)) {
+            if ("/".equals(contextPath)) {
+                return path;
+            }
+            return path.substring(contextPath.length());
+        } else {
+            return HttpUriMapper.getResourceBase(url.getPath());
+        }
     }
 
     private void initializeContexts() {
