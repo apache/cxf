@@ -79,12 +79,4 @@ public class BookStoreSwagger2 {
     public Response delete(@ApiParam(value = "id", required = true) @PathParam("id") String id) {
         return Response.ok().build();
     }
-    
-    @ApiOperation(hidden = true, value = "css")
-    @Produces({ "text/css" })
-    @Path("/css/book.css")
-    @GET
-    public String getCss() {
-        return "body { background-color: lightblue; }"; 
-    }
 }
