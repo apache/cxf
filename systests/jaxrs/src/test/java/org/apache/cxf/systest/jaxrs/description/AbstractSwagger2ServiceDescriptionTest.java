@@ -188,6 +188,7 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
     }
 
     @Test
+    @Ignore
     public void testNonUiResource() {
         // Test that Swagger UI resources do not interfere with 
         // application-specific ones.

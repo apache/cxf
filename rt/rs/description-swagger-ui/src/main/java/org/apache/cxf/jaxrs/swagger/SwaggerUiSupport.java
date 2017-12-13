@@ -65,8 +65,7 @@ public interface SwaggerUiSupport {
             String swaggerUiRoot = findSwaggerUiRoot();
             
             if (swaggerUiRoot != null) {
-                final SwaggerUiResourceLocator locator = new SwaggerUiResourceLocator(swaggerUiRoot);
-                SwaggerUiService swaggerUiService = new SwaggerUiService(locator, getSwaggerUiMediaTypes());
+                SwaggerUiService swaggerUiService = new SwaggerUiService(swaggerUiRoot, getSwaggerUiMediaTypes());
                 
                 if (!runAsFilter) {
                     registration.resources.add(swaggerUiService);
@@ -74,7 +73,7 @@ public interface SwaggerUiSupport {
                     registration.providers.add(new SwaggerUiServiceFilter(swaggerUiService));
                 }
 
-                registration.providers.add(new SwaggerUiResourceFilter(locator));
+                registration.providers.add(new SwaggerUiResourceFilter());
                 bus.setProperty("swagger.service.ui.available", "true");
             }
         }
