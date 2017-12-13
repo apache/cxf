@@ -20,7 +20,6 @@
 package org.apache.cxf.jaxrs.swagger;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,9 +32,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
-
-import org.apache.cxf.common.util.StringUtils;
-
 
 @Path("api-docs")
 public class SwaggerUiService {
@@ -56,30 +52,24 @@ public class SwaggerUiService {
         DEFAULT_MEDIA_TYPES.put("woff2", "application/font-woff2");
     }
 
-    private final String swaggerUiRoot;
-
+    
+    private final SwaggerUiResourceLocator locator;
     private final Map<String, String> mediaTypes;
 
-    public SwaggerUiService(String swaggerUiRoot, Map<String, String> mediaTypes) {
-        this.swaggerUiRoot = swaggerUiRoot;
+    public SwaggerUiService(SwaggerUiResourceLocator locator, Map<String, String> mediaTypes) {
+        this.locator = locator;
         this.mediaTypes = mediaTypes;
     }
 
     @GET
     @Path("{resource:.*}")
     public Response getResource(@Context UriInfo uriInfo, @PathParam("resource") String resourcePath) {
-        if (StringUtils.isEmpty(resourcePath) || "/".equals(resourcePath)) {
-            resourcePath = "index.html";
-        }
         if (resourcePath.contains(FAVICON)) {
             return Response.status(404).build();
         }
-        if (resourcePath.startsWith("/")) {
-            resourcePath = resourcePath.substring(1);
-        }
-
+        
         try {
-            URL resourceURL = URI.create(swaggerUiRoot + resourcePath).toURL();
+            final URL resourceURL = locator.locate(resourcePath);
 
             String mediaType = null;
             int ind = resourcePath.lastIndexOf('.');

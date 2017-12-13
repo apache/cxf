@@ -55,6 +55,10 @@ import org.junit.Test;
 
 import org.yaml.snakeyaml.Yaml;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
+
+
 public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBusClientServerTestBase {
     static final String SECURITY_DEFINITION_NAME = "basicAuth";
     
@@ -183,6 +187,28 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
         checkUiResource();
     }
 
+    @Test
+    public void testNonUiResource() {
+        // Test that Swagger UI resources do not interfere with 
+        // application-specific ones.
+        WebClient uiClient = WebClient
+            .create("http://localhost:" + getPort() + "/bookstore/css/book.css")
+            .accept("text/css");
+        String css = uiClient.get(String.class);
+        assertThat(css, equalTo("body { background-color: lightblue; }"));
+    }
+    
+    @Test
+    public void testUiResource() {
+        // Test that Swagger UI resources do not interfere with 
+        // application-specific ones and are accessible.
+        WebClient uiClient = WebClient
+            .create("http://localhost:" + getPort() + "/swagger-ui.css")
+            .accept("text/css");
+        String css = uiClient.get(String.class);
+        assertThat(css, containsString(".swagger-ui{font"));
+    }
+    
     @Test
     @Ignore
     public void testApiListingIsProperlyReturnedYAML() throws Exception {
