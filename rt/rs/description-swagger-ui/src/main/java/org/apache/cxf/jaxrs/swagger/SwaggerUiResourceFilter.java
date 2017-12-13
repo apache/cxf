@@ -39,12 +39,18 @@ class SwaggerUiResourceFilter implements ContainerRequestFilter {
               + "/css/.*|/images/.*|/lib/.*|/fonts/.*"
         );
 
+    private final SwaggerUiResourceLocator locator;
+    
+    SwaggerUiResourceFilter(SwaggerUiResourceLocator locator) {
+        this.locator = locator;
+    }
+    
     @Override
     public void filter(ContainerRequestContext rc) throws IOException {
         if (HttpMethod.GET.equals(rc.getRequest().getMethod())) {
             UriInfo ui = rc.getUriInfo();
             String path = "/" + ui.getPath();
-            if (PATTERN.matcher(path).matches()) {
+            if (PATTERN.matcher(path).matches() && locator.exists(path)) {
                 rc.setRequestUri(URI.create("api-docs" + path));
             }
         }
