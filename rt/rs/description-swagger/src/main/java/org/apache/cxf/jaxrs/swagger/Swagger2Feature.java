@@ -163,13 +163,14 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
             String swaggerUiRoot = SwaggerUiResolver.findSwaggerUiRoot(swaggerUiMavenGroupAndArtifact, 
                                                                        swaggerUiVersion);
             if (swaggerUiRoot != null) {
-                SwaggerUIService swaggerUiService = new SwaggerUIService(swaggerUiRoot, swaggerUiMediaTypes);
+                final SwaggerUiResourceLocator locator = new SwaggerUiResourceLocator(swaggerUiRoot);
+                final SwaggerUIService swaggerUiService = new SwaggerUIService(locator, swaggerUiMediaTypes);
                 if (!isRunAsFilter()) {
                     swaggerResources.add(swaggerUiService);
                 } else {
                     providers.add(new SwaggerUIServiceFilter(swaggerUiService));
                 }
-                providers.add(new SwaggerUIResourceFilter());
+                providers.add(new SwaggerUIResourceFilter(locator));
                 
                 bus.setProperty("swagger.service.ui.available", "true");
             }
@@ -595,30 +596,23 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
             DEFAULT_MEDIA_TYPES.put("woff2", "application/font-woff2");
         }
 
-        private final String swaggerUiRoot;
-
+        private final SwaggerUiResourceLocator locator;
         private final Map<String, String> mediaTypes;
 
-        public SwaggerUIService(String swaggerUiRoot, Map<String, String> mediaTypes) {
-            this.swaggerUiRoot = swaggerUiRoot;
+        public SwaggerUIService(SwaggerUiResourceLocator locator, Map<String, String> mediaTypes) {
+            this.locator = locator;
             this.mediaTypes = mediaTypes;
         }
         
         @GET
         @Path("{resource:.*}")
         public Response getResource(@Context UriInfo uriInfo, @PathParam("resource") String resourcePath) {
-            if (StringUtils.isEmpty(resourcePath) || "/".equals(resourcePath)) {        
-                resourcePath = "index.html";
-            }
-            if (resourcePath.contains(FAVICON)) {        
+            if (resourcePath.contains(FAVICON)) {
                 return Response.status(404).build();
-            }
-            if (resourcePath.startsWith("/")) {
-                resourcePath = resourcePath.substring(1);
             }
             
             try {
-                URL resourceURL = URI.create(swaggerUiRoot + resourcePath).toURL();
+                URL resourceURL = locator.locate(resourcePath);
                 
                 String mediaType = null;
                 int ind = resourcePath.lastIndexOf('.');
@@ -650,13 +644,19 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
                   ".*[.]js|.*[.]gz|.*[.]map|oauth2*[.]html|.*[.]png|.*[.]css|.*[.]ico|"
                   + "/css/.*|/images/.*|/lib/.*|/fonts/.*"
             );
+        
+        private final SwaggerUiResourceLocator locator;
+        
+        SwaggerUIResourceFilter(SwaggerUiResourceLocator locator) {
+            this.locator = locator;
+        }
 
         @Override
         public void filter(ContainerRequestContext rc) throws IOException {
             if (HttpMethod.GET.equals(rc.getRequest().getMethod())) {
                 UriInfo ui = rc.getUriInfo();
                 String path = "/" + ui.getPath();
-                if (PATTERN.matcher(path).matches()) {
+                if (PATTERN.matcher(path).matches() && locator.exists(path)) {
                     rc.setRequestUri(URI.create("api-docs" + path));
                 }
             }

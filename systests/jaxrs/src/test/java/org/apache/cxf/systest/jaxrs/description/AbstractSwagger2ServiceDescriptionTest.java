@@ -56,6 +56,9 @@ import org.junit.Test;
 
 import org.yaml.snakeyaml.Yaml;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
+
 public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBusClientServerTestBase {
     static final String SECURITY_DEFINITION_NAME = "basicAuth";
     
@@ -79,7 +82,8 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
         protected void run() {
             final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setResourceClasses(BookStoreSwagger2.class);
-            sf.setResourceProvider(BookStoreSwagger2.class, 
+            sf.setResourceClasses(BookStoreStylesheetsSwagger2.class);
+            sf.setResourceProvider(BookStoreSwagger2.class,
                 new SingletonResourceProvider(new BookStoreSwagger2()));
             sf.setProvider(new JacksonJsonProvider());
             final Swagger2Feature feature = createSwagger2Feature();
@@ -190,6 +194,28 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
         checkUiResource();
     }
 
+    @Test
+    public void testNonUiResource() {
+        // Test that Swagger UI resources do not interfere with 
+        // application-specific ones.
+        WebClient uiClient = WebClient
+            .create("http://localhost:" + getPort() + "/css/book.css")
+            .accept("text/css");
+        String css = uiClient.get(String.class);
+        assertThat(css, equalTo("body { background-color: lightblue; }"));
+    }
+    
+    @Test
+    public void testUiResource() {
+        // Test that Swagger UI resources do not interfere with 
+        // application-specific ones and are accessible.
+        WebClient uiClient = WebClient
+            .create("http://localhost:" + getPort() + "/css/print.css")
+            .accept("text/css");
+        String css = uiClient.get(String.class);
+        assertThat(css, containsString(".swagger-section pre code{display"));
+    }
+    
     @Test
     @Ignore
     public void testApiListingIsProperlyReturnedYAML() throws Exception {

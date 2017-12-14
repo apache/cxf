@@ -42,7 +42,8 @@ public class Swagger2NonAnnotatedServiceDescriptionTest extends AbstractSwagger2
         protected void run() {
             final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setResourceClasses(BookStore.class);
-            sf.setResourceProvider(BookStore.class, 
+            sf.setResourceClasses(BookStoreStylesheetsSwagger2.class);
+            sf.setResourceProvider(BookStore.class,
                 new SingletonResourceProvider(new BookStore()));
             sf.setProvider(new JacksonJsonProvider());
             final Swagger2Feature feature = createSwagger2Feature();
