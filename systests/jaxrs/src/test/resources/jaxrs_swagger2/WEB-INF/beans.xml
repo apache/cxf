@@ -40,6 +40,7 @@
     <jaxrs:server address="/">
         <jaxrs:serviceBeans>
             <bean class="org.apache.cxf.systest.jaxrs.description.BookStoreSwagger2"/>
+            <bean class="org.apache.cxf.systest.jaxrs.description.BookStoreStylesheetsSwagger2"/>
         </jaxrs:serviceBeans>
         <jaxrs:features>
             <bean class="org.apache.cxf.jaxrs.swagger.Swagger2Feature">
