@@ -88,6 +88,7 @@ public class JMSEndpoint {
     private int concurrentConsumers = 1;
     private String messageSelector;
     private int retryInterval = 5000;
+    private boolean oneSessionPerConnection;
 
     /**
      * @param uri
@@ -499,4 +500,16 @@ public class JMSEndpoint {
         this.retryInterval = Integer.valueOf(retryInterval);
     }
     
+    public boolean isOneSessionPerConnection() {
+        return oneSessionPerConnection;
+    }
+    
+    public void setOneSessionPerConnection(String oneSessionPerConnection) {
+        this.oneSessionPerConnection = Boolean.valueOf(oneSessionPerConnection);
+    }
+    
+    public void setOneSessionPerConnection(boolean oneSessionPerConnection) {
+        this.oneSessionPerConnection = oneSessionPerConnection;
+    }
+
 }

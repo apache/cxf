@@ -90,7 +90,13 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
             && !robust) {
             return null;
         }
-        return new BackChannelConduit(inMessage, jmsConfig, connection);
+
+        if (jmsConfig.isOneSessionPerConnection()) {
+            return new BackChannelConduit(inMessage, jmsConfig);
+        } else {
+            return new BackChannelConduit(inMessage, jmsConfig, connection);
+        }
+
     }
 
     /**
@@ -105,14 +111,15 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
             if (e.getCause() != null && InvalidClientIDException.class.isInstance(e.getCause())) {
                 throw e;
             }
-            // If first connect fails we will try to establish the connection in the background 
-            new Thread(new Runnable() {
-
-                @Override
-                public void run() {
-                    restartConnection();
-                }
-            }).start();
+            if (!jmsConfig.isOneSessionPerConnection()) {
+                // If first connect fails we will try to establish the connection in the background
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        restartConnection();
+                    }
+                }).start();
+            }
         }
     }
 
@@ -120,7 +127,6 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
     private JMSListenerContainer createTargetDestinationListener() {
         Session session = null;
         try {
-            connection = JMSFactory.createConnection(jmsConfig);
             ExceptionListener exListener = new ExceptionListener() {
                 public void onException(JMSException exception) {
                     if (!shutdown) {
@@ -129,12 +135,17 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
                     }
                 }
             };
-            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            Destination destination = jmsConfig.getTargetDestination(session);
+            
+            PollingMessageListenerContainer container;
+            if (!jmsConfig.isOneSessionPerConnection()) {
+                connection = JMSFactory.createConnection(jmsConfig);
+                session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+                Destination destination = jmsConfig.getTargetDestination(session);
+                container = new PollingMessageListenerContainer(connection, destination, this, exListener);
+            } else {
+                container = new PollingMessageListenerContainer(jmsConfig, false, this);
+            }
 
-            PollingMessageListenerContainer container = new PollingMessageListenerContainer(connection,
-                                                                                            destination, 
-                                                                                            this, exListener);
             container.setConcurrentConsumers(jmsConfig.getConcurrentConsumers());
             container.setTransactionManager(jmsConfig.getTransactionManager());
             container.setMessageSelector(jmsConfig.getMessageSelector());
@@ -149,7 +160,10 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
             container.setJndiEnvironment(jmsConfig.getJndiEnvironment());
             container.start();
             suspendedContinuations.setListenerContainer(container);
-            connection.start();
+
+            if (!jmsConfig.isOneSessionPerConnection()) {
+                connection.start();
+            }
             return container;
         } catch (JMSException e) {
             ResourceCloser.close(connection);

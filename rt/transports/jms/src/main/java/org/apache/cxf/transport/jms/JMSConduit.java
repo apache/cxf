@@ -47,10 +47,12 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.transport.AbstractConduit;
+import org.apache.cxf.transport.jms.util.AbstractMessageListenerContainer;
 import org.apache.cxf.transport.jms.util.JMSListenerContainer;
 import org.apache.cxf.transport.jms.util.JMSSender;
 import org.apache.cxf.transport.jms.util.JMSUtil;
 import org.apache.cxf.transport.jms.util.MessageListenerContainer;
+import org.apache.cxf.transport.jms.util.PollingMessageListenerContainer;
 import org.apache.cxf.transport.jms.util.ResourceCloser;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
@@ -157,8 +159,16 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
         assertIsNotTextMessageAndMtom(outMessage);
 
         try (ResourceCloser closer = new ResourceCloser()) {
-            Connection c = getConnection();
-            Session session = closer.register(c.createSession(false,
+            Connection c;
+
+            if (jmsConfig.isOneSessionPerConnection()) {
+                c = closer.register(JMSFactory.createConnection(jmsConfig));
+                c.start();
+            } else {
+                c = getConnection();
+            }
+
+            Session session = closer.register(c.createSession(false, 
                                                               Session.AUTO_ACKNOWLEDGE));
 
             if (exchange.isOneWay()) {
@@ -168,9 +178,11 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
             }
         } catch (JMSException e) {
             // Close connection so it will be refreshed on next try
-            ResourceCloser.close(connection);
-            this.connection = null;
-            jmsConfig.resetCachedReplyDestination();
+            if (!jmsConfig.isOneSessionPerConnection()) {
+                ResourceCloser.close(connection);
+                this.connection = null;
+                jmsConfig.resetCachedReplyDestination();
+            }
             this.staticReplyDestination = null;
             if (this.jmsListener != null) {
                 this.jmsListener.shutdown();
@@ -192,14 +204,27 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                     staticReplyDestination = jmsConfig.getReplyDestination(session);
 
                     String messageSelector = JMSFactory.getMessageSelector(jmsConfig, conduitId);
+                    if (jmsConfig.getMessageSelector() != null) {
+                        messageSelector += (messageSelector != null && !messageSelector.isEmpty() ? " AND " : "")
+                                + jmsConfig.getMessageSelector();
+                    }
                     if (messageSelector == null && !jmsConfig.isPubSubDomain()) {
                         // Do not open listener without selector on a queue as we then can not share the queue.
                         // An option for this might be a good idea for people who do not plan to share queues.
                         return;
                     }
-                    MessageListenerContainer container = new MessageListenerContainer(getConnection(),
-                                                                                      staticReplyDestination,
-                                                                                      this);
+
+                    AbstractMessageListenerContainer container;
+
+                    if (jmsConfig.isOneSessionPerConnection()) {
+                        container = new PollingMessageListenerContainer(jmsConfig, true, this);
+                    } else {
+                        container = new MessageListenerContainer(getConnection(), staticReplyDestination, this);
+                    }
+
+                    container.setTransactionManager(jmsConfig.getTransactionManager());
+                    container.setTransacted(jmsConfig.isSessionTransacted());
+                    container.setDurableSubscriptionName(jmsConfig.getDurableSubscriptionName());
                     container.setMessageSelector(messageSelector);
                     Object executor = bus.getProperty(JMSFactory.JMS_CONDUIT_EXECUTOR);
                     if (executor instanceof Executor) {
