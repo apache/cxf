@@ -23,6 +23,9 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
+import io.swagger.annotations.Api;
+
+@Api(hidden = true)
 @Path("/")
 public class BookStoreStylesheetsSwagger2 {
     @Produces({ "text/css" })
