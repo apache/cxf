@@ -85,7 +85,7 @@ public final class SystemPropertyAction implements PrivilegedAction<String> {
      * @param name - system property name
      * @param def - the default value if the system property does not exist or cannot be acquired
      */
-    public static int getInteger(String name, int def) {
+    public static int getInteger(final String name, final int def) {
         try {
             return AccessController.doPrivileged(new PrivilegedAction<Integer>() {
                 @Override
