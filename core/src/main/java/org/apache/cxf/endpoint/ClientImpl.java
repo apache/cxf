@@ -242,19 +242,36 @@ public class ClientImpl
 
     public Map<String, Object> getRequestContext() {
         if (isThreadLocalRequestContext()) {
-            if (!requestContext.containsKey(Thread.currentThread())) {
-                Map<String, Object> freshRequestContext = new ConcurrentHashMap<String, Object>(8, 0.75f, 4);
+            final Thread t = Thread.currentThread();
+            if (!requestContext.containsKey(t)) {
+                Map<String, Object> freshRequestContext = new ConcurrentHashMap<String, Object>(8, 0.75f, 4) {
+                    private static final long serialVersionUID = 1L;
+
+                    @Override
+                    public void clear() {
+                        super.clear();
+                        requestContext.remove(t);
+                    }
+                };
                 freshRequestContext.putAll(currentRequestContext);
-                requestContext.put(Thread.currentThread(), new EchoContext(freshRequestContext));
+                requestContext.put(t, new EchoContext(freshRequestContext));
             }
-            latestContextThread = Thread.currentThread();
-            return requestContext.get(Thread.currentThread());
+            latestContextThread = t;
+            return requestContext.get(t);
         }
         return currentRequestContext;
     }
     public Map<String, Object> getResponseContext() {
         if (!responseContext.containsKey(Thread.currentThread())) {
-            responseContext.put(Thread.currentThread(), new HashMap<String, Object>());
+            final Thread t = Thread.currentThread();
+            responseContext.put(t, new HashMap<String, Object>() {
+                private static final long serialVersionUID = 1L;
+                @Override
+                public void clear() {
+                    super.clear();
+                    responseContext.remove(t);
+                }
+            });
         }
         return responseContext.get(Thread.currentThread());
 

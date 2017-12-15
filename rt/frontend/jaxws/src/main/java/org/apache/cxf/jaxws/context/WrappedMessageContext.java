@@ -181,9 +181,14 @@ public class WrappedMessageContext implements MessageContext {
     }
     
     public void clear() {
-        //just clear the JAXWS things....
-        for (String key : jaxws2cxfMap.keySet()) {
-            remove(key);
+        if (message instanceof Message) {
+            //server side, just clear the JAXWS things....
+            //Otherwise lots of CXF things will not be found
+            for (String key : jaxws2cxfMap.keySet()) {
+                remove(key);
+            }
+        } else {
+            message.clear();
         }
     }
 
