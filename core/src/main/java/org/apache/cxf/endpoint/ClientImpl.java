@@ -96,8 +96,8 @@ public class ClientImpl
 
     protected Map<String, Object> currentRequestContext = new ConcurrentHashMap<String, Object>(8, 0.75f, 4);
     protected Thread latestContextThread;
-    protected Map<Thread, EchoContext> requestContext
-        = Collections.synchronizedMap(new WeakHashMap<Thread, EchoContext>());
+    protected Map<Thread, Map<String, Object>> requestContext
+        = Collections.synchronizedMap(new WeakHashMap<Thread, Map<String, Object>>());
 
     protected Map<Thread, Map<String, Object>> responseContext
         = Collections.synchronizedMap(new WeakHashMap<Thread, Map<String, Object>>());
@@ -242,17 +242,8 @@ public class ClientImpl
         if (isThreadLocalRequestContext()) {
             final Thread t = Thread.currentThread();
             if (!requestContext.containsKey(t)) {
-                Map<String, Object> freshRequestContext = new ConcurrentHashMap<String, Object>(8, 0.75f, 4) {
-                    private static final long serialVersionUID = 1L;
-
-                    @Override
-                    public void clear() {
-                        super.clear();
-                        requestContext.remove(t);
-                    }
-                };
-                freshRequestContext.putAll(currentRequestContext);
-                requestContext.put(t, new EchoContext(freshRequestContext));
+                Map<String, Object> freshRequestContext = new EchoContext(currentRequestContext);
+                requestContext.put(t, freshRequestContext);
             }
             latestContextThread = t;
             return requestContext.get(t);
@@ -267,7 +258,16 @@ public class ClientImpl
                 @Override
                 public void clear() {
                     super.clear();
-                    responseContext.remove(t);
+                    try {
+                        for (Map.Entry<Thread, Map<String, Object>> ent : responseContext.entrySet()) {
+                            if (ent.getValue() == this) {
+                                responseContext.remove(ent.getKey());
+                                return;
+                            }
+                        }
+                    } catch (Throwable t) {
+                        //ignore
+                    }
                 }
             });
         }
@@ -1042,27 +1042,31 @@ public class ClientImpl
     /*
      * modification are echoed back to the shared map
      */
-    public class EchoContext extends HashMap<String, Object> {
-        private static final long serialVersionUID = 5199023273052841289L;
+    public class EchoContext extends ConcurrentHashMap<String, Object> {
+        private static final long serialVersionUID = 1L;
         public EchoContext(Map<String, Object> sharedMap) {
-            super(sharedMap);
-        }
-
-        public Object put(String key, Object value) {
-            return super.put(key, value);
-        }
-
-        public void putAll(Map<? extends String, ? extends Object> t) {
-            super.putAll(t);
-        }
-
-        public Object remove(Object key) {
-            return super.remove(key);
+            super(8, 0.75f, 4);
+            putAll(sharedMap);
         }
 
         public void reload() {
             super.clear();
             super.putAll(requestContext.get(latestContextThread));
+        }
+        
+        @Override
+        public void clear() {
+            super.clear();
+            try {
+                for (Map.Entry<Thread, Map<String, Object>> ent : requestContext.entrySet()) {
+                    if (ent.getValue() == this) {
+                        requestContext.remove(ent.getKey());
+                        return;
+                    }
+                }
+            } catch (Throwable t) {
+                //ignore
+            }
         }
     }
 
