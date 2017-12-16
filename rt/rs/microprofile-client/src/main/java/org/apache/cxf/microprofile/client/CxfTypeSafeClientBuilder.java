@@ -24,7 +24,7 @@ import java.util.Objects;
 import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.Configuration;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
-import org.eclipse.microprofile.rest.client.annotation.RegisterProviders;
+import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
 
 public class CxfTypeSafeClientBuilder implements RestClientBuilder, Configurable<RestClientBuilder> {
     private String baseUri;
@@ -42,12 +42,16 @@ public class CxfTypeSafeClientBuilder implements RestClientBuilder, Configurable
         if (baseUri == null) {
             throw new IllegalStateException("baseUrl not set");
         }
-        RegisterProviders providers = aClass.getAnnotation(RegisterProviders.class);
+        RegisterProvider[] providers = aClass.getAnnotationsByType(RegisterProvider.class);
         Configuration config = configImpl.getConfiguration();
         if (providers != null) {
-            for (Class<?> c : providers.value()) {
-                if (!config.isRegistered(c)) {
-                    register(c);
+            for (RegisterProvider provider : providers) {
+                if (!config.isRegistered(provider.value())) {
+                    if (provider.priority() == -1) {
+                        register(provider.value());
+                    } else {
+                        register(provider.value(), provider.priority());
+                    }
                 }
             }
         }

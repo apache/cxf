@@ -657,14 +657,14 @@ public abstract class ProviderFactory {
      */
     private void sortReaders() {
         if (!customComparatorAvailable(MessageBodyReader.class)) {
-            Collections.sort(messageReaders, new MessageBodyReaderComparator());
+            messageReaders.sort(new MessageBodyReaderComparator());
         } else {
             doCustomSort(messageReaders);
         }
     }
     private <T> void sortWriters() {
         if (!customComparatorAvailable(MessageBodyWriter.class)) {
-            Collections.sort(messageWriters, new MessageBodyWriterComparator());
+            messageWriters.sort(new MessageBodyWriterComparator());
         } else {
             doCustomSort(messageWriters);
         }
@@ -703,11 +703,11 @@ public abstract class ProviderFactory {
         }
         List<T> theProviders = (List<T>)listOfProviders;
         Comparator<? super T> theComparator = (Comparator<? super T>)theProviderComparator;
-        Collections.sort(theProviders, theComparator);
+        theProviders.sort(theComparator);
     }
 
     private void sortContextResolvers() {
-        Collections.sort(contextResolvers, new ContextResolverComparator());
+        contextResolvers.sort(new ContextResolverComparator());
     }
 
 
