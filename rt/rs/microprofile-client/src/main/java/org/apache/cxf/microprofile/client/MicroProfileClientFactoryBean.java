@@ -36,6 +36,7 @@ import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.FilterProviderInfo;
 import org.apache.cxf.microprofile.client.proxy.MicroProfileClientProxyImpl;
+import org.eclipse.microprofile.rest.client.RestClientBuilder;
 
 public class MicroProfileClientFactoryBean extends JAXRSClientFactoryBean {
     private final ContractComparator comparator;
@@ -44,16 +45,19 @@ public class MicroProfileClientFactoryBean extends JAXRSClientFactoryBean {
     private ClassLoader proxyLoader;
     private boolean inheritHeaders;
 
-    public MicroProfileClientFactoryBean(Configuration configuration, String baseUri, Class<?> aClass) {
+    public MicroProfileClientFactoryBean(MicroProfileClientConfigurableImpl<RestClientBuilder> configuration,
+                                         String baseUri, Class<?> aClass) {
         super();
-        this.configuration = configuration;
+        this.configuration = configuration.getConfiguration();
         this.comparator = new ContractComparator(this);
         super.setAddress(baseUri);
         super.setServiceClass(aClass);
         super.setProviderComparator(comparator);
         registeredProviders = new ArrayList<>();
         registeredProviders.addAll(processProviders());
-        registeredProviders.add(new DefaultResponseExceptionMapper());
+        if (!configuration.isDefaultExceptionMapperDisabled()) {
+            registeredProviders.add(new DefaultResponseExceptionMapper());
+        }
         super.setProviders(registeredProviders);
     }
 

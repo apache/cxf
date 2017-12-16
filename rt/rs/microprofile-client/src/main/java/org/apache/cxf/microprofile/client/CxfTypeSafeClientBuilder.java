@@ -55,7 +55,7 @@ public class CxfTypeSafeClientBuilder implements RestClientBuilder, Configurable
                 }
             }
         }
-        MicroProfileClientFactoryBean bean = new MicroProfileClientFactoryBean(getConfiguration(),
+        MicroProfileClientFactoryBean bean = new MicroProfileClientFactoryBean(configImpl,
                 baseUri, aClass);
         return bean.create(aClass);
     }

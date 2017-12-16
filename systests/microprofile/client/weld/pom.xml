@@ -53,7 +53,7 @@
         <dependency>
             <groupId>org.jboss.arquillian.container</groupId>
             <artifactId>arquillian-weld-embedded</artifactId>
-            <version>2.0.0.Beta5</version>
+            <version>2.0.0.Final</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -120,6 +120,7 @@
                         <dependency>org.eclipse.microprofile.rest.client:microprofile-rest-client-tck</dependency>
                     </dependenciesToScan>
                     <excludes>
+                        <exclude>org.eclipse.microprofile.rest.client.tck.CustomHttpMethodTest</exclude>
                         <exclude>org.eclipse.microprofile.rest.client.tck.InvokeWithJsonPProviderTest</exclude>
                         <exclude>org.eclipse.microprofile.rest.client.tck.InvalidInterfaceTest</exclude>
                     </excludes>
