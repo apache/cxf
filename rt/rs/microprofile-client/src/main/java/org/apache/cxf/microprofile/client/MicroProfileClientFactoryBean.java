@@ -39,6 +39,7 @@ import org.apache.cxf.microprofile.client.proxy.MicroProfileClientProxyImpl;
 
 public class MicroProfileClientFactoryBean extends JAXRSClientFactoryBean {
     private final ContractComparator comparator;
+    private final List<Object> registeredProviders;
     private Configuration configuration;
     private ClassLoader proxyLoader;
     private boolean inheritHeaders;
@@ -50,9 +51,10 @@ public class MicroProfileClientFactoryBean extends JAXRSClientFactoryBean {
         super.setAddress(baseUri);
         super.setServiceClass(aClass);
         super.setProviderComparator(comparator);
-        List<Object> providers = new ArrayList<>();
-        providers.addAll(processProviders());
-        super.setProviders(providers);
+        registeredProviders = new ArrayList<>();
+        registeredProviders.addAll(processProviders());
+        registeredProviders.add(new DefaultResponseExceptionMapper());
+        super.setProviders(registeredProviders);
     }
 
     @Override
@@ -72,6 +74,7 @@ public class MicroProfileClientFactoryBean extends JAXRSClientFactoryBean {
         super.initClient(client, ep, addHeaders);
         MicroProfileClientProviderFactory factory = MicroProfileClientProviderFactory.createInstance(getBus(),
                 comparator);
+        factory.setUserProviders(registeredProviders);
         ep.put(MicroProfileClientProviderFactory.CLIENT_FACTORY_NAME, factory);
     }
 
