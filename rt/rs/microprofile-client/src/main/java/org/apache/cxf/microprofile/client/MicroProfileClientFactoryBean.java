@@ -18,51 +18,91 @@
  */
 package org.apache.cxf.microprofile.client;
 
+import java.net.URI;
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
+import javax.ws.rs.client.ClientRequestFilter;
+import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.core.Configuration;
+
+import org.apache.cxf.common.util.ClassHelper;
+import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.jaxrs.client.AbstractClient;
+import org.apache.cxf.jaxrs.client.ClientProxyImpl;
+import org.apache.cxf.jaxrs.client.ClientState;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
-import org.apache.cxf.jaxrs.utils.AnnotationUtils;
-import static org.apache.cxf.microprofile.client.MicroProfileClientConfigurableImpl.CONTRACTS;
+import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.model.FilterProviderInfo;
+import org.apache.cxf.microprofile.client.proxy.MicroProfileClientProxyImpl;
 
 public class MicroProfileClientFactoryBean extends JAXRSClientFactoryBean {
+    private final ContractComparator comparator;
     private Configuration configuration;
+    private ClassLoader proxyLoader;
+    private boolean inheritHeaders;
 
     public MicroProfileClientFactoryBean(Configuration configuration, String baseUri, Class<?> aClass) {
         super();
         this.configuration = configuration;
+        this.comparator = new ContractComparator(this);
         super.setAddress(baseUri);
         super.setServiceClass(aClass);
-        super.setProviderComparator(new ContractComparator());
-        List<Object> providerClasses = new ArrayList<>();
-        providerClasses.addAll(configuration.getClasses());
-        providerClasses.addAll(configuration.getInstances());
-        super.setProviders(providerClasses);
+        super.setProviderComparator(comparator);
+        List<Object> providers = new ArrayList<>();
+        providers.addAll(processProviders());
+        super.setProviders(providers);
     }
 
-    private class ContractComparator implements Comparator<Object> {
-        @Override
-        public int compare(Object o1, Object o2) {
-            int left = getPriority(o1.getClass());
-            int right = getPriority(o2.getClass());
-            return left - right;
-        }
+    @Override
+    public void setClassLoader(ClassLoader loader) {
+        super.setClassLoader(loader);
+        this.proxyLoader = loader;
+    }
 
-        private int getPriority(Class<?> clazz) {
-            for (Class<?> providerClass : CONTRACTS) {
-                Map<Class<?>, Integer> contracts = MicroProfileClientFactoryBean.this.
-                        configuration.getContracts(providerClass);
-                if (contracts != null) {
-                    Integer priority = contracts.get(clazz);
-                    if (priority != null) {
-                        return priority;
-                    }
-                }
+    @Override
+    public void setInheritHeaders(boolean inheritHeaders) {
+        super.setInheritHeaders(inheritHeaders);
+        this.inheritHeaders = inheritHeaders;
+    }
+
+    @Override
+    protected void initClient(AbstractClient client, Endpoint ep, boolean addHeaders) {
+        super.initClient(client, ep, addHeaders);
+        MicroProfileClientProviderFactory factory = MicroProfileClientProviderFactory.createInstance(getBus(),
+                comparator);
+        ep.put(MicroProfileClientProviderFactory.CLIENT_FACTORY_NAME, factory);
+    }
+
+    @Override
+    protected ClientProxyImpl createClientProxy(ClassResourceInfo cri, boolean isRoot,
+                                                ClientState actualState, Object[] varValues) {
+        if (actualState == null) {
+            return new MicroProfileClientProxyImpl(URI.create(getAddress()), proxyLoader, cri, isRoot,
+                    inheritHeaders, varValues);
+        } else {
+            return new MicroProfileClientProxyImpl(actualState, proxyLoader, cri, isRoot,
+                    inheritHeaders, varValues);
+        }
+    }
+
+    Configuration getConfiguration() {
+        return configuration;
+    }
+
+    private Set<Object> processProviders() {
+        Set<Object> providers = new LinkedHashSet<>();
+        for (Object provider : configuration.getInstances()) {
+            Class<?> providerCls = ClassHelper.getRealClass(bus, provider);
+            if (provider instanceof ClientRequestFilter || provider instanceof ClientResponseFilter) {
+                FilterProviderInfo<Object> filter = new FilterProviderInfo<>(providerCls, providerCls,
+                        provider, bus, configuration.getContracts(providerCls));
+                providers.add(filter);
+            } else {
+                providers.add(provider);
             }
-            return AnnotationUtils.getBindingPriority(clazz);
         }
+        return providers;
     }
-
 }

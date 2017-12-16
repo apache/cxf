@@ -23,15 +23,19 @@ import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.context.spi.CreationalContext;
+import javax.enterprise.inject.Default;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.enterprise.inject.spi.PassivationCapable;
+import javax.enterprise.util.AnnotationLiteral;
 import org.apache.cxf.microprofile.client.CxfTypeSafeClientBuilder;
 import org.eclipse.microprofile.config.Config;
 import org.eclipse.microprofile.config.ConfigProvider;
@@ -40,6 +44,7 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 public class RestClientBean implements Bean<Object>, PassivationCapable {
     public static final String REST_URL_FORMAT = "%s/mp-rest/url";
     public static final String REST_SCOPE_FORMAT = "%s/mp-rest/scope";
+    private static final Default DEFAULT_LITERAL = new DefaultLiteral();
     private final Class<?> clientInterface;
     private final Class<? extends Annotation> scope;
     private final BeanManager beanManager;
@@ -94,7 +99,7 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
 
     @Override
     public Set<Annotation> getQualifiers() {
-        return Collections.singleton(RestClient.LITERAL);
+        return new HashSet<>(Arrays.asList(DEFAULT_LITERAL, RestClient.RestClientLiteral.LITERAL));
     }
 
     @Override
@@ -149,5 +154,9 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
             throw new IllegalArgumentException("The client interface " + clientInterface
                     + " has multiple scopes defined " + possibleScopes);
         }
+    }
+
+    private static final class DefaultLiteral extends AnnotationLiteral<Default> implements Default {
+
     }
 }
