@@ -298,7 +298,7 @@ public class ClientProxyImpl extends AbstractClient implements
         return index;
     }
 
-    private void checkResponse(Method m, Response r, Message inMessage) throws Throwable {
+    protected void checkResponse(Method m, Response r, Message inMessage) throws Throwable {
         Throwable t = null;
         int status = r.getStatus();
 

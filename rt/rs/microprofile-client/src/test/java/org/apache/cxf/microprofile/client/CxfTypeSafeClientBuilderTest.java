@@ -17,6 +17,7 @@
  * under the License.
  */
 package org.apache.cxf.microprofile.client;
+
 import java.net.URL;
 import javax.ws.rs.core.Response;
 import org.apache.cxf.microprofile.client.mock.HighPriorityClientReqFilter;
@@ -24,9 +25,15 @@ import org.apache.cxf.microprofile.client.mock.HighPriorityMBW;
 import org.apache.cxf.microprofile.client.mock.LowPriorityClientReqFilter;
 import org.apache.cxf.microprofile.client.mock.MyClient;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
-
+import org.eclipse.microprofile.rest.client.tck.interfaces.InterfaceWithoutProvidersDefined;
+import org.eclipse.microprofile.rest.client.tck.providers.TestClientRequestFilter;
+import org.eclipse.microprofile.rest.client.tck.providers.TestClientResponseFilter;
+import org.eclipse.microprofile.rest.client.tck.providers.TestMessageBodyReader;
+import org.eclipse.microprofile.rest.client.tck.providers.TestMessageBodyWriter;
+import org.eclipse.microprofile.rest.client.tck.providers.TestParamConverterProvider;
+import org.eclipse.microprofile.rest.client.tck.providers.TestReaderInterceptor;
+import org.eclipse.microprofile.rest.client.tck.providers.TestWriterInterceptor;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class CxfTypeSafeClientBuilderTest extends Assert {
@@ -45,15 +52,47 @@ public class CxfTypeSafeClientBuilderTest extends Assert {
     }
 
     @Test
-    @Ignore
     public void testConfigPriorityOverrides() throws Exception {
         RestClientBuilder builder = RestClientBuilder.newBuilder();
         builder.register(HighPriorityClientReqFilter.class); // annotation priority of 10
-        builder.register(LowPriorityClientReqFilter.class, 5); // overriding priority to be 5 (preferred)
+        builder.register(LowPriorityClientReqFilter.class, 5);
+        // overriding priority to be 5 (preferred)
+        assertTrue(builder.getConfiguration().isRegistered(LowPriorityClientReqFilter.class));
         MyClient c = builder.baseUrl(new URL("http://localhost/null")).build(MyClient.class);
         Response r = c.get();
         assertEquals("low", r.readEntity(String.class));
     }
+
+    @Test
+    public void testInvokesPostOperationWithRegisteredProviders() throws Exception {
+        String inputBody = "input body will be removed";
+        String expectedResponseBody = TestMessageBodyReader.REPLACED_BODY;
+
+        InterfaceWithoutProvidersDefined api = new CxfTypeSafeClientBuilder()
+                .register(TestClientRequestFilter.class)
+                .register(TestClientResponseFilter.class)
+                .register(TestMessageBodyReader.class, 4999)
+                .register(TestMessageBodyWriter.class)
+                .register(TestParamConverterProvider.class)
+                .register(TestReaderInterceptor.class)
+                .register(TestWriterInterceptor.class)
+                .baseUrl(new URL("http://localhost/null"))
+                .build(InterfaceWithoutProvidersDefined.class);
+
+        Response response = api.executePost(inputBody);
+
+        String body = response.readEntity(String.class);
+
+        response.close();
+
+        assertEquals(expectedResponseBody, body);
+
+        assertEquals(TestClientResponseFilter.getAndResetValue(), 1);
+        assertEquals(TestClientRequestFilter.getAndResetValue(), 1);
+        assertEquals(TestReaderInterceptor.getAndResetValue(), 1);
+        assertEquals(TestWriterInterceptor.getAndResetValue(), 1);
+    }
+
 /** using for test coverage
     @Override
     public RestClientBuilder register(Class<?> componentClass, int priority) {
