@@ -34,8 +34,10 @@ import org.eclipse.microprofile.rest.client.tck.providers.TestParamConverterProv
 import org.eclipse.microprofile.rest.client.tck.providers.TestReaderInterceptor;
 import org.eclipse.microprofile.rest.client.tck.providers.TestWriterInterceptor;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore
 public class CxfTypeSafeClientBuilderTest extends Assert {
 
     @Test
