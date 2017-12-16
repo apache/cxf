@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.microprofile.client;
 
+import java.util.Optional;
 import javax.ws.rs.RuntimeType;
 import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.client.ClientResponseFilter;
@@ -29,6 +30,8 @@ import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.WriterInterceptor;
 import org.apache.cxf.jaxrs.impl.ConfigurableImpl;
 import org.apache.cxf.jaxrs.impl.ConfigurationImpl;
+import org.eclipse.microprofile.config.Config;
+import org.eclipse.microprofile.config.ConfigProvider;
 import org.eclipse.microprofile.rest.client.ext.ResponseExceptionMapper;
 
 public class MicroProfileClientConfigurableImpl<C extends Configurable<C>>
@@ -37,6 +40,7 @@ public class MicroProfileClientConfigurableImpl<C extends Configurable<C>>
     static final Class<?>[] CONTRACTS = new Class<?>[] {ClientRequestFilter.class,
         ClientResponseFilter.class, ReaderInterceptor.class, WriterInterceptor.class,
         MessageBodyWriter.class, MessageBodyReader.class, ResponseExceptionMapper.class};
+    private static final String CONFIG_KEY_DISABLE_MAPPER = "microprofile.rest.client.disable.default.mapper";
 
     public MicroProfileClientConfigurableImpl(C configurable) {
         this(configurable, null);
@@ -46,5 +50,20 @@ public class MicroProfileClientConfigurableImpl<C extends Configurable<C>>
         super(configurable,
                 CONTRACTS, config == null ? new ConfigurationImpl(RuntimeType.CLIENT)
                         : new ConfigurationImpl(config, CONTRACTS));
+    }
+
+    boolean isDefaultExceptionMapperDisabled() {
+        Object prop = getConfiguration().getProperty(CONFIG_KEY_DISABLE_MAPPER);
+        if (prop instanceof Boolean) {
+            return (Boolean)prop;
+        } else {
+            Config config = ConfigProvider.getConfig();
+            Optional<Boolean> optionalValue = config.getOptionalValue(CONFIG_KEY_DISABLE_MAPPER,
+                    Boolean.class);
+            if (optionalValue.isPresent()) {
+                return optionalValue.get();
+            }
+        }
+        return false;
     }
 }

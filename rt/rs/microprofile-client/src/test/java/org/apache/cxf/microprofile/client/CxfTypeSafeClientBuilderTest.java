@@ -34,10 +34,8 @@ import org.eclipse.microprofile.rest.client.tck.providers.TestParamConverterProv
 import org.eclipse.microprofile.rest.client.tck.providers.TestReaderInterceptor;
 import org.eclipse.microprofile.rest.client.tck.providers.TestWriterInterceptor;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore
 public class CxfTypeSafeClientBuilderTest extends Assert {
 
     @Test
@@ -56,6 +54,7 @@ public class CxfTypeSafeClientBuilderTest extends Assert {
     @Test
     public void testConfigPriorityOverrides() throws Exception {
         RestClientBuilder builder = RestClientBuilder.newBuilder();
+        builder.property("microprofile.rest.client.disable.default.mapper", true);
         builder.register(HighPriorityClientReqFilter.class); // annotation priority of 10
         builder.register(LowPriorityClientReqFilter.class, 5);
         // overriding priority to be 5 (preferred)
@@ -78,6 +77,7 @@ public class CxfTypeSafeClientBuilderTest extends Assert {
                 .register(TestParamConverterProvider.class)
                 .register(TestReaderInterceptor.class)
                 .register(TestWriterInterceptor.class)
+                .property("microprofile.rest.client.disable.default.mapper", true)
                 .baseUrl(new URL("http://localhost/null"))
                 .build(InterfaceWithoutProvidersDefined.class);
 
