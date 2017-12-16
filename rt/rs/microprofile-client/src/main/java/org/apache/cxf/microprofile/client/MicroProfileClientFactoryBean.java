@@ -58,6 +58,7 @@ public class MicroProfileClientFactoryBean extends JAXRSClientFactoryBean {
         if (!configuration.isDefaultExceptionMapperDisabled()) {
             registeredProviders.add(new DefaultResponseExceptionMapper());
         }
+        registeredProviders.add(new JsonPProvider());
         super.setProviders(registeredProviders);
     }
 
