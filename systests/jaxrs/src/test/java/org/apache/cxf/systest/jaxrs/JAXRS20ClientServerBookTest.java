@@ -269,6 +269,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         assertEquals("prematch", response.getHeaderString("FilterException"));
         assertEquals("OK", response.getHeaderString("Response"));
         assertEquals("OK2", response.getHeaderString("Response2"));
+        assertNull(response.getHeaderString("IOException"));
         assertNull(response.getHeaderString("DynamicResponse"));
         assertNull(response.getHeaderString("Custom"));
         assertEquals("serverWrite", response.getHeaderString("ServerWriterInterceptor"));
@@ -278,6 +279,27 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         assertEquals("text/plain;charset=us-ascii", response.getMediaType().toString());
     }
     
+    @Test
+    public void testPreMatchContainerFilterThrowsIOException() {
+        String address = "http://localhost:" + PORT + "/throwExceptionIO";
+        WebClient wc = WebClient.create(address);
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
+        Response response = wc.get();
+        assertEquals(500, response.getStatus());
+        assertEquals("Prematch filter error", response.readEntity(String.class));
+        assertEquals("prematch", response.getHeaderString("FilterException"));
+        assertEquals("OK", response.getHeaderString("Response"));
+        assertEquals("OK2", response.getHeaderString("Response2"));
+        assertNull(response.getHeaderString("DynamicResponse"));
+        assertNull(response.getHeaderString("Custom"));
+        assertEquals("true", response.getHeaderString("IOException"));
+        assertEquals("serverWrite", response.getHeaderString("ServerWriterInterceptor"));
+        assertEquals("serverWrite2", response.getHeaderString("ServerWriterInterceptor2"));
+        assertEquals("serverWriteHttpResponse",
+                     response.getHeaderString("ServerWriterInterceptorHttpResponse"));
+        assertEquals("text/plain;charset=us-ascii", response.getMediaType().toString());
+    }
+
     @Test
     public void testPostMatchContainerFilterThrowsException() {
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple?throwException";

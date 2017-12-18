@@ -1677,22 +1677,18 @@ public final class JAXRSUtils {
     public static QName convertStringToQName(String name) {
         return DOMUtils.convertStringToQName(name, "");
     }
-    
-    public static boolean runContainerRequestFilters(ServerProviderFactory pf, 
-                                                     Message m, 
-                                                     boolean preMatch, 
-                                                     Set<String> names) {
-        List<ProviderInfo<ContainerRequestFilter>> containerFilters = preMatch 
+
+    public static boolean runContainerRequestFilters(ServerProviderFactory pf,
+                                                     Message m,
+                                                     boolean preMatch,
+                                                     Set<String> names) throws IOException {
+        List<ProviderInfo<ContainerRequestFilter>> containerFilters = preMatch
             ? pf.getPreMatchContainerRequestFilters() : pf.getPostMatchContainerRequestFilters(names);
         if (!containerFilters.isEmpty()) {
             ContainerRequestContext context = new ContainerRequestContextImpl(m, preMatch, false);
             for (ProviderInfo<ContainerRequestFilter> filter : containerFilters) {
-                try {
-                    InjectionUtils.injectContexts(filter.getProvider(), filter, m);
-                    filter.getProvider().filter(context);
-                } catch (IOException ex) {
-                    throw ExceptionUtils.toInternalServerErrorException(ex, null); 
-                }
+                InjectionUtils.injectContexts(filter.getProvider(), filter, m);
+                filter.getProvider().filter(context);
                 Response response = m.getExchange().get(Response.class);
                 if (response != null) {
                     setMessageContentType(m, response);

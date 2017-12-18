@@ -55,6 +55,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.ReaderInterceptorContext;
 import javax.ws.rs.ext.WriterInterceptor;
@@ -99,6 +100,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
         providers.add(new PreMatchReplaceStreamOrAddress());
         providers.add(new ServerTestFeature());
         providers.add(new JacksonJaxbJsonProvider());
+        providers.add(new IOExceptionMapper());
         sf.setProviders(providers);
         sf.setResourceProvider(BookStore.class,
                                new SingletonResourceProvider(new BookStore(), true));
@@ -155,6 +157,9 @@ public class BookServer20 extends AbstractBusTestServerBase {
                 throw new InternalServerErrorException(
                     Response.status(500).type("text/plain")
                         .entity("Prematch filter error").build());
+            } else if ("throwExceptionIO".equals(path)) {
+                context.setProperty("filterexception", "prematch");
+                throw new IOException();
             }
             
             MediaType mt = context.getMediaType();
@@ -328,7 +333,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
         
             if ((!responseContext.getHeaders().containsKey("DynamicResponse")
                 || !responseContext.getHeaders().containsKey("DynamicResponse2"))
-                && !"Prematch filter error".equals(responseContext.getEntity())) {
+                && (!"Prematch filter error".equals(responseContext.getEntity()))) {
                 throw new RuntimeException();
             }
             responseContext.getHeaders().add("Response2", "OK2");
@@ -522,5 +527,14 @@ public class BookServer20 extends AbstractBusTestServerBase {
             return true;
         }
         
+    }
+    private static class IOExceptionMapper implements ExceptionMapper<IOException> {
+
+        @Override
+        public Response toResponse(IOException ex) {
+            return Response.status(500).type("text/plain")
+                .entity("Prematch filter error").header("IOException", "true").build();
+        }
+
     }
 }
