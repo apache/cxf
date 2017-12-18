@@ -83,6 +83,8 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                 convertExceptionToResponseIfPossible(ex.getCause(), message);
             } catch (RuntimeException ex) {
                 convertExceptionToResponseIfPossible(ex, message);
+            } catch (IOException ex) {
+                convertExceptionToResponseIfPossible(ex, message);
             }
         }
 
@@ -94,7 +96,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         }
     }
 
-    private void processRequest(Message message, Exchange exchange) {
+    private void processRequest(Message message, Exchange exchange) throws IOException {
 
         ServerProviderFactory providerFactory = ServerProviderFactory.getInstance(message);
 
@@ -209,13 +211,8 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
 
 
         //Process parameters
-        try {
-            List<Object> params = JAXRSUtils.processParameters(ori, matchedValues, message);
-            message.setContent(List.class, params);
-        } catch (IOException ex) {
-            convertExceptionToResponseIfPossible(ex, message);
-        }
-
+        List<Object> params = JAXRSUtils.processParameters(ori, matchedValues, message);
+        message.setContent(List.class, params);
     }
 
     private void convertExceptionToResponseIfPossible(Throwable ex, Message message) {
