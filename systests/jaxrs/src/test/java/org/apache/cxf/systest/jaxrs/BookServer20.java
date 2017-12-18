@@ -333,7 +333,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
 
             if ((!responseContext.getHeaders().containsKey("DynamicResponse")
                 || !responseContext.getHeaders().containsKey("DynamicResponse2"))
-                && (!"Prematch filter error".equals(responseContext.getEntity()))) {
+                && !"Prematch filter error".equals(responseContext.getEntity())) {
                 throw new RuntimeException();
             }
             responseContext.getHeaders().add("Response2", "OK2");
