@@ -20,6 +20,7 @@ package org.apache.cxf.microprofile.client;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,11 +36,12 @@ import org.apache.cxf.jaxrs.client.ClientState;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.FilterProviderInfo;
+import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.microprofile.client.proxy.MicroProfileClientProxyImpl;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 
 public class MicroProfileClientFactoryBean extends JAXRSClientFactoryBean {
-    private final ContractComparator comparator;
+    private final Comparator<ProviderInfo<?>> comparator;
     private final List<Object> registeredProviders;
     private Configuration configuration;
     private ClassLoader proxyLoader;
@@ -49,7 +51,7 @@ public class MicroProfileClientFactoryBean extends JAXRSClientFactoryBean {
                                          String baseUri, Class<?> aClass) {
         super();
         this.configuration = configuration.getConfiguration();
-        this.comparator = new ContractComparator(this);
+        this.comparator = MicroProfileClientProviderFactory.createComparator(this);
         super.setAddress(baseUri);
         super.setServiceClass(aClass);
         super.setProviderComparator(comparator);
