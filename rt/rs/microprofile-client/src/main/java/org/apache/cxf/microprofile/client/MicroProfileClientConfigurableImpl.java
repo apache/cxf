@@ -56,7 +56,13 @@ public class MicroProfileClientConfigurableImpl<C extends Configurable<C>>
         if (prop instanceof Boolean) {
             return (Boolean)prop;
         } else {
-            Config config = ConfigProvider.getConfig();
+            Config config;
+            try {
+                config = ConfigProvider.getConfig();
+            } catch (ExceptionInInitializerError | NoClassDefFoundError | IllegalStateException ex) {
+                // no config provider implementation
+                return false;
+            }
             return config.getOptionalValue(CONFIG_KEY_DISABLE_MAPPER,
                     Boolean.class).orElse(false);
         }
