@@ -48,6 +48,7 @@ import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.container.ResourceInfo;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
@@ -101,6 +102,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
         providers.add(new ServerTestFeature());
         providers.add(new JacksonJaxbJsonProvider());
         providers.add(new IOExceptionMapper());
+        sf.setApplication(new Application());
         sf.setProviders(providers);
         sf.setResourceProvider(BookStore.class,
                                new SingletonResourceProvider(new BookStore(), true));
@@ -521,8 +523,14 @@ public class BookServer20 extends AbstractBusTestServerBase {
     }
     private static class ServerTestFeature implements Feature {
 
+        @Context
+        private Application app;
+        
         @Override
         public boolean configure(FeatureContext context) {
+            if (app == null) {
+                throw new RuntimeException();
+            }
             context.register(new GenericHandlerWriter());
             return true;
         }

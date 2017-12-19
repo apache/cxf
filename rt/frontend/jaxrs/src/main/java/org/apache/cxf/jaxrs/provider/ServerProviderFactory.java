@@ -38,6 +38,7 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.container.PreMatching;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Feature;
@@ -57,6 +58,7 @@ import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
 import org.apache.cxf.jaxrs.impl.ResourceInfoImpl;
 import org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
+import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.model.ApplicationInfo;
 import org.apache.cxf.jaxrs.model.BeanParamInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
@@ -205,7 +207,9 @@ public final class ServerProviderFactory extends ProviderFactory {
         for (Object p : providers) {
             if (p instanceof Feature) {
                 FeatureContext featureContext = createServerFeatureContext();
-                ((Feature)p).configure(featureContext);
+                Feature feature = (Feature)p; 
+                injectApplicationIntoFeature(feature);
+                feature.configure(featureContext);
                 Configuration cfg = featureContext.getConfiguration();
 
                 for (Object featureProvider : cfg.getInstances()) {
@@ -271,6 +275,34 @@ public final class ServerProviderFactory extends ProviderFactory {
         injectContextProxies(exceptionMappers,
             postMatchContainerRequestFilters.values(), preMatchContainerRequestFilters,
             containerResponseFilters.values());
+    }
+
+    protected void injectApplicationIntoFeature(Feature feature) {
+        if (application != null) {
+            AbstractResourceInfo info = new AbstractResourceInfo(feature.getClass(),
+                                                                 ClassHelper.getRealClass(feature),
+                                                                 true,
+                                                                 true,
+                                                                 getBus()) {
+                @Override
+                public boolean isSingleton() {
+                    return false;
+                }
+            };
+            Method contextMethod = info.getContextMethods().get(Application.class);
+            if (contextMethod != null) {
+                InjectionUtils.injectThroughMethod(feature, contextMethod, application.getProvider());
+                return;
+            }
+            for (Field contextField : info.getContextFields()) {
+                if (Application.class == contextField.getType()) {
+                    InjectionUtils.injectContextField(info, contextField, feature, application.getProvider());
+                    break;
+                }
+            }
+            
+        }
+        
     }
 
     @Override
