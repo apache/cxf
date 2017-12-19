@@ -237,6 +237,8 @@
         <cxf.pmd.eclipse.ruleset.ext />
         <cxf.resources.base.path />
         <cxf.reactor.version>3.1.0.RELEASE</cxf.reactor.version>
+        <cxf.microprofile.rest.client.version>1.0</cxf.microprofile.rest.client.version>
+        <cxf.microprofile.config.version>1.1</cxf.microprofile.config.version>
     </properties>
     <build>
         <resources>
@@ -1027,6 +1029,23 @@
                 <artifactId>johnzon-core</artifactId>
                 <version>${cxf.johnzon.version}</version>
                 <optional>true</optional>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.microprofile.rest.client</groupId>
+                <artifactId>microprofile-rest-client-api</artifactId>
+                <version>${cxf.microprofile.rest.client.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.microprofile.rest.client</groupId>
+                <artifactId>microprofile-rest-client-tck</artifactId>
+                <version>${cxf.microprofile.rest.client.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.microprofile.config</groupId>
+                <artifactId>microprofile-config-api</artifactId>
+                <version>${cxf.microprofile.config.version}</version>
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
