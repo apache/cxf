@@ -42,6 +42,7 @@ public class CxfTypeSafeClientBuilder implements RestClientBuilder, Configurable
         if (baseUri == null) {
             throw new IllegalStateException("baseUrl not set");
         }
+        Validator.checkValid(aClass);
         RegisterProvider[] providers = aClass.getAnnotationsByType(RegisterProvider.class);
         Configuration config = configImpl.getConfiguration();
         if (providers != null) {
