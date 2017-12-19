@@ -31,6 +31,7 @@
     <properties>
         <microprofile.rest.client.version>1.0-SNAPSHOT</microprofile.rest.client.version>
         <geronimo.config.version>1.0</geronimo.config.version>
+        <wiremock.params>--port=8765</wiremock.params>
     </properties>
     <dependencies>
         <dependency>
@@ -119,7 +120,7 @@
                         </goals>
                         <configuration>
                             <dir>target/classes</dir>
-                            <params>--port=8765 --verbose</params>
+                            <params>${wiremock.params}</params>
                         </configuration>
                     </execution>
                 </executions>

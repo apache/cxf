@@ -37,14 +37,15 @@ public final class MicroProfileClientProviderFactory extends ProviderFactory {
     static final String CLIENT_FACTORY_NAME = MicroProfileClientProviderFactory.class.getName();
     private List<ProviderInfo<ResponseExceptionMapper<?>>> responseExceptionMappers =
             new ArrayList<ProviderInfo<ResponseExceptionMapper<?>>>(1);
-    private final ContractComparator comparator;
+    private final Comparator<ProviderInfo<?>> comparator;
 
-    private MicroProfileClientProviderFactory(Bus bus, ContractComparator comparator) {
+    private MicroProfileClientProviderFactory(Bus bus, Comparator<ProviderInfo<?>> comparator) {
         super(bus);
         this.comparator = comparator;
     }
 
-    public static MicroProfileClientProviderFactory createInstance(Bus bus, ContractComparator comparator) {
+    public static MicroProfileClientProviderFactory createInstance(Bus bus,
+                                                                   Comparator<ProviderInfo<?>> comparator) {
         if (bus == null) {
             bus = BusFactory.getThreadDefaultBus();
         }
@@ -61,6 +62,11 @@ public final class MicroProfileClientProviderFactory extends ProviderFactory {
 
     public static MicroProfileClientProviderFactory getInstance(Endpoint e) {
         return (MicroProfileClientProviderFactory)e.get(CLIENT_FACTORY_NAME);
+    }
+
+    static Comparator<ProviderInfo<?>> createComparator(MicroProfileClientFactoryBean bean) {
+        Comparator<ProviderInfo<?>> parent = ProviderFactory::compareCustomStatus;
+        return new ContractComparator(bean, parent);
     }
 
     @Override

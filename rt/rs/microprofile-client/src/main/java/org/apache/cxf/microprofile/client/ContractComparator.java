@@ -20,20 +20,29 @@ package org.apache.cxf.microprofile.client;
 
 import java.util.Comparator;
 import java.util.Map;
+
+import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import static org.apache.cxf.microprofile.client.MicroProfileClientConfigurableImpl.CONTRACTS;
 
-class ContractComparator implements Comparator<Object> {
-    private MicroProfileClientFactoryBean microProfileClientFactoryBean;
+class ContractComparator implements Comparator<ProviderInfo<?>> {
+    private final MicroProfileClientFactoryBean microProfileClientFactoryBean;
+    private final Comparator<ProviderInfo<?>> parent;
 
-    ContractComparator(MicroProfileClientFactoryBean microProfileClientFactoryBean) {
+    ContractComparator(MicroProfileClientFactoryBean microProfileClientFactoryBean,
+                       Comparator<ProviderInfo<?>> parent) {
         this.microProfileClientFactoryBean = microProfileClientFactoryBean;
+        this.parent = parent;
     }
 
     @Override
-    public int compare(Object oLeft, Object oRight) {
-        int left = getPriority(oLeft.getClass());
-        int right = getPriority(oRight.getClass());
+    public int compare(ProviderInfo<?> oLeft, ProviderInfo<?> oRight) {
+        int parentResult = parent.compare(oLeft, oRight);
+        if (parentResult != 0) {
+            return parentResult;
+        }
+        int left = getPriority(oLeft.getResourceClass());
+        int right = getPriority(oRight.getResourceClass());
         return left - right;
     }
 

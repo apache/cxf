@@ -846,7 +846,7 @@ public abstract class ProviderFactory {
         }
     }
 
-    private static int compareCustomStatus(ProviderInfo<?> p1, ProviderInfo<?> p2) {
+    protected static int compareCustomStatus(ProviderInfo<?> p1, ProviderInfo<?> p2) {
         Boolean custom1 = p1.isCustom();
         Boolean custom2 = p2.isCustom();
         int result = custom1.compareTo(custom2) * -1;
