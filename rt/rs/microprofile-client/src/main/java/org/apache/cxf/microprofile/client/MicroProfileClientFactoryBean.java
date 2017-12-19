@@ -18,16 +18,6 @@
  */
 package org.apache.cxf.microprofile.client;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import javax.ws.rs.client.ClientRequestFilter;
-import javax.ws.rs.client.ClientResponseFilter;
-import javax.ws.rs.core.Configuration;
-
 import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.client.AbstractClient;
@@ -37,8 +27,19 @@ import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.FilterProviderInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
+import org.apache.cxf.jaxrs.provider.jsrjsonp.JsrJsonpProvider;
 import org.apache.cxf.microprofile.client.proxy.MicroProfileClientProxyImpl;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
+
+import javax.ws.rs.client.ClientRequestFilter;
+import javax.ws.rs.client.ClientResponseFilter;
+import javax.ws.rs.core.Configuration;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 public class MicroProfileClientFactoryBean extends JAXRSClientFactoryBean {
     private final Comparator<ProviderInfo<?>> comparator;
@@ -58,9 +59,9 @@ public class MicroProfileClientFactoryBean extends JAXRSClientFactoryBean {
         registeredProviders = new ArrayList<>();
         registeredProviders.addAll(processProviders());
         if (!configuration.isDefaultExceptionMapperDisabled()) {
-            registeredProviders.add(new DefaultResponseExceptionMapper());
+            registeredProviders.add(new ProviderInfo<>(new DefaultResponseExceptionMapper(),getBus(),false));
         }
-        registeredProviders.add(new JsonPProvider());
+        registeredProviders.add(new ProviderInfo<>(new JsrJsonpProvider(),getBus(),false));
         super.setProviders(registeredProviders);
     }
 
