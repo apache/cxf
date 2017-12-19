@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.microprofile.client;
 
-import java.util.Optional;
 import javax.ws.rs.RuntimeType;
 import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.client.ClientResponseFilter;
@@ -58,12 +57,8 @@ public class MicroProfileClientConfigurableImpl<C extends Configurable<C>>
             return (Boolean)prop;
         } else {
             Config config = ConfigProvider.getConfig();
-            Optional<Boolean> optionalValue = config.getOptionalValue(CONFIG_KEY_DISABLE_MAPPER,
-                    Boolean.class);
-            if (optionalValue.isPresent()) {
-                return optionalValue.get();
-            }
+            return config.getOptionalValue(CONFIG_KEY_DISABLE_MAPPER,
+                    Boolean.class).orElse(false);
         }
-        return false;
     }
 }
