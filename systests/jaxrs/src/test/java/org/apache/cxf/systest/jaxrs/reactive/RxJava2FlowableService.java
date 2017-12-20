@@ -32,6 +32,7 @@ import javax.ws.rs.container.Suspended;
 import org.apache.cxf.jaxrs.reactivestreams.server.AbstractSubscriber;
 import org.apache.cxf.jaxrs.reactivestreams.server.JsonStreamingAsyncSubscriber;
 
+import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.schedulers.Schedulers;
 
@@ -79,7 +80,24 @@ public class RxJava2FlowableService {
     @Produces("application/json")
     @Path("textJsonImplicitList")
     public Flowable<HelloWorldBean> getJsonImplicitList() {
-        return Flowable.just("Hello", "Ciao").map(HelloWorldBean::new);
+        return Flowable.create(subscriber -> {
+            Thread t = new Thread(() -> {
+                subscriber.onNext(new HelloWorldBean("Hello"));
+                sleep();
+                subscriber.onNext(new HelloWorldBean("Ciao"));
+                sleep();
+                subscriber.onComplete();
+            });
+            t.start();
+        }, BackpressureStrategy.MISSING);
+    }
+    
+    private static void sleep() {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException ex) {
+            // ignore
+        }
     }
     
     @GET
