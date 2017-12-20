@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import javax.enterprise.context.Dependent;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.Default;
@@ -36,9 +37,9 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.enterprise.inject.spi.PassivationCapable;
 import javax.enterprise.util.AnnotationLiteral;
+
 import org.apache.cxf.microprofile.client.CxfTypeSafeClientBuilder;
-import org.eclipse.microprofile.config.Config;
-import org.eclipse.microprofile.config.ConfigProvider;
+import org.apache.cxf.microprofile.client.config.ConfigFacade;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 public class RestClientBean implements Bean<Object>, PassivationCapable {
@@ -48,12 +49,10 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
     private final Class<?> clientInterface;
     private final Class<? extends Annotation> scope;
     private final BeanManager beanManager;
-    private final Config config;
 
     RestClientBean(Class<?> clientInterface, BeanManager beanManager) {
         this.clientInterface = clientInterface;
         this.beanManager = beanManager;
-        this.config = ConfigProvider.getConfig();
         this.scope = this.readScope();
     }
     @Override
@@ -124,16 +123,20 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
 
     private String getBaseUrl() {
         String property = String.format(REST_URL_FORMAT, clientInterface.getName());
-        return config.getValue(property, String.class);
+        String baseURL = ConfigFacade.getValue(property, String.class);
+        if (baseURL == null) {
+            throw new IllegalStateException("Unable to determine base URL from configuration");
+        }
+        return baseURL;
     }
 
     private Class<? extends Annotation> readScope() {
         // first check to see if the value is set
         String property = String.format(REST_SCOPE_FORMAT, clientInterface.getName());
-        String configuredScope = config.getOptionalValue(property, String.class).orElse(null);
+        String configuredScope = ConfigFacade.getOptionalValue(property, String.class).orElse(null);
         if (configuredScope != null) {
             try {
-                return (Class<? extends Annotation>)Class.forName(configuredScope);
+                return (Class<? extends Annotation>) Class.forName(configuredScope);
             } catch (Exception e) {
                 throw new IllegalArgumentException("The scope " + configuredScope + " is invalid", e);
             }

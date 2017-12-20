@@ -27,10 +27,10 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.WriterInterceptor;
+
 import org.apache.cxf.jaxrs.impl.ConfigurableImpl;
 import org.apache.cxf.jaxrs.impl.ConfigurationImpl;
-import org.eclipse.microprofile.config.Config;
-import org.eclipse.microprofile.config.ConfigProvider;
+import org.apache.cxf.microprofile.client.config.ConfigFacade;
 import org.eclipse.microprofile.rest.client.ext.ResponseExceptionMapper;
 
 public class MicroProfileClientConfigurableImpl<C extends Configurable<C>>
@@ -55,16 +55,8 @@ public class MicroProfileClientConfigurableImpl<C extends Configurable<C>>
         Object prop = getConfiguration().getProperty(CONFIG_KEY_DISABLE_MAPPER);
         if (prop instanceof Boolean) {
             return (Boolean)prop;
-        } else {
-            Config config;
-            try {
-                config = ConfigProvider.getConfig();
-            } catch (ExceptionInInitializerError | NoClassDefFoundError | IllegalStateException ex) {
-                // no config provider implementation
-                return false;
-            }
-            return config.getOptionalValue(CONFIG_KEY_DISABLE_MAPPER,
-                    Boolean.class).orElse(false);
         }
+        return ConfigFacade.getOptionalValue(CONFIG_KEY_DISABLE_MAPPER,
+                                             Boolean.class).orElse(false);
     }
 }
