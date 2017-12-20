@@ -109,9 +109,6 @@
                     <dependenciesToScan>
                         <dependency>org.eclipse.microprofile.rest.client:microprofile-rest-client-tck</dependency>
                     </dependenciesToScan>
-                    <excludes>
-                        <exclude>org.eclipse.microprofile.rest.client.tck.InvalidInterfaceTest</exclude>
-                    </excludes>
                 </configuration>
             </plugin>
         </plugins>
