@@ -32,6 +32,7 @@ public class URIResolverTest extends Assert {
 
     private URL resourceURL = getClass().getResource("resources/helloworld.bpr");
 
+    private Throwable checkingThreadThrowable;      // assumes single-thread test execution
 
     @Test
     public void testJARProtocol() throws Exception {
@@ -57,6 +58,9 @@ public class URIResolverTest extends Assert {
         is2.read(barray2);
         is2.close();
         assertEquals(IOUtils.newStringFromBytes(barray), IOUtils.newStringFromBytes(barray2));
+
+        resolveWithCheckingClassloader(uriResolver, "baseUriStr", uriStr, null);
+        resolveWithCheckingClassloaderInConstructor("baseUriStr", uriStr, null);
     }
 
     @Test
@@ -79,8 +83,30 @@ public class URIResolverTest extends Assert {
 
         InputStream is3 = uriResolver.getInputStream();
         assertNotNull(is3);
+
+        resolveWithCheckingClassloader(uriResolver, uriStr, "hello_world_2.wsdl", null);
+        resolveWithCheckingClassloaderInConstructor(uriStr, "hello_world_2.wsdl", null);
     }
 
+    @Test
+    public void testJARResolveBaseAndAbsolute() throws Exception {
+        uriResolver = new URIResolver();
+
+        String baseUriStr = "jar:" + resourceURL.toString() + "!/wsdl/hello_world.wsdl";
+
+        URL jarURL = new URL(baseUriStr);
+        InputStream is = jarURL.openStream();
+        assertNotNull(is);
+
+        String uriStr = "jar:" + resourceURL.toString() + "!/wsdl/hello_world_2.wsdl";
+
+        URL jarURL2 = new URL(uriStr);
+        InputStream is2 = jarURL2.openStream();
+        assertNotNull(is2);
+
+        resolveWithCheckingClassloader(uriResolver, baseUriStr, uriStr, null);
+        resolveWithCheckingClassloaderInConstructor(baseUriStr, uriStr, null);
+    }
 
     @Test
     public void testResolveRelativeFile() throws Exception {
@@ -98,12 +124,15 @@ public class URIResolverTest extends Assert {
         URIResolver xsdResolver = new URIResolver();
         xsdResolver.resolve(baseUri, schemaLocation, this.getClass());
         assertNotNull(xsdResolver.getInputStream());
+        resolveWithCheckingClassloader(xsdResolver, baseUri, schemaLocation, this.getClass());
+        resolveWithCheckingClassloaderInConstructor(baseUri, schemaLocation, this.getClass());
 
         // resolve the schema using relative location with base uri fragment
         xsdResolver = new URIResolver();
         xsdResolver.resolve(baseUri + "#type2", schemaLocation, this.getClass());
         assertNotNull(xsdResolver.getInputStream());
-
+        resolveWithCheckingClassloader(xsdResolver, baseUri + "#type2", schemaLocation, this.getClass());
+        resolveWithCheckingClassloaderInConstructor(baseUri + "#type2", schemaLocation, this.getClass());
     }
 
     @Test
@@ -122,12 +151,15 @@ public class URIResolverTest extends Assert {
         URIResolver xsdResolver = new URIResolver();
         xsdResolver.resolve(baseUri, schemaLocation, this.getClass());
         assertNotNull(xsdResolver.getInputStream());
+        resolveWithCheckingClassloader(xsdResolver, baseUri, schemaLocation, this.getClass());
+        resolveWithCheckingClassloaderInConstructor(baseUri, schemaLocation, this.getClass());
 
         // resolve the schema using relative location with base uri fragment
         xsdResolver = new URIResolver();
         xsdResolver.resolve(baseUri + "#type2", schemaLocation, this.getClass());
         assertNotNull(xsdResolver.getInputStream());
-
+        resolveWithCheckingClassloader(xsdResolver, baseUri + "#type2", schemaLocation, this.getClass());
+        resolveWithCheckingClassloaderInConstructor(baseUri + "#type2", schemaLocation, this.getClass());
     }
 
     @Test
@@ -136,6 +168,8 @@ public class URIResolverTest extends Assert {
         // resolve the wsdl
         wsdlResolver.resolve(null, "wsdl/folder with spaces/foo.wsdl", this.getClass());
         assertTrue(wsdlResolver.isResolved());
+        resolveWithCheckingClassloader(wsdlResolver, null, "wsdl/folder with spaces/foo.wsdl", this.getClass());
+        resolveWithCheckingClassloaderInConstructor(null, "wsdl/folder with spaces/foo.wsdl", this.getClass());
     }
 
     @Test
@@ -144,5 +178,62 @@ public class URIResolverTest extends Assert {
         // resolve the wsdl
         wsdlResolver.resolve(null, "wsdl/folder%20with%20spaces/foo.wsdl", this.getClass());
         assertTrue(wsdlResolver.isResolved());
+        resolveWithCheckingClassloader(wsdlResolver, null, "wsdl/folder%20with%20spaces/foo.wsdl", this.getClass());
+        resolveWithCheckingClassloaderInConstructor(null, "wsdl/folder%20with%20spaces/foo.wsdl", this.getClass());
+    }
+
+    private void resolveWithCheckingClassloader(URIResolver resolver, String baseUriStr, String uriStr,
+            Class<?> callingCls) throws InterruptedException {
+        checkingThreadThrowable = null;
+        Runnable operation = () -> {
+            try {
+                resolver.resolve(baseUriStr, uriStr, callingCls);
+            } catch (Throwable t) {
+                checkingThreadThrowable = t;
+            }
+            assertNotNull(resolver.getInputStream());
+        };
+        Thread thread = new Thread(operation);
+        thread.setContextClassLoader(new CheckingClassLoader(this.getClass().getClassLoader()));
+        thread.start();
+        thread.join(10000);
+        assertFalse("resolve operation did not finish in time", thread.isAlive());
+        assertNull(checkingThreadThrowable);
+    }
+
+    private void resolveWithCheckingClassloaderInConstructor(String baseUriStr, String uriStr, Class<?> callingCls)
+            throws InterruptedException {
+        checkingThreadThrowable = null;
+        Runnable operation = () -> {
+            URIResolver resolver = null;
+            try {
+                resolver = new URIResolver(baseUriStr, uriStr, callingCls);
+            } catch (Throwable t) {
+                checkingThreadThrowable = t;
+            }
+            if (resolver != null) {
+                assertNotNull(resolver.getInputStream());
+            }
+        };
+        Thread thread = new Thread(operation);
+        thread.setContextClassLoader(new CheckingClassLoader(this.getClass().getClassLoader()));
+        thread.start();
+        thread.join(10000);
+        assertFalse("resolve operation did not finish in time", thread.isAlive());
+        assertNull(checkingThreadThrowable);
+    }
+
+    static class CheckingClassLoader extends ClassLoader {
+        CheckingClassLoader(ClassLoader parent) {
+            super(parent);
+        }
+
+        @Override
+        protected URL findResource(String name) {
+            if (name != null && name.startsWith("jar:file:")) {
+                throw new AssertionError("Suspicious resource name: " + name);
+            }
+            return super.findResource(name);
+        }
     }
 }
