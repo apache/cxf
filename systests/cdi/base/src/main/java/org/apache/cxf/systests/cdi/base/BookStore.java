@@ -32,15 +32,19 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import org.apache.cxf.tracing.TracerContext;
 
 @Path("/bookstore/")
 public class BookStore {
     @Inject private BookStoreService service;
     @Inject private BookStoreVersion bookStoreVersion;
     @Inject private UriInfo uriInfo;
+    @Inject
+    private TracerContext tracerContext;
 
     @Path("/version")
     public BookStoreVersion getVersion() {
+        System.out.println("Tracer: " + tracerContext);
         return bookStoreVersion;
     }
 

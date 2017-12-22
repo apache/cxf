@@ -205,6 +205,8 @@ public class JAXRSCdiResourceExtension implements Extension {
                 .map(this::toClass)
                 .filter(Objects::nonNull)
                 .forEach(contextTypes::add);
+        // add custom contexts
+        contextTypes.addAll(InjectionUtils.getCustomContextClasses());
         // register all of the context types
         contextTypes.forEach(t -> event.addBean(new ContextProducerBean(t)));
     }
