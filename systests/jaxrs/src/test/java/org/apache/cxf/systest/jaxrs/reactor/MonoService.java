@@ -29,7 +29,7 @@ import org.apache.cxf.jaxrs.reactivestreams.server.JsonStreamingAsyncSubscriber;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
-@Path("/reactor/mono")
+@Path("/mono")
 public class MonoService {
 
     @GET

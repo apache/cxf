@@ -64,6 +64,11 @@ public class FluxReactorTest extends AbstractBusClientServerTestBase {
         String address = "http://localhost:" + PORT + "/reactor/flux/textJsonImplicitListAsyncStream";
         doTestTextJsonImplicitListAsyncStream(address);
     }
+    @Test
+    public void testTextJsonImplicitListAsyncStream2() throws Exception {
+        String address = "http://localhost:" + PORT + "/reactor2/flux/textJsonImplicitListAsyncStream2";
+        doTestTextJsonImplicitListAsyncStream(address);
+    }
     private void doTestTextJsonImplicitListAsyncStream(String address) throws Exception {
         List<HelloWorldBean> holder = new ArrayList<>();
         ClientBuilder.newClient()

@@ -33,8 +33,9 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 public class ReactorServer extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(ReactorServer.class);
 
-    org.apache.cxf.endpoint.Server server;
-
+    org.apache.cxf.endpoint.Server server1;
+    org.apache.cxf.endpoint.Server server2;
+    
     @Override
     protected void run() {
         Bus bus = BusFactory.getDefaultBus();
@@ -52,15 +53,34 @@ public class ReactorServer extends AbstractBusTestServerBase {
                 new SingletonResourceProvider(new FluxService(), true));
         sf.setResourceProvider(MonoService.class,
                 new SingletonResourceProvider(new MonoService(), true));
-        sf.setAddress("http://localhost:" + PORT + "/");
-        server = sf.create();
+        sf.setAddress("http://localhost:" + PORT + "/reactor");
+        server1 = sf.create();
+        
+        JAXRSServerFactoryBean sf2 = new JAXRSServerFactoryBean();
+        ReactorInvoker invoker2 = new ReactorInvoker();
+        invoker2.setUseStreamingSubscriberIfPossible(true);
+        sf2.setInvoker(invoker2);
+        StreamingResponseProvider<HelloWorldBean> streamProvider2 = new StreamingResponseProvider<HelloWorldBean>();
+        streamProvider2.setProduceMediaTypes(Collections.singletonList("application/json"));
+        sf2.setProvider(streamProvider2);
+        sf2.setProvider(new JacksonJsonProvider());
+        sf2.getOutInterceptors().add(new LoggingOutInterceptor());
+        sf2.setResourceClasses(FluxService.class);
+        sf2.setResourceProvider(FluxService.class,
+                new SingletonResourceProvider(new FluxService(), true));
+        sf2.setAddress("http://localhost:" + PORT + "/reactor2");
+        server2 = sf2.create();
     }
 
     @Override
     public void tearDown() throws Exception {
-        server.stop();
-        server.destroy();
-        server = null;
+        server1.stop();
+        server1.destroy();
+        server1 = null;
+        
+        server2.stop();
+        server2.destroy();
+        server2 = null;
     }
 
     public static void main(String[] args) {

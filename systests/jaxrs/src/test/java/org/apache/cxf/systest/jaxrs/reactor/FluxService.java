@@ -28,7 +28,7 @@ import org.apache.cxf.jaxrs.reactivestreams.server.JsonStreamingAsyncSubscriber;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 
-@Path("/reactor/flux")
+@Path("/flux")
 public class FluxService {
 
     @GET

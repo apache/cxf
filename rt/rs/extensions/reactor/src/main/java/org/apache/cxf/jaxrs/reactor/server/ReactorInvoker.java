@@ -18,29 +18,33 @@
  */
 package org.apache.cxf.jaxrs.reactor.server;
 
-import java.util.concurrent.CancellationException;
-
-import org.apache.cxf.jaxrs.JAXRSInvoker;
 import org.apache.cxf.jaxrs.impl.AsyncResponseImpl;
+import org.apache.cxf.jaxrs.reactivestreams.server.AbstractReactiveInvoker;
+import org.apache.cxf.jaxrs.reactivestreams.server.JsonStreamingAsyncSubscriber;
 import org.apache.cxf.message.Message;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-public class ReactorInvoker extends JAXRSInvoker {
+public class ReactorInvoker extends AbstractReactiveInvoker {
+    
     @Override
     protected AsyncResponseImpl checkFutureResponse(Message inMessage, Object result) {
         if (result instanceof Flux) {
             final Flux<?> flux = (Flux<?>) result;
             final AsyncResponseImpl asyncResponse = new AsyncResponseImpl(inMessage);
-            flux.doOnNext(asyncResponse::resume)
+            if (isUseStreamingSubscriberIfPossible() && isJsonResponse(inMessage)) {
+                flux.subscribe(new JsonStreamingAsyncSubscriber<>(asyncResponse));
+            } else {
+                flux.doOnNext(asyncResponse::resume)
                     .doOnError(t -> handleThrowable(asyncResponse, t))
                     .subscribe();
+            }
             return asyncResponse;
         } else if (result instanceof Mono) {
-            final Mono<?> flux = (Mono<?>) result;
+            final Mono<?> mono = (Mono<?>) result;
             final AsyncResponseImpl asyncResponse = new AsyncResponseImpl(inMessage);
-            flux.doOnNext(asyncResponse::resume)
+            mono.doOnNext(asyncResponse::resume)
                 .doOnError(t -> handleThrowable(asyncResponse, t))
                 .subscribe();
             return asyncResponse;
@@ -48,12 +52,4 @@ public class ReactorInvoker extends JAXRSInvoker {
         return null;
     }
     
-    private Object handleThrowable(AsyncResponseImpl asyncResponse, Throwable t) {
-        if (t instanceof CancellationException) {
-            asyncResponse.cancel();
-        } else {
-            asyncResponse.resume(t);
-        }
-        return null;
-    }
 }
