@@ -85,6 +85,12 @@ public class ValidatorTest extends Assert {
         Response post(@PathParam("class")String className);
     }
 
+    @Path("/rest")
+    public interface ExtraParamTemplate {
+        @GET
+        Response get(@PathParam("any") String any);
+    }
+
     private static RestClientBuilder newBuilder() {
         RestClientBuilder builder = RestClientBuilder.newBuilder();
         try {
@@ -116,6 +122,11 @@ public class ValidatorTest extends Assert {
             "put");
         test(PartiallyResolvedUriTemplate2.class, "unresolved path template variables", "PartiallyResolvedUriTemplate2",
             "post");
+    }
+
+    @Test
+    public void testMissingTemplate() {
+        test(ExtraParamTemplate.class, "extra path segments", "ExtraParamTemplate");
     }
 
     private void test(Class<?> clientInterface, String...expectedMessageTexts) {

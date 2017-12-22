@@ -21,9 +21,11 @@ package org.apache.cxf.microprofile.client;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -111,6 +113,17 @@ final class Validator {
                     template.substitute(paramMap, Collections.<String>emptySet(), false);
                 } catch (IllegalArgumentException ex) {
                     throwException("VALIDATION_UNRESOLVED_PATH_PARAMS", userType, method);
+                }
+            } else {
+                List<String> foundParams = new ArrayList<>();
+                for (Parameter p : method.getParameters()) {
+                    PathParam pathParam = p.getAnnotation(PathParam.class);
+                    if (pathParam != null) {
+                        foundParams.add(pathParam.value());
+                    }
+                }
+                if (!foundParams.isEmpty()) {
+                    throwException("VALIDATION_EXTRA_PATH_PARAMS", userType, method);
                 }
             }
         }
