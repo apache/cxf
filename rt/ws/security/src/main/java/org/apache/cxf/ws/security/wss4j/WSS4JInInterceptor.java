@@ -442,7 +442,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         if (signatureParts != null) {
             String warning = "To enforce that particular elements were signed you must either "
                 + "use WS-SecurityPolicy, or else use the CryptoCoverageChecker or "
-                + "SignatureCoverageChecker";
+                + "DefaultCryptoCoverageChecker";
             LOG.warning(warning);
         }
 
