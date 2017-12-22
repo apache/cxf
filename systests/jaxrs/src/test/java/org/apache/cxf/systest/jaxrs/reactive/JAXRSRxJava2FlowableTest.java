@@ -111,6 +111,17 @@ public class JAXRSRxJava2FlowableTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testGetHelloWorldJsonSingle() throws Exception {
+        String address = "http://localhost:" + PORT + "/rx22/flowable/textJsonSingle";
+        WebClient wc = WebClient.create(address,
+                                        Collections.singletonList(new JacksonJsonProvider()));
+    
+        HelloWorldBean bean = wc.accept("application/json").get(HelloWorldBean.class);
+        assertEquals("Hello", bean.getGreeting());
+        assertEquals("World", bean.getAudience());
+    }
+    
+    @Test
     public void testGetHelloWorldAsyncObservable() throws Exception {
         String address = "http://localhost:" + PORT + "/rx2/flowable/textAsync";
         WebClient wc = WebClient.create(address,

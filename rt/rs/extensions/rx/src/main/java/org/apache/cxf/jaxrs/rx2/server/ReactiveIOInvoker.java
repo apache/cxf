@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.jaxrs.rx2.server;
 
+import java.util.concurrent.CancellationException;
+
 import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.jaxrs.JAXRSInvoker;
@@ -27,6 +29,7 @@ import org.apache.cxf.message.Message;
 
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 
 //Work in Progress
 public class ReactiveIOInvoker extends JAXRSInvoker {
@@ -34,6 +37,8 @@ public class ReactiveIOInvoker extends JAXRSInvoker {
     protected AsyncResponseImpl checkFutureResponse(Message inMessage, Object result) {
         if (result instanceof Flowable) {
             return handleFlowable(inMessage, (Flowable<?>)result);
+        } else if (result instanceof Single) {
+            return handleSingle(inMessage, (Single<?>)result);
         } else if (result instanceof Observable) {
             return handleObservable(inMessage, (Observable<?>)result);
         } else {
@@ -41,6 +46,12 @@ public class ReactiveIOInvoker extends JAXRSInvoker {
         }
     }
     
+    protected AsyncResponseImpl handleSingle(Message inMessage, Single<?> single) {
+        final AsyncResponseImpl asyncResponse = new AsyncResponseImpl(inMessage);
+        single.subscribe(v -> asyncResponse.resume(v), t -> handleThrowable(asyncResponse, t));
+        return asyncResponse;
+    }
+
     protected AsyncResponseImpl handleFlowable(Message inMessage, Flowable<?> f) {
         final AsyncResponseImpl asyncResponse = new AsyncResponseImpl(inMessage);
         if (isUseStreamingSubscriberIfPossible() && isJsonResponse(inMessage)) {
@@ -62,8 +73,11 @@ public class ReactiveIOInvoker extends JAXRSInvoker {
     }
 
     private Object handleThrowable(AsyncResponseImpl asyncResponse, Throwable t) {
-        //TODO: if it is a Cancelation exception => asyncResponse.cancel(); 
-        asyncResponse.resume(t);
+        if (t instanceof CancellationException) {
+            asyncResponse.cancel();
+        } else {
+            asyncResponse.resume(t);
+        }
         return null;
     }
 

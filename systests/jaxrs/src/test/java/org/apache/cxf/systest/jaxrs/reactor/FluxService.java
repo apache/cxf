@@ -47,4 +47,13 @@ public class FluxService {
                 .subscribeOn(Schedulers.parallel())
                 .subscribe(new JsonStreamingAsyncSubscriber<>(ar));
     }
+    
+    @GET
+    @Produces("application/json")
+    @Path("textJsonImplicitListAsyncStream2")
+    public Flux<HelloWorldBean> getJsonImplicitListStreamingAsync2() {
+        return Flux.just("Hello", "Ciao")
+                .map(HelloWorldBean::new)
+                .subscribeOn(Schedulers.parallel());
+    }
 }

@@ -22,6 +22,7 @@ package org.apache.cxf.systest.jaxrs.reactive;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -34,6 +35,7 @@ import org.apache.cxf.jaxrs.reactivestreams.server.JsonStreamingAsyncSubscriber;
 
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
+import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
 
 
@@ -71,7 +73,7 @@ public class RxJava2FlowableService {
     @Path("textJsonImplicitListAsyncStream")
     public void getJsonImplicitListStreamingAsync(@Suspended AsyncResponse ar) {
         Flowable.just("Hello", "Ciao")
-            .map(s -> new HelloWorldBean(s))
+            .map(HelloWorldBean::new)
             .subscribeOn(Schedulers.computation())
             .subscribe(new JsonStreamingAsyncSubscriber<HelloWorldBean>(ar));
     }
@@ -90,6 +92,18 @@ public class RxJava2FlowableService {
             });
             t.start();
         }, BackpressureStrategy.MISSING);
+    }
+    
+    @GET
+    @Produces("application/json")
+    @Path("textJsonSingle")
+    public Single<HelloWorldBean> getJsonSingle() {
+        CompletableFuture<HelloWorldBean> completableFuture = CompletableFuture
+            .supplyAsync(() -> {
+                sleep();
+                return new HelloWorldBean("Hello");
+            });
+        return Single.fromFuture(completableFuture);
     }
     
     private static void sleep() {
