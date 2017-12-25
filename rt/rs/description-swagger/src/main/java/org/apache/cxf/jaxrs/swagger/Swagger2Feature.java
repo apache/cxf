@@ -246,8 +246,15 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
                 props.load(is);
             } catch (IOException ex) {
                 props = null;
+            } finally {
+                try {
+                    is.close();
+                } catch (IOException ignore) {
+                    // ignore
+                }
             }
         }
+
         return props;
     }
 
