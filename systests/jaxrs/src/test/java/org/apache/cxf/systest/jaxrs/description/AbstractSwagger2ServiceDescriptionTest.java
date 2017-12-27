@@ -133,8 +133,13 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
     protected void doTestApiListingIsProperlyReturnedJSON() throws Exception {
         doTestApiListingIsProperlyReturnedJSON(false);
     }
-    protected void doTestApiListingIsProperlyReturnedJSON(boolean useXForwarded) throws Exception {    
-        final WebClient client = createWebClient("/swagger.json");
+    protected void doTestApiListingIsProperlyReturnedJSON(boolean useXForwarded) throws Exception {
+        doTestApiListingIsProperlyReturnedJSON(createWebClient("/swagger.json"), 
+                                               useXForwarded);
+        checkUiResource();
+    }
+    protected static void doTestApiListingIsProperlyReturnedJSON(final WebClient client,
+                                                          boolean useXForwarded) throws Exception {    
         if (useXForwarded) {
             client.header("USE_XFORWARDED", true);
         }
@@ -184,8 +189,6 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
         } finally {
             client.close();
         }
-        
-        checkUiResource();
     }
 
     @Test

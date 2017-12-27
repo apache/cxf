@@ -153,6 +153,9 @@ public class SwaggerToOpenApiConversionTest extends AbstractBusClientServerTestB
         assertEquals(1, schemas.size());
         JsonMapObject secSchemes = comps.getJsonMapProperty("securitySchemes");
         assertEquals(1, secSchemes.size());
+        
+        // Finally check swagger.json can still be generated.
+        doTestSwagger2JSON();
     }
     private void verifyBookStoreGet(JsonMapObject bookstore) {
         JsonMapObject bookstoreGet = bookstore.getJsonMapProperty("get");
@@ -258,5 +261,10 @@ public class SwaggerToOpenApiConversionTest extends AbstractBusClientServerTestB
             .accept(MediaType.APPLICATION_JSON);
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
         return wc;
+    }
+    
+    private void doTestSwagger2JSON() throws Exception {    
+        final WebClient client = createWebClient("/swagger.json");
+        AbstractSwagger2ServiceDescriptionTest.doTestApiListingIsProperlyReturnedJSON(client, false);
     }
 }
