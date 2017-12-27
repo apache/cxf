@@ -30,7 +30,7 @@ import org.reactivestreams.Publisher;
 
 
 public abstract class AbstractReactiveInvoker extends JAXRSInvoker {
-    private boolean useStreamingSubscriberIfPossible;
+    private boolean useStreamingSubscriberIfPossible = true;
     
     
     protected Object handleThrowable(AsyncResponseImpl asyncResponse, Throwable t) {

@@ -42,7 +42,9 @@ public class ReactorServer extends AbstractBusTestServerBase {
         // Make sure default JSONProvider is not loaded
         bus.setProperty("skip.default.json.provider.registration", true);
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
-        sf.setInvoker(new ReactorInvoker());
+        ReactorInvoker invoker = new ReactorInvoker();
+        invoker.setUseStreamingSubscriberIfPossible(false);
+        sf.setInvoker(invoker);
         sf.setProvider(new JacksonJsonProvider());
         StreamingResponseProvider<HelloWorldBean> streamProvider = new StreamingResponseProvider<HelloWorldBean>();
         streamProvider.setProduceMediaTypes(Collections.singletonList("application/json"));
@@ -57,9 +59,7 @@ public class ReactorServer extends AbstractBusTestServerBase {
         server1 = sf.create();
         
         JAXRSServerFactoryBean sf2 = new JAXRSServerFactoryBean();
-        ReactorInvoker invoker2 = new ReactorInvoker();
-        invoker2.setUseStreamingSubscriberIfPossible(true);
-        sf2.setInvoker(invoker2);
+        sf2.setInvoker(new ReactorInvoker());
         StreamingResponseProvider<HelloWorldBean> streamProvider2 = new StreamingResponseProvider<HelloWorldBean>();
         streamProvider2.setProduceMediaTypes(Collections.singletonList("application/json"));
         sf2.setProvider(streamProvider2);
