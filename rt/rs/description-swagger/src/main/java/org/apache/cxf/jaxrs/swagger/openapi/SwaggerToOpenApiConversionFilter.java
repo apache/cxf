@@ -25,6 +25,8 @@ import java.net.URI;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.WriterInterceptor;
@@ -37,7 +39,8 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 @Provider
 @PreMatching
-public final class SwaggerToOpenApiConversionFilter implements ContainerRequestFilter, WriterInterceptor {
+public final class SwaggerToOpenApiConversionFilter implements ContainerRequestFilter,
+    ContainerResponseFilter, WriterInterceptor {
 
     private static final String SWAGGER_PATH = "swagger.json";
     private static final String OPEN_API_PATH = "openapi.json";
@@ -64,7 +67,7 @@ public final class SwaggerToOpenApiConversionFilter implements ContainerRequestF
 
     @Override
     public void aroundWriteTo(WriterInterceptorContext context) throws IOException, WebApplicationException {
-        if (Boolean.TRUE == JAXRSUtils.getCurrentMessage().getExchange().get(OPEN_API_PROPERTY)) {
+        if (isOpenApiRequested() && !(context.getEntity() instanceof String)) {
             OutputStream os = context.getOutputStream();
             CachedOutputStream cos = new CachedOutputStream();
             context.setOutputStream(cos);
@@ -75,5 +78,20 @@ public final class SwaggerToOpenApiConversionFilter implements ContainerRequestF
             os.flush();
             
         }
+    }
+
+    private boolean isOpenApiRequested() {
+        return Boolean.TRUE == JAXRSUtils.getCurrentMessage().getExchange().get(OPEN_API_PROPERTY);
+    }
+
+    @Override
+    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
+        throws IOException {
+        if (isOpenApiRequested() && responseContext.getEntity() instanceof String) {
+            String swaggerJson = (String)responseContext.getEntity();
+            String openApiJson = SwaggerToOpenApiConversionUtils.getOpenApiFromSwaggerJson(swaggerJson, openApiConfig);
+            responseContext.setEntity(openApiJson);
+        }
+        
     }
 }
