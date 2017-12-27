@@ -20,7 +20,6 @@ package org.apache.cxf.jaxrs.rx2.server;
 
 import org.apache.cxf.jaxrs.impl.AsyncResponseImpl;
 import org.apache.cxf.jaxrs.reactivestreams.server.AbstractReactiveInvoker;
-import org.apache.cxf.jaxrs.reactivestreams.server.JsonStreamingAsyncSubscriber;
 import org.apache.cxf.message.Message;
 
 import io.reactivex.Flowable;
@@ -48,9 +47,7 @@ public class ReactiveIOInvoker extends AbstractReactiveInvoker {
 
     protected AsyncResponseImpl handleFlowable(Message inMessage, Flowable<?> f) {
         final AsyncResponseImpl asyncResponse = new AsyncResponseImpl(inMessage);
-        if (isUseStreamingSubscriberIfPossible() && isJsonResponse(inMessage)) {
-            f.subscribe(new JsonStreamingAsyncSubscriber<>(asyncResponse));
-        } else {
+        if (!isStreamingSubscriberUsed(f, asyncResponse, inMessage)) {
             f.subscribe(v -> asyncResponse.resume(v), t -> handleThrowable(asyncResponse, t));
         }
         return asyncResponse;

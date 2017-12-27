@@ -20,7 +20,6 @@ package org.apache.cxf.jaxrs.reactor.server;
 
 import org.apache.cxf.jaxrs.impl.AsyncResponseImpl;
 import org.apache.cxf.jaxrs.reactivestreams.server.AbstractReactiveInvoker;
-import org.apache.cxf.jaxrs.reactivestreams.server.JsonStreamingAsyncSubscriber;
 import org.apache.cxf.message.Message;
 
 import reactor.core.publisher.Flux;
@@ -33,9 +32,7 @@ public class ReactorInvoker extends AbstractReactiveInvoker {
         if (result instanceof Flux) {
             final Flux<?> flux = (Flux<?>) result;
             final AsyncResponseImpl asyncResponse = new AsyncResponseImpl(inMessage);
-            if (isUseStreamingSubscriberIfPossible() && isJsonResponse(inMessage)) {
-                flux.subscribe(new JsonStreamingAsyncSubscriber<>(asyncResponse));
-            } else {
+            if (!isStreamingSubscriberUsed(flux, asyncResponse, inMessage)) {
                 flux.doOnNext(asyncResponse::resume)
                     .doOnError(t -> handleThrowable(asyncResponse, t))
                     .subscribe();
