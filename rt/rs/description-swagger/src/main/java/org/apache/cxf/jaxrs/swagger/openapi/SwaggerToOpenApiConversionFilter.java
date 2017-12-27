@@ -73,7 +73,8 @@ public final class SwaggerToOpenApiConversionFilter implements ContainerRequestF
             String openApiJson = SwaggerToOpenApiConversionUtils.getOpenApiFromSwaggerJson(swaggerJson, openApiConfig);
             os.write(StringUtils.toBytesUTF8(openApiJson));
             os.flush();
-            
+        } else {
+            context.proceed();
         }
     }
 

@@ -34,8 +34,10 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.swagger.SwaggerFeature;
+import org.apache.cxf.jaxrs.swagger.openapi.SwaggerToOpenApiConversionFilter;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -126,6 +128,7 @@ public abstract class AbstractSwaggerServiceDescriptionTest extends AbstractBusC
             sf.setResourceProvider(BookStoreSwagger.class, 
                 new SingletonResourceProvider(new BookStoreSwagger()));
             sf.setProvider(new JacksonJsonProvider());
+            sf.setProvider(new SwaggerToOpenApiConversionFilter());
             final SwaggerFeature feature = new SwaggerFeature();
             feature.setRunAsFilter(runAsFilter);
             sf.setFeatures(Arrays.asList(feature));
