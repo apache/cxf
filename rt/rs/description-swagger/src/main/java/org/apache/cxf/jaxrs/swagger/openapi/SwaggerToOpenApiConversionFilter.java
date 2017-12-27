@@ -67,7 +67,7 @@ public final class SwaggerToOpenApiConversionFilter implements ContainerRequestF
 
     @Override
     public void aroundWriteTo(WriterInterceptorContext context) throws IOException, WebApplicationException {
-        if (isOpenApiRequested() && !(context.getEntity() instanceof String)) {
+        if (isOpenApiRequested()) {
             OutputStream os = context.getOutputStream();
             CachedOutputStream cos = new CachedOutputStream();
             context.setOutputStream(cos);
@@ -91,6 +91,7 @@ public final class SwaggerToOpenApiConversionFilter implements ContainerRequestF
             String swaggerJson = (String)responseContext.getEntity();
             String openApiJson = SwaggerToOpenApiConversionUtils.getOpenApiFromSwaggerJson(swaggerJson, openApiConfig);
             responseContext.setEntity(openApiJson);
+            JAXRSUtils.getCurrentMessage().getExchange().remove(OPEN_API_PROPERTY);
         }
         
     }
