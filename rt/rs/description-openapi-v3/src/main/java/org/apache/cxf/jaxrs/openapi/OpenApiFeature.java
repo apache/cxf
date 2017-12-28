@@ -20,6 +20,7 @@ package org.apache.cxf.jaxrs.openapi;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
@@ -32,6 +33,8 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.annotations.Provider;
 import org.apache.cxf.annotations.Provider.Scope;
 import org.apache.cxf.annotations.Provider.Type;
+import org.apache.cxf.common.util.PropertyUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
@@ -46,13 +49,18 @@ import io.swagger.v3.oas.integration.GenericOpenApiContextBuilder;
 import io.swagger.v3.oas.integration.OpenApiConfigurationException;
 import io.swagger.v3.oas.integration.SwaggerConfiguration;
 import io.swagger.v3.oas.integration.api.OpenAPIConfiguration;
+import io.swagger.v3.oas.integration.api.OpenApiContext;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 
 @Provider(value = Type.Feature, scope = Scope.Server)
-public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport {
+public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport, SwaggerProperties {
+    private static final String DEFAULT_PROPS_LOCATION = "/swagger.properties";
+    private static final String DEFAULT_LICENSE_VALUE = "Apache 2.0 License";
+    private static final String DEFAULT_LICENSE_URL = "http://www.apache.org/licenses/LICENSE-2.0.html";
+    
     private String version;
     private String title;
     private String description;
@@ -78,6 +86,12 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport 
     private String swaggerUiMavenGroupAndArtifact;
     private Map<String, String> swaggerUiMediaTypes;
 
+    // Allows to pass the configuration location, usually openapi-configuration.json
+    // or openapi-configuration.yml file.
+    private String configLocation;
+    // Allows to pass the properties location, by default swagger.properties
+    private String propertiesLocation = DEFAULT_PROPS_LOCATION;
+
     protected static class DefaultApplication extends Application {
         private final Set<Class<?>> serviceClasses;
         
@@ -100,34 +114,50 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport 
             .getEndpoint()
             .get(ServerProviderFactory.class.getName());
 
-        final OpenAPI oas = new OpenAPI().info(getInfo());
-        
-        if (isScan()) {
-            resourcePackages = merge(resourcePackages, scanResourcePackages(sfb));
+        final Set<String> packages = new HashSet<>();
+        if (resourcePackages != null) {
+            packages.addAll(resourcePackages);
         }
-        
-        // Read configuration from properties first (openapi-configuration.json)
-        final SwaggerConfiguration config = new SwaggerConfiguration()
-            .openAPI(oas)
-            .prettyPrint(isPrettyPrint())
-            .readAllResources(isReadAllResources())
-            .ignoredRoutes(getIgnoredRoutes())
-            .filterClass(filterClass)
-            .resourceClasses(getResourceClasses())
-            .resourcePackages(resourcePackages);
 
-        final GenericOpenApiContextBuilder<?> openApiConfiguration = new JaxrsOpenApiContextBuilder<>()
-            .application(getApplicationOrDefault(server, factory, sfb, bus))
-            .openApiConfiguration(config);
+        Properties swaggerProps = null;
+        GenericOpenApiContextBuilder<?> openApiConfiguration = null; 
+        if (StringUtils.isEmpty(getConfigLocation())) {
+            swaggerProps = getSwaggerProperties(propertiesLocation, bus);
+            
+            if (isScan()) {
+                packages.addAll(scanResourcePackages(sfb));
+            }
+        
+            final OpenAPI oas = new OpenAPI().info(getInfo(swaggerProps));
+            final SwaggerConfiguration config = new SwaggerConfiguration()
+                .openAPI(oas)
+                .prettyPrint(getOrFallback(isPrettyPrint(), swaggerProps, PRETTY_PRINT_PROPERTY))
+                .readAllResources(isReadAllResources())
+                .ignoredRoutes(getIgnoredRoutes())
+                .filterClass(getOrFallback(getFilterClass(), swaggerProps, FILTER_CLASS_PROPERTY))
+                .resourceClasses(getResourceClasses())
+                .resourcePackages(getOrFallback(packages, swaggerProps, RESOURCE_PACKAGE_PROPERTY));
+
+            openApiConfiguration = new JaxrsOpenApiContextBuilder<>()
+                .application(getApplicationOrDefault(server, factory, sfb, bus))
+                .openApiConfiguration(config);
+        } else {
+            openApiConfiguration = new JaxrsOpenApiContextBuilder<>()
+                .application(getApplicationOrDefault(server, factory, sfb, bus))
+                .configLocation(getConfigLocation());
+        }
 
         try {
-            openApiConfiguration.buildContext(true);
+            final OpenApiContext context = openApiConfiguration.buildContext(true);
+            final Properties userProperties = getUserProperties(
+                context
+                    .getOpenApiConfiguration()
+                    .getUserDefinedOptions());
+            registerOpenApiResources(sfb, packages, context.getOpenApiConfiguration());
+            registerSwaggerUiResources(sfb, combine(swaggerProps, userProperties), factory, bus);
         } catch (OpenApiConfigurationException ex) {
             throw new RuntimeException("Unable to initialize OpenAPI context", ex);
         }
-        
-        registerOpenApiResources(sfb, config);
-        registerSwaggerUiResources(sfb, factory, bus);
     }
 
     public boolean isScan() {
@@ -295,30 +325,61 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport 
     public void setSwaggerUiMediaTypes(Map<String, String> swaggerUiMediaTypes) {
         this.swaggerUiMediaTypes = swaggerUiMediaTypes;
     }
-    
+
+    public String getConfigLocation() {
+        return configLocation;
+    }
+
+    public void setConfigLocation(String configLocation) {
+        this.configLocation = configLocation;
+    }
+
+    public String getPropertiesLocation() {
+        return propertiesLocation;
+    }
+
+    public void setPropertiesLocation(String propertiesLocation) {
+        this.propertiesLocation = propertiesLocation;
+    }
+
     @Override
     public String findSwaggerUiRoot() {
         return SwaggerUi.findSwaggerUiRoot(swaggerUiMavenGroupAndArtifact, swaggerUiVersion);
     }
-
-    protected void registerOpenApiResources(JAXRSServiceFactoryBean sfb, OpenAPIConfiguration config) {
-        sfb.setResourceClassesFromBeans(Arrays.asList(new OpenApiResource().openApiConfiguration(config)));
+    
+    protected Properties getUserProperties(final Map<String, Object> userDefinedOptions) {
+        final Properties properties = new Properties();
+        
+        if (userDefinedOptions != null) {
+            userDefinedOptions
+                .entrySet()
+                .stream()
+                .filter(entry -> entry.getValue() != null)
+                .forEach(entry -> properties.setProperty(entry.getKey(), entry.getValue().toString()));
+        }
+        
+        return properties;
     }
 
-    protected void registerSwaggerUiResources(JAXRSServiceFactoryBean sfb, ServerProviderFactory factory, Bus bus) {
-        final Properties swaggerProps = getSwaggerProperties(bus);
-        final Registration swaggerUiRegistration = getSwaggerUi(bus, swaggerProps, isRunAsFilter());
+    protected void registerOpenApiResources(JAXRSServiceFactoryBean sfb, Set<String> packages, 
+            OpenAPIConfiguration config) {
+        sfb.setResourceClassesFromBeans(Arrays.asList(
+            new OpenApiResource()
+                .openApiConfiguration(config)
+                .configLocation(configLocation)
+                .resourcePackages(packages)));
+    }
+
+    protected void registerSwaggerUiResources(JAXRSServiceFactoryBean sfb, Properties properties, 
+            ServerProviderFactory factory, Bus bus) {
+        
+        final Registration swaggerUiRegistration = getSwaggerUi(bus, properties, isRunAsFilter());
         
         if (!isRunAsFilter()) {
             sfb.setResourceClassesFromBeans(swaggerUiRegistration.getResources());
         } 
 
         factory.setUserProviders(swaggerUiRegistration.getProviders());
-    }
-
-    protected Properties getSwaggerProperties(Bus bus) {
-        // TODO: Read from OpenAPI properties
-        return new Properties();
     }
 
     /**
@@ -348,21 +409,63 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport 
     /**
      * The info will be used only if there is no @OpenAPIDefinition annotation is present. 
      */
-    private Info getInfo() {
-        return new Info()
-            .title(getTitle())
-            .version(getVersion())
-            .description(getDescription())
-            .termsOfService(getTermsOfServiceUrl())
+    private Info getInfo(final Properties properties) {
+        final Info info = new Info()
+            .title(getOrFallback(getTitle(), properties, TITLE_PROPERTY))
+            .version(getOrFallback(getVersion(), properties, VERSION_PROPERTY))
+            .description(getOrFallback(getDescription(), properties, DESCRIPTION_PROPERTY))
+            .termsOfService(getOrFallback(getTermsOfServiceUrl(), properties, TERMS_URL_PROPERTY))
             .contact(new Contact()
-                .name(getContactName())
+                .name(getOrFallback(getContactName(), properties, CONTACT_PROPERTY))
                 .email(getContactEmail())
                 .url(getContactUrl()))
             .license(new License()
-                .name(getLicense())
-                .url(getLicenseUrl()));
-    }
+                .name(getOrFallback(getLicense(), properties, LICENSE_PROPERTY))
+                .url(getOrFallback(getLicenseUrl(), properties, LICENSE_URL_PROPERTY)));
         
+        if (info.getLicense().getName() == null) {
+            info.getLicense().setName(DEFAULT_LICENSE_VALUE);
+        }
+        
+        if (info.getLicense().getUrl() == null && DEFAULT_LICENSE_VALUE.equals(info.getLicense().getName())) {
+            info.getLicense().setUrl(DEFAULT_LICENSE_URL);
+        }
+        
+        return info;
+    }
+
+    private String getOrFallback(String value, Properties properties, String property) {
+        if (value == null && properties != null) {
+            return properties.getProperty(property);
+        } else {
+            return value;
+        }
+    }
+
+    private Boolean getOrFallback(Boolean value, Properties properties, String property) {
+        Boolean fallback = value;
+        if (value == null && properties != null) {
+            fallback = PropertyUtils.isTrue(properties.get(PRETTY_PRINT_PROPERTY));
+        }
+        
+        if (fallback == null) {
+            return false;
+        }
+        
+        return fallback;
+    }
+    
+    private Set<String> getOrFallback(Set<String> collection, Properties properties, String property) {
+        if (collection.isEmpty() && properties != null) {
+            final String value = properties.getProperty(property);
+            if (!StringUtils.isEmpty(value)) {
+                collection.add(value);
+            }
+        } 
+
+        return collection;
+    }
+
     private Collection<String> scanResourcePackages(JAXRSServiceFactoryBean sfb) {
         return sfb
             .getClassResourceInfo()
@@ -371,9 +474,24 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport 
             .collect(Collectors.toSet());
     }
     
-    private Set<String> merge(Set<String> destination, Collection<String> source) {
-        final Set<String> dst = (destination == null) ? new HashSet<>() : destination;
-        dst.addAll(source);
-        return dst;
+    private static Properties combine(final Properties primary, final Properties secondary) {
+        if (primary == null) {
+            return secondary;
+        } else if (secondary == null) {
+            return primary;
+        } else {
+            final Properties combined = new Properties();
+            setOrReplace(secondary, combined);
+            setOrReplace(primary, combined);
+            return combined;
+        }
+    }
+
+    private static void setOrReplace(final Properties source, final Properties destination) {
+        final Enumeration<?> enumeration = source.propertyNames();
+        while (enumeration.hasMoreElements()) {
+            final String name = (String)enumeration.nextElement(); 
+            destination.setProperty(name, source.getProperty(name));
+        }
     }
 }
