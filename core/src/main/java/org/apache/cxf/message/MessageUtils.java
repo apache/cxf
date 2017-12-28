@@ -19,6 +19,7 @@
 
 package org.apache.cxf.message;
 
+import java.nio.charset.StandardCharsets;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Node;
@@ -186,6 +187,17 @@ public final class MessageUtils {
         }
         return false;
         */
+    }
+
+    /**
+     * Returns the effective encoding of the message (which defaults to UTF_8 if unspecified)
+     */
+    public static String getMessageEncoding(Message m) {
+        String encoding = (String)m.getContextualProperty(Message.ENCODING);
+        if (encoding == null) {
+            encoding = StandardCharsets.UTF_8.name();
+        }
+        return encoding;
     }
 
 }

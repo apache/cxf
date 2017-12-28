@@ -386,7 +386,6 @@ public final class StaxUtils {
         return false;
     }
 
-    
 
     public static XMLStreamWriter createXMLStreamWriter(Writer out) {
         XMLOutputFactory factory = getXMLOutputFactory();
@@ -581,7 +580,10 @@ public final class StaxUtils {
         return false;
     }
     public static void copy(Source source, OutputStream os) throws XMLStreamException {
-        XMLStreamWriter writer = createXMLStreamWriter(os);
+        copy(source, os, StandardCharsets.UTF_8.name());
+    }
+    public static void copy(Source source, OutputStream os, String encoding) throws XMLStreamException {
+        XMLStreamWriter writer = createXMLStreamWriter(os, encoding);
         try {
             copy(source, writer);
         } finally {
@@ -678,7 +680,14 @@ public final class StaxUtils {
         StaxUtils.copy(reader, xsw);
         xsw.close();
     }
-    
+
+    public static void copy(XMLStreamReader reader, OutputStream os, String encoding)
+            throws XMLStreamException {
+        XMLStreamWriter xsw = StaxUtils.createXMLStreamWriter(os, encoding);
+        StaxUtils.copy(reader, xsw);
+        xsw.close();
+    }
+
     public static void writeTo(Node node, OutputStream os) throws XMLStreamException {
         copy(new DOMSource(node), os);
     }
@@ -1135,8 +1144,12 @@ public final class StaxUtils {
             }
         }
     }
+
     public static Document read(InputStream s) throws XMLStreamException {
-        XMLStreamReader reader = createXMLStreamReader(s);
+        return read(s, StandardCharsets.UTF_8.name());
+    }
+    public static Document read(InputStream s, String charset) throws XMLStreamException {
+        XMLStreamReader reader = createXMLStreamReader(s, charset);
         try {
             return read(reader);
         } finally {
@@ -1147,6 +1160,7 @@ public final class StaxUtils {
             }
         }
     }
+
     public static Document read(Reader s) throws XMLStreamException {
         XMLStreamReader reader = createXMLStreamReader(s);
         try {
@@ -1736,15 +1750,9 @@ public final class StaxUtils {
      * @param in
      */
     public static XMLStreamReader createXMLStreamReader(InputStream in) {
-        XMLInputFactory factory = getXMLInputFactory();
-        try {
-            return factory.createXMLStreamReader(in);
-        } catch (XMLStreamException e) {
-            throw new RuntimeException("Couldn't parse stream.", e);
-        } finally {
-            returnXMLInputFactory(factory);
-        }
+        return createXMLStreamReader(in, StandardCharsets.UTF_8.name());
     }
+
     public static XMLStreamReader createXMLStreamReader(String systemId, InputStream in) {
         XMLInputFactory factory = getXMLInputFactory();
         try {

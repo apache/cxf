@@ -20,6 +20,7 @@ package org.apache.cxf.staxutils.transform;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,15 +38,27 @@ public final class TransformUtils {
     private TransformUtils() {
         
     }
-    
+
+    public static XMLStreamReader createNewReaderIfNeeded(XMLStreamReader reader, InputStream is, String encoding) {
+        return reader == null ? StaxUtils.createXMLStreamReader(is, encoding) : reader;
+    }
+
+    @Deprecated // please provide explicitly the desired charset encoding
     public static XMLStreamReader createNewReaderIfNeeded(XMLStreamReader reader, InputStream is) {
-        return reader == null ? StaxUtils.createXMLStreamReader(is) : reader;
+        return createNewReaderIfNeeded(reader, is, StandardCharsets.UTF_8.name());
     }
-    
+
+    public static XMLStreamWriter createNewWriterIfNeeded(XMLStreamWriter writer, OutputStream os, String encoding) {
+        return writer == null ? StaxUtils.createXMLStreamWriter(os, encoding) : writer;
+    }
+
+    @Deprecated // please provide explicitly the desired charset encoding
     public static XMLStreamWriter createNewWriterIfNeeded(XMLStreamWriter writer, OutputStream os) {
-        return writer == null ? StaxUtils.createXMLStreamWriter(os) : writer;
+        return createNewWriterIfNeeded(writer, os, StandardCharsets.UTF_8.name());
     }
-    
+
+
+    @Deprecated // please provide explicitly the desired charset encoding
     public static XMLStreamWriter createTransformWriterIfNeeded(XMLStreamWriter writer,
                                                                 OutputStream os,
                                                                 Map<String, String> outElementsMap,
@@ -53,18 +66,49 @@ public final class TransformUtils {
                                                                 Map<String, String> outAppendMap,
                                                                 boolean attributesToElements,
                                                                 String defaultNamespace) {
-        if (outElementsMap != null || outDropElements != null 
-            || outAppendMap != null || attributesToElements) {
-            writer = createNewWriterIfNeeded(writer, os);
-            writer = new OutTransformWriter(writer, outElementsMap, outAppendMap,
-                                            outDropElements, null, attributesToElements, defaultNamespace);
-        }
-        return writer;
+        return createTransformWriterIfNeeded(writer, os, StandardCharsets.UTF_8.name(),
+                outElementsMap, outDropElements, outAppendMap, attributesToElements, defaultNamespace);
     }
 
     //CHECKSTYLE:OFF ParameterNumber
     public static XMLStreamWriter createTransformWriterIfNeeded(XMLStreamWriter writer,
                                                                 OutputStream os,
+                                                                String encoding,
+                                                                Map<String, String> outElementsMap,
+                                                                List<String> outDropElements,
+                                                                Map<String, String> outAppendMap,
+                                                                boolean attributesToElements,
+                                                                String defaultNamespace) {
+        if (outElementsMap != null || outDropElements != null 
+            || outAppendMap != null || attributesToElements) {
+            writer = createNewWriterIfNeeded(writer, os, encoding);
+            writer = new OutTransformWriter(writer, outElementsMap, outAppendMap,
+                                            outDropElements, null, attributesToElements, defaultNamespace);
+        }
+        return writer;
+    }
+    //CHECKSTYLE:ON
+
+    //CHECKSTYLE:OFF ParameterNumber
+    @Deprecated // please provide explicitly the desired charset encoding
+    public static XMLStreamWriter createTransformWriterIfNeeded(XMLStreamWriter writer,
+                                                                OutputStream os,
+                                                                Map<String, String> outElementsMap,
+                                                                List<String> outDropElements,
+                                                                Map<String, String> outAppendMap,
+                                                                Map<String, String> outAttributesMap,
+                                                                boolean attributesToElements,
+                                                                    String defaultNamespace) {
+        return createTransformWriterIfNeeded(writer, os, StandardCharsets.UTF_8.name(),
+                outElementsMap, outDropElements, outAppendMap, outAttributesMap,
+                attributesToElements, defaultNamespace);
+    }
+    //CHECKSTYLE:ON
+
+    //CHECKSTYLE:OFF ParameterNumber
+    public static XMLStreamWriter createTransformWriterIfNeeded(XMLStreamWriter writer,
+                                                                OutputStream os,
+                                                                String encoding,
                                                                 Map<String, String> outElementsMap,
                                                                 List<String> outDropElements,
                                                                 Map<String, String> outAppendMap,
@@ -73,7 +117,7 @@ public final class TransformUtils {
                                                                 String defaultNamespace) {
         if (outElementsMap != null || outDropElements != null 
             || outAppendMap != null || attributesToElements) {
-            writer = createNewWriterIfNeeded(writer, os);
+            writer = createNewWriterIfNeeded(writer, os, encoding);
             writer = new OutTransformWriter(writer, outElementsMap, outAppendMap,
                                             outDropElements, outAttributesMap, attributesToElements, defaultNamespace);
         }
@@ -81,18 +125,44 @@ public final class TransformUtils {
     }
     //CHECKSTYLE:ON
 
-    public static XMLStreamReader createTransformReaderIfNeeded(XMLStreamReader reader, 
+    @Deprecated // please provide explicitly the desired charset encoding
+    public static XMLStreamReader createTransformReaderIfNeeded(XMLStreamReader reader,
                                                                 InputStream is,
                                                                 List<String> inDropElements,
                                                                 Map<String, String> inElementsMap,
                                                                 Map<String, String> inAppendMap,
                                                                 boolean blockOriginalReader) {
-        return createTransformReaderIfNeeded(reader, is, 
+        return createTransformReaderIfNeeded(reader, is, StandardCharsets.UTF_8.name(),
+                inDropElements, inElementsMap, inAppendMap, blockOriginalReader);
+    }
+
+    public static XMLStreamReader createTransformReaderIfNeeded(XMLStreamReader reader,
+                                                                InputStream is,
+                                                                String encoding,
+                                                                List<String> inDropElements,
+                                                                Map<String, String> inElementsMap,
+                                                                Map<String, String> inAppendMap,
+                                                                boolean blockOriginalReader) {
+        return createTransformReaderIfNeeded(reader, is, encoding,
                           inDropElements, inElementsMap, inAppendMap, null, blockOriginalReader);
     }
-    
-    public static XMLStreamReader createTransformReaderIfNeeded(XMLStreamReader reader, 
+
+    @Deprecated // please provide explicitly the desired charset encoding
+    public static XMLStreamReader createTransformReaderIfNeeded(XMLStreamReader reader,
                                                                 InputStream is,
+                                                                List<String> inDropElements,
+                                                                Map<String, String> inElementsMap,
+                                                                Map<String, String> inAppendMap,
+                                                                Map<String, String> inAttributesMap,
+                                                                boolean blockOriginalReader) {
+        return createTransformReaderIfNeeded(reader, is, StandardCharsets.UTF_8.name(),
+                inDropElements, inElementsMap, inAppendMap, inAttributesMap, blockOriginalReader);
+    }
+
+    //CHECKSTYLE:OFF ParameterNumber
+    public static XMLStreamReader createTransformReaderIfNeeded(XMLStreamReader reader,
+                                                                InputStream is,
+                                                                String encoding,
                                                                 List<String> inDropElements,
                                                                 Map<String, String> inElementsMap,
                                                                 Map<String, String> inAppendMap,
@@ -100,14 +170,15 @@ public final class TransformUtils {
                                                                 boolean blockOriginalReader) {
         if (inElementsMap != null || inAppendMap != null || inDropElements != null 
             || inAttributesMap != null) {
-            reader = new InTransformReader(createNewReaderIfNeeded(reader, is),
+            reader = new InTransformReader(createNewReaderIfNeeded(reader, is, encoding),
                                            inElementsMap, inAppendMap, inDropElements, 
                                            inAttributesMap, blockOriginalReader);
         }
 
         return reader;
     }
-    
+    //CHECKSTYLE:ON
+
     protected static void convertToQNamesMap(Map<String, String> map,
                                              QNamesMap elementsMap,
                                              Map<String, String> nsMap) {

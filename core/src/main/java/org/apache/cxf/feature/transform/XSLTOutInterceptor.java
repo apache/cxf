@@ -40,6 +40,7 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CachedOutputStreamCallback;
 import org.apache.cxf.io.CachedWriter;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -94,7 +95,8 @@ public class XSLTOutInterceptor extends AbstractXSLTInterceptor {
 
     protected void transformOS(Message message, OutputStream out) {
         CachedOutputStream wrapper = new CachedOutputStream();
-        CachedOutputStreamCallback callback = new XSLTCachedOutputStreamCallback(getXSLTTemplate(), out);
+        CachedOutputStreamCallback callback = new XSLTCachedOutputStreamCallback(getXSLTTemplate(), out,
+                MessageUtils.getMessageEncoding(message));
         wrapper.registerCallback(callback);
         message.setContent(OutputStream.class, wrapper);
     }
@@ -147,10 +149,12 @@ public class XSLTOutInterceptor extends AbstractXSLTInterceptor {
     public static class XSLTCachedOutputStreamCallback implements CachedOutputStreamCallback {
         private final Templates xsltTemplate;
         private final OutputStream origStream;
+        private final String encoding;
 
-        public XSLTCachedOutputStreamCallback(Templates xsltTemplate, OutputStream origStream) {
+        public XSLTCachedOutputStreamCallback(Templates xsltTemplate, OutputStream origStream, String encoding) {
             this.xsltTemplate = xsltTemplate;
             this.origStream = origStream;
+            this.encoding = encoding;
         }
 
         @Override
@@ -161,7 +165,7 @@ public class XSLTOutInterceptor extends AbstractXSLTInterceptor {
         public void onClose(CachedOutputStream wrapper) {
             InputStream transformedStream = null;
             try {
-                transformedStream = XSLTUtils.transform(xsltTemplate, wrapper.getInputStream());
+                transformedStream = XSLTUtils.transform(xsltTemplate, wrapper.getInputStream(), encoding);
                 IOUtils.copyAndCloseInput(transformedStream, origStream);
             } catch (IOException e) {
                 throw new Fault("STREAM_COPY", LOG, e, e.getMessage());

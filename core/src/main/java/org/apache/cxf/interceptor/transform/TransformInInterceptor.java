@@ -74,18 +74,20 @@ public class TransformInInterceptor extends AbstractPhaseInterceptor<Message> {
             && !MessageUtils.getContextualBoolean(message, contextPropertyName, false)) {
             return;
         }
+
         XMLStreamReader reader = message.getContent(XMLStreamReader.class);
         InputStream is = message.getContent(InputStream.class);
-        
-        XMLStreamReader transformReader = createTransformReaderIfNeeded(reader, is);
+
+        final String encoding = MessageUtils.getMessageEncoding(message);
+        XMLStreamReader transformReader = createTransformReaderIfNeeded(reader, is, encoding);
         if (transformReader != null) {
             message.setContent(XMLStreamReader.class, transformReader);
         }
          
     }
 
-    protected XMLStreamReader createTransformReaderIfNeeded(XMLStreamReader reader, InputStream is) {
-        return TransformUtils.createTransformReaderIfNeeded(reader, is,
+    protected XMLStreamReader createTransformReaderIfNeeded(XMLStreamReader reader, InputStream is, String encoding) {
+        return TransformUtils.createTransformReaderIfNeeded(reader, is, encoding,
                                                             inDropElements,
                                                             inElementsMap,
                                                             inAppendMap,

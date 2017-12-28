@@ -38,7 +38,7 @@ import org.apache.cxf.staxutils.transform.TransformUtils;
 
 
 /**
- * Creates an XMLStreamReader from the InputStream on the Message.
+ * Creates an XMLStreamWriter from the OutputStream on the Message.
  */
 public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
     
@@ -91,11 +91,12 @@ public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
             || MessageUtils.isTrue(message.getContextualProperty(TRANSFORM_SKIP))) {
             return;
         }
-        
+
         XMLStreamWriter writer = message.getContent(XMLStreamWriter.class);
         OutputStream out = message.getContent(OutputStream.class);
-        
-        XMLStreamWriter transformWriter = createTransformWriterIfNeeded(writer, out);
+
+        final String encoding = MessageUtils.getMessageEncoding(message);
+        XMLStreamWriter transformWriter = createTransformWriterIfNeeded(writer, out, encoding);
         if (transformWriter != null) {
             message.setContent(XMLStreamWriter.class, transformWriter);
             if (MessageUtils.isRequestor(message)) {
@@ -108,8 +109,8 @@ public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
         }
     }
    
-    protected XMLStreamWriter createTransformWriterIfNeeded(XMLStreamWriter writer, OutputStream os) {
-        return TransformUtils.createTransformWriterIfNeeded(writer, os, 
+    protected XMLStreamWriter createTransformWriterIfNeeded(XMLStreamWriter writer, OutputStream os, String encoding) {
+        return TransformUtils.createTransformWriterIfNeeded(writer, os, encoding,
                                                       outElementsMap,
                                                       outDropElements,
                                                       outAppendMap,

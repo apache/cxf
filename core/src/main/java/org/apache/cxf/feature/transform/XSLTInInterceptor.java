@@ -33,6 +33,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.StaxUtils;
 
@@ -79,9 +80,11 @@ public class XSLTInInterceptor extends AbstractXSLTInterceptor {
     protected void transformXReader(Message message, XMLStreamReader xReader) {
         CachedOutputStream cachedOS = new CachedOutputStream();
         try {
-            StaxUtils.copy(xReader, cachedOS);
-            InputStream transformedIS = XSLTUtils.transform(getXSLTTemplate(), cachedOS.getInputStream());
-            XMLStreamReader transformedReader = StaxUtils.createXMLStreamReader(transformedIS);
+            final String encoding = MessageUtils.getMessageEncoding(message);
+
+            StaxUtils.copy(xReader, cachedOS, encoding);
+            InputStream transformedIS = XSLTUtils.transform(getXSLTTemplate(), cachedOS.getInputStream(), encoding);
+            XMLStreamReader transformedReader = StaxUtils.createXMLStreamReader(transformedIS, encoding);
             message.setContent(XMLStreamReader.class, transformedReader);
         } catch (XMLStreamException e) {
             throw new Fault("STAX_COPY", LOG, e, e.getMessage());
@@ -103,7 +106,8 @@ public class XSLTInInterceptor extends AbstractXSLTInterceptor {
     
     protected void transformIS(Message message, InputStream is) {
         try {
-            InputStream transformedIS = XSLTUtils.transform(getXSLTTemplate(), is);
+            InputStream transformedIS = XSLTUtils.transform(getXSLTTemplate(), is,
+                    MessageUtils.getMessageEncoding(message));
             message.setContent(InputStream.class, transformedIS);
         } finally {
             try {
@@ -116,7 +120,7 @@ public class XSLTInInterceptor extends AbstractXSLTInterceptor {
 
     protected void transformReader(Message message, Reader reader) {
         try {
-            Reader transformedReader = XSLTUtils.transform(getXSLTTemplate(), reader);
+            Reader transformedReader = XSLTUtils.transform(getXSLTTemplate(), reader); // reader encapsulates encoding
             message.setContent(Reader.class, transformedReader);
         } finally {
             try {
