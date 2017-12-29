@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -50,10 +51,12 @@ import io.swagger.v3.oas.integration.OpenApiConfigurationException;
 import io.swagger.v3.oas.integration.SwaggerConfiguration;
 import io.swagger.v3.oas.integration.api.OpenAPIConfiguration;
 import io.swagger.v3.oas.integration.api.OpenApiContext;
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 
 @Provider(value = Type.Feature, scope = Scope.Server)
 public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport, SwaggerProperties {
@@ -85,7 +88,10 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
     private String swaggerUiVersion;
     private String swaggerUiMavenGroupAndArtifact;
     private Map<String, String> swaggerUiMediaTypes;
-
+    
+    // Additional components
+    private Map<String, SecurityScheme> securityDefinitions;
+    
     // Allows to pass the configuration location, usually openapi-configuration.json
     // or openapi-configuration.yml file.
     private String configLocation;
@@ -129,6 +135,8 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
             }
         
             final OpenAPI oas = new OpenAPI().info(getInfo(swaggerProps));
+            registerComponents(securityDefinitions).ifPresent(oas::setComponents);
+            
             final SwaggerConfiguration config = new SwaggerConfiguration()
                 .openAPI(oas)
                 .prettyPrint(getOrFallback(isPrettyPrint(), swaggerProps, PRETTY_PRINT_PROPERTY))
@@ -342,6 +350,18 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
         this.propertiesLocation = propertiesLocation;
     }
 
+    public void setRunAsFilter(boolean runAsFilter) {
+        this.runAsFilter = runAsFilter;
+    }
+
+    public Map<String, SecurityScheme> getSecurityDefinitions() {
+        return securityDefinitions;
+    }
+
+    public void setSecurityDefinitions(Map<String, SecurityScheme> securityDefinitions) {
+        this.securityDefinitions = securityDefinitions;
+    }
+
     @Override
     public String findSwaggerUiRoot() {
         return SwaggerUi.findSwaggerUiRoot(swaggerUiMavenGroupAndArtifact, swaggerUiVersion);
@@ -493,5 +513,18 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
             final String name = (String)enumeration.nextElement(); 
             destination.setProperty(name, source.getProperty(name));
         }
+    }
+    
+    private static Optional<Components> registerComponents(Map<String, SecurityScheme> securityDefinitions) {
+        final Components components = new Components();
+    
+        boolean hasComponents = false;
+        if (securityDefinitions != null && !securityDefinitions.isEmpty()) {
+            securityDefinitions.entrySet().forEach(entry ->
+                components.addSecuritySchemes(entry.getKey(), entry.getValue()));
+            hasComponents |= true;
+        }
+        
+        return hasComponents ? Optional.of(components) : Optional.empty();
     }
 }
