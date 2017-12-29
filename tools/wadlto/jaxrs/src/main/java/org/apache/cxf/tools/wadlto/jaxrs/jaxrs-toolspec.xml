@@ -58,6 +58,16 @@ Examples:
                     <annotation>[schema-namespace =]package-name</annotation>
                 </associatedArgument>
             </option>
+            <option id="jaxbClassNameSuffix">
+                <annotation>
+                    Specify the JAXB class name suffix which will be used to modify
+                    the method signatures where schema-generated types are used
+                </annotation>
+                <switch>jaxbClassNameSuffix</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>jaxb-class-name-suffix</annotation>
+                </associatedArgument>
+            </option>
             <option id="schemaTypeMap" maxOccurs="unbounded">
                 <annotation>
                     Specifies the optional mapping between WADL parameter 

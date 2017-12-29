@@ -56,6 +56,7 @@ public final class WadlToolConstants {
     public static final String CFG_WADL_NAMESPACE = "wadlNamespace";
     public static final String CFG_GENERATE_ENUMS = "generateEnums";
     public static final String CFG_INHERIT_PARAMS = "inheritResourceParams";
+    public static final String CFG_JAXB_CLASS_NAME_SUFFIX = "jaxbClassNameSuffix";
     public static final String CFG_CREATE_JAVA_DOCS = "javaDocs";
     public static final String CFG_GENERATE_RESPONSE_IF_HEADERS_SET = "generateResponseIfHeadersSet";
     public static final String CFG_GENERATE_RESPONSE_FOR_METHODS = "generateResponseForMethods";
