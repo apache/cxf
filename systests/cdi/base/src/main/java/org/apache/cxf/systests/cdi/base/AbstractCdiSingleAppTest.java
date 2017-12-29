@@ -39,6 +39,7 @@ public abstract class AbstractCdiSingleAppTest extends AbstractBusClientServerTe
         Response r = createWebClient(getBasePath() + "/version", MediaType.TEXT_PLAIN).get();
         assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
         assertEquals("1.0", r.readEntity(String.class));
+        assertNotNull(r.getHeaderString("Id"));
     }
 
     @Test

@@ -16,31 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systests.cdi.base;
+package org.apache.cxf.systests.cdi.base.context;
 
-import java.util.List;
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Feature;
+import javax.ws.rs.core.FeatureContext;
+import javax.ws.rs.ext.Provider;
+import org.apache.cxf.jaxrs.ext.ContextClassProvider;
 
-import org.apache.cxf.systests.cdi.base.context.CustomContext;
+@Provider
+public class CustomContextFeature implements Feature, ContextClassProvider {
+    @Override
+    public boolean configure(FeatureContext context) {
+        context.register(new CustomContextProvider());
+        return true;
+    }
 
-@RequestScoped
-public class BookStoreVersion {
-    @Inject
-    private String version;
-    @Inject
-    private HttpHeaders httpHeaders;
-    @Inject
-    private CustomContext customContext;
-    @GET
-    public Response getVersion() {
-        List<MediaType> mediaTypeList = httpHeaders.getAcceptableMediaTypes();
-        return Response.ok(version, mediaTypeList.get(0))
-                .header("Id", customContext.getName())
-                .build();
+    @Override
+    public Class<?> getContextClass() {
+        return CustomContext.class;
     }
 }

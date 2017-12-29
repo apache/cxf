@@ -16,17 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systests.cdi.base;
+package org.apache.cxf.systests.cdi.base.context;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
-import org.apache.cxf.tracing.opentracing.jaxrs.OpenTracingFeature;
+public class CustomContextImpl implements CustomContext {
+    private final String name;
 
-@ApplicationScoped
-public class OpenTracingProducer {
-    @Produces
-    @ApplicationScoped
-    public OpenTracingFeature createFeature() {
-        return new OpenTracingFeature();
+    public CustomContextImpl(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 }

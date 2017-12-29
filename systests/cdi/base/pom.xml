@@ -83,10 +83,5 @@
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-integration-tracing-opentracing</artifactId>
-            <version>${project.version}</version>
-        </dependency>
     </dependencies>
 </project>

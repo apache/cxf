@@ -25,11 +25,13 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.context.spi.CreationalContext;
+import javax.enterprise.inject.spi.PassivationCapable;
+
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
-public class ContextProducerBean extends AbstractCXFBean<Object> {
+public class ContextProducerBean extends AbstractCXFBean<Object> implements PassivationCapable {
     private final Type type;
 
     ContextProducerBean(Type type) {
@@ -88,5 +90,10 @@ public class ContextProducerBean extends AbstractCXFBean<Object> {
             contextType = (Class<?>)type;
         }
         return JAXRSUtils.createContextValue(currentMessage, genericType, contextType);
+    }
+
+    @Override
+    public String getId() {
+        return getName();
     }
 }
