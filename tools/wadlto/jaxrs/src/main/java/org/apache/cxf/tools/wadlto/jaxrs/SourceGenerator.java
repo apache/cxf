@@ -227,7 +227,8 @@ public class SourceGenerator {
     private String encoding;
     private String authentication;
     private boolean createJavaDocs;
-    
+    private String jaxbClassNameSuffix;
+
     public SourceGenerator() {
         this(Collections.<String, String>emptyMap());
     }
@@ -1621,14 +1622,29 @@ public class SourceGenerator {
                 String[] pair = prefixedElementTypeName.split(":");
                 String elementTypeName = pair.length == 2 ? pair[1] : pair[0];
                 clsName = matchClassName(typeClassNames, packageName, elementTypeName);
+                if (clsName == null && jaxbClassNameSuffix != null) {
+                    clsName = matchClassName(typeClassNames, packageName, 
+                                             elementTypeName + jaxbClassNameSuffix);
+                }
                 if (clsName == null && elementTypeName.contains("_")) {
-                    clsName = matchClassName(typeClassNames, packageName, elementTypeName.replaceAll("_", ""));
+                    String elementTypeNameWithoutUnderscore = elementTypeName.replaceAll("_", "");
+                    clsName = matchClassName(typeClassNames, packageName, elementTypeNameWithoutUnderscore);
+                    if (clsName == null && jaxbClassNameSuffix != null) {
+                        clsName = matchClassName(typeClassNames, packageName, 
+                                                 elementTypeNameWithoutUnderscore + jaxbClassNameSuffix);
+                    }
                 }
                 if (clsName == null && pair.length == 2) {
                     String namespace = gInfo.getNsMap().get(pair[0]);
                     if (namespace != null) {
                         packageName = getPackageFromNamespace(namespace);
                         clsName = matchClassName(typeClassNames, packageName, elementTypeName);
+                        //CHECKSTYLE:OFF
+                        if (clsName == null && jaxbClassNameSuffix != null) {
+                            clsName = matchClassName(typeClassNames, packageName, 
+                                                     elementTypeName + jaxbClassNameSuffix);
+                        }
+                        //CHECKSTYLE:ON
                     }
                 }
                 
@@ -2034,6 +2050,10 @@ public class SourceGenerator {
 
     public void setAuthentication(String authentication) {
         this.authentication = authentication;
+    }
+
+    public void setJaxbClassNameSuffix(String jaxbClassNameSuffix) {
+        this.jaxbClassNameSuffix = jaxbClassNameSuffix;
     }
 
     private static class GrammarInfo {

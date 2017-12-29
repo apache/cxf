@@ -134,7 +134,8 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         if (wadlNs != null) {
             sg.setWadlNamespace(wadlNs);
         }
-        
+        sg.setJaxbClassNameSuffix((String)context.get(WadlToolConstants.CFG_JAXB_CLASS_NAME_SUFFIX));
+
         sg.setSupportMultipleXmlReps(context.optionSet(WadlToolConstants.CFG_MULTIPLE_XML_REPS));
         sg.setSupportBeanValidation(context.optionSet(WadlToolConstants.CFG_BEAN_VALIDATION));
         sg.setCreateJavaDocs(context.optionSet(WadlToolConstants.CFG_CREATE_JAVA_DOCS));

@@ -181,7 +181,37 @@ public class JAXRSContainerTest extends ProcessorTestBase {
         }
     }
     
-    @Test    
+    @Test
+    public void testCodeGenInterfacesWithJaxbClassNameSuffix() {
+        try {
+            JAXRSContainer container = new JAXRSContainer(null);
+
+            ToolContext context = new ToolContext();
+            context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
+            context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/bookstore.xml"));
+            context.put(WadlToolConstants.CFG_JAXB_CLASS_NAME_SUFFIX, "DTO");
+            context.put(WadlToolConstants.CFG_BINDING, getLocation("/wadl/jaxbSchemaBindings.xml"));
+            context.put(WadlToolConstants.CFG_COMPILE, "true");
+
+            container.setContext(context);
+            container.execute();
+
+            assertNotNull(output.list());
+            List<File> schemafiles = FileUtils.getFilesRecurse(output, ".+\\." + "java" + "$");
+            assertEquals(10, schemafiles.size());
+            doVerifyTypesWithSuffix(schemafiles, "superbooks", "java");
+            
+            List<File> classfiles = FileUtils.getFilesRecurse(output, ".+\\." + "class" + "$");
+            assertEquals(10, classfiles.size());
+            doVerifyTypesWithSuffix(classfiles, "superbooks", "class");
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+
+    @Test
     public void testCodeGenWithImportedSchema() {
         try {
             JAXRSContainer container = new JAXRSContainer(null);
@@ -905,7 +935,15 @@ public class JAXRSContainerTest extends ProcessorTestBase {
         assertTrue(checkContains(files, schemaPackage + ".ObjectFactory." + ext));
         assertTrue(checkContains(files, schemaPackage + ".package-info." + ext));
     }
-    
+
+    private void doVerifyTypesWithSuffix(List<File> files, String schemaPackage, String ext) {
+        assertTrue(checkContains(files, schemaPackage + ".BookDTO." + ext));
+        assertTrue(checkContains(files, schemaPackage + ".TheBook2DTO." + ext));
+        assertTrue(checkContains(files, schemaPackage + ".ChapterDTO." + ext));
+        assertTrue(checkContains(files, schemaPackage + ".ObjectFactory." + ext));
+        assertTrue(checkContains(files, schemaPackage + ".package-info." + ext));
+    }
+
     private boolean checkContains(List<File> clsFiles, String name) {
         for (File f : clsFiles) {
             if (f.getAbsolutePath().replace(File.separatorChar, '.').endsWith(name)) {
