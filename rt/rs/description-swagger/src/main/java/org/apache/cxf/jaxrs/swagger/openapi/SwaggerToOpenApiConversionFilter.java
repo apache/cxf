@@ -33,6 +33,7 @@ import javax.ws.rs.ext.WriterInterceptorContext;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 @Provider
@@ -42,7 +43,7 @@ public final class SwaggerToOpenApiConversionFilter implements ContainerRequestF
     private static final String SWAGGER_PATH = "swagger.json";
     private static final String OPEN_API_PATH = "openapi.json";
     private static final String OPEN_API_PROPERTY = "openapi";
-    
+
     private OpenApiConfiguration openApiConfig;
     @Override
     public void filter(ContainerRequestContext reqCtx) throws IOException {
@@ -51,9 +52,9 @@ public final class SwaggerToOpenApiConversionFilter implements ContainerRequestF
             reqCtx.setRequestUri(URI.create(SWAGGER_PATH));
             JAXRSUtils.getCurrentMessage().getExchange().put(OPEN_API_PROPERTY, Boolean.TRUE);
         }
-        
+
     }
-    
+
     public OpenApiConfiguration getOpenApiConfig() {
         return openApiConfig;
     }
@@ -70,12 +71,18 @@ public final class SwaggerToOpenApiConversionFilter implements ContainerRequestF
             context.setOutputStream(cos);
             context.proceed();
             String swaggerJson = IOUtils.readStringFromStream(cos.getInputStream());
-            String openApiJson = SwaggerToOpenApiConversionUtils.getOpenApiFromSwaggerJson(swaggerJson, openApiConfig);
+            String openApiJson = SwaggerToOpenApiConversionUtils.getOpenApiFromSwaggerJson(
+                    createMessageContext(), swaggerJson, openApiConfig);
             os.write(StringUtils.toBytesUTF8(openApiJson));
             os.flush();
         } else {
             context.proceed();
         }
+    }
+
+    private MessageContext createMessageContext() {
+        return JAXRSUtils.createContextValue(
+                JAXRSUtils.getCurrentMessage(), null, MessageContext.class);
     }
 
     private boolean isOpenApiRequested() {
