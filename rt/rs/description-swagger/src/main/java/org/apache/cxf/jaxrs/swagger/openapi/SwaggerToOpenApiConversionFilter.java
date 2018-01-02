@@ -28,6 +28,9 @@ import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.ext.Provider;
 
+import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+
 @Provider
 @PreMatching
 public final class SwaggerToOpenApiConversionFilter implements ContainerRequestFilter, ContainerResponseFilter {
@@ -35,7 +38,7 @@ public final class SwaggerToOpenApiConversionFilter implements ContainerRequestF
     private static final String SWAGGER_PATH = "swagger.json";
     private static final String OPEN_API_PATH = "openapi.json";
     private static final String OPEN_API_PROPERTY = "openapi";
-    
+
     private OpenApiConfiguration openApiConfig;
     @Override
     public void filter(ContainerRequestContext reqCtx) throws IOException {
@@ -44,20 +47,22 @@ public final class SwaggerToOpenApiConversionFilter implements ContainerRequestF
             reqCtx.setRequestUri(URI.create(SWAGGER_PATH));
             reqCtx.setProperty(OPEN_API_PROPERTY, Boolean.TRUE);
         }
-        
+
     }
     
     @Override
     public void filter(ContainerRequestContext reqCtx, ContainerResponseContext respCtx) throws IOException {
         if (Boolean.TRUE == reqCtx.getProperty(OPEN_API_PROPERTY)) {
             String swaggerJson = (String)respCtx.getEntity();
-            String openApiJson = SwaggerToOpenApiConversionUtils.getOpenApiFromSwaggerJson(swaggerJson, openApiConfig);
+            String openApiJson = SwaggerToOpenApiConversionUtils.getOpenApiFromSwaggerJson(
+                    createMessageContext(), swaggerJson, openApiConfig);
             respCtx.setEntity(openApiJson);
         }
     }
 
-    public OpenApiConfiguration getOpenApiConfig() {
-        return openApiConfig;
+    private MessageContext createMessageContext() {
+        return JAXRSUtils.createContextValue(
+                JAXRSUtils.getCurrentMessage(), null, MessageContext.class);
     }
 
     public void setOpenApiConfig(OpenApiConfiguration openApiConfig) {
