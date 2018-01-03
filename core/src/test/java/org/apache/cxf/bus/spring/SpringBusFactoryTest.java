@@ -48,6 +48,7 @@ import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.workqueue.WorkQueueManager;
+
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Assert;

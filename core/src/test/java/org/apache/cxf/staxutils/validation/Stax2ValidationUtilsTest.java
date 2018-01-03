@@ -26,6 +26,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -35,6 +36,7 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

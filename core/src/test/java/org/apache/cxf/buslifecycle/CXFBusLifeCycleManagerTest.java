@@ -20,6 +20,7 @@
 package org.apache.cxf.buslifecycle;
 
 import org.apache.cxf.bus.managers.CXFBusLifeCycleManager;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Assert;

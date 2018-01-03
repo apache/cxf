@@ -25,6 +25,7 @@ import java.util.TreeSet;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptorChain;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;

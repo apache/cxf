@@ -38,6 +38,7 @@ import org.apache.cxf.interceptor.security.callback.CertKeyToUserNameMapper;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.security.transport.TLSSessionInfo;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Test;

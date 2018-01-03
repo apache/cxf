@@ -39,6 +39,7 @@ import javax.xml.xpath.XPathConstants;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;

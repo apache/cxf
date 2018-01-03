@@ -23,6 +23,7 @@ package org.apache.cxf.common.annotation;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+
 import javax.annotation.Resource;
 import javax.jws.HandlerChain;
 import javax.jws.WebMethod;

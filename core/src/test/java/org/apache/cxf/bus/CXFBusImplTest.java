@@ -33,9 +33,9 @@ import org.apache.cxf.management.InstrumentationManager;
 import org.apache.cxf.phase.PhaseManager;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.DestinationFactoryManager;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.junit.Assert;
 import org.junit.Test;
 

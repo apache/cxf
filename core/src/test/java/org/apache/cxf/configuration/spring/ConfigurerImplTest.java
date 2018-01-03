@@ -38,8 +38,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 
 
-
-
 public class ConfigurerImplTest extends Assert {
     
     static {

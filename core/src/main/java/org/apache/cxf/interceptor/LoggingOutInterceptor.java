@@ -27,6 +27,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.io.CacheAndWriteOutputStream;

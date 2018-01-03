@@ -20,6 +20,7 @@
 package org.apache.cxf.security.transport;
 
 import java.security.cert.Certificate;
+
 import javax.net.ssl.SSLSession;
 
 /**

@@ -20,7 +20,6 @@
 package org.apache.cxf.resource;
 
 import java.io.InputStream;
-
 import java.net.URL;
 
 import org.apache.cxf.common.injection.NoJSR250Annotations;

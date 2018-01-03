@@ -33,11 +33,11 @@ import org.apache.cxf.feature.Feature;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.message.Message;
-
 import org.junit.Assert;
 import org.junit.Test;
-
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+
 
 public class BusDefinitionParserTest extends Assert {
     

@@ -20,6 +20,7 @@
 package org.apache.cxf.continuations;
 
 import org.apache.cxf.common.i18n.UncheckedException;
+
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -24,6 +24,7 @@ import java.util.Random;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+
 import org.junit.Test;
 
 import static org.apache.cxf.ws.addressing.ContextUtils.getAttributedURI;

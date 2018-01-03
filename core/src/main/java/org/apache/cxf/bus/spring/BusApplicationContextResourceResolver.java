@@ -24,7 +24,6 @@ import java.net.URL;
 
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.resource.ResourceResolver;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
