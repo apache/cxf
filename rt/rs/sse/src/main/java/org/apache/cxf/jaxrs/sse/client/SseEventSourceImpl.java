@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.jaxrs.sse.client;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
@@ -259,7 +261,11 @@ public class SseEventSourceImpl implements SseEventSource {
         }
         
         if (executor != null && !managedExecutor) {
-            executor.shutdown();
+            AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
+                executor.shutdown();
+                return null;
+            });
+            
             executor = null;
             managedExecutor = true;
         }
