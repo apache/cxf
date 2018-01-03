@@ -26,6 +26,7 @@ import org.apache.cxf.resource.DefaultResourceManager;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.resource.ResourceResolver;
 import org.apache.cxf.resource.SinglePropertyResolver;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

@@ -31,14 +31,9 @@ import javax.xml.namespace.QName;
 //import javax.xml.ws.EndpointReference;
 //import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
-
-
 import org.w3c.dom.Element;
 
 import org.apache.cxf.common.jaxb.JAXBUtils;
-// importation convention: if the same class name is used for
-// 2005/08 and 2004/08, then the former version is imported
-// and the latter is fully qualified when used
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.addressing.v200408.AttributedQName;
 import org.apache.cxf.ws.addressing.v200408.AttributedURI;

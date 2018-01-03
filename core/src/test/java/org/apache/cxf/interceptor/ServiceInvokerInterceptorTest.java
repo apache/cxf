@@ -31,6 +31,7 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.ServiceImpl;
 import org.apache.cxf.service.invoker.Invoker;
 import org.apache.cxf.service.model.ServiceInfo;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Assert;

@@ -28,8 +28,8 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.service.invoker.MethodDispatcher;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.OperationInfo;
-import org.easymock.EasyMock;
 
+import org.easymock.EasyMock;
 import org.junit.Before;
 
 public class OperationInfoAuthorizingInterceptorTest extends SimpleAuthorizingInterceptorTest {

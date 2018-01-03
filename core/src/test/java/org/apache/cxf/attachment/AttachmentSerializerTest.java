@@ -38,6 +38,7 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+
 import org.junit.Assert;
 import org.junit.Test;
 

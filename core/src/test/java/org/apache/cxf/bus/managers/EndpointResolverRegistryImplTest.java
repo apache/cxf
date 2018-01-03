@@ -23,9 +23,9 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.endpoint.EndpointResolver;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

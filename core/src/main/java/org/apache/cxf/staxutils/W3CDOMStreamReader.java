@@ -26,7 +26,6 @@ import javax.xml.stream.Location;
 import javax.xml.stream.XMLStreamException;
 
 import org.w3c.dom.Attr;
-
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;

@@ -20,7 +20,6 @@
 package org.apache.cxf.bus.managers;
 
 import java.util.Map;
-
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;

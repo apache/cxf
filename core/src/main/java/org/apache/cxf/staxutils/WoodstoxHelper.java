@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import com.ctc.wstx.stax.WstxEventFactory;
 import com.ctc.wstx.stax.WstxInputFactory;
+
 import org.codehaus.stax2.XMLStreamReader2;
 
 /**
