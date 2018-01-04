@@ -35,8 +35,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import junit.framework.AssertionFailedError;
-
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapFault;
@@ -68,8 +66,8 @@ public class SoapFaultSerializerTest extends Assert {
         namespaces.put("xml", "http://www.w3.org/XML/1998/namespace");
         XPathUtils xpu = new XPathUtils(namespaces);
         if (!xpu.isExist(xpathExpression, doc, XPathConstants.NODE)) {
-            throw new AssertionFailedError("Failed to select any nodes for expression:\n" + xpathExpression
-                                           + " from document:\n" + StaxUtils.toString(doc));
+            fail("Failed to select any nodes for expression:\n" + xpathExpression
+                 + " from document:\n" + StaxUtils.toString(doc));
         }
     }
     

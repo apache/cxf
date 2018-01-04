@@ -32,7 +32,6 @@ import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import junit.framework.AssertionFailedError;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 
@@ -59,8 +58,8 @@ public final class XPathAssert {
         NodeList nodes = (NodeList)createXPath(namespaces).evaluate(xpath, node, XPathConstants.NODESET);
 
         if (nodes.getLength() == 0) {
-            throw new AssertionFailedError("Failed to select any nodes for expression:\n" + xpath
-                                           + " from document:\n" + writeNodeToString(node));
+            Assert.fail("Failed to select any nodes for expression:\n" + xpath
+                         + " from document:\n" + writeNodeToString(node));
         }
 
         return nodes;
@@ -79,14 +78,14 @@ public final class XPathAssert {
         Boolean b = (Boolean)createXPath(namespaces).evaluate(xpath, node, XPathConstants.BOOLEAN);
 
         if (b == null) {
-            throw new AssertionFailedError("Failed to select any nodes for expression:\n" + xpath
-                                           + " from document:\n" + writeNodeToString(node));
+            Assert.fail("Failed to select any nodes for expression:\n" + xpath
+                        + " from document:\n" + writeNodeToString(node));
         }
         
         if (!b.booleanValue()) {
-            throw new AssertionFailedError("Boolean XPath assertion evaluated to false:\n"
-                                           + xpath
-                                           + " from document:\n" + writeNodeToString(node));
+            Assert.fail("Boolean XPath assertion evaluated to false:\n"
+                        + xpath
+                        + " from document:\n" + writeNodeToString(node));
         }
     }
 
@@ -110,7 +109,7 @@ public final class XPathAssert {
         if (nodes.getLength() > 0) {
             String value = writeNodeToString(node);
 
-            throw new AssertionFailedError("Found multiple nodes for expression:\n" + xpath + "\n" + value);
+            Assert.fail("Found multiple nodes for expression:\n" + xpath + "\n" + value);
         }
 
         return nodes;
@@ -144,9 +143,9 @@ public final class XPathAssert {
                 return;
             }
         }
-        throw new AssertionFailedError("No nodes were found for expression: " 
-            + xpath 
-            + " in document " 
+        Assert.fail("No nodes were found for expression: "
+            + xpath
+            + " in document "
             + writeNodeToString(node));
     }
     
@@ -180,9 +179,9 @@ public final class XPathAssert {
                 return;
             }
         }
-        throw new AssertionFailedError("No nodes were found for expression: " 
-            + xpath 
-            + " in document " 
+        Assert.fail("No nodes were found for expression: "
+            + xpath
+            + " in document "
             + writeNodeToString(node));
     }    
 
