@@ -84,6 +84,21 @@ public class WadlGeneratorTest extends Assert {
     }
     
     @Test
+    public void testWhiteList() throws Exception {
+        WadlGenerator wg = new WadlGenerator();
+        List<String> whiteList = new ArrayList<String>();
+        whiteList.add("123.123.123.123");
+        wg.setWhiteList(whiteList);
+        wg.setExternalLinks(Collections.singletonList("http://books.xsd"));
+
+        ClassResourceInfo cri =
+            ResourceUtils.createClassResourceInfo(BookStore.class, BookStore.class, true, true);
+        Message m = mockMessage("http://localhost:8080/baz", "/bookstore/1", WadlGenerator.WADL_QUERY, cri);
+        Response response = handleRequest(wg, m);
+        assertEquals(response.getStatus(), 404);
+    }
+    
+    @Test
     public void testCustomSchemaJaxbContextPrefixes() throws Exception {
         WadlGenerator wg = new WadlGenerator();
         wg.setSchemaLocations(Collections.singletonList("classpath:/book1.xsd"));

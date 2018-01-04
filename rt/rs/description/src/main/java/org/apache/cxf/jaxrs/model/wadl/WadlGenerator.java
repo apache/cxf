@@ -50,6 +50,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
+import javax.servlet.ServletRequest;
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.Encoded;
@@ -187,6 +188,7 @@ public class WadlGenerator implements ContainerRequestFilter {
 
     private ElementQNameResolver resolver;
     private List<String> privateAddresses;
+    private List<String> whiteList;
     private String applicationTitle;
     private String nsPrefix = DEFAULT_NS_PREFIX;
     private MediaType defaultWadlResponseMediaType = MediaType.APPLICATION_XML_TYPE;
@@ -238,6 +240,28 @@ public class WadlGenerator implements ContainerRequestFilter {
         if (ignoreRequests) {
             context.abortWith(Response.status(404).build());
             return;
+        }
+        
+        if (whiteList != null && whiteList.size() > 0) {
+            ServletRequest servletRequest = (ServletRequest)m.getContextualProperty(
+                "HTTP.REQUEST");
+            String remoteAddress = null;
+            if (servletRequest != null) {
+                remoteAddress = servletRequest.getRemoteAddr();
+            } else {
+                remoteAddress = "";
+            }
+            boolean foundMatch = false;
+            for (String addr : whiteList) {
+                if (addr.equals(remoteAddress)) {
+                    foundMatch = true;
+                    break;
+                }
+            }
+            if (!foundMatch) {
+                context.abortWith(Response.status(404).build());
+                return;
+            }
         }
 
         HttpHeaders headers = new HttpHeadersImpl(m);
@@ -2259,6 +2283,14 @@ public class WadlGenerator implements ContainerRequestFilter {
         this.jaxbContextProperties = jaxbContextProperties;
     }
 
+
+    public List<String> getWhiteList() {
+        return whiteList;
+    }
+
+    public void setWhiteList(List<String> whiteList) {
+        this.whiteList = whiteList;
+    }
 
     private static class SchemaConverter extends DelegatingXMLStreamWriter {
         private static final String SCHEMA_LOCATION = "schemaLocation";
