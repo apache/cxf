@@ -23,6 +23,7 @@ import java.awt.Image;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 import java.net.URL;
+
 import javax.imageio.ImageIO;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;

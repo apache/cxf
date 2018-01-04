@@ -19,8 +19,10 @@
 package org.apache.cxf.frontend.spring;
 
 import org.apache.cxf.BusFactory;
+
 import org.junit.After;
 import org.junit.Assert;
+
 import org.springframework.context.support.AbstractApplicationContext;
 
 public class AbstractSimpleFrontendSpringTest extends Assert {

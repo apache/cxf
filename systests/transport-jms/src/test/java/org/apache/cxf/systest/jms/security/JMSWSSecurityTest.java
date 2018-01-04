@@ -40,6 +40,7 @@ import org.apache.wss4j.common.saml.bean.AudienceRestrictionBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;

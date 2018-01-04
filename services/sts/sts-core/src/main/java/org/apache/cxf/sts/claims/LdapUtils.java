@@ -32,7 +32,6 @@ import javax.naming.directory.SearchControls;
 import javax.security.auth.x500.X500Principal;
 
 import org.apache.cxf.helpers.CastUtils;
-
 import org.springframework.ldap.core.AttributesMapper;
 import org.springframework.ldap.core.ContextMapper;
 import org.springframework.ldap.core.DirContextOperations;

@@ -39,6 +39,7 @@ import org.apache.cxf.xkms.model.xkms.StatusType;
 import org.apache.cxf.xkms.model.xkms.ValidateRequestType;
 import org.apache.cxf.xkms.model.xmldsig.KeyInfoType;
 import org.apache.cxf.xkms.model.xmldsig.X509DataType;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

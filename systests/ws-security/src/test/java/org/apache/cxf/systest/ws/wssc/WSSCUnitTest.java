@@ -57,6 +57,7 @@ import org.apache.wss4j.policy.model.ProtectionToken;
 import org.apache.wss4j.policy.model.SignedParts;
 import org.apache.wss4j.policy.model.X509Token;
 import org.example.contract.doubleit.DoubleItPortType;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;

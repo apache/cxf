@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.common.security.SimpleGroup;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rt.security.SecurityConstants;

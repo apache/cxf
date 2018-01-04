@@ -25,6 +25,7 @@ import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.aegis.type.TypeCreationOptions;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
+
 import org.junit.Test;
 
 public class DuplicateArrayTest extends AbstractAegisTest {

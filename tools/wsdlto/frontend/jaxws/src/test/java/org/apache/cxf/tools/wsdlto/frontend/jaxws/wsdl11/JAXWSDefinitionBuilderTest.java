@@ -22,6 +22,7 @@ package org.apache.cxf.tools.wsdlto.frontend.jaxws.wsdl11;
 import java.io.File;
 import java.util.Iterator;
 import java.util.List;
+
 import javax.wsdl.Definition;
 import javax.wsdl.Operation;
 import javax.wsdl.PortType;
@@ -32,6 +33,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSBinding;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

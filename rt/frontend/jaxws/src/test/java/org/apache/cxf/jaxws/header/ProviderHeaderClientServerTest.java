@@ -37,6 +37,7 @@ import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.AbstractJaxWsTest;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.header_test.rpc.SOAPRPCHeaderService;
+
 import org.junit.Before;
 import org.junit.Test;
 

@@ -40,6 +40,7 @@ import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.processor.Processor;
 import org.apache.wss4j.dom.processor.SAMLTokenProcessor;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

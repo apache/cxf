@@ -21,7 +21,6 @@ package org.apache.cxf.rs.security.oauth.services;
 import javax.ws.rs.core.Context;
 
 import net.oauth.OAuthValidator;
-
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.oauth.provider.DefaultOAuthValidator;
 import org.apache.cxf.rs.security.oauth.provider.OAuthDataProvider;

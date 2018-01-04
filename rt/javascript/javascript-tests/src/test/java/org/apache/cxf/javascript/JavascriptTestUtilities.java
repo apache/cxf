@@ -36,6 +36,7 @@ import org.apache.cxf.javascript.types.SchemaJavascriptBuilder;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.test.TestUtilities;
+
 import org.junit.Assert;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;

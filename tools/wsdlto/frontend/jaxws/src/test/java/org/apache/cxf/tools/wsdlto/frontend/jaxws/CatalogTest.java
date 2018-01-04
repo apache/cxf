@@ -25,6 +25,7 @@ import org.xml.sax.InputSource;
 
 import org.apache.cxf.catalog.OASISCatalogManager;
 import org.apache.cxf.resource.ExtendedURIResolver;
+
 import org.junit.Assert;
 import org.junit.Test;
 

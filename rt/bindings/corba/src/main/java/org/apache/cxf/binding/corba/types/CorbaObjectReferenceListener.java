@@ -21,7 +21,6 @@ package org.apache.cxf.binding.corba.types;
 
 import org.apache.cxf.binding.corba.utils.CorbaObjectReferenceHelper;
 import org.apache.cxf.binding.corba.utils.CorbaUtils;
-
 import org.omg.CORBA.ORB;
 
 

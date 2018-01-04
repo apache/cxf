@@ -38,6 +38,7 @@ import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.hello_world_doc_lit.PingMeFault;
 import org.apache.hello_world_doc_lit.types.FaultDetail;
+
 import org.junit.Before;
 import org.junit.Test;
 

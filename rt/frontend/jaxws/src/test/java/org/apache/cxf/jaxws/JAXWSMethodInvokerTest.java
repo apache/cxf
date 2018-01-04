@@ -34,6 +34,7 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.Provider;
 
 import org.w3c.dom.Document;
+
 import org.xml.sax.SAXException;
 
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -52,6 +53,7 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.service.invoker.Factory;
 import org.apache.cxf.service.invoker.MethodDispatcher;
 import org.apache.cxf.service.model.BindingOperationInfo;
+
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;

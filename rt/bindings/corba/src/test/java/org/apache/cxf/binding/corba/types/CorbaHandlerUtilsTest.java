@@ -34,6 +34,7 @@ import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
 import org.apache.cxf.binding.corba.wsdl.TypeMappingType;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

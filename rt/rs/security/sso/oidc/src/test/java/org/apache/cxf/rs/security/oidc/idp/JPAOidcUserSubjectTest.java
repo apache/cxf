@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.oidc.idp;
 
 import java.util.Collections;
+
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
@@ -27,6 +28,7 @@ import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.provider.JPAOAuthDataProvider;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

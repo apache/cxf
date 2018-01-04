@@ -19,6 +19,7 @@
 package org.apache.cxf.jaxrs.resources;
 
 import java.util.List;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 

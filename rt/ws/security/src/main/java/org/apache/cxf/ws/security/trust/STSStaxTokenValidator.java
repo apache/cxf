@@ -20,6 +20,7 @@ package org.apache.cxf.ws.security.trust;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.helpers.DOMUtils;

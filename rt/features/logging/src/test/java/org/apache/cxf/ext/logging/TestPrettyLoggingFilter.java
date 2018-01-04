@@ -21,6 +21,7 @@ package org.apache.cxf.ext.logging;
 import org.apache.cxf.ext.logging.event.LogEvent;
 import org.apache.cxf.ext.logging.event.LogEventSender;
 import org.apache.cxf.ext.logging.event.PrettyLoggingFilter;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

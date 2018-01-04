@@ -41,9 +41,7 @@ import javax.wsdl.extensions.soap.SOAPBinding;
 import javax.wsdl.extensions.soap.SOAPBody;
 import javax.wsdl.extensions.soap.SOAPFault;
 import javax.wsdl.extensions.soap.SOAPOperation;
-
 import javax.xml.namespace.QName;
-
 
 import org.apache.cxf.helpers.CastUtils;
 

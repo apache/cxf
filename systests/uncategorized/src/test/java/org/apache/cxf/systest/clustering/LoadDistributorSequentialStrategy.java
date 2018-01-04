@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.clustering;
 
 import java.util.List;
+
 import org.apache.cxf.clustering.SequentialStrategy;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Exchange;

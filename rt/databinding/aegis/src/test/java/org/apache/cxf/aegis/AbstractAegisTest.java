@@ -74,6 +74,7 @@ import org.apache.cxf.wsdl11.WSDLManagerImpl;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.constants.Constants;
 import org.apache.ws.commons.schema.utils.NamespaceMap;
+
 import org.junit.Before;
 
 public abstract class AbstractAegisTest extends AbstractCXFTest {

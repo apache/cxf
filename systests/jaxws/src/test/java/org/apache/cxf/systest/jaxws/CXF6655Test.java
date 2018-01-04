@@ -34,6 +34,7 @@ import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.transports.http.configuration.ProxyServerType;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;

@@ -40,6 +40,7 @@ import org.apache.cxf.service.model.ServiceModelUtil;
 import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 import org.apache.hello_world_soap_http.GreeterImpl;
 import org.apache.hello_world_soap_http.RPCLitGreeterImpl;
+
 import org.junit.Before;
 import org.junit.Test;
 

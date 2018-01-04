@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.ehcache.Ehcache;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.helpers.CastUtils;

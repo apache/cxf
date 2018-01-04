@@ -38,6 +38,7 @@ import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.hello_world.types.GreetMe;
 import org.apache.hello_world_soap_http.types.GreetMeOneWay;
+
 import org.junit.Test;
 
 public class ServerFactoryTest extends AbstractSimpleFrontendTest {

@@ -37,6 +37,7 @@ import org.apache.cxf.jaxws.JaxWsClientProxy;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.test.AbstractCXFTest;
 import org.apache.hello_world_soap_http.Greeter;
+
 import org.junit.Test;
 
 public class JaxWsClientThreadTest extends AbstractCXFTest {

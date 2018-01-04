@@ -25,6 +25,7 @@ import org.apache.cxf.jca.cxf.CXFInvocationHandler;
 import org.apache.cxf.jca.cxf.CXFManagedConnection;
 import org.apache.cxf.jca.cxf.ManagedConnectionFactoryImpl;
 import org.apache.cxf.jca.cxf.ManagedConnectionImpl;
+
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;

@@ -23,7 +23,6 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.binding.corba.CorbaBindingException;
 import org.apache.cxf.binding.corba.CorbaStreamable;
 import org.apache.cxf.binding.corba.types.CorbaObjectHandler;
-
 import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.portable.InputStream;
 import org.omg.CORBA.portable.OutputStream;

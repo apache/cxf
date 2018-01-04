@@ -29,7 +29,6 @@ import javax.ws.rs.ext.Provider;
 import org.apache.cxf.tracing.brave.AbstractBraveClientProvider;
 import org.apache.cxf.tracing.brave.HttpClientSpanParser;
 import org.apache.cxf.tracing.brave.TraceScope;
-
 import brave.Tracing;
 import brave.http.HttpTracing;
 

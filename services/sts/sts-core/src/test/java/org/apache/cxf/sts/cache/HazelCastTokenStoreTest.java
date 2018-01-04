@@ -22,6 +22,7 @@ import java.util.Date;
 
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+
 import org.junit.BeforeClass;
 
 public class HazelCastTokenStoreTest extends org.junit.Assert {

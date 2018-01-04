@@ -30,7 +30,6 @@ import javax.activation.URLDataSource;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
-
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPElement;
@@ -59,6 +58,7 @@ import org.apache.handlers.types.AddNumbers;
 import org.apache.handlers.types.AddNumbersResponse;
 import org.apache.handlers.types.ObjectFactory;
 import org.apache.hello_world_xml_http.wrapped.XMLService;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 

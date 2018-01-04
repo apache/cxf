@@ -26,6 +26,7 @@ import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.test.AbstractCXFTest;
+
 import org.junit.Test;
 
 public class ReaderTest extends AbstractCXFTest {

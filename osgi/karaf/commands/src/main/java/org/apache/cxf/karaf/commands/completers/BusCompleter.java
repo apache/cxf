@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.karaf.commands.CXFController;
-
 import org.apache.karaf.shell.console.Completer;
 import org.apache.karaf.shell.console.completer.StringsCompleter;
 

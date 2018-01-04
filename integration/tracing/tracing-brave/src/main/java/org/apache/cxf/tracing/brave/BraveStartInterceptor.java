@@ -22,7 +22,6 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
-
 import brave.http.HttpTracing;
 
 @NoJSR250Annotations

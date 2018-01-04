@@ -20,6 +20,7 @@ package org.apache.cxf.wsn.client;
 
 import java.math.BigInteger;
 import java.util.List;
+
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
 import org.apache.cxf.wsn.util.WSNHelper;

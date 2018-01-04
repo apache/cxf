@@ -40,6 +40,7 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.ws.policy.PolicyInInterceptor;
 import org.apache.cxf.ws.policy.PolicyOutInterceptor;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 

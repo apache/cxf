@@ -45,6 +45,7 @@ import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.message.Message;
+
 import org.junit.Assert;
 import org.junit.Test;
 

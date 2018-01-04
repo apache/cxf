@@ -24,6 +24,7 @@ import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.service.invoker.BeanInvoker;
+
 import org.junit.Before;
 import org.junit.Test;
 

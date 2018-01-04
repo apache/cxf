@@ -38,6 +38,7 @@ import org.apache.cxf.ws.security.wss4j.policyvalidators.PolicyValidatorParamete
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SecurityPolicyValidator;
 import org.apache.neethi.Policy;
 import org.apache.wss4j.policy.SP12Constants;
+
 import org.junit.Test;
 
 /**

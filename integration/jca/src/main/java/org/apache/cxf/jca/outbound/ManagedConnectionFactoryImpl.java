@@ -19,7 +19,6 @@
 package org.apache.cxf.jca.outbound;
 
 import java.io.PrintWriter;
-
 import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Level;

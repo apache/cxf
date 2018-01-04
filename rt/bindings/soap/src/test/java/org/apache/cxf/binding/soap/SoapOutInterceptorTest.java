@@ -34,6 +34,7 @@ import org.apache.cxf.binding.soap.interceptor.SoapOutInterceptor;
 import org.apache.cxf.binding.soap.interceptor.StartBodyInterceptor;
 import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.staxutils.StaxUtils;
+
 import org.junit.Before;
 import org.junit.Test;
 

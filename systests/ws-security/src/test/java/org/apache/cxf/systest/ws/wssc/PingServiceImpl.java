@@ -20,7 +20,6 @@ package org.apache.cxf.systest.ws.wssc;
 
 
 import org.xmlsoap.ping.PingResponseBody;
-
 import wssec.wssc.IPingService;
 import wssec.wssc.PingRequest;
 import wssec.wssc.PingResponse;

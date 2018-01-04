@@ -20,7 +20,9 @@
 package org.apache.cxf.tools.corba.processors.idl;
 
 import javax.wsdl.Definition;
+
 import antlr.collections.AST;
+
 import org.apache.ws.commons.schema.XmlSchema;
 
 public class SimpleTypeSpecVisitor extends VisitorBase {

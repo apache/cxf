@@ -35,6 +35,7 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItMtomPortType;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.example.schema.doubleit.DoubleIt4;
+
 import org.junit.BeforeClass;
 
 /**

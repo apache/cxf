@@ -24,6 +24,7 @@ import java.util.Enumeration;
 
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.tools.common.ToolTestBase;
+
 import org.junit.Before;
 import org.junit.Test;
 

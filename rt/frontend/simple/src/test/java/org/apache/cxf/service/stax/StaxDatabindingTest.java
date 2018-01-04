@@ -33,6 +33,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.staxutils.FragmentStreamReader;
 import org.apache.cxf.test.AbstractCXFTest;
 import org.apache.cxf.transport.local.LocalTransportFactory;
+
 import org.junit.Test;
 
 public class StaxDatabindingTest extends AbstractCXFTest {

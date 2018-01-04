@@ -25,6 +25,7 @@ import java.io.Writer;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
+
 import org.junit.Test;
 
 public class JMSConduitTest extends AbstractJMSTester {

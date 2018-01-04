@@ -25,7 +25,6 @@ import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.tracing.brave.HttpServerSpanParser;
-
 import brave.Tracing;
 import brave.http.HttpTracing;
 

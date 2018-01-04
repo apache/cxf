@@ -24,6 +24,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.http.HTTPTransportFactory;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;

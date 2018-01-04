@@ -35,6 +35,7 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.auth.SpnegoAuthSupplier;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.ietf.jgss.GSSName;
+
 import org.junit.BeforeClass;
 
 /**

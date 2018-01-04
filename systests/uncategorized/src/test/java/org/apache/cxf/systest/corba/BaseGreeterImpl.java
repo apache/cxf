@@ -25,6 +25,7 @@ import org.apache.cxf.hello_world_corba.Greeter;
 import org.apache.cxf.hello_world_corba.PingMeFault;
 import org.apache.cxf.hello_world_corba.types.FaultDetail;
 import org.apache.cxf.interceptor.Fault;
+
 import org.junit.Assert;
 
 /**

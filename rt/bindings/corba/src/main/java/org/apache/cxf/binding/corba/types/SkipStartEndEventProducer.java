@@ -21,7 +21,6 @@ package org.apache.cxf.binding.corba.types;
 import java.util.List;
 
 import javax.xml.namespace.QName;
-//import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Namespace;
 

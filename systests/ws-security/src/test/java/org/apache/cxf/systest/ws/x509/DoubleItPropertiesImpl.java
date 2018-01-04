@@ -24,7 +24,6 @@ import org.apache.cxf.annotations.EndpointProperties;
 import org.apache.cxf.annotations.EndpointProperty;
 import org.apache.cxf.feature.Features;
 import org.apache.cxf.rt.security.SecurityConstants;
-
 import org.example.contract.doubleit.DoubleItFault;
 import org.example.contract.doubleit.DoubleItPortType;
 

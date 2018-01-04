@@ -24,6 +24,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.tools.common.model.JavaField;
 import org.apache.cxf.tools.java2wsdl.generator.wsdl11.model.WrapperBeanClass;
+
 import org.junit.Assert;
 import org.junit.Test;
 

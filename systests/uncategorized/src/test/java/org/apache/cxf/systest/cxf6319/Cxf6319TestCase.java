@@ -28,6 +28,7 @@ import javax.xml.ws.Endpoint;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.TestUtil;
+
 import org.junit.Test;
 
 /**

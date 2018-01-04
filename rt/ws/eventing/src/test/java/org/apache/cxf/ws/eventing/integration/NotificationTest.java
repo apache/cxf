@@ -45,6 +45,7 @@ import org.apache.cxf.ws.eventing.integration.notificationapi.EarthquakeEvent;
 import org.apache.cxf.ws.eventing.integration.notificationapi.FireEvent;
 import org.apache.cxf.ws.eventing.shared.EventingConstants;
 import org.apache.cxf.ws.eventing.shared.utils.DurationAndDateUtil;
+
 import org.junit.Assert;
 import org.junit.Test;
 

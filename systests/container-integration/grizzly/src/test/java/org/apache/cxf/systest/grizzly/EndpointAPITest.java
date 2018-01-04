@@ -33,6 +33,7 @@ import javax.xml.ws.soap.MTOMFeature;
 import javax.xml.ws.spi.http.HttpContext;
 
 import org.apache.cxf.testutil.common.TestUtil;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

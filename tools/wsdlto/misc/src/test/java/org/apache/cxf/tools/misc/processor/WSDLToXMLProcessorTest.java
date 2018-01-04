@@ -33,6 +33,7 @@ import org.apache.cxf.bindings.xformat.XMLBindingMessageFormat;
 import org.apache.cxf.bindings.xformat.XMLFormatBinding;
 import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.misc.WSDLToXML;
+
 import org.junit.Before;
 import org.junit.Test;
 

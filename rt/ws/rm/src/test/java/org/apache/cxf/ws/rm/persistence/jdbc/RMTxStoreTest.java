@@ -21,13 +21,14 @@ package org.apache.cxf.ws.rm.persistence.jdbc;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+
 import org.apache.cxf.ws.rm.ProtocolVariation;
 import org.apache.cxf.ws.rm.RMUtils;
 import org.apache.cxf.ws.rm.SourceSequence;
 import org.apache.cxf.ws.rm.persistence.RMStoreException;
 import org.apache.cxf.ws.rm.v200702.Identifier;
-import org.easymock.EasyMock;
 
+import org.easymock.EasyMock;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;

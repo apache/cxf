@@ -20,6 +20,7 @@
 package org.apache.cxf.tools.wsdlto.databinding.jaxb;
 
 import com.sun.tools.xjc.api.ClassNameAllocator;
+
 import org.apache.cxf.tools.util.ClassCollector;
 
 public class ClassNameAllocatorImpl implements ClassNameAllocator {

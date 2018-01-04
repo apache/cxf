@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.IOUtils;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

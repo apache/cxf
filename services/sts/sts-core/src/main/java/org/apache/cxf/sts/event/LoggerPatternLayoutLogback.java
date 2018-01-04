@@ -20,7 +20,6 @@
 package org.apache.cxf.sts.event;
 
 import org.apache.cxf.sts.event.map.MapEventLogger;
-
 import ch.qos.logback.classic.PatternLayout;
 
 public class LoggerPatternLayoutLogback extends PatternLayout {

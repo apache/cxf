@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.mtom_feature;
 
 import java.awt.Image;
+
 import javax.xml.ws.Holder;
 import javax.xml.ws.soap.MTOM;
 

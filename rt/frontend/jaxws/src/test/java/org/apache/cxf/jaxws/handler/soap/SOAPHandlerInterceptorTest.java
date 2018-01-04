@@ -71,6 +71,7 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.staxutils.PartialXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
+
 import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Assert;

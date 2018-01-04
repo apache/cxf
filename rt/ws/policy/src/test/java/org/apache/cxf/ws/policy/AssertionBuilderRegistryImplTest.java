@@ -26,6 +26,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.Bus;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.builders.PrimitiveAssertion;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;

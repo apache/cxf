@@ -20,6 +20,7 @@ package org.apache.cxf.aegis.type.encoded;
 
 import java.util.Map;
 import java.util.TreeMap;
+
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Attr;

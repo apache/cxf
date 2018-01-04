@@ -29,6 +29,7 @@ import org.apache.cxf.systest.jaxrs.AbstractSpringServer;
 import org.apache.cxf.systest.jaxrs.validation.AbstractJAXRSValidationTest;
 import org.apache.cxf.systest.jaxrs.validation.BookWithValidation;
 import org.apache.cxf.testutil.common.TestUtil;
+
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;

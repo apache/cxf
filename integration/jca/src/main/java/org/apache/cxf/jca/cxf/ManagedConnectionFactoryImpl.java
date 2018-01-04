@@ -30,7 +30,6 @@ import javax.resource.spi.ManagedConnection;
 import javax.security.auth.Subject;
 
 import org.apache.cxf.Bus;
-//import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;

@@ -36,6 +36,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.transport.jms.ConnectionFactoryFeature;
+
 import org.junit.After;
 import org.junit.AfterClass;
 

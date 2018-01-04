@@ -26,7 +26,6 @@ import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
-
 import org.apache.cxf.service.model.BindingInfo;
 
 public class CorbaBinding extends AbstractBasicInterceptorProvider implements Binding {

@@ -20,6 +20,7 @@ package org.apache.cxf.jca.core.resourceadapter;
 
 import java.util.*;
 import java.util.logging.Logger;
+
 import org.apache.cxf.common.logging.LogUtils;
 
 public class UriHandlerInit {

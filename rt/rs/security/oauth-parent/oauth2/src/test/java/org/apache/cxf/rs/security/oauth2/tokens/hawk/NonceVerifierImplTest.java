@@ -19,8 +19,8 @@
 package org.apache.cxf.rs.security.oauth2.tokens.hawk;
 
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
-import org.easymock.EasyMock;
 
+import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

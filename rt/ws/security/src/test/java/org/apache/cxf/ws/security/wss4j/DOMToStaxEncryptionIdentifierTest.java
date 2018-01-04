@@ -34,6 +34,7 @@ import org.apache.cxf.transport.local.LocalTransportFactory;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+
 import org.junit.Test;
 
 

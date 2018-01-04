@@ -35,6 +35,7 @@ import org.apache.wss4j.dom.action.UsernameTokenAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandler;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
+
 import org.junit.Test;
 
 public class WSS4JOutInterceptorTest extends AbstractSecurityTest {

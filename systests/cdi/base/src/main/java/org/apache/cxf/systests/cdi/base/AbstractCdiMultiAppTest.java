@@ -29,6 +29,7 @@ import javax.ws.rs.core.Response;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import org.apache.cxf.jaxrs.client.WebClient;
+
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;

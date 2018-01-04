@@ -18,15 +18,13 @@
  */
 package org.apache.cxf.binding.corba;
 
-
-
-
 import org.apache.cxf.binding.corba.utils.OrbConfig;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

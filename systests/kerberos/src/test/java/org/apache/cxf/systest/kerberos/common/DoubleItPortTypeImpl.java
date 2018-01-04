@@ -27,6 +27,7 @@ import javax.xml.ws.WebServiceContext;
 import org.apache.cxf.feature.Features;
 import org.example.contract.doubleit.DoubleItFault;
 import org.example.contract.doubleit.DoubleItPortType;
+
 import org.junit.Assert;
 
 @WebService(targetNamespace = "http://www.example.org/contract/DoubleIt", 

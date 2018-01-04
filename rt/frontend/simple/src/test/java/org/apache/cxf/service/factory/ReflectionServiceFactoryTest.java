@@ -44,6 +44,7 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.wsdl.service.factory.AbstractServiceConfiguration;
 import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 import org.apache.ws.commons.schema.XmlSchemaElement;
+
 import org.junit.Test;
 
 public class ReflectionServiceFactoryTest extends AbstractSimpleFrontendTest {

@@ -20,9 +20,11 @@
 package org.apache.cxf.tools.java2wsdl.processor.internal.jaxws;
 
 import java.lang.reflect.Method;
+
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.tools.common.model.JavaClass;
+
 import org.junit.Assert;
 import org.junit.Test;
 

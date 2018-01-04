@@ -27,6 +27,7 @@ import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.soap.AddressingFeature;
 
 import org.w3c.dom.Document;
+
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.interceptor.Fault;
@@ -39,6 +40,7 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.transport.Destination;
+
 import org.junit.Before;
 import org.junit.Test;
 

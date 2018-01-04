@@ -32,8 +32,10 @@ import org.apache.cxf.aegis.AegisReader;
 import org.apache.cxf.aegis.services.SimpleBean;
 import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.test.TestUtilities;
+
 import org.junit.Before;
 import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

@@ -21,7 +21,6 @@ package org.apache.cxf.systest.jaxrs.tracing.brave;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 import org.hamcrest.core.IsCollectionContaining;
-
 import zipkin.Annotation;
 
 public class IsAnnotationContaining extends IsCollectionContaining<Annotation> {

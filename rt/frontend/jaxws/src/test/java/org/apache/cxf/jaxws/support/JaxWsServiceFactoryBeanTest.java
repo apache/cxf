@@ -56,6 +56,7 @@ import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.wsdl11.ServiceWSDLBuilder;
 import org.apache.hello_world_soap_http.GreeterImpl;
 import org.apache.ws.commons.schema.XmlSchemaElement;
+
 import org.junit.Test;
 
 public class JaxWsServiceFactoryBeanTest extends AbstractJaxWsTest {

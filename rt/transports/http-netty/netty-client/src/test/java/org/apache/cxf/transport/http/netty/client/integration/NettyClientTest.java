@@ -20,9 +20,11 @@ package org.apache.cxf.transport.http.netty.client.integration;
 
 import java.net.URL;
 import java.util.concurrent.ExecutionException;
+
 import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.Response;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
@@ -31,6 +33,7 @@ import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
 import org.apache.hello_world_soap_http.types.GreetMeLaterResponse;
 import org.apache.hello_world_soap_http.types.GreetMeResponse;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;

@@ -24,7 +24,6 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.corba.wsdl.Anonfixed;
 import org.apache.cxf.binding.corba.wsdl.Fixed;
-
 import org.omg.CORBA.TypeCode;
 
 public final class CorbaFixedHandler extends CorbaObjectHandler {

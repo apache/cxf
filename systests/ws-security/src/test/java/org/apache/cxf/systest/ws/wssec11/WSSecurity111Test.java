@@ -28,6 +28,7 @@ import org.apache.cxf.systest.ws.wssec11.server.Server11;
 import org.apache.cxf.systest.ws.wssec11.server.Server11Restricted;
 import org.apache.cxf.systest.ws.wssec11.server.StaxServer11;
 import org.apache.cxf.systest.ws.wssec11.server.StaxServer11Restricted;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;

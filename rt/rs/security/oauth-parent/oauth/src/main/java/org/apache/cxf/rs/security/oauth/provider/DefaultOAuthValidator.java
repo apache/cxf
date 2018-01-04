@@ -27,7 +27,6 @@ import net.oauth.OAuthException;
 import net.oauth.OAuthMessage;
 import net.oauth.OAuthProblemException;
 import net.oauth.SimpleOAuthValidator;
-
 import org.apache.cxf.rs.security.oauth.data.Token;
 
 /**

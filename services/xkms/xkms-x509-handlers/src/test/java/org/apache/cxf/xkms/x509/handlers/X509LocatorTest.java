@@ -32,6 +32,7 @@ import org.apache.cxf.xkms.model.xkms.QueryKeyBindingType;
 import org.apache.cxf.xkms.model.xkms.UnverifiedKeyBindingType;
 import org.apache.cxf.xkms.model.xkms.UseKeyWithType;
 import org.apache.cxf.xkms.x509.repo.CertificateRepo;
+
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;

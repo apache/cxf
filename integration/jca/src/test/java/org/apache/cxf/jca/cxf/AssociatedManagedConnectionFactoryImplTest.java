@@ -18,17 +18,13 @@
  */
 package org.apache.cxf.jca.cxf;
 
-//import java.lang.reflect.Method;
 import java.util.Properties;
 
 import javax.resource.ResourceException;
-
-//import javax.resource.spi.ConnectionManager;
 import javax.resource.spi.ResourceAdapter;
 
-
 import org.apache.cxf.Bus;
-//import org.apache.cxf.jca.cxf.test.DummyBus;
+
 import org.easymock.EasyMock;
 import org.junit.Test;
 

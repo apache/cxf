@@ -21,7 +21,6 @@ package org.apache.cxf.transport.https;
 
 import java.util.ArrayList;
 import java.util.Collection;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

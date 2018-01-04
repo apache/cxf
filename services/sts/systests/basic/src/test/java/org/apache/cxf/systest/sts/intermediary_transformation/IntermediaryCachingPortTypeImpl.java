@@ -35,6 +35,7 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.cxf.ws.security.trust.delegation.ReceivedTokenCallbackHandler;
 import org.example.contract.doubleit.DoubleItPortType;
+
 import org.junit.Assert;
 
 @WebService(targetNamespace = "http://www.example.org/contract/DoubleIt", 

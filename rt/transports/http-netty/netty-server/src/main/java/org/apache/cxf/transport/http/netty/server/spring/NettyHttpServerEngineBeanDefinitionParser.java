@@ -51,7 +51,6 @@ import org.apache.cxf.transport.http.netty.server.ThreadingParameters;
 import org.apache.cxf.transports.http_netty_server.configuration.TLSServerParametersIdentifiedType;
 import org.apache.cxf.transports.http_netty_server.configuration.ThreadingParametersIdentifiedType;
 import org.apache.cxf.transports.http_netty_server.configuration.ThreadingParametersType;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.config.ConstructorArgumentValues.ValueHolder;

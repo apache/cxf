@@ -66,6 +66,7 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.hello_world_soap_http.types.GreetMe;
 import org.apache.hello_world_soap_http.types.GreetMeResponse;
 import org.apache.hello_world_soap_http.types.StringStruct;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

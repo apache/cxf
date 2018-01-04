@@ -24,6 +24,7 @@ import org.apache.cxf.systests.cdi.base.AbstractCdiMultiAppTest;
 import org.apache.cxf.systests.cdi.base.tomcat.AbstractTomcatServer;
 import org.jboss.weld.environment.Container;
 import org.jboss.weld.environment.tomcat.TomcatContainer;
+
 import org.junit.BeforeClass;
 
 public class TomcatWarTest extends AbstractCdiMultiAppTest {

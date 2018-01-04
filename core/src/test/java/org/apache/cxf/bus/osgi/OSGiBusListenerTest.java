@@ -30,6 +30,7 @@ import org.apache.cxf.endpoint.ClientLifeCycleManager;
 import org.apache.cxf.endpoint.ServerLifeCycleListener;
 import org.apache.cxf.endpoint.ServerLifeCycleManager;
 import org.apache.cxf.feature.Feature;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Assert;
@@ -127,7 +128,7 @@ public class OSGiBusListenerTest extends Assert {
     }
 
     private void setUpClientLifeCycleListeners(String[] names, String[] restricted, String excludes) throws Exception {
-        ServiceReference<Object>[] svcrefs = createTestServiceReferences(names, restricted);
+        ServiceReference[] svcrefs = createTestServiceReferences(names, restricted);
         EasyMock.expect(bundleContext.getServiceReferences(ClientLifeCycleListener.class.getName(), null))
             .andReturn(svcrefs);
         ClientLifeCycleManager lcmanager = control.createMock(ClientLifeCycleManager.class);
@@ -143,7 +144,7 @@ public class OSGiBusListenerTest extends Assert {
     }
 
     private void setUpServerLifeCycleListeners(String[] names, String[] restricted, String excludes) throws Exception {
-        ServiceReference<Object>[] svcrefs = createTestServiceReferences(names, restricted);
+        ServiceReference[] svcrefs = createTestServiceReferences(names, restricted);
         EasyMock.expect(bundleContext.getServiceReferences(ServerLifeCycleListener.class.getName(), null))
             .andReturn(svcrefs);
         ServerLifeCycleManager lcmanager = control.createMock(ServerLifeCycleManager.class);
@@ -160,7 +161,7 @@ public class OSGiBusListenerTest extends Assert {
 
     private void setFeatures(String[] names, String[] restricted,
                              Collection<Feature> lst) throws Exception {
-        ServiceReference<Object>[] svcrefs = createTestServiceReferences(names, restricted);
+        ServiceReference[] svcrefs = createTestServiceReferences(names, restricted);
         EasyMock.expect(bundleContext.getServiceReferences(Feature.class.getName(), null))
             .andReturn(svcrefs);
         for (int i = 0; i < names.length; i++) {
@@ -172,9 +173,8 @@ public class OSGiBusListenerTest extends Assert {
     }
 
     // Creates test service references with the specified symbolic names and the restricted extension properties.
-    private ServiceReference<Object>[] createTestServiceReferences(String[] names, String[] restricted) {
-        @SuppressWarnings("unchecked")
-        ServiceReference<Object>[] refs = new ServiceReference[names.length];
+    private ServiceReference[] createTestServiceReferences(String[] names, String[] restricted) {
+        ServiceReference[] refs = new ServiceReference[names.length];
         for (int i = 0; i < names.length; i++) {
             refs[i] = createTestServiceReference(names[i], restricted[i]);
         }
@@ -183,9 +183,8 @@ public class OSGiBusListenerTest extends Assert {
 
 
     // Creates a test service reference with the specified symbolic name and the restricted extension property.
-    private ServiceReference<Object> createTestServiceReference(String name, String rst) {
-        @SuppressWarnings("unchecked")
-        ServiceReference<Object> ref = control.createMock(ServiceReference.class);
+    private ServiceReference createTestServiceReference(String name, String rst) {
+        ServiceReference ref = control.createMock(ServiceReference.class);
         Bundle b = control.createMock(Bundle.class);
         EasyMock.expect(b.getSymbolicName()).andReturn(name).anyTimes();
         EasyMock.expect(ref.getBundle()).andReturn(b).anyTimes();

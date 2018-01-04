@@ -20,12 +20,10 @@ package org.apache.cxf.binding.coloc;
 
 import java.util.SortedSet;
 import java.util.TreeSet;
-//import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
-//import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.InterceptorChain;

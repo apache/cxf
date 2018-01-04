@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.w3c.dom.Document;
+
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.rt.security.claims.Claim;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
@@ -35,6 +36,7 @@ import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.bean.AttributeBean;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
+
 import org.junit.Assert;
 
 public class SAMLClaimsTest extends Assert {

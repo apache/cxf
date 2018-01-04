@@ -19,6 +19,7 @@
 package org.apache.cxf.systest.servlet;
 
 import com.meterware.servletunit.ServletRunner;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 

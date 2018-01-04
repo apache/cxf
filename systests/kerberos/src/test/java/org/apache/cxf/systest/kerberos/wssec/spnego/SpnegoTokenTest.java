@@ -45,6 +45,7 @@ import org.apache.directory.server.core.integ.FrameworkRunner;
 import org.apache.directory.server.core.kerberos.KeyDerivationInterceptor;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.example.contract.doubleit.DoubleItPortType;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;

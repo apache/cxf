@@ -19,6 +19,7 @@
 package org.apache.cxf.systest.handlers;
 
 import java.net.URL;
+
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebEndpoint;

@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.systest.jms.AbstractVmJMSTest;
+
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;

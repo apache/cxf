@@ -25,6 +25,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.hello_world_jms.HelloWorldPortType;
 import org.apache.cxf.hello_world_jms.HelloWorldService;
 import org.apache.cxf.systest.jms.AbstractVmJMSTest;
+
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;

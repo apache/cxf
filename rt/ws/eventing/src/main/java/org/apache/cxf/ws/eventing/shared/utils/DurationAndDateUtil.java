@@ -20,10 +20,12 @@
 package org.apache.cxf.ws.eventing.shared.utils;
 
 import java.util.GregorianCalendar;
+
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
+
 import org.apache.cxf.ws.eventing.ExpirationType;
 
 public final class DurationAndDateUtil {

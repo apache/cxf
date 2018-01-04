@@ -24,6 +24,7 @@ import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.xml.namespace.QName;
 
 public class JavaType {

@@ -36,6 +36,7 @@ import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.service.invoker.BeanInvoker;
+
 import org.junit.Test;
 
 public class ExceptionInheritanceTest extends AbstractAegisTest {

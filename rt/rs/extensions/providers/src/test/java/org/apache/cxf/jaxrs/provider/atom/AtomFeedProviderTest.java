@@ -29,6 +29,7 @@ import javax.ws.rs.Produces;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.parser.stax.FOMFeed;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

@@ -39,7 +39,6 @@ import org.apache.hello_world_soap_http.GreeterImpl;
 import org.apache.hello_world_soap_http.SOAPService;
 
 import org.junit.Assert;
-
 import org.junit.Test;
 
 public class BusShutdownTest extends Assert {

@@ -33,6 +33,7 @@ import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.misc.WSDLToService;
+
 import org.junit.Before;
 import org.junit.Test;
 

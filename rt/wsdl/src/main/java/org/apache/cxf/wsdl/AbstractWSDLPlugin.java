@@ -20,6 +20,7 @@
 package org.apache.cxf.wsdl;
 
 import java.util.Map;
+
 import javax.wsdl.extensions.ExtensionRegistry;
 
 public abstract class AbstractWSDLPlugin implements WSDLExtensibilityPlugin {

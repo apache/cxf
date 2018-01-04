@@ -23,6 +23,7 @@ import java.util.Date;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.ws.security.SecurityConstants;
+
 import org.junit.BeforeClass;
 
 public class MemoryTokenStoreTest extends org.junit.Assert {

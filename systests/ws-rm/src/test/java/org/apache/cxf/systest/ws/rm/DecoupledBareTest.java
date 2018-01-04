@@ -39,6 +39,7 @@ import org.apache.hello_world_soap_http.DocLitBare;
 import org.apache.hello_world_soap_http.DocLitBareGreeterImpl;
 import org.apache.hello_world_soap_http.SOAPServiceAddressingDocLitBare;
 import org.apache.hello_world_soap_http.types.BareDocumentResponse;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 

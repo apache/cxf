@@ -29,6 +29,7 @@ import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.hello_world_doc_lit.Greeter;
 import org.apache.hello_world_doc_lit.GreeterImplDoc;
+
 import org.junit.Test;
 
 public class RountripTest extends AbstractSimpleFrontendTest {

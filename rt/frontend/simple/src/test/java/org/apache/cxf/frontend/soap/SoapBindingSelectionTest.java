@@ -36,6 +36,7 @@ import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.MultipleEndpointObserver;
 import org.apache.cxf.transport.local.LocalTransportFactory;
+
 import org.junit.Test;
 
 public class SoapBindingSelectionTest extends AbstractSimpleFrontendTest {

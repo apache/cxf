@@ -29,6 +29,7 @@ import org.w3c.dom.Node;
 import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.services.AddNumbers;
 import org.apache.cxf.aegis.services.ArrayService;
+
 import org.junit.Before;
 import org.junit.Test;
 

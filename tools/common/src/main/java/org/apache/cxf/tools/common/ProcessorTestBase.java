@@ -47,6 +47,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.tools.util.ToolsStaxUtils;
 import org.apache.ws.commons.schema.constants.Constants;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.ComparisonFailure;

@@ -26,6 +26,7 @@ import org.apache.cxf.service.ServiceBuilder;
 import org.apache.cxf.simple.SimpleServiceBuilder;
 import org.apache.cxf.tools.fortest.classnoanno.docbare.Stock;
 import org.apache.cxf.tools.fortest.simple.Hello;
+
 import org.junit.Assert;
 import org.junit.Test;
 

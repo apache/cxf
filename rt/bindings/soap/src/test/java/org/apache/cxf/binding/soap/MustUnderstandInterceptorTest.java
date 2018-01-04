@@ -42,6 +42,7 @@ import org.apache.cxf.message.Attachment;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
+
 import org.junit.Before;
 import org.junit.Test;
 

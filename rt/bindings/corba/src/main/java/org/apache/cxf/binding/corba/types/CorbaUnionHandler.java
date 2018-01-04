@@ -29,7 +29,6 @@ import org.apache.cxf.binding.corba.wsdl.Enum;
 import org.apache.cxf.binding.corba.wsdl.Enumerator;
 import org.apache.cxf.binding.corba.wsdl.Union;
 import org.apache.cxf.binding.corba.wsdl.Unionbranch;
-
 import org.omg.CORBA.TCKind;
 import org.omg.CORBA.TypeCode;
 

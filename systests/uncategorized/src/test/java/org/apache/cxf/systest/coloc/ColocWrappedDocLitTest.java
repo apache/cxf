@@ -22,6 +22,7 @@ package org.apache.cxf.systest.coloc;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.junit.Test;
 
 

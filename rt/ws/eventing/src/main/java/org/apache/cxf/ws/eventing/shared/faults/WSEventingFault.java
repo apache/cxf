@@ -22,6 +22,7 @@ package org.apache.cxf.ws.eventing.shared.faults;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.ws.addressing.FaultAction;
 import org.apache.cxf.ws.eventing.shared.EventingConstants;

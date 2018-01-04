@@ -45,9 +45,9 @@ import org.apache.cxf.ws.rm.v200502.OfferType;
 import org.apache.cxf.ws.rm.v200502.TerminateSequenceType;
 import org.apache.cxf.ws.rm.v200702.CloseSequenceType;
 import org.apache.cxf.ws.rm.v200702.TerminateSequenceResponseType;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

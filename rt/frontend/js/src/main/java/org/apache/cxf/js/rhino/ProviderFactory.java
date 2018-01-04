@@ -22,7 +22,6 @@ package org.apache.cxf.js.rhino;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;

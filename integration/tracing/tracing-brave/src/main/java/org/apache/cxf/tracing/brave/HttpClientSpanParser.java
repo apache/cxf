@@ -19,7 +19,6 @@
 package org.apache.cxf.tracing.brave;
 
 import org.apache.cxf.common.util.StringUtils;
-
 import brave.http.HttpAdapter;
 import brave.http.HttpClientParser;
 

@@ -24,6 +24,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import org.apache.cxf.xkms.model.xkms.MessageAbstractType;
+
 import org.junit.Before;
 
 public class BasicValidationTest {

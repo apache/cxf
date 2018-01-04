@@ -22,6 +22,7 @@ import java.io.File;
 
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.wsdlto.AbstractCodeGenTest;
+
 import org.junit.Test;
 
 public class JAXBCodeGenOptionTest extends AbstractCodeGenTest {

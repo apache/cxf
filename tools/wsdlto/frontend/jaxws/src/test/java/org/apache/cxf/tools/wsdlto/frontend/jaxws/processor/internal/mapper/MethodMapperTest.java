@@ -25,6 +25,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.tools.common.model.JavaMethod;
+
 import org.junit.Assert;
 import org.junit.Test;
 

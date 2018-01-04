@@ -20,10 +20,9 @@ package org.apache.cxf.binding.corba.types;
 
 import javax.xml.namespace.QName;
 
-
-
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
 import org.apache.cxf.binding.corba.wsdl.Sequence;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

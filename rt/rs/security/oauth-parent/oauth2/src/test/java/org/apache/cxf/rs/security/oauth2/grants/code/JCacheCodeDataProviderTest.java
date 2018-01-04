@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

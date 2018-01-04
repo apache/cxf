@@ -30,6 +30,7 @@ import org.apache.cxf.xkms.exception.XKMSRequestException;
 import org.apache.cxf.xkms.model.xkms.ValidateRequestType;
 import org.apache.cxf.xkms.x509.validator.BasicValidationTest;
 import org.apache.cxf.xkms.x509.validator.ValidateRequestParser;
+
 import org.junit.Assert;
 import org.junit.Test;
 

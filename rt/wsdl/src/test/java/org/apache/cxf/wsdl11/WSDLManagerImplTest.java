@@ -34,6 +34,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.staxutils.PropertiesExpandingStreamReader;
 import org.apache.cxf.staxutils.XMLStreamReaderWrapper;
+
 import org.junit.Assert;
 import org.junit.Test;
 

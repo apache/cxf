@@ -26,7 +26,6 @@ import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Namespace;
 
 import org.apache.cxf.service.model.ServiceInfo;
-
 import org.omg.CORBA.ORB;
 
 public class ParameterEventProducer implements CorbaTypeEventProducer {

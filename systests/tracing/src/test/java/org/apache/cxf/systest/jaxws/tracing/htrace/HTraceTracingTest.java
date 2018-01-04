@@ -47,6 +47,7 @@ import org.apache.htrace.core.HTraceConfiguration;
 import org.apache.htrace.core.SpanId;
 import org.apache.htrace.core.TraceScope;
 import org.apache.htrace.core.Tracer;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;

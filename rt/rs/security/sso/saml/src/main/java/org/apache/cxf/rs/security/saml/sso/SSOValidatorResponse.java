@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.saml.sso;
 import java.util.Date;
 
 import org.w3c.dom.Element;
+
 import org.opensaml.saml.saml2.core.Assertion;
 
 /**

@@ -22,6 +22,7 @@ package org.apache.cxf.systest.ws.addr_wsdl.jaxwsmm;
 import java.net.URL;
 import java.util.List;
 import java.util.logging.Logger;
+
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;

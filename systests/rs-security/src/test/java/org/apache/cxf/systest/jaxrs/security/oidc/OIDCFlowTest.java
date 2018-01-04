@@ -50,6 +50,7 @@ import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils.Autho
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.xml.security.utils.ClassLoaderUtils;
+
 import org.junit.Assert;
 import org.junit.BeforeClass;
 

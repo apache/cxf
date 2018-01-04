@@ -25,7 +25,6 @@ import org.apache.cxf.annotations.Provider.Type;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
-
 import brave.Tracing;
 import brave.http.HttpTracing;
 

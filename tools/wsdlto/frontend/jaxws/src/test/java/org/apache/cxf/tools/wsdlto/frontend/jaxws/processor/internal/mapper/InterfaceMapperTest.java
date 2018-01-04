@@ -26,6 +26,7 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.model.JavaInterface;
+
 import org.junit.Assert;
 import org.junit.Test;
 

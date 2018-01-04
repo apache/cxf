@@ -20,6 +20,7 @@
 package org.apache.cxf.tools.common.model;
 
 import java.util.Arrays;
+
 import javax.jws.WebParam;
 import javax.jws.WebParam.Mode;
 import javax.jws.WebService;

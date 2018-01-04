@@ -36,6 +36,7 @@ import org.apache.activemq.ActiveMQXAConnectionFactory;
 import org.apache.activemq.RedeliveryPolicy;
 import org.apache.activemq.pool.XaPooledConnectionFactory;
 import org.apache.geronimo.transaction.manager.GeronimoTransactionManager;
+
 import org.junit.Assert;
 import org.junit.Test;
 

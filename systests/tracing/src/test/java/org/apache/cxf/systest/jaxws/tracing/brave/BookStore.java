@@ -28,7 +28,6 @@ import javax.jws.WebService;
 import org.apache.cxf.systest.Book;
 import org.apache.cxf.systest.TestSpanReporter;
 import org.apache.cxf.systest.jaxws.tracing.BookStoreService;
-
 import brave.Span;
 import brave.Tracer.SpanInScope;
 import brave.Tracing;
