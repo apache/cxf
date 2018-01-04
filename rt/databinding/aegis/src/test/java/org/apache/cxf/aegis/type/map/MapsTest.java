@@ -36,6 +36,7 @@ import org.apache.cxf.aegis.type.map.ns2.ObjectWithAMapNs2;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
+
 import org.junit.Before;
 import org.junit.Test;
 

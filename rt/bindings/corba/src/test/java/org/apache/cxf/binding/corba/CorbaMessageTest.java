@@ -23,6 +23,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.binding.corba.types.CorbaPrimitiveHandler;
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
 import org.apache.cxf.message.Message;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Assert;

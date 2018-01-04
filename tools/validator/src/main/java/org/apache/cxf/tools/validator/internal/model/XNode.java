@@ -22,6 +22,7 @@ package org.apache.cxf.tools.validator.internal.model;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
+
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;

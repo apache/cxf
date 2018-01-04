@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxrs.provider;
 
 import org.apache.cxf.Bus;
+
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;

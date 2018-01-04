@@ -20,6 +20,7 @@ package org.apache.cxf.jaxws;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.wsdl.Definition;
 import javax.wsdl.xml.WSDLWriter;
 import javax.xml.xpath.XPathConstants;
@@ -41,6 +42,7 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.ServiceWSDLBuilder;
 import org.apache.hello_world_doc_lit.GreeterImplDoc;
+
 import org.junit.Test;
 
 public class JaxWsServerFactoryBeanTest extends AbstractJaxWsTest {

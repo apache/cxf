@@ -61,9 +61,9 @@ import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;

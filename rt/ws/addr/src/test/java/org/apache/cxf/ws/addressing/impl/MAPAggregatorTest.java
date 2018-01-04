@@ -73,9 +73,9 @@ import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.addressing.WSAContextUtils;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

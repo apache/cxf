@@ -25,6 +25,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
@@ -67,6 +68,7 @@ import org.apache.handler_test.HandlerTestService;
 import org.apache.handler_test.PingException;
 import org.apache.handler_test.types.PingOneWay;
 import org.apache.handler_test.types.PingResponse;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;

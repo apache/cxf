@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.jaxb.validators;
 
 import org.apache.cxf.testutil.common.TestUtil;
+
 import org.junit.Assert;
 import org.junit.Test;
 

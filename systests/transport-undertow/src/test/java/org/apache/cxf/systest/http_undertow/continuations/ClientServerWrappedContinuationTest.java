@@ -37,6 +37,7 @@ import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 

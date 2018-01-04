@@ -25,6 +25,7 @@ import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.hello_world_doc_lit.Greeter;
 import org.apache.hello_world_doc_lit.GreeterImplDoc;
+
 import org.junit.Test;
 
 public class RountripTest extends AbstractSimpleFrontendTest {

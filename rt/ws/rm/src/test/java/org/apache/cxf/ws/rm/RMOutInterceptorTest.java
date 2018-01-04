@@ -32,9 +32,9 @@ import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
 import org.apache.cxf.ws.rm.v200702.Identifier;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

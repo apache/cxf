@@ -28,6 +28,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.policy.PolicyCalculator;
 import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertion;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Assert;

@@ -27,6 +27,7 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.osgi.itests.CXFOSGiTestSupport;
 import org.apache.cxf.transport.jms.ConnectionFactoryFeature;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

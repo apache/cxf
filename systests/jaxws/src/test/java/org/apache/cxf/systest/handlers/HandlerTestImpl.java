@@ -21,8 +21,8 @@ package org.apache.cxf.systest.handlers;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.annotation.Resource;
-//import javax.jws.HandlerChain;
 import javax.jws.HandlerChain;
 import javax.jws.WebService;
 import javax.xml.namespace.QName;

@@ -30,6 +30,7 @@ import org.apache.cxf.service.invoker.BeanInvoker;
 import org.apache.cxf.transport.local.LocalTransportFactory;
 import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 import org.apache.hello_world_soap_http.GreeterImpl;
+
 import org.junit.Test;
 
 public class GreeterTest extends AbstractJaxWsTest {

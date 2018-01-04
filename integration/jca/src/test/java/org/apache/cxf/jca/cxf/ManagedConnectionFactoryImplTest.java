@@ -36,6 +36,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.connector.CXFConnectionFactory;
 import org.apache.hello_world_soap_http.Greeter;
+
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;

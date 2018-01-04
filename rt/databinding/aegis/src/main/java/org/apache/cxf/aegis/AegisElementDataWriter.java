@@ -20,6 +20,7 @@
 package org.apache.cxf.aegis;
 
 import javax.xml.namespace.QName;
+
 import org.w3c.dom.Element;
 
 import org.apache.cxf.aegis.type.AegisType;

@@ -37,6 +37,7 @@ import org.apache.type_test.types1.MixedArray.Array9;
 import org.apache.type_test.types1.UnboundedArray;
 import org.apache.type_test.types2.StructWithAnyArrayLax;
 import org.apache.type_test.types2.StructWithAnyStrict;
+
 import org.junit.Test;
 
 public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {

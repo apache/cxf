@@ -22,7 +22,6 @@ import java.util.concurrent.Callable;
 
 import org.apache.cxf.tracing.Traceable;
 import org.apache.cxf.tracing.TracerContext;
-
 import brave.Span;
 import brave.Tracer;
 import brave.Tracer.SpanInScope;

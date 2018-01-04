@@ -24,6 +24,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+
 import org.junit.Assert;
 import org.junit.Test;
 

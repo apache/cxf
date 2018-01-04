@@ -25,11 +25,14 @@ import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
+
 import org.apache.cxf.jaxrs.client.WebClient;
+
 import static org.apache.cxf.jaxrs.reactor.client.ReactorUtils.TRACE;
 import static org.apache.cxf.jaxrs.reactor.client.ReactorUtils.toCompletableFuture;
 

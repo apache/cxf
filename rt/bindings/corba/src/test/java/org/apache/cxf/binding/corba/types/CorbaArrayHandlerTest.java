@@ -22,6 +22,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.corba.wsdl.Array;
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

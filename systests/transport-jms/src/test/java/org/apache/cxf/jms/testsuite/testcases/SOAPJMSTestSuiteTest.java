@@ -71,6 +71,7 @@ import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 import org.apache.cxf.transport.jms.util.JMSSender;
 import org.apache.cxf.transport.jms.util.JMSUtil;
 import org.apache.cxf.transport.jms.util.ResourceCloser;
+
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;

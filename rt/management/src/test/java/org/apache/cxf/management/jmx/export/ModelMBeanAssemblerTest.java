@@ -34,6 +34,7 @@ import javax.management.modelmbean.RequiredModelMBean;
 
 
 import org.apache.cxf.management.jmx.export.runtime.ModelMBeanAssembler;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

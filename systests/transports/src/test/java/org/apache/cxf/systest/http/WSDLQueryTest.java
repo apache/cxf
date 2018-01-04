@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 

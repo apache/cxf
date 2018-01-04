@@ -32,6 +32,7 @@ import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.xkms.handlers.Applications;
 import org.apache.cxf.xkms.model.xkms.UseKeyWithType;
 import org.apache.cxf.xkms.x509.repo.file.FileCertificateRepo;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

@@ -21,6 +21,7 @@ package org.apache.cxf.tools.wsdlto.core;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.cxf.tools.common.FrontEndGenerator;
 import org.apache.cxf.tools.common.Processor;
 import org.apache.cxf.tools.common.toolspec.ToolContainer;

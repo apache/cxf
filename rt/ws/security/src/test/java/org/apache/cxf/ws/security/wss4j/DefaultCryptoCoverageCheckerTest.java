@@ -33,6 +33,7 @@ import org.apache.cxf.ws.security.wss4j.CryptoCoverageChecker.XPathExpression;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageScope;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
 import org.apache.wss4j.common.ConfigurationConstants;
+
 import org.junit.Test;
 
 /**

@@ -31,6 +31,7 @@ import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.fortest.date.EchoCalendar;
 import org.apache.cxf.tools.fortest.date.EchoDate;
 import org.apache.cxf.tools.java2wsdl.processor.JavaToWSDLProcessor;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

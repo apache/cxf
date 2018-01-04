@@ -20,6 +20,7 @@
 package org.apache.cxf.tools.fortest.date;
 
 import java.util.Date;
+
 import javax.jws.WebService;
 
 @WebService

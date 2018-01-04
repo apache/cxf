@@ -45,6 +45,7 @@ import org.apache.cxf.jaxrs.client.ClientConfiguration;
 import org.apache.cxf.jaxrs.client.ClientProviderFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.client.spec.ClientImpl.WebTargetImpl;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

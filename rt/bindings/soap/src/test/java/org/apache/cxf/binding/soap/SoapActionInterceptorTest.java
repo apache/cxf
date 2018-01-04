@@ -34,6 +34,7 @@ import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.ServiceInfo;
+
 import org.junit.Assert;
 import org.junit.Test;
 

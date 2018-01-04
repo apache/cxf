@@ -23,7 +23,6 @@ import java.util.Currency;
 
 import javax.jws.WebParam;
 import javax.jws.WebService;
-// import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 @WebService

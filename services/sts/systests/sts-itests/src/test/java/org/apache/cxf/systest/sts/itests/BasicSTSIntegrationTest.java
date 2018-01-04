@@ -21,6 +21,7 @@ package org.apache.cxf.systest.sts.itests;
 import java.io.File;
 
 import org.apache.cxf.testutil.common.TestUtil;
+
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.options.MavenArtifactUrlReference;

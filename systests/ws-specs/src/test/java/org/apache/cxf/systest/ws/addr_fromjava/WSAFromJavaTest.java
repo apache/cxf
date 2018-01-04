@@ -41,6 +41,7 @@ import org.apache.cxf.systest.ws.addr_fromjava.client.AddNumberImpl;
 import org.apache.cxf.systest.ws.addr_fromjava.client.AddNumberImplService;
 import org.apache.cxf.systest.ws.addr_fromjava.client.AddNumbersException_Exception;
 import org.apache.cxf.systest.ws.addr_fromjava.server.Server;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;

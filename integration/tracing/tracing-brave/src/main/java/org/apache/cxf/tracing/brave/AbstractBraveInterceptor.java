@@ -32,7 +32,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.tracing.AbstractTracingProvider;
-
 import brave.http.HttpTracing;
 
 public abstract class AbstractBraveInterceptor extends AbstractBraveProvider implements PhaseInterceptor<Message> {

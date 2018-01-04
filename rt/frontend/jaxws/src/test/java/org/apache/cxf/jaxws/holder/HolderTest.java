@@ -32,6 +32,7 @@ import org.apache.cxf.jaxws.MessageReplayObserver;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.local.LocalTransportFactory;
+
 import org.junit.Test;
 
 public class HolderTest extends AbstractJaxWsTest {

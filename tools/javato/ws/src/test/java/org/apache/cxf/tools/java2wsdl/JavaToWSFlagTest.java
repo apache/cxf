@@ -21,6 +21,7 @@ package org.apache.cxf.tools.java2wsdl;
 
 import org.apache.cxf.tools.common.ToolTestBase;
 import org.apache.cxf.tools.java2ws.JavaToWS;
+
 import org.junit.After;
 import org.junit.Test;
 

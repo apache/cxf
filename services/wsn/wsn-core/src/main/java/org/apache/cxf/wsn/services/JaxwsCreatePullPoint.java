@@ -19,6 +19,7 @@
 package org.apache.cxf.wsn.services;
 
 import java.net.URI;
+
 import javax.jms.ConnectionFactory;
 import javax.jws.WebService;
 import javax.xml.ws.BindingType;

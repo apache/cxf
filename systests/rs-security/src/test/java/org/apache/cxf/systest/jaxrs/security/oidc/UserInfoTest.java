@@ -43,6 +43,7 @@ import org.apache.cxf.rs.security.oidc.common.UserInfo;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.TestUtil;
+
 import org.junit.Assert;
 import org.junit.BeforeClass;
 

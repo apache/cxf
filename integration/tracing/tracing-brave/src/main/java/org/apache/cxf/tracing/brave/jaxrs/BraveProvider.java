@@ -32,7 +32,6 @@ import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.tracing.brave.AbstractBraveProvider;
 import org.apache.cxf.tracing.brave.TraceScope;
-
 import brave.http.HttpTracing;
 
 @Provider

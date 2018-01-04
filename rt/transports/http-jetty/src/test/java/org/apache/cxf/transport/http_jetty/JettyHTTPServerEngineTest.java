@@ -43,8 +43,10 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.management.InstrumentationManager;
 import org.apache.cxf.testutil.common.TestUtil;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
+
 import org.eclipse.jetty.server.ConnectionFactory;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
@@ -55,6 +57,7 @@ import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ThreadPool;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

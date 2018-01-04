@@ -20,6 +20,7 @@
 package org.apache.cxf.tools.validator.internal;
 
 import java.util.Stack;
+
 import org.apache.cxf.common.i18n.Message;
 
 public final class ValidationResult {

@@ -51,9 +51,9 @@ import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
 import org.apache.neethi.PolicyReference;
 import org.apache.neethi.PolicyRegistry;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

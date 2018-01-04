@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.eventing.shared.handlers;
 
 import java.util.Set;
+
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPException;

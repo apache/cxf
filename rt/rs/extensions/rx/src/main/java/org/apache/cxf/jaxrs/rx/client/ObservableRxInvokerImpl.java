@@ -26,7 +26,6 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.client.WebClient;
-
 import rx.Observable;
 import rx.Scheduler;
 import rx.schedulers.Schedulers;

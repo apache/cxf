@@ -19,7 +19,6 @@
 package org.apache.cxf.jca.outbound;
 
 import java.io.PrintWriter;
-
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;

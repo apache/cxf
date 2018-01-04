@@ -21,7 +21,6 @@ package org.apache.cxf.binding.corba.types;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.service.model.ServiceInfo;
-
 import org.omg.CORBA.ORB;
 
 public class WrappedParameterSequenceEventProducer extends AbstractStartEndEventProducer {

@@ -29,8 +29,8 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.message.Message;
-import org.easymock.EasyMock;
 
+import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
 

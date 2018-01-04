@@ -44,6 +44,7 @@ import org.apache.cxf.binding.corba.wsdl.MemberType;
 import org.apache.cxf.binding.corba.wsdl.Sequence;
 import org.apache.cxf.binding.corba.wsdl.Struct;
 import org.apache.cxf.helpers.IOUtils;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

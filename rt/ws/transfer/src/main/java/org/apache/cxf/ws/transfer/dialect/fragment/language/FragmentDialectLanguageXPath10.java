@@ -19,14 +19,17 @@
 package org.apache.cxf.ws.transfer.dialect.fragment.language;
 
 import java.util.Iterator;
+
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathException;
 import javax.xml.xpath.XPathFactory;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.transfer.Representation;
 import org.apache.cxf.ws.transfer.dialect.fragment.ExpressionType;

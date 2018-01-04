@@ -27,6 +27,7 @@ import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.model.JavaField;
 import org.apache.cxf.tools.fortest.withannotation.doc.GreeterArray;
+
 import org.junit.Assert;
 import org.junit.Test;
 

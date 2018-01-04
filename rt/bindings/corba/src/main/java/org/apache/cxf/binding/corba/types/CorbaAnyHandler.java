@@ -23,7 +23,6 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.corba.CorbaBindingException;
 import org.apache.cxf.binding.corba.CorbaTypeMap;
-
 import org.omg.CORBA.Any;
 import org.omg.CORBA.TypeCode;
 

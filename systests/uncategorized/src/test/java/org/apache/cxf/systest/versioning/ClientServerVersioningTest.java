@@ -29,6 +29,7 @@ import org.apache.hello_world_mixedstyle.Greeter;
 import org.apache.hello_world_mixedstyle.SOAPService;
 import org.apache.hello_world_mixedstyle.types.GreetMe1;
 import org.apache.hello_world_mixedstyle.types.GreetMeResponse;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 

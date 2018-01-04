@@ -30,6 +30,7 @@ import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxws.service.AddNumbers;
 import org.apache.cxf.jaxws.service.AddNumbersImpl;
+
 import org.junit.Test;
 
 

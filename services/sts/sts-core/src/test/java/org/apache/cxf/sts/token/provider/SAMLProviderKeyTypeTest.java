@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.sts.STSConstants;

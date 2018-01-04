@@ -52,6 +52,7 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.wsdl11.WSDLServiceFactory;
 import org.apache.hello_world_soap_http.types.GreetMe;
 import org.apache.hello_world_soap_http.types.GreetMeResponse;
+
 import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Assert;

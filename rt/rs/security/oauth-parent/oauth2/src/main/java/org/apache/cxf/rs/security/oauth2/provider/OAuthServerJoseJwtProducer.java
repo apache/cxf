@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.oauth2.provider;
 
 import java.security.cert.X509Certificate;
+
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;

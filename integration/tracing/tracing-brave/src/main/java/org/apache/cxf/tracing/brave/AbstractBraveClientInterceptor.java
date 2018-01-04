@@ -24,7 +24,6 @@ import java.util.Set;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptor;
-
 import brave.http.HttpTracing;
 
 public abstract class AbstractBraveClientInterceptor extends AbstractBraveClientProvider

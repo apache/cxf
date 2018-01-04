@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.jms.uri.JMSEndpoint.DeliveryModeType;
+
 import org.junit.Assert;
 import org.junit.Test;
 

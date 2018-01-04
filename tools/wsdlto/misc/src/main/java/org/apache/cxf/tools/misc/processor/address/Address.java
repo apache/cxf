@@ -20,6 +20,7 @@
 package org.apache.cxf.tools.misc.processor.address;
 
 import java.util.Map;
+
 import org.apache.cxf.tools.common.ToolContext;
 
 public interface Address {

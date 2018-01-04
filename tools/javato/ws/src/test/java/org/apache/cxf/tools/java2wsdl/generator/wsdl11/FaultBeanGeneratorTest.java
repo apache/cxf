@@ -29,6 +29,7 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.java2wsdl.processor.JavaToWSDLProcessor;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

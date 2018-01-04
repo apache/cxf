@@ -66,6 +66,7 @@ import org.apache.type_test.types3.StructWithNillableChoice;
 import org.apache.type_test.types3.StructWithNillableStruct;
 import org.apache.type_test.types3.StructWithOccuringChoice;
 import org.apache.type_test.types3.StructWithOccuringStruct;
+
 import org.junit.Test;
 
 public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {

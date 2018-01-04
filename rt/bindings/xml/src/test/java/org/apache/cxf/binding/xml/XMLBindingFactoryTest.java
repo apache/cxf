@@ -24,6 +24,7 @@ import org.apache.cxf.interceptor.AttachmentInInterceptor;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.BindingInfo;
+
 import org.junit.Assert;
 import org.junit.Test;
 

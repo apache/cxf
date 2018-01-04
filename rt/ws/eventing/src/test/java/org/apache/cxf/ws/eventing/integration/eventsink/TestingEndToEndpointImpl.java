@@ -21,6 +21,7 @@ package org.apache.cxf.ws.eventing.integration.eventsink;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
+
 import javax.jws.WebParam;
 
 import org.apache.cxf.common.logging.LogUtils;

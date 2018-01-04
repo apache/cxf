@@ -56,6 +56,7 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.processor.Processor;
 import org.apache.wss4j.dom.processor.SAMLTokenProcessor;
 import org.example.contract.doubleit.DoubleItPortType;
+
 import org.junit.BeforeClass;
 
 /**

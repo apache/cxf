@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.policy.attachment.external;
 
 import java.util.Collection;
+
 import org.w3c.dom.Element;
 
 import org.apache.cxf.service.model.BindingFaultInfo;

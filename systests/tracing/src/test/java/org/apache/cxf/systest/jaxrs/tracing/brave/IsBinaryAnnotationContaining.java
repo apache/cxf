@@ -23,7 +23,6 @@ import java.nio.charset.StandardCharsets;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 import org.hamcrest.core.IsCollectionContaining;
-
 import zipkin.BinaryAnnotation;
 
 public class IsBinaryAnnotationContaining extends IsCollectionContaining<BinaryAnnotation> {

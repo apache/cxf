@@ -27,6 +27,7 @@ import org.apache.cxf.xkms.model.xkms.RegisterRequestType;
 import org.apache.cxf.xkms.model.xkms.RegisterResultType;
 import org.apache.cxf.xkms.model.xkms.ResultMajorEnum;
 import org.apache.cxf.xkms.model.xkms.ResultMinorEnum;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -27,6 +27,7 @@ import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.basic.BeanTypeInfo;
 import org.apache.cxf.aegis.xml.stax.ElementReader;
+
 import org.junit.Test;
 
 public class SoapArrayTypeTest extends AbstractEncodedTest {

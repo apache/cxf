@@ -27,6 +27,7 @@ import org.apache.cxf.aegis.xml.MessageWriter;
 import org.apache.cxf.test.AbstractCXFTest;
 import org.jdom.Document;
 import org.jdom.output.DOMOutputter;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

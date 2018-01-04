@@ -38,6 +38,7 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.transport.local.LocalTransportFactory;
 import org.apache.hello_world_soap_http.HWSoapMessageProvider;
+
 import org.junit.Test;
 
 public class ProviderServiceFactoryTest extends AbstractJaxWsTest {

@@ -19,9 +19,11 @@
 package org.apache.cxf.jaxrs.reactor.client;
 
 import java.util.concurrent.ExecutorService;
+
 import javax.ws.rs.client.RxInvokerProvider;
 import javax.ws.rs.client.SyncInvoker;
 import javax.ws.rs.ext.Provider;
+
 import org.apache.cxf.jaxrs.client.SyncInvokerImpl;
 
 @Provider

@@ -30,6 +30,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.jms.uri.JMSEndpoint;
 import org.apache.cxf.transport.jms.uri.MyBeanLocator;
 import org.apache.geronimo.transaction.manager.GeronimoTransactionManager;
+
 import org.junit.Assert;
 import org.junit.Test;
 

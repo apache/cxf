@@ -37,6 +37,7 @@ import org.apache.cxf.transport.local.LocalConduit;
 import org.apache.cxf.transport.local.LocalTransportFactory;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.WSS4JConstants;
+
 import org.junit.Test;
 
 public class UserNameTokenAuthorizationTest extends AbstractSecurityTest {

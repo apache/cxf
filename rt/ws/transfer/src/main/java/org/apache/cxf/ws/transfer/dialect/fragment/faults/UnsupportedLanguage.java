@@ -19,6 +19,7 @@
 package org.apache.cxf.ws.transfer.dialect.fragment.faults;
 
 import javax.xml.namespace.QName;
+
 import org.apache.cxf.ws.transfer.dialect.fragment.FragmentDialectConstants;
 
 /**

@@ -26,6 +26,7 @@ import java.util.List;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;

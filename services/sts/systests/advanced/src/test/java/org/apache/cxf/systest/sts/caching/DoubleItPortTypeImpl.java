@@ -28,7 +28,6 @@ import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.trust.STSClient;
-
 import org.example.contract.doubleit.DoubleItPortType;
 
 @WebService(targetNamespace = "http://www.example.org/contract/DoubleIt",

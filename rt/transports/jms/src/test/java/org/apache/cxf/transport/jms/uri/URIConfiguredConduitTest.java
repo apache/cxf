@@ -35,6 +35,7 @@ import org.apache.cxf.transport.jms.JMSConstants;
 import org.apache.cxf.transport.jms.JMSMessageHeadersType;
 import org.apache.cxf.transport.jms.util.TestReceiver;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;

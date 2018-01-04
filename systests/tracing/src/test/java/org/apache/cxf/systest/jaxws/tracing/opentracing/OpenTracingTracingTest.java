@@ -45,6 +45,7 @@ import org.apache.cxf.tracing.opentracing.OpenTracingClientFeature;
 import org.apache.cxf.tracing.opentracing.OpenTracingFeature;
 import org.apache.cxf.tracing.opentracing.internal.TextMapInjectAdapter;
 import org.awaitility.Duration;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;

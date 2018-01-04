@@ -48,8 +48,8 @@ import org.apache.cxf.jaxrs.swagger.Swagger2Feature;
 import org.apache.cxf.jaxrs.swagger.parse.SwaggerParseUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-
 import org.hamcrest.CoreMatchers;
+
 import org.junit.Ignore;
 import org.junit.Test;
 

@@ -42,6 +42,7 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.ws.policy.PolicyException;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 

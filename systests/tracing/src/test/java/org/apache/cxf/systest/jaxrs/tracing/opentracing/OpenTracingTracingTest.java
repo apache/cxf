@@ -51,6 +51,7 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.tracing.opentracing.jaxrs.OpenTracingClientProvider;
 import org.apache.cxf.tracing.opentracing.jaxrs.OpenTracingFeature;
 import org.awaitility.Duration;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;

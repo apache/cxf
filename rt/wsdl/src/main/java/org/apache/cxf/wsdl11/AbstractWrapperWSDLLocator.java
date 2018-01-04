@@ -21,6 +21,7 @@ package org.apache.cxf.wsdl11;
 import java.io.IOException;
 
 import javax.wsdl.xml.WSDLLocator;
+
 import org.xml.sax.InputSource;
 
 public abstract class AbstractWrapperWSDLLocator implements WSDLLocator {

@@ -76,6 +76,7 @@ import org.apache.hello_world_soap_http.SOAPServiceMultiPortTypeTest;
 import org.apache.hello_world_soap_http.types.BareDocumentResponse;
 import org.apache.hello_world_soap_http.types.GreetMeLaterResponse;
 import org.apache.hello_world_soap_http.types.GreetMeResponse;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 

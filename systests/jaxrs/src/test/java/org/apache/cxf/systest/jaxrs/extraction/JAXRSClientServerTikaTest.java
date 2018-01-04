@@ -43,6 +43,7 @@ import org.apache.cxf.jaxrs.provider.MultipartProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.lucene.search.ScoreDoc;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;

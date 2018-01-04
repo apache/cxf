@@ -39,6 +39,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.service.factory.HelloService;
 import org.apache.cxf.service.factory.HelloServiceImpl;
 import org.apache.cxf.service.model.EndpointInfo;
+
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 

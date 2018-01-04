@@ -29,6 +29,7 @@ import javax.xml.ws.handler.MessageContext;
 import org.apache.cxf.message.AbstractWrappedMessage;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+
 import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Assert;

@@ -37,6 +37,7 @@ import org.apache.cxf.xkms.model.xkms.ResultMinorEnum;
 import org.apache.cxf.xkms.model.xkms.UnverifiedKeyBindingType;
 import org.apache.cxf.xkms.model.xkms.UseKeyWithType;
 import org.apache.cxf.xkms.model.xmldsig.KeyInfoType;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

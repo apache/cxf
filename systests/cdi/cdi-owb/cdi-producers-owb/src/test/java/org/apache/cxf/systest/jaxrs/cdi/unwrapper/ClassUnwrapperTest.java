@@ -31,6 +31,7 @@ import org.apache.cxf.systests.cdi.base.BookStorePreMatchingRequestFilter;
 import org.apache.cxf.systests.cdi.base.BookStoreRequestFilter;
 import org.apache.webbeans.config.WebBeansContext;
 import org.apache.webbeans.spi.ContainerLifecycle;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

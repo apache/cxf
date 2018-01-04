@@ -26,9 +26,9 @@ import java.util.Map;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

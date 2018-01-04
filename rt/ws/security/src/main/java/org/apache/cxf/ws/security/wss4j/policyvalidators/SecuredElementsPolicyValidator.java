@@ -29,6 +29,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.helpers.MapNamespaceContext;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil;

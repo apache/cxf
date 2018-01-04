@@ -39,7 +39,6 @@ import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;

@@ -35,6 +35,7 @@ import javax.xml.bind.DatatypeConverter;
 
 import org.apache.cxf.xkms.handlers.Applications;
 import org.apache.cxf.xkms.model.xkms.UseKeyWithType;
+
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -29,6 +29,7 @@ import javax.xml.ws.soap.SOAPBinding;
 
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.calculator.CalculatorPortType;
+
 import org.junit.Test;
 
 public class SOAPBindingTest extends AbstractJaxWsTest {

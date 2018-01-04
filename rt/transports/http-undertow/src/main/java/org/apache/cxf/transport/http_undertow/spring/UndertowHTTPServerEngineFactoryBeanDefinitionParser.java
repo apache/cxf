@@ -37,7 +37,6 @@ import org.apache.cxf.transport.http_undertow.ThreadingParameters;
 import org.apache.cxf.transport.http_undertow.UndertowHTTPServerEngineFactory;
 import org.apache.cxf.transports.http_undertow.configuration.TLSServerParametersIdentifiedType;
 import org.apache.cxf.transports.http_undertow.configuration.ThreadingParametersIdentifiedType;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;

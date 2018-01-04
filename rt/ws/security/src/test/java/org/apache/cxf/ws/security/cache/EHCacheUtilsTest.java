@@ -23,10 +23,10 @@ import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Status;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.ConfigurationFactory;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.wss4j.common.cache.EHCacheManagerHolder;
+
 import org.junit.Assert;
 import org.junit.Test;
 

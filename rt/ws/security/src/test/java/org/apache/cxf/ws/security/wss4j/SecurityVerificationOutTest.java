@@ -30,6 +30,7 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.security.policy.interceptors.SecurityVerificationOutInterceptor;
 import org.apache.neethi.Policy;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Before;

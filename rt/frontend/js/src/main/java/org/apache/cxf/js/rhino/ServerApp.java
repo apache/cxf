@@ -21,7 +21,6 @@ package org.apache.cxf.js.rhino;
 
 import java.io.File;
 import java.io.FileFilter;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 

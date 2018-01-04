@@ -19,6 +19,7 @@
 package org.apache.cxf.sts.token.provider;
 
 import java.util.List;
+
 import org.w3c.dom.Document;
 
 import org.apache.wss4j.common.saml.bean.AttributeStatementBean;

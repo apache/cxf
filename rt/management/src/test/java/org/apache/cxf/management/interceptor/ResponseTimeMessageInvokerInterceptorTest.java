@@ -21,6 +21,7 @@ package org.apache.cxf.management.interceptor;
 
 import org.apache.cxf.management.counters.MessageHandlingTimeRecorder;
 import org.apache.cxf.message.Message;
+
 import org.easymock.EasyMock;
 import org.junit.Test;
 

@@ -35,6 +35,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.rt.security.claims.Claim;
@@ -67,6 +68,7 @@ import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.util.DateUtil;
+
 import org.junit.BeforeClass;
 
 

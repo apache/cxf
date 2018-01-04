@@ -22,27 +22,22 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
-
 import java.net.Socket;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
 import java.util.Properties;
 
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.ServerImpl;
 import org.apache.cxf.endpoint.ServerRegistry;
 import org.apache.cxf.helpers.IOUtils;
-
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.transport.http_jetty.JettyHTTPDestination;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngine;
-
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.webapp.WebAppContext;
 

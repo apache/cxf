@@ -46,6 +46,7 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.wsdl11.ServiceWSDLBuilder;
+
 import org.junit.Test;
 
 public class CodeFirstWSDLTest extends AbstractJaxWsTest {

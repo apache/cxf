@@ -21,6 +21,7 @@ package org.apache.cxf.jca.cxf.handlers;
 
 import org.apache.cxf.jca.cxf.CXFInvocationHandler;
 import org.apache.cxf.jca.cxf.CXFManagedConnectionFactory;
+
 import org.junit.Test;
 
 public abstract class AbstractInvocationHandlerTest

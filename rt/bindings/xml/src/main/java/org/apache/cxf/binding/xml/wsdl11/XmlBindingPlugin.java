@@ -20,6 +20,7 @@
 package org.apache.cxf.binding.xml.wsdl11;
 
 import java.util.Map;
+
 import javax.wsdl.Binding;
 import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.ExtensibilityElement;

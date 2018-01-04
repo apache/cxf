@@ -32,6 +32,7 @@ import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;

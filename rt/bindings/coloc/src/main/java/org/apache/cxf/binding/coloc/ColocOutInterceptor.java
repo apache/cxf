@@ -41,12 +41,10 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
-//import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.phase.PhaseManager;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
-//import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.transport.MessageObserver;
 
 public class ColocOutInterceptor extends AbstractPhaseInterceptor<Message> {

@@ -43,8 +43,8 @@ import org.apache.cxf.jaxrs.openapi.OpenApiFeature;
 import org.apache.cxf.jaxrs.openapi.parse.OpenApiParseUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-
 import org.hamcrest.CoreMatchers;
+
 import org.junit.Ignore;
 import org.junit.Test;
 

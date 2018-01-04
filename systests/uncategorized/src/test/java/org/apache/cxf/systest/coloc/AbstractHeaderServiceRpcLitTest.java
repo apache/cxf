@@ -39,7 +39,6 @@ import org.apache.headers.rpc_lit.HeaderTester;
 import org.apache.headers.rpc_lit.PingMeFault;
 
 import org.junit.Before;
-//import org.junit.Ignore;
 import org.junit.Test;
 
 /**

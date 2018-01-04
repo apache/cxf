@@ -21,6 +21,7 @@ package org.apache.cxf.systest.jaxrs.cdi.tomcat;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.systests.cdi.base.AbstractCdiSingleAppTest;
 import org.apache.cxf.systests.cdi.base.tomcat.AbstractTomcatServer;
+
 import org.junit.BeforeClass;
 
 public class TomcatWarTest extends AbstractCdiSingleAppTest {

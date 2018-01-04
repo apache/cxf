@@ -26,6 +26,7 @@ import java.util.Properties;
 import javax.security.auth.callback.CallbackHandler;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -50,6 +51,7 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
+
 import org.junit.BeforeClass;
 
 /**

@@ -31,6 +31,7 @@ import java.util.concurrent.Executors;
 import javax.inject.Inject;
 
 import org.apache.karaf.features.FeaturesService;
+
 import org.junit.Assert;
 import org.ops4j.pax.exam.MavenUtils;
 import org.ops4j.pax.exam.Option;
@@ -39,6 +40,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.util.tracker.ServiceTracker;
+
 import static org.ops4j.pax.exam.CoreOptions.composite;
 import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;

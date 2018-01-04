@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.transfer.integration;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
@@ -29,6 +30,7 @@ import org.apache.cxf.ws.transfer.CreateResponse;
 import org.apache.cxf.ws.transfer.Representation;
 import org.apache.cxf.ws.transfer.manager.ResourceManager;
 import org.apache.cxf.ws.transfer.resourcefactory.ResourceFactory;
+
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;

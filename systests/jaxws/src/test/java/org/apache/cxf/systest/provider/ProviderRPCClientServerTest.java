@@ -35,6 +35,7 @@ import javax.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.hello_world_rpclit.GreeterRPCLit;
 import org.apache.hello_world_rpclit.SOAPServiceRPCLit;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 

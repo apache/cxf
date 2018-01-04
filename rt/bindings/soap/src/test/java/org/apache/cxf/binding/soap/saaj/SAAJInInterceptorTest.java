@@ -44,6 +44,7 @@ import org.apache.cxf.binding.soap.interceptor.ReadHeadersInterceptor;
 import org.apache.cxf.binding.soap.interceptor.StartBodyInterceptor;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.interceptor.StaxInInterceptor;
+
 import org.junit.Before;
 import org.junit.Test;
 

@@ -20,7 +20,9 @@
 package org.apache.cxf.systest.jaxrs.reactor;
 
 import java.util.Collections;
+
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;

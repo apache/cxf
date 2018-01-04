@@ -30,6 +30,7 @@ import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.aegis.inheritance.Employee;
 import org.apache.cxf.databinding.DataReader;
+
 import org.junit.Test;
 
 /**

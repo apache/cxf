@@ -24,6 +24,7 @@ import org.apache.cxf.systests.cdi.base.BookStorePreMatchingRequestFilter;
 import org.apache.cxf.systests.cdi.base.BookStoreRequestFilter;
 import org.jboss.weld.environment.se.Weld;
 import org.jboss.weld.environment.se.WeldContainer;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
