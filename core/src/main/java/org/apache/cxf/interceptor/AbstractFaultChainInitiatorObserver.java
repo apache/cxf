@@ -111,10 +111,10 @@ public abstract class AbstractFaultChainInitiatorObserver implements MessageObse
             try {
                 chain.doIntercept(faultMessage);
             } catch (RuntimeException exc) {
-                LOG.log(Level.SEVERE, "Error occurred during error handling, give up!", exc);
+                LOG.log(Level.SEVERE, "ERROR_DURING_ERROR_PROCESSING", exc);
                 throw exc;
             } catch (Exception exc) {
-                LOG.log(Level.SEVERE, "Error occurred during error handling, give up!", exc);
+                LOG.log(Level.SEVERE, "ERROR_DURING_ERROR_PROCESSING", exc);
                 throw new RuntimeException(exc);
             }
         } finally {
