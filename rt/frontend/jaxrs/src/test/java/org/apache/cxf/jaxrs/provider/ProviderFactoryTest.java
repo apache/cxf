@@ -95,7 +95,7 @@ public class ProviderFactoryTest extends Assert {
     public void testRegisterInFeature() {
         ServerProviderFactory pf = ServerProviderFactory.getInstance();
         final Object provider = new WebApplicationExceptionMapper();
-        pf.registerUserProvider((Feature)(context) -> {
+        pf.registerUserProvider((Feature) context -> {
             context.register(provider);
             return true;
         });
@@ -108,7 +108,7 @@ public class ProviderFactoryTest extends Assert {
     public void testRegisterFeatureInFeature() {
         ServerProviderFactory pf = ServerProviderFactory.getInstance();
         final Object provider = new WebApplicationExceptionMapper();
-        pf.registerUserProvider((Feature)(context) -> {
+        pf.registerUserProvider((Feature) context -> {
             context.register((Feature) context2-> {
                 context2.register(provider);
                 return true;
