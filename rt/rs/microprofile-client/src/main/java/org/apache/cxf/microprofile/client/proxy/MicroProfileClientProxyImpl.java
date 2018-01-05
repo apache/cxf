@@ -21,7 +21,9 @@ package org.apache.cxf.microprofile.client.proxy;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.List;
+
 import javax.ws.rs.core.Response;
+
 import org.apache.cxf.jaxrs.client.ClientProxyImpl;
 import org.apache.cxf.jaxrs.client.ClientState;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
@@ -52,7 +54,7 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
                     throw t;
                 } else if (t != null && m.getExceptionTypes() != null) {
                     // its a checked exception, make sure its declared
-                    for (Class c : m.getExceptionTypes()) {
+                    for (Class<?> c : m.getExceptionTypes()) {
                         if (t.getClass().isAssignableFrom(c)) {
                             throw t;
                         }

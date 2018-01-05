@@ -33,10 +33,10 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.test.AbstractCXFSpringTest;
 import org.apache.cxf.testutil.common.TestUtil;
+import org.springframework.context.support.GenericApplicationContext;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.context.support.GenericApplicationContext;
 
 /**
  *

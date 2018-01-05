@@ -31,14 +31,14 @@ import org.apache.cxf.binding.corba.CorbaDestination;
 import org.apache.cxf.binding.corba.TestUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.MessageObserver;
+import org.omg.CORBA.Context;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.ServerRequest;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.omg.CORBA.Context;
-import org.omg.CORBA.ORB;
-import org.omg.CORBA.ServerRequest;
 
 
 public class CorbaDSIServantTest extends Assert {

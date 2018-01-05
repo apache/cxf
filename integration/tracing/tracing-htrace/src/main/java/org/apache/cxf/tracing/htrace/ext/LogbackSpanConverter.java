@@ -19,10 +19,10 @@
 
 package org.apache.cxf.tracing.htrace.ext;
 
-import org.apache.htrace.core.Span;
-import org.apache.htrace.core.Tracer;
 import ch.qos.logback.classic.pattern.ClassicConverter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
+import org.apache.htrace.core.Span;
+import org.apache.htrace.core.Tracer;
 
 /**
  * Logback conversion rule implementation to enrich log records with tracing details like spanId and tracerId. 

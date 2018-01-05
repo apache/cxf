@@ -22,9 +22,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
+import brave.http.HttpTracing;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptor;
-import brave.http.HttpTracing;
 
 public abstract class AbstractBraveClientInterceptor extends AbstractBraveClientProvider
         implements PhaseInterceptor<Message> {

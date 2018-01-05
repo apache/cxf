@@ -30,13 +30,13 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.bus.spring.BusApplicationContext;
 import org.apache.cxf.configuration.Configurable;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 
 

@@ -36,8 +36,6 @@ import org.apache.cxf.javascript.types.SchemaJavascriptBuilder;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.test.TestUtilities;
-
-import org.junit.Assert;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.Function;
@@ -45,6 +43,8 @@ import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
+
+import org.junit.Assert;
 
 /**
  * Test utilities class with some Javascript capability included.

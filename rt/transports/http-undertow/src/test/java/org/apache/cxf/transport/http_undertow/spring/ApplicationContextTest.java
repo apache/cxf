@@ -37,12 +37,12 @@ import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http_undertow.UndertowHTTPDestination;
 import org.apache.cxf.transport.http_undertow.UndertowHTTPServerEngine;
+import org.springframework.beans.factory.xml.XmlBeanDefinitionStoreException;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.xml.XmlBeanDefinitionStoreException;
 
 
 public class ApplicationContextTest extends Assert {

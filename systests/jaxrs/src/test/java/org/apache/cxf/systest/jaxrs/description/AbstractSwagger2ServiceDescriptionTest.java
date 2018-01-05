@@ -49,11 +49,11 @@ import org.apache.cxf.jaxrs.swagger.parse.SwaggerParseUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.hamcrest.CoreMatchers;
+import org.yaml.snakeyaml.Yaml;
 
 import org.junit.Ignore;
 import org.junit.Test;
 
-import org.yaml.snakeyaml.Yaml;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;

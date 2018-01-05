@@ -25,9 +25,9 @@ import org.w3c.dom.NodeList;
 
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.test.AbstractCXFSpringTest;
+import org.springframework.context.support.GenericApplicationContext;
 
 import org.junit.Test;
-import org.springframework.context.support.GenericApplicationContext;
 
 /**
  *

@@ -27,11 +27,11 @@ import org.apache.cxf.javascript.JavascriptTestUtilities.CountDownNotifier;
 import org.apache.cxf.javascript.JavascriptTestUtilities.JSRunnable;
 import org.apache.cxf.javascript.JavascriptTestUtilities.Notifier;
 import org.apache.cxf.testutil.common.TestUtil;
+import org.mozilla.javascript.Context;
+import org.springframework.context.support.GenericApplicationContext;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mozilla.javascript.Context;
-import org.springframework.context.support.GenericApplicationContext;
 
 /**
  *  Test the same schema used in the samples.

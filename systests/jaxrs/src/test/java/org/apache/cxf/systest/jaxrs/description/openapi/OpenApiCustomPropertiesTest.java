@@ -22,11 +22,12 @@ import java.util.Collections;
 
 import org.apache.cxf.jaxrs.openapi.OpenApiFeature;
 
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.security.SecurityScheme.Type;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import io.swagger.v3.oas.models.security.SecurityScheme;
-import io.swagger.v3.oas.models.security.SecurityScheme.Type;
 
 public class OpenApiCustomPropertiesTest extends AbstractOpenApiServiceDescriptionTest {
     private static final String PORT = allocatePort(OpenApiCustomPropertiesTest.class);

@@ -18,12 +18,12 @@
  */
 package org.apache.cxf.tracing.brave.jaxrs;
 
+import brave.Span;
+import brave.http.HttpTracing;
 import org.apache.cxf.jaxrs.ext.ContextProvider;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.tracing.TracerContext;
 import org.apache.cxf.tracing.brave.BraveTracerContext;
-import brave.Span;
-import brave.http.HttpTracing;
 
 public class BraveContextProvider implements ContextProvider< TracerContext > {
     private final HttpTracing brave;

@@ -18,11 +18,11 @@
  */
 package org.apache.cxf.tracing.brave;
 
+import brave.http.HttpTracing;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.tracing.brave.AbstractBraveInterceptor.ParsedMessage;
-import brave.http.HttpTracing;
 
 public class BraveClientStartInterceptor extends AbstractBraveClientInterceptor {
     public BraveClientStartInterceptor(final HttpTracing brave) {

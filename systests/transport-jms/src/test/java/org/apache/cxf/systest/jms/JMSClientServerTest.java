@@ -66,6 +66,7 @@ import org.apache.hello_world_doc_lit.Greeter;
 import org.apache.hello_world_doc_lit.PingMeFault;
 import org.apache.hello_world_doc_lit.SOAPService2;
 import org.apache.hello_world_doc_lit.SOAPService7;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -74,7 +75,6 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class JMSClientServerTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(JMSClientServerTest.class);

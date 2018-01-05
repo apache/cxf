@@ -20,6 +20,8 @@ package org.apache.cxf.tracing.brave;
 
 import java.util.UUID;
 
+import brave.Tracing;
+import brave.http.HttpTracing;
 import org.apache.cxf.Bus;
 import org.apache.cxf.annotations.Provider;
 import org.apache.cxf.annotations.Provider.Scope;
@@ -27,8 +29,6 @@ import org.apache.cxf.annotations.Provider.Type;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
-import brave.Tracing;
-import brave.http.HttpTracing;
 
 @NoJSR250Annotations
 @Provider(value = Type.Feature, scope = Scope.Server)

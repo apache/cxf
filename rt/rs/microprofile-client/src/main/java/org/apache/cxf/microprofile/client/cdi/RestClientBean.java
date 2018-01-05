@@ -38,6 +38,7 @@ import javax.enterprise.inject.spi.InjectionPoint;
 import javax.enterprise.inject.spi.PassivationCapable;
 import javax.enterprise.util.AnnotationLiteral;
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.microprofile.client.CxfTypeSafeClientBuilder;
 import org.apache.cxf.microprofile.client.config.ConfigFacade;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
@@ -136,7 +137,7 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
         String configuredScope = ConfigFacade.getOptionalValue(property, String.class).orElse(null);
         if (configuredScope != null) {
             try {
-                return (Class<? extends Annotation>) Class.forName(configuredScope);
+                return ClassLoaderUtils.loadClass(configuredScope, getClass(), Annotation.class);
             } catch (Exception e) {
                 throw new IllegalArgumentException("The scope " + configuredScope + " is invalid", e);
             }
@@ -160,6 +161,7 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
     }
 
     private static final class DefaultLiteral extends AnnotationLiteral<Default> implements Default {
+        private static final long serialVersionUID = 1L;
 
     }
 }

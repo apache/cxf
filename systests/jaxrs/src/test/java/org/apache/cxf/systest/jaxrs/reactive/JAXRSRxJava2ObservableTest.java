@@ -32,10 +32,11 @@ import org.apache.cxf.jaxrs.rx2.client.ObservableRxInvoker;
 import org.apache.cxf.jaxrs.rx2.client.ObservableRxInvokerProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
+import io.reactivex.Observable;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import io.reactivex.Observable;
 
 public class JAXRSRxJava2ObservableTest extends AbstractBusClientServerTestBase {
     public static final String PORT = RxJava2ObservableServer.PORT;

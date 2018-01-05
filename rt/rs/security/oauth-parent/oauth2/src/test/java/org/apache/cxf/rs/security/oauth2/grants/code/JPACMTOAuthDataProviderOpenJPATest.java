@@ -18,12 +18,13 @@
  */
 package org.apache.cxf.rs.security.oauth2.grants.code;
 
-import org.junit.runner.RunWith;
-
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import org.junit.runner.RunWith;
+
 
 /**
  * Runs the same tests as JPAOAuthDataProviderTest but within a Spring Managed Transaction.

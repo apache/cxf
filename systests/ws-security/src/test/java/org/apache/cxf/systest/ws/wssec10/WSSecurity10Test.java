@@ -38,14 +38,14 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.ws.security.SecurityConstants;
+import wssec.wssec10.IPingService;
+import wssec.wssec10.PingService;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
-import wssec.wssec10.IPingService;
-import wssec.wssec10.PingService;
 
 
 /**

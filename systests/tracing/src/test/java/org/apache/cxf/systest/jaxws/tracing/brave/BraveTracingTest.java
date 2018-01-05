@@ -27,6 +27,9 @@ import java.util.Random;
 
 import javax.xml.ws.soap.SOAPFaultException;
 
+import brave.Span;
+import brave.Tracer.SpanInScope;
+import brave.Tracing;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
@@ -57,9 +60,6 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 
-import brave.Span;
-import brave.Tracer.SpanInScope;
-import brave.Tracing;
 
 public class BraveTracingTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(BraveTracingTest.class);

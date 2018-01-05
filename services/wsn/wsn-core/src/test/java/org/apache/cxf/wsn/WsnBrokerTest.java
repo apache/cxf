@@ -47,14 +47,14 @@ import org.apache.cxf.wsn.services.JaxwsCreatePullPoint;
 import org.apache.cxf.wsn.services.JaxwsNotificationBroker;
 import org.apache.cxf.wsn.types.CustomType;
 import org.apache.cxf.wsn.util.WSNHelper;
+import org.oasis_open.docs.wsn.b_2.NotificationMessageHolderType;
+import org.oasis_open.docs.wsn.b_2.TopicExpressionType;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.oasis_open.docs.wsn.b_2.NotificationMessageHolderType;
-import org.oasis_open.docs.wsn.b_2.TopicExpressionType;
 
 
 public abstract class WsnBrokerTest extends Assert {

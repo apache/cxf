@@ -25,13 +25,13 @@ import org.w3c.dom.Document;
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.test.TestUtilities;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
 @ContextConfiguration(locations = { "classpath:crossSchemaBeans.xml" })
 public class CrossSchemaImportsTests extends AbstractJUnit4SpringContextTests {

@@ -25,12 +25,12 @@ import java.util.UUID;
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 
-import org.apache.cxf.systest.Book;
-import org.apache.cxf.systest.brave.TestSpanReporter;
-import org.apache.cxf.systest.jaxws.tracing.BookStoreService;
 import brave.Span;
 import brave.Tracer.SpanInScope;
 import brave.Tracing;
+import org.apache.cxf.systest.Book;
+import org.apache.cxf.systest.brave.TestSpanReporter;
+import org.apache.cxf.systest.jaxws.tracing.BookStoreService;
 
 @WebService(endpointInterface = "org.apache.cxf.systest.jaxws.tracing.BookStoreService", serviceName = "BookStore")
 public class BookStore implements BookStoreService {

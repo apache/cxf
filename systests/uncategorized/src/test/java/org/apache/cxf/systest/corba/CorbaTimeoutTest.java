@@ -31,11 +31,11 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.hello_world_corba.Greeter;
 import org.apache.cxf.hello_world_corba.GreeterCORBAService;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.omg.CORBA.TIMEOUT;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.omg.CORBA.TIMEOUT;
 
 /**
  * This test uses Jacorb implementation, but cleans after itself.

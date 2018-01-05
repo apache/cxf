@@ -37,6 +37,8 @@ import org.apache.cxf.xkms.model.xkms.StatusType;
 import org.apache.cxf.xkms.model.xkms.ValidateRequestType;
 import org.apache.cxf.xkms.model.xmldsig.KeyInfoType;
 import org.apache.cxf.xkms.model.xmldsig.X509DataType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -45,8 +47,6 @@ import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.CoreOptions;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
 

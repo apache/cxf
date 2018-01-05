@@ -22,6 +22,7 @@ import javax.annotation.Priority;
 import javax.enterprise.inject.Vetoed;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
+
 import org.eclipse.microprofile.rest.client.ext.ResponseExceptionMapper;
 
 @Priority(Integer.MAX_VALUE)

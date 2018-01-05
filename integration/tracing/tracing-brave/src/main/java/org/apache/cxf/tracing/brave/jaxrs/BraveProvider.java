@@ -30,9 +30,9 @@ import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.Provider;
 
+import brave.http.HttpTracing;
 import org.apache.cxf.tracing.brave.AbstractBraveProvider;
 import org.apache.cxf.tracing.brave.TraceScope;
-import brave.http.HttpTracing;
 
 @Provider
 public class BraveProvider extends AbstractBraveProvider

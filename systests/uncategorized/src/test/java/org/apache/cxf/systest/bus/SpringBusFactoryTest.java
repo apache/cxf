@@ -32,11 +32,11 @@ import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.workqueue.WorkQueueManager;
 import org.apache.cxf.wsdl.WSDLManager;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class SpringBusFactoryTest extends Assert {
 

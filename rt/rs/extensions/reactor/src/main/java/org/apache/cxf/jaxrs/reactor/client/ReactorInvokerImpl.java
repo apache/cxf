@@ -32,12 +32,12 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.client.WebClient;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import static org.apache.cxf.jaxrs.reactor.client.ReactorUtils.TRACE;
 import static org.apache.cxf.jaxrs.reactor.client.ReactorUtils.toCompletableFuture;
 
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 public class ReactorInvokerImpl implements ReactorInvoker {
     private final WebClient webClient;

@@ -25,15 +25,15 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
 import org.apache.cxf.binding.corba.wsdl.MemberType;
 import org.apache.cxf.binding.corba.wsdl.Struct;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.StructMember;
+import org.omg.CORBA.TCKind;
+import org.omg.CORBA.TypeCode;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.omg.CORBA.ORB;
-import org.omg.CORBA.StructMember;
-import org.omg.CORBA.TCKind;
-import org.omg.CORBA.TypeCode;
 
 // Since the exception handler is essentially the same as the struct handler (just included in case
 // structs and exceptions diverge at a later date), this test should cover both.

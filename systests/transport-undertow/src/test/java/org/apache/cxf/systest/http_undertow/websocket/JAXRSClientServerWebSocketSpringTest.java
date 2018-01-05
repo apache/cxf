@@ -19,10 +19,11 @@
 
 package org.apache.cxf.systest.http_undertow.websocket;
 
-import org.junit.BeforeClass;
-
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import org.junit.BeforeClass;
+
 
 
 /**

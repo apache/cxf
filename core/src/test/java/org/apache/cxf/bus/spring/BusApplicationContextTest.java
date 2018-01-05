@@ -18,11 +18,11 @@
  */
 
 package org.apache.cxf.bus.spring;
+import org.springframework.beans.BeansException;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.springframework.beans.BeansException;
 
 public class BusApplicationContextTest extends Assert {
 

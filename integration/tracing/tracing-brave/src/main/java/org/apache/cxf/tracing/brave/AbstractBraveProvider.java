@@ -23,6 +23,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import brave.Span;
+import brave.Tracer.SpanInScope;
+import brave.http.HttpServerAdapter;
+import brave.http.HttpServerHandler;
+import brave.http.HttpTracing;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -31,11 +36,6 @@ import org.apache.cxf.tracing.brave.internal.HttpAdapterFactory;
 import org.apache.cxf.tracing.brave.internal.HttpAdapterFactory.Request;
 import org.apache.cxf.tracing.brave.internal.HttpAdapterFactory.Response;
 import org.apache.cxf.tracing.brave.internal.HttpServerAdapterFactory;
-import brave.Span;
-import brave.Tracer.SpanInScope;
-import brave.http.HttpServerAdapter;
-import brave.http.HttpServerHandler;
-import brave.http.HttpTracing;
 
 public abstract class AbstractBraveProvider extends AbstractTracingProvider {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractBraveProvider.class);

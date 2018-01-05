@@ -44,12 +44,12 @@ import org.apache.cxf.systest.aegis.mtom.fortest.MtomTestService;
 import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.ws.commons.schema.constants.Constants;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
 /**
  *

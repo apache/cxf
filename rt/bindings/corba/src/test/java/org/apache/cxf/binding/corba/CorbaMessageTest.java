@@ -23,17 +23,17 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.binding.corba.types.CorbaPrimitiveHandler;
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
 import org.apache.cxf.message.Message;
+import org.omg.CORBA.Any;
+import org.omg.CORBA.NVList;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.TCKind;
+import org.omg.CORBA.TypeCode;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.omg.CORBA.Any;
-import org.omg.CORBA.NVList;
-import org.omg.CORBA.ORB;
-import org.omg.CORBA.TCKind;
-import org.omg.CORBA.TypeCode;
 
 public class CorbaMessageTest extends Assert {
 

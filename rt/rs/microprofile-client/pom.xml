@@ -193,5 +193,33 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>setup.eclipse</id>
+            <build>
+                <defaultGoal>process-test-sources</defaultGoal>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>setup.eclipse.project.mp.client</id>
+                                <phase>process-test-sources</phase>
+                                <configuration>
+                                    <target>
+                                        <propertyfile file="${basedir}/.settings/org.eclipse.jdt.core.prefs">
+                                            <entry key="org.eclipse.jdt.core.compiler.problem.annotationSuperInterface" value="ignore" />
+                                        </propertyfile>
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 </project>

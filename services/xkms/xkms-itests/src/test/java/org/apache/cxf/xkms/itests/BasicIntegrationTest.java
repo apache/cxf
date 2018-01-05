@@ -28,6 +28,7 @@ import org.apache.cxf.xkms.model.extensions.ResultDetails;
 import org.apache.cxf.xkms.model.xkms.LocateResultType;
 import org.apache.cxf.xkms.model.xkms.MessageExtensionAbstractType;
 import org.apache.cxf.xkms.model.xkms.ResultMajorEnum;
+import org.w3._2002._03.xkms_wsdl.XKMSPortType;
 
 import org.junit.Assert;
 import org.ops4j.pax.exam.Configuration;
@@ -35,8 +36,6 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.options.MavenArtifactUrlReference;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
-
-import org.w3._2002._03.xkms_wsdl.XKMSPortType;
 
 import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
