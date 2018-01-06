@@ -18,7 +18,7 @@
 -->
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.3.0" name="cxf-${project.version}">
 
-	<repository>mvn:org.ops4j.pax.cdi/pax-cdi-features/[1.0.0.RC1,2)/xml/features</repository>
+	<repository>mvn:org.ops4j.pax.cdi/pax-cdi-features/1.0.0.RC2/xml/features</repository>
 
     <feature name="cxf-specs" version="${project.version}">
         <bundle start-level="9">mvn:org.apache.geronimo.specs/geronimo-osgi-registry/1.1</bundle>
