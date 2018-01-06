@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
+
 import static org.apache.cxf.microprofile.client.MicroProfileClientConfigurableImpl.CONTRACTS;
 
 class ContractComparator implements Comparator<ProviderInfo<?>> {

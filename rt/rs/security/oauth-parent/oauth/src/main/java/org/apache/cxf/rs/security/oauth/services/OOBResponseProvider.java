@@ -36,7 +36,6 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
 import net.oauth.OAuth;
-
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.provider.FormEncodingProvider;
 import org.apache.cxf.rs.security.oauth.utils.OAuthConstants;

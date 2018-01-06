@@ -22,7 +22,6 @@ package org.apache.cxf.transport.http.netty.server.interceptor;
 import org.apache.cxf.transport.http.netty.server.servlet.ChannelThreadLocal;
 
 import io.netty.channel.ChannelHandlerContext;
-
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
 

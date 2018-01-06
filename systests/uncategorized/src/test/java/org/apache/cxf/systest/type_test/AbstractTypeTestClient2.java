@@ -36,7 +36,6 @@ import org.apache.type_test.types1.Document;
 import org.apache.type_test.types1.EmptyAll;
 import org.apache.type_test.types1.EmptyChoice;
 import org.apache.type_test.types1.EmptyStruct;
-
 import org.apache.type_test.types1.ExtColourEnum;
 import org.apache.type_test.types1.ExtendsSimpleContent;
 import org.apache.type_test.types1.ExtendsSimpleType;
@@ -79,6 +78,7 @@ import org.apache.type_test.types3.StructWithMultipleSubstitutionGroups;
 import org.apache.type_test.types3.StructWithSubstitutionGroup;
 import org.apache.type_test.types3.StructWithSubstitutionGroupAbstract;
 import org.apache.type_test.types3.StructWithSubstitutionGroupNil;
+
 import org.junit.Test;
 
 public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {

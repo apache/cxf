@@ -19,6 +19,7 @@
 package org.apache.cxf.microprofile.client;
 
 import java.net.URL;
+
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.microprofile.client.mock.EchoClientReqFilter;
@@ -35,6 +36,7 @@ import org.eclipse.microprofile.rest.client.tck.providers.TestMessageBodyWriter;
 import org.eclipse.microprofile.rest.client.tck.providers.TestParamConverterProvider;
 import org.eclipse.microprofile.rest.client.tck.providers.TestReaderInterceptor;
 import org.eclipse.microprofile.rest.client.tck.providers.TestWriterInterceptor;
+
 import org.junit.Assert;
 import org.junit.Test;
 

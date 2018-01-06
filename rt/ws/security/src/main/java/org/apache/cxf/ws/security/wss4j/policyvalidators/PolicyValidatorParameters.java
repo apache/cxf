@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.wss4j.dom.WSDataRef;

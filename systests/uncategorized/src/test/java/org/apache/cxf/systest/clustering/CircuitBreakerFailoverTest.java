@@ -23,6 +23,7 @@ import javax.xml.ws.WebServiceException;
 import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.greeter_control.Greeter;
+
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;

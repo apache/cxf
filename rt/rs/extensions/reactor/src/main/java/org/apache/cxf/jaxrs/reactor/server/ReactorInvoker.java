@@ -21,7 +21,6 @@ package org.apache.cxf.jaxrs.reactor.server;
 import org.apache.cxf.jaxrs.impl.AsyncResponseImpl;
 import org.apache.cxf.jaxrs.reactivestreams.server.AbstractReactiveInvoker;
 import org.apache.cxf.message.Message;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

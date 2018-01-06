@@ -38,9 +38,9 @@ import org.apache.cxf.ws.rm.v200702.ObjectFactory;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement.AcknowledgementRange;
 import org.apache.cxf.ws.rm.v200702.SequenceType;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

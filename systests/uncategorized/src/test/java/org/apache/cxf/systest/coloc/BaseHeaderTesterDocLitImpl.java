@@ -20,8 +20,8 @@
 package org.apache.cxf.systest.coloc;
 
 import java.util.ResourceBundle;
-import javax.xml.ws.Holder;
 
+import javax.xml.ws.Holder;
 
 import org.apache.commons.logging.Log;
 import org.apache.cxf.common.i18n.Message;

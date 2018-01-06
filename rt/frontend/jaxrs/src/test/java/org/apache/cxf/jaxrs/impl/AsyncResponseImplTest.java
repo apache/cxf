@@ -30,9 +30,9 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.transport.http.Servlet3ContinuationProvider;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

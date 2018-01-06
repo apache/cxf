@@ -21,7 +21,6 @@ package org.apache.cxf.rs.security.saml.sso;
 
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Status;
-
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.ConfigurationFactory;
 

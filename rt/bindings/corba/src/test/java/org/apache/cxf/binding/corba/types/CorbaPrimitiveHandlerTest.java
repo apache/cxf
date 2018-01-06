@@ -20,15 +20,14 @@ package org.apache.cxf.binding.corba.types;
 
 import javax.xml.namespace.QName;
 
-
-
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.TCKind;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.omg.CORBA.ORB;
-import org.omg.CORBA.TCKind;
 
 public class CorbaPrimitiveHandlerTest extends Assert {
 

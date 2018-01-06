@@ -27,6 +27,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.management.InstrumentationManager;
 import org.apache.cxf.message.Message;
+
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;

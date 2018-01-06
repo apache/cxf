@@ -22,13 +22,16 @@ package org.apache.cxf.transport.http.netty.server.integration;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URL;
+
 import javax.xml.ws.Endpoint;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;

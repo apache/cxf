@@ -42,9 +42,9 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.test.AbstractCXFSpringTest;
+import org.springframework.context.support.GenericApplicationContext;
 
 import org.junit.Test;
-import org.springframework.context.support.GenericApplicationContext;
 
 public class AttributeTest extends AbstractCXFSpringTest {
     private JavascriptTestUtilities testUtilities;

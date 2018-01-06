@@ -27,6 +27,7 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.hello_world_doc_lit.Greeter;
 import org.apache.hello_world_doc_lit.SOAPService2;
+
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;

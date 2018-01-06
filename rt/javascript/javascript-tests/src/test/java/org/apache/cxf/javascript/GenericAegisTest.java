@@ -33,6 +33,7 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.testutil.common.TestUtil;
 
 import org.junit.Test;
+
 import static org.junit.Assert.assertNotNull;
 
 /**

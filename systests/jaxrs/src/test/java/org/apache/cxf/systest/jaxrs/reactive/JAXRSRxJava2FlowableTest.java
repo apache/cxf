@@ -38,10 +38,11 @@ import org.apache.cxf.jaxrs.rx2.client.FlowableRxInvoker;
 import org.apache.cxf.jaxrs.rx2.client.FlowableRxInvokerProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
+import io.reactivex.Flowable;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import io.reactivex.Flowable;
 
 public class JAXRSRxJava2FlowableTest extends AbstractBusClientServerTestBase {
     public static final String PORT = RxJava2FlowableServer.PORT;

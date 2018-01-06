@@ -33,7 +33,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.oauth.OAuthProblemException;
 import net.oauth.server.OAuthServlet;
-
 import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.rs.security.oauth.data.OAuthContext;
 import org.apache.cxf.rs.security.oauth.utils.OAuthUtils;

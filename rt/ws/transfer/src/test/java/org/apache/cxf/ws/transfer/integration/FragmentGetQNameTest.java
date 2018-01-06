@@ -24,6 +24,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.ws.soap.SOAPFaultException;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.ws.addressing.ReferenceParametersType;
 import org.apache.cxf.ws.transfer.Get;
@@ -35,6 +36,7 @@ import org.apache.cxf.ws.transfer.dialect.fragment.ValueType;
 import org.apache.cxf.ws.transfer.manager.MemoryResourceManager;
 import org.apache.cxf.ws.transfer.manager.ResourceManager;
 import org.apache.cxf.ws.transfer.resource.Resource;
+
 import org.junit.Assert;
 import org.junit.Test;
 

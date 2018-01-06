@@ -34,6 +34,7 @@ import javax.xml.ws.Service;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxws.AbstractJaxWsTest;
 import org.apache.header_test.rpc.SOAPRPCHeaderService;
+
 import org.junit.Before;
 import org.junit.Test;
 

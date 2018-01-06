@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.ws.transfer.resolver;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.ws.transfer.Create;
 import org.apache.cxf.ws.transfer.manager.ResourceManager;
 import org.apache.cxf.ws.transfer.resourcefactory.resolver.ResourceReference;

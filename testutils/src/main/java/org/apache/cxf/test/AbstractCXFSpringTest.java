@@ -21,13 +21,15 @@ package org.apache.cxf.test;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
-import org.junit.After;
-import org.junit.Before;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
+
+import org.junit.After;
+import org.junit.Before;
+
 
 /**
  * Base class for tests that use a Spring bean specification to load up components for testing.

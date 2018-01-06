@@ -30,6 +30,7 @@ import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.types.GreetMeResponse;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 

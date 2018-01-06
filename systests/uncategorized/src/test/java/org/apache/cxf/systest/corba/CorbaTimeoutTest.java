@@ -22,6 +22,7 @@ package org.apache.cxf.systest.corba;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.net.URL;
+
 import javax.xml.namespace.QName;
 import javax.xml.ws.WebServiceException;
 
@@ -30,10 +31,11 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.hello_world_corba.Greeter;
 import org.apache.cxf.hello_world_corba.GreeterCORBAService;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.omg.CORBA.TIMEOUT;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.omg.CORBA.TIMEOUT;
 
 /**
  * This test uses Jacorb implementation, but cleans after itself.

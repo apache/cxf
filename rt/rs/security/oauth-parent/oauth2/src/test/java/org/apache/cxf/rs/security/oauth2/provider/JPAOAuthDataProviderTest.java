@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.oauth2.provider;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
@@ -31,6 +32,7 @@ import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

@@ -23,6 +23,7 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.neethi.Policy;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.AsymmetricBinding;
+
 import org.junit.Test;
 
 public class CustomPolicyAlgorithmsTest extends AbstractPolicySecurityTest {

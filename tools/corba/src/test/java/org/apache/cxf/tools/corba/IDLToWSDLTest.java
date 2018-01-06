@@ -46,6 +46,10 @@ import org.apache.cxf.tools.corba.common.ToolTestBase;
 import org.apache.cxf.tools.corba.utils.TestUtils;
 import org.apache.cxf.tools.corba.utils.WSDLGenerationTester;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 public class IDLToWSDLTest extends ToolTestBase {
 
     private static StringBuffer usageBuf;
@@ -60,6 +64,7 @@ public class IDLToWSDLTest extends ToolTestBase {
         wsdlGenTester = new WSDLGenerationTester();
     }
 
+    @Before
     public void setUp() {
         super.setUp();
         try {
@@ -87,6 +92,7 @@ public class IDLToWSDLTest extends ToolTestBase {
         FileUtils.removeDir(dir);
     }
 
+    @After
     public void tearDown() {
         try {
             deleteDir(output);
@@ -131,6 +137,7 @@ public class IDLToWSDLTest extends ToolTestBase {
         genReader.close();
     }
 
+    @Test
     public void testNoArgs() throws Exception {
         String[] cmdArgs = {};
         int exc = execute(cmdArgs);
@@ -141,6 +148,7 @@ public class IDLToWSDLTest extends ToolTestBase {
         checkStrings(strBuf.toString().getBytes(), bout.toByteArray());
     }
 
+    @Test
     public void testDetailOutput() throws Exception {
         String[] args = new String[] {"-?"};
         int exc = execute(args);
@@ -148,6 +156,7 @@ public class IDLToWSDLTest extends ToolTestBase {
         assertNotNull(bout.toByteArray());
     }
 
+    @Test
     public void testVersionOutput() throws Exception {
         String[] args = new String[] {"-v"};
         int exc = execute(args);
@@ -155,6 +164,7 @@ public class IDLToWSDLTest extends ToolTestBase {
         assertNotNull(bout.toByteArray());
     }
 
+    @Test
     public void testHelpOutput() throws Exception {
         String[] args = new String[] {"-help"};
         int exc = execute(args);
@@ -162,10 +172,12 @@ public class IDLToWSDLTest extends ToolTestBase {
         assertNotNull(bout.toByteArray());
     }
 
+    @Test
     public void testBase64SequenceOctetMappingOption() throws Exception {
         doTestSequenceOctetMappingOption(ToolCorbaConstants.CFG_SEQUENCE_OCTET_TYPE_BASE64BINARY);
     }
 
+    @Test
     public void testHexBinarySequenceOctetMappingOption() throws Exception {
         doTestSequenceOctetMappingOption(ToolCorbaConstants.CFG_SEQUENCE_OCTET_TYPE_HEXBINARY);
     }
@@ -205,6 +217,7 @@ public class IDLToWSDLTest extends ToolTestBase {
     }
 
     // test "-x <schema-namespace>"
+    @Test
     public void testSchemaNamespace() throws Exception {
         File input = new File(getClass().getResource("/idl/HelloWorld.idl").toURI());
         File actual = new File(output, "HelloWorld.wsdl");
@@ -221,6 +234,7 @@ public class IDLToWSDLTest extends ToolTestBase {
     }
 
     // test "-f <corba-address-file>"
+    @Test
     public void testCorbaAddressFile() throws Exception {
         File input = new File(getClass().getResource("/idl/HelloWorld.idl").toURI());
         File actual = new File(output, "HelloWorld.wsdl");
@@ -252,6 +266,7 @@ public class IDLToWSDLTest extends ToolTestBase {
     }
 
     // test "-t <corba-type-map target-namespace>"
+    @Test
     public void testCorbaTypeMapTargetNamespace() throws Exception {
         File input = new File(getClass().getResource("/idl/sequence_octet.idl").toURI());
         File actual = new File(output, "sequence_octet.wsdl");
@@ -268,6 +283,7 @@ public class IDLToWSDLTest extends ToolTestBase {
     }
 
     // test "-b Treat bounded strings as unbounded."
+    @Test
     public void testTreatBoundedStringsAsUnbounded() throws Exception {
         File input = new File(getClass().getResource("/idl/String.idl").toURI());
         File actual = new File(output, "String.wsdl");
@@ -283,6 +299,7 @@ public class IDLToWSDLTest extends ToolTestBase {
     }
 
     //  test "-b Treat bounded strings as unbounded."
+    @Test
     public void testTreatBoundedAnonStringsAsUnbounded() throws Exception {
         File input = new File(getClass().getResource("/idl/Anonstring.idl").toURI());
         File actual = new File(output, "Anonstring.wsdl");
@@ -297,6 +314,7 @@ public class IDLToWSDLTest extends ToolTestBase {
         doTestGeneratedWsdl(expected, actual);
     }
 
+    @Test
     public void testExceptionsWithSchemasInDifferentNS() throws Exception {
         File input = new File(getClass().getResource("/idl/Exception.idl").toURI());
         File actual = new File(output, "Exception.wsdl");
@@ -311,6 +329,7 @@ public class IDLToWSDLTest extends ToolTestBase {
         doTestGeneratedWsdl(expected, actual);
     }
 
+    @Test
     public void testOutputWSDLFileName() throws Exception {
         File input = new File(getClass().getResource("/idl/HelloWorld.idl").toURI());
         File actual = new File(output, "ArtixHelloWorld.wsdl");
@@ -326,6 +345,7 @@ public class IDLToWSDLTest extends ToolTestBase {
         doTestGeneratedWsdl(expected, actual);
     }
 
+    @Test
     public void testMultipleIncludes() throws Exception {
         File input = new File(getClass().getResource("/idl/Parent.idl").toURI());
         File actual = new File(output, "Parent.wsdl");
@@ -347,6 +367,7 @@ public class IDLToWSDLTest extends ToolTestBase {
         doTestGeneratedWsdl(expected, actual);
     }
 
+    @Test
     public void testExternalInterfaceRef() throws Exception {
         File input = new File(getClass().getResource("/idl/ExternalInterfaceRef.idl").toURI());
         File actual = new File(output, "ExternalInterfaceRef.wsdl");
@@ -367,6 +388,7 @@ public class IDLToWSDLTest extends ToolTestBase {
         doTestGeneratedWsdl(expected, actual);
     }
 
+    @Test
     public void testDuplicateTypeGeneration() throws Exception {
         File input = new File(getClass().getResource("/idl/duplicateAttribute.idl").toURI());
         File expected =
@@ -384,6 +406,7 @@ public class IDLToWSDLTest extends ToolTestBase {
         doTestGeneratedWsdl(expected, actual);
     }
 
+    @Test
     public void testUndefinedTypeRef() throws Exception {
         File input = new File(getClass().getResource("/idl/ReferUndefinedType.idl").toURI());
         File include1Dir = new File(getClass().getResource("/idl").toURI());
@@ -402,6 +425,7 @@ public class IDLToWSDLTest extends ToolTestBase {
         }
     }
 
+    @Test
     public void testCXF4541() throws Exception {
         File input = new File(getClass().getResource("/idl/missing_struct_member.idl").toURI());
         String[] args = new String[] {
@@ -423,6 +447,7 @@ public class IDLToWSDLTest extends ToolTestBase {
         }
         fail("Did not find foo element");
     }
+    @Test
     public void testCXF3329() throws Exception {
         File input = new File(getClass().getResource("/idl/CXF3329.idl").toURI());
         String[] args = new String[] {
@@ -437,6 +462,7 @@ public class IDLToWSDLTest extends ToolTestBase {
         assertTrue(s.contains("name=\"myStruct\""));
     }
 
+    @Test
     public void testCXF5340() throws Exception {
         File input = new File(getClass().getResource("/idl/CXF5340.idl").toURI());
         String[] args = new String[] {

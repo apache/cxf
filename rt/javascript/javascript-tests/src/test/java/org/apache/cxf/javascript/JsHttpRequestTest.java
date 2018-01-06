@@ -36,11 +36,11 @@ import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.test.AbstractCXFSpringTest;
 import org.apache.cxf.test.XPathAssert;
 import org.apache.cxf.testutil.common.TestUtil;
+import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
+import org.springframework.context.support.GenericApplicationContext;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
-import org.springframework.context.support.GenericApplicationContext;
 
 /**
  * This test is ignored by default as it is continually failing on Jenkins.

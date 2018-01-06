@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.rt.security.claims.ClaimsSecurityContext;
 

@@ -23,9 +23,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.net.URL;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
 
-public abstract class ToolTestBase extends TestCase {
+public abstract class ToolTestBase extends Assert {
 
     protected PrintStream oldStdErr;
     protected PrintStream oldStdOut;
@@ -35,6 +37,7 @@ public abstract class ToolTestBase extends TestCase {
     protected ByteArrayOutputStream errOut = new ByteArrayOutputStream();
     protected ByteArrayOutputStream stdOut = new ByteArrayOutputStream();
 
+    @Before
     public void setUp() {
 
         oldStdErr = System.err;
@@ -47,6 +50,7 @@ public abstract class ToolTestBase extends TestCase {
         idlLocation = ToolTestBase.class.getResource("/idl/HelloWorld.idl");
     }
 
+    @After
     public void tearDown() {
 
         System.setErr(oldStdErr);

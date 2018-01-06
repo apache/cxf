@@ -21,14 +21,16 @@ package org.apache.cxf.systest.cxf993;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import testnotification.NotificationService;
 import testnotification.NotificationServicePort;
 import testnotification.SendNotification;
+
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class Cxf993Test extends AbstractBusClientServerTestBase {
     public static final String PORT = Server.PORT;

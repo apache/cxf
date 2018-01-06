@@ -24,6 +24,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import brave.Span;
+import brave.Tracer.SpanInScope;
+import brave.http.HttpClientAdapter;
+import brave.http.HttpClientHandler;
+import brave.http.HttpTracing;
+import brave.propagation.Propagation.Setter;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.tracing.AbstractTracingProvider;
@@ -31,13 +37,6 @@ import org.apache.cxf.tracing.brave.internal.HttpAdapterFactory;
 import org.apache.cxf.tracing.brave.internal.HttpAdapterFactory.Request;
 import org.apache.cxf.tracing.brave.internal.HttpAdapterFactory.Response;
 import org.apache.cxf.tracing.brave.internal.HttpClientAdapterFactory;
-
-import brave.Span;
-import brave.Tracer.SpanInScope;
-import brave.http.HttpClientAdapter;
-import brave.http.HttpClientHandler;
-import brave.http.HttpTracing;
-import brave.propagation.Propagation.Setter;
 
 public abstract class AbstractBraveClientProvider extends AbstractTracingProvider {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractBraveClientProvider.class);

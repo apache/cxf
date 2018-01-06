@@ -20,13 +20,12 @@ package org.apache.cxf.tracing.brave;
 
 import java.util.concurrent.Callable;
 
-import org.apache.cxf.tracing.Traceable;
-import org.apache.cxf.tracing.TracerContext;
-
 import brave.Span;
 import brave.Tracer;
 import brave.Tracer.SpanInScope;
 import brave.http.HttpTracing;
+import org.apache.cxf.tracing.Traceable;
+import org.apache.cxf.tracing.TracerContext;
 
 public class BraveTracerContext implements TracerContext {
     private final HttpTracing brave;

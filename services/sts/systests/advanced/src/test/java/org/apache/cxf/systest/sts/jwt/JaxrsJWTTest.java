@@ -44,6 +44,7 @@ import org.apache.cxf.ws.security.policy.interceptors.STSTokenOutInterceptor;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.cxf.ws.security.trust.STSTokenRetriever.TokenRequestParams;
+
 import org.junit.BeforeClass;
 
 /**

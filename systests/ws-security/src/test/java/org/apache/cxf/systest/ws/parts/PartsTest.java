@@ -37,6 +37,7 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.example.contract.doubleit.DoubleItSwaPortType;
 import org.example.schema.doubleit.DoubleIt3;
+
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;

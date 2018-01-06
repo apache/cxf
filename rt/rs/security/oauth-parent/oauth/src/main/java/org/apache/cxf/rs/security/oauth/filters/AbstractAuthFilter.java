@@ -37,7 +37,6 @@ import net.oauth.OAuthMessage;
 import net.oauth.OAuthProblemException;
 import net.oauth.OAuthValidator;
 import net.oauth.server.OAuthServlet;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;

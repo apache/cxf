@@ -32,7 +32,6 @@ import org.apache.cxf.tools.common.toolspec.ToolSpec;
 import org.apache.cxf.tools.common.toolspec.parser.BadUsageException;
 import org.apache.cxf.tools.common.toolspec.parser.CommandDocument;
 import org.apache.cxf.tools.common.toolspec.parser.ErrorVisitor;
-
 import org.apache.cxf.tools.corba.common.ProcessorEnvironment;
 import org.apache.cxf.tools.corba.common.ToolCorbaConstants;
 import org.apache.cxf.tools.corba.processors.idl.IDLToWSDLProcessor;

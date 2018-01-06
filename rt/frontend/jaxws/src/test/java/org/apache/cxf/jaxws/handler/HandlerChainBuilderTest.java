@@ -35,8 +35,8 @@ import org.apache.cxf.jaxws.handler.types.FullyQualifiedClassType;
 import org.apache.cxf.jaxws.handler.types.ParamValueType;
 import org.apache.cxf.jaxws.handler.types.PortComponentHandlerType;
 import org.apache.cxf.jaxws.handler.types.XsdStringType;
-import org.easymock.EasyMock;
 
+import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
 

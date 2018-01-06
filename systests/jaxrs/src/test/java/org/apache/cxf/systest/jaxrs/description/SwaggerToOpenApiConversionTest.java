@@ -110,7 +110,7 @@ public class SwaggerToOpenApiConversionTest extends AbstractBusClientServerTestB
         List<Map<String, Object>> servers = openApiJson.getListMapProperty("servers");
         assertEquals(1, servers.size());
         assertEquals(1, servers.get(0).size());
-        assertEquals("https://localhost:" + PORT, servers.get(0).get("url"));
+        assertEquals("http://localhost:" + PORT, servers.get(0).get("url"));
         // info
         JsonMapObject info = openApiJson.getJsonMapProperty("info");
         assertEquals(4, info.size());

@@ -71,15 +71,15 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
+
+import io.undertow.util.HeaderMap;
+import io.undertow.util.HttpString;
+
 import org.easymock.EasyMock;
-
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
-import io.undertow.util.HeaderMap;
-import io.undertow.util.HttpString;
 
 public class UndertowHTTPDestinationTest extends Assert {
     protected static final String AUTH_HEADER = "Authorization";

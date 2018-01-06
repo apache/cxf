@@ -20,10 +20,8 @@
 package org.apache.cxf.management.jmx.export.runtime;
 
 import java.lang.reflect.Constructor;
-
 import java.util.HashMap;
 import java.util.Map;
-
 
 import javax.management.Descriptor;
 import javax.management.MBeanOperationInfo;

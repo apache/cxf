@@ -23,11 +23,11 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.soapfault.SoapFaultPortType;
 import org.apache.cxf.soapfault.SoapFaultService;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
+import org.xmlsoap.schemas.soap.envelope.Fault;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import org.xmlsoap.schemas.soap.envelope.Fault;
 
 public class SOAPFaultRequestTestCase extends AbstractClientServerTestBase {
     private static final String PORT = Server.PORT;

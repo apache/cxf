@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import net.oauth.OAuth;
-
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.oauth.client.OAuthClientUtils;
 import org.apache.cxf.rs.security.oauth.client.OAuthClientUtils.Token;

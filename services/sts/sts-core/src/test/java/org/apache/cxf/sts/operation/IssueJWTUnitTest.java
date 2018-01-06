@@ -59,6 +59,7 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
+
 import org.junit.Assert;
 
 /**

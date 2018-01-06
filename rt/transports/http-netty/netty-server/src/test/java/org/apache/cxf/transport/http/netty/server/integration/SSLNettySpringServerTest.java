@@ -19,12 +19,15 @@
 package org.apache.cxf.transport.http.netty.server.integration;
 
 import java.net.URL;
+
 import javax.xml.ws.Endpoint;
+
 import org.apache.hello_world_soap_http.SOAPService;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 
 /**
  * publish the service with SSL configuraiton with Spring

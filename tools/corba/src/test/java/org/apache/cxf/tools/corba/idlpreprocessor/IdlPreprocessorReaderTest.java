@@ -29,9 +29,10 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class IdlPreprocessorReaderTest extends TestCase {
+public class IdlPreprocessorReaderTest extends Assert {
 
     private URL findTestResource(String spec) {
         String location = "/idlpreprocessor/" + spec;
@@ -48,6 +49,7 @@ public class IdlPreprocessorReaderTest extends TestCase {
         }
     }
 
+    @Test
     public void testResolvedInA() throws Exception {
         final String location = "A.idl";
         final IdlPreprocessorReader includeReader = createPreprocessorReader(location);
@@ -55,6 +57,7 @@ public class IdlPreprocessorReaderTest extends TestCase {
         assertExpectedPreprocessingResult(expectedResultLocation, includeReader);
     }
 
+    @Test
     public void testMultiFileResolve() throws Exception {
         final String location = "B.idl";
         final IdlPreprocessorReader includeReader = createPreprocessorReader(location);
@@ -62,6 +65,7 @@ public class IdlPreprocessorReaderTest extends TestCase {
         assertExpectedPreprocessingResult(expectedResultLocation, includeReader);
     }
 
+    @Test
     public void testIfElseHandling() throws Exception {
         final String location = "C.idl";
         final IdlPreprocessorReader includeReader = createPreprocessorReader(location);
@@ -69,6 +73,7 @@ public class IdlPreprocessorReaderTest extends TestCase {
         assertExpectedPreprocessingResult(expectedResultLocation, includeReader);
     }
 
+    @Test
     public void testMaximumIncludeDepthIsDetected() throws IOException {
         final String location = "MaximumIncludeDepthExceeded.idl";
         try {
@@ -81,6 +86,7 @@ public class IdlPreprocessorReaderTest extends TestCase {
         }
     }
 
+    @Test
     public void testUnresolvableInclude() throws IOException {
         final String location = "UnresolvableInclude.idl";
         try {
@@ -94,6 +100,7 @@ public class IdlPreprocessorReaderTest extends TestCase {
         }
     }
 
+    @Test
     public void testDefaultIncludeResolver() throws Exception {
         final String location = "B.idl";
         // uses <> notation for include

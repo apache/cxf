@@ -38,6 +38,7 @@ import org.apache.cxf.pizza.types.OrderPizzaResponseType;
 import org.apache.cxf.pizza.types.OrderPizzaType;
 import org.apache.cxf.pizza.types.ToppingsListType;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 

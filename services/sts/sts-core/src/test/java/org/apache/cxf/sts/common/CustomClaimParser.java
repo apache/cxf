@@ -21,6 +21,7 @@ package org.apache.cxf.sts.common;
 import java.net.URI;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.rt.security.claims.Claim;
 import org.apache.cxf.sts.claims.ClaimsParser;
 

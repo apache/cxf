@@ -39,7 +39,6 @@ import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.CatalogWSDLLocator;
 import org.apache.cxf.wsdl11.WSDLManagerImpl;
-
 import org.apache.hello_world.Greeter;
 import org.apache.hello_world.GreeterImpl;
 import org.apache.hello_world.services.SOAPService;

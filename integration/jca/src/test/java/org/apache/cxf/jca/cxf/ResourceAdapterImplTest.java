@@ -33,6 +33,7 @@ import javax.resource.spi.ResourceAdapter;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.jca.core.resourceadapter.ResourceBean;
+
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;

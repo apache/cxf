@@ -38,6 +38,7 @@ import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 import org.apache.cxf.transport.jms.util.JMSUtil;
 import org.apache.geronimo.transaction.manager.GeronimoTransactionManager;
 import org.apache.hello_world_doc_lit.Greeter;
+
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;

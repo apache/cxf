@@ -30,6 +30,7 @@ import java.net.URLConnection;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 

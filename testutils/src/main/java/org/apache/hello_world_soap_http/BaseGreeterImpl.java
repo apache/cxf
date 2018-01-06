@@ -25,7 +25,6 @@ import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
 import javax.annotation.Resource;
-
 import javax.jws.WebMethod;
 import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.BindingProvider;

@@ -31,8 +31,8 @@ import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.trust.STSClient;
-
 import org.example.contract.doubleit.DoubleItPortType;
+
 import org.junit.BeforeClass;
 
 /**

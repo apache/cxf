@@ -22,6 +22,7 @@ import org.apache.cxf.jaxrs.ext.search.SearchBean;
 import org.apache.cxf.jaxrs.ext.search.SearchConditionParser;
 import org.apache.cxf.jaxrs.ext.search.odata.ODataParser;
 import org.apache.lucene.search.Query;
+
 import org.junit.Test;
 
 public class LuceneQueryVisitorODataTest extends AbstractLuceneQueryVisitorTest {

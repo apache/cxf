@@ -26,6 +26,7 @@ import javax.ws.rs.core.Response;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.systests.cdi.base.AbstractCdiSingleAppTest;
 import org.apache.cxf.systests.cdi.base.tomcat.AbstractTomcatServer;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 

@@ -20,17 +20,16 @@ package org.apache.cxf.binding.corba.types;
 
 import javax.xml.namespace.QName;
 
-
-
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
 import org.apache.cxf.binding.corba.wsdl.Sequence;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.TCKind;
+import org.omg.CORBA.TypeCode;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.omg.CORBA.ORB;
-import org.omg.CORBA.TCKind;
-import org.omg.CORBA.TypeCode;
 
 public class CorbaSequenceHandlerTest extends Assert {
 

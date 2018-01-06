@@ -29,6 +29,7 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.soap.SoapFault;
@@ -43,6 +44,7 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.example.contract.doubleit.DoubleItPortType;
+
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;

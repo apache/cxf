@@ -26,13 +26,14 @@ import org.apache.cxf.binding.corba.CorbaBindingException;
 import org.apache.cxf.binding.corba.CorbaTypeMap;
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
 import org.apache.cxf.binding.corba.wsdl.CorbaType;
+import org.omg.CORBA.ORB;
+import org.omg.CORBA.TCKind;
+import org.omg.CORBA.TypeCode;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.omg.CORBA.ORB;
-import org.omg.CORBA.TCKind;
-import org.omg.CORBA.TypeCode;
 
 public class CorbaUtilsTest extends Assert {
 

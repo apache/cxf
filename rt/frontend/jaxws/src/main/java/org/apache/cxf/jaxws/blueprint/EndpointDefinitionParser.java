@@ -21,7 +21,9 @@ package org.apache.cxf.jaxws.blueprint;
 
 import java.util.StringTokenizer;
 import java.util.UUID;
+
 import javax.xml.namespace.QName;
+
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;

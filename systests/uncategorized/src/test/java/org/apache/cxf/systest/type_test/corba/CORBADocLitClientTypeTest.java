@@ -27,6 +27,7 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.systest.type_test.AbstractTypeTestClient5;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;

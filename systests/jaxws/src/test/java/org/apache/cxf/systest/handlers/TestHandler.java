@@ -42,7 +42,6 @@ import org.w3c.dom.Node;
 
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.saaj.SAAJUtils;
-
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.handler_test.PingException;

@@ -22,7 +22,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
 
-
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
@@ -54,13 +53,14 @@ import org.apache.cxf.jaxws.service.Hello;
 import org.apache.cxf.jaxws.spring.NamespaceHandler.SpringServerFactoryBean;
 import org.apache.cxf.message.Message;
 import org.apache.hello_world_soap_http.Greeter;
+import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class SpringBeansTest extends Assert {
 

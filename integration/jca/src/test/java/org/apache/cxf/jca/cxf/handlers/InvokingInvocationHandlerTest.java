@@ -23,6 +23,7 @@ import java.lang.reflect.Proxy;
 
 import org.apache.cxf.jca.cxf.CXFInvocationHandler;
 import org.apache.cxf.jca.cxf.CXFInvocationHandlerData;
+
 import org.junit.Before;
 import org.junit.Test;
 

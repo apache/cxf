@@ -20,8 +20,10 @@
 package org.apache.cxf.ws.transfer.shared.faults;
 
 import javax.xml.namespace.QName;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.helpers.DOMUtils;
 

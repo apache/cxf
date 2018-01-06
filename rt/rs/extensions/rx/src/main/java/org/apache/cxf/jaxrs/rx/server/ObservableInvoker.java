@@ -21,7 +21,6 @@ package org.apache.cxf.jaxrs.rx.server;
 import org.apache.cxf.jaxrs.JAXRSInvoker;
 import org.apache.cxf.jaxrs.impl.AsyncResponseImpl;
 import org.apache.cxf.message.Message;
-
 import rx.Observable;
 
 public class ObservableInvoker extends JAXRSInvoker {

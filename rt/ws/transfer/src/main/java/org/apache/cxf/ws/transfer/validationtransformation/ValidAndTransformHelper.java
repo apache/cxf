@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.transfer.validationtransformation;
 
 import java.util.List;
+
 import org.apache.cxf.ws.transfer.Representation;
 import org.apache.cxf.ws.transfer.shared.faults.InvalidRepresentation;
 

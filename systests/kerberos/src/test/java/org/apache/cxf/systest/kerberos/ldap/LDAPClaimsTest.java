@@ -55,12 +55,12 @@ import org.apache.directory.server.core.annotations.CreatePartition;
 import org.apache.directory.server.core.integ.AbstractLdapTestUnit;
 import org.apache.directory.server.core.integ.FrameworkRunner;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 @RunWith(FrameworkRunner.class)
 

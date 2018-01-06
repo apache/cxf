@@ -21,6 +21,7 @@ package org.apache.cxf.systest.jaxrs.sse.undertow;
 
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.systest.jaxrs.sse.AbstractSseTest;
+
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 

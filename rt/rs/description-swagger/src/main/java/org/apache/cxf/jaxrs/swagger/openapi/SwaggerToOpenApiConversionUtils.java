@@ -260,9 +260,13 @@ public final class SwaggerToOpenApiConversionUtils {
                     sw2PathVerbParamMap.setProperty("schema", schema);
                 } else {
                     String type = (String)sw2PathVerbParamMap.removeProperty("type");
+                    Object enumK = sw2PathVerbParamMap.removeProperty("enum");
                     if (type != null) {
                         JsonMapObject schema = new JsonMapObject();
                         schema.setProperty("type", type);
+                        if (enumK != null) {
+                            schema.setProperty("enum", enumK);
+                        }
                         for (String prop : SIMPLE_TYPE_RELATED_PROPS) {
                             Object value = sw2PathVerbParamMap.removeProperty(prop);
                             if (value != null) {

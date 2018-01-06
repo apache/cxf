@@ -26,6 +26,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.hello_world_doc_lit.Greeter;
 import org.apache.hello_world_doc_lit.PingMeFault;
+
 import org.junit.Assert;
 
 /**

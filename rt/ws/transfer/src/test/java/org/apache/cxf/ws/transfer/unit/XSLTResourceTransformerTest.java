@@ -20,14 +20,18 @@
 package org.apache.cxf.ws.transfer.unit;
 
 import java.io.InputStream;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.stream.StreamSource;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.transfer.Representation;
 import org.apache.cxf.ws.transfer.validationtransformation.ResourceTransformer;
 import org.apache.cxf.ws.transfer.validationtransformation.XSLTResourceTransformer;
+
 import org.junit.Assert;
 import org.junit.Test;
 

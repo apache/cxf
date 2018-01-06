@@ -42,6 +42,7 @@ import org.apache.cxf.ws.eventing.base.SimpleEventingIntegrationTest;
 import org.apache.cxf.ws.eventing.base.SingletonSubscriptionManagerContainer;
 import org.apache.cxf.ws.eventing.base.TestUtil;
 import org.apache.cxf.ws.eventing.integration.eventsink.TestingEndToEndpointImpl;
+
 import org.junit.Assert;
 import org.junit.Test;
 

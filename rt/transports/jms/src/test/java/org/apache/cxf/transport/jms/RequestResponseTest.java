@@ -30,6 +30,7 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.MessageObserver;
+
 import org.junit.Test;
 
 public class RequestResponseTest extends AbstractJMSTester {

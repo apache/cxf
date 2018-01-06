@@ -21,7 +21,6 @@ package org.apache.cxf.karaf.commands.completers;
 import java.util.List;
 
 import org.apache.cxf.Bus;
-
 import org.apache.cxf.karaf.commands.internal.CXFController;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.api.console.CommandLine;

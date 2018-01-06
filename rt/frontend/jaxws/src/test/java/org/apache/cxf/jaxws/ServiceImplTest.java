@@ -50,6 +50,7 @@ import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxws.handler.PortInfoImpl;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
+
 import org.junit.Test;
 
 public class ServiceImplTest extends AbstractJaxWsTest {

@@ -39,6 +39,7 @@ import org.apache.cxf.jaxrs.ext.search.SearchConditionParser;
 import org.apache.cxf.jaxrs.ext.search.SearchConditionVisitor;
 import org.apache.cxf.jaxrs.ext.search.SearchUtils;
 import org.apache.cxf.jaxrs.ext.search.jpa.BookReview.Review;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

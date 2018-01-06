@@ -54,8 +54,9 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.util.DOM2Writer;
-import org.junit.Assert;
 import org.opensaml.core.xml.XMLObject;
+
+import org.junit.Assert;
 
 /**
  * Some unit tests for creating SAML Tokens with an ActAs element.

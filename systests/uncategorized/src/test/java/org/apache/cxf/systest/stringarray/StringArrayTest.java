@@ -29,6 +29,7 @@ import org.apache.cxf.ext.logging.event.PrintWriterEventSender;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.stringarray.SOAPServiceRPCLit;
 import org.apache.stringarray.StringListTest;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;

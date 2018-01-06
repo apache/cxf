@@ -21,7 +21,6 @@ package org.apache.cxf.transport.servlet;
 import javax.servlet.http.HttpServletRequest;
 
 import org.easymock.EasyMock;
-
 import org.junit.Assert;
 import org.junit.Test;
 

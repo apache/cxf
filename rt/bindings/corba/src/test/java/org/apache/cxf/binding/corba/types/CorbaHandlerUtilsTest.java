@@ -34,12 +34,13 @@ import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
 import org.apache.cxf.binding.corba.wsdl.TypeMappingType;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
+import org.omg.CORBA.ORB;
+
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.omg.CORBA.ORB;
-
 
 
 public class CorbaHandlerUtilsTest extends Assert {

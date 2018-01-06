@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.jaxws;
 
 import javax.xml.ws.Endpoint;
+
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class ArrayServiceServer extends AbstractBusTestServerBase {

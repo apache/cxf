@@ -26,9 +26,9 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.service.factory.FactoryBeanListenerManager;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.wsdl.WSDLManager;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

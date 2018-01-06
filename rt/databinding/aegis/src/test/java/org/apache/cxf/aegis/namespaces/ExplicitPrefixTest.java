@@ -37,6 +37,7 @@ import org.apache.cxf.aegis.namespaces.impl.NameServiceImpl;
 import org.apache.cxf.aegis.type.TypeMapping;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.service.Service;
+
 import org.junit.Test;
 
 /**

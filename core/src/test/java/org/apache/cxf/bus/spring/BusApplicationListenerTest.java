@@ -21,13 +21,13 @@ package org.apache.cxf.bus.spring;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.managers.CXFBusLifeCycleManager;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
+import org.springframework.context.support.AbstractRefreshableApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.springframework.context.support.AbstractRefreshableApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 
 public class BusApplicationListenerTest extends Assert {

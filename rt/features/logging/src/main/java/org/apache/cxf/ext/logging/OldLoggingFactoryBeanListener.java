@@ -25,7 +25,6 @@ import java.io.PrintWriter;
 import java.net.URI;
 
 import org.apache.cxf.Bus;
-
 import org.apache.cxf.annotations.Logging;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Endpoint;

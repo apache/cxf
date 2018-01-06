@@ -35,6 +35,7 @@ import java.util.Map;
 import javax.xml.stream.XMLStreamException;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.staxutils.StaxUtils;

@@ -37,6 +37,7 @@ import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.mime.TestMtom;
 import org.apache.cxf.transport.jms.ConnectionFactoryFeature;
+
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;

@@ -35,6 +35,10 @@ import javax.ws.rs.core.Response.Status;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
+import brave.Span;
+import brave.Tracer.SpanInScope;
+import brave.Tracing;
+import brave.sampler.Sampler;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
@@ -64,10 +68,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 
-import brave.Span;
-import brave.Tracer.SpanInScope;
-import brave.Tracing;
-import brave.sampler.Sampler;
 
 public class BraveTracingTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(BraveTracingTest.class);

@@ -28,6 +28,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.w3c.dom.Document;
+
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.MustUnderstandInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
@@ -41,6 +42,7 @@ import org.apache.cxf.ws.security.wss4j.CryptoCoverageChecker.XPathExpression;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageScope;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
 import org.apache.wss4j.common.ConfigurationConstants;
+
 import org.junit.Test;
 
 

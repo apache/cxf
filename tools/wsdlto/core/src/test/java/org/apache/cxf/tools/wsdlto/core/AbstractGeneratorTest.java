@@ -25,6 +25,7 @@ import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.util.FileWriterUtil;
+
 import org.junit.Test;
 
 public class AbstractGeneratorTest extends ProcessorTestBase {

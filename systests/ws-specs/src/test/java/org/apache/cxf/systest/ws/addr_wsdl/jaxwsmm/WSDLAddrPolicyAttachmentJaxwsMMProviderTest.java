@@ -22,8 +22,11 @@ package org.apache.cxf.systest.ws.addr_wsdl.jaxwsmm;
 import java.net.URL;
 import java.util.List;
 import java.util.logging.Logger;
+
 import javax.xml.namespace.QName;
 
+import messaging.AsyncMessaging;
+import messaging.AsyncMessagingService;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -41,8 +44,6 @@ import org.apache.cxf.ws.policy.PolicyOutInterceptor;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import messaging.AsyncMessaging;
-import messaging.AsyncMessagingService;
 
 public class WSDLAddrPolicyAttachmentJaxwsMMProviderTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);

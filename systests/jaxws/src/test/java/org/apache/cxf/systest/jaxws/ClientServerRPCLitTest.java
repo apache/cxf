@@ -65,6 +65,7 @@ import org.apache.hello_world_rpclit.GreeterRPCLit;
 import org.apache.hello_world_rpclit.SOAPServiceRPCLit;
 import org.apache.hello_world_rpclit.types.MyComplexStruct;
 import org.apache.hello_world_soap_http.RPCLitGreeterImpl;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 

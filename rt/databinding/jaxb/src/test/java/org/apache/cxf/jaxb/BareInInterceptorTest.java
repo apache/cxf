@@ -54,8 +54,8 @@ import org.apache.cxf.wsdl11.WSDLServiceFactory;
 import org.apache.hello_world_doc_lit_bare.types.TradePriceData;
 import org.apache.hello_world_soap_http.types.GreetMe;
 import org.apache.hello_world_soap_http.types.GreetMeResponse;
-import org.easymock.IMocksControl;
 
+import org.easymock.IMocksControl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

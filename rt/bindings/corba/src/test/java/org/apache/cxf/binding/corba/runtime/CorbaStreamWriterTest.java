@@ -21,6 +21,7 @@ package org.apache.cxf.binding.corba.runtime;
 import javax.xml.stream.XMLStreamException;
 
 import org.apache.cxf.binding.corba.types.AbstractCorbaTypeListener;
+
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -26,6 +26,7 @@ import javax.jms.Message;
 import javax.jms.Session;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+
 import org.junit.Assert;
 import org.junit.Test;
 

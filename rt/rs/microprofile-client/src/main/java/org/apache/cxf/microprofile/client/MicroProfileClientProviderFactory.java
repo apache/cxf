@@ -23,7 +23,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+
 import javax.ws.rs.core.Configuration;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.ClassHelper;
@@ -87,7 +89,6 @@ public final class MicroProfileClientProviderFactory extends ProviderFactory {
         injectContextProxies(responseExceptionMappers);
     }
 
-    @SuppressWarnings("unchecked")
     public List<ResponseExceptionMapper<?>> createResponseExceptionMapper(Message m, Class<?> paramType) {
 
         List<ResponseExceptionMapper<?>> candidates = new LinkedList<>();

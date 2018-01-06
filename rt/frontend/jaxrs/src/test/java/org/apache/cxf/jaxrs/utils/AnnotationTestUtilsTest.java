@@ -29,6 +29,7 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.jaxrs.Customer;
+
 import org.junit.Assert;
 import org.junit.Test;
 

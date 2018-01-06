@@ -50,6 +50,7 @@ import org.apache.cxf.ws.eventing.integration.notificationapi.assertions.WSAActi
 import org.apache.cxf.ws.eventing.manager.SubscriptionManagerEndpoint;
 import org.apache.cxf.ws.eventing.shared.EventingConstants;
 import org.apache.cxf.ws.eventing.shared.handlers.ReferenceParametersAddingHandler;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;

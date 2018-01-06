@@ -29,8 +29,6 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.Bus;
-//import org.apache.cxf.BusFactory;
-//import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.annotations.EndpointProperty;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 

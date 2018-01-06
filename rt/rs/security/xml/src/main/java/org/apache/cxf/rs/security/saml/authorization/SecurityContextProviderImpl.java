@@ -22,6 +22,7 @@ import java.security.Principal;
 import java.util.Set;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.saml.assertion.Subject;
 import org.apache.cxf.rt.security.SecurityConstants;

@@ -45,6 +45,12 @@ import org.apache.cxf.tracing.opentracing.OpenTracingClientFeature;
 import org.apache.cxf.tracing.opentracing.OpenTracingFeature;
 import org.apache.cxf.tracing.opentracing.internal.TextMapInjectAdapter;
 import org.awaitility.Duration;
+
+import io.opentracing.ActiveSpan;
+import io.opentracing.Tracer;
+import io.opentracing.propagation.Format.Builtin;
+import io.opentracing.util.GlobalTracer;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -55,11 +61,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.empty;
-
-import io.opentracing.ActiveSpan;
-import io.opentracing.Tracer;
-import io.opentracing.propagation.Format.Builtin;
-import io.opentracing.util.GlobalTracer;
 
 public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(OpenTracingTracingTest.class);

@@ -35,10 +35,11 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSUtils;
+import org.opensaml.saml.common.xml.SAMLConstants;
+
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
-import org.opensaml.saml.common.xml.SAMLConstants;
 
 /**
  * In this test case, a CXF client requests a number of SAML Tokens from an STS using batch processing.

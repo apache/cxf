@@ -37,6 +37,7 @@ import org.apache.cxf.jms_mtom.JMSMTOMPortType;
 import org.apache.cxf.jms_mtom.JMSMTOMService;
 import org.apache.cxf.jms_mtom.JMSOutMTOMService;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
+
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;

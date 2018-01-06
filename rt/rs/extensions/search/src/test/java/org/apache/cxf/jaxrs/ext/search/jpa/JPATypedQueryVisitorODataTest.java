@@ -28,6 +28,7 @@ import javax.persistence.Tuple;
 
 import org.apache.cxf.jaxrs.ext.search.SearchConditionParser;
 import org.apache.cxf.jaxrs.ext.search.odata.ODataParser;
+
 import org.junit.Test;
 
 public class JPATypedQueryVisitorODataTest extends AbstractJPATypedQueryVisitorTest {

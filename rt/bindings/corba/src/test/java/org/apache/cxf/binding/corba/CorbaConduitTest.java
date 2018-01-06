@@ -46,12 +46,6 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.wsdl11.WSDLServiceFactory;
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.omg.CORBA.Context;
 import org.omg.CORBA.ContextList;
 import org.omg.CORBA.ExceptionList;
@@ -61,6 +55,13 @@ import org.omg.CORBA.ORB;
 import org.omg.CORBA.Request;
 import org.omg.CORBA.TCKind;
 import org.omg.CORBA.TypeCode;
+
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 
 public class CorbaConduitTest extends Assert {

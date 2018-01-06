@@ -33,11 +33,12 @@ import javax.xml.ws.soap.MTOMFeature;
 import javax.xml.ws.spi.http.HttpContext;
 
 import org.apache.cxf.testutil.common.TestUtil;
+import org.jvnet.jax_ws_commons.transport.grizzly_httpspi.GrizzlyHttpContextFactory;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.jvnet.jax_ws_commons.transport.grizzly_httpspi.GrizzlyHttpContextFactory;
 
 public class EndpointAPITest extends Assert {
 

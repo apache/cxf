@@ -38,12 +38,12 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.ws.rm.RMManager;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * Tests the correct interaction of ws-rm calls with security.when policy validator verifies the calls.

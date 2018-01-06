@@ -31,12 +31,12 @@ import org.apache.cxf.jaxrs.resources.BookStore;
 import org.apache.cxf.jaxrs.resources.BookStoreNoAnnotations;
 import org.apache.cxf.jaxrs.resources.BookStoreSubresourcesOnly;
 import org.apache.cxf.jaxrs.resources.SuperBook;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 
 public class JAXRSServerFactoryBeanTest extends Assert {

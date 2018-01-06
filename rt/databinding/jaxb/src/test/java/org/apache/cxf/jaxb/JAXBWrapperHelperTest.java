@@ -29,6 +29,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 import org.apache.cxf.databinding.WrapperHelper;
+
 import org.junit.Assert;
 import org.junit.Test;
 

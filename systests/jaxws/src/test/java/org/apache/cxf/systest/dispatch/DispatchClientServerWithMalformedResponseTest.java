@@ -43,6 +43,7 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.hello_world_soap_http.GreeterImpl;
 import org.apache.hello_world_soap_http.SOAPService;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 

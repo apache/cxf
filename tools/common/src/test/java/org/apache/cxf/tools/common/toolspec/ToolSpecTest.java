@@ -20,6 +20,7 @@
 package org.apache.cxf.tools.common.toolspec;
 
 import org.apache.cxf.tools.common.ToolException;
+
 import org.junit.Assert;
 import org.junit.Test;
 

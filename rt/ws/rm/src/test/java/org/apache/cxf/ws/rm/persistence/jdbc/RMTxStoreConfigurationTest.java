@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.ws.rm.RMManager;
+
 import org.junit.Assert;
 import org.junit.Test;
 

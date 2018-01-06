@@ -72,6 +72,7 @@ import org.apache.cxf.transport.local.LocalTransportFactory;
 import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.wsdl11.ServiceWSDLBuilder;
 import org.apache.ws.commons.schema.constants.Constants;
+
 import org.junit.Test;
 
 

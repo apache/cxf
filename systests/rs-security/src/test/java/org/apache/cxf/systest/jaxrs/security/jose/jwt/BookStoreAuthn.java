@@ -28,6 +28,7 @@ import javax.ws.rs.core.Context;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.systest.jaxrs.security.Book;
+
 import org.junit.Assert;
 
 @Path("/bookstore")

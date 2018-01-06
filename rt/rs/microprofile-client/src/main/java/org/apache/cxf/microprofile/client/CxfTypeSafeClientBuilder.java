@@ -21,8 +21,10 @@ package org.apache.cxf.microprofile.client;
 import java.net.URL;
 import java.util.Map;
 import java.util.Objects;
+
 import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.Configuration;
+
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
 

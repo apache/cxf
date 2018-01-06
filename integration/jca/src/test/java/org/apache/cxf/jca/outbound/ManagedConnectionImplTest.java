@@ -23,6 +23,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.BusFactory;
 import org.apache.hello_world_soap_http.Greeter;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Test;

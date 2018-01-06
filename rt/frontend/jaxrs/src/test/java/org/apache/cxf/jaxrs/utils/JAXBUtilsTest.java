@@ -30,6 +30,7 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import com.migesok.jaxb.adapter.javatime.LocalDateXmlAdapter;
+
 import org.junit.Assert;
 import org.junit.Test;
 

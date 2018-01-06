@@ -25,6 +25,7 @@ import org.apache.cxf.systest.ws.AbstractWSATestBase;
 import org.apache.cxf.ws.mex.MetadataExchange;
 import org.apache.cxf.ws.mex.model._2004_09.GetMetadata;
 import org.apache.cxf.ws.mex.model._2004_09.Metadata;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 

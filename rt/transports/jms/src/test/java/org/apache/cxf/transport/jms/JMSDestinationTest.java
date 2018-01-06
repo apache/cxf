@@ -44,6 +44,7 @@ import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.MultiplexDestination;
 import org.apache.cxf.transport.jms.util.ResourceCloser;
+
 import org.junit.Ignore;
 import org.junit.Test;
 

@@ -28,12 +28,12 @@ import org.apache.cxf.javascript.fortest.SimpleRPCImpl;
 import org.apache.cxf.javascript.fortest.TestBean1;
 import org.apache.cxf.javascript.fortest.TestBean2;
 import org.apache.cxf.testutil.common.TestUtil;
-
-import org.junit.Before;
-import org.junit.Test;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.springframework.context.support.GenericApplicationContext;
+
+import org.junit.Before;
+import org.junit.Test;
 
 /*
  * We end up here with a part with isElement == true, a non-array element,

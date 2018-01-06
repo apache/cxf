@@ -23,6 +23,7 @@ import java.util.List;
 import javax.xml.ws.BindingProvider;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.frontend.ClientProxy;

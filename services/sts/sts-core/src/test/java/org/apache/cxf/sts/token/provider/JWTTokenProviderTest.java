@@ -54,6 +54,7 @@ import org.apache.wss4j.common.crypto.Merlin;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
 import org.junit.Assert;
 
 /**

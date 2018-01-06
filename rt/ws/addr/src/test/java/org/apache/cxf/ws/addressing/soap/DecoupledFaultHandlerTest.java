@@ -30,6 +30,7 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;

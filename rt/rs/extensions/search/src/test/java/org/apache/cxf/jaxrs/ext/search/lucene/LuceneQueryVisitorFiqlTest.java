@@ -31,6 +31,7 @@ import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchConditionParser;
 import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
 import org.apache.lucene.search.Query;
+
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;

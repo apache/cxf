@@ -38,6 +38,7 @@ import org.apache.activemq.RedeliveryPolicy;
 import org.apache.activemq.pool.XaPooledConnectionFactory;
 import org.apache.geronimo.transaction.manager.GeronimoTransactionManager;
 import org.awaitility.Awaitility;
+
 import org.easymock.Capture;
 import org.junit.Assert;
 import org.junit.Test;

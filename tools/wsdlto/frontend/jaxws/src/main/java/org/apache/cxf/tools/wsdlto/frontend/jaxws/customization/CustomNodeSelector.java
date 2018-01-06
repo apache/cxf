@@ -20,6 +20,7 @@ package org.apache.cxf.tools.wsdlto.frontend.jaxws.customization;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.xml.xpath.XPathConstants;
 
 import org.w3c.dom.NamedNodeMap;

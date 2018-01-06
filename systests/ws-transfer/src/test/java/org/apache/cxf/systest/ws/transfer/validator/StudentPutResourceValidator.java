@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.ws.transfer.validator;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.ws.transfer.Representation;
 import org.apache.cxf.ws.transfer.shared.faults.PutDenied;
 import org.apache.cxf.ws.transfer.validationtransformation.ResourceValidator;

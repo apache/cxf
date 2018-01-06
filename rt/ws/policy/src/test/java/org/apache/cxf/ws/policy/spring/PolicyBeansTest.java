@@ -27,6 +27,7 @@ import org.apache.cxf.ws.policy.PolicyEngineImpl;
 import org.apache.cxf.ws.policy.PolicyProvider;
 import org.apache.cxf.ws.policy.attachment.external.ExternalAttachmentProvider;
 import org.apache.cxf.ws.policy.selector.MaximalAlternativeSelector;
+
 import org.junit.Assert;
 import org.junit.Test;
 

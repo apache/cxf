@@ -27,6 +27,7 @@ import org.apache.cxf.hello_world_jms.HelloWorldPortType;
 import org.apache.cxf.hello_world_jms.HelloWorldService;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.systest.jms.AbstractVmJMSTest;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 

@@ -33,6 +33,7 @@ import org.apache.cxf.sts.claims.ProcessedClaimCollection;
 import org.apache.cxf.sts.common.RealmSupportClaimsHandler;
 import org.apache.cxf.sts.operation.CustomIdentityMapper;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
+
 import org.junit.Assert;
 
 public class RealmSupportTest extends org.junit.Assert {

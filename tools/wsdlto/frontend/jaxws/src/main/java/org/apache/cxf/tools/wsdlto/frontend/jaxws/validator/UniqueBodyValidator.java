@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.i18n.Message;

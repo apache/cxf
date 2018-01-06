@@ -30,6 +30,7 @@ import org.apache.type_substitution.Car;
 import org.apache.type_substitution.CarDealer;
 import org.apache.type_substitution.CarDealerService;
 import org.apache.type_substitution.Porsche;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 

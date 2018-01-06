@@ -37,6 +37,7 @@ import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.systest.sts.deployment.StaxSTSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItPortType;
+
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;

@@ -33,9 +33,9 @@ import org.apache.cxf.ws.rmp.v200502.RMAssertion.AcknowledgementInterval;
 import org.apache.cxf.ws.rmp.v200502.RMAssertion.BaseRetransmissionInterval;
 import org.apache.cxf.ws.rmp.v200502.RMAssertion.ExponentialBackoff;
 import org.apache.cxf.ws.rmp.v200502.RMAssertion.InactivityTimeout;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

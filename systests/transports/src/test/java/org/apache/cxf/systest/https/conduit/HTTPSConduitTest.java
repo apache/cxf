@@ -60,10 +60,11 @@ import org.apache.cxf.transport.https.HttpsURLConnectionInfo;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.hello_world.Greeter;
 import org.apache.hello_world.services.SOAPService;
+import org.springframework.context.ApplicationContext;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.springframework.context.ApplicationContext;
 
 /**
  * This class tests several issues and Conduit policies based

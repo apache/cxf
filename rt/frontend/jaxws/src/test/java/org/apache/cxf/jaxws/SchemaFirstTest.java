@@ -26,6 +26,7 @@ import org.w3c.dom.Document;
 
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxws.service.EchoFoo;
+
 import org.junit.Test;
 
 public class SchemaFirstTest extends AbstractJaxWsTest {

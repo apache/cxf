@@ -31,14 +31,13 @@ import javax.xml.xpath.XPathConstants;
 
 import org.w3c.dom.Document;
 
-import junit.framework.AssertionFailedError;
-
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.tools.common.ToolTestBase;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -140,8 +139,8 @@ public class AegisTest extends ToolTestBase {
     private void assertValid(String xpathExpression, Document doc) throws XMLStreamException {
         XPathUtils xpu = new XPathUtils(getNSMap());
         if (!xpu.isExist(xpathExpression, doc, XPathConstants.NODE)) {
-            throw new AssertionFailedError("Failed to select any nodes for expression:\n" + xpathExpression
-                                           + " from document:\n" + StaxUtils.toString(doc));
+            Assert.fail("Failed to select any nodes for expression:\n" + xpathExpression
+                        + " from document:\n" + StaxUtils.toString(doc));
         }
     }
 }

@@ -23,6 +23,7 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.ws.security.SecurityConstants;
+
 import org.junit.BeforeClass;
 
 public class EHCacheTokenStoreTest extends org.junit.Assert {

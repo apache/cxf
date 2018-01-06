@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.policy.blueprint;
 
 import java.util.List;
+
 import org.w3c.dom.Element;
 
 import org.apache.aries.blueprint.ParserContext;
