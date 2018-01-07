@@ -21,6 +21,7 @@ package org.apache.cxf.systests.cdi.base.context;
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.ext.Provider;
+
 import org.apache.cxf.jaxrs.ext.ContextClassProvider;
 
 @Provider

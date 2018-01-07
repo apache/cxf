@@ -19,6 +19,7 @@
 package org.apache.cxf.systests.cdi.base;
 
 import java.util.List;
+
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.GET;

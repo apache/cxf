@@ -20,6 +20,7 @@ package org.apache.cxf.cdi;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+
 import javax.enterprise.util.AnnotationLiteral;
 import javax.inject.Qualifier;
 

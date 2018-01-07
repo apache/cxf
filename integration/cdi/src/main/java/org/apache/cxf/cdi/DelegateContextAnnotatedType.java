@@ -24,7 +24,7 @@ import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import static java.util.stream.Collectors.toSet;
+
 import javax.enterprise.inject.spi.AnnotatedConstructor;
 import javax.enterprise.inject.spi.AnnotatedField;
 import javax.enterprise.inject.spi.AnnotatedMethod;
@@ -32,6 +32,8 @@ import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.util.AnnotationLiteral;
 import javax.inject.Inject;
 import javax.ws.rs.core.Context;
+
+import static java.util.stream.Collectors.toSet;
 
 final class DelegateContextAnnotatedType<X> implements AnnotatedType<X> {
     private static final Inject INJECT = new InjectLiteral();

@@ -19,6 +19,7 @@
 package org.apache.cxf.systests.cdi.base;
 
 import java.util.Collection;
+
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
