@@ -259,6 +259,12 @@ public final class SwaggerToOpenApiConversionUtils {
                     schema.setProperty("items", items);
                     sw2PathVerbParamMap.setProperty("schema", schema);
                 } else {
+                    if ("matrix".equals(sw2PathVerbParamMap.getStringProperty("in"))) {
+                        sw2PathVerbParamMap.removeProperty("in");
+                        sw2PathVerbParamMap.setProperty("in", "path");
+                        sw2PathVerbParamMap.setProperty("style", "matrix");
+                    }
+
                     String type = (String)sw2PathVerbParamMap.removeProperty("type");
                     Object enumK = sw2PathVerbParamMap.removeProperty("enum");
                     if (type != null) {
