@@ -192,7 +192,6 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
                         writeTo(bout);
                         return bout.createInputStream();
                     }
-
                     @Override
                     public void writeTo(OutputStream out) throws IOException {
                         ImageWriter writer = null;
@@ -206,10 +205,10 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
                             writer.setOutput(iout);
                             writer.write(bimg);
                             writer.dispose();
+                            iout.flush();
                             out.flush();
                         }
                     }
-                    
                 };
                 
             } else if (o instanceof DataHandler) {

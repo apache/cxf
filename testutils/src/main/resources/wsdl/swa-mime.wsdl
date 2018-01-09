@@ -190,7 +190,7 @@
                         <mime:content part="attach4" type="image/jpeg"/>
                     </mime:part>
                     <mime:part>
-                        <mime:content part="attach5" type="image/jpeg"/>
+                        <mime:content part="attach5" type="image/gif"/>
                     </mime:part>
                 </mime:multipartRelated>
             </wsdl:input>
@@ -212,7 +212,7 @@
                         <mime:content part="attach4" type="image/jpeg"/>
                     </mime:part>
                     <mime:part>
-                        <mime:content part="attach5" type="image/jpeg"/>
+                        <mime:content part="attach5" type="image/gif"/>
                     </mime:part>
                 </mime:multipartRelated>
             </wsdl:output>

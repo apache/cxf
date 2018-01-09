@@ -193,7 +193,7 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         URL url2 = this.getClass().getResource("resources/attach.html");
         URL url3 = this.getClass().getResource("resources/attach.xml");
         URL url4 = this.getClass().getResource("resources/attach.jpeg1");
-        URL url5 = this.getClass().getResource("resources/attach.jpeg2");
+        URL url5 = this.getClass().getResource("resources/attach.gif");
 
         DataHandler dh1 = new DataHandler(url1);
         DataHandler dh2 = new DataHandler(url2);
