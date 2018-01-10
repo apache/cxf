@@ -53,6 +53,12 @@ public class HighPriorityMBW implements MessageBodyWriter<MyObject> {
     }
 
     @Override
+    public long getSize(MyObject o, Class<?> type, Type genericType,
+                       Annotation[] annotations, MediaType mediaType) {
+        return -1;
+    }
+
+    @Override
     public boolean isWriteable(Class<?> type, Type genericType,
                                Annotation[] annotations, MediaType mediaType) {
         return true;
