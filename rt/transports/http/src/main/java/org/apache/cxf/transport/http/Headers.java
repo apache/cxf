@@ -450,6 +450,12 @@ public class Headers {
             }
             for (Enumeration<String> e2 = req.getHeaders(fname); e2.hasMoreElements();) {
                 String val = e2.nextElement();
+                if ("Accept".equals(mappedName) && values.size() > 0) {
+                    //ensure we collapse Accept into first line
+                    String firstAccept = values.get(0);
+                    firstAccept = firstAccept + ", " + val;
+                    values.set(0, firstAccept);
+                }
                 values.add(val);
             }
         }

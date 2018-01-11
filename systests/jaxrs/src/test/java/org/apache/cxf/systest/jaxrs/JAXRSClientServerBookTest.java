@@ -2482,6 +2482,28 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         }
     }
 
+    
+    @Test
+    public void testMutipleAcceptHeader() throws Exception {
+        String endpointAddress =
+            "http://localhost:" + PORT + "/bookstore/booksplain";
+
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpPost post = new HttpPost(endpointAddress);
+        post.addHeader("Content-Type", "text/plain");
+        post.addHeader("Accept", "text/xml");
+        post.addHeader("Accept", "text/plain");
+        post.setEntity(new StringEntity("12345"));
+
+        try {
+            CloseableHttpResponse response = client.execute(post);
+            assertEquals(200, response.getStatusLine().getStatusCode());
+            assertEquals(EntityUtils.toString(response.getEntity()), "12345");
+        } finally {
+            // Release current connection to the connection pool once you are done
+            post.releaseConnection();
+        }
+    }
     @Test
     public void testDeleteBook() throws Exception {
         String endpointAddress =
