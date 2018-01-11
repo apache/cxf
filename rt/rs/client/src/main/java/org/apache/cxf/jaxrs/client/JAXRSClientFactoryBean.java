@@ -308,15 +308,7 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
             boolean isRoot = cri.getURITemplate() != null;
             ClientProxyImpl proxyImpl = null;
             ClientState actualState = getActualState();
-            if (actualState == null) {
-                proxyImpl = 
-                    new ClientProxyImpl(URI.create(getAddress()), proxyLoader, cri, isRoot, 
-                                        inheritHeaders, varValues);
-            } else {
-                proxyImpl = 
-                    new ClientProxyImpl(actualState, proxyLoader, cri, isRoot, 
-                                        inheritHeaders, varValues);
-            }
+            proxyImpl = createClientProxy(cri, isRoot, actualState, varValues);
             initClient(proxyImpl, ep, actualState == null);    
             
             ClassLoader theLoader = proxyLoader == null ? cri.getServiceClass().getClassLoader() : proxyLoader;
@@ -341,6 +333,17 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
             throw new RuntimeException(ex);
         }
         
+    }
+
+    protected ClientProxyImpl createClientProxy(ClassResourceInfo cri, boolean isRoot,
+                                                ClientState actualState, Object[] varValues) {
+        if (actualState == null) {
+            return new ClientProxyImpl(URI.create(getAddress()), proxyLoader, cri, isRoot,
+                                    inheritHeaders, varValues);
+        } else {
+            return new ClientProxyImpl(actualState, proxyLoader, cri, isRoot,
+                                    inheritHeaders, varValues);
+        }
     }
 
     protected ConduitSelector getConduitSelector(Endpoint ep) {
