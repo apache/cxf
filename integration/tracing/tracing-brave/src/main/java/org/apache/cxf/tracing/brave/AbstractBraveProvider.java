@@ -69,7 +69,7 @@ public abstract class AbstractBraveProvider extends AbstractTracingProvider {
         if (isAsyncResponse() && span != null) {
            // Do not modify the current context span
             propagateContinuationSpan(span);
-        } else if (span != null && !span.isNoop()) {
+        } else if (span != null) {
             scope = brave.tracing().tracer().withSpanInScope(span);
         }
 
