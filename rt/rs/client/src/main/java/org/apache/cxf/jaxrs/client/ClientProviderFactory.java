@@ -20,8 +20,8 @@ package org.apache.cxf.jaxrs.client;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.client.ClientResponseFilter;
@@ -103,18 +103,14 @@ public final class ClientProviderFactory extends ProviderFactory {
     public <T extends Throwable> ResponseExceptionMapper<T> createResponseExceptionMapper(
                                  Message m, Class<?> paramType) {
 
-        List<ResponseExceptionMapper<?>> candidates = new LinkedList<ResponseExceptionMapper<?>>();
-
-        for (ProviderInfo<ResponseExceptionMapper<?>> em : responseExceptionMappers) {
-            if (handleMapper(em, paramType, m, ResponseExceptionMapper.class, true)) {
-                candidates.add(em.getProvider());
-            }
-        }
-        if (candidates.size() == 0) {
-            return null;
-        }
-        Collections.sort(candidates, new ProviderFactory.ClassComparator(paramType));
-        return (ResponseExceptionMapper<T>) candidates.get(0);
+        List<ResponseExceptionMapper<?>> candidates = 
+            responseExceptionMappers.stream()
+                .filter(em -> handleMapper(em, paramType, m, ResponseExceptionMapper.class, true))
+                .map(ProviderInfo::getProvider)
+                .sorted(new ProviderFactory.ClassComparator(paramType))
+                .collect(Collectors.toList());
+             
+        return candidates.isEmpty() ? null : (ResponseExceptionMapper<T>)candidates.get(0);
     }
 
     @Override

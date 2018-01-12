@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.Priorities;
@@ -183,20 +184,18 @@ public final class ServerProviderFactory extends ProviderFactory {
     @SuppressWarnings("unchecked")
     public <T extends Throwable> ExceptionMapper<T> createExceptionMapper(Class<?> exceptionType,
                                                                           Message m) {
-        List<ProviderInfo<ExceptionMapper<?>>> candidates = new LinkedList<ProviderInfo<ExceptionMapper<?>>>();
-        for (ProviderInfo<ExceptionMapper<?>> em : exceptionMappers) {
-            if (handleMapper(em, exceptionType, m, ExceptionMapper.class, true)) {
-                candidates.add(em);
-            }
-        }
-        if (candidates.size() == 0) {
-            return null;
-        }
+        
         boolean makeDefaultWaeLeastSpecific =
             MessageUtils.getContextualBoolean(m, MAKE_DEFAULT_WAE_LEAST_SPECIFIC, false);
-        Collections.sort(candidates, new ExceptionProviderInfoComparator(exceptionType,
-                                                                         makeDefaultWaeLeastSpecific));
-        return (ExceptionMapper<T>) candidates.get(0).getProvider();
+        
+        List<ExceptionMapper<?>> candidates = exceptionMappers.stream()
+                .filter(em -> handleMapper(em, exceptionType, m, ExceptionMapper.class, true))
+                .sorted(new ExceptionProviderInfoComparator(exceptionType,
+                                                            makeDefaultWaeLeastSpecific))
+                .map(ProviderInfo::getProvider)
+                .collect(Collectors.toList());
+        
+        return candidates.isEmpty() ? null : (ExceptionMapper<T>)candidates.get(0);
     }
 
 
