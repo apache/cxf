@@ -110,7 +110,21 @@ public class JAXRSCdiResourceExtension implements Extension {
         }
     }
 
-    public <X> void convertContextsToCdi(@Observes @WithAnnotations({Context.class, ContextResolved.class})
+    /**
+     * For any {@link AnnotatedType} that includes a {@link Context} injection point, this method replaces
+     * the field with the following code:
+     * <pre>
+     *     @Inject @ContextResolved T field;
+     * </pre>
+     * For any usage of T that is a valid context object in JAX-RS.
+     *
+     * It also has a side effect of capturing the context object type, in case no
+     * {@link org.apache.cxf.jaxrs.ext.ContextClassProvider} was registered for the type.
+     *
+     * @param processAnnotatedType the annotated type being investigated
+     * @param <X> the generic type of that processAnnotatedType
+     */
+    public <X> void convertContextsToCdi(@Observes @WithAnnotations({Context.class})
                                              ProcessAnnotatedType<X> processAnnotatedType) {
         AnnotatedType<X> annotatedType = processAnnotatedType.getAnnotatedType();
         DelegateContextAnnotatedType<X> type = new DelegateContextAnnotatedType<>(annotatedType);

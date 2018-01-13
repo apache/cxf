@@ -24,6 +24,22 @@ import java.lang.annotation.RetentionPolicy;
 import javax.enterprise.util.AnnotationLiteral;
 import javax.inject.Qualifier;
 
+import org.apache.cxf.jaxrs.ext.ContextProvider;
+
+/**
+ * ContextResolved is an internal qualifier used by CXF to differentiate the beans it will manage from
+ * beans a user may have provided.  A user should not use this qualifier, but all beans that CXF provides
+ * that are from {@link javax.ws.rs.core.Context} objects.
+ *
+ * Likewise, for any field level injections, as well as constructor injections, the CDI instance of the
+ * Context object will be used.  Methods annotated {@link javax.inject.Inject} will also delegate to CDI.
+ * Any method parameter that takes a Context object will still be resolved from non-CDI semantics.
+ *
+ * For all built in context objects (as defined by the JAX-RS specification), the thread local aware instance
+ * is used.  For any custom context objects (implemented via {@link ContextProvider}) you must ensure that
+ * they are implemented in a thread safe manner.  All context objects are backed by a
+ * {@link javax.enterprise.context.RequestScoped} bean.
+ */
 @Qualifier
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ContextResolved {
