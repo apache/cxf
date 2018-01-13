@@ -29,6 +29,7 @@ import javax.ws.rs.core.Response;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.Test;
@@ -37,9 +38,12 @@ public abstract class AbstractCdiSingleAppTest extends AbstractBusClientServerTe
     @Test
     public void testInjectedVersionIsProperlyReturned() {
         Response r = createWebClient(getBasePath() + "/version", MediaType.TEXT_PLAIN).get();
+        String pathInfo = r.getHeaderString(Message.PATH_INFO);
+        String httpMethod = r.getHeaderString(Message.HTTP_REQUEST_METHOD);
         assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
         assertEquals("1.0", r.readEntity(String.class));
-        assertNotNull(r.getHeaderString("Id"));
+        assertTrue(pathInfo.endsWith("/bookstore/version"));
+        assertEquals("GET", httpMethod);
     }
 
     @Test

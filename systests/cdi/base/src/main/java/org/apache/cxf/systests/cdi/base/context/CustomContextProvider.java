@@ -24,6 +24,6 @@ import org.apache.cxf.message.Message;
 public class CustomContextProvider implements ContextProvider<CustomContext> {
     @Override
     public CustomContext createContext(Message message) {
-        return new CustomContextImpl(message.getId());
+        return new CustomContextImpl(message);
     }
 }

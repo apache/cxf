@@ -27,6 +27,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.message.Message;
 import org.apache.cxf.systests.cdi.base.context.CustomContext;
 
 @RequestScoped
@@ -40,8 +41,13 @@ public class BookStoreVersion {
     @GET
     public Response getVersion() {
         List<MediaType> mediaTypeList = httpHeaders.getAcceptableMediaTypes();
+
+        String requestMethod = (String)customContext.getMessage().get(Message.HTTP_REQUEST_METHOD);
+        String pathInfo = (String)customContext.getMessage().get(Message.PATH_INFO);
+
         return Response.ok(version, mediaTypeList.get(0))
-                .header("Id", customContext.getName())
+                .header(Message.HTTP_REQUEST_METHOD, requestMethod)
+                .header(Message.PATH_INFO, pathInfo)
                 .build();
     }
 }

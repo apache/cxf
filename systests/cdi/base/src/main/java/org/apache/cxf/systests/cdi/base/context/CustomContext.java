@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.systests.cdi.base.context;
 
+import org.apache.cxf.message.Message;
+
 public interface CustomContext {
-    String getName();
+    Message getMessage();
 }

@@ -18,15 +18,17 @@
  */
 package org.apache.cxf.systests.cdi.base.context;
 
-public class CustomContextImpl implements CustomContext {
-    private final String name;
+import org.apache.cxf.message.Message;
 
-    public CustomContextImpl(String name) {
-        this.name = name;
+public class CustomContextImpl implements CustomContext {
+    private final Message message;
+
+    public CustomContextImpl(Message message) {
+        this.message = message;
     }
 
     @Override
-    public String getName() {
-        return name;
+    public Message getMessage() {
+        return message;
     }
 }
