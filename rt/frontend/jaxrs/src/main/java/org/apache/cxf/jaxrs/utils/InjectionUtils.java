@@ -43,11 +43,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -77,7 +75,6 @@ import org.apache.cxf.common.util.ProxyClassLoader;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.jaxrs.ext.ContextClassProvider;
 import org.apache.cxf.jaxrs.ext.ContextProvider;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.ProtocolHeaders;
@@ -1528,14 +1525,5 @@ public final class InjectionUtils {
 
     public static Object getEntity(Object o) {
         return o instanceof GenericEntity ? ((GenericEntity<?>)o).getEntity() : o;
-    }
-
-    public static Set<Class<?>> getCustomContextClasses() {
-        ServiceLoader<ContextClassProvider> classProviders = ServiceLoader.load(ContextClassProvider.class);
-        Set<Class<?>> customContextClasses = new LinkedHashSet<>();
-        for (ContextClassProvider classProvider : classProviders) {
-            customContextClasses.add(classProvider.getContextClass());
-        }
-        return Collections.unmodifiableSet(customContextClasses);
     }
 }

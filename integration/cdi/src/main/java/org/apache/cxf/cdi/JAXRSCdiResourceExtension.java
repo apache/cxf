@@ -57,6 +57,7 @@ import org.apache.cxf.cdi.event.DisposableCreationalContext;
 import org.apache.cxf.cdi.extension.JAXRSServerFactoryCustomizationExtension;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.ext.ContextClassProvider;
 import org.apache.cxf.jaxrs.provider.ServerConfigurableFactory;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
@@ -220,7 +221,7 @@ public class JAXRSCdiResourceExtension implements Extension {
                 .filter(Objects::nonNull)
                 .forEach(contextTypes::add);
         // add custom contexts
-        contextTypes.addAll(InjectionUtils.getCustomContextClasses());
+        contextTypes.addAll(getCustomContextClasses());
         // register all of the context types
         contextTypes.forEach(t -> event.addBean(new ContextProducerBean(t)));
     }
@@ -466,4 +467,12 @@ public class JAXRSCdiResourceExtension implements Extension {
         }
     }
 
+    public static Set<Class<?>> getCustomContextClasses() {
+        ServiceLoader<ContextClassProvider> classProviders = ServiceLoader.load(ContextClassProvider.class);
+        Set<Class<?>> customContextClasses = new LinkedHashSet<>();
+        for (ContextClassProvider classProvider : classProviders) {
+            customContextClasses.add(classProvider.getContextClass());
+        }
+        return Collections.unmodifiableSet(customContextClasses);
+    }
 }
