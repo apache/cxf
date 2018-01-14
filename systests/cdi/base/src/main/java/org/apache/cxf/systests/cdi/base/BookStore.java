@@ -36,9 +36,19 @@ import javax.ws.rs.core.UriInfo;
 
 @Path("/bookstore/")
 public class BookStore {
-    @Inject private BookStoreService service;
-    @Inject private BookStoreVersion bookStoreVersion;
-    @Inject private UriInfo uriInfo;
+    private BookStoreService service;
+    private BookStoreVersion bookStoreVersion;
+    private UriInfo uriInfo;
+
+    public BookStore() {
+    }
+
+    @Inject
+    public BookStore(BookStoreService service, BookStoreVersion bookStoreVersion, UriInfo uriInfo) {
+        this.service = service;
+        this.bookStoreVersion = bookStoreVersion;
+        this.uriInfo = uriInfo;
+    }
 
     @Path("/version")
     public BookStoreVersion getVersion() {
