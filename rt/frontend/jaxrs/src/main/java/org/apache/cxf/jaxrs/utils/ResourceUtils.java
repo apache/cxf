@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -72,6 +73,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.jaxrs.ext.JAXRSServerFactoryCustomizationExtension;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -902,9 +904,18 @@ public final class ResourceUtils {
             bean.getProperties(true).putAll(appProps);
         }
         bean.setApplication(app);
-
+        customize(bean);
         return bean;
     }
+
+    private static void customize(JAXRSServerFactoryBean bean) {
+        ServiceLoader<JAXRSServerFactoryCustomizationExtension> extensions
+                = ServiceLoader.load(JAXRSServerFactoryCustomizationExtension.class);
+        for(JAXRSServerFactoryCustomizationExtension extension : extensions) {
+            extension.customize(bean);
+        }
+    }
+
     public static Object createProviderInstance(Class<?> cls) {
         try {
             Constructor<?> c = ResourceUtils.findResourceConstructor(cls, false);
