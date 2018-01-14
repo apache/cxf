@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.Set;
 
@@ -37,12 +38,15 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.BeforeShutdown;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.InjectionTarget;
+import javax.enterprise.inject.spi.ProcessAnnotatedType;
 import javax.enterprise.inject.spi.ProcessBean;
 import javax.enterprise.inject.spi.ProcessProducerField;
 import javax.enterprise.inject.spi.ProcessProducerMethod;
+import javax.enterprise.inject.spi.WithAnnotations;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
@@ -53,7 +57,9 @@ import org.apache.cxf.cdi.event.DisposableCreationalContext;
 import org.apache.cxf.cdi.extension.JAXRSServerFactoryCustomizationExtension;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.ext.ContextClassProvider;
 import org.apache.cxf.jaxrs.provider.ServerConfigurableFactory;
+import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 /**
@@ -69,6 +75,7 @@ public class JAXRSCdiResourceExtension implements Extension {
     private final List< Bean< ? extends Feature > > featureBeans = new ArrayList< Bean< ? extends Feature > >();
     private final List< CreationalContext< ? > > disposableCreationalContexts =
         new ArrayList< CreationalContext< ? > >();
+    private final Set< Type > contextTypes = new LinkedHashSet<>();
 
     /**
      * Holder of the classified resource classes, converted to appropriate instance
@@ -102,6 +109,28 @@ public class JAXRSCdiResourceExtension implements Extension {
         public List<CdiResourceProvider> getResourceProviders() {
             return resourceProviders;
         }
+    }
+
+    /**
+     * For any {@link AnnotatedType} that includes a {@link Context} injection point, this method replaces
+     * the field with the following code:
+     * <pre>
+     *     @Inject @ContextResolved T field;
+     * </pre>
+     * For any usage of T that is a valid context object in JAX-RS.
+     *
+     * It also has a side effect of capturing the context object type, in case no
+     * {@link org.apache.cxf.jaxrs.ext.ContextClassProvider} was registered for the type.
+     *
+     * @param processAnnotatedType the annotated type being investigated
+     * @param <X> the generic type of that processAnnotatedType
+     */
+    public <X> void convertContextsToCdi(@Observes @WithAnnotations({Context.class})
+                                             ProcessAnnotatedType<X> processAnnotatedType) {
+        AnnotatedType<X> annotatedType = processAnnotatedType.getAnnotatedType();
+        DelegateContextAnnotatedType<X> type = new DelegateContextAnnotatedType<>(annotatedType);
+        contextTypes.addAll(type.getContextFieldTypes());
+        processAnnotatedType.setAnnotatedType(type);
     }
 
     @SuppressWarnings("unchecked")
@@ -186,6 +215,15 @@ public class JAXRSCdiResourceExtension implements Extension {
             applicationBeans.add(applicationBean);
             event.addBean(applicationBean);
         }
+        // always add the standard context classes
+        InjectionUtils.STANDARD_CONTEXT_CLASSES.stream()
+                .map(this::toClass)
+                .filter(Objects::nonNull)
+                .forEach(contextTypes::add);
+        // add custom contexts
+        contextTypes.addAll(getCustomContextClasses());
+        // register all of the context types
+        contextTypes.forEach(t -> event.addBean(new ContextProducerBean(t)));
     }
 
     /**
@@ -205,6 +243,14 @@ public class JAXRSCdiResourceExtension implements Extension {
             for (final CreationalContext<?> disposableCreationalContext: disposableCreationalContexts) {
                 disposableCreationalContext.release();
             }
+        }
+    }
+
+    private Class<?> toClass(String name) {
+        try {
+            return Class.forName(name);
+        } catch (Exception e) {
+            return null;
         }
     }
 
@@ -421,4 +467,12 @@ public class JAXRSCdiResourceExtension implements Extension {
         }
     }
 
+    public static Set<Class<?>> getCustomContextClasses() {
+        ServiceLoader<ContextClassProvider> classProviders = ServiceLoader.load(ContextClassProvider.class);
+        Set<Class<?>> customContextClasses = new LinkedHashSet<>();
+        for (ContextClassProvider classProvider : classProviders) {
+            customContextClasses.add(classProvider.getContextClass());
+        }
+        return Collections.unmodifiableSet(customContextClasses);
+    }
 }

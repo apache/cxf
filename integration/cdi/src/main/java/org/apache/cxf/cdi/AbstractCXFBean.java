@@ -25,21 +25,21 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Default;
 import javax.enterprise.inject.spi.Bean;
+import javax.enterprise.inject.spi.InjectionPoint;
 import javax.enterprise.util.AnnotationLiteral;
 
 abstract class AbstractCXFBean<T> implements Bean<T> {
+    static final Any ANY = new AnyLiteral();
+    static final Default DEFAULT = new DefaultLiteral();
     @Override
     public Set<Annotation> getQualifiers() {
         Set<Annotation> qualifiers = new HashSet<>();
-        qualifiers.add(new AnnotationLiteral<Default>() {
-            private static final long serialVersionUID = 1L;
-        });
-        qualifiers.add(new AnnotationLiteral<Any>() {
-            private static final long serialVersionUID = 1L;
-        });
+        qualifiers.add(ANY);
+        qualifiers.add(DEFAULT);
         return qualifiers;
     }
 
@@ -66,7 +66,26 @@ abstract class AbstractCXFBean<T> implements Bean<T> {
     }
 
     @Override
+    public Set<InjectionPoint> getInjectionPoints() {
+        return Collections.emptySet();
+    }
+
+
+    @Override
+    public void destroy(T instance, CreationalContext<T> creationalContext) {
+        creationalContext.release();
+    }
+
+    @Override
     public Set< Class< ? extends Annotation > > getStereotypes() {
         return Collections.emptySet();
+    }
+
+    private static class DefaultLiteral extends AnnotationLiteral<Default> implements Default {
+        private static final long serialVersionUID = 1L;
+    }
+
+    private static class AnyLiteral extends AnnotationLiteral<Any> implements Any {
+        private static final long serialVersionUID = 1L;
     }
 }

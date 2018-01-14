@@ -1,0 +1,2 @@
+org.apache.cxf.rs.security.oidc.rp.IdTokenContextClassProvider
+org.apache.cxf.rs.security.oidc.rp.UserInfoContextClassProvider
