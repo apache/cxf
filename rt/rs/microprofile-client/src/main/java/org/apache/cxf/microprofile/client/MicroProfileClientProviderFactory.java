@@ -21,8 +21,8 @@ package org.apache.cxf.microprofile.client;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Configuration;
 
@@ -91,18 +91,14 @@ public final class MicroProfileClientProviderFactory extends ProviderFactory {
 
     public List<ResponseExceptionMapper<?>> createResponseExceptionMapper(Message m, Class<?> paramType) {
 
-        List<ResponseExceptionMapper<?>> candidates = new LinkedList<>();
-
-        for (ProviderInfo<ResponseExceptionMapper<?>> em : responseExceptionMappers) {
-            if (handleMapper(em, paramType, m, ResponseExceptionMapper.class, true)) {
-                candidates.add(em.getProvider());
-            }
-        }
-        if (candidates.size() == 0) {
+        if (responseExceptionMappers.isEmpty()) {
             return Collections.emptyList();
         }
-        candidates.sort(new ResponseExceptionMapperComparator());
-        return Collections.unmodifiableList(candidates);
+        return Collections.unmodifiableList(responseExceptionMappers
+                                            .stream()
+                                            .map(ProviderInfo::getProvider)
+                                            .sorted(new ResponseExceptionMapperComparator())
+                                            .collect(Collectors.toList()));
     }
 
     @Override

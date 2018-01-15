@@ -21,12 +21,17 @@ package org.apache.cxf.microprofile.client;
 import java.net.URL;
 
 import javax.ws.rs.core.Response;
+import javax.ws.rs.WebApplicationException;
 
 import org.apache.cxf.microprofile.client.mock.EchoClientReqFilter;
+import org.apache.cxf.microprofile.client.mock.ExceptionMappingClient;
 import org.apache.cxf.microprofile.client.mock.HighPriorityClientReqFilter;
 import org.apache.cxf.microprofile.client.mock.HighPriorityMBW;
 import org.apache.cxf.microprofile.client.mock.LowPriorityClientReqFilter;
 import org.apache.cxf.microprofile.client.mock.MyClient;
+import org.apache.cxf.microprofile.client.mock.NoSuchEntityException;
+import org.apache.cxf.microprofile.client.mock.NotFoundClientReqFilter;
+import org.apache.cxf.microprofile.client.mock.NotFoundExceptionMapper;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.eclipse.microprofile.rest.client.tck.interfaces.InterfaceWithoutProvidersDefined;
 import org.eclipse.microprofile.rest.client.tck.providers.TestClientRequestFilter;
@@ -103,41 +108,31 @@ public class CxfTypeSafeClientBuilderTest extends Assert {
         //assertEquals(TestWriterInterceptor.getAndResetValue(), 1);
     }
 
-/** using for test coverage
-    @Override
-    public RestClientBuilder register(Class<?> componentClass, int priority) {
-      configImpl.register(componentClass, priority);
-      return this;
-    }
+    @Test(expected = NoSuchEntityException.class)
+    public void testResponseExceptionMapper() throws Exception {
+        ExceptionMappingClient client = new CxfTypeSafeClientBuilder()
+            .register(NotFoundExceptionMapper.class)
+            .register(NotFoundClientReqFilter.class)
+            .baseUrl(new URL("http://localhost/null"))
+            .build(ExceptionMappingClient.class);
 
-    @Override
-    public RestClientBuilder register(Class<?> componentClass, Class<?>... contracts) {
-      configImpl.register(componentClass, contracts);
-      return this;
+        Response r = client.getEntity();
+        fail(r, "Did not throw expected mapped exception: NoSuchEntityException");
     }
+    
+    @Test(expected = WebApplicationException.class)
+    public void testDefaultResponseExceptionMapper() throws Exception {
+        ExceptionMappingClient client = new CxfTypeSafeClientBuilder()
+            .register(NotFoundClientReqFilter.class)
+            .baseUrl(new URL("http://localhost/null"))
+            .build(ExceptionMappingClient.class);
 
-    @Override
-    public RestClientBuilder register(Class<?> componentClass, Map<Class<?>, Integer> contracts) {
-      configImpl.register(componentClass, contracts);
-      return this;
+        Response r = client.getEntity();
+        fail(r, "Did not throw expected mapped exception: WebApplicationException");
     }
-
-    @Override
-    public RestClientBuilder register(Object component, int priority) {
-      configImpl.register(component, priority);
-      return this;
+    
+    private void fail(Response r, String failureMessage) {
+        System.out.println(r.getStatus());
+        fail(failureMessage);
     }
-
-    @Override
-    public RestClientBuilder register(Object component, Class<?>... contracts) {
-      configImpl.register(component, contracts);
-      return this;
-    }
-
-    @Override
-    public RestClientBuilder register(Object component, Map<Class<?>, Integer> contracts) {
-      configImpl.register(component, contracts);
-      return this;
-    }
-**/
 }
