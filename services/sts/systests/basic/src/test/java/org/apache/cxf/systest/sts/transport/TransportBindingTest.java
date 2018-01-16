@@ -417,7 +417,40 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)transportSaml1Port).close();
         bus.shutdown(true);
     }
+<<<<<<< HEAD
     
+=======
+
+    @org.junit.Test
+    public void testSAML2EndorsingSymmetric() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = TransportBindingTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2SymmetricEndorsingPort");
+        DoubleItPortType transportSaml1Port =
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(transportSaml1Port, test.getPort());
+
+        TokenTestUtils.updateSTSPort((BindingProvider)transportSaml1Port, test.getStsPort());
+
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(transportSaml1Port);
+        }
+
+        doubleIt(transportSaml1Port, 25);
+
+        ((java.io.Closeable)transportSaml1Port).close();
+        bus.shutdown(true);
+    }
+
+>>>>>>> dae5b16c80... Added EndorsingSupportingToken/IssuedToken SymmetricKey test
     private DOMSource createDOMRequest() throws ParserConfigurationException {
         // Creating a DOMSource Object for the request
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
