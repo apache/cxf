@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.Priorities;
@@ -188,14 +187,14 @@ public final class ServerProviderFactory extends ProviderFactory {
         boolean makeDefaultWaeLeastSpecific =
             MessageUtils.getContextualBoolean(m, MAKE_DEFAULT_WAE_LEAST_SPECIFIC, false);
         
-        List<ExceptionMapper<?>> candidates = exceptionMappers.stream()
+        return (ExceptionMapper<T>)exceptionMappers.stream()
                 .filter(em -> handleMapper(em, exceptionType, m, ExceptionMapper.class, true))
                 .sorted(new ExceptionProviderInfoComparator(exceptionType,
                                                             makeDefaultWaeLeastSpecific))
                 .map(ProviderInfo::getProvider)
-                .collect(Collectors.toList());
+                .findFirst()
+                .orElse(null);
         
-        return candidates.isEmpty() ? null : (ExceptionMapper<T>)candidates.get(0);
     }
 
 
