@@ -84,6 +84,7 @@ import org.apache.http.util.EntityUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+//CHECKSTYLE.OFF:JavaNCSS
 public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServer.PORT;
     public static final String PORT2 = allocatePort(JAXRSClientServerBookTest.class);

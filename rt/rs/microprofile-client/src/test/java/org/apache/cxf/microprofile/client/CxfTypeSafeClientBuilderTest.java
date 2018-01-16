@@ -20,8 +20,8 @@ package org.apache.cxf.microprofile.client;
 
 import java.net.URL;
 
-import javax.ws.rs.core.Response;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 
 import org.apache.cxf.microprofile.client.mock.EchoClientReqFilter;
 import org.apache.cxf.microprofile.client.mock.ExceptionMappingClient;

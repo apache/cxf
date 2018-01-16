@@ -170,7 +170,7 @@
         <cxf.xbean.version>3.5</cxf.xbean.version>
         <cxf.xerces.version>2.11.0</cxf.xerces.version>
         <cxf.xmlbeans.version>2.6.0</cxf.xmlbeans.version>
-        <cxf.xmlschema.version>2.2.2</cxf.xmlschema.version>
+        <cxf.xmlschema.version>2.2.3-SNAPSHOT</cxf.xmlschema.version>
         <cxf.xpp3.bundle.version>1.1.4c_6</cxf.xpp3.bundle.version>
         <cxf.validation.api.version>1.1.0.Final</cxf.validation.api.version>
         <!-- the Export-Package is the same as the Maven artifact
@@ -378,6 +378,7 @@
                             <id>validate</id>
                             <phase>validate</phase>
                             <configuration>
+                                <includeTestSourceDirectory>true</includeTestSourceDirectory>
                                 <configLocation>${cxf.resources.base.path}cxf-checkstyle${cxf.checkstyle.extension}.xml</configLocation>
                                 <consoleOutput>true</consoleOutput>
                                 <failsOnError>true</failsOnError>
