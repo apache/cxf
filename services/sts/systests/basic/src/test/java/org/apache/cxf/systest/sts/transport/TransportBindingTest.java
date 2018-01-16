@@ -417,10 +417,7 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)transportSaml1Port).close();
         bus.shutdown(true);
     }
-<<<<<<< HEAD
     
-=======
-
     @org.junit.Test
     public void testSAML2EndorsingSymmetric() throws Exception {
 
@@ -428,8 +425,8 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         URL busFile = TransportBindingTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -450,7 +447,6 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
 
->>>>>>> dae5b16c80... Added EndorsingSupportingToken/IssuedToken SymmetricKey test
     private DOMSource createDOMRequest() throws ParserConfigurationException {
         // Creating a DOMSource Object for the request
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
