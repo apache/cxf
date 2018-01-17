@@ -373,6 +373,21 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
         assertThatTraceIsPresent(r, spanId);
     }
 
+    @Test
+    public void testThatNoSpansAreRecordedWhenNotSampled() {
+        final Tracing never = Tracing
+                .newBuilder()
+                .reporter(new TestSpanReporter())
+                .sampler(Sampler.NEVER_SAMPLE)
+                .build();
+
+        final Response r = createWebClient("/bookstore/books", new BraveClientProvider(never)).get();
+        assertEquals(Status.OK.getStatusCode(), r.getStatus());
+
+        assertThat(TestSpanReporter.getAllSpans().size(), equalTo(0));
+        assertThatTraceHeadersArePresent(r, false);
+    }
+
     protected WebClient createWebClient(final String url, final Object ... providers) {
         return WebClient
             .create("http://localhost:" + PORT + url, Arrays.asList(providers))
