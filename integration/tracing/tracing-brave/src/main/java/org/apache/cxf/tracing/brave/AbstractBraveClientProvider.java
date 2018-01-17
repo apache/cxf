@@ -66,7 +66,7 @@ public abstract class AbstractBraveClientProvider extends AbstractTracingProvide
         // In case of asynchronous client invocation, the span should be detached as JAX-RS
         // client request / response filters are going to be executed in different threads.
         SpanInScope scope = null;
-        if (!isAsyncInvocation() && span != null && !span.isNoop()) {
+        if (!isAsyncInvocation() && span != null) {
             scope = brave.tracing().tracer().withSpanInScope(span);
         }
 
