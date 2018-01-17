@@ -432,5 +432,11 @@ public abstract class AbstractBindingPolicyValidator implements SecurityPolicyVa
         }
         return false;
     }
-    
+
+    protected void assertDerivedKeys(AbstractToken token, AssertionInfoMap aim) {
+        DerivedKeys derivedKeys = token.getDerivedKeys();
+        if (derivedKeys != null) {
+            PolicyUtils.assertPolicy(aim, new QName(token.getName().getNamespaceURI(), derivedKeys.name()));
+        }
+    }
 }

@@ -48,6 +48,8 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.token.BinarySecurity;
@@ -61,6 +63,8 @@ import org.apache.wss4j.dom.message.token.KerberosSecurity;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractSecuredParts;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
+import org.apache.wss4j.policy.model.AbstractToken;
+import org.apache.wss4j.policy.model.AbstractToken.DerivedKeys;
 import org.apache.wss4j.policy.model.EncryptedElements;
 import org.apache.wss4j.policy.model.EncryptedParts;
 import org.apache.wss4j.policy.model.Header;
@@ -891,4 +895,10 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
         this.enforceEncryptedTokens = enforceEncryptedTokens;
     }
 
+    protected void assertDerivedKeys(AbstractToken token, AssertionInfoMap aim) {
+        DerivedKeys derivedKeys = token.getDerivedKeys();
+        if (derivedKeys != null) {
+            PolicyUtils.assertPolicy(aim, new QName(token.getName().getNamespaceURI(), derivedKeys.name()));
+        }
+    }
 }

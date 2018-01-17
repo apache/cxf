@@ -385,8 +385,8 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
-    public void testSAML2EndorsingX509() throws Exception {
-        
+    public void testSAML2X509Endorsing() throws Exception {
+
         // Only works for DOM (clients)
         if (test.isStreaming()) {
             return;
@@ -419,7 +419,7 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
-    public void testSAML2EndorsingSymmetric() throws Exception {
+    public void testSAML2SymmetricEndorsing() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = TransportBindingTest.class.getResource("cxf-client.xml");
@@ -431,6 +431,40 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2SymmetricEndorsingPort");
+        DoubleItPortType transportSaml1Port =
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(transportSaml1Port, test.getPort());
+
+        TokenTestUtils.updateSTSPort((BindingProvider)transportSaml1Port, test.getStsPort());
+
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(transportSaml1Port);
+        }
+
+        doubleIt(transportSaml1Port, 25);
+
+        ((java.io.Closeable)transportSaml1Port).close();
+        bus.shutdown(true);
+    }
+
+    @org.junit.Test
+    public void testSAML2SymmetricEndorsingDerived() throws Exception {
+
+        // Only works for DOM (clients)
+        if (test.isStreaming()) {
+            return;
+        }
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = TransportBindingTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2SymmetricEndorsingDerivedPort");
         DoubleItPortType transportSaml1Port =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportSaml1Port, test.getPort());

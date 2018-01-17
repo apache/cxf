@@ -26,6 +26,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
+import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractToken;
@@ -79,6 +80,7 @@ public class SignedEndorsingEncryptedTokenPolicyValidator extends AbstractSuppor
             List<AbstractToken> tokens = binding.getTokens();
             for (AbstractToken token : tokens) {
                 if (!isTokenRequired(token, parameters.getMessage())) {
+                    assertDerivedKeys(token, parameters.getAssertionInfoMap());
                     assertSecurePartsIfTokenNotRequired(binding, parameters.getAssertionInfoMap());
                     continue;
                 }
@@ -121,6 +123,10 @@ public class SignedEndorsingEncryptedTokenPolicyValidator extends AbstractSuppor
                         + "supporting token requirement"
                     );
                     continue;
+                }
+
+                if (derived && parameters.getResults().getActionResults().containsKey(WSConstants.DKT)) {
+                    assertDerivedKeys(token, parameters.getAssertionInfoMap());
                 }
             }
         }

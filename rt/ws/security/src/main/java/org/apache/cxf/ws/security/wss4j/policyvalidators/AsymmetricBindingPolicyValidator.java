@@ -33,7 +33,6 @@ import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.AbstractToken;
-import org.apache.wss4j.policy.model.AbstractToken.DerivedKeys;
 import org.apache.wss4j.policy.model.AbstractTokenWrapper;
 import org.apache.wss4j.policy.model.AsymmetricBinding;
 import org.apache.wss4j.policy.model.X509Token;
@@ -156,7 +155,7 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
             ai.setNotAsserted("Message fails the DerivedKeys requirement");
             return false;
         }
-        assertToken(wrapper, aim);
+        assertDerivedKeys(wrapper.getToken(), aim);
 
         return true;
     }
@@ -184,19 +183,9 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
             ai.setNotAsserted("Message fails the DerivedKeys requirement");
             return false;
         }
-        assertToken(wrapper, aim);
+        assertDerivedKeys(wrapper.getToken(), aim);
 
         return true;
-    }
-    
-    private void assertToken(AbstractTokenWrapper tokenWrapper, AssertionInfoMap aim) {
-        String namespace = tokenWrapper.getName().getNamespaceURI();
-        
-        AbstractToken token = tokenWrapper.getToken();
-        DerivedKeys derivedKeys = token.getDerivedKeys();
-        if (derivedKeys != null) {
-            PolicyUtils.assertPolicy(aim, new QName(namespace, derivedKeys.name()));
-        }
     }
     
 }
