@@ -325,15 +325,11 @@ public class JSONProviderTest extends Assert {
 
     @Test
     public void testWriteNullValueAsString() throws Exception {
-        if (!System.getProperty("java.version").startsWith("9")) {
-            doTestWriteNullValue(true);
-        }
+        doTestWriteNullValue(true);
     }
     @Test
     public void testWriteNullValueAsNull() throws Exception {
-        if (!System.getProperty("java.version").startsWith("9")) {
-            doTestWriteNullValue(false);
-        }
+        doTestWriteNullValue(false);
     }
 
     private void doTestWriteNullValue(boolean nullAsString) throws Exception {
@@ -1952,7 +1948,7 @@ public class JSONProviderTest extends Assert {
         public void writeCharacters(char[] text, int arg1, int arg2) throws XMLStreamException {
             String str = new String(text);
             if (StringUtils.isEmpty(str.trim())) {
-                super.writeCharacters(null, arg1, arg2);
+                super.writeCharacters(null);
             } else {
                 super.writeCharacters(text, arg1, arg2);
             }
