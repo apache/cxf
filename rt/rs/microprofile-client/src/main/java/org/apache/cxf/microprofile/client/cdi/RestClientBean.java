@@ -51,7 +51,7 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
     private final Class<? extends Annotation> scope;
     private final BeanManager beanManager;
 
-    RestClientBean(Class<?> clientInterface, BeanManager beanManager) {
+    public RestClientBean(Class<?> clientInterface, BeanManager beanManager) {
         this.clientInterface = clientInterface;
         this.beanManager = beanManager;
         this.scope = this.readScope();
