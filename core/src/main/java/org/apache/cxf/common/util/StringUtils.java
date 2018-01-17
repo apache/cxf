@@ -29,8 +29,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 public final class StringUtils {
     public static final Map<String, Pattern> PATTERN_MAP = new HashMap<>();
@@ -40,23 +42,22 @@ public final class StringUtils {
             PATTERN_MAP.put(p, Pattern.compile(p));
         }
     }
+    private static final Predicate<String> NOT_EMPTY = (String s) -> !s.isEmpty();
 
     private StringUtils() {
     }
 
     public static String[] split(String s, String regex) {
-        Pattern p = PATTERN_MAP.get(regex);
-        if (p != null) {
-            return p.split(s);
-        }
-        return s.split(regex);
+        return split(s, regex, 0);
     }
     public static String[] split(String s, String regex, int limit) {
-        Pattern p = PATTERN_MAP.get(regex);
-        if (p != null) {
-            return p.split(s, limit);
-        }
-        return s.split(regex, limit);
+        Pattern p = PATTERN_MAP.getOrDefault(regex, Pattern.compile(regex));
+        return p.split(s, limit);
+    }
+    
+    public static Stream<String> splitAsStream(String s, String regex) {
+        Pattern p = PATTERN_MAP.getOrDefault(regex, Pattern.compile(regex));
+        return p.splitAsStream(s);
     }
 
     public static boolean isFileExist(String file) {
@@ -73,6 +74,10 @@ public final class StringUtils {
             }
         }
         return true;
+    }
+    
+    public static Predicate<String> notEmpty() {
+        return NOT_EMPTY;
     }
 
     public static boolean isEmpty(List<String> list) {

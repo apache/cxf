@@ -45,6 +45,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.Consumes;
@@ -179,13 +180,12 @@ public final class JAXRSUtils {
 
     public static List<PathSegment> getPathSegments(String thePath, boolean decode,
                                                     boolean ignoreLastSlash) {
-        String[] segments = StringUtils.split(thePath, "/");
-        List<PathSegment> theList = new ArrayList<>();
-        for (String path : segments) {
-            if (!StringUtils.isEmpty(path)) {
-                theList.add(new PathSegmentImpl(path, decode));
-            }
-        }
+        List<PathSegment> theList = 
+            StringUtils.splitAsStream(thePath, "/")
+            .filter(StringUtils.notEmpty())
+            .map(p -> new PathSegmentImpl(p, decode))
+            .collect(Collectors.toList());
+        
         int len = thePath.length();
         if (len > 0 && thePath.charAt(len - 1) == '/') {
             String value = ignoreLastSlash ? "" : "/";
