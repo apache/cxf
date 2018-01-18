@@ -91,6 +91,7 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
     
     // Additional components
     private Map<String, SecurityScheme> securityDefinitions;
+    private OpenApiCustomizer customizer;
     
     // Allows to pass the configuration location, usually openapi-configuration.json
     // or openapi-configuration.yml file.
@@ -361,6 +362,14 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
     public void setSecurityDefinitions(Map<String, SecurityScheme> securityDefinitions) {
         this.securityDefinitions = securityDefinitions;
     }
+    
+    public OpenApiCustomizer getCustomizer() {
+        return customizer;
+    }
+    
+    public void setCustomizer(OpenApiCustomizer customizer) {
+        this.customizer = customizer;
+    }
 
     @Override
     public String findSwaggerUiRoot() {
@@ -384,7 +393,7 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
     protected void registerOpenApiResources(JAXRSServiceFactoryBean sfb, Set<String> packages, 
             OpenAPIConfiguration config) {
         sfb.setResourceClassesFromBeans(Arrays.asList(
-            new OpenApiResource()
+            createOpenApiResource()
                 .openApiConfiguration(config)
                 .configLocation(configLocation)
                 .resourcePackages(packages)));
@@ -526,5 +535,9 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
         }
         
         return hasComponents ? Optional.of(components) : Optional.empty();
+    }
+    
+    private OpenApiResource createOpenApiResource() {
+        return (customizer == null) ? new OpenApiResource() : new OpenApiCustomizedResource(customizer);
     }
 }

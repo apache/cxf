@@ -117,7 +117,7 @@ public abstract class AbstractOpenApiServiceDescriptionTest extends AbstractBusC
     protected static void startServers(final Class< ? extends Server> serverClass) throws Exception {
         AbstractResourceInfo.clearAllMaps();
         //keep out of process due to stack traces testing failures
-        assertTrue("server did not launch correctly", launchServer(serverClass, true));
+        assertTrue("server did not launch correctly", launchServer(serverClass, false));
         createStaticBus();
     }
 
@@ -127,12 +127,14 @@ public abstract class AbstractOpenApiServiceDescriptionTest extends AbstractBusC
         doTestApiListingIsProperlyReturnedJSON(false);
     }
     protected void doTestApiListingIsProperlyReturnedJSON(boolean useXForwarded) throws Exception {
-        doTestApiListingIsProperlyReturnedJSON(createWebClient("/openapi.json"), 
-                                               useXForwarded);
+        doTestApiListingIsProperlyReturnedJSON(useXForwarded, null);
+    }
+    protected void doTestApiListingIsProperlyReturnedJSON(boolean useXForwarded, String basePath) throws Exception {
+        doTestApiListingIsProperlyReturnedJSON(createWebClient("/openapi.json"), useXForwarded, basePath);
         checkUiResource();
     }
     protected static void doTestApiListingIsProperlyReturnedJSON(final WebClient client,
-                                                          boolean useXForwarded) throws Exception {    
+            boolean useXForwarded, String basePath) throws Exception {    
         if (useXForwarded) {
             client.header("USE_XFORWARDED", true);
         }
@@ -140,35 +142,37 @@ public abstract class AbstractOpenApiServiceDescriptionTest extends AbstractBusC
             String swaggerJson = client.get(String.class);
             UserApplication ap = OpenApiParseUtils.getUserApplicationFromJson(swaggerJson);
             assertNotNull(ap);
-            assertEquals(useXForwarded ? "/reverse" : "/", ap.getBasePath());
+            
+            if (basePath == null) {
+                assertEquals(useXForwarded ? "/reverse" : "/", ap.getBasePath());
+            } else {
+                assertEquals(basePath, ap.getBasePath());
+            }
             
             List<UserResource> urs = ap.getResources();
             assertNotNull(urs);
             assertEquals(1, urs.size());
             UserResource r = urs.get(0);
-            String basePath = "";
-            if (!"/".equals(r.getPath())) {
-                basePath = r.getPath();
-            }
+            
             Map<String, UserOperation> map = r.getOperationsAsMap();
             assertEquals(3, map.size());
             UserOperation getBooksOp = map.get("getBooks");
             assertEquals(HttpMethod.GET, getBooksOp.getVerb());
-            assertEquals("/bookstore", basePath + getBooksOp.getPath());
+            assertEquals("/bookstore", getBooksOp.getPath());
             assertEquals(MediaType.APPLICATION_JSON, getBooksOp.getProduces());
             List<Parameter> getBooksOpParams = getBooksOp.getParameters();
             assertEquals(1, getBooksOpParams.size());
             assertEquals(ParameterType.QUERY, getBooksOpParams.get(0).getType());
             UserOperation getBookOp = map.get("getBook");
             assertEquals(HttpMethod.GET, getBookOp.getVerb());
-            assertEquals("/bookstore/{id}", basePath + getBookOp.getPath());
+            assertEquals("/bookstore/{id}", getBookOp.getPath());
             assertEquals(MediaType.APPLICATION_JSON, getBookOp.getProduces());
             List<Parameter> getBookOpParams = getBookOp.getParameters();
             assertEquals(1, getBookOpParams.size());
             assertEquals(ParameterType.PATH, getBookOpParams.get(0).getType());
             UserOperation deleteOp = map.get("delete");
             assertEquals(HttpMethod.DELETE, deleteOp.getVerb());
-            assertEquals("/bookstore/{id}", basePath + deleteOp.getPath());
+            assertEquals("/bookstore/{id}", deleteOp.getPath());
             List<Parameter> delOpParams = deleteOp.getParameters();
             assertEquals(1, delOpParams.size());
             assertEquals(ParameterType.PATH, delOpParams.get(0).getType());

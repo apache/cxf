@@ -95,13 +95,20 @@ public final class OpenApiParseUtils {
     public static UserApplication getUserApplicationFromJson(String json) {
         return getUserApplicationFromJson(json, new ParseConfiguration());
     }
-    public static UserApplication getUserApplicationFromJson(String json,
-                                                             ParseConfiguration cfg) {
+    public static UserApplication getUserApplicationFromJson(String json, ParseConfiguration cfg) {
         JsonMapObjectReaderWriter reader = new JsonMapObjectReaderWriter();
         Map<String, Object> map = reader.fromJson(json);
 
         UserApplication app = new UserApplication();
         app.setBasePath("/");
+        
+        List<Map<String, Object>> servers = CastUtils.cast((List<?>)map.get("servers"));
+        if (servers != null && !servers.isEmpty()) {
+            final String url = (String)servers.get(0).get("url");
+            if (url != null) {
+                app.setBasePath(url);
+            }
+        }
 
         Map<String, List<UserOperation>> userOpsMap = new LinkedHashMap<String, List<UserOperation>>();
         Set<String> tags = new HashSet<>();
