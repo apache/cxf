@@ -67,6 +67,7 @@ import org.apache.wss4j.policy.model.AbstractToken.DerivedKeys;
 import org.apache.wss4j.policy.model.EncryptedElements;
 import org.apache.wss4j.policy.model.EncryptedParts;
 import org.apache.wss4j.policy.model.Header;
+import org.apache.wss4j.policy.model.IssuedToken;
 import org.apache.wss4j.policy.model.RequiredElements;
 import org.apache.wss4j.policy.model.SignedElements;
 import org.apache.wss4j.policy.model.SignedParts;
@@ -900,4 +901,21 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
             PolicyUtils.assertPolicy(aim, new QName(token.getName().getNamespaceURI(), derivedKeys.name()));
         }
     }
+
+    protected static boolean isSamlTokenRequiredForIssuedToken(IssuedToken issuedToken) {
+        Element template = issuedToken.getRequestSecurityTokenTemplate();
+        if (template != null) {
+            Element child = DOMUtils.getFirstElement(template);
+            while (child != null) {
+                if ("TokenType".equals(child.getLocalName())) {
+                    String content = child.getTextContent();
+                    return WSConstants.WSS_SAML_TOKEN_TYPE.equals(content)
+                        || WSConstants.WSS_SAML2_TOKEN_TYPE.equals(content);
+                }
+                child = DOMUtils.getNextElement(child);
+            }
+        }
+        return false;
+    }
+
 }
