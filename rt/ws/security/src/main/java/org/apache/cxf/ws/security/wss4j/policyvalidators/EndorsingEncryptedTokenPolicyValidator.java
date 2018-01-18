@@ -113,7 +113,12 @@ public class EndorsingEncryptedTokenPolicyValidator extends AbstractSupportingTo
                     if (!processSAMLTokens(parameters)) {
                         processingFailed = true;
                     }
-                } else if (!(token instanceof IssuedToken)) {
+                } else if (token instanceof IssuedToken) {
+                    IssuedToken issuedToken = (IssuedToken)token;
+                    if (isSamlTokenRequiredForIssuedToken(issuedToken) && !processSAMLTokens(parameters)) {
+                        processingFailed = true;
+                    }
+                } else {
                     processingFailed = true;
                 }
 

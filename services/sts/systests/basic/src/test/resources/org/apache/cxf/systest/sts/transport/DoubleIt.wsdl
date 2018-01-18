@@ -520,7 +520,7 @@
                             </sp:RequestSecurityTokenTemplate>
                             <wsp:Policy>
                                 <sp:RequireInternalReference/>
-                                <sp:RequireDerivedKeys/>
+                                <!-- TODO <sp:RequireDerivedKeys/> -->
                             </wsp:Policy>
                             <sp:Issuer>
                                 <wsaw:Address>http://localhost:8080/STS/STSUT
