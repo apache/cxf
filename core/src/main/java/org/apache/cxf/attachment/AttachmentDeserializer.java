@@ -34,9 +34,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.activation.DataSource;
+import javax.mail.MessagingException;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
@@ -56,7 +58,8 @@ public class AttachmentDeserializer {
      * The maximum MIME Header Length. The default is 300.
      */
     public static final String ATTACHMENT_MAX_HEADER_SIZE = "attachment-max-header-size";
-    public static final int DEFAULT_MAX_HEADER_SIZE = 300;
+    public static final int DEFAULT_MAX_HEADER_SIZE = 
+        SystemPropertyAction.getInteger("org.apache.cxf.attachment-max-header-size", 300);
 
     public static final int THRESHOLD = 1024 * 100; //100K (byte unit)
 
