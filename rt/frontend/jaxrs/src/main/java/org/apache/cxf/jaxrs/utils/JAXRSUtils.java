@@ -43,6 +43,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -380,7 +381,6 @@ public final class JAXRSUtils {
         boolean throwException,
         boolean recordMatchedUri) {
     //CHECKSTYLE:ON
-        final boolean isFineLevelLoggable = LOG.isLoggable(Level.FINE);
         final boolean getMethod = HttpMethod.GET.equals(httpMethod);
 
         MediaType requestType;
@@ -405,15 +405,10 @@ public final class JAXRSUtils {
             MultivaluedMap<String, String> values = rEntry.getValue();
 
             String path = getCurrentPath(values);
-            if (isFineLevelLoggable) {
-                org.apache.cxf.common.i18n.Message msg =
-                    new org.apache.cxf.common.i18n.Message("START_OPER_MATCH",
-                                                           BUNDLE,
-                                                           resource.getServiceClass().getName());
-                LOG.fine(msg.toString());
-
-            }
-
+            LOG.fine(() -> new org.apache.cxf.common.i18n.Message("START_OPER_MATCH",
+                                                                  BUNDLE,
+                                                                  resource.getServiceClass().getName()).toString());
+            
             for (OperationResourceInfo ori : resource.getMethodDispatcher().getOperationResourceInfos()) {
                 boolean added = false;
 
@@ -451,15 +446,7 @@ public final class JAXRSUtils {
                         }
                     }
                 }
-                if (isFineLevelLoggable) {
-                    if (added) {
-                        LOG.fine(new org.apache.cxf.common.i18n.Message("OPER_SELECTED_POSSIBLY",
-                                  BUNDLE,
-                                  ori.getMethodToInvoke().getName()).toString());
-                    } else {
-                        logNoMatchMessage(ori, path, httpMethod, requestType, acceptContentTypes);
-                    }
-                }
+                LOG.fine(matchMessageLogSupplier(ori, path, httpMethod, requestType, acceptContentTypes, added));
             }
         }
         if (finalPathSubresources != null && pathMatched > 0
@@ -479,11 +466,9 @@ public final class JAXRSUtils {
                          BUNDLE, ori.getClassResourceInfo().getServiceClass().getName(),
                          ori.getMethodToInvoke().getName()).toString());
             }
-            if (isFineLevelLoggable) {
-                LOG.fine(new org.apache.cxf.common.i18n.Message("OPER_SELECTED",
+            LOG.fine(() -> new org.apache.cxf.common.i18n.Message("OPER_SELECTED",
                                BUNDLE, ori.getMethodToInvoke().getName(),
                                ori.getClassResourceInfo().getServiceClass().getName()).toString());
-            }
             if (!ori.isSubResourceLocator()) {
                 MediaType responseMediaType = intersectSortMediaTypes(acceptContentTypes,
                                                                       ori.getProduceTypes(),
@@ -529,7 +514,7 @@ public final class JAXRSUtils {
                                                    convertTypesToString(acceptContentTypes));
         if (!"OPTIONS".equalsIgnoreCase(httpMethod)) {
             Level logLevel = getExceptionLogLevel(message, ClientErrorException.class);
-            LOG.log(logLevel == null ? Level.FINE : logLevel, errorMsg.toString());
+            LOG.log(logLevel == null ? Level.FINE : logLevel, () -> errorMsg.toString());
         }
         Response response =
             createResponse(getRootResources(message), message, errorMsg.toString(), status, methodMatched == 0);
@@ -604,10 +589,13 @@ public final class JAXRSUtils {
             && "OPTIONS".equalsIgnoreCase(httpMethod);
     }
 
-    private static void logNoMatchMessage(OperationResourceInfo ori,
-        String path, String httpMethod, MediaType requestType, List<MediaType> acceptContentTypes) {
-        org.apache.cxf.common.i18n.Message errorMsg =
-            new org.apache.cxf.common.i18n.Message("OPER_NO_MATCH",
+    private static Supplier<String> matchMessageLogSupplier(OperationResourceInfo ori,
+        String path, String httpMethod, MediaType requestType, List<MediaType> acceptContentTypes,
+        boolean added) {
+        org.apache.cxf.common.i18n.Message errorMsg = added 
+            ? new org.apache.cxf.common.i18n.Message("OPER_SELECTED_POSSIBLY",
+                                                   BUNDLE, ori.getMethodToInvoke().getName())
+            : new org.apache.cxf.common.i18n.Message("OPER_NO_MATCH",
                                                    BUNDLE,
                                                    ori.getMethodToInvoke().getName(),
                                                    path,
@@ -618,7 +606,7 @@ public final class JAXRSUtils {
                                                    convertTypesToString(ori.getConsumeTypes()),
                                                    convertTypesToString(acceptContentTypes),
                                                    convertTypesToString(ori.getProduceTypes()));
-        LOG.fine(errorMsg.toString());
+        return () -> errorMsg.toString();
     }
 
     public static Response createResponse(List<ClassResourceInfo> cris, Message msg,
