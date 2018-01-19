@@ -34,7 +34,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.activation.DataSource;
-import javax.mail.MessagingException;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -253,7 +252,7 @@ public class AttachmentDeserializer {
      *
      * @param pushbackInStream
      * @param boundary
-     * @throws MessagingException
+     * @throws IOException
      */
     private static boolean readTillFirstBoundary(PushbackInputStream pbs, byte[] bp) throws IOException {
 
