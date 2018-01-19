@@ -140,7 +140,7 @@ public class ClassResourceInfo extends BeanResourceInfo {
     }
 
     public ClassResourceInfo getSubResource(Class<?> typedClass, Class<?> instanceClass, Object instance) {
-        instanceClass = enableStatic ? typedClass : instanceClass;
+        instanceClass = enableStatic && typedClass != Object.class ? typedClass : instanceClass;
         return getSubResource(typedClass, instanceClass, instance, enableStatic, JAXRSUtils.getCurrentMessage());
     }
 
