@@ -82,7 +82,7 @@ public class SignedEndorsingTokenPolicyValidator extends AbstractSupportingToken
                         processingFailed = true;
                     }
                 } else if (token instanceof SamlToken) {
-                    if (!processSAMLTokens(parameters)) {
+                    if (!processSAMLTokens(parameters, derived)) {
                         processingFailed = true;
                     }
                 } else if (token instanceof X509Token) {
@@ -104,7 +104,7 @@ public class SignedEndorsingTokenPolicyValidator extends AbstractSupportingToken
                     }
                 } else if (token instanceof IssuedToken) {
                     IssuedToken issuedToken = (IssuedToken)token;
-                    if (isSamlTokenRequiredForIssuedToken(issuedToken) && !processSAMLTokens(parameters)) {
+                    if (isSamlTokenRequiredForIssuedToken(issuedToken) && !processSAMLTokens(parameters, derived)) {
                         processingFailed = true;
                     }
                 } else {
