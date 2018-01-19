@@ -30,7 +30,6 @@ import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
@@ -125,8 +124,8 @@ public final class JAXBUtils {
     private static final Map<String, String> BUILTIN_DATATYPES_MAP;
     private static final Map<String, Class<?>> HOLDER_TYPES_MAP;
     private static ClassLoader jaxbXjcLoader;
-    private static Object jaxbEscapeHandler;
-
+    private static volatile Object jaxbEscapeHandler;
+    
     static {
         BUILTIN_DATATYPES_MAP = new HashMap<>();
         BUILTIN_DATATYPES_MAP.put("string", "java.lang.String");
@@ -1534,43 +1533,55 @@ public final class JAXBUtils {
         return ReflectionInvokationHandler.createProxyWrapper(o, JAXBBeanInfo.class);
     }
 
-    public static void setMinimumEscapeHandler(Marshaller marshaller) {
-        String postFix = "";
-        if (marshaller.getClass().getName().contains("com.sun.xml.internal")
-            || marshaller.getClass().getName().contains("eclipse")) {
+    private static String getPostfix(Class<?> cls) {
+        if (cls.getName().contains("com.sun.xml.internal")
+            || cls.getName().contains("eclipse")) {
             //eclipse moxy accepts sun package CharacterEscapeHandler 
-            postFix = ".internal";
-        } else if (marshaller.getClass().getName().contains("com.sun.xml.bind")) {
-            postFix = "";
-        } else {
-            LOG.log(Level.WARNING, "Failed to set MinumEscapeHandler for unknown jaxb marshaller:"
-                                   + marshaller);
-            return;
+            return ".internal";
+        } else if (cls.getName().contains("com.sun.xml.bind")) {
+            return "";
         }
+        return null;
+    }
+    public static void setMinimumEscapeHandler(Marshaller marshaller) {
+        if (jaxbEscapeHandler == null) {
+            jaxbEscapeHandler = createEscapeHandler(marshaller.getClass());
+        }
+        setMinimumEscapeHandler(marshaller, jaxbEscapeHandler);
+    }
+    public static void setMinimumEscapeHandler(Marshaller marshaller, Object escapeHandler) {
         try {
-            Class<?> handlerClass = ClassLoaderUtils.loadClass("com.sun.xml" + postFix
-                                                                   + ".bind.marshaller.MinimumEscapeHandler",
-                                                               marshaller.getClass());
-            Class<?> handlerInterface = ClassLoaderUtils
-                .loadClass("com.sun.xml" + postFix + ".bind.marshaller.CharacterEscapeHandler",
-                           marshaller.getClass());
-            Object targetHandler = ReflectionUtil.getDeclaredField(handlerClass, "theInstance").get(null);
-            Object escapeHandler = getEscapeHandlerInstance(marshaller.getClass().getClassLoader(),
-                                                            new Class[] {handlerInterface},
-                                                            new EscapeHandlerInvocationHandler(targetHandler));
+            String postFix = getPostfix(marshaller.getClass());
             marshaller.setProperty("com.sun.xml" + postFix + ".bind.characterEscapeHandler", escapeHandler);
-        } catch (Exception e) {
+        } catch (PropertyException e) {
             e.printStackTrace();
             LOG.log(Level.INFO, "Failed to set MinumEscapeHandler to jaxb marshaller", e);
         }
     }
-
-    private static synchronized Object getEscapeHandlerInstance(ClassLoader loader, Class<?>[] interfaces,
-                                                                InvocationHandler handler) {
-        if (jaxbEscapeHandler == null) {
-            jaxbEscapeHandler = ProxyHelper.getProxy(loader, interfaces, handler);
+    
+    public static Object createEscapeHandler(Class<?> cls) {
+        try {
+            String postFix = getPostfix(cls);
+            if (postFix == null) {
+                LOG.log(Level.WARNING, "Failed to create MinumEscapeHandler for unknown jaxb class:"
+                    + cls);
+                return null;
+            }
+            Class<?> handlerClass = ClassLoaderUtils.loadClass("com.sun.xml" + postFix
+                                                                   + ".bind.marshaller.MinimumEscapeHandler",
+                                                               cls);
+            Class<?> handlerInterface = ClassLoaderUtils
+                .loadClass("com.sun.xml" + postFix + ".bind.marshaller.CharacterEscapeHandler",
+                           cls);
+            Object targetHandler = ReflectionUtil.getDeclaredField(handlerClass, "theInstance").get(null);
+            return ProxyHelper.getProxy(cls.getClassLoader(),
+                                        new Class[] {handlerInterface},
+                                        new EscapeHandlerInvocationHandler(targetHandler));
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.log(Level.INFO, "Failed to create MinumEscapeHandler", e);
         }
-        return jaxbEscapeHandler;
+        return null;
     }
     
 
