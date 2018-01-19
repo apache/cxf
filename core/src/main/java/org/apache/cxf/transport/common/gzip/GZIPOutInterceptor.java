@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -112,7 +113,8 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
      */
     private int threshold = 1024;
     private boolean force;
-
+    private Set<String> supportedPayloadContentTypes;
+    
     public GZIPOutInterceptor() {
         super(Phase.PREPARE_SEND);
         addAfter(MessageSenderInterceptor.class.getName());
@@ -132,7 +134,7 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
     }
 
     public void handleMessage(Message message) throws Fault {
-        UseGzip use = gzipPermitted(message, force);
+        UseGzip use = gzipPermitted(message);
         if (use != UseGzip.NO) {
             // remember the original output stream, we will write compressed
             // data to this later
@@ -167,8 +169,12 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
      * @throws Fault if the Accept-Encoding header does not allow any encoding
      *                 that we can support (identity, gzip or x-gzip).
      */
-    public static UseGzip gzipPermitted(Message message, boolean force) throws Fault {
+    public UseGzip gzipPermitted(Message message) throws Fault {
         UseGzip permitted = UseGzip.NO;
+        if (supportedPayloadContentTypes != null && message.containsKey(Message.CONTENT_TYPE)
+            && !supportedPayloadContentTypes.contains(message.get(Message.CONTENT_TYPE))) {
+            return permitted;
+        }
         if (MessageUtils.isRequestor(message)) {
             LOG.fine("Requestor role, so gzip enabled");
             Object o = message.getContextualProperty(USE_GZIP_KEY);
@@ -336,6 +342,12 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
     }
     public void setForce(boolean force) {
         this.force = force;
-    }    
+    }
+    public Set<String> getSupportedPayloadContentTypes() {
+        return supportedPayloadContentTypes;
+    }
+    public void setSupportedPayloadContentTypes(Set<String> supportedPayloadContentTypes) {
+        this.supportedPayloadContentTypes = supportedPayloadContentTypes;
+    }
 
 }
