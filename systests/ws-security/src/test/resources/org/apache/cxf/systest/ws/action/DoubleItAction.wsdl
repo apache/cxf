@@ -45,6 +45,9 @@
         <wsdl:port name="DoubleItUsernameTokenPort2" binding="tns:DoubleItNoSecurityBinding">
             <soap:address location="http://localhost:9001/DoubleItUsernameToken2"/>
         </wsdl:port>
+        <wsdl:port name="DoubleItUsernameTokenPort3" binding="tns:DoubleItNoSecurityBinding">
+            <soap:address location="http://localhost:9001/DoubleItUsernameToken3"/>
+        </wsdl:port>
         <wsdl:port name="DoubleItEncryptedPasswordPort" binding="tns:DoubleItNoSecurityBinding">
             <soap:address location="http://localhost:9001/DoubleItEncryptedPassword"/>
         </wsdl:port>

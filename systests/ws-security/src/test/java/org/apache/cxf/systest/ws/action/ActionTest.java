@@ -56,6 +56,12 @@ public class ActionTest extends AbstractBusClientServerTestBase {
                 // set this to false to fork
                 launchServer(Server.class, true)
         );
+        assertTrue(
+                   "Server failed to launch",
+                   // run the server in the same process
+                   // set this to false to fork
+                   launchServer(UTServer.class, true)
+        );
     }
     
     @org.junit.AfterClass
@@ -102,7 +108,7 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         DoubleItPortType port = 
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
-        
+
         // Successful call
         port.doubleIt(25);
         
@@ -117,8 +123,14 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             assertTrue(ex.getMessage().equals(WSSecurityException.UNIFIED_SECURITY_ERR));
         }
-        
-        
+
+        // Here the Server is adding the WSS4JInInterceptor in code
+        portQName = new QName(NAMESPACE, "DoubleItUsernameTokenPort3");
+        port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, UTServer.PORT);
+
+        port.doubleIt(25);
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
@@ -426,4 +438,5 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
+
 }
