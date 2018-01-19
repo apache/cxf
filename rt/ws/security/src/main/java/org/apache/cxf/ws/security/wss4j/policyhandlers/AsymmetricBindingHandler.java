@@ -817,11 +817,12 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
 
             for (WSSecurityEngineResult wser : wsSecEngineResults) {
                 Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
-                String id = (String)wser.get(WSSecurityEngineResult.TAG_ID);
                 if (actInt.intValue() == WSConstants.ST_SIGNED
                     || actInt.intValue() == WSConstants.ST_UNSIGNED) {
                     Instant created = Instant.now();
                     Instant expires = created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(message) / 1000L);
+
+                    String id = (String)wser.get(WSSecurityEngineResult.TAG_ID);
                     SecurityToken tempTok = new SecurityToken(id, created, expires);
                     tempTok.setSecret((byte[])wser.get(WSSecurityEngineResult.TAG_SECRET));
                     tempTok.setX509Certificate(

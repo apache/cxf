@@ -643,7 +643,7 @@
                                 <t:SignWith>http://www.w3.org/2000/09/xmldsig#hmac-sha1</t:SignWith>
                             </sp:RequestSecurityTokenTemplate>
                             <wsp:Policy>
-                                <!-- TODO re-enable <sp:RequireDerivedKeys/> -->
+                                <sp:RequireDerivedKeys/>
                                 <sp:RequireInternalReference/>
                             </wsp:Policy>
                         </sp:IssuedToken>

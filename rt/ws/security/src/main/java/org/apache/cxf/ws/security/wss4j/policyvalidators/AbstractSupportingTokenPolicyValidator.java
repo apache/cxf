@@ -141,28 +141,51 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
     /**
      * Process SAML Tokens. Only signed results are supported.
      */
-    protected boolean processSAMLTokens(PolicyValidatorParameters parameters) {
+    protected boolean processSAMLTokens(PolicyValidatorParameters parameters, boolean derived) {
         if (parameters.getSamlResults().isEmpty()) {
             return false;
         }
 
-        if (isSigned() && !areTokensSigned(parameters.getSamlResults(), parameters.getSignedResults(),
+        List<WSSecurityEngineResult> tokenResults = new ArrayList<>();
+        tokenResults.addAll(parameters.getSamlResults());
+
+
+        if (isSigned() && !areTokensSigned(tokenResults, parameters.getSignedResults(),
                                            parameters.getEncryptedResults(),
                                            parameters.getMessage())) {
             return false;
         }
-        if (isEncrypted() && !areTokensEncrypted(parameters.getSamlResults(),
+        if (isEncrypted() && !areTokensEncrypted(tokenResults,
                                                  parameters.getEncryptedResults(),
                                                  parameters.getMessage())) {
             return false;
         }
-        if (isEndorsing() && !checkEndorsed(parameters.getSamlResults(), parameters.getSignedResults(),
+
+        if (derived && parameters.getResults().getActionResults().containsKey(WSConstants.DKT)) {
+            List<WSSecurityEngineResult> dktResults = new ArrayList<>(tokenResults.size());
+            for (WSSecurityEngineResult wser : tokenResults) {
+                SamlAssertionWrapper assertion =
+                    (SamlAssertionWrapper)wser.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+                if (assertion != null && assertion.getSubjectKeyInfo() != null
+                    && assertion.getSubjectKeyInfo().getSecret() != null) {
+                    WSSecurityEngineResult dktResult =
+                        getMatchingDerivedKey(assertion.getSubjectKeyInfo().getSecret(), parameters.getResults());
+                    if (dktResult != null) {
+                        dktResults.add(dktResult);
+                    }
+                }
+            }
+            tokenResults.addAll(dktResults);
+        }
+
+
+        if (isEndorsing() && !checkEndorsed(tokenResults, parameters.getSignedResults(),
                                             parameters.getMessage(),
                                             parameters.getTimestampElement())) {
             return false;
         }
 
-        return validateSignedEncryptedPolicies(parameters.getSamlResults(), parameters.getSignedResults(),
+        return validateSignedEncryptedPolicies(tokenResults, parameters.getSignedResults(),
                                              parameters.getEncryptedResults(),
                                              parameters.getMessage());
     }
