@@ -73,7 +73,6 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
-import org.apache.cxf.jaxrs.ext.JAXRSServerFactoryCustomizationExtension;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -89,6 +88,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.ext.DefaultMethod;
+import org.apache.cxf.jaxrs.ext.JAXRSServerFactoryCustomizationExtension;
 import org.apache.cxf.jaxrs.ext.xml.ElementClass;
 import org.apache.cxf.jaxrs.ext.xml.XMLName;
 import org.apache.cxf.jaxrs.lifecycle.PerRequestResourceProvider;
@@ -911,7 +911,7 @@ public final class ResourceUtils {
     private static void customize(JAXRSServerFactoryBean bean) {
         ServiceLoader<JAXRSServerFactoryCustomizationExtension> extensions
                 = ServiceLoader.load(JAXRSServerFactoryCustomizationExtension.class);
-        for(JAXRSServerFactoryCustomizationExtension extension : extensions) {
+        for (JAXRSServerFactoryCustomizationExtension extension : extensions) {
             extension.customize(bean);
         }
     }

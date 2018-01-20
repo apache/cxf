@@ -16,10 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.sse.cdi;
+package org.apache.cxf.jaxrs.sse.ext;
 
-import org.apache.cxf.cdi.extension.JAXRSServerFactoryCustomizationExtension;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.ext.JAXRSServerFactoryCustomizationExtension;
 import org.apache.cxf.transport.sse.SseHttpTransportFactory;
 
 public class SseTransportCustomizationExtension implements JAXRSServerFactoryCustomizationExtension {
