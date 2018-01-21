@@ -18,14 +18,26 @@
  */
 package org.apache.cxf.jaxrs.client.spec;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.CompletionStage;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.ClientRequestContext;
+import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Response;
 
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.jaxrs.client.AbstractClient;
 import org.apache.cxf.jaxrs.client.ClientConfiguration;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.client.spec.ClientImpl.WebTargetImpl;
@@ -126,5 +138,39 @@ public class ClientImplTest extends Assert {
         assertTrue("New WebTarget is missing expected interceptor specified on 'parent' WebTarget's client impl",
                    doesClientConfigHaveMyInterceptor(webClientAfterPath));
 
+    }
+
+    public static class MockServerResponse implements ClientRequestFilter {
+
+        /** {@inheritDoc}*/
+        @Override
+        public void filter(ClientRequestContext crc) throws IOException {
+            crc.abortWith(Response.ok("SUCCESS").build());
+        }
+        
+    }
+    @Test
+    public void testCompletionStageUsesSpecifiedExecutorForAsyncOperations() throws Exception {
+        CountDownLatch latch = new CountDownLatch(1);
+        List<String> threadInfo = new ArrayList<String>();
+        ExecutorService es = Executors.newSingleThreadExecutor(new ThreadFactory() {
+
+            @Override
+            public Thread newThread(Runnable r) {
+                return new Thread(r, "CXF-Thread");
+            } });
+        Client client = ClientBuilder.newClient()
+                                     .register(MockServerResponse.class)
+                                     .property(AbstractClient.EXECUTOR_SERVICE_PROPERTY, es);
+
+        CompletionStage<String> cs = client.target("http://localhost:9999/dummyApp").request().rx().get(String.class);
+        cs.thenAcceptAsync(o -> {
+            threadInfo.add(Thread.currentThread().getName());
+            latch.countDown();
+        });
+        latch.await();
+        assertEquals("SUCCESS", cs.toCompletableFuture().get());
+        assertEquals(1, threadInfo.size());
+        assertEquals("CXF-Thread", threadInfo.get(0));
     }
 }
