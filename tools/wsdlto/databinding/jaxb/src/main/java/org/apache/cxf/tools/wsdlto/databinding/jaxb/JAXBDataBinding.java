@@ -437,24 +437,10 @@ public class JAXBDataBinding implements DataBindingProfile {
                 throw new ToolException(e);
             }
         }
+
         addSchemas(opts, schemaCompiler, schemas);
         addBindingFiles(opts, jaxbBindings, schemas);
-
-
-        for (String ns : context.getNamespacePackageMap().keySet()) {
-            File file = JAXBUtils.getPackageMappingSchemaBindingFile(ns, context.mapPackageName(ns));
-            try {
-                InputSource ins = new InputSource(file.toURI().toString());
-                schemaCompiler.parseSchema(ins);
-            } finally {
-                FileUtils.delete(file);
-            }
-        }
-
-        if (context.getPackageName() != null) {
-            schemaCompiler.setDefaultPackageName(context.getPackageName());
-        }
-
+        parseSchemas(schemaCompiler);
 
         rawJaxbModelGenCode = schemaCompiler.bind();
 
@@ -478,6 +464,22 @@ public class JAXBDataBinding implements DataBindingProfile {
         }
 
         initialized = true;
+    }
+
+    private void parseSchemas(SchemaCompiler schemaCompiler) {
+        for (String ns : context.getNamespacePackageMap().keySet()) {
+            File file = JAXBUtils.getPackageMappingSchemaBindingFile(ns, context.mapPackageName(ns));
+            try {
+                InputSource ins = new InputSource(file.toURI().toString());
+                schemaCompiler.parseSchema(ins);
+            } finally {
+                FileUtils.delete(file);
+            }
+        }
+
+        if (context.getPackageName() != null) {
+            schemaCompiler.setDefaultPackageName(context.getPackageName());
+        }
     }
 
     private boolean isJAXB22() {

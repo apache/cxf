@@ -170,6 +170,8 @@ public class WsdlOption extends Option implements org.apache.cxf.maven_plugin.Ge
         }
         addIfTrue(list, isMarkGenerated() != null && isMarkGenerated(),
             "-" + ToolConstants.CFG_MARK_GENERATED);
+        addIfTrue(list, isSuppressGeneratedDate() != null && isSuppressGeneratedDate(),
+            "-" + ToolConstants.CFG_SUPPRESS_GENERATED_DATE);
         addIfNotNull(list, getDefaultExcludesNamespace(), "-dex");
         addIfNotNull(list, getDefaultNamespacePackageMapping(), "-dns");
         addIfNotNull(list, getServiceName(), "-sn");
