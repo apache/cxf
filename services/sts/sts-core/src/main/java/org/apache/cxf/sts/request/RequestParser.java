@@ -148,7 +148,8 @@ public class RequestParser {
                     parseSecondaryParameters(element, claimsParsers, tokenRequirements, keyRequirements);
                 } else if ("AppliesTo".equals(element.getLocalName())
                     && (STSConstants.WSP_NS.equals(element.getNamespaceURI())
-                        || STSConstants.WSP_NS_04.equals(element.getNamespaceURI()))) {
+                        || STSConstants.WSP_NS_04.equals(element.getNamespaceURI())
+                        || STSConstants.WSP_NS_06.equals(element.getNamespaceURI()))) {
                     tokenRequirements.setAppliesTo(element);
                     LOG.fine("Found AppliesTo element");
                 } else if (allowCustomContent) {

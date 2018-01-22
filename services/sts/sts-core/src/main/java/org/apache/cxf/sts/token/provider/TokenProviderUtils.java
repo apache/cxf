@@ -74,7 +74,8 @@ public final class TokenProviderUtils {
                     LOG.fine("Found address element");
                     return address.getTextContent();
                 }
-            } else if ((STSConstants.WSP_NS.equals(namespace) || STSConstants.WSP_NS_04.equals(namespace))
+            } else if ((STSConstants.WSP_NS.equals(namespace) || STSConstants.WSP_NS_04.equals(namespace)
+                || STSConstants.WSP_NS_06.equals(namespace))
                 && "URI".equals(localName)) {
                 return ((Element)participants).getTextContent();
             }
