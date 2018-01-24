@@ -203,8 +203,8 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
         URL busFile = SymmetricBindingTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
