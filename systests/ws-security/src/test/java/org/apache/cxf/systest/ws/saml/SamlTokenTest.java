@@ -568,6 +568,44 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     }
 
     @org.junit.Test
+    public void testAsymmetricSamlInitiatorProtectTokens() throws Exception {
+
+        // We don't support ProtectTokens + streaming clients
+        if (test.isStreaming()) {
+            return;
+        }
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSamlInitiatorProtectTokensPort");
+        DoubleItPortType saml2Port =
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(saml2Port, test.getPort());
+
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(saml2Port);
+        }
+
+        SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true, true);
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
+        ((BindingProvider)saml2Port).getRequestContext().put(
+            SecurityConstants.SAML_CALLBACK_HANDLER, callbackHandler
+        );
+        int result = saml2Port.doubleIt(25);
+        assertTrue(result == 50);
+
+        ((java.io.Closeable)saml2Port).close();
+        bus.shutdown(true);
+    }
+
+    @org.junit.Test
     public void testSaml2OverSymmetricSignedElements() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -1205,4 +1243,5 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)saml2Port).close();
         bus.shutdown(true);
     }
+
 }

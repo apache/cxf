@@ -720,17 +720,22 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
         } else {
             WSSecSignature sig = getSignatureBuilder(sigToken, attached, false);
 
-            // This action must occur before sig.prependBSTElementToHeader
             if (abinding.isProtectTokens()) {
                 assertPolicy(
                     new QName(abinding.getName().getNamespaceURI(), SPConstants.PROTECT_TOKENS));
-                if (sig.getBSTTokenId() != null) {
+                if (sig.getCustomTokenId() != null
+                    && (sigToken instanceof SamlToken || sigToken instanceof IssuedToken)) {
+                    WSEncryptionPart samlPart =
+                        new WSEncryptionPart(sig.getCustomTokenId());
+                    sigParts.add(samlPart);
+                } else if (sig.getBSTTokenId() != null) {
+                    // This action must occur before sig.prependBSTElementToHeader
                     WSEncryptionPart bstPart =
                         new WSEncryptionPart(sig.getBSTTokenId());
                     bstPart.setElement(sig.getBinarySecurityTokenElement());
                     sigParts.add(bstPart);
+                    sig.prependBSTElementToHeader();
                 }
-                sig.prependBSTElementToHeader();
             }
 
             List<Reference> referenceList = sig.addReferencesToSign(sigParts);

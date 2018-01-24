@@ -194,6 +194,40 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
     }
 
     @org.junit.Test
+    public void testUsernameTokenSAML2ProtectTokens() throws Exception {
+
+        if (test.isStreaming()) {
+            // We don't support ProtectTokens + the streaming clients.
+            return;
+        }
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SymmetricBindingTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSAML2ProtectTokensPort");
+        DoubleItPortType symmetricSaml2Port =
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(symmetricSaml2Port, test.getPort());
+
+        TokenTestUtils.updateSTSPort((BindingProvider)symmetricSaml2Port, test.getStsPort());
+
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(symmetricSaml2Port);
+        }
+
+        doubleIt(symmetricSaml2Port, 30);
+        TokenTestUtils.verifyToken(symmetricSaml2Port);
+
+        ((java.io.Closeable)symmetricSaml2Port).close();
+        bus.shutdown(true);
+    }
+
+    @org.junit.Test
     public void testUsernameTokenSAML1Encrypted() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = SymmetricBindingTest.class.getResource("cxf-client.xml");

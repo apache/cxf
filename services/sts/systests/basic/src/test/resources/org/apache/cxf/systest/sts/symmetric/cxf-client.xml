@@ -48,6 +48,11 @@
             <entry key="security.sts.client" value-ref="stsClient"/>
         </jaxws:properties>
     </jaxws:client>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetricSAML2ProtectTokensPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="security.sts.client" value-ref="stsClient"/>
+        </jaxws:properties>
+    </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetricSAML1EncryptedPort" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.sts.client">
