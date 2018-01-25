@@ -298,12 +298,9 @@ public final class JAXRSUtils {
     public static Map<ClassResourceInfo, MultivaluedMap<String, String>> selectResourceClass(
         List<ClassResourceInfo> resources, String path, Message message) {
 
-        boolean isFineLevelLoggable = LOG.isLoggable(Level.FINE);
-        if (isFineLevelLoggable) {
-            LOG.fine(new org.apache.cxf.common.i18n.Message("START_CRI_MATCH",
+        LOG.fine(() -> new org.apache.cxf.common.i18n.Message("START_CRI_MATCH",
                                                         BUNDLE,
                                                         path).toString());
-        }
         if (resources.size() == 1) {
             MultivaluedMap<String, String> values = new MetadataMap<String, String>();
             return resources.get(0).getURITemplate().match(path, values)
@@ -318,15 +315,13 @@ public final class JAXRSUtils {
             MultivaluedMap<String, String> map = new MetadataMap<String, String>();
             if (cri.getURITemplate().match(path, map)) {
                 candidateList.put(cri, map);
-                if (isFineLevelLoggable) {
-                    LOG.fine(new org.apache.cxf.common.i18n.Message("CRI_SELECTED_POSSIBLY",
+                LOG.fine(() -> new org.apache.cxf.common.i18n.Message("CRI_SELECTED_POSSIBLY",
                                                                 BUNDLE,
                                                                 cri.getServiceClass().getName(),
                                                                 path,
                                                                 cri.getURITemplate().getValue()).toString());
-                }
-            } else if (isFineLevelLoggable) {
-                LOG.fine(new org.apache.cxf.common.i18n.Message("CRI_NO_MATCH",
+            } else {
+                LOG.fine(() -> new org.apache.cxf.common.i18n.Message("CRI_NO_MATCH",
                                                                 BUNDLE,
                                                                 path,
                                                                 cri.getServiceClass().getName()).toString());
@@ -348,12 +343,10 @@ public final class JAXRSUtils {
                 } else {
                     break;
                 }
-                if (isFineLevelLoggable) {
-                    LOG.fine(new org.apache.cxf.common.i18n.Message("CRI_SELECTED",
+                LOG.fine(() -> new org.apache.cxf.common.i18n.Message("CRI_SELECTED",
                                                              BUNDLE,
                                                              cri.getServiceClass().getName(),
                                                              path, cri.getURITemplate().getValue()).toString());
-                }
             }
             return cris;
         }
@@ -546,7 +539,7 @@ public final class JAXRSUtils {
                                                            final boolean checkDistance) {
         List<MediaType> all = intersectMimeTypes(acceptTypes, producesTypes, true, checkDistance);
         if (all.size() > 1) {
-            Collections.sort(all, new Comparator<MediaType>() {
+            all.sort(new Comparator<MediaType>() {
 
                 public int compare(MediaType mt1, MediaType mt2) {
                     int result = compareMediaTypes(mt1, mt2, null);
