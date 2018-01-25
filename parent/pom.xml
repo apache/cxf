@@ -132,7 +132,7 @@
         <cxf.littleproxy.version>1.1.2</cxf.littleproxy.version>
         <cxf.maven.core.version>3.0.5</cxf.maven.core.version>
         <cxf.msv.version>2013.6.1</cxf.msv.version>
-        <cxf.neethi.version>3.1.0</cxf.neethi.version>
+        <cxf.neethi.version>3.1.1</cxf.neethi.version>
         <cxf.netty.version>4.0.43.Final</cxf.netty.version>
         <cxf.netty3.version>3.9.2.Final</cxf.netty3.version>
         <cxf.netty.version.range>[4,5)</cxf.netty.version.range>
@@ -170,7 +170,7 @@
         <cxf.xbean.version>3.5</cxf.xbean.version>
         <cxf.xerces.version>2.11.0</cxf.xerces.version>
         <cxf.xmlbeans.version>2.6.0</cxf.xmlbeans.version>
-        <cxf.xmlschema.version>2.2.3-SNAPSHOT</cxf.xmlschema.version>
+        <cxf.xmlschema.version>2.2.3</cxf.xmlschema.version>
         <cxf.xpp3.bundle.version>1.1.4c_6</cxf.xpp3.bundle.version>
         <cxf.validation.api.version>1.1.0.Final</cxf.validation.api.version>
         <!-- the Export-Package is the same as the Maven artifact
