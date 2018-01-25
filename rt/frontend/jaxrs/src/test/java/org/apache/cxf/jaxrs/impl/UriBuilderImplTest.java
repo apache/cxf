@@ -1606,6 +1606,37 @@ public class UriBuilderImplTest extends Assert {
         assertEquals(uri.toString(), "/sub");
     }
 
+    @Test
+    public void testURItoStringMatchesOriginalURI() {
+        String[] uriStrings = new String[]{"mailto:bob@apache.org",
+                                           "news:comp.lang.java",
+                                           "urn:isbn:096139210x",
+                                           "docs/guide/collections/designfaq.html#28",
+                                           "../../../demo/jfc/SwingSet2/src/SwingSet2.java",
+                                           "file:///~/calendar",
+                                           "bob@somehost.com",
+                                           "http://localhost/somePath",
+                                           "http://localhost:1234/someOtherPath",
+                                           "http://127.0.0.1",
+                                           "http://127.0.0.1/",
+                                           "http://127.0.0.1/index.html",
+                                           "myscheme://a.host:7575/",
+                                           "myscheme://not.really.a.host:fakePort/"
+        };
+        for (String uriString :uriStrings) {
+            URI uri = UriBuilder.fromUri(uriString).build();
+            assertEquals(uriString, uri.toString());
+        }
+    }
+
+    @Test
+    public void testURIWithNonIntegerPort() {
+        String url = "myscheme://not.really.a.host:port/";
+        UriBuilder builder = UriBuilder.fromUri(url);
+        URI uri = builder.build();
+        assertEquals(url, uri.toString());
+    }
+
     @Path(value = "/TestPath")
     public static class TestPath {
 
