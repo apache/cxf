@@ -715,8 +715,10 @@ public class MAPCodec extends AbstractSoapInterceptor {
                                  Class<T> clz,
                                  JAXBContext ctx,
                                  boolean mustUnderstand) throws JAXBException {
+        JAXBDataBinding jaxbDataBinding = new JAXBDataBinding(ctx);
+        jaxbDataBinding.setEscapeHandler(null);
         SoapHeader h = new SoapHeader(qname, new JAXBElement<T>(qname, clz, value),
-                                      new JAXBDataBinding(ctx));
+                                      jaxbDataBinding);
         h.setMustUnderstand(mustUnderstand);
         message.getHeaders().add(h);
     }
