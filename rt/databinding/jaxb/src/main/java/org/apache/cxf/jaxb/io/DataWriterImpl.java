@@ -135,11 +135,10 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
             marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.FALSE);
             marshaller.setListener(databinding.getMarshallerListener());
-            if (noEscape) {
+            if (noEscape || databinding.getEscapeHandler() == null) {
                 JAXBUtils.setNoEscapeHandler(marshaller);
             } else {
                 JAXBUtils.setEscapeHandler(marshaller, databinding.getEscapeHandler());
-
             }
 
             if (setEventHandler) {
