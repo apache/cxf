@@ -143,9 +143,17 @@ public final class SwaggerToOpenApiConversionUtils {
         if (s2Defs != null) {
             comps.setProperty("schemas", s2Defs);
         }
-        Object s2SecurityDefs = sw2.getProperty("securityDefinitions");
+        JsonMapObject s2SecurityDefs = sw2.getJsonMapProperty("securityDefinitions");
         if (s2SecurityDefs != null) {
             comps.setProperty("securitySchemes", s2SecurityDefs);
+
+            for (String property : s2SecurityDefs.asMap().keySet()) {
+                JsonMapObject securityScheme = s2SecurityDefs.getJsonMapProperty(property);
+                if ("basic".equals(securityScheme.getStringProperty("type"))) {
+                    securityScheme.setProperty("type", "http");
+                    securityScheme.setProperty("scheme", "basic");
+                }
+            }
         }
         
         sw3.setProperty("components", comps);
