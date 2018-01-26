@@ -59,6 +59,7 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
 
     ValidationEventHandler veventHandler;
     boolean setEventHandler = true;
+    boolean noEscape;
     private JAXBDataBinding databinding;
 
     public DataWriterImpl(JAXBDataBinding binding) {
@@ -79,6 +80,10 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
             }
             setEventHandler = MessageUtils.getContextualBoolean(m,
                     JAXBDataBinding.SET_VALIDATION_EVENT_HANDLER, true);
+            Object contentType = m.get(org.apache.cxf.message.Message.CONTENT_TYPE);
+            if (contentType != null && contentType.toString().contains("fastinfoset")) {
+                noEscape = true;
+            }
         }
     }
 
@@ -130,7 +135,12 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
             marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.FALSE);
             marshaller.setListener(databinding.getMarshallerListener());
-            JAXBUtils.setMinimumEscapeHandler(marshaller, databinding.getEscapeHandler());
+            if (noEscape) {
+                JAXBUtils.setNoEscapeHandler(marshaller);
+            } else {
+                JAXBUtils.setEscapeHandler(marshaller, databinding.getEscapeHandler());
+
+            }
 
             if (setEventHandler) {
                 ValidationEventHandler h = veventHandler;
