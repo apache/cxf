@@ -46,6 +46,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
@@ -124,7 +125,8 @@ public final class JAXBUtils {
     private static final Map<String, String> BUILTIN_DATATYPES_MAP;
     private static final Map<String, Class<?>> HOLDER_TYPES_MAP;
     private static ClassLoader jaxbXjcLoader;
-    private static volatile Object jaxbEscapeHandler;
+    private static volatile Optional<Object> jaxbMinimumEscapeHandler;
+    private static volatile Optional<Object> jaxbNoEscapeHandler;
     
     static {
         BUILTIN_DATATYPES_MAP = new HashMap<>();
@@ -1543,32 +1545,55 @@ public final class JAXBUtils {
         }
         return null;
     }
+
     public static void setMinimumEscapeHandler(Marshaller marshaller) {
-        if (jaxbEscapeHandler == null) {
-            jaxbEscapeHandler = createEscapeHandler(marshaller.getClass());
+        if (jaxbMinimumEscapeHandler == null) {
+            jaxbMinimumEscapeHandler = Optional.ofNullable(createMininumEscapeHandler(marshaller.getClass()));
         }
-        setMinimumEscapeHandler(marshaller, jaxbEscapeHandler);
+        //if escape handler class is not loaded
+        if (jaxbMinimumEscapeHandler.isPresent()) {
+            setEscapeHandler(marshaller, jaxbMinimumEscapeHandler.get());
+        }
+
     }
-    public static void setMinimumEscapeHandler(Marshaller marshaller, Object escapeHandler) {
+
+    public static void setNoEscapeHandler(Marshaller marshaller) {
+        if (jaxbNoEscapeHandler == null) {
+            jaxbNoEscapeHandler = Optional.ofNullable(createNoEscapeHandler(marshaller.getClass()));
+        }
+        //if escape handler class is not loaded
+        if (jaxbNoEscapeHandler.isPresent()) {
+            setEscapeHandler(marshaller, jaxbNoEscapeHandler.get());
+        }
+    }
+    
+    public static void setEscapeHandler(Marshaller marshaller, Object escapeHandler) {
         try {
             String postFix = getPostfix(marshaller.getClass());
             marshaller.setProperty("com.sun.xml" + postFix + ".bind.characterEscapeHandler", escapeHandler);
         } catch (PropertyException e) {
-            e.printStackTrace();
             LOG.log(Level.INFO, "Failed to set MinumEscapeHandler to jaxb marshaller", e);
         }
     }
     
-    public static Object createEscapeHandler(Class<?> cls) {
+    public static Object createMininumEscapeHandler(Class<?> cls) {
+        return createEscapeHandler(cls, "MinimumEscapeHandler");
+    }
+    
+    public static Object createNoEscapeHandler(Class<?> cls) {
+        return createEscapeHandler(cls, "NoEscapeHandler");
+    }
+    
+    private static Object createEscapeHandler(Class<?> cls, String simpleClassName) {
         try {
             String postFix = getPostfix(cls);
             if (postFix == null) {
-                LOG.log(Level.WARNING, "Failed to create MinumEscapeHandler for unknown jaxb class:"
+                LOG.log(Level.WARNING, "Failed to create" + simpleClassName + " for unknown jaxb class:"
                     + cls);
                 return null;
             }
             Class<?> handlerClass = ClassLoaderUtils.loadClass("com.sun.xml" + postFix
-                                                                   + ".bind.marshaller.MinimumEscapeHandler",
+                                                                   + ".bind.marshaller." + simpleClassName,
                                                                cls);
             Class<?> handlerInterface = ClassLoaderUtils
                 .loadClass("com.sun.xml" + postFix + ".bind.marshaller.CharacterEscapeHandler",
@@ -1578,8 +1603,7 @@ public final class JAXBUtils {
                                         new Class[] {handlerInterface},
                                         new EscapeHandlerInvocationHandler(targetHandler));
         } catch (Exception e) {
-            e.printStackTrace();
-            LOG.log(Level.INFO, "Failed to create MinumEscapeHandler", e);
+            LOG.log(Level.INFO, "Failed to create " + simpleClassName);
         }
         return null;
     }
