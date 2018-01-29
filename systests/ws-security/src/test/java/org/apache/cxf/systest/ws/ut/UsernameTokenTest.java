@@ -19,21 +19,27 @@
 
 package org.apache.cxf.systest.ws.ut;
 
+import java.io.InputStream;
 import java.net.URL;
+import java.security.KeyStore;
 import java.util.Arrays;
 import java.util.Collection;
 
+import javax.net.ssl.TrustManagerFactory;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.example.contract.doubleit.DoubleItPortType;
@@ -89,6 +95,48 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
         stopAllServers();
+    }
+
+    @org.junit.Test
+    public void testPlaintextTLSConfigViaCode() throws Exception {
+
+        URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
+        // URL wsdl = new URL("https://localhost:" + PORT + "/DoubleItUTPlaintext?wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItPlaintextPort");
+        DoubleItPortType utPort =
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(utPort, test.getPort());
+
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(utPort);
+        }
+
+        ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "Alice");
+
+        ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.CALLBACK_HANDLER,
+                                                          "org.apache.cxf.systest.ws.common.UTPasswordCallback");
+
+        TrustManagerFactory tmf =
+            TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        final KeyStore ts = KeyStore.getInstance("JKS");
+        try (InputStream trustStore =
+            ClassLoaderUtils.getResourceAsStream("keys/Truststore.jks", UsernameTokenTest.class)) {
+            ts.load(trustStore, "password".toCharArray());
+        }
+        tmf.init(ts);
+
+        TLSClientParameters tlsParams = new TLSClientParameters();
+        tlsParams.setTrustManagers(tmf.getTrustManagers());
+        tlsParams.setDisableCNCheck(true);
+
+        Client client = ClientProxy.getClient(utPort);
+        HTTPConduit http = (HTTPConduit) client.getConduit();
+        http.setTlsClientParameters(tlsParams);
+
+        utPort.doubleIt(25);
+
+        ((java.io.Closeable)utPort).close();
     }
 
     @org.junit.Test
@@ -482,4 +530,5 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
+
 }
