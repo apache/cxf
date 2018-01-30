@@ -18,17 +18,19 @@
   ~  under the License.
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <artifactId>cxf-parent</artifactId>
+        <groupId>org.apache.cxf</groupId>
+        <version>3.2.2-SNAPSHOT</version>
+        <relativePath>../../parent/pom.xml</relativePath>
+    </parent>
     <modelVersion>4.0.0</modelVersion>
+    <groupId>org.apache.cxf.systests</groupId>
     <artifactId>cxf-microprofile-tck</artifactId>
     <packaging>pom</packaging>
     <name>Apache CXF MicroProfile TCKs</name>
     <description>Apache CXF System Tests - MicroProfile TCKs</description>
     <url>http://cxf.apache.org</url>
-    <parent>
-        <groupId>org.apache.cxf.systests</groupId>
-        <artifactId>cxf-systests</artifactId>
-        <version>3.2.2-SNAPSHOT</version>
-    </parent>
     <properties>
         <cxf.geronimo.config.version>1.0</cxf.geronimo.config.version>
         <cxf.microprofile.rest.client.version>1.0</cxf.microprofile.rest.client.version>
