@@ -50,12 +50,12 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
     private Continuation cont;
     private Message inMessage;
     private TimeoutHandler timeoutHandler;
-    private volatile boolean initialSuspend;
-    private volatile boolean cancelled;
-    private volatile boolean done;
-    private volatile boolean resumedByApplication;
-    private volatile Long pendingTimeout;
-    
+    private boolean initialSuspend;
+    private boolean cancelled;
+    private boolean done;
+    private boolean resumedByApplication;
+    private Long pendingTimeout;
+
     private List<CompletionCallback> completionCallbacks = new LinkedList<CompletionCallback>();
     private List<ConnectionCallback> connectionCallbacks = new LinkedList<ConnectionCallback>();
     private Throwable unmappedThrowable;
@@ -88,7 +88,7 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
         }
         return doResumeFinal(response);
     }
-    private boolean doResumeFinal(Object response) {
+    private synchronized boolean doResumeFinal(Object response) {
         inMessage.getExchange().put(AsyncResponse.class, this);
         cont.setObject(response);
         resumedByApplication = true;
@@ -151,7 +151,7 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
     }
 
     @Override
-    public boolean setTimeout(long time, TimeUnit unit) throws IllegalStateException {
+    public synchronized boolean setTimeout(long time, TimeUnit unit) throws IllegalStateException {
         if (isCancelledOrNotSuspended()) {
             return false;
         }
