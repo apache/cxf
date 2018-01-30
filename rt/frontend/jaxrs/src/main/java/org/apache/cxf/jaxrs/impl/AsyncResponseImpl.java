@@ -50,11 +50,11 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
     private Continuation cont;
     private Message inMessage;
     private TimeoutHandler timeoutHandler;
-    private boolean initialSuspend;
-    private boolean cancelled;
-    private boolean done;
-    private boolean resumedByApplication;
-    private Long pendingTimeout;
+    private volatile boolean initialSuspend;
+    private volatile boolean cancelled;
+    private volatile boolean done;
+    private volatile boolean resumedByApplication;
+    private volatile Long pendingTimeout;
 
     private List<CompletionCallback> completionCallbacks = new LinkedList<CompletionCallback>();
     private List<ConnectionCallback> connectionCallbacks = new LinkedList<ConnectionCallback>();
