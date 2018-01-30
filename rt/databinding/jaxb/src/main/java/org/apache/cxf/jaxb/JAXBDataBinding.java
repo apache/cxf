@@ -243,18 +243,24 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
         this();
         setContext(context);
     }
-
+    
     public JAXBContext getContext() {
         return context;
     }
 
     public final void setContext(JAXBContext ctx) {
         context = ctx;
-        escapeHandler = JAXBUtils.createEscapeHandler(ctx.getClass());
+        //create default MininumEscapeHandler
+        escapeHandler = JAXBUtils.createMininumEscapeHandler(ctx.getClass());
     }
 
     public Object getEscapeHandler() {
         return escapeHandler;
+    }
+    
+    public void setEscapeHandler(Object handler) {
+        escapeHandler = handler;
+        
     }
     
     @SuppressWarnings("unchecked")

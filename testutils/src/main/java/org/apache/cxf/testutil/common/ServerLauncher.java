@@ -30,6 +30,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -287,17 +288,21 @@ public class ServerLauncher {
             try {
                 try {
                     os = Files.newOutputStream(Paths.get(outputDir + className + ".out"));
-                } catch (FileNotFoundException fex) {
-                    outputDir = System.getProperty("basedir");
-                    if (outputDir == null) {
-                        outputDir = "target/surefire-reports/";
-                    } else {
-                        outputDir += "/target/surefire-reports/";
-                    }
+                } catch (IOException ioe) {
+                    if (ioe instanceof FileNotFoundException || ioe instanceof NoSuchFileException) {
+                        outputDir = System.getProperty("basedir");
+                        if (outputDir == null) {
+                            outputDir = "target/surefire-reports/";
+                        } else {
+                            outputDir += "/target/surefire-reports/";
+                        }
 
-                    File file = new File(outputDir);
-                    file.mkdirs();
-                    os = Files.newOutputStream(Paths.get(outputDir + className + ".out"));
+                        File file = new File(outputDir);
+                        file.mkdirs();
+                        os = Files.newOutputStream(Paths.get(outputDir + className + ".out"));
+                    } else {
+                        throw ioe;
+                    }
                 }
             } catch (IOException ex) {
                 if (!ex.getMessage().contains("Stream closed")) {
