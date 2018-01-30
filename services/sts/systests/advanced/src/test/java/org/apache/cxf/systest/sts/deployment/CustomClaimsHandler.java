@@ -28,6 +28,12 @@ import org.apache.cxf.sts.claims.ClaimsHandler;
 import org.apache.cxf.sts.claims.ClaimsParameters;
 import org.apache.cxf.sts.claims.ProcessedClaim;
 import org.apache.cxf.sts.claims.ProcessedClaimCollection;
+import org.apache.wss4j.common.saml.OpenSAMLUtil;
+import org.opensaml.core.xml.XMLObjectBuilder;
+import org.opensaml.core.xml.XMLObjectBuilderFactory;
+import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
+import org.opensaml.core.xml.schema.XSInteger;
+import org.opensaml.saml.saml2.core.AttributeValue;
 
 /**
  * A custom ClaimsHandler implementation for use in the tests.
@@ -40,6 +46,8 @@ public class CustomClaimsHandler implements ClaimsHandler {
         URI.create("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname");
     public static final URI LANGUAGE =
         URI.create("http://schemas.mycompany.com/claims/language");
+    public static final URI NUMBER =
+        URI.create("http://schemas.mycompany.com/claims/number");
 
     public ProcessedClaimCollection retrieveClaimValues(
             ClaimCollection claims, ClaimsParameters parameters) {
@@ -55,8 +63,18 @@ public class CustomClaimsHandler implements ClaimsHandler {
                     claim.addValue("admin-user");
                 } else if (GIVEN_NAME.equals(requestClaim.getClaimType())) {
                     claim.addValue(parameters.getPrincipal().getName());
-                } else if (LANGUAGE.equals(requestClaim.getClaimType())) {
-                    claim.addValue(parameters.getPrincipal().getName());
+                } else if (NUMBER.equals(requestClaim.getClaimType())) {
+                    // Create and add a custom Attribute (Integer)
+                    OpenSAMLUtil.initSamlEngine();
+                    XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
+
+                    XMLObjectBuilder<XSInteger> xsIntegerBuilder =
+                        (XMLObjectBuilder<XSInteger>)builderFactory.getBuilder(XSInteger.TYPE_NAME);
+                    XSInteger attributeValue =
+                        xsIntegerBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSInteger.TYPE_NAME);
+                    attributeValue.setValue(5);
+
+                    claim.addValue(attributeValue);
                 }
                 claimCollection.add(claim);
             }
@@ -70,6 +88,7 @@ public class CustomClaimsHandler implements ClaimsHandler {
         list.add(ROLE);
         list.add(GIVEN_NAME);
         list.add(LANGUAGE);
+        list.add(NUMBER);
         return list;
     }
 

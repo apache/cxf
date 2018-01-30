@@ -39,6 +39,16 @@
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleittransportsaml2customclaims" implementor="org.apache.cxf.systest.sts.common.DoubleItPortTypeImpl" endpointName="s:DoubleItTransportSAML2CustomClaimsPort" serviceName="s:DoubleItService" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.claims.StaxServer}/doubleit/services/doubleittransportsaml2customclaims" wsdlLocation="org/apache/cxf/systest/sts/claims/DoubleIt.wsdl">
+        <jaxws:properties>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+            <entry key="security.signature.properties" value="serviceKeystore.properties"/>
+            <entry key="ws-security.saml2.validator">
+                <bean class="org.apache.cxf.systest.sts.claims.StaxClaimsValidator"/>
+            </entry>
+            <entry key="ws-security.enable.streaming" value="true"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleittransportsaml2claims" implementor="org.apache.cxf.systest.sts.common.DoubleItPortTypeImpl" endpointName="s:DoubleItTransportSAML2ClaimsPort" serviceName="s:DoubleItService" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.claims.StaxServer}/doubleit/services/doubleittransportsaml2claims" wsdlLocation="org/apache/cxf/systest/sts/claims/DoubleIt.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
