@@ -173,6 +173,36 @@ public class ClaimsTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
+    public void testSaml2CustomClaims() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = ClaimsTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = ClaimsTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2CustomClaimsPort");
+        DoubleItPortType transportClaimsPort =
+            service.getPort(portQName, DoubleItPortType.class);
+
+        updateAddressPort(transportClaimsPort, test.getPort());
+
+        TokenTestUtils.updateSTSPort((BindingProvider)transportClaimsPort, test.getStsPort());
+
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(transportClaimsPort);
+        }
+
+        doubleIt(transportClaimsPort, 25);
+
+        ((java.io.Closeable)transportClaimsPort).close();
+        bus.shutdown(true);
+    }
+
+    @org.junit.Test
     public void testSaml1WrongClaims() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();

@@ -49,6 +49,11 @@
             <entry key="security.sts.client" value-ref="stsClient"/>
         </jaxws:properties>
     </jaxws:client>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSAML2CustomClaimsPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="security.sts.client" value-ref="stsClient"/>
+        </jaxws:properties>
+    </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSAML2ClaimsPort" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
