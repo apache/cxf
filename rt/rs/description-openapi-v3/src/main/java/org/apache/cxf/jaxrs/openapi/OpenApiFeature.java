@@ -40,7 +40,6 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.model.ApplicationInfo;
-import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.swagger.SwaggerUiSupport;
 
@@ -127,7 +126,7 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
         }
 
         Properties swaggerProps = null;
-        GenericOpenApiContextBuilder<?> openApiConfiguration = null; 
+        GenericOpenApiContextBuilder<?> openApiConfiguration; 
         if (StringUtils.isEmpty(getConfigLocation())) {
             swaggerProps = getSwaggerProperties(propertiesLocation, bus);
             
@@ -327,6 +326,7 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
         this.swaggerUiMavenGroupAndArtifact = swaggerUiMavenGroupAndArtifact;
     }
 
+    @Override
     public Map<String, String> getSwaggerUiMediaTypes() {
         return swaggerUiMediaTypes;
     }
@@ -390,8 +390,15 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
         return properties;
     }
 
-    protected void registerOpenApiResources(JAXRSServiceFactoryBean sfb, Set<String> packages, 
-            OpenAPIConfiguration config) {
+    protected void registerOpenApiResources(
+            final JAXRSServiceFactoryBean sfb, 
+            final Set<String> packages, 
+            final OpenAPIConfiguration config) {
+
+        if (customizer != null) {
+            customizer.setClassResourceInfos(sfb.getClassResourceInfo());
+        }
+
         sfb.setResourceClassesFromBeans(Arrays.asList(
             createOpenApiResource()
                 .openApiConfiguration(config)
@@ -423,10 +430,9 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
             appInfo = factory.getApplicationProvider();
             
             if (appInfo == null) {
-                Set<Class<?>> serviceClasses = new HashSet<>();
-                for (ClassResourceInfo cri : sfb.getClassResourceInfo()) {
-                    serviceClasses.add(cri.getServiceClass());
-                }
+                Set<Class<?>> serviceClasses = sfb.getClassResourceInfo().stream().
+                        map(cri -> cri.getServiceClass()).
+                        collect(Collectors.toSet());
                 appInfo = new ApplicationInfo(new DefaultApplication(serviceClasses), bus);
                 server.getEndpoint().put(Application.class.getName(), appInfo);
             }
