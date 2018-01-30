@@ -40,17 +40,9 @@ public class OpenApiCustomizedResource extends OpenApiResource {
 
     private final OpenApiCustomizer customizer;
 
-//    private boolean customized;
-
     public OpenApiCustomizedResource(final OpenApiCustomizer customizer) {
         this.customizer = customizer;
     }
-
-//    private void setCustomized() {
-//        synchronized (customizer) {
-//            customized = true;
-//        }
-//    }
 
     @GET
     @Produces({ MediaType.APPLICATION_JSON, "application/yaml" })
@@ -58,7 +50,6 @@ public class OpenApiCustomizedResource extends OpenApiResource {
     public Response getOpenApi(@Context ServletConfig config, @Context HttpHeaders headers,
             @Context UriInfo uriInfo, @PathParam("type") String type) throws Exception {
 
-//        if (customizer != null && !customized) {
         if (customizer != null) {
             final OpenAPIConfiguration configuration = customizer.customize(getOpenApiConfiguration());
             setOpenApiConfiguration(configuration);
@@ -73,8 +64,6 @@ public class OpenApiCustomizedResource extends OpenApiResource {
                 ((GenericOpenApiContext<?>) ctx).getOpenApiReader().setConfiguration(configuration);
                 customizer.customize(ctx.read());
             }
-
-//            setCustomized();
         }
 
         return super.getOpenApi(headers, uriInfo, type);
