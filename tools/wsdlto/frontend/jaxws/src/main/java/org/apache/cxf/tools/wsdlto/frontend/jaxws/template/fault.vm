@@ -75,7 +75,7 @@ public class $expClass.Name extends $exceptionSuperclass {
 #if ($markGenerated == "true")
     @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
 #end
-    public ${expClass.Name}(String message, Throwable cause) {
+    public ${expClass.Name}(String message, java.lang.Throwable cause) {
         super(message, cause);
     }
 
@@ -90,7 +90,7 @@ public class $expClass.Name extends $exceptionSuperclass {
 #if ($markGenerated == "true")
     @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
 #end
-    public ${expClass.Name}(String message, $field.ClassName $paraName, Throwable cause) {
+    public ${expClass.Name}(String message, $field.ClassName $paraName, java.lang.Throwable cause) {
         super(message, cause);
         this.$paraName = $paraName;
     }
