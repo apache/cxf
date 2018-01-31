@@ -535,8 +535,7 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
     
         boolean hasComponents = false;
         if (securityDefinitions != null && !securityDefinitions.isEmpty()) {
-            securityDefinitions.entrySet().forEach(entry ->
-                components.addSecuritySchemes(entry.getKey(), entry.getValue()));
+            securityDefinitions.forEach((key, value) -> components.addSecuritySchemes(key, value));
             hasComponents |= true;
         }
         

@@ -90,10 +90,10 @@ public class OpenApiCustomizer {
             });
 
             List<Tag> tags = new ArrayList<>();
-            oas.getPaths().entrySet().forEach(entry -> {
+            oas.getPaths().forEach((pathKey, pathItem) -> {
                 Tag tag = null;
-                if (replaceTags && operations.containsKey(entry.getKey())) {
-                    ClassResourceInfo cri = operations.get(entry.getKey());
+                if (replaceTags && operations.containsKey(pathKey)) {
+                    ClassResourceInfo cri = operations.get(pathKey);
 
                     tag = new Tag();
                     tag.setName(cri.getURITemplate().getValue().replaceAll("/", "_"));
@@ -106,12 +106,12 @@ public class OpenApiCustomizer {
                     }
                 }
 
-                for (Map.Entry<HttpMethod, Operation> subentry : entry.getValue().readOperationsMap().entrySet()) {
+                for (Map.Entry<HttpMethod, Operation> subentry : pathItem.readOperationsMap().entrySet()) {
                     if (replaceTags && tag != null) {
                         subentry.getValue().setTags(Collections.singletonList(tag.getName()));
                     }
 
-                    Pair<String, String> key = Pair.of(subentry.getKey().name(), entry.getKey());
+                    Pair<String, String> key = Pair.of(subentry.getKey().name(), pathKey);
                     if (methods.containsKey(key) && javadocProvider != null) {
                         OperationResourceInfo ori = methods.get(key);
 
