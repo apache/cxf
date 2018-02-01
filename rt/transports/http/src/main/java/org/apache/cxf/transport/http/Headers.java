@@ -43,7 +43,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PropertyUtils;
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.message.Message;
@@ -587,13 +586,6 @@ public class Headers {
     }
 
     public static String toHttpLanguage(Locale locale) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(locale.getLanguage());
-        String country = locale.getCountry();
-        if (!StringUtils.isEmpty(country)) {
-            // Locale.toString() will add "_" instead, '-' is typically expected
-            sb.append('-').append(country);
-        }
-        return sb.toString();
+        return locale.toString().replace('_', '-');
     }
 }
