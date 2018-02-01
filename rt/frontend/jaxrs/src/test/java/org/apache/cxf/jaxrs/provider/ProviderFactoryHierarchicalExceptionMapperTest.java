@@ -25,7 +25,6 @@ import org.apache.cxf.message.MessageImpl;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -59,7 +58,6 @@ public class ProviderFactoryHierarchicalExceptionMapperTest {
                 IllegalStateExceptionMapper.class, exceptionMapper.getClass());
     }
 
-    @Ignore("To be fixed in CXF-7473")
     @Test
     public void testNoMatch() {
         ExceptionMapper<?> exceptionMapper = pf.createExceptionMapper(UnmappedRuntimeException.class,

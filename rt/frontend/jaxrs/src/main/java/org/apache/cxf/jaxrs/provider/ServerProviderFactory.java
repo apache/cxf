@@ -188,7 +188,7 @@ public final class ServerProviderFactory extends ProviderFactory {
             MessageUtils.getContextualBoolean(m, MAKE_DEFAULT_WAE_LEAST_SPECIFIC, false);
         
         return (ExceptionMapper<T>)exceptionMappers.stream()
-                .filter(em -> handleMapper(em, exceptionType, m, ExceptionMapper.class, true))
+                .filter(em -> handleMapper(em, exceptionType, m, ExceptionMapper.class, Throwable.class, true))
                 .sorted(new ExceptionProviderInfoComparator(exceptionType,
                                                             makeDefaultWaeLeastSpecific))
                 .map(ProviderInfo::getProvider)
