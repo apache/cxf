@@ -33,6 +33,8 @@ import javax.xml.bind.JAXBException;
 
 import org.w3c.dom.Element;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.jaxb.JAXBContextCache;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
@@ -77,7 +79,8 @@ public class JettyHTTPServerEngineFactoryHolder {
                 = getJaxbObject(element,
                 JettyHTTPServerEngineFactoryConfigType.class);
 
-            factory = new JettyHTTPServerEngineFactory();
+            Bus defaultBus = BusFactory.getDefaultBus();
+            factory = new JettyHTTPServerEngineFactory(defaultBus);
 
             Map<String, ThreadingParameters> threadingParametersMap
                 = new TreeMap<String, ThreadingParameters>();
@@ -114,7 +117,8 @@ public class JettyHTTPServerEngineFactoryHolder {
 
             List<JettyHTTPServerEngine> engineList = new ArrayList<>();
             for (JettyHTTPServerEngineConfigType engine : config.getEngine()) {
-                JettyHTTPServerEngine eng = new JettyHTTPServerEngine();
+                JettyHTTPServerEngine eng = new JettyHTTPServerEngine(
+                        factory.getMBeanContainer(), engine.getHost(), engine.getPort());
                 if (engine.getConnector() != null && connectorMap != null) {
                     // we need to setup the Connector from the connectorMap
                     Connector connector = connectorMap.get(engine.getPort().toString());
