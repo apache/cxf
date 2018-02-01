@@ -27,6 +27,7 @@ import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.openapi.OpenApiFeature;
 import org.apache.cxf.systest.jaxrs.description.group1.BookStore;
+import org.apache.cxf.systest.jaxrs.description.group1.BookStoreStylesheetsOpenApi;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
