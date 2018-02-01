@@ -183,7 +183,7 @@ public final class ServerProviderFactory extends ProviderFactory {
                                                                           Message m) {
         List<ProviderInfo<ExceptionMapper<?>>> candidates = new LinkedList<ProviderInfo<ExceptionMapper<?>>>();
         for (ProviderInfo<ExceptionMapper<?>> em : exceptionMappers) {
-            if (handleMapper(em, exceptionType, m, ExceptionMapper.class, true)) {
+            if (handleMapper(em, exceptionType, m, ExceptionMapper.class, Throwable.class, true)) {
                 candidates.add(em);
             }
         }

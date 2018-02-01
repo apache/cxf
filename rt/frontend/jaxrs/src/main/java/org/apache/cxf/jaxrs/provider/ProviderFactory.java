@@ -291,13 +291,22 @@ public abstract class ProviderFactory {
                                        Message m, 
                                        Class<?> providerClass,
                                        boolean injectContext) {
-        
+        return handleMapper(em, expectedType, m, providerClass, null, injectContext);
+    }
+    
+    protected <T> boolean handleMapper(ProviderInfo<T> em,
+                                       Class<?> expectedType,
+                                       Message m,
+                                       Class<?> providerClass,
+                                       Class<?> commonBaseClass,
+                                       boolean injectContext) {
+
         Class<?> mapperClass = ClassHelper.getRealClass(bus, em.getProvider());
         Type[] types = null;
         if (m != null && MessageUtils.isTrue(m.getContextualProperty(IGNORE_TYPE_VARIABLES))) {
             types = new Type[]{mapperClass};
         } else {
-            types = getGenericInterfaces(mapperClass, expectedType);
+            types = getGenericInterfaces(mapperClass, expectedType, commonBaseClass);
         }
         for (Type t : types) {
             if (t instanceof ParameterizedType) {
@@ -1045,6 +1054,10 @@ public abstract class ProviderFactory {
     }
     
     private static Type[] getGenericInterfaces(Class<?> cls, Class<?> expectedClass) {
+        return getGenericInterfaces(cls, expectedClass, Object.class);
+    }
+    private static Type[] getGenericInterfaces(Class<?> cls, Class<?> expectedClass,
+                                               Class<?> commonBaseCls) {
         if (Object.class == cls) {
             return new Type[]{};
         }
@@ -1054,8 +1067,11 @@ public abstract class ProviderFactory {
                 Class<?> actualType = InjectionUtils.getActualType(genericSuperType);
                 if (actualType != null && actualType.isAssignableFrom(expectedClass)) {
                     return new Type[]{genericSuperType};
-                } else if (expectedClass.isAssignableFrom(actualType)) {
-                    return new Type[]{};    
+                } else if (commonBaseCls != null && commonBaseCls != Object.class 
+                           && commonBaseCls.isAssignableFrom(expectedClass)
+                           && commonBaseCls.isAssignableFrom(actualType)
+                           || expectedClass.isAssignableFrom(actualType)) {
+                    return new Type[]{};
                 }
             }
         }
@@ -1063,7 +1079,7 @@ public abstract class ProviderFactory {
         if (types.length > 0) {
             return types;
         }
-        return getGenericInterfaces(cls.getSuperclass(), expectedClass);
+        return getGenericInterfaces(cls.getSuperclass(), expectedClass, commonBaseCls);
     }
     
     protected static class AbstractPriorityComparator {
