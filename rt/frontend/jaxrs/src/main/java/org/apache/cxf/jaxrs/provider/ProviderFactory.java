@@ -1235,11 +1235,11 @@ public abstract class ProviderFactory {
     }
     
     protected static Set<String> getFilterNameBindings(ProviderInfo<?> p) {
-        Set<String> names = null;
         if (p instanceof FilterProviderInfo) {
-            names = ((FilterProviderInfo<?>)p).getNameBindings();
-        } 
-        return names == null ? getFilterNameBindings(p.getBus(), p.getProvider()) : names;
+            return ((FilterProviderInfo<?>)p).getNameBindings();
+        } else {
+            return getFilterNameBindings(p.getBus(), p.getProvider());
+        }
         
     }
     protected static Set<String> getFilterNameBindings(Bus bus, Object provider) {
