@@ -121,6 +121,42 @@ public class ProviderFactoryTest extends Assert {
     }
     
     @Test
+    public void testRegisterMbrMbwProviderAsMbrOnly() {
+        ServerProviderFactory pf = ServerProviderFactory.getInstance();
+        JAXBElementProvider<Book> customProvider = new JAXBElementProvider<Book>();
+        pf.registerUserProvider((Feature) context -> {
+            context.register(customProvider, MessageBodyReader.class);
+            return true;
+        });
+        MessageBodyReader<Book> reader = pf.createMessageBodyReader(Book.class, null, null,
+                                                                    MediaType.TEXT_XML_TYPE, new MessageImpl());
+        assertSame(reader, customProvider);
+
+        MessageBodyWriter<Book> writer = pf.createMessageBodyWriter(Book.class, null, null,
+                                                                    MediaType.TEXT_XML_TYPE, new MessageImpl());
+        assertTrue(writer instanceof JAXBElementProvider);
+        assertNotSame(writer, customProvider);
+    }
+    
+    @Test
+    public void testRegisterMbrMbwProviderAsMbwOnly() {
+        ServerProviderFactory pf = ServerProviderFactory.getInstance();
+        JAXBElementProvider<Book> customProvider = new JAXBElementProvider<Book>();
+        pf.registerUserProvider((Feature) context -> {
+            context.register(customProvider, MessageBodyWriter.class);
+            return true;
+        });
+        MessageBodyWriter<Book> writer = pf.createMessageBodyWriter(Book.class, null, null,
+                                                                    MediaType.TEXT_XML_TYPE, new MessageImpl());
+        assertSame(writer, customProvider);
+
+        MessageBodyReader<Book> reader = pf.createMessageBodyReader(Book.class, null, null,
+                                                                    MediaType.TEXT_XML_TYPE, new MessageImpl());
+        assertTrue(reader instanceof JAXBElementProvider);
+        assertNotSame(reader, customProvider);
+    }
+    
+    @Test
     public void testOrderOfProvidersWithSameProperties() {
         ProviderFactory pf = ServerProviderFactory.getInstance();
         WildcardReader reader1 = new WildcardReader();
