@@ -578,8 +578,8 @@ public abstract class ProviderFactory {
             if (filterContractSupported(provider, providerCls, MessageBodyWriter.class)) {
                 addProviderToList(messageWriters, provider);
             }
-            
-            if (ContextResolver.class.isAssignableFrom(providerCls)) {
+
+            if (filterContractSupported(provider, providerCls, ContextResolver.class)) {
                 addProviderToList(contextResolvers, provider);
             }
             
@@ -594,8 +594,8 @@ public abstract class ProviderFactory {
             if (filterContractSupported(provider, providerCls, WriterInterceptor.class)) {
                 writeInts.add((ProviderInfo<WriterInterceptor>)provider);
             }
-            
-            if (ParamConverterProvider.class.isAssignableFrom(providerCls)) {
+
+            if (filterContractSupported(provider, providerCls, ParamConverterProvider.class)) {
                 paramConverters.add((ProviderInfo<ParamConverterProvider>)provider);
             }
         }

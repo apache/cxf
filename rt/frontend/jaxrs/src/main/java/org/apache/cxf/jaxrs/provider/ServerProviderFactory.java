@@ -258,10 +258,9 @@ public final class ServerProviderFactory extends ProviderFactory {
                 Object feature = provider.getProvider();
                 dynamicFeatures.add((DynamicFeature)feature);
             }
-            
-            
-            if (ExceptionMapper.class.isAssignableFrom(providerCls)) {
-                addProviderToList(exceptionMappers, provider); 
+
+            if (filterContractSupported(provider, providerCls, ExceptionMapper.class)) {    
+                addProviderToList(exceptionMappers, provider);
             }
             
         }
