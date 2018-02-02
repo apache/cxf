@@ -28,7 +28,7 @@ import org.apache.cxf.jaxrs.provider.ProviderFactory;
 
 public class FilterProviderInfo<T> extends ProviderInfo<T> {
 
-    private Set<String> nameBinding;
+    private Set<String> nameBindings;
     private Map<Class<?>, Integer> supportedContracts;
     private boolean dynamic;
 
@@ -37,25 +37,26 @@ public class FilterProviderInfo<T> extends ProviderInfo<T> {
                               T provider,
                               Bus bus,
                               Map<Class<?>, Integer> supportedContracts) {
-        this(resourceClass, serviceClass, provider, bus, ProviderFactory.DEFAULT_FILTER_NAME_BINDING, 
-            false, supportedContracts);
+        this(resourceClass, serviceClass, provider, bus,
+             null, false, supportedContracts);
     }
 
     public FilterProviderInfo(Class<?> resourceClass, 
                               Class<?> serviceClass,
                               T provider,
                               Bus bus,
-                              String nameBinding,
+                              Set<String> nameBindings,
                               boolean dynamic,
                               Map<Class<?>, Integer> supportedContracts) {
         super(resourceClass, serviceClass, provider, bus, true);
-        this.nameBinding = nameBinding == null ? null : Collections.singleton(nameBinding);
+        this.nameBindings = nameBindings == null 
+            ? Collections.singleton(ProviderFactory.DEFAULT_FILTER_NAME_BINDING) : nameBindings;
         this.supportedContracts = supportedContracts;
         this.dynamic = dynamic;
     }
 
-    public Set<String> getNameBinding() {
-        return nameBinding;
+    public Set<String> getNameBindings() {
+        return nameBindings;
     }
 
     public int getPriority(Class<?> contract) {
