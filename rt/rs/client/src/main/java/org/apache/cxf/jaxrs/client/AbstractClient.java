@@ -352,6 +352,10 @@ public abstract class AbstractClient implements Client {
         closed = null;
     }
 
+    public void removeAllHeaders() {
+        state.getRequestHeaders().clear();
+    }
+
     private void possiblyAddHeader(String name, String value) {
         if (!isDuplicate(name, value)) {
             state.getRequestHeaders().add(name, value);

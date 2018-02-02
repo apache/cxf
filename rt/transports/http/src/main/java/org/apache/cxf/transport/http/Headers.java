@@ -586,12 +586,6 @@ public class Headers {
     }
 
     public static String toHttpLanguage(Locale locale) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(locale.getLanguage());
-        if (locale.getCountry() != null) {
-            // Locale.toString() will add "_" instead, '-' is typically expected
-            sb.append('-').append(locale.getCountry());
-        }
-        return sb.toString();
+        return locale.toString().replace('_', '-');
     }
 }

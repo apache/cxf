@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -206,5 +207,20 @@ public class HeadersTest extends Assert {
                      headers.determineContentType());
 
         control.verify();
+    }
+    
+    @Test
+    public void httpLanguage() {
+        Locale locale = new Locale("en", "US");
+        assertEquals("en-US", Headers.toHttpLanguage(locale));
+
+        locale = new Locale("de");
+        assertEquals("de", Headers.toHttpLanguage(locale));
+
+        locale = new Locale("aa", "ZZ");
+        assertEquals("aa-ZZ", Headers.toHttpLanguage(locale));
+
+        locale = new Locale("es", "");
+        assertEquals("es", Headers.toHttpLanguage(locale));
     }
 }
