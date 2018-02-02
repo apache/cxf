@@ -570,12 +570,12 @@ public abstract class ProviderFactory {
             new LinkedList<ProviderInfo<WriterInterceptor>>();
         for (ProviderInfo<? extends Object> provider : theProviders) {
             Class<?> providerCls = ClassHelper.getRealClass(bus, provider.getProvider());
-            
-            if (MessageBodyReader.class.isAssignableFrom(providerCls)) {
+
+            if (filterContractSupported(provider, providerCls, MessageBodyReader.class)) {
                 addProviderToList(messageReaders, provider);
             }
-            
-            if (MessageBodyWriter.class.isAssignableFrom(providerCls)) {
+
+            if (filterContractSupported(provider, providerCls, MessageBodyWriter.class)) {
                 addProviderToList(messageWriters, provider);
             }
             
