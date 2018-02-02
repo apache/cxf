@@ -90,7 +90,11 @@ public class BookServer20 extends AbstractBusTestServerBase {
         providers.add(new PreMatchContainerRequestFilter2());
         providers.add(new PreMatchContainerRequestFilter());
         providers.add(new PostMatchContainerResponseFilter());
-        providers.add(new PostMatchContainerResponseFilter3());
+        providers.add((Feature) context -> {
+            context.register(new PostMatchContainerResponseFilter3());
+
+            return true;
+        });
         providers.add(new PostMatchContainerResponseFilter2());
         providers.add(new CustomReaderBoundInterceptor());
         providers.add(new CustomReaderInterceptor());
