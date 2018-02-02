@@ -219,7 +219,8 @@ public final class ServerProviderFactory extends ProviderFactory {
                                                                         providerCls,
                                                                         featureProvider,
                                                                         getBus(),
-                                                                        null,
+                                                                        getFilterNameBindings(getBus(), 
+                                                                                              featureProvider),
                                                                         false,
                                                                         contracts));
                     } else {
@@ -414,7 +415,7 @@ public final class ServerProviderFactory extends ProviderFactory {
                             providerCls,
                             provider,
                             getBus(),
-                            nameBinding,
+                            Collections.singleton(nameBinding),
                             true,
                             contracts));
                         ori.addNameBindings(Collections.singletonList(nameBinding));

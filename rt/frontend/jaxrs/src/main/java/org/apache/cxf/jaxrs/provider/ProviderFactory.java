@@ -959,7 +959,7 @@ public abstract class ProviderFactory {
             } else {
                 if (provider instanceof FilterProviderInfo) {
                     FilterProviderInfo<?> fpi = (FilterProviderInfo<?>)provider;
-                    if (fpi.isDynamic() && !names.containsAll(fpi.getNameBinding())) {
+                    if (fpi.isDynamic() && !names.containsAll(fpi.getNameBindings())) {
                         continue;
                     }
                 }
@@ -1266,12 +1266,14 @@ public abstract class ProviderFactory {
     protected static Set<String> getFilterNameBindings(ProviderInfo<?> p) {
         Set<String> names = null;
         if (p instanceof FilterProviderInfo) {
-            names = ((FilterProviderInfo<?>)p).getNameBinding();
-        }
-        if (names == null) {
-            Class<?> pClass = ClassHelper.getRealClass(p.getBus(), p.getProvider());
-            names = AnnotationUtils.getNameBindings(pClass.getAnnotations());
-        }
+            names = ((FilterProviderInfo<?>)p).getNameBindings();
+        } 
+        return names == null ? getFilterNameBindings(p.getBus(), p.getProvider()) : names;
+        
+    }
+    protected static Set<String> getFilterNameBindings(Bus bus, Object provider) {
+        Class<?> pClass = ClassHelper.getRealClass(bus, provider);
+        Set<String> names = AnnotationUtils.getNameBindings(pClass.getAnnotations());
         if (names.isEmpty()) {
             names = Collections.singleton(DEFAULT_FILTER_NAME_BINDING);
         }
