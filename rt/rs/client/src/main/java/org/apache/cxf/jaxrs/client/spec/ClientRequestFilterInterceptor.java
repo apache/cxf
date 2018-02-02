@@ -20,16 +20,19 @@ package org.apache.cxf.jaxrs.client.spec;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.client.ClientProviderFactory;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
@@ -58,6 +61,11 @@ public class ClientRequestFilterInterceptor extends AbstractOutDatabindingInterc
                 InjectionUtils.injectContexts(filter.getProvider(), filter, outMessage);
                 try {
                     filter.getProvider().filter(context);
+
+                    @SuppressWarnings("unchecked")
+                    Map<String, List<Object>> headers = CastUtils.cast((Map<String, List<Object>>) 
+                                                                       outMessage.get(Message.PROTOCOL_HEADERS));
+                    HttpUtils.convertHeaderValuesToString(headers, false);
 
                     Response response = outMessage.getExchange().get(Response.class);
                     if (response != null) {
