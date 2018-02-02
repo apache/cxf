@@ -29,12 +29,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
+import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.sse.InboundSseEvent;
 import javax.ws.rs.sse.SseEventSource;
@@ -184,16 +183,12 @@ public class SseEventSourceImpl implements SseEventSource {
         Response response = null;
         
         try {
-            final MultivaluedMap<String, Object> headers = new MultivaluedHashMap<>();
+            Invocation.Builder builder = target.request(MediaType.SERVER_SENT_EVENTS);
             if (lastEventId != null) {
-                headers.putSingle(HttpHeaders.LAST_EVENT_ID_HEADER, lastEventId);
+                builder.header(HttpHeaders.LAST_EVENT_ID_HEADER, lastEventId);
             }
-            
-            response = target
-                .request(MediaType.SERVER_SENT_EVENTS)
-                .headers(headers)
-                .get();
-            
+            response = builder.get();
+
             // A client can be told to stop reconnecting using the HTTP 204 No Content 
             // response code. In this case, we should give up.
             if (response.getStatus() == 204) {

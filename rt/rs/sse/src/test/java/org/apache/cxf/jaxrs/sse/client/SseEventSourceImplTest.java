@@ -35,7 +35,6 @@ import java.util.concurrent.TimeUnit;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.sse.InboundSseEvent;
 import javax.ws.rs.sse.SseEventSource;
@@ -132,13 +131,12 @@ public class SseEventSourceImplTest extends Assert {
     @Mock
     private Response response;
 
-    @SuppressWarnings("unchecked")
     @Before
     public void setUp() {
         when(target.getConfiguration()).thenReturn(configuration);
         when(target.getWebClient()).thenReturn(client);
         when(target.request(MediaType.SERVER_SENT_EVENTS)).thenReturn(builder);
-        when(builder.headers(any(MultivaluedMap.class))).thenReturn(builder);
+        when(builder.header(any(String.class), any(Object.class))).thenReturn(builder);
         when(builder.get()).thenReturn(response);
         when(client.getConfiguration()).thenReturn(clientConfiguration);
         when(clientConfiguration.getEndpoint()).thenReturn(endpoint);
