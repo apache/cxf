@@ -1,4 +1,4 @@
-Apache CXF 3.2.1 Release Notes
+Apache CXF 3.2.2 Release Notes
 
 1. Overview
 
@@ -17,7 +17,7 @@ New features include:
 * Preliminary support for running on Java 9  (no module support yet)
 * New http-undertow transport
 
-3.2.1 fixes over 32 JIRA issues reported by users and the community
+3.2.2 fixes over 64 JIRA issues reported by users and the community
 
 
 Important notes:
@@ -70,67 +70,77 @@ for caveats when upgrading.
 7. Specific issues, features, and improvements fixed in this version
 
 ** Bug
-* [CXF-6454] - Orphaned JMS connections created in endless loop
-* [CXF-6672] - PollingMessageListenerContainer does fail silently upon java.lang.Error
-* [CXF-7493] - Cannot define a List<Double> or List<Long> as a query param
-* [CXF-7498] - Problem running cxf-java2swagger-plugin:3.2.0-SNAPSHOT:java2swagger
-* [CXF-7501] - Cannot inject field in ContainerRequestFilter
-* [CXF-7503] - JwsJsonContainerRequestFilter throws exception in case of DELETE method invocation with empty payload
-* [CXF-7504] - NPE in oauth2 module for jose auth code tokens
-* [CXF-7505] - Oauth2 keystore loading inconsistent with jwt keys
-* [CXF-7507] - Put a configurable limit on the attachment header sizes
-* [CXF-7509] - The authSupplier property is ignored in case of OSGi http conduit configuration
-* [CXF-7510] - SSE integration in CDI abruptly fails with no indication why
-* [CXF-7511] - cxf-wadl2java-plugin version 3.1.x and 3.2.0 fails to download wadlArtifact
-* [CXF-7515] - Beans created with no package are throwing nullpointer exception
-* [CXF-7517] - Codegen fails when using JDK9 with maven and cxf-plugin
-* [CXF-7519] - The cxf-rt-transports-http-jetty should not rely on the old blueprint compatibility bundle
-* [CXF-7524] - runAsFilter is shadowed in Swagger2Feature, should use AbstractSwaggerFeature
-* [CXF-7529] - [osgi] Stale CXF's javax.ws.rs.ext.RuntimeDelegate after refreshing rt-frontend-jaxrs bundle
-* [CXF-7530] - AttachmentSerializer miss a CRLF before the multipart-body per spec rfc2046
-* [CXF-7532] - REST on JMS transport can't handle the request message with text messageType
-* [CXF-7533] - Setter setBus in AbstractConfigurableProvider does nothing
-* [CXF-7534] - Bus set on jaxws-endpoint is not honored anymore
-* [CXF-7536] - STRTransform TransformException when manually adding SAML Assertion via SAMLCallback.setAssertionElement()
-* [CXF-7541] - IllegalStateException can escape from AbstractHttpDestination
-* [CXF-7542] - Resources cannot be injected into fields declared in superclasses
+* [CXF-5051] - ProtectTokens assertion is not respected for SAML tokens
+* [CXF-6134] - Apache CXF generating constructor with duplicate argument names causing compilation error
+* [CXF-7023] - SOAP over JMS transport does not use XA transactions with Websphere MQ resource adapter
+* [CXF-7389] - JAXRSUtils warning logs
+* [CXF-7473] - ExceptionMapper class hierarchies: incompatible ExceptionMapper selected
+* [CXF-7518] - Loggers logs request twice in case of Fault
+* [CXF-7520] - Ensure CXF can build with JDK9.0.1 and JDK8_161
+* [CXF-7527] - JAXRS UriInfo.getMatchedUris does return matched URIs twice for sub resources
 * [CXF-7545] - Problem to generate WADL when a implementation of generic type is used
+* [CXF-7547] - Problem to generate Java from WADL file when method id defined
+* [CXF-7549] - Can't register Feature from inside another Feature in JAX-RS
+* [CXF-7550] - StaxActionInInterceptor can't function completely with WSS4JStaxInInterceptor
+* [CXF-7551] - Policy Based WSS4J Stax Interceptors may not be correctly initialized
+* [CXF-7552] - wsdl2java fails on SwA WSDL using SOAP 1.2 Bindings
+* [CXF-7553] - selectVariant doesn't take into account quality factors in Accept header
+* [CXF-7554] - remove org.sonatype.sisu:sisu-guava dependency from java2swagger-plugin
+* [CXF-7555] - Failure to construct bean of org.apache.cxf.jaxrs.spring.SpringViewResolverProvider
+* [CXF-7561] - CrossOriginResourceSharing annotation on a super interface is not interpreted
+* [CXF-7562] - ext.logging: truncated flag not set
+* [CXF-7565] - Verification of feature cxf-ws-security failure
+* [CXF-7567] - Unable to resolve pax-cdi-features when trying to build Karaf feature repo with apache-cxf feature
+* [CXF-7572] - OAuth/OIDC endpoints in discovery document contains default ports
+* [CXF-7573] - CXF Jose not closing Inpustream when loading Keystore
+* [CXF-7575] - @Suspended race condition
+* [CXF-7578] - WS-Trust Secured Request casts SecretKeySpec to PrivateKey
+* [CXF-7581] - SwaggerUIResourceFilter doesn't allow call to service endpoint
+* [CXF-7584] - proxy client: forbid empty path param
+* [CXF-7585] - base64 attachment encoding does not close the InputSteam
+* [CXF-7586] - cxf-rt-rs-security-oauth2 preventing application on JBoss from starting if more than 1 PU defined
+* [CXF-7587] - JAXRS Server fails to serve requests when context path ends with asterisk '*' caracter
+* [CXF-7588] - SAML audience restriction validation is enabled by default for REST services
+* [CXF-7592] - Wrong JAX-RS 2.1 request filter handling for IOException
+* [CXF-7593] - Application is not visible in Feature.configure
+* [CXF-7595] - Swagger2Feature - inputstream of stream swagger.properties after loading not closed
+* [CXF-7596] - ClassNotFoundException: javax.net.SocketFactory not found by org.apache.cxf.cxf-rt-transports-http
+* [CXF-7597] - Suspicious calls to ClassLoader.findResource when resolving absolute base and actual URIs
+* [CXF-7598] - Log warning mentions deleted class
+* [CXF-7599] - The apache-cxf-3.2.1-features.xml for karaf OSGi is not correct enough
+* [CXF-7604] - Change to "Error occurred during error handling, give up!" message
+* [CXF-7606] - SwA doesn't work for image/gif content type
+* [CXF-7607] - JAXRS only consider the first "Accept" header in the request
+* [CXF-7608] - [brave feature] Propagate trace ids as it lets log correlation to be consistent even if not sampling
+* [CXF-7613] - Support Derived keys policy validation for EndorsingSupportingTokens
+* [CXF-7623] - AsynchHTTPConduit setupConnection - timeout settings
+* [CXF-7625] - JAX-RS 2.1 TCK: UriBuilder doesn't handle case where "port" is not an integer
+* [CXF-7628] - JMX mbean 'Thread Pools' and 'Connectors' for Jetty are not registered if CXF endpoint is configured with engine-factory element having threadingParameters.
+* [CXF-7629] - When registering a provider that implements MessageBodyReader and MessageBodyWriter interfaces through a Feature CXF ignores the interfaces in the contract and registers them all
+* [CXF-7630] - NameBindings are ignored for (at least) ContextResponseFilters
 
+** New Feature
+* [CXF-7535] - Support for Project Reactor as rx()
+* [CXF-7579] - Implement MicroProfile Rest Client 1.0
 
 ** Improvement
-* [CXF-7439] - Support OpenTracing Tracer API
-* [CXF-7461] - Update jackson to 2.9.1
-* [CXF-7462] - OutboundSseEventImpl could use some minor tweaks
-* [CXF-7500] - AbstractSSOSpHandler throws IllegalArgumentException when creating a cookie
-* [CXF-7528] - [osgi] rt-transports-http should not fail during servlet unregistration
-* [CXF-7531] - add async-supported init parameter configuration for the cxf-osgi-transport-servlet
-* [CXF-7539] - Provide Boolean wrapper object for == comparation
+* [CXF-7103] - CDI Client Proxy injection
+* [CXF-7200] - wadl2java does not see generated classes with jaxb:nameXmlTransform
+* [CXF-7556] - Get Rx2 and Reactor AsyncSubscriber utility code reused
+* [CXF-7558] - set retryInterval default value to 5 sec if not specify it in JMSConfiguration
+* [CXF-7568] - Support JWE PBES encryption
+* [CXF-7569] - PrimitiveTextProvider: support enums
+* [CXF-7603] - private a way that only a set of client IP can access the WADL
+* [CXF-7616] - Add support for (SAML) IssuedToken policy validation
+* [CXF-7617] - Support Derived keys policy validation for endorsing IssuedTokens/SamlTokens
+* [CXF-7618] - Suppress generated date switch for wsdl2java
+* [CXF-7619] - Support deprecated 1.5 WS-Policy URI in the STS
+
+** Task
+* [CXF-7559] - enhance the way to handle java version in CipherSuitesTest
+* [CXF-7570] - CompletionStage RxInvoker needs to lookup a default ExecutorService
+* [CXF-7626] - ensure new module  systests/microprofile can pass with JDK9
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+ 
