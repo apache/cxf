@@ -219,6 +219,8 @@ public final class ServerProviderFactory extends ProviderFactory {
                                                                         providerCls,
                                                                         featureProvider,
                                                                         getBus(),
+                                                                        null,
+                                                                        false,
                                                                         contracts));
                     } else {
                         allProviders.add(featureProvider);
