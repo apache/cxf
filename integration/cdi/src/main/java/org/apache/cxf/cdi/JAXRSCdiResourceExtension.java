@@ -60,6 +60,7 @@ import org.apache.cxf.jaxrs.ext.ContextClassProvider;
 import org.apache.cxf.jaxrs.ext.JAXRSServerFactoryCustomizationExtension;
 import org.apache.cxf.jaxrs.provider.ServerConfigurableFactory;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSServerFactoryCustomizationUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 /**
@@ -418,6 +419,7 @@ public class JAXRSCdiResourceExtension implements Extension {
      * @param bean JAX-RS server factory bean about to be created
      */
     private void customize(final BeanManager beanManager, final JAXRSServerFactoryBean bean) {
+        JAXRSServerFactoryCustomizationUtils.customize(bean);
         final Collection<Bean<?>> extensionBeans = beanManager.getBeans(JAXRSServerFactoryCustomizationExtension.class);
 
         for (final Bean<?> extensionBean: extensionBeans) {

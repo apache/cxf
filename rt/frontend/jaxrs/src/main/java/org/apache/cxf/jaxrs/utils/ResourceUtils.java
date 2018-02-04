@@ -42,7 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
-import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -88,7 +87,6 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.ext.DefaultMethod;
-import org.apache.cxf.jaxrs.ext.JAXRSServerFactoryCustomizationExtension;
 import org.apache.cxf.jaxrs.ext.xml.ElementClass;
 import org.apache.cxf.jaxrs.ext.xml.XMLName;
 import org.apache.cxf.jaxrs.lifecycle.PerRequestResourceProvider;
@@ -904,16 +902,7 @@ public final class ResourceUtils {
             bean.getProperties(true).putAll(appProps);
         }
         bean.setApplication(app);
-        customize(bean);
         return bean;
-    }
-
-    private static void customize(JAXRSServerFactoryBean bean) {
-        ServiceLoader<JAXRSServerFactoryCustomizationExtension> extensions
-                = ServiceLoader.load(JAXRSServerFactoryCustomizationExtension.class);
-        for (JAXRSServerFactoryCustomizationExtension extension : extensions) {
-            extension.customize(bean);
-        }
     }
 
     public static Object createProviderInstance(Class<?> cls) {
