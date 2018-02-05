@@ -51,7 +51,7 @@ code and source code.
 
 The following provides more details on the included cryptographic
 software:
-   http://xml.apache.org/security/
+   http://santuario.apache.org/
    http://www.bouncycastle.org/
    http://ws.apache.org/wss4j/
 
