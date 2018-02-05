@@ -20,11 +20,15 @@ package org.apache.cxf.jaxrs.sse.ext;
 
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.ext.JAXRSServerFactoryCustomizationExtension;
+import org.apache.cxf.jaxrs.sse.SseContextProvider;
+import org.apache.cxf.jaxrs.sse.atmosphere.SseAtmosphereEventSinkContextProvider;
 import org.apache.cxf.transport.sse.SseHttpTransportFactory;
 
 public class SseTransportCustomizationExtension implements JAXRSServerFactoryCustomizationExtension {
     @Override
     public void customize(final JAXRSServerFactoryBean bean) {
         bean.setTransportId(SseHttpTransportFactory.TRANSPORT_ID);
+        bean.setProvider(new SseContextProvider());
+        bean.setProvider(new SseAtmosphereEventSinkContextProvider());
     }
 }
