@@ -45,8 +45,6 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-extension-reactivestreams</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>io.projectreactor</groupId>
