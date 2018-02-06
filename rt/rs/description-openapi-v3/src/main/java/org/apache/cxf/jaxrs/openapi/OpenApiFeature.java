@@ -127,6 +127,7 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
 
         Properties swaggerProps = null;
         GenericOpenApiContextBuilder<?> openApiConfiguration; 
+        final Application application = getApplicationOrDefault(server, factory, sfb, bus);
         if (StringUtils.isEmpty(getConfigLocation())) {
             swaggerProps = getSwaggerProperties(propertiesLocation, bus);
             
@@ -147,11 +148,11 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
                 .resourcePackages(getOrFallback(packages, swaggerProps, RESOURCE_PACKAGE_PROPERTY));
 
             openApiConfiguration = new JaxrsOpenApiContextBuilder<>()
-                .application(getApplicationOrDefault(server, factory, sfb, bus))
+                .application(application)
                 .openApiConfiguration(config);
         } else {
             openApiConfiguration = new JaxrsOpenApiContextBuilder<>()
-                .application(getApplicationOrDefault(server, factory, sfb, bus))
+                .application(application)
                 .configLocation(getConfigLocation());
         }
 
@@ -163,6 +164,10 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
                     .getUserDefinedOptions());
             registerOpenApiResources(sfb, packages, context.getOpenApiConfiguration());
             registerSwaggerUiResources(sfb, combine(swaggerProps, userProperties), factory, bus);
+            
+            if (customizer != null) {
+                customizer.setApplicationInfo(factory.getApplicationProvider());
+            }
         } catch (OpenApiConfigurationException ex) {
             throw new RuntimeException("Unable to initialize OpenAPI context", ex);
         }

@@ -26,14 +26,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.ApplicationPath;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.model.ApplicationInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.doc.DocumentationProvider;
 import org.apache.cxf.jaxrs.model.doc.JavaDocProvider;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 import io.swagger.v3.oas.integration.api.OpenAPIConfiguration;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -44,14 +48,11 @@ import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
 
 public class OpenApiCustomizer {
-
-    protected boolean dynamicBasePath;
-
-    protected boolean replaceTags;
-
-    protected DocumentationProvider javadocProvider;
-
-    protected List<ClassResourceInfo> cris;
+    private boolean dynamicBasePath;
+    private boolean replaceTags;
+    private DocumentationProvider javadocProvider;
+    private List<ClassResourceInfo> cris;
+    private String applicationPath;
 
     public OpenAPIConfiguration customize(final OpenAPIConfiguration configuration) {
         if (configuration == null) {
@@ -60,7 +61,13 @@ public class OpenApiCustomizer {
 
         if (dynamicBasePath) {
             final MessageContext ctx = createMessageContext();
-            final String url = StringUtils.substringBeforeLast(ctx.getUriInfo().getRequestUri().toString(), "/");
+            
+            // If the JAX-RS application with custom path is defined, it might be present twice, in the 
+            // request URI as well as in each resource operation URI. To properly represent server URL, 
+            // the application path should be removed from it.
+            final String url = StringUtils.removeEnd(
+                StringUtils.substringBeforeLast(ctx.getUriInfo().getRequestUri().toString(), "/"),
+                    applicationPath);
 
             final Collection<Server> servers = configuration.getOpenAPI().getServers();
             if (servers == null || servers.stream().noneMatch(s -> s.getUrl().equalsIgnoreCase(url))) {
@@ -69,10 +76,6 @@ public class OpenApiCustomizer {
         }
 
         return configuration;
-    }
-
-    protected MessageContext createMessageContext() {
-        return JAXRSUtils.createContextValue(JAXRSUtils.getCurrentMessage(), null, MessageContext.class);
     }
 
     public void customize(final OpenAPI oas) {
@@ -202,4 +205,26 @@ public class OpenApiCustomizer {
         this.javadocProvider = new JavaDocProvider(javaDocURLs);
     }
 
+    public void setApplicationInfo(ApplicationInfo application) {
+        if (application != null && application.getProvider() != null) {
+            final Class<?> clazz = application.getProvider().getClass();
+            final ApplicationPath path = ResourceUtils.locateApplicationPath(clazz);
+            
+            if (path != null) {
+                applicationPath = path.value();
+                
+                if (!applicationPath.startsWith("/")) {
+                    applicationPath = "/" + applicationPath;
+                }
+                
+                if (applicationPath.endsWith("/")) {
+                    applicationPath = applicationPath.substring(0, applicationPath.lastIndexOf("/"));
+                }
+            }
+        }
+    }
+
+    private MessageContext createMessageContext() {
+        return JAXRSUtils.createContextValue(JAXRSUtils.getCurrentMessage(), null, MessageContext.class);
+    }
 }

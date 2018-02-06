@@ -133,7 +133,7 @@ public abstract class AbstractOpenApiServiceDescriptionTest extends AbstractBusC
         doTestApiListingIsProperlyReturnedJSON(createWebClient("/openapi.json"), useXForwarded, basePath);
         checkUiResource();
     }
-    protected static void doTestApiListingIsProperlyReturnedJSON(final WebClient client,
+    protected void doTestApiListingIsProperlyReturnedJSON(final WebClient client,
             boolean useXForwarded, String basePath) throws Exception {    
         if (useXForwarded) {
             client.header("USE_XFORWARDED", true);
@@ -158,7 +158,7 @@ public abstract class AbstractOpenApiServiceDescriptionTest extends AbstractBusC
             assertEquals(3, map.size());
             UserOperation getBooksOp = map.get("getBooks");
             assertEquals(HttpMethod.GET, getBooksOp.getVerb());
-            assertEquals("/bookstore", getBooksOp.getPath());
+            assertEquals(getApplicationPath() + "/bookstore", getBooksOp.getPath());
             // see https://github.com/swagger-api/swagger-core/issues/2646
             if (getBooksOp.getProduces() != null) {
                 assertEquals(MediaType.APPLICATION_JSON, getBooksOp.getProduces());
@@ -168,14 +168,14 @@ public abstract class AbstractOpenApiServiceDescriptionTest extends AbstractBusC
             assertEquals(ParameterType.QUERY, getBooksOpParams.get(0).getType());
             UserOperation getBookOp = map.get("getBook");
             assertEquals(HttpMethod.GET, getBookOp.getVerb());
-            assertEquals("/bookstore/{id}", getBookOp.getPath());
+            assertEquals(getApplicationPath() + "/bookstore/{id}", getBookOp.getPath());
             assertEquals(MediaType.APPLICATION_JSON, getBookOp.getProduces());
             List<Parameter> getBookOpParams = getBookOp.getParameters();
             assertEquals(1, getBookOpParams.size());
             assertEquals(ParameterType.PATH, getBookOpParams.get(0).getType());
             UserOperation deleteOp = map.get("delete");
             assertEquals(HttpMethod.DELETE, deleteOp.getVerb());
-            assertEquals("/bookstore/{id}", deleteOp.getPath());
+            assertEquals(getApplicationPath() + "/bookstore/{id}", deleteOp.getPath());
             List<Parameter> delOpParams = deleteOp.getParameters();
             assertEquals(1, delOpParams.size());
             assertEquals(ParameterType.PATH, delOpParams.get(0).getType());
@@ -196,7 +196,7 @@ public abstract class AbstractOpenApiServiceDescriptionTest extends AbstractBusC
         // Test that Swagger UI resources do not interfere with 
         // application-specific ones.
         WebClient uiClient = WebClient
-            .create("http://localhost:" + getPort() + "/css/book.css")
+            .create(getBaseUrl() + "/css/book.css")
             .accept("text/css");
         String css = uiClient.get(String.class);
         assertThat(css, equalTo("body { background-color: lightblue; }"));
@@ -207,16 +207,23 @@ public abstract class AbstractOpenApiServiceDescriptionTest extends AbstractBusC
         // Test that Swagger UI resources do not interfere with 
         // application-specific ones and are accessible.
         WebClient uiClient = WebClient
-            .create("http://localhost:" + getPort() + "/swagger-ui.css")
+            .create(getBaseUrl() + "/swagger-ui.css")
             .accept("text/css");
         String css = uiClient.get(String.class);
         assertThat(css, containsString(".swagger-ui{font"));
     }
     
+    protected String getApplicationPath() {
+        return "";
+    }
+    
+    protected String getBaseUrl() {
+        return "http://localhost:" + getPort();
+    }
 
     protected WebClient createWebClient(final String url) {
         return WebClient
-            .create("http://localhost:" + getPort() + url,
+            .create(getBaseUrl() + url,
                 Arrays.< Object >asList(new JacksonJsonProvider()),
                 Arrays.< Feature >asList(new LoggingFeature()),
                 null)
@@ -224,7 +231,7 @@ public abstract class AbstractOpenApiServiceDescriptionTest extends AbstractBusC
     }
 
     protected void checkUiResource() {
-        WebClient uiClient = WebClient.create("http://localhost:" + getPort() + "/api-docs")
+        WebClient uiClient = WebClient.create(getBaseUrl() + "/api-docs")
             .accept(MediaType.WILDCARD);
         String uiHtml = uiClient.get(String.class);
         assertTrue(uiHtml.contains("<title>Swagger UI</title>"));

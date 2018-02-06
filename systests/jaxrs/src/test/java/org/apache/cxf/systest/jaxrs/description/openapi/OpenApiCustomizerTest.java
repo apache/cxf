@@ -18,6 +18,15 @@
  */
 package org.apache.cxf.systest.jaxrs.description.openapi;
 
+import java.util.Arrays;
+import java.util.Collections;
+
+import javax.ws.rs.ext.RuntimeDelegate;
+
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+
+import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.openapi.OpenApiCustomizer;
 import org.apache.cxf.jaxrs.openapi.OpenApiFeature;
 
@@ -37,12 +46,31 @@ public class OpenApiCustomizerTest extends AbstractOpenApiServiceDescriptionTest
         }
         
         @Override
+        protected void run() {
+            final JAXRSServerFactoryBean sf = RuntimeDelegate
+                .getInstance()
+                .createEndpoint(new BookStoreApplication(), JAXRSServerFactoryBean.class);
+            sf.setResourceClasses(BookStoreOpenApi.class);
+            sf.setResourceClasses(BookStoreStylesheetsOpenApi.class);
+            sf.setResourceProvider(BookStoreOpenApi.class,
+                new SingletonResourceProvider(new BookStoreOpenApi()));
+            sf.setProvider(new JacksonJsonProvider());
+            final OpenApiFeature feature = createOpenApiFeature();
+            sf.setFeatures(Arrays.asList(feature));
+            sf.setAddress("http://localhost:" + port + "/api");
+            sf.create();
+        }
+
+        
+        @Override
         protected OpenApiFeature createOpenApiFeature() {
             final OpenApiCustomizer customizer = new OpenApiCustomizer();
             customizer.setDynamicBasePath(true);
             
             final OpenApiFeature feature = super.createOpenApiFeature();
             feature.setCustomizer(customizer);
+            feature.setScan(false);
+            feature.setResourcePackages(Collections.singleton(getClass().getPackage().getName()));
 
             return feature;
         }
@@ -56,6 +84,15 @@ public class OpenApiCustomizerTest extends AbstractOpenApiServiceDescriptionTest
     @Override
     protected String getPort() {
         return PORT;
+    }
+
+    @Override
+    protected String getBaseUrl() {
+        return "http://localhost:" + getPort() + getApplicationPath();
+    }
+
+    protected String getApplicationPath() {
+        return "/api";
     }
 
     @Test
