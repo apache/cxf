@@ -51,9 +51,9 @@ code and source code.
 
 The following provides more details on the included cryptographic
 software:
-   http://santuario.apache.org/
-   http://www.bouncycastle.org/
-   http://ws.apache.org/wss4j/
+- http://santuario.apache.org/
+- http://www.bouncycastle.org/
+- http://ws.apache.org/wss4j/
 
 
 
