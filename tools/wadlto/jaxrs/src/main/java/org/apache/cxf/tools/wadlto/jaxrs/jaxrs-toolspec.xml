@@ -279,6 +279,16 @@ Examples:
                 </associatedArgument>
                 <switch>authentication</switch>
             </option>
+            <option id="oneway" maxOccurs="1">
+                <annotation>
+                    Specifies a comma separated list of method names or identifiers 
+                    which need to support oneway invocations
+                </annotation>
+                <associatedArgument placement="immediate">
+                    <annotation> methodNames</annotation>
+                </associatedArgument>
+                <switch>oneway</switch>
+            </option>
         </optionGroup>
         <optionGroup id="common_options">
             <option id="help" maxOccurs="1">

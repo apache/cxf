@@ -160,6 +160,7 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
 
         sg.setSuspendedAsyncMethods(getSuspendedAsyncMethods());
         sg.setResponseMethods(getResponseMethods());
+        sg.setOnewayMethods(getOnewayMethods());
 
         sg.setGenerateEnums(context.optionSet(WadlToolConstants.CFG_GENERATE_ENUMS));
         sg.setValidateWadl(context.optionSet(WadlToolConstants.CFG_VALIDATE_WADL));
@@ -236,6 +237,10 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
 
     public Set<String> getResponseMethods() {
         return parseMethodList(WadlToolConstants.CFG_GENERATE_RESPONSE_FOR_METHODS);
+    }
+
+    public Set<String> getOnewayMethods() {
+        return parseMethodList(WadlToolConstants.CFG_ONEWAY);
     }
 
     private Set<String> parseMethodList(String paramName) {

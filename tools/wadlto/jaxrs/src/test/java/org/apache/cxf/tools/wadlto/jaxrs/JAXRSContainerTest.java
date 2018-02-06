@@ -37,9 +37,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
 import org.apache.cxf.helpers.FileUtils;
+import org.apache.cxf.jaxrs.ext.Oneway;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolContext;
+import org.apache.cxf.tools.util.ClassCollector;
 import org.apache.cxf.tools.wadlto.WadlToolConstants;
 
 import org.junit.Test;
@@ -128,6 +130,30 @@ public class JAXRSContainerTest extends ProcessorTestBase {
         } catch (Exception e) {
             e.printStackTrace();
             fail();
+        }
+    }
+
+    @Test
+    public void testOnewayMethod() throws Exception {
+        JAXRSContainer container = new JAXRSContainer(null);
+
+        final String onewayMethod = "deleteRepository";
+        ToolContext context = new ToolContext();
+        context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
+        context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/test.xml"));
+        context.put(WadlToolConstants.CFG_COMPILE, "true");
+        context.put(WadlToolConstants.CFG_ONEWAY, onewayMethod);
+        container.setContext(context);
+        container.execute();
+
+        assertNotNull(output.list());
+
+        ClassCollector cc = context.get(ClassCollector.class);
+        assertEquals(1, cc.getServiceClassNames().size());
+        try (URLClassLoader loader = new URLClassLoader(new URL[]{output.toURI().toURL()})) {
+            final Class<?> generatedClass = loader.loadClass(cc.getServiceClassNames().values().iterator().next());
+            Method m = generatedClass.getMethod(onewayMethod, String.class);
+            assertNotNull(m.getAnnotation(Oneway.class));
         }
     }
 
