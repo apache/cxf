@@ -47,7 +47,7 @@ public class ConfigurationImpl implements Configuration {
         this.runtimeType = rt;
     }
 
-    public ConfigurationImpl(Configuration parent, Class<?>[] defaultContracts) {
+    public ConfigurationImpl(Configuration parent) {
         if (parent != null) {
             this.props.putAll(parent.getProperties());
             this.runtimeType = parent.getRuntimeType();
@@ -55,7 +55,7 @@ public class ConfigurationImpl implements Configuration {
             Set<Class<?>> providerClasses = new HashSet<Class<?>>(parent.getClasses());
             for (Object o : parent.getInstances()) {
                 if (!(o instanceof Feature)) {
-                    registerParentProvider(o, parent, defaultContracts);
+                    registerParentProvider(o, parent);
                 } else {
                     Feature f = (Feature)o;
                     features.put(f, parent.isEnabled(f));
@@ -63,18 +63,18 @@ public class ConfigurationImpl implements Configuration {
                 providerClasses.remove(o.getClass());
             }
             for (Class<?> cls : providerClasses) {
-                registerParentProvider(createProvider(cls), parent, defaultContracts);
+                registerParentProvider(createProvider(cls), parent);
             }
 
         }
     }
 
-    private void registerParentProvider(Object o, Configuration parent, Class<?>[] defaultContracts) {
+    private void registerParentProvider(Object o, Configuration parent) {
         Map<Class<?>, Integer> contracts = parent.getContracts(o.getClass());
         if (contracts != null) {
             providers.put(o, contracts);
         } else {
-            register(o, AnnotationUtils.getBindingPriority(o.getClass()), defaultContracts);
+            register(o, AnnotationUtils.getBindingPriority(o.getClass()), ConfigurableImpl.getImplementedContracts(o));
         }
     }
 
@@ -194,6 +194,10 @@ public class ConfigurationImpl implements Configuration {
             return false;
         }
 
+        if (!contractsValid(provider, contracts)) {
+            return false;
+        }
+
         Map<Class<?>, Integer> metadata = providers.get(provider);
         if (metadata == null) {
             metadata = new HashMap<>();
@@ -207,6 +211,17 @@ public class ConfigurationImpl implements Configuration {
         return true;
     }
 
+    private boolean contractsValid(Object provider, Map<Class<?>, Integer> contracts) {
+        final Class<?> providerClass = provider.getClass();
+        for (Class<?> contractInterface : contracts.keySet()) {
+            if (!contractInterface.isAssignableFrom(providerClass)) {
+                LOG.warning("Provider " + providerClass.getName() + " does not implement specified contract: "
+                    + contractInterface.getName());
+                return false;
+            }
+        }
+        return true;
+    }
     public static Map<Class<?>, Integer> initContractsMap(int bindingPriority, Class<?>... contracts) {
         Map<Class<?>, Integer> metadata = new HashMap<>();
         for (Class<?> contract : contracts) {

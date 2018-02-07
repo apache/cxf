@@ -35,27 +35,26 @@ public class ConfigurableImpl<C extends Configurable<C>> implements Configurable
     private static final Logger LOG = LogUtils.getL7dLogger(ConfigurableImpl.class);
     private ConfigurationImpl config;
     private final C configurable;
-    private final Class<?>[] supportedProviderClasses;
     
     public interface Instantiator {
         <T> Object create(Class<T> cls);
     }
     
-    public ConfigurableImpl(C configurable, RuntimeType rt, Class<?>[] supportedProviderClasses) {
-        this(configurable, supportedProviderClasses, new ConfigurationImpl(rt));
+    public ConfigurableImpl(C configurable, RuntimeType rt) {
+        this(configurable, new ConfigurationImpl(rt));
     }
     
-    public ConfigurableImpl(C configurable, Class<?>[] supportedProviderClasses, Configuration config) {
-        this(configurable, supportedProviderClasses);
-        this.config = config instanceof ConfigurationImpl
-            ? (ConfigurationImpl)config : new ConfigurationImpl(config, supportedProviderClasses);
-    }
-
-    private ConfigurableImpl(C configurable, Class<?>[] supportedProviderClasses) {
+    public ConfigurableImpl(C configurable, Configuration config) {
         this.configurable = configurable;
-        this.supportedProviderClasses = supportedProviderClasses;
+        this.config = config instanceof ConfigurationImpl
+            ? (ConfigurationImpl)config : new ConfigurationImpl(config);
     }
 
+    static Class<?>[] getImplementedContracts(Object provider) {
+        Class<?> providerClass = provider instanceof Class<?> ? ((Class<?>)provider) : provider.getClass();
+        return providerClass.getInterfaces();
+    }
+    
     protected C getConfigurable() {
         return configurable;
     }
@@ -78,7 +77,7 @@ public class ConfigurableImpl<C extends Configurable<C>> implements Configurable
 
     @Override
     public C register(Object provider, int bindingPriority) {
-        return doRegister(provider, bindingPriority, supportedProviderClasses);
+        return doRegister(provider, bindingPriority, getImplementedContracts(provider));
     }
 
     @Override
@@ -98,7 +97,8 @@ public class ConfigurableImpl<C extends Configurable<C>> implements Configurable
 
     @Override
     public C register(Class<?> providerClass, int bindingPriority) {
-        return doRegister(getInstantiator().create(providerClass), bindingPriority, supportedProviderClasses);
+        return doRegister(getInstantiator().create(providerClass), bindingPriority, 
+                          getImplementedContracts(providerClass));
     }
 
     @Override

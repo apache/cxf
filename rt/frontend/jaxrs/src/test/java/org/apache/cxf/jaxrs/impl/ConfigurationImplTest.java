@@ -20,12 +20,19 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
 
 import javax.ws.rs.RuntimeType;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.ext.MessageBodyReader;
+
+import org.apache.cxf.common.logging.LogUtils;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -57,4 +64,44 @@ public class ConfigurationImplTest extends Assert {
 
     }
 
+    static class TestHandler extends Handler {
+
+        List<String> messages = new ArrayList<>();
+        
+        /** {@inheritDoc}*/
+        @Override
+        public void publish(LogRecord record) {
+            messages.add(record.getLevel().toString() + ": " + record.getMessage());
+        }
+
+        /** {@inheritDoc}*/
+        @Override
+        public void flush() {
+            // no-op
+        }
+
+        /** {@inheritDoc}*/
+        @Override
+        public void close() throws SecurityException {
+            // no-op
+        }
+    }
+
+    @Test
+    public void testInvalidContract() {
+        TestHandler handler = new TestHandler();
+        LogUtils.getL7dLogger(ConfigurationImpl.class).addHandler(handler);
+
+        ConfigurationImpl c = new ConfigurationImpl(RuntimeType.SERVER);
+        ContainerResponseFilter filter = new ContainerResponseFilterImpl();
+        assertFalse(c.register(filter,
+                   Collections.<Class<?>, Integer>singletonMap(MessageBodyReader.class, 1000)));
+
+        for (String message : handler.messages) {
+            if (message.startsWith("WARN") && message.contains("does not implement specified contract")) {
+                return; // success
+            }
+        }
+        fail("did not log expected message");
+    }
 }
