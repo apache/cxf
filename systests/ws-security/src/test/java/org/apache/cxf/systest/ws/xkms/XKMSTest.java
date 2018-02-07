@@ -117,7 +117,7 @@ public class XKMSTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(port);
         }
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -147,7 +147,7 @@ public class XKMSTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(port);
         }
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);

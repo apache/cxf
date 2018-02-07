@@ -34,8 +34,8 @@ import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 
 /**
- * A test for Basic Auth using the WS-SecurityPolicy HttpBasicAuthentication policy. 
- * Note the basic auth credentials are not actually authenticated in this test...we are testing 
+ * A test for Basic Auth using the WS-SecurityPolicy HttpBasicAuthentication policy.
+ * Note the basic auth credentials are not actually authenticated in this test...we are testing
  * the WS-SecurityPolicy enforcement of whether the credentials are present or not.
  */
 public class BasicAuthTest extends AbstractBusClientServerTestBase {
@@ -77,12 +77,12 @@ public class BasicAuthTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, PORT);
 
-        utPort.doubleIt(25);
+        assertEquals(50, utPort.doubleIt(25));
 
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testNoBasicAuthCredentials() throws Exception {
 
@@ -110,5 +110,5 @@ public class BasicAuthTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
-    
+
 }

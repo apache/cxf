@@ -98,7 +98,7 @@ public class BinarySecurityTokenTest extends AbstractBusClientServerTestBase {
 
         ((BindingProvider)port).getRequestContext().put(SecurityConstants.TOKEN, securityToken);
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);

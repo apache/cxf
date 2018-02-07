@@ -167,7 +167,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -194,7 +194,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -221,7 +221,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -248,7 +248,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -279,7 +279,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
                 "bob.properties");
         ((BindingProvider)x509Port).getRequestContext().put(SecurityConstants.ENCRYPT_USERNAME, "bob");
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -308,7 +308,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -335,7 +335,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(x509Port, INTERMEDIARY_PORT);
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -362,7 +362,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -389,7 +389,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -413,7 +413,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(x509Port, test.getPort());
 
         if (!test.isStreaming()) {
-            x509Port.doubleIt(25);
+            assertEquals(50, x509Port.doubleIt(25));
         }
 
         ((java.io.Closeable)x509Port).close();
@@ -438,7 +438,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(x509Port, test.getPort());
 
         if (!test.isStreaming()) {
-            x509Port.doubleIt(25);
+            assertEquals(50, x509Port.doubleIt(25));
         }
 
         ((java.io.Closeable)x509Port).close();
@@ -466,7 +466,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -490,7 +490,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(x509Port, test.getPort());
 
         if (!test.isStreaming()) {
-            x509Port.doubleIt(25);
+            assertEquals(50, x509Port.doubleIt(25));
         }
 
         ((java.io.Closeable)x509Port).close();
@@ -518,7 +518,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -545,7 +545,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -572,7 +572,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -600,7 +600,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -627,7 +627,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -658,7 +658,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -685,7 +685,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -712,7 +712,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -739,7 +739,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -766,7 +766,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -793,7 +793,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -820,7 +820,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -847,7 +847,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -874,7 +874,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -902,7 +902,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         }
 
         if (!test.isStreaming() && !STAX_PORT.equals(test.getPort())) {
-            x509Port.doubleIt(25);
+            assertEquals(50, x509Port.doubleIt(25));
         }
 
         ((java.io.Closeable)x509Port).close();
@@ -930,7 +930,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -959,7 +959,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
 
         // TODO WSS-456 Streaming
         if (!test.isStreaming()) {
-            x509Port.doubleIt(25);
+            assertEquals(50, x509Port.doubleIt(25));
         }
 
         ((java.io.Closeable)x509Port).close();
@@ -991,7 +991,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -1022,7 +1022,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -1053,7 +1053,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -1084,7 +1084,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -1115,7 +1115,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -1142,7 +1142,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -1169,7 +1169,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -1196,7 +1196,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -1223,7 +1223,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -1255,7 +1255,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         cxfClient.getOutInterceptors().add(cacheInterceptor);
 
         // Make two invocations with the same security header
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
         try {
             x509Port.doubleIt(25);
             fail("Failure expected on a replayed Timestamp");
@@ -1292,7 +1292,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -1341,7 +1341,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             "alice.properties");
         ((BindingProvider)x509Port).getRequestContext().put(SecurityConstants.SIGNATURE_USERNAME, "alice");
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -1372,7 +1372,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -1495,7 +1495,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         // This should fail, as the client is not endorsing the token
         portQName = new QName(NAMESPACE, "DoubleItTransportNegativeEndorsingPort2");
@@ -1540,7 +1540,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -1567,7 +1567,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
@@ -1594,7 +1594,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(x509Port);
         }
 
-        x509Port.doubleIt(25);
+        assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);

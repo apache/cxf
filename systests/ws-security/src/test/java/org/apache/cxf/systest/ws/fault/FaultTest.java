@@ -89,7 +89,7 @@ public class FaultTest extends AbstractBusClientServerTestBase {
 
         // Make a successful invocation
         ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "alice");
-        utPort.doubleIt(25);
+        assertEquals(50, utPort.doubleIt(25));
 
         // Now make an invocation using another username
         ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "bob");
@@ -106,7 +106,7 @@ public class FaultTest extends AbstractBusClientServerTestBase {
 
         // Make a successful invocation
         ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "alice");
-        utPort.doubleIt(25);
+        assertEquals(50, utPort.doubleIt(25));
 
         // Now make an invocation using another username
         ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "bob");
@@ -140,7 +140,7 @@ public class FaultTest extends AbstractBusClientServerTestBase {
 
         // Make a successful invocation
         ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "alice");
-        utPort.doubleIt(25);
+        assertEquals(50, utPort.doubleIt(25));
 
         // Now make an invocation using another username
         ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "bob");
@@ -173,7 +173,7 @@ public class FaultTest extends AbstractBusClientServerTestBase {
 
         // Make a successful invocation
         ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "alice");
-        utPort.doubleIt(25);
+        assertEquals(50, utPort.doubleIt(25));
 
         // Now make an invocation using another username
         ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "bob");
@@ -263,7 +263,7 @@ public class FaultTest extends AbstractBusClientServerTestBase {
 
         // Make a successful invocation
         ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "alice");
-        utPort.doubleIt(25);
+        assertEquals(50, utPort.doubleIt(25));
 
         // Now make an invocation using another username
         ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "bob");
@@ -299,7 +299,7 @@ public class FaultTest extends AbstractBusClientServerTestBase {
 
         // Make a successful invocation
         ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "alice");
-        utPort.doubleIt(25);
+        assertEquals(50, utPort.doubleIt(25));
 
         // Now make an invocation using another username
         ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "bob");

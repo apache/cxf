@@ -19,19 +19,31 @@
 
 package org.apache.cxf.systest.ws.action;
 
+import java.io.StringReader;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.ws.Dispatch;
 import javax.xml.ws.Service;
+
+import org.w3c.dom.Document;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.jaxws.DispatchImpl;
+import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.systest.ws.common.KeystorePasswordCallback;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.ut.SecurityHeaderCacheInterceptor;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
+import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.example.contract.doubleit.DoubleItPortType;
 
@@ -87,7 +99,7 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -112,7 +124,7 @@ public class ActionTest extends AbstractBusClientServerTestBase {
 
 
         // Successful call
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         // This should fail, as the client is not sending a UsernameToken
         portQName = new QName(NAMESPACE, "DoubleItUsernameTokenPort2");
@@ -131,7 +143,7 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, UTServer.PORT);
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -160,7 +172,7 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         cxfClient.getOutInterceptors().add(cacheInterceptor);
 
         // Make two invocations with the same UsernameToken
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
         try {
             port.doubleIt(25);
             fail("Failure expected on a replayed UsernameToken");
@@ -192,7 +204,7 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -221,7 +233,7 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         cxfClient.getOutInterceptors().add(cacheInterceptor);
 
         // Make two invocations with the same SecurityHeader
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
         try {
             port.doubleIt(25);
             fail("Failure expected on a replayed Timestamp");
@@ -252,7 +264,7 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         updateAddressPort(port, PORT);
 
         // Successful call
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -277,7 +289,7 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         updateAddressPort(port, PORT);
 
         // Successful call
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -301,7 +313,7 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         updateAddressPort(port, PORT);
 
         // Successful call
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -435,9 +447,131 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+
+    @org.junit.Test
+    public void testSignatureProgrammatic() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = ActionTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = ActionTest.class.getResource("DoubleItAction.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSignatureConfigPort");
+
+        DoubleItPortType port =
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+
+        // Programmatic interceptor
+        Map<String, Object> props = new HashMap<>();
+        props.put(ConfigurationConstants.ACTION, "Signature");
+        props.put(ConfigurationConstants.SIGNATURE_USER, "alice");
+        props.put(ConfigurationConstants.PW_CALLBACK_REF, new KeystorePasswordCallback());
+        props.put(ConfigurationConstants.SIG_KEY_ID, "DirectReference");
+        props.put(ConfigurationConstants.SIG_PROP_FILE, "alice.properties");
+        WSS4JOutInterceptor outInterceptor = new WSS4JOutInterceptor(props);
+        Client client = ClientProxy.getClient(port);
+        client.getOutInterceptors().add(outInterceptor);
+
+        assertEquals(50, port.doubleIt(25));
+
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+
+    @org.junit.Test
+    public void testSignatureDispatchPayload() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = ActionTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = ActionTest.class.getResource("DoubleItAction.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSignatureConfigPort");
+
+        Dispatch<StreamSource> dispatch =
+            service.createDispatch(portQName, StreamSource.class, Service.Mode.PAYLOAD);
+        updateAddressPort(dispatch, PORT);
+
+        // Programmatic interceptor
+        Map<String, Object> props = new HashMap<>();
+        props.put(ConfigurationConstants.ACTION, "Signature");
+        props.put(ConfigurationConstants.SIGNATURE_USER, "alice");
+        props.put(ConfigurationConstants.PW_CALLBACK_REF, new KeystorePasswordCallback());
+        props.put(ConfigurationConstants.SIG_KEY_ID, "DirectReference");
+        props.put(ConfigurationConstants.SIG_PROP_FILE, "alice.properties");
+        WSS4JOutInterceptor outInterceptor = new WSS4JOutInterceptor(props);
+        Client client = ((DispatchImpl<StreamSource>) dispatch).getClient();
+        client.getOutInterceptors().add(outInterceptor);
+
+        String payload = "<ns2:DoubleIt xmlns:ns2=\"http://www.example.org/schema/DoubleIt\">"
+            + "<numberToDouble>25</numberToDouble></ns2:DoubleIt>";
+        StreamSource request = new StreamSource(new StringReader(payload));
+        StreamSource response = dispatch.invoke(request);
+        assertNotNull(response);
+
+        Document doc = StaxUtils.read(response.getInputStream());
+        assertEquals("50", doc.getElementsByTagNameNS(null, "doubledNumber").item(0).getTextContent());
+
+        ((java.io.Closeable)dispatch).close();
+        bus.shutdown(true);
+    }
+
+    @org.junit.Test
+    public void testSignatureDispatchMessage() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = ActionTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = ActionTest.class.getResource("DoubleItAction.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSignatureConfigPort");
+
+        Dispatch<StreamSource> dispatch =
+            service.createDispatch(portQName, StreamSource.class, Service.Mode.MESSAGE);
+        updateAddressPort(dispatch, PORT);
+
+        // Programmatic interceptor
+        Map<String, Object> props = new HashMap<>();
+        props.put(ConfigurationConstants.ACTION, "Signature");
+        props.put(ConfigurationConstants.SIGNATURE_USER, "alice");
+        props.put(ConfigurationConstants.PW_CALLBACK_REF, new KeystorePasswordCallback());
+        props.put(ConfigurationConstants.SIG_KEY_ID, "DirectReference");
+        props.put(ConfigurationConstants.SIG_PROP_FILE, "alice.properties");
+        WSS4JOutInterceptor outInterceptor = new WSS4JOutInterceptor(props);
+        Client client = ((DispatchImpl<StreamSource>) dispatch).getClient();
+        client.getOutInterceptors().add(outInterceptor);
+
+        String payload = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+            + "<soap:Header></soap:Header><soap:Body>"
+            + "<ns2:DoubleIt xmlns:ns2=\"http://www.example.org/schema/DoubleIt\">"
+            + "<numberToDouble>25</numberToDouble></ns2:DoubleIt>"
+            + "</soap:Body></soap:Envelope>";
+        StreamSource request = new StreamSource(new StringReader(payload));
+        StreamSource response = dispatch.invoke(request);
+        assertNotNull(response);
+
+        Document doc = StaxUtils.read(response.getInputStream());
+        assertEquals("50", doc.getElementsByTagNameNS(null, "doubledNumber").item(0).getTextContent());
+
+        ((java.io.Closeable)dispatch).close();
         bus.shutdown(true);
     }
 

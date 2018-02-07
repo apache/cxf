@@ -29,11 +29,14 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.Dispatch;
 import javax.xml.ws.Service;
 
+import org.w3c.dom.Document;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.jaxws.DispatchImpl;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -109,7 +112,7 @@ public class SignatureWhitespaceTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -154,6 +157,11 @@ public class SignatureWhitespaceTest extends AbstractBusClientServerTestBase {
         // Make a successful request
         StreamSource response = dispatch.invoke(request);
         assertNotNull(response);
+
+        Document doc = StaxUtils.read(response.getInputStream());
+        assertEquals("50", doc.getElementsByTagNameNS(null, "doubledNumber").item(0).getTextContent());
+
+        ((java.io.Closeable)dispatch).close();
     }
 
     @org.junit.Test
@@ -185,6 +193,11 @@ public class SignatureWhitespaceTest extends AbstractBusClientServerTestBase {
         // Make a successful request
         StreamSource response = dispatch.invoke(request);
         assertNotNull(response);
+
+        Document doc = StaxUtils.read(response.getInputStream());
+        assertEquals("50", doc.getElementsByTagNameNS(null, "doubledNumber").item(0).getTextContent());
+
+        ((java.io.Closeable)dispatch).close();
     }
 
 }

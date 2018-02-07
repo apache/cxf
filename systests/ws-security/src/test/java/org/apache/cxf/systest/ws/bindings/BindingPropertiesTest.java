@@ -110,7 +110,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(port);
         }
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         // This should fail, as OnlySignEntireHeadersAndBody is specified
         portQName = new QName(NAMESPACE, "DoubleItOnlySignPort");
@@ -155,7 +155,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(port);
         }
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         // This should fail, as the client is not encrypting the signature is specified
         portQName = new QName(NAMESPACE, "DoubleItEncryptSignaturePort2");
@@ -201,7 +201,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(port);
         }
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         // This should fail, as the client is not sending a Timestamp
         portQName = new QName(NAMESPACE, "DoubleItIncludeTimestampPort2");
@@ -247,7 +247,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(port);
         }
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         // This should fail, as the client is not following the correct steps for this property
         portQName = new QName(NAMESPACE, "DoubleItEncryptBeforeSigningPort2");
@@ -293,7 +293,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(port);
         }
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         // This should fail, as the client is not following the correct steps for this property
         portQName = new QName(NAMESPACE, "DoubleItSignBeforeEncryptingPort2");
@@ -342,7 +342,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
 
         // TODO Timestamp First/Last validation not working - see WSS-444
         if (!STAX_PORT.equals(test.getPort())) {
-            port.doubleIt(25);
+            assertEquals(50, port.doubleIt(25));
         }
 
         // This should fail, as the client is sending the timestamp last
@@ -393,7 +393,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
 
         // TODO Timestamp First/Last validation not working - see WSS-444
         if (!STAX_PORT.equals(test.getPort())) {
-            port.doubleIt(25);
+            assertEquals(50, port.doubleIt(25));
         }
 
         // This should fail, as the client is sending the timestamp first
@@ -444,7 +444,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
 
         // TODO Strict validation not working - see WSS-444
         if (!STAX_PORT.equals(test.getPort())) {
-            port.doubleIt(25);
+            assertEquals(50, port.doubleIt(25));
         }
 
         // This should fail, as the client is sending the timestamp last
@@ -495,7 +495,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
 
         // TODO DOM server not working
         if (!PORT.equals(test.getPort())) {
-            port.doubleIt(25);
+            assertEquals(50, port.doubleIt(25));
         }
 
         // This should fail, as the property is not enabled
@@ -545,7 +545,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(port);
         }
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         // This should fail, as SignatureConfirmation is not enabled
         portQName = new QName(NAMESPACE, "DoubleItSignatureConfirmationPort2");
@@ -588,7 +588,7 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(port);
         }
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
