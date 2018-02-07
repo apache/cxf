@@ -67,7 +67,7 @@ public final class ExceptionUtils {
         }
         Message inMessage = currentMessage.getExchange().getInMessage();
         Response response = null;
-        if (ex.getClass() == WebApplicationException.class) {
+        if (ex instanceof WebApplicationException) {
             WebApplicationException webEx = (WebApplicationException)ex;
             if (webEx.getResponse().hasEntity()
                 && webEx.getCause() == null
