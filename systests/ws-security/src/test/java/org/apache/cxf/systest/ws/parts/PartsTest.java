@@ -146,9 +146,9 @@ public class PartsTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
-        port.doubleIt(25);
-        
+
+        assertEquals(50, port.doubleIt(25));
+
         // This should fail, as the service requires a (bad) header
         portQName = new QName(NAMESPACE, "DoubleItRequiredPartsPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
@@ -191,9 +191,9 @@ public class PartsTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
-        port.doubleIt(25);
-        
+
+        assertEquals(50, port.doubleIt(25));
+
         // This should fail, as the service requires a (bad) header
         portQName = new QName(NAMESPACE, "DoubleItRequiredElementsPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
@@ -237,9 +237,9 @@ public class PartsTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
-        port.doubleIt(25);
-        
+
+        assertEquals(50, port.doubleIt(25));
+
         // This should fail, as the service requires that the Body must be signed
         portQName = new QName(NAMESPACE, "DoubleItSignedPartsPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
@@ -301,9 +301,9 @@ public class PartsTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
-        port.doubleIt(25);
-        
+
+        assertEquals(50, port.doubleIt(25));
+
         // This should fail, as the service requires that the To header must be signed
         portQName = new QName(NAMESPACE, "DoubleItSignedElementsPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
@@ -347,9 +347,9 @@ public class PartsTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
-        port.doubleIt(25);
-        
+
+        assertEquals(50, port.doubleIt(25));
+
         // This should fail, as the service requires that the Body must be encrypted
         portQName = new QName(NAMESPACE, "DoubleItEncryptedPartsPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
@@ -411,9 +411,9 @@ public class PartsTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
-        port.doubleIt(25);
-        
+
+        assertEquals(50, port.doubleIt(25));
+
         // This should fail, as the service requires that the header must be encrypted
         portQName = new QName(NAMESPACE, "DoubleItEncryptedElementsPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
@@ -461,9 +461,9 @@ public class PartsTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
-        port.doubleIt(25);
-        
+
+        assertEquals(50, port.doubleIt(25));
+
         // This should fail, as the service requires that the header must be encrypted
         portQName = new QName(NAMESPACE, "DoubleItEncryptedElementsPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
@@ -507,9 +507,9 @@ public class PartsTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
-        port.doubleIt(25);
-        
+
+        assertEquals(50, port.doubleIt(25));
+
         // This should fail, as the service requires that the header must be encrypted
         portQName = new QName(NAMESPACE, "DoubleItContentEncryptedElementsPort2");
         port = service.getPort(portQName, DoubleItPortType.class);

@@ -135,9 +135,9 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
             WSS4JOutInterceptor outInterceptor = new WSS4JOutInterceptor(outProps);
             bus.getOutInterceptors().add(outInterceptor);
         }
-        
-        port.doubleIt(25);
-        
+
+        assertEquals(50, port.doubleIt(25));
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
@@ -277,9 +277,9 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
             WSS4JOutInterceptor outInterceptor = new WSS4JOutInterceptor(outProps);
             bus.getOutInterceptors().add(outInterceptor);
         }
-        
-        port.doubleIt(25);
-        
+
+        assertEquals(50, port.doubleIt(25));
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
@@ -426,8 +426,8 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
             bus.getOutInterceptors().add(outInterceptor);
         }
 
-        port.doubleIt(25);
-        
+        assertEquals(50, port.doubleIt(25));
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
@@ -554,9 +554,9 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
             outInterceptor = new WSS4JOutInterceptor(outProps);
             bus.getOutInterceptors().add(outInterceptor);
         }
-        
-        port.doubleIt(25);
-        
+
+        assertEquals(50, port.doubleIt(25));
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
@@ -602,9 +602,9 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
             outInterceptor = new WSS4JOutInterceptor(outProps);
             bus.getOutInterceptors().add(outInterceptor);
         }
-        
-        port.doubleIt(25);
-        
+
+        assertEquals(50, port.doubleIt(25));
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
@@ -666,8 +666,8 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         
         // This test only applies to the DOM implementation
         if (PORT.equals(test.getPort()) && !test.isStreaming()) {
-            port.doubleIt(25);
-            
+            assertEquals(50, port.doubleIt(25));
+
             // Now try with a message that will create a Fault in the SEI
             try {
                 port.doubleIt(0);
@@ -724,8 +724,8 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
             bus.getOutInterceptors().add(outInterceptor);
         }
 
-        port.doubleIt(25);
-        
+        assertEquals(50, port.doubleIt(25));
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }

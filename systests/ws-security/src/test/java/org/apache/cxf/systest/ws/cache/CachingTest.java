@@ -104,8 +104,8 @@ public class CachingTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
-        port.doubleIt(25);
+
+        assertEquals(50, port.doubleIt(25));
 
         Client client = ClientProxy.getClient(port);
         TokenStore tokenStore = 
@@ -175,8 +175,8 @@ public class CachingTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
-        port.doubleIt(25);
+
+        assertEquals(50, port.doubleIt(25));
 
         Client client = ClientProxy.getClient(port);
         TokenStore tokenStore = 
@@ -201,8 +201,8 @@ public class CachingTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port2);
         }
-        
-        port2.doubleIt(35);
+
+        assertEquals(70, port2.doubleIt(35));
 
         client = ClientProxy.getClient(port2);
         tokenStore = 

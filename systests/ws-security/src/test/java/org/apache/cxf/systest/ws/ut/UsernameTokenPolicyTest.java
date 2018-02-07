@@ -106,9 +106,9 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
-        port.doubleIt(25);
-        
+
+        assertEquals(50, port.doubleIt(25));
+
         // This should fail, as the client is not sending a UsernameToken Supporting Token
         portQName = new QName(NAMESPACE, "DoubleItSupportingTokenPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
@@ -151,9 +151,9 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
-        port.doubleIt(25);
-        
+
+        assertEquals(50, port.doubleIt(25));
+
         // This should fail, as the client is sending a hashed password
         portQName = new QName(NAMESPACE, "DoubleItPlaintextPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
@@ -212,9 +212,9 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
-        port.doubleIt(25);
-        
+
+        assertEquals(50, port.doubleIt(25));
+
         // This should fail, as the client is sending a plaintext password
         portQName = new QName(NAMESPACE, "DoubleItHashPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
@@ -273,9 +273,9 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
-        port.doubleIt(25);
-        
+
+        assertEquals(50, port.doubleIt(25));
+
         // This should fail, as the client is not sending a Created element
         portQName = new QName(NAMESPACE, "DoubleItCreatedPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
@@ -318,9 +318,9 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
-        port.doubleIt(25);
-        
+
+        assertEquals(50, port.doubleIt(25));
+
         // This should fail, as the client is not sending a Nonce element
         portQName = new QName(NAMESPACE, "DoubleItNoncePort2");
         port = service.getPort(portQName, DoubleItPortType.class);

@@ -79,12 +79,12 @@ public class AlgorithmSuiteTest extends AbstractBusClientServerTestBase {
         
         // This should succeed as the client + server policies match
         // DOM
-        port.doubleIt(25);
-        
+        assertEquals(50, port.doubleIt(25));
+
         // Streaming
         SecurityTestUtil.enableStreaming(port);
-        port.doubleIt(25);
-        
+        assertEquals(50, port.doubleIt(25));
+
         portQName = new QName(NAMESPACE, "DoubleItSymmetric128Port2");
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
@@ -160,12 +160,12 @@ public class AlgorithmSuiteTest extends AbstractBusClientServerTestBase {
         updateAddressPort(port, PORT);
 
         // DOM
-        port.doubleIt(25);
-        
+        assertEquals(50, port.doubleIt(25));
+
         // Streaming
         SecurityTestUtil.enableStreaming(port);
-        port.doubleIt(25);
-        
+        assertEquals(50, port.doubleIt(25));
+
         bus.shutdown(true);
     }
     
@@ -187,8 +187,8 @@ public class AlgorithmSuiteTest extends AbstractBusClientServerTestBase {
         updateAddressPort(port, PORT);
         
         // This should succeed as the client + server settings match
-        port.doubleIt(25);
-        
+        assertEquals(50, port.doubleIt(25));
+
         portQName = new QName(NAMESPACE, "DoubleItEncryptionOAEPPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
@@ -237,8 +237,8 @@ public class AlgorithmSuiteTest extends AbstractBusClientServerTestBase {
         updateAddressPort(port, PORT);
         
         // This should succeed as the client + server settings match
-        port.doubleIt(25);
-        
+        assertEquals(50, port.doubleIt(25));
+
         // This should fail as the client uses uses RSA-SHA256 + the server uses RSA-SHA1
         if (SecurityTestUtil.checkUnrestrictedPoliciesInstalled()) {
             portQName = new QName(NAMESPACE, "DoubleItSignaturePort2");
@@ -277,12 +277,12 @@ public class AlgorithmSuiteTest extends AbstractBusClientServerTestBase {
         
         // This should succeed as the client + server policies match
         // DOM
-        port.doubleIt(25);
-        
+        assertEquals(50, port.doubleIt(25));
+
         // Streaming
         SecurityTestUtil.enableStreaming(port);
-        port.doubleIt(25);
-        
+        assertEquals(50, port.doubleIt(25));
+
         portQName = new QName(NAMESPACE, "DoubleItSymmetric128InclusivePort2");
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
@@ -331,12 +331,12 @@ public class AlgorithmSuiteTest extends AbstractBusClientServerTestBase {
         updateAddressPort(port, PORT);
 
         // DOM
-        port.doubleIt(25);
-        
+        assertEquals(50, port.doubleIt(25));
+
         // Streaming
         SecurityTestUtil.enableStreaming(port);
-        port.doubleIt(25);
-        
+        assertEquals(50, port.doubleIt(25));
+
         bus.shutdown(true);
     }
 }

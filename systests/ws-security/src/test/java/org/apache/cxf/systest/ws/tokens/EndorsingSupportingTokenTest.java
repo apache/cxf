@@ -102,9 +102,9 @@ public class EndorsingSupportingTokenTest extends AbstractBusClientServerTestBas
         QName portQName = new QName(NAMESPACE, "DoubleItEndorsingSupportingPort");
         DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
-        port.doubleIt(25);
-        
+
+        assertEquals(50, port.doubleIt(25));
+
         // This should fail, as the client is signing (but not endorsing) the X.509 Token
         portQName = new QName(NAMESPACE, "DoubleItEndorsingSupportingPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
@@ -156,9 +156,9 @@ public class EndorsingSupportingTokenTest extends AbstractBusClientServerTestBas
         QName portQName = new QName(NAMESPACE, "DoubleItSignedEndorsingSupportingPort");
         DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
-        port.doubleIt(25);
-        
+
+        assertEquals(50, port.doubleIt(25));
+
         // This should fail, as the client is signing (but not endorsing) the X.509 Token
         portQName = new QName(NAMESPACE, "DoubleItSignedEndorsingSupportingPort2");
         port = service.getPort(portQName, DoubleItPortType.class);

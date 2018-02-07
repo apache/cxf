@@ -138,9 +138,9 @@ public class GCMTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(gcmPort);
         }
-        
-        gcmPort.doubleIt(25);
-        
+
+        assertEquals(50, gcmPort.doubleIt(25));
+
         ((java.io.Closeable)gcmPort).close();
         bus.shutdown(true);
     }
@@ -182,8 +182,8 @@ public class GCMTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(gcmPort);
         }
 
-        gcmPort.doubleIt(25);
-        
+        assertEquals(50, gcmPort.doubleIt(25));
+
         ((java.io.Closeable)gcmPort).close();
         bus.shutdown(true);
     }
@@ -223,9 +223,8 @@ public class GCMTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(gcmPort);
         }
-        
-        gcmPort.doubleIt(25);
-        
+        assertEquals(50, gcmPort.doubleIt(25));
+
         ((java.io.Closeable)gcmPort).close();
         bus.shutdown(true);
     }
@@ -270,9 +269,9 @@ public class GCMTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(gcmPort);
         }
-        
-        gcmPort.doubleIt(25);
-        
+
+        assertEquals(50, gcmPort.doubleIt(25));
+
         ((java.io.Closeable)gcmPort).close();
         bus.shutdown(true);
     }
@@ -318,9 +317,9 @@ public class GCMTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(gcmPort);
         }
-        
-        gcmPort.doubleIt(25);
-        
+
+        assertEquals(50, gcmPort.doubleIt(25));
+
         ((java.io.Closeable)gcmPort).close();
         bus.shutdown(true);
     }

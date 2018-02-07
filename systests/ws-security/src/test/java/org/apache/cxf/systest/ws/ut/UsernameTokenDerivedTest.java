@@ -79,9 +79,9 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
         DoubleItPortType utPort = 
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, PORT);
-        
-        utPort.doubleIt(25);
-        
+
+        assertEquals(50, utPort.doubleIt(25));
+
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
@@ -106,9 +106,9 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
         DoubleItPortType utPort = 
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, PORT);
-        
-        utPort.doubleIt(25);
-        
+
+        assertEquals(50, utPort.doubleIt(25));
+
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
@@ -133,9 +133,9 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
         DoubleItPortType utPort = 
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, PORT);
-        
-        utPort.doubleIt(25);
-        
+
+        assertEquals(50, utPort.doubleIt(25));
+
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
@@ -160,9 +160,9 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
         DoubleItPortType utPort = 
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, PORT2);
-        
-        utPort.doubleIt(25);
-        
+
+        assertEquals(50, utPort.doubleIt(25));
+
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
@@ -187,9 +187,9 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
         DoubleItPortType utPort = 
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, PORT);
-        
-        utPort.doubleIt(25);
-        
+
+        assertEquals(50, utPort.doubleIt(25));
+
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
@@ -214,9 +214,9 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
         DoubleItPortType utPort = 
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, PORT);
-        
-        utPort.doubleIt(25);
-        
+
+        assertEquals(50, utPort.doubleIt(25));
+
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
@@ -241,9 +241,9 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
         DoubleItPortType utPort = 
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, PORT);
-        
-        utPort.doubleIt(25);
-        
+
+        assertEquals(50, utPort.doubleIt(25));
+
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }

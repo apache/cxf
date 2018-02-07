@@ -122,9 +122,9 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
-        port.doubleIt(25);
-        
+
+        assertEquals(50, port.doubleIt(25));
+
         // This should fail, as the client is not signing the UsernameToken
         portQName = new QName(NAMESPACE, "DoubleItSignedSupportingPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
@@ -186,9 +186,9 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
-        port.doubleIt(25);
-        
+
+        assertEquals(50, port.doubleIt(25));
+
         // This should fail, as the client is not encrypting the UsernameToken
         portQName = new QName(NAMESPACE, "DoubleItEncryptedSupportingPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
@@ -255,9 +255,9 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
-        port.doubleIt(25);
-        
+
+        assertEquals(50, port.doubleIt(25));
+
         // This should fail, as the client is not encrypting the UsernameToken
         portQName = new QName(NAMESPACE, "DoubleItEncryptedSupportingPort5");
         port = service.getPort(portQName, DoubleItPortType.class);
@@ -306,9 +306,9 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
-        port.doubleIt(25);
-        
+
+        assertEquals(50, port.doubleIt(25));
+
         // This should fail, as the client is not encrypting the UsernameToken
         portQName = new QName(NAMESPACE, "DoubleItSignedEncryptedSupportingPort2");
         port = service.getPort(portQName, DoubleItPortType.class);

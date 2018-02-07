@@ -124,9 +124,9 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
-        port.doubleIt(25);
-        
+
+        assertEquals(50, port.doubleIt(25));
+
         ((java.io.Closeable)port).close();
     }
     
@@ -150,9 +150,9 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
-        port.doubleIt(25);
-        
+
+        assertEquals(50, port.doubleIt(25));
+
         ((java.io.Closeable)port).close();
     }
     

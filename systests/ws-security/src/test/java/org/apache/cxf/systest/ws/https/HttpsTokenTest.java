@@ -106,9 +106,9 @@ public class HttpsTokenTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
-        port.doubleIt(25);
-        
+
+        assertEquals(50, port.doubleIt(25));
+
         // This should fail, as the client does not use a client cert
         portQName = new QName(NAMESPACE, "DoubleItRequireClientCertPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
@@ -170,7 +170,7 @@ public class HttpsTokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(port);
         }
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -196,9 +196,9 @@ public class HttpsTokenTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
-        port.doubleIt(25);
-        
+
+        assertEquals(50, port.doubleIt(25));
+
         // This should fail, as the client does not send a UsernamePassword
         portQName = new QName(NAMESPACE, "DoubleItBasicAuthPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
@@ -243,7 +243,7 @@ public class HttpsTokenTest extends AbstractBusClientServerTestBase {
             SecurityTestUtil.enableStreaming(port);
         }
 
-        port.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);

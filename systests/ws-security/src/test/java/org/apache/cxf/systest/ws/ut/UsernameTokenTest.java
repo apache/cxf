@@ -134,7 +134,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         HTTPConduit http = (HTTPConduit) client.getConduit();
         http.setTlsClientParameters(tlsParams);
 
-        utPort.doubleIt(25);
+        assertEquals(50, utPort.doubleIt(25));
 
         ((java.io.Closeable)utPort).close();
     }
@@ -159,9 +159,9 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(utPort);
         }
-        
-        utPort.doubleIt(25);
-        
+
+        assertEquals(50, utPort.doubleIt(25));
+
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
@@ -186,9 +186,9 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(utPort);
         }
-        
-        utPort.doubleIt(25);
-        
+
+        assertEquals(50, utPort.doubleIt(25));
+
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
@@ -213,9 +213,9 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(utPort);
         }
-        
-        utPort.doubleIt(25);
-        
+
+        assertEquals(50, utPort.doubleIt(25));
+
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
@@ -240,9 +240,9 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(utPort);
         }
-        
-        utPort.doubleIt(25);
-        
+
+        assertEquals(50, utPort.doubleIt(25));
+
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
@@ -267,9 +267,9 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(utPort);
         }
-        
-        utPort.doubleIt(25);
-        
+
+        assertEquals(50, utPort.doubleIt(25));
+
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
@@ -294,9 +294,9 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(utPort);
         }
-        
-        utPort.doubleIt(25);
-        
+
+        assertEquals(50, utPort.doubleIt(25));
+
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
@@ -321,9 +321,9 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(utPort);
         }
-        
-        utPort.doubleIt(25);
-        
+
+        assertEquals(50, utPort.doubleIt(25));
+
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
@@ -348,9 +348,9 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(utPort);
         }
-        
-        utPort.doubleIt(25);
-        
+
+        assertEquals(50, utPort.doubleIt(25));
+
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
@@ -375,9 +375,9 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(utPort);
         }
-        
-        utPort.doubleIt(25);
-        
+
+        assertEquals(50, utPort.doubleIt(25));
+
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
@@ -441,7 +441,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
             cxfClient.getOutInterceptors().add(cacheInterceptor);
             
             // Make two invocations with the same UsernameToken
-            utPort.doubleIt(25);
+            assertEquals(50, utPort.doubleIt(25));
             try {
                 utPort.doubleIt(25);
                 fail("Failure expected on a replayed UsernameToken");
@@ -481,7 +481,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
             cxfClient.getOutInterceptors().add(cacheInterceptor);
             
             // Make two invocations with the same UsernameToken
-            utPort.doubleIt(25);
+            assertEquals(50, utPort.doubleIt(25));
             try {
                 utPort.doubleIt(25);
                 fail("Failure expected on a replayed UsernameToken");
@@ -516,8 +516,8 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         }
         
         ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "Alice");
-        utPort.doubleIt(25);
-        
+        assertEquals(50, utPort.doubleIt(25));
+
         try {
             ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "Frank");
             utPort.doubleIt(30);

@@ -79,12 +79,12 @@ public class StaxAlgorithmSuiteTest extends AbstractBusClientServerTestBase {
         
         // This should succeed as the client + server policies match
         // DOM
-        port.doubleIt(25);
-        
+        assertEquals(50, port.doubleIt(25));
+
         // Streaming
         SecurityTestUtil.enableStreaming(port);
-        port.doubleIt(25);
-        
+        assertEquals(50, port.doubleIt(25));
+
         portQName = new QName(NAMESPACE, "DoubleItSymmetric128Port2");
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
