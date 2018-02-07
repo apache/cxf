@@ -16,16 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.cdi.extension;
+package org.apache.cxf.jaxrs.sse.ext;
 
-/**
- * Serves as an extension point in order to allow to customize JAX-RS server
- * factory bean creation (f.e. add features, providers, assign transport, ...)
- * during the CDI beans discovery and initialization.
- *
- * This class is now deprecated, in favor of {@link org.apache.cxf.jaxrs.ext.JAXRSServerFactoryCustomizationExtension}
- */
-@Deprecated
-public interface JAXRSServerFactoryCustomizationExtension extends
-        org.apache.cxf.jaxrs.ext.JAXRSServerFactoryCustomizationExtension {
+import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.ext.JAXRSServerFactoryCustomizationExtension;
+import org.apache.cxf.jaxrs.sse.SseContextProvider;
+import org.apache.cxf.jaxrs.sse.atmosphere.SseAtmosphereEventSinkContextProvider;
+import org.apache.cxf.transport.sse.SseHttpTransportFactory;
+
+public class SseTransportCustomizationExtension implements JAXRSServerFactoryCustomizationExtension {
+    @Override
+    public void customize(final JAXRSServerFactoryBean bean) {
+        bean.setTransportId(SseHttpTransportFactory.TRANSPORT_ID);
+        bean.setProvider(new SseContextProvider());
+        bean.setProvider(new SseAtmosphereEventSinkContextProvider());
+    }
 }

@@ -16,15 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.sse.cdi;
+package org.apache.cxf.jaxrs.utils;
 
-import org.apache.cxf.cdi.extension.JAXRSServerFactoryCustomizationExtension;
+import java.util.ServiceLoader;
+
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
-import org.apache.cxf.transport.sse.SseHttpTransportFactory;
+import org.apache.cxf.jaxrs.ext.JAXRSServerFactoryCustomizationExtension;
 
-public class SseTransportCustomizationExtension implements JAXRSServerFactoryCustomizationExtension {
-    @Override
-    public void customize(final JAXRSServerFactoryBean bean) {
-        bean.setTransportId(SseHttpTransportFactory.TRANSPORT_ID);
+public final class JAXRSServerFactoryCustomizationUtils {
+    private JAXRSServerFactoryCustomizationUtils() {
+    }
+    /**
+     * Looks up JAXRSServerFactoryCustomizationExtension via ServiceLoader and applies them to the passed in bean
+     */
+    public static void customize(JAXRSServerFactoryBean bean) {
+        ServiceLoader<JAXRSServerFactoryCustomizationExtension> extensions
+                = ServiceLoader.load(JAXRSServerFactoryCustomizationExtension.class);
+        for (JAXRSServerFactoryCustomizationExtension extension : extensions) {
+            extension.customize(bean);
+        }
     }
 }

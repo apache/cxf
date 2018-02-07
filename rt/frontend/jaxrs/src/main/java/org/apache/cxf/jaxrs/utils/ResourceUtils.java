@@ -902,9 +902,9 @@ public final class ResourceUtils {
             bean.getProperties(true).putAll(appProps);
         }
         bean.setApplication(app);
-
         return bean;
     }
+
     public static Object createProviderInstance(Class<?> cls) {
         try {
             Constructor<?> c = ResourceUtils.findResourceConstructor(cls, false);
