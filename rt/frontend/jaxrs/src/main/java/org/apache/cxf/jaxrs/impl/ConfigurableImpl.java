@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.ws.rs.Priorities;
 import javax.ws.rs.RuntimeType;
@@ -27,9 +28,11 @@ import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Feature;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 
 public class ConfigurableImpl<C extends Configurable<C>> implements Configurable<C> {
+    private static final Logger LOG = LogUtils.getL7dLogger(ConfigurableImpl.class);
     private ConfigurationImpl config;
     private final C configurable;
     private final Class<?>[] supportedProviderClasses;
@@ -120,6 +123,10 @@ public class ConfigurableImpl<C extends Configurable<C>> implements Configurable
     }
     
     private C doRegister(Object provider, int bindingPriority, Class<?>... contracts) {
+        if (contracts == null || contracts.length == 0) {
+            LOG.warning("Null or empty contracts specified for " + provider + "; ignoring.");
+            return configurable;
+        }
         return doRegisterProvider(provider, ConfigurationImpl.initContractsMap(bindingPriority, contracts));
     }
     

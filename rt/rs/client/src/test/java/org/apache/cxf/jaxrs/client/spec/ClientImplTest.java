@@ -18,17 +18,23 @@
  */
 package org.apache.cxf.jaxrs.client.spec;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxrs.client.ClientConfiguration;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.client.spec.ClientImpl.WebTargetImpl;
+import org.apache.cxf.jaxrs.impl.ConfigurableImpl;
 import org.apache.cxf.message.Message;
 
 import org.junit.Assert;
@@ -37,7 +43,7 @@ import org.junit.Test;
 public class ClientImplTest extends Assert {
 
     private static final String MY_INTERCEPTOR_NAME = "MyInterceptor";
-    
+
     private static class MyInterceptor implements Interceptor<Message> {
         @Override
         public String toString() {
@@ -55,7 +61,7 @@ public class ClientImplTest extends Assert {
             
         }
     }
-    
+
     /**
      * This test checks that we do not lose track of registered interceptors
      * on the original client implementation after we create a new impl with
@@ -72,15 +78,13 @@ public class ClientImplTest extends Assert {
         clientConfig.getOutInterceptors().addAll(Arrays.asList(new MyInterceptor()));
         assertTrue("Precondition failed - original WebTarget is missing expected interceptor",
                    doesClientConfigHaveMyInterceptor(webClient));
-        
+
         WebTarget webTargetAfterPath = webTarget.path("/rest/{key}/").resolveTemplate("key", "myKey");
         WebClient webClientAfterPath = getWebClient(webTargetAfterPath);
         assertTrue("New WebTarget is missing expected interceptor specified on 'parent' WebTarget's client impl",
                    doesClientConfigHaveMyInterceptor(webClientAfterPath));
-
-        
     }
-    
+
     private WebClient getWebClient(WebTarget webTarget) {
         webTarget.request();
         WebTargetImpl webTargetImpl = (WebTargetImpl) webTarget;
@@ -88,7 +92,7 @@ public class ClientImplTest extends Assert {
         assertNotNull("No WebClient is associated with this WebTargetImpl", webClient);
         return webClient;
     }
-    
+
     private boolean doesClientConfigHaveMyInterceptor(WebClient webClient) {
         ClientConfiguration clientConfigAfterPath = WebClient.getConfig(webClient);
         boolean foundMyInterceptor = false;
@@ -100,7 +104,7 @@ public class ClientImplTest extends Assert {
         }
         return foundMyInterceptor;
     }
-    
+
     /**
      * Similar to <code>testClientConfigCopiedOnPathCallWithTemplates</code>,
      * this test uses a template, but in the initial call to target().  At this
@@ -126,5 +130,61 @@ public class ClientImplTest extends Assert {
         assertTrue("New WebTarget is missing expected interceptor specified on 'parent' WebTarget's client impl",
                    doesClientConfigHaveMyInterceptor(webClientAfterPath));
 
+    }
+
+    static class TestHandler extends Handler {
+
+        List<String> messages = new ArrayList<>();
+        
+        /** {@inheritDoc}*/
+        @Override
+        public void publish(LogRecord record) {
+            messages.add(record.getLevel().toString() + ": " + record.getMessage());
+        }
+
+        /** {@inheritDoc}*/
+        @Override
+        public void flush() {
+            // no-op
+        }
+
+        /** {@inheritDoc}*/
+        @Override
+        public void close() throws SecurityException {
+            // no-op
+        }
+    }
+    @Test
+    public void testRegisterNullComponentClass() {
+        // Per register's javadoc, "Implementations MUST ignore attempts to register a component class for an empty
+        // or null collection of contracts via this method and SHOULD raise a warning about such event."
+        TestHandler handler = new TestHandler();
+        LogUtils.getL7dLogger(ConfigurableImpl.class).addHandler(handler);
+
+        ClientBuilder.newClient().register(MyInterceptor.class, (Class<?>[]) null);
+
+        for (String message : handler.messages) {
+            if (message.startsWith("WARN") && message.contains("Null or empty contracts")) {
+                return; // success
+            }
+        }
+        fail("did not log expected message");
+    }
+
+    @Test
+    public void testRegisterNullComponentObject() {
+        // Per register's javadoc, "Implementations MUST ignore attempts to register a component class for an empty
+        // or null collection of contracts via this method and SHOULD raise a warning about such event."
+        TestHandler handler = new TestHandler();
+        LogUtils.getL7dLogger(ConfigurableImpl.class).addHandler(handler);
+
+        ClientBuilder.newClient().register(new MyInterceptor(), (Class<?>[]) null);
+
+        for (String message : handler.messages) {
+            if (message.startsWith("WARN") && message.contains("Null or empty contracts")) {
+                return; // success
+            }
+        }
+        fail("did not log expected message");
     }
 }
