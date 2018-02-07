@@ -45,10 +45,12 @@ public final class SwaggerToOpenApiConversionFilter implements ContainerRequestF
     private static final String OPEN_API_PROPERTY = "openapi";
 
     private OpenApiConfiguration openApiConfig;
+    private String openApiJsonPath = OPEN_API_PATH;
+    
     @Override
     public void filter(ContainerRequestContext reqCtx) throws IOException {
         String path = reqCtx.getUriInfo().getPath();
-        if (path.endsWith(OPEN_API_PATH)) {
+        if (path.endsWith(openApiJsonPath)) {
             reqCtx.setRequestUri(URI.create(SWAGGER_PATH));
             JAXRSUtils.getCurrentMessage().getExchange().put(OPEN_API_PROPERTY, Boolean.TRUE);
         }
@@ -87,5 +89,9 @@ public final class SwaggerToOpenApiConversionFilter implements ContainerRequestF
 
     private boolean isOpenApiRequested() {
         return Boolean.TRUE == JAXRSUtils.getCurrentMessage().getExchange().get(OPEN_API_PROPERTY);
+    }
+
+    public void setOpenApiJsonPath(String openApiJsonPath) {
+        this.openApiJsonPath = openApiJsonPath;
     }
 }
