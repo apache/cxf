@@ -100,6 +100,7 @@ import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.JavaUtils;
+import org.apache.cxf.jaxrs.ext.Oneway;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
@@ -215,6 +216,7 @@ public class SourceGenerator {
     private List<String> compilerArgs = new ArrayList<>();
     private Set<String> suspendedAsyncMethods = Collections.emptySet();
     private Set<String> responseMethods = Collections.emptySet();
+    private Set<String> onewayMethods = Collections.emptySet();
     private Map<String, String> schemaPackageMap = Collections.emptyMap();
     private Map<String, String> javaTypeMap = Collections.emptyMap();
     private Map<String, String> schemaTypeMap = Collections.emptyMap();
@@ -271,6 +273,10 @@ public class SourceGenerator {
 
     public void setResponseMethods(Set<String> responseMethods) {
         this.responseMethods = responseMethods;
+    }
+
+    public void setOnewayMethods(Set<String> onewayMethods) {
+        this.onewayMethods = onewayMethods;
     }
 
     private String getClassPackageName(String wadlPackageName) {
@@ -724,6 +730,7 @@ public class SourceGenerator {
         final boolean responseRequired = isMethodMatched(responseMethods, methodNameLowerCase, id);
         final boolean suspendedAsync = responseRequired ? false
             : isMethodMatched(suspendedAsyncMethods, methodNameLowerCase, id);
+        final boolean oneway = isMethodMatched(onewayMethods, methodNameLowerCase, id);
 
         boolean jaxpSourceRequired = requestRepsWithElements.size() > 1 && !supportMultipleRepsWithElements;
         int numOfMethods = jaxpSourceRequired ? 1 : requestRepsWithElements.size();
@@ -771,6 +778,10 @@ public class SourceGenerator {
                         && isRepWithElementAvailable(responseReps, info.getGrammarInfo())) {
                         addImport(imports, BEAN_VALID_FULL_NAME);
                         sbMethodCode.append("@").append(BEAN_VALID_SIMPLE_NAME).append(getLineSep()).append(TAB);
+                    }
+                    if (oneway) {
+                        addImport(imports, Oneway.class.getName());
+                        sbMethodCode.append("@").append(Oneway.class.getSimpleName()).append(getLineSep()).append(TAB);
                     }
                 }
                 if (!isRoot && !"/".equals(currentPath)) {
