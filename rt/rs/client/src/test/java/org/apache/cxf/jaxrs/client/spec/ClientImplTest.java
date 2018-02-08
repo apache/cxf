@@ -164,7 +164,7 @@ public class ClientImplTest extends Assert {
         ClientBuilder.newClient().register(MyInterceptor.class, (Class<?>[]) null);
 
         for (String message : handler.messages) {
-            if (message.startsWith("WARN") && message.contains("Null or empty contracts")) {
+            if (message.startsWith("WARN") && message.contains("Null, empty or invalid contracts specified")) {
                 return; // success
             }
         }
@@ -181,7 +181,7 @@ public class ClientImplTest extends Assert {
         ClientBuilder.newClient().register(new MyInterceptor(), (Class<?>[]) null);
 
         for (String message : handler.messages) {
-            if (message.startsWith("WARN") && message.contains("Null or empty contracts")) {
+            if (message.startsWith("WARN") && message.contains("Null, empty or invalid contracts specified")) {
                 return; // success
             }
         }

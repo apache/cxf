@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
+import javax.ws.rs.ConstrainedTo;
 import javax.ws.rs.RuntimeType;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientRequestContext;
@@ -54,30 +55,62 @@ import org.junit.Test;
 public class ConfigurationImplTest extends Assert {
 
     @Test
-    public void testIsRegistered() {
+    public void testIsRegistered() throws Exception {
+//        ConfigurationImpl c = new ConfigurationImpl(RuntimeType.SERVER);
+//        ContainerResponseFilter filter = new ContainerResponseFilterImpl();
+//        assertTrue(c.register(filter,
+//                              Collections.<Class<?>, Integer>singletonMap(ContainerResponseFilter.class, 1000)));
+//        assertTrue(c.isRegistered(filter));
+//        assertFalse(c.isRegistered(new ContainerResponseFilterImpl()));
+//        assertTrue(c.isRegistered(ContainerResponseFilterImpl.class));
+//        assertFalse(c.isRegistered(ContainerResponseFilter.class));
+//        assertFalse(c.register(filter,
+//                               Collections.<Class<?>, Integer>singletonMap(ContainerResponseFilter.class, 1000)));
+//        assertFalse(c.register(ContainerResponseFilterImpl.class,
+//                               Collections.<Class<?>, Integer>singletonMap(ContainerResponseFilter.class, 1000)));
+        doTestIsFilterRegistered(new ContainerResponseFilterImpl(), ContainerResponseFilterImpl.class);
+    }
+    
+    @Test
+    public void testIsRegisteredSubClass() throws Exception {
+        doTestIsFilterRegistered(new ContainerResponseFilterSubClassImpl(), ContainerResponseFilterSubClassImpl.class);
+    }
+
+    private void doTestIsFilterRegistered(Object provider, Class<?> providerClass) throws Exception {
         ConfigurationImpl c = new ConfigurationImpl(RuntimeType.SERVER);
-        ContainerResponseFilter filter = new ContainerResponseFilterImpl();
-        assertTrue(c.register(filter,
+        assertTrue(c.register(provider,
                               Collections.<Class<?>, Integer>singletonMap(ContainerResponseFilter.class, 1000)));
-        assertTrue(c.isRegistered(filter));
-        assertFalse(c.isRegistered(new ContainerResponseFilterImpl()));
-        assertTrue(c.isRegistered(ContainerResponseFilterImpl.class));
+        assertTrue(c.isRegistered(provider));
+        assertFalse(c.isRegistered(providerClass.newInstance()));
+        assertTrue(c.isRegistered(providerClass));
         assertFalse(c.isRegistered(ContainerResponseFilter.class));
-        assertFalse(c.register(filter,
+        assertFalse(c.register(provider,
                                Collections.<Class<?>, Integer>singletonMap(ContainerResponseFilter.class, 1000)));
-        assertFalse(c.register(ContainerResponseFilterImpl.class,
+        assertFalse(c.register(providerClass,
                                Collections.<Class<?>, Integer>singletonMap(ContainerResponseFilter.class, 1000)));
     }
+
+    @ConstrainedTo(RuntimeType.SERVER)
     public static class ContainerResponseFilterImpl implements ContainerResponseFilter {
 
         @Override
         public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
             throws IOException {
-
         }
 
     }
 
+    public static class ContainerResponseFilterSubClassImpl extends ContainerResponseFilterImpl { }
+
+    @ConstrainedTo(RuntimeType.CLIENT)
+    public static class ClientResponseFilterImpl implements ClientResponseFilter {
+
+        @Override
+        public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext)
+            throws IOException {
+        }
+
+    }
     static class TestHandler extends Handler {
 
         List<String> messages = new ArrayList<>();
@@ -158,6 +191,18 @@ public class ConfigurationImplTest extends Assert {
                 } });
     }
 
+    @Test
+    public void testSubClassIsRegisteredOnConfigurable() {
+        FeatureContextImpl featureContext = new FeatureContextImpl();
+        Configurable<FeatureContext> configurable = new ConfigurableImpl<>(featureContext, RuntimeType.SERVER);
+        featureContext.setConfigurable(configurable);
+        featureContext.register(ContainerResponseFilterSubClassImpl.class);
+        Configuration config = configurable.getConfiguration();
+        Map<Class<?>, Integer> contracts = config.getContracts(ContainerResponseFilter.class);
+        assertEquals(1, contracts.size());
+        assertTrue(contracts.containsKey(ContainerResponseFilter.class));
+    }
+    
     @Test
     public void testServerFilterContractsOnClientIsRejected() {
         Configurable<Client> configurable = new ConfigurableImpl<Client>(createClientProxy(), RuntimeType.CLIENT);
@@ -243,5 +288,57 @@ public class ConfigurationImplTest extends Assert {
         featureContext.register(new DisablableFeature());
         assertEquals(5, config.getInstances().size());
         assertTrue(config.isEnabled(DisablableFeature.class));
+    }
+
+    @ConstrainedTo(RuntimeType.SERVER)
+    public static class ClientFilterConstrainedToServer implements ClientRequestFilter {
+
+        /** {@inheritDoc}*/
+        @Override
+        public void filter(ClientRequestContext paramClientRequestContext) throws IOException {
+            // no-op
+        }
+        
+    }
+
+    @Test
+    public void testInvalidConstraintOnProvider() {
+        TestHandler handler = new TestHandler();
+        LogUtils.getL7dLogger(ConfigurableImpl.class).addHandler(handler);
+
+        Configurable<Client> configurable = new ConfigurableImpl<Client>(createClientProxy(), RuntimeType.CLIENT);
+        Configuration config = configurable.getConfiguration();
+
+        configurable.register(ClientFilterConstrainedToServer.class);
+
+        assertEquals(0, config.getInstances().size());
+
+        for (String message : handler.messages) {
+            if (message.startsWith("WARN") && message.contains("cannot be registered in ")) {
+                return; // success
+            }
+        }
+        fail("did not log expected message");
+    }
+
+    
+    @Test
+    public void testChecksConstrainedToAnnotationDuringRegistration() {
+        TestHandler handler = new TestHandler();
+        LogUtils.getL7dLogger(ConfigurableImpl.class).addHandler(handler);
+
+        Configurable<Client> configurable = new ConfigurableImpl<Client>(createClientProxy(), RuntimeType.CLIENT);
+        Configuration config = configurable.getConfiguration();
+
+        configurable.register(ContainerResponseFilterImpl.class);
+
+        assertEquals(0, config.getInstances().size());
+
+        for (String message : handler.messages) {
+            if (message.startsWith("WARN") && message.contains("Null, empty or invalid contracts specified")) {
+                return; // success
+            }
+        }
+        fail("did not log expected message");
     }
 }
