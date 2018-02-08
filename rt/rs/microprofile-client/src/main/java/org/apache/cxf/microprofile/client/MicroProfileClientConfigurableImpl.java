@@ -46,9 +46,8 @@ public class MicroProfileClientConfigurableImpl<C extends Configurable<C>>
     }
 
     public MicroProfileClientConfigurableImpl(C configurable, Configuration config) {
-        super(configurable,
-                CONTRACTS, config == null ? new ConfigurationImpl(RuntimeType.CLIENT)
-                        : new ConfigurationImpl(config, CONTRACTS));
+        super(configurable, config == null ? new ConfigurationImpl(RuntimeType.CLIENT)
+                        : new ConfigurationImpl(config));
     }
 
     boolean isDefaultExceptionMapperDisabled() {
