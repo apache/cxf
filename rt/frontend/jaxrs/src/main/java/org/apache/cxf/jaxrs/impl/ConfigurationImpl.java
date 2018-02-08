@@ -132,13 +132,15 @@ public class ConfigurationImpl implements Configuration {
 
     @Override
     public boolean isEnabled(Feature f) {
-        return features.containsKey(f);
+        return features.containsKey(f) && features.get(f);
     }
 
     @Override
     public boolean isEnabled(Class<? extends Feature> f) {
-        for (Feature feature : features.keySet()) {
-            if (feature.getClass().isAssignableFrom(f)) {
+        for (Entry<Feature, Boolean> entry : features.entrySet()) {
+            Feature feature = entry.getKey();
+            Boolean enabled = entry.getValue();
+            if (f.isAssignableFrom(feature.getClass()) && enabled.booleanValue()) {
                 return true;
             }
         }

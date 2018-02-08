@@ -42,6 +42,7 @@ import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.Configuration;
+import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.ext.MessageBodyReader;
 
@@ -57,13 +58,13 @@ public class ConfigurationImplTest extends Assert {
         ConfigurationImpl c = new ConfigurationImpl(RuntimeType.SERVER);
         ContainerResponseFilter filter = new ContainerResponseFilterImpl();
         assertTrue(c.register(filter,
-                   Collections.<Class<?>, Integer>singletonMap(ContainerResponseFilter.class, 1000)));
+                              Collections.<Class<?>, Integer>singletonMap(ContainerResponseFilter.class, 1000)));
         assertTrue(c.isRegistered(filter));
         assertFalse(c.isRegistered(new ContainerResponseFilterImpl()));
         assertTrue(c.isRegistered(ContainerResponseFilterImpl.class));
         assertFalse(c.isRegistered(ContainerResponseFilter.class));
         assertFalse(c.register(filter,
-                              Collections.<Class<?>, Integer>singletonMap(ContainerResponseFilter.class, 1000)));
+                               Collections.<Class<?>, Integer>singletonMap(ContainerResponseFilter.class, 1000)));
         assertFalse(c.register(ContainerResponseFilterImpl.class,
                                Collections.<Class<?>, Integer>singletonMap(ContainerResponseFilter.class, 1000)));
     }
@@ -80,7 +81,7 @@ public class ConfigurationImplTest extends Assert {
     static class TestHandler extends Handler {
 
         List<String> messages = new ArrayList<>();
-        
+
         /** {@inheritDoc}*/
         @Override
         public void publish(LogRecord record) {
@@ -108,7 +109,7 @@ public class ConfigurationImplTest extends Assert {
         ConfigurationImpl c = new ConfigurationImpl(RuntimeType.SERVER);
         ContainerResponseFilter filter = new ContainerResponseFilterImpl();
         assertFalse(c.register(filter,
-                   Collections.<Class<?>, Integer>singletonMap(MessageBodyReader.class, 1000)));
+                               Collections.<Class<?>, Integer>singletonMap(MessageBodyReader.class, 1000)));
 
         for (String message : handler.messages) {
             if (message.startsWith("WARN") && message.contains("does not implement specified contract")) {
@@ -119,12 +120,12 @@ public class ConfigurationImplTest extends Assert {
     }
 
     public static class TestFilter implements ContainerRequestFilter, ContainerResponseFilter, 
-                                              ClientRequestFilter, ClientResponseFilter {
+    ClientRequestFilter, ClientResponseFilter {
 
         @Override
         public void filter(ClientRequestContext paramClientRequestContext,
                            ClientResponseContext paramClientResponseContext)
-            throws IOException {
+                               throws IOException {
             // no-op
         }
 
@@ -136,7 +137,7 @@ public class ConfigurationImplTest extends Assert {
         @Override
         public void filter(ContainerRequestContext paramContainerRequestContext,
                            ContainerResponseContext paramContainerResponseContext)
-            throws IOException {
+                               throws IOException {
             // no-op
         }
 
@@ -148,14 +149,13 @@ public class ConfigurationImplTest extends Assert {
 
     private Client createClientProxy() {
         return (Client) Proxy.newProxyInstance(this.getClass().getClassLoader(), 
-                                                     new Class<?>[]{Client.class},
-                                                     new InvocationHandler() {
+            new Class<?>[]{Client.class},
+            new InvocationHandler() {
 
-            @Override
-            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                // TODO Auto-generated method stub
-                return null;
-            } });
+                @Override
+                public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                    return null; //no-op
+                } });
     }
 
     @Test
@@ -182,5 +182,66 @@ public class ConfigurationImplTest extends Assert {
         assertFalse(contracts.containsKey(ClientResponseFilter.class));
         assertTrue(contracts.containsKey(ContainerRequestFilter.class));
         assertTrue(contracts.containsKey(ContainerResponseFilter.class));
+    }
+
+    public static class DisablableFeature implements Feature {
+
+        boolean enabled;
+
+        /** {@inheritDoc}*/
+        @Override
+        public boolean configure(FeatureContext context) {
+            return enabled;
+        }
+
+    }
+
+    @Test
+    public void testFeatureDisabledClass() {
+        FeatureContextImpl featureContext = new FeatureContextImpl();
+        Configurable<FeatureContext> configurable = new ConfigurableImpl<>(featureContext, RuntimeType.SERVER);
+        featureContext.setConfigurable(configurable);
+        featureContext.register(DisablableFeature.class);
+
+        Configuration config = configurable.getConfiguration();
+        assertFalse(config.isEnabled(DisablableFeature.class));
+    }
+
+    @Test
+    public void testFeatureDisabledInstance() {
+        FeatureContextImpl featureContext = new FeatureContextImpl();
+        Configurable<FeatureContext> configurable = new ConfigurableImpl<>(featureContext, RuntimeType.SERVER);
+        featureContext.setConfigurable(configurable);
+        Feature feature = new DisablableFeature();
+        featureContext.register(feature);
+
+        Configuration config = configurable.getConfiguration();
+        assertFalse(config.isEnabled(feature));
+    }
+
+    @Test 
+    public void testIsEnabledWithMultipleFeaturesOfSameType() {
+        FeatureContextImpl featureContext = new FeatureContextImpl();
+        Configurable<FeatureContext> configurable = new ConfigurableImpl<>(featureContext, RuntimeType.SERVER);
+        featureContext.setConfigurable(configurable);
+
+        featureContext.register(new DisablableFeature());
+        featureContext.register(new DisablableFeature());
+        featureContext.register(new DisablableFeature());
+
+        Configuration config = configurable.getConfiguration();
+        assertEquals(3, config.getInstances().size());
+        assertFalse(config.isEnabled(DisablableFeature.class));
+
+        DisablableFeature enabledFeature = new DisablableFeature();
+        enabledFeature.enabled = true;
+
+        featureContext.register(enabledFeature);
+        assertEquals(4, config.getInstances().size());
+        assertTrue(config.isEnabled(DisablableFeature.class));
+
+        featureContext.register(new DisablableFeature());
+        assertEquals(5, config.getInstances().size());
+        assertTrue(config.isEnabled(DisablableFeature.class));
     }
 }
