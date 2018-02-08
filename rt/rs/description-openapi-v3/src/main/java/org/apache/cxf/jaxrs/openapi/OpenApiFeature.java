@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
@@ -40,6 +41,7 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.model.ApplicationInfo;
+import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.swagger.SwaggerUiSupport;
 
@@ -99,11 +101,19 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
     private String propertiesLocation = DEFAULT_PROPS_LOCATION;
 
     protected static class DefaultApplication extends Application {
+
         private final Set<Class<?>> serviceClasses;
-        
-        DefaultApplication(Set<Class<?>> serviceClasses) {
-            this.serviceClasses = serviceClasses;
+
+        DefaultApplication(final List<ClassResourceInfo> cris, final Set<String> resourcePackages) {
+            this.serviceClasses = cris.stream().map(ClassResourceInfo::getServiceClass).
+                    filter(cls -> {
+                    return resourcePackages == null || resourcePackages.isEmpty()
+                           ? true
+                           : resourcePackages.stream().
+                               anyMatch(pkg -> cls.getPackage().getName().startsWith(pkg));
+                }).collect(Collectors.toSet());
         }
+
         @Override
         public Set<Class<?>> getClasses() {
             return serviceClasses;
@@ -424,21 +434,21 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
     }
 
     /**
-     * Detects the application (if present) or creates the default application (in case the
-     * scan is disabled)
+     * Detects the application (if present) or creates the default application (in case the scan is disabled).
      */
-    protected Application getApplicationOrDefault(Server server, ServerProviderFactory factory, 
-            JAXRSServiceFactoryBean sfb, Bus bus) {
+    protected Application getApplicationOrDefault(
+            final Server server,
+            final ServerProviderFactory factory,
+            final JAXRSServiceFactoryBean sfb,
+            final Bus bus) {
 
         ApplicationInfo appInfo = null;
         if (!isScan()) {
             appInfo = factory.getApplicationProvider();
             
             if (appInfo == null) {
-                Set<Class<?>> serviceClasses = sfb.getClassResourceInfo().stream().
-                        map(cri -> cri.getServiceClass()).
-                        collect(Collectors.toSet());
-                appInfo = new ApplicationInfo(new DefaultApplication(serviceClasses), bus);
+                appInfo = new ApplicationInfo(
+                        new DefaultApplication(sfb.getClassResourceInfo(), resourcePackages), bus);
                 server.getEndpoint().put(Application.class.getName(), appInfo);
             }
         }
