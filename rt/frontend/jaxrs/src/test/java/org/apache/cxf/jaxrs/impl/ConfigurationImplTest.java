@@ -20,16 +20,29 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
 import javax.ws.rs.RuntimeType;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientRequestContext;
+import javax.ws.rs.client.ClientRequestFilter;
+import javax.ws.rs.client.ClientResponseContext;
+import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.core.Configurable;
+import javax.ws.rs.core.Configuration;
+import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.ext.MessageBodyReader;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -103,5 +116,71 @@ public class ConfigurationImplTest extends Assert {
             }
         }
         fail("did not log expected message");
+    }
+
+    public static class TestFilter implements ContainerRequestFilter, ContainerResponseFilter, 
+                                              ClientRequestFilter, ClientResponseFilter {
+
+        @Override
+        public void filter(ClientRequestContext paramClientRequestContext,
+                           ClientResponseContext paramClientResponseContext)
+            throws IOException {
+            // no-op
+        }
+
+        @Override
+        public void filter(ClientRequestContext paramClientRequestContext) throws IOException {
+            // no-op
+        }
+
+        @Override
+        public void filter(ContainerRequestContext paramContainerRequestContext,
+                           ContainerResponseContext paramContainerResponseContext)
+            throws IOException {
+            // no-op
+        }
+
+        @Override
+        public void filter(ContainerRequestContext paramContainerRequestContext) throws IOException {
+            // no-op
+        }
+    }
+
+    private Client createClientProxy() {
+        return (Client) Proxy.newProxyInstance(this.getClass().getClassLoader(), 
+                                                     new Class<?>[]{Client.class},
+                                                     new InvocationHandler() {
+
+            @Override
+            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                // TODO Auto-generated method stub
+                return null;
+            } });
+    }
+
+    @Test
+    public void testServerFilterContractsOnClientIsRejected() {
+        Configurable<Client> configurable = new ConfigurableImpl<Client>(createClientProxy(), RuntimeType.CLIENT);
+        Configuration config = configurable.getConfiguration();
+        configurable.register(TestFilter.class);
+        Map<Class<?>, Integer> contracts = config.getContracts(TestFilter.class);
+        assertTrue(contracts.containsKey(ClientRequestFilter.class));
+        assertTrue(contracts.containsKey(ClientResponseFilter.class));
+        assertFalse(contracts.containsKey(ContainerRequestFilter.class));
+        assertFalse(contracts.containsKey(ContainerResponseFilter.class));
+    }
+
+    @Test
+    public void testClientFilterContractsOnServerFeatureIsRejected() {
+        FeatureContextImpl featureContext = new FeatureContextImpl();
+        Configurable<FeatureContext> configurable = new ConfigurableImpl<>(featureContext, RuntimeType.SERVER);
+        featureContext.setConfigurable(configurable);
+        featureContext.register(TestFilter.class);
+        Configuration config = configurable.getConfiguration();
+        Map<Class<?>, Integer> contracts = config.getContracts(TestFilter.class);
+        assertFalse(contracts.containsKey(ClientRequestFilter.class));
+        assertFalse(contracts.containsKey(ClientResponseFilter.class));
+        assertTrue(contracts.containsKey(ContainerRequestFilter.class));
+        assertTrue(contracts.containsKey(ContainerResponseFilter.class));
     }
 }
