@@ -19,8 +19,6 @@
 
 package org.apache.cxf.systest.jaxrs.reactive;
 
-import java.util.Collections;
-
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import org.apache.cxf.Bus;
@@ -28,8 +26,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
-import org.apache.cxf.jaxrs.provider.StreamingResponseProvider;
-import org.apache.cxf.jaxrs.rx2.server.ReactiveIOInvoker;
+import org.apache.cxf.jaxrs.rx2.server.ReactiveIOCustomizer;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 
@@ -52,13 +49,9 @@ public class RxJava2FlowableServer extends AbstractBusTestServerBase {
     private JAXRSServerFactoryBean createFactoryBean(Bus bus, boolean useStreamingSubscriber,
                                                      String relAddress) {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
-        ReactiveIOInvoker invoker = new ReactiveIOInvoker();
-        invoker.setUseStreamingSubscriberIfPossible(useStreamingSubscriber);
-        sf.setInvoker(invoker);
+        sf.getProperties(true).put("useStreamingSubscriber", useStreamingSubscriber);
         sf.setProvider(new JacksonJsonProvider());
-        StreamingResponseProvider<HelloWorldBean> streamProvider = new StreamingResponseProvider<HelloWorldBean>();
-        streamProvider.setProduceMediaTypes(Collections.singletonList("application/json"));
-        sf.setProvider(streamProvider);
+        new ReactiveIOCustomizer().customize(sf);
         sf.getOutInterceptors().add(new LoggingOutInterceptor());
         sf.setResourceClasses(RxJava2FlowableService.class);
         sf.setResourceProvider(RxJava2FlowableService.class,

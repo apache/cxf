@@ -19,8 +19,6 @@
 
 package org.apache.cxf.systest.jaxrs.reactive;
 
-import java.util.Collections;
-
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import org.apache.cxf.Bus;
@@ -28,8 +26,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
-import org.apache.cxf.jaxrs.provider.StreamingResponseProvider;
-import org.apache.cxf.jaxrs.rx.server.ObservableInvoker;
+import org.apache.cxf.jaxrs.rx.server.ObservableCustomizer;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 
@@ -45,11 +42,8 @@ public class RxJavaObservableServer extends AbstractBusTestServerBase {
         // Make sure default JSONProvider is not loaded
         bus.setProperty("skip.default.json.provider.registration", true);
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
-        sf.setInvoker(new ObservableInvoker());
         sf.setProvider(new JacksonJsonProvider());
-        StreamingResponseProvider<HelloWorldBean> streamProvider = new StreamingResponseProvider<HelloWorldBean>();
-        streamProvider.setProduceMediaTypes(Collections.singletonList("application/json"));
-        sf.setProvider(streamProvider);
+        new ObservableCustomizer().customize(sf);
         sf.getOutInterceptors().add(new LoggingOutInterceptor());
         sf.setResourceClasses(RxJavaObservableService.class);
         sf.setResourceProvider(RxJavaObservableService.class,

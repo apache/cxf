@@ -38,6 +38,7 @@
         <module>extensions/providers</module>
         <module>extensions/search</module>
         <module>extensions/rx</module>
+        <module>extensions/rx2</module>
         <module>extensions/reactor</module>
         <module>extensions/reactivestreams</module>
         <module>security</module>

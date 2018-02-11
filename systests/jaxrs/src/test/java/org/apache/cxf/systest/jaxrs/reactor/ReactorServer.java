@@ -19,8 +19,6 @@
 
 package org.apache.cxf.systest.jaxrs.reactor;
 
-import java.util.Collections;
-
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import org.apache.cxf.Bus;
@@ -28,8 +26,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
-import org.apache.cxf.jaxrs.provider.StreamingResponseProvider;
-import org.apache.cxf.jaxrs.reactor.server.ReactorInvoker;
+import org.apache.cxf.jaxrs.reactor.server.ReactorCustomizer;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class ReactorServer extends AbstractBusTestServerBase {
@@ -44,13 +41,9 @@ public class ReactorServer extends AbstractBusTestServerBase {
         // Make sure default JSONProvider is not loaded
         bus.setProperty("skip.default.json.provider.registration", true);
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
-        ReactorInvoker invoker = new ReactorInvoker();
-        invoker.setUseStreamingSubscriberIfPossible(false);
-        sf.setInvoker(invoker);
+        sf.getProperties(true).put("useStreamingSubscriber", false);
         sf.setProvider(new JacksonJsonProvider());
-        StreamingResponseProvider<HelloWorldBean> streamProvider = new StreamingResponseProvider<HelloWorldBean>();
-        streamProvider.setProduceMediaTypes(Collections.singletonList("application/json"));
-        sf.setProvider(streamProvider);
+        new ReactorCustomizer().customize(sf);
         sf.getOutInterceptors().add(new LoggingOutInterceptor());
         sf.setResourceClasses(FluxService.class, MonoService.class);
         sf.setResourceProvider(FluxService.class,
@@ -61,11 +54,8 @@ public class ReactorServer extends AbstractBusTestServerBase {
         server1 = sf.create();
         
         JAXRSServerFactoryBean sf2 = new JAXRSServerFactoryBean();
-        sf2.setInvoker(new ReactorInvoker());
-        StreamingResponseProvider<HelloWorldBean> streamProvider2 = new StreamingResponseProvider<HelloWorldBean>();
-        streamProvider2.setProduceMediaTypes(Collections.singletonList("application/json"));
-        sf2.setProvider(streamProvider2);
         sf2.setProvider(new JacksonJsonProvider());
+        new ReactorCustomizer().customize(sf2);
         sf2.getOutInterceptors().add(new LoggingOutInterceptor());
         sf2.setResourceClasses(FluxService.class);
         sf2.setResourceProvider(FluxService.class,
