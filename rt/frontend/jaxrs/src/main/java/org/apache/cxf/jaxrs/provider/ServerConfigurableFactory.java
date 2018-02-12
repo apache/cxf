@@ -19,12 +19,8 @@
 
 package org.apache.cxf.jaxrs.provider;
 
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.FeatureContext;
-import javax.ws.rs.ext.ReaderInterceptor;
-import javax.ws.rs.ext.WriterInterceptor;
 
 /**
  * Manages the creation of server-side {@code Configurable<FeatureContext>} depending on 
@@ -34,12 +30,6 @@ import javax.ws.rs.ext.WriterInterceptor;
  * notice, please be aware of that. 
  */
 public interface ServerConfigurableFactory {
-    Class<?>[] SERVER_FILTER_INTERCEPTOR_CLASSES = new Class<?>[] {
-        ContainerRequestFilter.class,
-        ContainerResponseFilter.class,
-        ReaderInterceptor.class,
-        WriterInterceptor.class 
-    };
-    
+
     Configurable<FeatureContext> create(FeatureContext context);
 }

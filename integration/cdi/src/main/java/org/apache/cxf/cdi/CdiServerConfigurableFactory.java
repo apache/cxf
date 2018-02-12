@@ -83,7 +83,7 @@ public class CdiServerConfigurableFactory implements ServerConfigurableFactory {
         private final Instantiator instantiator;
         
         CdiServerFeatureContextConfigurable(FeatureContext mc, BeanManager beanManager) {
-            super(mc, RuntimeType.SERVER, SERVER_FILTER_INTERCEPTOR_CLASSES);
+            super(mc, RuntimeType.SERVER);
             this.instantiator = new CdiInstantiator(beanManager);
         }
         
