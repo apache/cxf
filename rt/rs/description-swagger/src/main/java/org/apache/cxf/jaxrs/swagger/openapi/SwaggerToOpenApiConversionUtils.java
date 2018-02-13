@@ -228,6 +228,7 @@ public final class SwaggerToOpenApiConversionUtils {
         if (sw2PathVerbParamsList != null) {
             for (Iterator<Map<String, Object>> it = sw2PathVerbParamsList.iterator(); it.hasNext();) {
                 JsonMapObject sw2PathVerbParamMap = new JsonMapObject(it.next());
+                sw2PathVerbParamMap.removeProperty("pattern");
                 if ("body".equals(sw2PathVerbParamMap.getStringProperty("in"))) {
                     it.remove();
                     
