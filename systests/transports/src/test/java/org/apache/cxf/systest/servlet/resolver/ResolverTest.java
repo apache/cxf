@@ -45,9 +45,8 @@ public class ResolverTest extends AbstractBusClientServerTestBase {
         WebAppContext webappcontext = new WebAppContext();
         webappcontext.setContextPath("/resolver");
 
-        String warPath = null;
         URL res = getClass().getResource("/resolver");
-        warPath = res.toURI().getPath();
+        String warPath = res.toURI().getPath();
 
         webappcontext.setWar(warPath);
 
