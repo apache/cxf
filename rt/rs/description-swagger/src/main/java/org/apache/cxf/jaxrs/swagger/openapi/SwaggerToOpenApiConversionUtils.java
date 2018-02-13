@@ -139,8 +139,20 @@ public final class SwaggerToOpenApiConversionUtils {
         }
         comps.setProperty("requestBodies", requestBodiesObj);
         
-        Object s2Defs = sw2.getProperty("definitions");
+        JsonMapObject s2Defs = sw2.getJsonMapProperty("definitions");
         if (s2Defs != null) {
+            for (Object schema : s2Defs.asMap().values()) {
+                if (schema instanceof Map) {
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> schemaMap = (Map<String, Object>) schema;
+                    Object discriminator = schemaMap.get("discriminator");
+                    if (discriminator != null) {
+                        schemaMap.put("discriminator", new JsonMapObject(
+                                Collections.singletonMap("propertyName", discriminator)));
+                    }
+                }
+            }
+            
             comps.setProperty("schemas", s2Defs);
         }
         JsonMapObject s2SecurityDefs = sw2.getJsonMapProperty("securityDefinitions");
