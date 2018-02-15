@@ -44,14 +44,20 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem.HttpMethod;
 import io.swagger.v3.oas.models.parameters.Parameter;
+import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
 
 public class OpenApiCustomizer {
+
     private boolean dynamicBasePath;
+
     private boolean replaceTags;
+
     private DocumentationProvider javadocProvider;
+
     private List<ClassResourceInfo> cris;
+
     private String applicationPath;
 
     public OpenAPIConfiguration customize(final OpenAPIConfiguration configuration) {
@@ -61,12 +67,12 @@ public class OpenApiCustomizer {
 
         if (dynamicBasePath) {
             final MessageContext ctx = createMessageContext();
-            
+
             // If the JAX-RS application with custom path is defined, it might be present twice, in the 
             // request URI as well as in each resource operation URI. To properly represent server URL, 
             // the application path should be removed from it.
             final String url = StringUtils.removeEnd(
-                StringUtils.substringBeforeLast(ctx.getUriInfo().getRequestUri().toString(), "/"),
+                    StringUtils.substringBeforeLast(ctx.getUriInfo().getRequestUri().toString(), "/"),
                     applicationPath);
 
             final Collection<Server> servers = configuration.getOpenAPI().getServers();
@@ -118,15 +124,19 @@ public class OpenApiCustomizer {
                     if (methods.containsKey(key) && javadocProvider != null) {
                         OperationResourceInfo ori = methods.get(key);
 
-                        subentry.getValue().setSummary(javadocProvider.getMethodDoc(ori));
+                        if (StringUtils.isBlank(subentry.getValue().getSummary())) {
+                            subentry.getValue().setSummary(javadocProvider.getMethodDoc(ori));
+                        }
                         if (subentry.getValue().getParameters() == null) {
                             List<Parameter> parameters = new ArrayList<>();
                             addParameters(parameters);
                             subentry.getValue().setParameters(parameters);
                         } else {
                             for (int i = 0; i < subentry.getValue().getParameters().size(); i++) {
-                                subentry.getValue().getParameters().get(i).
-                                        setDescription(javadocProvider.getMethodParameterDoc(ori, i));
+                                if (StringUtils.isBlank(subentry.getValue().getParameters().get(i).getDescription())) {
+                                    subentry.getValue().getParameters().get(i).
+                                            setDescription(javadocProvider.getMethodParameterDoc(ori, i));
+                                }
                             }
                             addParameters(subentry.getValue().getParameters());
                         }
@@ -134,8 +144,11 @@ public class OpenApiCustomizer {
                         if (subentry.getValue().getResponses() != null
                                 && !subentry.getValue().getResponses().isEmpty()) {
 
-                            subentry.getValue().getResponses().entrySet().iterator().next().getValue().
-                                    setDescription(javadocProvider.getMethodResponseDoc(ori));
+                            ApiResponse response =
+                                    subentry.getValue().getResponses().entrySet().iterator().next().getValue();
+                            if (StringUtils.isBlank(response.getDescription())) {
+                                response.setDescription(javadocProvider.getMethodResponseDoc(ori));
+                            }
                         }
                     }
                 }
@@ -209,14 +222,14 @@ public class OpenApiCustomizer {
         if (application != null && application.getProvider() != null) {
             final Class<?> clazz = application.getProvider().getClass();
             final ApplicationPath path = ResourceUtils.locateApplicationPath(clazz);
-            
+
             if (path != null) {
                 applicationPath = path.value();
-                
+
                 if (!applicationPath.startsWith("/")) {
                     applicationPath = "/" + applicationPath;
                 }
-                
+
                 if (applicationPath.endsWith("/")) {
                     applicationPath = applicationPath.substring(0, applicationPath.lastIndexOf("/"));
                 }
