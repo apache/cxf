@@ -77,6 +77,7 @@ public class MonoReactorTest extends AbstractBusClientServerTestBase {
                 .doOnNext(helloWorldBean -> holder.value = helloWorldBean)
                 .subscribe();
         Thread.sleep(500);
+        assertNotNull(holder.value);
         assertEquals("Hello", holder.value.getGreeting());
         assertEquals("World", holder.value.getAudience());
     }

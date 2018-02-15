@@ -41,14 +41,14 @@ public class ReactiveIOInvoker extends AbstractReactiveInvoker {
     
     protected AsyncResponseImpl handleSingle(Message inMessage, Single<?> single) {
         final AsyncResponseImpl asyncResponse = new AsyncResponseImpl(inMessage);
-        single.subscribe(v -> asyncResponse.resume(v), t -> handleThrowable(asyncResponse, t));
+        single.subscribe(asyncResponse::resume, t -> handleThrowable(asyncResponse, t));
         return asyncResponse;
     }
 
     protected AsyncResponseImpl handleFlowable(Message inMessage, Flowable<?> f) {
         final AsyncResponseImpl asyncResponse = new AsyncResponseImpl(inMessage);
         if (!isStreamingSubscriberUsed(f, asyncResponse, inMessage)) {
-            f.subscribe(v -> asyncResponse.resume(v), t -> handleThrowable(asyncResponse, t));
+            f.subscribe(asyncResponse::resume, t -> handleThrowable(asyncResponse, t));
         }
         return asyncResponse;
     }
