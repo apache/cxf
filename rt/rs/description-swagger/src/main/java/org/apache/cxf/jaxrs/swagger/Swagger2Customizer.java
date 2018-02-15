@@ -39,6 +39,7 @@ import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.models.HttpMethod;
 import io.swagger.models.Operation;
 import io.swagger.models.Path;
+import io.swagger.models.Response;
 import io.swagger.models.Swagger;
 import io.swagger.models.Tag;
 import io.swagger.models.parameters.Parameter;
@@ -56,7 +57,6 @@ public class Swagger2Customizer {
     protected BeanConfig beanConfig;
 
     public Swagger customize(Swagger data) {
-
         if (dynamicBasePath) {
             MessageContext ctx = createMessageContext();
             String currentBasePath = StringUtils.substringBeforeLast(ctx.getHttpServletRequest().getRequestURI(), "/");
@@ -65,9 +65,9 @@ public class Swagger2Customizer {
                 data.setHost(beanConfig.getHost());
                 data.setInfo(beanConfig.getInfo());
             }
-            if (beanConfig.getSwagger() != null 
-                && beanConfig.getSwagger().getSecurityDefinitions() != null
-                && data.getSecurityDefinitions() == null) {
+            if (beanConfig.getSwagger() != null
+                    && beanConfig.getSwagger().getSecurityDefinitions() != null
+                    && data.getSecurityDefinitions() == null) {
                 data.setSecurityDefinitions(beanConfig.getSwagger().getSecurityDefinitions());
             }
         }
@@ -111,18 +111,25 @@ public class Swagger2Customizer {
                     if (methods.containsKey(key) && javadocProvider != null) {
                         OperationResourceInfo ori = methods.get(key);
 
-                        subentry.getValue().setSummary(javadocProvider.getMethodDoc(ori));
+                        if (StringUtils.isBlank(subentry.getValue().getSummary())) {
+                            subentry.getValue().setSummary(javadocProvider.getMethodDoc(ori));
+                        }
                         for (int i = 0; i < subentry.getValue().getParameters().size(); i++) {
-                            subentry.getValue().getParameters().get(i).
-                                    setDescription(javadocProvider.getMethodParameterDoc(ori, i));
+                            if (StringUtils.isBlank(subentry.getValue().getParameters().get(i).getDescription())) {
+                                subentry.getValue().getParameters().get(i).
+                                        setDescription(javadocProvider.getMethodParameterDoc(ori, i));
+                            }
                         }
                         addParameters(subentry.getValue().getParameters());
 
                         if (subentry.getValue().getResponses() != null
                                 && !subentry.getValue().getResponses().isEmpty()) {
 
-                            subentry.getValue().getResponses().entrySet().iterator().next().getValue().
-                                    setDescription(javadocProvider.getMethodResponseDoc(ori));
+                            Response response =
+                                    subentry.getValue().getResponses().entrySet().iterator().next().getValue();
+                            if (StringUtils.isBlank(response.getDescription())) {
+                                response.setDescription(javadocProvider.getMethodResponseDoc(ori));
+                            }
                         }
                     }
                 }
@@ -142,7 +149,7 @@ public class Swagger2Customizer {
 
     private MessageContext createMessageContext() {
         return JAXRSUtils.createContextValue(
-                               JAXRSUtils.getCurrentMessage(), null, MessageContext.class);
+                JAXRSUtils.getCurrentMessage(), null, MessageContext.class);
     }
 
     protected String getNormalizedPath(String classResourcePath, String operationResourcePath) {
