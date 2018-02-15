@@ -191,40 +191,44 @@ public final class SwaggerToOpenApiConversionUtils {
     }
     
     private static void prepareResponses(JsonMapObject sw2PathVerbProps) {
-        List<String> sw2PathVerbProduces =
-            CastUtils.cast((List<?>)sw2PathVerbProps.removeProperty("produces"));
-        
-        JsonMapObject sw3PathVerbResps = null;
+        List<String> sw2PathVerbProduces = CastUtils.cast((List<?>) sw2PathVerbProps.removeProperty("produces"));
+
         JsonMapObject sw2PathVerbResps = sw2PathVerbProps.getJsonMapProperty("responses");
         if (sw2PathVerbResps != null) {
-            sw3PathVerbResps = new JsonMapObject();
-            
-            JsonMapObject okResp = null;
-            if (sw2PathVerbResps.containsProperty("200")) {
-                Map<String, Object> map = CastUtils.cast((Map<?, ?>)sw2PathVerbResps.removeProperty("200"));
-                okResp = new JsonMapObject(map);
-                JsonMapObject newOkResp = new JsonMapObject();
-                String description = okResp.getStringProperty("description");
+            JsonMapObject sw3PathVerbResps = new JsonMapObject();
+
+            for (Map.Entry<String, Object> entry : sw2PathVerbResps.asMap().entrySet()) {
+                JsonMapObject v2Resp = new JsonMapObject(sw2PathVerbResps.getMapProperty(entry.getKey()));
+                JsonMapObject v3Resp = new JsonMapObject();
+                String description = v2Resp.getStringProperty("description");
                 if (description != null) {
-                    newOkResp.setProperty("description", description);
+                    v3Resp.setProperty("description", description);
                 }
-                JsonMapObject schema = okResp.getJsonMapProperty("schema");
+                JsonMapObject schema = v2Resp.getJsonMapProperty("schema");
                 if (schema != null) {
                     JsonMapObject content = prepareContentFromSchema(schema, sw2PathVerbProduces, false);
                     if (content != null) {
-                        newOkResp.setProperty("content", content);
+                        v3Resp.setProperty("content", content);
                     }
-                    
+
                 }
-                JsonMapObject headers = okResp.getJsonMapProperty("headers");
+                JsonMapObject headers = v2Resp.getJsonMapProperty("headers");
                 if (headers != null) {
-                    newOkResp.setProperty("headers", headers);
+                    for (Map.Entry<String, Object> header: headers.asMap().entrySet()) {
+                        JsonMapObject headerObj = new JsonMapObject(headers.getMapProperty(header.getKey()));
+                        String type = headerObj.getStringProperty("type");
+                        if (type != null) {
+                            JsonMapObject headerSchema = new JsonMapObject();
+                            headerSchema.setProperty("type", type);
+                            headerObj.removeProperty("type");
+                            headerObj.setProperty("schema", headerSchema);
+                        }
+                    }
+                    v3Resp.setProperty("headers", headers);
                 }
-                sw3PathVerbResps.setProperty("200", newOkResp);
+                sw3PathVerbResps.setProperty(entry.getKey(), v3Resp);
             }
-            for (Map.Entry<String, Object> entry : sw2PathVerbResps.asMap().entrySet()) {
-                sw3PathVerbResps.setProperty(entry.getKey(), entry.getValue());
-            }
+
             sw2PathVerbProps.setProperty("responses", sw3PathVerbResps);
         }
     }
