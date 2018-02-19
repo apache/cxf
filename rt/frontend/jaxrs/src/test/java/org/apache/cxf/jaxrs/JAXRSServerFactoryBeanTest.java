@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 
@@ -64,6 +65,39 @@ public class JAXRSServerFactoryBeanTest extends Assert {
 
     }
 
+    @Test
+    public void testRegisterInFeature() {
+        JAXRSServerFactoryBean bean = new JAXRSServerFactoryBean();
+        bean.setAddress("http://localhost:8080/rest");
+        bean.setResourceClasses(BookStore.class);
+        bean.setStart(false);
+        bean.setProvider((Feature)(context) -> {
+            context.register(new RuntimeExceptionMapper());
+
+            return true;
+        });
+
+        bean.create();
+    }
+
+    @Test
+    public void testRegisterFeatureInFeature() {
+        JAXRSServerFactoryBean bean = new JAXRSServerFactoryBean();
+        bean.setAddress("http://localhost:8080/rest");
+        bean.setStart(false);
+        bean.setResourceClasses(BookStore.class);
+        bean.setProvider((Feature)(context) -> {
+            context.register((Feature) context2-> {
+                context2.register(new RuntimeExceptionMapper());
+
+                return true;
+            });
+
+            return true;
+        });
+
+        bean.create();
+    }
 
     private static class CustomExceptionMapper implements ExceptionMapper<Exception> {
 
