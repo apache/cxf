@@ -154,9 +154,9 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
 
     private void checkSecurityContextEnd(ContainerRequestContext rc,
                                          MultivaluedMap<String, String> requestParams) {
-        String codeParam = requestParams.getFirst(OAuthConstants.AUTHORIZATION_CODE_VALUE);
         SecurityContext sc = rc.getSecurityContext();
         if (sc == null || sc.getUserPrincipal() == null) {
+            String codeParam = requestParams.getFirst(OAuthConstants.AUTHORIZATION_CODE_VALUE);
             if (codeParam == null
                 && requestParams.containsKey(OAuthConstants.ERROR_KEY)
                 && !faultAccessDeniedResponses) {
@@ -235,7 +235,9 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
         ClientAccessToken at = null;
         if (codeParam != null) {
             AuthorizationCodeGrant grant = prepareCodeGrant(codeParam, getAbsoluteRedirectUri(ui));
-            grant.setCodeVerifier(state.getFirst(OAuthConstants.AUTHORIZATION_CODE_VERIFIER));
+            if (state != null) {
+                grant.setCodeVerifier(state.getFirst(OAuthConstants.AUTHORIZATION_CODE_VERIFIER));
+            }
             at = OAuthClientUtils.getAccessToken(accessTokenServiceClient, consumer, grant, useAuthorizationHeader);
         }
         ClientTokenContext tokenContext = initializeClientTokenContext(rc, at, requestParams, state);
