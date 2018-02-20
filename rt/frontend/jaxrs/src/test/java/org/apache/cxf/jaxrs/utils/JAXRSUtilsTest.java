@@ -824,7 +824,7 @@ public class JAXRSUtilsTest extends Assert {
         Method m = Customer.class.getMethod("testQuery", argType);
         Message messageImpl = createMessage();
 
-        messageImpl.put(Message.QUERY_STRING, "query=24&query2");
+        messageImpl.put(Message.QUERY_STRING, "query=24&query2=");
         List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m,
                                                                new ClassResourceInfo(Customer.class)),
                                                            null,
@@ -901,7 +901,7 @@ public class JAXRSUtilsTest extends Assert {
         ProviderFactory.getInstance(messageImpl)
             .registerUserProvider(new MyTypeParamConverterProvider());
         messageImpl.put(Message.QUERY_STRING,
-                "query2=query2Value&query2=query2Value2&query3=1&query3=2&query4");
+                "query2=query2Value&query2=query2Value2&query3=1&query3=2&query4=");
         List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m,
                                                                new ClassResourceInfo(Customer.class)),
                                                            null,
@@ -1472,12 +1472,12 @@ public class JAXRSUtilsTest extends Assert {
     @Test
     public void testMultipleQueryParameters() throws Exception {
         Class<?>[] argType = {String.class, String.class, Long.class,
-                              Boolean.TYPE, char.class, String.class, Boolean.class};
+                              Boolean.TYPE, char.class, String.class, Boolean.class, String.class};
         Method m = Customer.class.getMethod("testMultipleQuery", argType);
         Message messageImpl = createMessage();
 
         messageImpl.put(Message.QUERY_STRING,
-                        "query=first&query2=second&query3=3&query4=true&query6&query7=true");
+                        "query=first&query2=second&query3=3&query4=true&query6=&query7=true&query8");
         List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m,
                                                                new ClassResourceInfo(Customer.class)),
                                                            null, messageImpl);
@@ -1486,15 +1486,17 @@ public class JAXRSUtilsTest extends Assert {
         assertEquals("Second Query Parameter of multiple was not matched correctly",
                      "second", params.get(1));
         assertEquals("Third Query Parameter of multiple was not matched correctly",
-                     new Long(3), params.get(2));
+                    3L, params.get(2));
         assertSame("Fourth Query Parameter of multiple was not matched correctly",
                      Boolean.TRUE, params.get(3));
         assertEquals("Fifth Query Parameter of multiple was not matched correctly",
                      '\u0000', params.get(4));
-        assertEquals("Six Query Parameter of multiple was not matched correctly",
+        assertEquals("Sixth Query Parameter of multiple was not matched correctly",
                      "", params.get(5));
         assertSame("Seventh Query Parameter of multiple was not matched correctly",
                 Boolean.TRUE, params.get(6));
+        assertNull("Eighth Query Parameter of multiple was not matched correctly",
+                params.get(7));
     }
 
     @SuppressWarnings("unchecked")
@@ -1505,7 +1507,7 @@ public class JAXRSUtilsTest extends Assert {
         Method m = Customer.class.getMethod("testMatrixParam", argType);
         Message messageImpl = createMessage();
 
-        messageImpl.put(Message.REQUEST_URI, "/foo;p4=0;p3=3/bar;p1=1;p2/baz;p4=4;p4=5;p5");
+        messageImpl.put(Message.REQUEST_URI, "/foo;p4=0;p3=3/bar;p1=1;p2=/baz;p4=4;p4=5;p5");
         List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m,
                                                                new ClassResourceInfo(Customer.class)),
                                                            null, messageImpl);
@@ -1524,8 +1526,8 @@ public class JAXRSUtilsTest extends Assert {
         assertEquals("0", list.get(0));
         assertEquals("4", list.get(1));
         assertEquals("5", list.get(2));
-        assertEquals("Sixth Matrix Parameter was not matched correctly",
-                     "", params.get(5));
+        assertNull("Sixth Matrix Parameter was not matched correctly",
+                     params.get(5));
     }
 
     @Test

@@ -1241,14 +1241,12 @@ public final class JAXRSUtils {
                                            boolean decodePlus,
                                            boolean valueIsCollection) {
         if (!StringUtils.isEmpty(query)) {
-            List<String> parts = Arrays.asList(StringUtils.split(query, sep));
-            for (String part : parts) {
+            for (String part : query.split(sep)) { // fastpath expected
                 int index = part.indexOf('=');
-                String name = null;
+                final String name;
                 String value = null;
                 if (index == -1) {
                     name = part;
-                    value = "";
                 } else {
                     name = part.substring(0, index);
                     value = index < part.length() ? part.substring(index + 1) : "";
@@ -1271,12 +1269,14 @@ public final class JAXRSUtils {
                                                boolean decode,
                                                boolean decodePlus) {
 
-        if (decodePlus && value.contains("+")) {
-            value = value.replace('+', ' ');
-        }
-        if (decode) {
-            value = (";".equals(sep))
-                ? HttpUtils.pathDecode(value) : HttpUtils.urlDecode(value);
+        if (value != null) {
+            if (decodePlus && value.contains("+")) {
+                value = value.replace('+', ' ');
+            }
+            if (decode) {
+                value = (";".equals(sep))
+                    ? HttpUtils.pathDecode(value) : HttpUtils.urlDecode(value);
+            }
         }
 
         queries.add(HttpUtils.urlDecode(name), value);
