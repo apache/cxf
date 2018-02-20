@@ -311,44 +311,54 @@ public final class ResourceUtils {
         MethodDispatcher md = new MethodDispatcher();
         Class<?> serviceClass = cri.getServiceClass();
 
+        final Set<Method> annotatedMethods = new HashSet<>();
+
         for (Method m : serviceClass.getMethods()) {
 
             Method annotatedMethod = AnnotationUtils.getAnnotatedMethod(serviceClass, m);
 
-            String httpMethod = AnnotationUtils.getHttpMethodValue(annotatedMethod);
-            Path path = AnnotationUtils.getMethodAnnotation(annotatedMethod, Path.class);
-
-            if (httpMethod != null || path != null) {
-                if (!checkAsyncResponse(annotatedMethod)) {
-                    continue;
-                }
-
-                md.bind(createOperationInfo(m, annotatedMethod, cri, path, httpMethod), m);
-                if (httpMethod == null) {
-                    // subresource locator
-                    Class<?> subClass = m.getReturnType();
-                    if (subClass == Class.class) {
-                        subClass = InjectionUtils.getActualType(m.getGenericReturnType());
-                    }
-                    if (enableStatic) {
-                        ClassResourceInfo subCri = cri.findResource(subClass, subClass);
-                        if (subCri == null) {
-                            ClassResourceInfo ancestor = getAncestorWithSameServiceClass(cri, subClass);
-                            subCri = ancestor != null ? ancestor
-                                     : createClassResourceInfo(subClass, subClass, cri, false, enableStatic,
-                                                               cri.getBus());
-                        }
-
-                        if (subCri != null) {
-                            cri.addSubClassResourceInfo(subCri);
-                        }
-                    }
-                }
-            } else {
-                reportInvalidResourceMethod(m, NOT_RESOURCE_METHOD_MESSAGE_ID, Level.FINE);
+            if (!annotatedMethods.contains(annotatedMethod)) {
+                evaluateResourceMethod(cri, enableStatic, md, m, annotatedMethod);
+                annotatedMethods.add(annotatedMethod);
             }
+
         }
         cri.setMethodDispatcher(md);
+    }
+
+    private static void evaluateResourceMethod(ClassResourceInfo cri, boolean enableStatic, MethodDispatcher md, Method m, Method annotatedMethod) {
+        String httpMethod = AnnotationUtils.getHttpMethodValue(annotatedMethod);
+        Path path = AnnotationUtils.getMethodAnnotation(annotatedMethod, Path.class);
+
+        if (httpMethod != null || path != null) {
+            if (!checkAsyncResponse(annotatedMethod)) {
+                return;
+            }
+
+            md.bind(createOperationInfo(m, annotatedMethod, cri, path, httpMethod), m);
+            if (httpMethod == null) {
+                // subresource locator
+                Class<?> subClass = m.getReturnType();
+                if (subClass == Class.class) {
+                    subClass = InjectionUtils.getActualType(m.getGenericReturnType());
+                }
+                if (enableStatic) {
+                    ClassResourceInfo subCri = cri.findResource(subClass, subClass);
+                    if (subCri == null) {
+                        ClassResourceInfo ancestor = getAncestorWithSameServiceClass(cri, subClass);
+                        subCri = ancestor != null ? ancestor
+                                : createClassResourceInfo(subClass, subClass, cri, false, enableStatic,
+                                cri.getBus());
+                    }
+
+                    if (subCri != null) {
+                        cri.addSubClassResourceInfo(subCri);
+                    }
+                }
+            }
+        } else {
+            reportInvalidResourceMethod(m, NOT_RESOURCE_METHOD_MESSAGE_ID, Level.FINE);
+        }
     }
 
     private static void reportInvalidResourceMethod(Method m, String messageId, Level logLevel) {
