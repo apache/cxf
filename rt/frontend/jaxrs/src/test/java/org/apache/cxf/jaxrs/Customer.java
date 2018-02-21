@@ -402,20 +402,22 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
                                 @PathParam("ps") String path) {
         // complete
     }
-    
-    @Produces("text/xml")   
-    public void testMultipleQuery(@QueryParam("query")  String queryString, 
+    @Produces("text/xml")
+    //CHECKSTYLE:OFF: checkstyle:parameternumber
+    public void testMultipleQuery(@QueryParam("query")  String queryString,
                                   @QueryParam("query2") String queryString2,
                                   @QueryParam("query3") Long queryString3,
                                   @QueryParam("query4") boolean queryBoolean4,
                                   @QueryParam("query5") char queryChar5,
                                   @QueryParam("query6") String queryString6,
-                                  @QueryParam("query7") Boolean queryString7) {
+                                  @QueryParam("query7") Boolean queryString7,
+                                  @QueryParam("query8") String queryString8) {
         // complete
     }
-    
-    @Produces("text/xml")   
-    public void testMatrixParam(@MatrixParam("p1") String mp1, 
+    //CHECKSTYLE:ON: checkstyle:parameternumber
+
+    @Produces("text/xml")
+    public void testMatrixParam(@MatrixParam("p1") String mp1,
                                 @MatrixParam("p2") String mp2,
                                 @MatrixParam("p3") String mp3,
                                 @MatrixParam("p4") String mp4,
