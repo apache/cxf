@@ -62,12 +62,15 @@ public class Swagger2Customizer {
         if (dynamicBasePath) {
             MessageContext ctx = createMessageContext();
             String currentBasePath = StringUtils.substringBeforeLast(ctx.getHttpServletRequest().getRequestURI(), "/");
-            if (!currentBasePath.equals(beanConfig.getBasePath())) {
-                data.setBasePath(currentBasePath);
+            data.setBasePath(currentBasePath);
+            if (data.getHost() == null) {
                 data.setHost(beanConfig.getHost());
+            }
+            if (data.getInfo() == null) {
                 data.setInfo(beanConfig.getInfo());
             }
-            if (beanConfig.getSwagger() != null 
+
+            if (beanConfig.getSwagger() != null
                 && beanConfig.getSwagger().getSecurityDefinitions() != null
                 && data.getSecurityDefinitions() == null) {
                 data.setSecurityDefinitions(beanConfig.getSwagger().getSecurityDefinitions());
