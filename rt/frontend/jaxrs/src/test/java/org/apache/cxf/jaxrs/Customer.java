@@ -404,15 +404,18 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     }
 
     @Produces("text/xml")
+    //CHECKSTYLE:OFF: checkstyle:parameternumber
     public void testMultipleQuery(@QueryParam("query")  String queryString,
                                   @QueryParam("query2") String queryString2,
                                   @QueryParam("query3") Long queryString3,
                                   @QueryParam("query4") boolean queryBoolean4,
                                   @QueryParam("query5") char queryChar5,
                                   @QueryParam("query6") String queryString6,
-                                  @QueryParam("query7") Boolean queryString7) {
+                                  @QueryParam("query7") Boolean queryString7,
+                                  @QueryParam("query8") String queryString8) {
         // complete
     }
+    //CHECKSTYLE:ON: checkstyle:parameternumber
 
     @Produces("text/xml")
     public void testMatrixParam(@MatrixParam("p1") String mp1,

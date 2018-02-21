@@ -305,7 +305,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
 
     @Test
     public void testPostMatchContainerFilterThrowsException() {
-        String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple?throwException";
+        String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple?throwException=true";
         WebClient wc = WebClient.create(address);
         Response response = wc.get();
         assertEquals(500, response.getStatus());

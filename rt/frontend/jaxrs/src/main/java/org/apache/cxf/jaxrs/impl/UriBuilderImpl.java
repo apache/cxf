@@ -811,7 +811,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
      */
     private List<String> toStringList(boolean encodeSlash, Object... values) throws IllegalArgumentException {
         List<String> list = new ArrayList<>();
-        if (values != null) {
+        if (values != null && values.length > 0) {
             for (int i = 0; i < values.length; i++) {
                 Object value = values[i];
                 if (value == null) {
@@ -823,9 +823,8 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
                 }
                 list.add(strValue);
             }
-        }
-        if (list.isEmpty()) {
-            list.add("");
+        } else {
+            list.add(null);
         }
         return list;
     }
@@ -845,18 +844,21 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
             Map.Entry<String, List<String>> entry = it.next();
             for (Iterator<String> sit = entry.getValue().iterator(); sit.hasNext();) {
                 String val = sit.next();
-                boolean templateValue = val.startsWith("{") && val.endsWith("}");
-                if (!templateValue) {
-                    val = HttpUtils.encodePartiallyEncoded(val, isQuery);
-                    if (!isQuery) {
-                        val = val.replaceAll("/", "%2F");
-                    }
-                } else {
-                    val = URITemplate.createExactTemplate(val).encodeLiteralCharacters(isQuery);
-                }
                 b.append(entry.getKey());
-                if (val.length() != 0) {
-                    b.append('=').append(val);
+                if (val != null) {
+                    boolean templateValue = val.startsWith("{") && val.endsWith("}");
+                    if (!templateValue) {
+                        val = HttpUtils.encodePartiallyEncoded(val, isQuery);
+                        if (!isQuery) {
+                            val = val.replaceAll("/", "%2F");
+                        }
+                    } else {
+                        val = URITemplate.createExactTemplate(val).encodeLiteralCharacters(isQuery);
+                    }
+                    b.append('=');
+                    if (!val.isEmpty()) {
+                        b.append(val);
+                    }
                 }
                 if (sit.hasNext() || it.hasNext()) {
                     b.append(separator);
