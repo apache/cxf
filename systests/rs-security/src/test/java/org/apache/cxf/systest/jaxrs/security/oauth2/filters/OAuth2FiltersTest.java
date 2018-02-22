@@ -22,10 +22,12 @@ package org.apache.cxf.systest.jaxrs.security.oauth2.filters;
 import java.net.URL;
 import java.util.UUID;
 
+import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
+import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;
 import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -38,13 +40,16 @@ import org.junit.BeforeClass;
 public class OAuth2FiltersTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServerOAuth2Filters.PORT;
     public static final String OAUTH_PORT = BookServerOAuth2Service.PORT;
-    
+    public static final String PARTNER_PORT = PartnerServer.PORT;
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
                    launchServer(BookServerOAuth2Filters.class, true));
         assertTrue("server did not launch correctly", 
                    launchServer(BookServerOAuth2Service.class, true));
+        assertTrue("server did not launch correctly",
+                   launchServer(PartnerServer.class, true));
     }
 
     @org.junit.Test
@@ -367,5 +372,89 @@ public class OAuth2FiltersTest extends AbstractBusClientServerTestBase {
         Response response = client.post(new Book("book", 123L));
         assertNotEquals(response.getStatus(), 200);
     }
-    
+
+    @org.junit.Test
+    public void testPartnerServiceUsingClientCodeRequestFilter() throws Exception {
+        URL busFile = OAuth2FiltersTest.class.getResource("client.xml");
+
+        // Invoke on the partner service, which is secured with the ClientCodeRequestFilter
+        String partnerService = "https://localhost:" + PARTNER_PORT + "/partnerservice/bookstore/books";
+
+        WebClient partnerClient =
+            WebClient.create(partnerService, OAuth2TestUtils.setupProviders(), "bob", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(partnerClient).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        Response response = partnerClient.type("application/xml").post(new Book("book", 123L));
+
+        // Response response = partnerClient.get();
+        // Get the "Location"
+        String location = response.getHeaderString("Location");
+        // Now make an invocation on the OIDC IdP using another WebClient instance
+
+
+        WebClient idpClient =
+            WebClient.create(location, OAuth2TestUtils.setupProviders(), "bob", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(idpClient).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        // Get Authorization Code + State
+        String receivedLocation = getLocationUsingAuthorizationCodeGrant(idpClient);
+        assertNotNull(receivedLocation);
+        String code = getSubstring(receivedLocation, "code");
+        String state = getSubstring(receivedLocation, "state");
+
+        // Add Referer
+        String referer = "https://localhost:" + OAUTH_PORT + "/services/authorize";
+        partnerClient.header("Referer", referer);
+
+        // Now invoke back on the service using the authorization code
+        partnerClient.query("code", code);
+        partnerClient.query("state", state);
+
+        Response serviceResponse = partnerClient.accept("application/xml").post(new Book("book", 123L));
+        assertEquals(serviceResponse.getStatus(), 200);
+        Book returnedBook = serviceResponse.readEntity(Book.class);
+        assertEquals(returnedBook.getName(), "book");
+        assertEquals(returnedBook.getId(), 123L);
+    }
+
+    private String getLocationUsingAuthorizationCodeGrant(WebClient client) {
+        client.type("application/json").accept("application/json");
+
+        Response response = client.get();
+
+        OAuthAuthorizationData authzData = response.readEntity(OAuthAuthorizationData.class);
+
+        // Now call "decision" to get the authorization code grant
+        client.path("decision");
+        client.type("application/x-www-form-urlencoded");
+
+        Form form = new Form();
+        form.param("session_authenticity_token", authzData.getAuthenticityToken());
+        form.param("client_id", authzData.getClientId());
+        form.param("redirect_uri", authzData.getRedirectUri());
+        if (authzData.getProposedScope() != null) {
+            form.param("scope", authzData.getProposedScope());
+        }
+        form.param("state", authzData.getState());
+        form.param("oauthDecision", "allow");
+
+        response = client.post(form);
+        return response.getHeaderString("Location");
+    }
+
+
+    private String getSubstring(String parentString, String substringName) {
+        String foundString =
+            parentString.substring(parentString.indexOf(substringName + "=") + (substringName + "=").length());
+        int ampersandIndex = foundString.indexOf('&');
+        if (ampersandIndex < 1) {
+            ampersandIndex = foundString.length();
+        }
+        return foundString.substring(0, ampersandIndex);
+    }
+
 }

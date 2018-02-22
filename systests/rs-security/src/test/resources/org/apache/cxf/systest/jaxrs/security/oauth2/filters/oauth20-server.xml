@@ -64,6 +64,7 @@ under the License.
     
    <bean id="oauthProvider" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuthDataProviderImpl">
        <constructor-arg><value>${testutil.ports.jaxrs-oauth2-filters}</value></constructor-arg>
+       <constructor-arg><value>${testutil.ports.jaxrs-oauth2-filters-partner}</value></constructor-arg>
    </bean>
    
    <bean id="authorizationService" class="org.apache.cxf.rs.security.oauth2.services.AuthorizationCodeGrantService">

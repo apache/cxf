@@ -154,6 +154,7 @@ public final class OAuth2TestUtils {
         if (audience != null) {
             form.param("audience", audience);
         }
+        form.param("redirect_uri", "http://www.blah.apache.org");
         Response response = client.post(form);
 
         return response.readEntity(ClientAccessToken.class);
