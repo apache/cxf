@@ -23,9 +23,11 @@ under the License.
     xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration" 
     xmlns:sec="http://cxf.apache.org/configuration/security" 
     xmlns:cxf="http://cxf.apache.org/core" 
-    xmlns:jaxrs="http://cxf.apache.org/jaxrs" 
+    xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+    xmlns:jaxrs-client="http://cxf.apache.org/jaxrs-client"
     xmlns:util="http://www.springframework.org/schema/util"
     xsi:schemaLocation="http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
+             http://cxf.apache.org/jaxrs-client http://cxf.apache.org/schemas/jaxrs-client.xsd
              http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
              http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
              http://www.springframework.org/schema/util  http://www.springframework.org/schema/util/spring-util-4.2.xsd
@@ -37,18 +39,61 @@ under the License.
         <cxf:features>
             <cxf:logging/>
         </cxf:features>
-        <cxf:properties> 
-          <entry key="org.apache.cxf.jaxrs.bus.providers" value-ref="busProviders"/> 
-        </cxf:properties>
     </cxf:bus>
-    <!-- providers -->
-    <util:list id="busProviders"> 
-        <ref bean="oauthJson"/> 
-    </util:list> 
-    <bean id="oauthJson" class="org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider"/>
+    
+   <bean id="partnerServiceBean" 
+         class="org.apache.cxf.systest.jaxrs.security.oauth2.filters.PartnerService" />
+   
+   <bean id="callbackHandler" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.CallbackHandlerImpl"/>
+   <bean id="basicAuthFilter" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.WSS4JBasicAuthFilter">
+       <property name="callbackHandler" ref="callbackHandler"/>
+   </bean>
+   
+   <bean id="consumer" class="org.apache.cxf.rs.security.oauth2.client.Consumer">
+        <property name="key" value="consumer-id"/>
+        <property name="secret" value="this-is-a-secret"/>
+   </bean>
+ 
+   <jaxrs-client:client id="atServiceClient" serviceClass="org.apache.cxf.jaxrs.client.WebClient"
+        address="https://localhost:${testutil.ports.jaxrs-oauth2-service}/services/token">
+        <jaxrs-client:headers>
+           <entry key="Accept" value="application/json"/>
+        </jaxrs-client:headers>
+   </jaxrs-client:client>
+   
+   <bean id="stateManager" class="org.apache.cxf.rs.security.oauth2.client.MemoryClientCodeStateManager"/>
+   
+   <bean id="codeRequestFilter" class="org.apache.cxf.rs.security.oauth2.client.ClientCodeRequestFilter">
+       <property name="authorizationServiceUri" value="https://localhost:${testutil.ports.jaxrs-oauth2-service}/services/authorize"/>
+       <property name="accessTokenServiceClient" ref="atServiceClient"/>
+       <property name="consumer" ref="consumer"/>
+       <property name="clientCodeStateManager" ref="stateManager"/>
+   </bean>
+   
+   <jaxrs:server 
+        depends-on="tls-config" 
+        address="https://localhost:${testutil.ports.jaxrs-oauth2-filters-partner}/partnerservice">
+        <jaxrs:serviceBeans>
+            <ref bean="partnerServiceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <bean class="org.apache.cxf.rs.security.oauth2.client.ClientTokenContextProvider" />
+            <ref bean="basicAuthFilter"/>
+            <ref bean="codeRequestFilter"/>
+        </jaxrs:providers>
+        
+   </jaxrs:server>
+   
+   <http:conduit name="https://localhost.*">
+        <http:tlsClientParameters disableCNCheck="true">
+            <sec:trustManagers>
+                <sec:keyStore type="JKS" password="password" resource="keys/Truststore.jks"/>
+            </sec:trustManagers>
+        </http:tlsClientParameters>
+    </http:conduit>
     
     <httpj:engine-factory id="tls-config">
-        <httpj:engine port="${testutil.ports.jaxrs-oauth2-service}">
+        <httpj:engine port="${testutil.ports.jaxrs-oauth2-filters-partner}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
                     <sec:keyStore type="JKS" password="password" resource="keys/Bethal.jks"/>
@@ -56,60 +101,10 @@ under the License.
                 <sec:trustManagers>
                     <sec:keyStore type="JKS" password="password" resource="keys/Truststore.jks"/>
                 </sec:trustManagers>
-                <sec:clientAuthentication want="true" required="false"/>
+                <sec:clientAuthentication want="true" required="true"/>
             </httpj:tlsServerParameters>
             <httpj:sessionSupport>true</httpj:sessionSupport>
         </httpj:engine>
     </httpj:engine-factory>
-    
-   <bean id="oauthProvider" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuthDataProviderImpl">
-       <constructor-arg><value>${testutil.ports.jaxrs-oauth2-filters}</value></constructor-arg>
-       <constructor-arg><value>${testutil.ports.jaxrs-oauth2-filters-partner}</value></constructor-arg>
-   </bean>
-   
-   <bean id="authorizationService" class="org.apache.cxf.rs.security.oauth2.services.AuthorizationCodeGrantService">
-      <property name="dataProvider" ref="oauthProvider"/>
-   </bean>
-   
-   <bean id="implicitService" class="org.apache.cxf.rs.security.oauth2.services.ImplicitGrantService">
-      <property name="dataProvider" ref="oauthProvider"/>
-   </bean>
-   
-   <bean id="refreshGrantHandler" class="org.apache.cxf.rs.security.oauth2.grants.refresh.RefreshTokenGrantHandler">
-      <property name="dataProvider" ref="oauthProvider"/>
-   </bean>
-   
-   <bean id="tokenService" class="org.apache.cxf.rs.security.oauth2.services.AccessTokenService">
-      <property name="dataProvider" ref="oauthProvider"/>
-      <property name="grantHandlers">
-         <list>
-             <ref bean="refreshGrantHandler"/>
-         </list>
-      </property>
-   </bean>
-   
-   <bean id="tokenValidateService" class="org.apache.cxf.rs.security.oauth2.services.AccessTokenValidatorService">
-       <property name="dataProvider" ref="oauthProvider"/>
-   </bean>
-   
-   <bean id="callbackHandler" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.CallbackHandlerImpl"/>
-   <bean id="basicAuthFilter" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.WSS4JBasicAuthFilter">
-       <property name="callbackHandler" ref="callbackHandler"/>
-   </bean>
-   
-   <jaxrs:server 
-       depends-on="tls-config" 
-       address="https://localhost:${testutil.ports.jaxrs-oauth2-service}/services">
-       <jaxrs:serviceBeans>
-           <ref bean="authorizationService"/>
-           <ref bean="implicitService"/>
-           <ref bean="tokenService"/>
-           <ref bean="tokenValidateService"/>
-       </jaxrs:serviceBeans>
-       <jaxrs:providers>
-           <ref bean="basicAuthFilter"/>
-       </jaxrs:providers>
-   </jaxrs:server>
-   
 
 </beans>

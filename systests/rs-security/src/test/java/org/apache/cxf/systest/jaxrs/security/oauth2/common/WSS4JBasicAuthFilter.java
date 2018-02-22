@@ -20,8 +20,11 @@ package org.apache.cxf.systest.jaxrs.security.oauth2.common;
 
 import java.io.IOException;
 
+import javax.annotation.Priority;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
@@ -33,6 +36,8 @@ import org.apache.cxf.rt.security.saml.interceptor.WSS4JBasicAuthValidator;
 /**
  * Extends the WSS4J validator as a JAX-RS request filter
  */
+@PreMatching
+@Priority(Priorities.AUTHENTICATION)
 public class WSS4JBasicAuthFilter extends WSS4JBasicAuthValidator implements ContainerRequestFilter {
 
     public void filter(ContainerRequestContext requestContext) throws IOException {

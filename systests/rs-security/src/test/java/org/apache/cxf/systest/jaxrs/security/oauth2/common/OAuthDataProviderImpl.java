@@ -41,10 +41,20 @@ import org.apache.xml.security.utils.ClassLoaderUtils;
  */
 public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
     private Set<String> externalClients = new HashSet<>();
+
     public OAuthDataProviderImpl(String servicePort) throws Exception {
+        this(servicePort, null);
+    }
+
+    public OAuthDataProviderImpl(String servicePort, String partnerPort) throws Exception {
         // filters/grants test client
         Client client = new Client("consumer-id", "this-is-a-secret", true);
-        client.setRedirectUris(Collections.singletonList("http://www.blah.apache.org"));
+        List<String> redirectUris = new ArrayList<>();
+        redirectUris.add("http://www.blah.apache.org");
+        if (partnerPort != null) {
+            redirectUris.add("https://localhost:" + partnerPort + "/partnerservice/bookstore/books");
+        }
+        client.setRedirectUris(redirectUris);
 
         client.getAllowedGrantTypes().add("authorization_code");
         client.getAllowedGrantTypes().add("refresh_token");
@@ -110,15 +120,15 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
         client.getAllowedGrantTypes().add("urn:ietf:params:oauth:grant-type:jwt-bearer");
         client.getAllowedGrantTypes().add("custom_grant");
         this.setClient(client);
-        
+
         client = new Client("fredNoPassword", null, true);
         client.getAllowedGrantTypes().add("custom_grant");
         this.setClient(client);
-        
+
         client = new Client("fredPublic", null, false);
         client.getAllowedGrantTypes().add("custom_grant");
         this.setClient(client);
-        
+
         client = new Client("fred", "password", true);
         client.getAllowedGrantTypes().add("custom_grant");
         this.setClient(client);
