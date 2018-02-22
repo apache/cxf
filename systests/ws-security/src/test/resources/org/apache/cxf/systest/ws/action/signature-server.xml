@@ -26,9 +26,9 @@
         </cxf:features>
     </cxf:bus>
     
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Signature" address="http://localhost:${testutil.ports.SignatureStaxServer}/DoubleItSignature" serviceName="s:DoubleItService" endpointName="s:DoubleItSignaturePort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/action/DoubleItAction.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Signature" address="http://localhost:${testutil.ports.SignatureServer}/DoubleItSignature" serviceName="s:DoubleItService" endpointName="s:DoubleItSignaturePort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/action/DoubleItAction.wsdl">
         <jaxws:outInterceptors>
-            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JStaxOutInterceptor">
+            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
                 <constructor-arg>
                     <map>
                         <entry key="action" value="Signature"/>
@@ -41,7 +41,7 @@
             </bean>
         </jaxws:outInterceptors>
         <jaxws:inInterceptors>
-            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor">
+            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
                 <constructor-arg>
                     <map>
                         <entry key="action" value="Signature"/>
@@ -52,9 +52,9 @@
         </jaxws:inInterceptors>
     </jaxws:endpoint>
     
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Signature2" address="http://localhost:${testutil.ports.SignatureStaxServer}/DoubleItSignature2" serviceName="s:DoubleItService" endpointName="s:DoubleItSignaturePort2" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/action/DoubleItAction.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Signature2" address="http://localhost:${testutil.ports.SignatureServer}/DoubleItSignature2" serviceName="s:DoubleItService" endpointName="s:DoubleItSignaturePort2" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/action/DoubleItAction.wsdl">
         <jaxws:outInterceptors>
-            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JStaxOutInterceptor">
+            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
                 <constructor-arg>
                     <map>
                         <entry key="action" value="Signature"/>
@@ -67,7 +67,7 @@
             </bean>
         </jaxws:outInterceptors>
         <jaxws:inInterceptors>
-            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor">
+            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
                 <constructor-arg>
                     <map>
                         <entry key="action" value="Signature"/>
