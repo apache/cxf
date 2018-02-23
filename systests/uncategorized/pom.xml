@@ -61,6 +61,9 @@
                             </defaultOptions>
                             <wsdlOptions>
                                 <wsdlOption>
+                                    <wsdl>${basedir}/src/test/resources/DoubleItLogical.wsdl</wsdl>
+                                </wsdlOption>
+                                <wsdlOption>
                                     <wsdl>${basedir}/src/test/resources/wsdl_systest/hello_world_corba.wsdl</wsdl>
                                 </wsdlOption>
                                 <wsdlOption>
