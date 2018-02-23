@@ -659,6 +659,19 @@ public class ClientImpl
             throw ex;
         }
 
+        if (resList == null   
+            && oi != null && !oi.getOperationInfo().isOneWay()) {
+            
+            BindingOperationInfo boi = oi;
+            if (boi.isUnwrapped()) {
+                boi = boi.getWrappedOperation();
+            }
+            if (!boi.getOutput().getMessageParts().isEmpty()) {
+                //we were supposed to get some output, but didn't
+                throw new IllegalStateException("Response message did not contain proper response data. Expected: "
+                    + boi.getOutput().getMessageParts().get(0).getConcreteName());
+            }
+        }
         if (resList != null) {
             return resList.toArray();
         }
