@@ -23,6 +23,7 @@ import java.net.URL;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
+import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -35,7 +36,6 @@ import org.junit.BeforeClass;
 /**
  * Test what happens when we make an invocation and get back an empty SOAP Body (see CXF-7653)
  */
-@org.junit.Ignore("Ignoring this until CXF-7653 is resolved")
 public class EmptySOAPBodyTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(EmptySOAPBodyServer.class);
 
@@ -74,7 +74,13 @@ public class EmptySOAPBodyTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
 
-        port.doubleIt(25);
+        try {
+            port.doubleIt(25);
+            fail("Should have thown an exception");
+        } catch (SOAPFaultException t) {
+            assertTrue("Wrong exception cause " + t.getCause(), 
+                 t.getCause() instanceof IllegalStateException);
+        }
 
         ((java.io.Closeable)port).close();
 
