@@ -263,4 +263,35 @@ public class WsdlOption extends Option implements org.apache.cxf.maven_plugin.Ge
     public void setUri(String uri) {
         wsdl = uri;
     }
+    
+    /**
+     * Calls {@link Option#merge(Option)} and checks afterwards, if a classpath
+     * replacement string has been set as default option.<br>
+     * <br>
+     * A classpath replacement string in the format
+     * "classpath;/path/to/replace/" will be processed to replace the local
+     * file-Url of the WSDL-files with the classpath URL.<br>
+     * <br>
+     * Example: "file:/path/to/package1/package2/myservice.wsdl" will be converted
+     * to "classpath:/package1/package2/myservice.wsdl", if "classpath;/path/to/"
+     * has been set<br>
+     * 
+     * @see org.apache.cxf.maven_plugin.wsdl2java.Option#merge(org.apache.cxf.maven_plugin.wsdl2java.Option)
+     */
+    @Override
+    public void merge(Option defaultOptions) {
+        super.merge(defaultOptions);
+        if (!isSetWsdlLocation() && defaultOptions.isSetWsdlLocation()) {
+            String defaultWsdlLocation = defaultOptions.getWsdlLocation();
+            if (defaultWsdlLocation != null && defaultWsdlLocation.startsWith("classpath;")) {
+                try {
+                    String[] replacer = defaultWsdlLocation.split(";");
+                    String filePath = new File(replacer[1]).toURI().toURL().toExternalForm();
+                    this.wsdlLocation = this.getWsdl().replace(filePath, "classpath:/");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 }
