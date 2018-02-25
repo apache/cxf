@@ -15,3 +15,9 @@ wsdl-artifact-resolution
 ------------------------
 
 Verifies that a wsdlArtifact from local repository is properly resolved for codegen.
+
+wsdl-classpath-resolution
+------------------------
+
+Verifies that using wsdlRoot with "classpath;<path-to-replace>" will generate Java classes with valid classpath 
+URLs instead of the local file URL.
