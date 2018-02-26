@@ -110,7 +110,8 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
 
         // add Acknowledgements (to application messages or explicitly created Acknowledgement messages only)
         boolean isAck = constants.getSequenceAckAction().equals(action);
-        if (isApplicationMessage || isAck) {
+        boolean isClose = constants.getCloseSequenceAction().equals(action);
+        if (isApplicationMessage || isAck || isClose) {
             AttributedURIType to = maps.getTo();
             assert null != to;
             addAcknowledgements(destination, rmpsOut, inSeqId, to);
