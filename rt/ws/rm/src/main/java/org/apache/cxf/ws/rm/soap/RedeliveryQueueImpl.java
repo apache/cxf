@@ -417,7 +417,11 @@ public class RedeliveryQueueImpl implements RedeliveryQueue {
             if (null != rmrp && rmrp.getInterval() > 0L) {
                 baseRedeliveryInterval = rmrp.getInterval();
             }
-            backoff = RedeliveryQueue.DEFAULT_EXPONENTIAL_BACKOFF;
+            if (rmrp == null || "ExponentialBackoff".equals(rmrp.getAlgorithm())) {
+                backoff = RedeliveryQueue.DEFAULT_EXPONENTIAL_BACKOFF;
+            } else {
+                backoff = 1;
+            }
             next = new Date(System.currentTimeMillis() + baseRedeliveryInterval);
             nextInterval = baseRedeliveryInterval * backoff;
             maxRetries = null != rmrp ? rmrp.getMaxRetries() : 0;
