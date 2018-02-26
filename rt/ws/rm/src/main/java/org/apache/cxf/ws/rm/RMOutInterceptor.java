@@ -111,7 +111,8 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
         // add Acknowledgements (to application messages or explicitly created Acknowledgement messages only)
         boolean isAck = constants.getSequenceAckAction().equals(action);
         boolean isClose = constants.getCloseSequenceAction().equals(action);
-        if (isApplicationMessage || isAck || isClose) {
+        boolean isTerminate = constants.getTerminateSequenceAction().equals(action);
+        if (isApplicationMessage || isAck || isClose || isTerminate) {
             AttributedURIType to = maps.getTo();
             assert null != to;
             addAcknowledgements(destination, rmpsOut, inSeqId, to);
@@ -121,7 +122,7 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
                 isAck = true;
             }
         }
-        if (isAck || (constants.getTerminateSequenceAction().equals(action)
+        if (isAck || (isTerminate
                 && RM10Constants.NAMESPACE_URI.equals(rmNamespace))) {
             maps.setReplyTo(RMUtils.createNoneReference());
         }
@@ -165,6 +166,9 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
     }
 
     void addAcknowledgements(Destination destination, RMProperties rmpsOut, Identifier inSeqId,  AttributedURIType to) {
+        if (destination == null) {
+            return;
+        }
         for (DestinationSequence seq : destination.getAllSequences()) {
             if (!seq.sendAcknowledgement()) {
                 if (LOG.isLoggable(Level.FINE)) {
