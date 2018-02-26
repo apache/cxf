@@ -239,14 +239,10 @@ public class Servant implements Invoker {
         Destination destination = reliableEndpoint.getDestination();
         Identifier sid = terminate.getIdentifier();
         DestinationSequence terminatedSeq = destination.getSequence(sid);
-        if (null == terminatedSeq) {
-            //  TODO
-            LOG.severe("No such sequence.");
-            return null;
-        } 
+        if (null != terminatedSeq) {
+            destination.terminateSequence(terminatedSeq);
+        }
 
-        destination.terminateSequence(terminatedSeq);
-        
         // the following may be necessary if the last message for this sequence was a oneway
         // request and hence there was no response to which a last message could have been added
         
