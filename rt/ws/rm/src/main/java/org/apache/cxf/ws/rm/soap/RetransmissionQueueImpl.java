@@ -323,7 +323,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
      * @param message the message context
      * @return a ResendCandidate
      */
-    protected ResendCandidate createResendCandidate(SoapMessage message) {
+    protected ResendCandidate createResendCandidate(Message message) {
         return new ResendCandidate(message);
     }
 
@@ -347,7 +347,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
                 sequenceCandidates = new ArrayList<>();
                 candidates.put(key, sequenceCandidates);
             }
-            candidate = new ResendCandidate(message);
+            candidate = createResendCandidate(message);
             if (isSequenceSuspended(key)) {
                 candidate.suspend();
             }
