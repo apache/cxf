@@ -123,7 +123,7 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
                 context.abortWith(r);
             }
         } else if (findResourceMethod) {
-            Method method = findResourceMethod ? getResourceMethod(m, httpMethod) : null;
+            Method method = getResourceMethod(m, httpMethod);
             simpleRequest(m, method);
         } else {
             m.getInterceptorChain().add(new CorsInInterceptor());
@@ -296,7 +296,7 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
         OperationResourceInfo ori = JAXRSUtils.findTargetMethod(matchedResources,
                                     m, httpMethod, values,
                                     contentType,
-                                    Collections.singletonList(acceptType), 
+                                    Collections.singletonList(acceptType),
                                     false,
                                     false);
         if (ori == null) {

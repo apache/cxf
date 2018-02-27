@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -102,7 +103,7 @@ public class JaxrsServletContainerInitializer implements ServletContainerInitial
                     // with a JAX-RS Application class name
                     servletMapping = getServletMapping(ctx, servletName);
                 }
-                final Map<String, Object> appProperties = 
+                final Map<String, Object> appProperties =
                     app != null ? app.getProperties() : Collections.emptyMap();
                 app = new Application() {
                     @Override
@@ -171,9 +172,9 @@ public class JaxrsServletContainerInitializer implements ServletContainerInitial
         if (classes != null) {
             for (final Class< ? > clazz: classes) {
                 if (!classShouldBeIgnored(clazz)) {
-                    for (final Class< ? extends Annotation > annotation: grouped.keySet()) {
-                        if (clazz.isAnnotationPresent(annotation)) {
-                            grouped.get(annotation).add(clazz);
+                    for (final Entry<Class<? extends Annotation>, Collection<Class<?>>> entry : grouped.entrySet()) {
+                        if (clazz.isAnnotationPresent(entry.getKey())) {
+                            entry.getValue().add(clazz);
                         }
                     }
                 }

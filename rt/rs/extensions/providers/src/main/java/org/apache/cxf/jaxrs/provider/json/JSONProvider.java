@@ -675,10 +675,10 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
             if (totalElementCountStr != null || innerElementCountStr != null || elementLevelStr != null) {
                 try {
                     int totalElementCount = totalElementCountStr != null
-                        ? Integer.valueOf(totalElementCountStr) : -1;
-                    int elementLevel = elementLevelStr != null ? Integer.valueOf(elementLevelStr) : -1;
+                        ? Integer.parseInt(totalElementCountStr) : -1;
+                    int elementLevel = elementLevelStr != null ? Integer.parseInt(elementLevelStr) : -1;
                     int innerElementCount = innerElementCountStr != null
-                        ? Integer.valueOf(innerElementCountStr) : -1;
+                        ? Integer.parseInt(innerElementCountStr) : -1;
                     return new DocumentDepthProperties(totalElementCount, elementLevel, innerElementCount);
                 } catch (Exception ex) {
                     throw ExceptionUtils.toInternalServerErrorException(ex, null);

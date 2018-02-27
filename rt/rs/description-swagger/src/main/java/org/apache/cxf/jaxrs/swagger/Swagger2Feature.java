@@ -70,7 +70,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature implements SwaggerUi
 
     private static final String DEFAULT_LICENSE_VALUE = "Apache 2.0 License";
     private static final String DEFAULT_LICENSE_URL = "http://www.apache.org/licenses/LICENSE-2.0.html";
-    
+
     private static final String DEFAULT_PROPS_LOCATION = "/swagger.properties";
     private static final String RESOURCE_PACKAGE_PROPERTY = "resource.package";
     private static final String TITLE_PROPERTY = "title";
@@ -85,7 +85,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature implements SwaggerUi
     private static final String FILTER_CLASS_PROPERTY = "filter.class";
     private static final String HOST_PROPERTY = "host";
     private static final String USE_PATH_CFG_PROPERTY = "use.path.based.config";
-    
+
     private boolean scan;
     private boolean scanAllResources;
 
@@ -94,7 +94,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature implements SwaggerUi
     private Boolean supportSwaggerUi;
 
     private String swaggerUiVersion;
-    
+
     private String swaggerUiMavenGroupAndArtifact;
 
     private Map<String, String> swaggerUiMediaTypes;
@@ -102,14 +102,14 @@ public class Swagger2Feature extends AbstractSwaggerFeature implements SwaggerUi
     private boolean dynamicBasePath;
 
     private Map<String, SecuritySchemeDefinition> securityDefinitions;
-    
+
     private Swagger2Customizer customizer;
-    
+
     private String host;
     private String[] schemes;
     private Boolean prettyPrint;
     private Boolean usePathBasedConfig;
-    
+
     private String propertiesLocation = DEFAULT_PROPS_LOCATION;
 
     @Override
@@ -126,7 +126,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature implements SwaggerUi
         ServerProviderFactory factory =
             (ServerProviderFactory)server.getEndpoint().get(ServerProviderFactory.class.getName());
         ApplicationInfo appInfo = null;
-        if (!isScan()) {    
+        if (!isScan()) {
             appInfo = factory.getApplicationProvider();
             if (appInfo == null) {
                 Set<Class<?>> serviceClasses = new HashSet<>();
@@ -137,10 +137,10 @@ public class Swagger2Feature extends AbstractSwaggerFeature implements SwaggerUi
                 server.getEndpoint().put(Application.class.getName(), appInfo);
             }
         }
-        
+
 
         List<Object> swaggerResources = new LinkedList<>();
-        
+
         if (customizer == null) {
             customizer = new Swagger2Customizer();
         }
@@ -155,11 +155,11 @@ public class Swagger2Feature extends AbstractSwaggerFeature implements SwaggerUi
 
         final Properties swaggerProps = getSwaggerProperties(bus);
         final Registration swaggerUiRegistration = getSwaggerUi(bus, swaggerProps, isRunAsFilter());
-        
+
         if (!isRunAsFilter()) {
             swaggerResources.addAll(swaggerUiRegistration.getResources());
-        } 
-            
+        }
+
         providers.addAll(swaggerUiRegistration.getProviders());
         sfb.setResourceClassesFromBeans(swaggerResources);
 
@@ -173,7 +173,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature implements SwaggerUi
         }
         customizer.setClassResourceInfos(cris);
         customizer.setDynamicBasePath(dynamicBasePath);
-        
+
         BeanConfig beanConfig = appInfo == null
             ? new BeanConfig()
             : new ApplicationBeanConfig(appInfo.getProvider());
@@ -184,7 +184,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature implements SwaggerUi
             swagger.setSecurityDefinitions(securityDefinitions);
         }
         customizer.setBeanConfig(beanConfig);
-        
+
         providers.add(new ReaderConfigFilter());
 
         if (beanConfig.isUsePathBasedConfig()) {
@@ -195,8 +195,8 @@ public class Swagger2Feature extends AbstractSwaggerFeature implements SwaggerUi
     }
 
     protected Properties getSwaggerProperties(Bus bus) {
-        InputStream is = ResourceUtils.getClasspathResourceStream(propertiesLocation, 
-                                                 AbstractSwaggerFeature.class, 
+        InputStream is = ResourceUtils.getClasspathResourceStream(propertiesLocation,
+                                                 AbstractSwaggerFeature.class,
                                                  bus);
         Properties props = null;
         if (is != null) {
@@ -217,14 +217,14 @@ public class Swagger2Feature extends AbstractSwaggerFeature implements SwaggerUi
         return props;
     }
     protected void initBeanConfig(BeanConfig beanConfig, Properties props) {
-        
+
         // resource package
         String theResourcePackage = getResourcePackage();
         if (theResourcePackage == null && props != null) {
             theResourcePackage = props.getProperty(RESOURCE_PACKAGE_PROPERTY);
         }
         beanConfig.setResourcePackage(theResourcePackage);
-        
+
         // use path based configuration
         Boolean theUsePathBasedConfig = isUsePathBasedConfig();
         if (theUsePathBasedConfig == null && props != null) {
@@ -234,49 +234,49 @@ public class Swagger2Feature extends AbstractSwaggerFeature implements SwaggerUi
             theUsePathBasedConfig = false;
         }
         beanConfig.setUsePathBasedConfig(theUsePathBasedConfig);
-        
-        // version 
+
+        // version
         String theVersion = getVersion();
         if (theVersion == null && props != null) {
             theVersion = props.getProperty(VERSION_PROPERTY);
         }
         beanConfig.setVersion(theVersion);
-        
+
         // host
         String theHost = getHost();
         if (theHost == null && props != null) {
             theHost = props.getProperty(HOST_PROPERTY);
         }
         beanConfig.setHost(theHost);
-        
+
         // schemes
         String[] theSchemes = getSchemes();
         if (theSchemes == null && props != null && props.containsKey(SCHEMES_PROPERTY)) {
             theSchemes = props.getProperty(SCHEMES_PROPERTY).split(",");
         }
         beanConfig.setSchemes(theSchemes);
-        
+
         // title
         String theTitle = getTitle();
         if (theTitle == null && props != null) {
             theTitle = props.getProperty(TITLE_PROPERTY);
         }
         beanConfig.setTitle(theTitle);
-        
+
         // description
         String theDescription = getDescription();
         if (theDescription == null && props != null) {
             theDescription = props.getProperty(DESCRIPTION_PROPERTY);
         }
         beanConfig.setDescription(theDescription);
-        
+
         // contact
         String theContact = getContact();
         if (theContact == null && props != null) {
             theContact = props.getProperty(CONTACT_PROPERTY);
         }
         beanConfig.setContact(theContact);
-        
+
         // license
         String theLicense = getLicense();
         if (theLicense == null && !licenseWasSet) {
@@ -290,7 +290,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature implements SwaggerUi
             }
         }
         beanConfig.setLicense(theLicense);
-        
+
         // license url
         String theLicenseUrl = getLicenseUrl();
         if (theLicenseUrl == null && props != null) {
@@ -300,14 +300,14 @@ public class Swagger2Feature extends AbstractSwaggerFeature implements SwaggerUi
             theLicenseUrl = DEFAULT_LICENSE_URL;
         }
         beanConfig.setLicenseUrl(theLicenseUrl);
-        
+
         // terms of service url
         String theTermsUrl = getTermsOfServiceUrl();
         if (theTermsUrl == null && props != null) {
             theTermsUrl = props.getProperty(TERMS_URL_PROPERTY);
         }
         beanConfig.setTermsOfServiceUrl(theTermsUrl);
-        
+
         // pretty print
         Boolean thePrettyPrint = isPrettyPrint();
         if (thePrettyPrint == null && props != null) {
@@ -317,20 +317,20 @@ public class Swagger2Feature extends AbstractSwaggerFeature implements SwaggerUi
             thePrettyPrint = false;
         }
         beanConfig.setPrettyPrint(thePrettyPrint);
-        
+
         // filter class
         String theFilterClass = getFilterClass();
         if (theFilterClass == null && props != null) {
             theFilterClass = props.getProperty(FILTER_CLASS_PROPERTY);
         }
         beanConfig.setFilterClass(theFilterClass);
-        
+
         // scan
         beanConfig.setScan(isScan());
-        
+
         // base path is calculated dynamically
         beanConfig.setBasePath(getBasePath());
-        
+
     }
 
     public Boolean isUsePathBasedConfig() {
@@ -352,7 +352,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature implements SwaggerUi
     public String[] getSchemes() {
         return schemes;
     }
-    
+
     public void setSchemes(String[] schemes) {
         this.schemes = schemes;
     }
@@ -364,7 +364,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature implements SwaggerUi
     public void setPrettyPrint(Boolean prettyPrint) {
         this.prettyPrint = prettyPrint;
     }
-    
+
     public Swagger2Customizer getCustomizer() {
         return customizer;
     }
@@ -372,7 +372,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature implements SwaggerUi
     public void setCustomizer(Swagger2Customizer customizer) {
         this.customizer = customizer;
     }
-    
+
     public boolean isScanAllResources() {
         return scanAllResources;
     }
@@ -404,13 +404,13 @@ public class Swagger2Feature extends AbstractSwaggerFeature implements SwaggerUi
     }
 
     /**
-     * Set SwaggerUI Maven group and artifact using the "groupId/artifactId" format. 
+     * Set SwaggerUI Maven group and artifact using the "groupId/artifactId" format.
      * @param swaggerUiMavenGroupAndArtifact
      */
     public void setSwaggerUiMavenGroupAndArtifact(String swaggerUiMavenGroupAndArtifact) {
         this.swaggerUiMavenGroupAndArtifact = swaggerUiMavenGroupAndArtifact;
     }
-    
+
     public void setSwaggerUiVersion(String swaggerUiVersion) {
         this.swaggerUiVersion = swaggerUiVersion;
     }
@@ -427,12 +427,12 @@ public class Swagger2Feature extends AbstractSwaggerFeature implements SwaggerUi
     public void setSwaggerUiMediaTypes(Map<String, String> swaggerUiMediaTypes) {
         this.swaggerUiMediaTypes = swaggerUiMediaTypes;
     }
-    
+
     @Override
     public Map<String, String> getSwaggerUiMediaTypes() {
         return swaggerUiMediaTypes;
     }
-    
+
     public void setSecurityDefinitions(Map<String, SecuritySchemeDefinition> securityDefinitions) {
         this.securityDefinitions = securityDefinitions;
     }
@@ -444,7 +444,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature implements SwaggerUi
     public void setPropertiesLocation(String propertiesLocation) {
         this.propertiesLocation = propertiesLocation;
     }
-    
+
     public boolean isScan() {
         return scan;
     }
@@ -452,7 +452,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature implements SwaggerUi
     public void setScan(boolean scan) {
         this.scan = scan;
     }
-    
+
     @Override
     public String findSwaggerUiRoot() {
         return SwaggerUi.findSwaggerUiRoot(swaggerUiMavenGroupAndArtifact, swaggerUiVersion);
@@ -473,7 +473,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature implements SwaggerUi
                 if (context != null) {
                     return new SyntheticServletConfig(context);
                 }
-            } else if (sc != null && sc.getInitParameter(SwaggerContextService.USE_PATH_BASED_CONFIG) == null) {
+            } else if (sc.getInitParameter(SwaggerContextService.USE_PATH_BASED_CONFIG) == null) {
                 return new DelegatingServletConfig(sc);
             }
 
@@ -482,7 +482,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature implements SwaggerUi
     }
 
     @PreMatching
-    protected static class SwaggerContainerRequestFilter extends Swagger2ApiListingResource 
+    protected static class SwaggerContainerRequestFilter extends Swagger2ApiListingResource
         implements ContainerRequestFilter {
 
         protected static final String APIDOCS_LISTING_PATH_JSON = "swagger.json";

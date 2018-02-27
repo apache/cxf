@@ -230,8 +230,8 @@ public final class ModelEncryptionSupport {
         final ServerAccessToken newToken = new ServerAccessToken(provider.getClient(parts[4]),
                                                                  parts[1],
                                                                  newTokenKey == null ? parts[0] : newTokenKey,
-                                                                 Long.valueOf(parts[2]),
-                                                                 Long.valueOf(parts[3])) {
+                                                                 Long.parseLong(parts[2]),
+                                                                 Long.parseLong(parts[3])) {
         };
 
         newToken.setRefreshToken(getStringPart(parts[5]));
@@ -245,7 +245,7 @@ public final class ModelEncryptionSupport {
             String[] allPermParts = parts[9].split("\\.");
             for (int i = 0; i + 4 < allPermParts.length; i = i + 5) {
                 OAuthPermission perm = new OAuthPermission(allPermParts[i], allPermParts[i + 1]);
-                perm.setDefaultPermission(Boolean.valueOf(allPermParts[i + 2]));
+                perm.setDefaultPermission(Boolean.parseBoolean(allPermParts[i + 2]));
                 perm.setHttpVerbs(parseSimpleList(allPermParts[i + 3]));
                 perm.setUris(parseSimpleList(allPermParts[i + 4]));
                 perms.add(perm);
@@ -336,7 +336,7 @@ public final class ModelEncryptionSupport {
         String[] parts = getParts(sequence);
         Client c = new Client(parts[0],
                               parts[1],
-                              Boolean.valueOf(parts[2]),
+                              Boolean.parseBoolean(parts[2]),
                               getStringPart(parts[3]), getStringPart(parts[4]));
         c.setApplicationDescription(getStringPart(parts[5]));
         c.setApplicationLogoUri(getStringPart(parts[6]));
@@ -400,8 +400,8 @@ public final class ModelEncryptionSupport {
         String[] parts = getParts(sequence);
         ServerAuthorizationCodeGrant grant = new ServerAuthorizationCodeGrant(provider.getClient(parts[0]),
                                                                               parts[1],
-                                                                              Long.valueOf(parts[2]),
-                                                                              Long.valueOf(parts[3]));
+                                                                              Long.parseLong(parts[2]),
+                                                                              Long.parseLong(parts[3]));
         grant.setRedirectUri(getStringPart(parts[4]));
         grant.setAudience(getStringPart(parts[5]));
         grant.setClientCodeChallenge(getStringPart(parts[6]));

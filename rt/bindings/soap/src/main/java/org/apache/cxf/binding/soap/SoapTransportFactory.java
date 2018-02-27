@@ -65,14 +65,14 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
 
     public static final String TRANSPORT_ID = "http://schemas.xmlsoap.org/soap/";
 
-    public static final List<String> DEFAULT_NAMESPACES = Arrays.asList(
+    public static final List<String> DEFAULT_NAMESPACES = Collections.unmodifiableList(Arrays.asList(
             "http://schemas.xmlsoap.org/soap/",
             "http://schemas.xmlsoap.org/wsdl/soap/",
             "http://schemas.xmlsoap.org/wsdl/soap12/",
             "http://schemas.xmlsoap.org/soap/http",
             "http://schemas.xmlsoap.org/wsdl/soap/http",
             "http://www.w3.org/2010/soapjms/",
-            "http://www.w3.org/2003/05/soap/bindings/HTTP/");
+            "http://www.w3.org/2003/05/soap/bindings/HTTP/"));
     public static final Set<String> DEFAULT_PREFIXES
         = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
             "soap.udp"

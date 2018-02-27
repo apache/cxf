@@ -95,7 +95,7 @@ final class JMSMessageUtils {
     }
 
     private static void populateIncomingContext(JMSMessageHeadersType messageHeaders,
-                                               org.apache.cxf.message.Message inMessage) 
+                                               org.apache.cxf.message.Message inMessage)
                                                    throws UnsupportedEncodingException {
         String contentType = messageHeaders.getContentType();
         if (contentType != null) {
@@ -119,9 +119,7 @@ final class JMSMessageUtils {
                     protHeaders.put(JMSConstants.TARGET_SERVICE_IN_REQUESTURI,
                                     Collections.singletonList("true"));
                 }
-                if (requestURI != null) {
-                    inMessage.put(org.apache.cxf.message.Message.REQUEST_URI, requestURI);
-                }
+                inMessage.put(org.apache.cxf.message.Message.REQUEST_URI, requestURI);
             } catch (Exception e) {
                 protHeaders.put(JMSConstants.MALFORMED_REQUESTURI, Collections.singletonList("true"));
             }
@@ -215,10 +213,10 @@ final class JMSMessageUtils {
         // Retrieve or create protocol headers
         Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)outMessage
             .get(org.apache.cxf.message.Message.PROTOCOL_HEADERS));
-        
+
         boolean isSoapMessage =
             !PropertyUtils.isTrue(outMessage.getExchange().get(org.apache.cxf.message.Message.REST_MESSAGE));
-        
+
         if (isSoapMessage) {
             if (!messageHeaders.isSetSOAPJMSTargetService()) {
                 messageHeaders.setSOAPJMSTargetService(jmsConfig.getTargetService());

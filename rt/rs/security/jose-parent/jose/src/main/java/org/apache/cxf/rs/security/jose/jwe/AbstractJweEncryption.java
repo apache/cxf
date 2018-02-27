@@ -200,8 +200,7 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
 
             String protectedHeadersJson = writer.toJson(protectedHeaders);
 
-            byte[] additionalEncryptionParam = getAAD(protectedHeadersJson,
-                                                      jweInput == null ? null : jweInput.getAad());
+            byte[] additionalEncryptionParam = getAAD(protectedHeadersJson, jweInput.getAad());
             keyProps.setAdditionalData(additionalEncryptionParam);
 
             state.keyProps = keyProps;

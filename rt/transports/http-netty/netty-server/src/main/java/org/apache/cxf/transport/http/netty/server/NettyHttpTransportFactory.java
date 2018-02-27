@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -39,8 +40,8 @@ import org.apache.cxf.transport.http.HttpDestinationFactory;
 
 public class NettyHttpTransportFactory extends AbstractTransportFactory implements DestinationFactory {
 
-    public static final List<String> DEFAULT_NAMESPACES = Arrays
-        .asList("http://cxf.apache.org/transports/http/netty/server");
+    public static final List<String> DEFAULT_NAMESPACES = Collections.unmodifiableList(Arrays
+        .asList("http://cxf.apache.org/transports/http/netty/server"));
 
     /**
      * This constant holds the prefixes served by this factory.

@@ -21,6 +21,7 @@ package org.apache.cxf.transport.udp;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -45,7 +46,7 @@ public class UDPTransportFactory extends AbstractTransportFactory
 
     public static final String TRANSPORT_ID = "http://cxf.apache.org/transports/udp";
     public static final List<String> DEFAULT_NAMESPACES
-        = Arrays.asList(TRANSPORT_ID);
+        = Collections.unmodifiableList(Arrays.asList(TRANSPORT_ID));
 
     private static final Logger LOG = LogUtils.getL7dLogger(UDPTransportFactory.class);
     private static final Set<String> URI_PREFIXES = new HashSet<>();

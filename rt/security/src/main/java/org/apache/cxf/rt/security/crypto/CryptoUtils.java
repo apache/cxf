@@ -125,7 +125,7 @@ public final class CryptoUtils {
             throw new SecurityException(ex);
         }
     }
-    
+
     public static RSAPublicKey getRSAPublicKey(KeyFactory factory,
                                                byte[] modulusBytes,
                                                byte[] publicExponentBytes) {
@@ -133,7 +133,7 @@ public final class CryptoUtils {
         BigInteger publicExponent = toBigInteger(publicExponentBytes);
         return getRSAPublicKey(factory, modulus, publicExponent);
     }
-    
+
     public static RSAPublicKey getRSAPublicKey(BigInteger modulusBytes,
                                                BigInteger publicExponentBytes) {
         try {
@@ -145,7 +145,7 @@ public final class CryptoUtils {
         }
     }
 
-    
+
     public static RSAPublicKey getRSAPublicKey(KeyFactory factory,
                                                BigInteger modulus,
                                                BigInteger publicExponent) {
@@ -156,7 +156,7 @@ public final class CryptoUtils {
             throw new SecurityException(ex);
         }
     }
-    
+
     public static RSAPrivateKey getRSAPrivateKey(String encodedModulus,
                                                  String encodedPrivateExponent) {
         try {
@@ -348,8 +348,8 @@ public final class CryptoUtils {
         }
     }
 
-    public static Signature getVerificationSignature(PublicKey key, 
-                                                        String signAlgo, 
+    public static Signature getVerificationSignature(PublicKey key,
+                                                        String signAlgo,
                                                         AlgorithmParameterSpec params) {
         try {
             Signature s = Signature.getInstance(signAlgo);
@@ -549,7 +549,7 @@ public final class CryptoUtils {
                         //the default block size is 256 when use private key under java9
                         blockSize = secretKey instanceof PublicKey ? 117 : 256;
                     } else {
-                        
+
                         blockSize = secretKey instanceof PublicKey ? 117 : 128;
                     }
                 }
@@ -576,7 +576,7 @@ public final class CryptoUtils {
     }
 
     private static boolean isJava8Release161OrLater(String javaVersion) {
-        return javaVersion.startsWith("1.8.0_") && Integer.valueOf(javaVersion.substring(6)) >= 161;
+        return javaVersion.startsWith("1.8.0_") && Integer.parseInt(javaVersion.substring(6)) >= 161;
     }
 
     public static Cipher initCipher(Key secretKey, KeyProperties keyProps, int mode)  throws SecurityException {

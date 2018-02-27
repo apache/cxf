@@ -491,7 +491,7 @@ public class JettyHTTPServerEngine implements ServerEngine {
         if (isSessionSupport) {
             // If we have sessions, we need two handlers.
             SessionHandler sh = null;
-            if (Server.getVersion().startsWith("9.2") 
+            if (Server.getVersion().startsWith("9.2")
                 || Server.getVersion().startsWith("9.3")) {
                 if (sessionHandler == null) {
                     sessionHandler = new SessionHandler();
@@ -499,8 +499,8 @@ public class JettyHTTPServerEngine implements ServerEngine {
                 sh = new SessionHandler();
                 try {
                     Method get = ReflectionUtil.getDeclaredMethod(SessionHandler.class, "getSessionManager");
-                    Method set = ReflectionUtil.getDeclaredMethod(SessionHandler.class, 
-                                                                  "setSessionManager", 
+                    Method set = ReflectionUtil.getDeclaredMethod(SessionHandler.class,
+                                                                  "setSessionManager",
                                                                   get.getReturnType());
                     ReflectionUtil.setAccessible(set)
                         .invoke(sh, ReflectionUtil.setAccessible(get).invoke(sessionHandler));
@@ -982,10 +982,12 @@ public class JettyHTTPServerEngine implements ServerEngine {
 
     private void checkConnectorPort() throws IOException {
         try {
-            int cp = ((ServerConnector)connector).getPort();
-            if (null != connector && port != cp) {
-                throw new IOException("Error: Connector port " + cp + " does not match"
-                            + " with the server engine port " + port);
+            if (null != connector) {
+                int cp = ((ServerConnector)connector).getPort();
+                if (port != cp) {
+                    throw new IOException("Error: Connector port " + cp + " does not match"
+                                + " with the server engine port " + port);
+                }
             }
         } catch (IOException ioe) {
             throw ioe;

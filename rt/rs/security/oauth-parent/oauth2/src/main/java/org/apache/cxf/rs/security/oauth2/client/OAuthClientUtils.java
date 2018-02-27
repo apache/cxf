@@ -192,7 +192,7 @@ public final class OAuthClientUtils {
         throws OAuthServiceException {
         return getAccessToken(accessTokenService, null, grant, null, false);
     }
-    
+
     /**
      * Obtains the access token from OAuth AccessToken Service
      * using the initialized web client
@@ -351,10 +351,10 @@ public final class OAuthClientUtils {
                 }
                 String expiresInStr = map.remove(OAuthConstants.ACCESS_TOKEN_EXPIRES_IN);
                 if (expiresInStr != null) {
-                    token.setExpiresIn(Long.valueOf(expiresInStr));
+                    token.setExpiresIn(Long.parseLong(expiresInStr));
                 }
                 String issuedAtStr = map.remove(OAuthConstants.ACCESS_TOKEN_ISSUED_AT);
-                token.setIssuedAt(issuedAtStr != null ? Long.valueOf(issuedAtStr)
+                token.setIssuedAt(issuedAtStr != null ? Long.parseLong(issuedAtStr)
                                                       : System.currentTimeMillis() / 1000);
                 String scope = map.remove(OAuthConstants.SCOPE);
                 if (scope != null) {

@@ -23,6 +23,7 @@ import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,22 +76,24 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
     private static final Logger LOG = LogUtils.getL7dLogger(RESTSecurityTokenServiceImpl.class);
 
     static {
-        DEFAULT_CLAIM_TYPE_MAP = new HashMap<>();
-        DEFAULT_CLAIM_TYPE_MAP.put("emailaddress", CLAIM_TYPE_NS + "/claims/emailaddress");
-        DEFAULT_CLAIM_TYPE_MAP.put("role", CLAIM_TYPE_NS + "/claims/role");
-        DEFAULT_CLAIM_TYPE_MAP.put("roles", CLAIM_TYPE_NS + "/claims/role");
-        DEFAULT_CLAIM_TYPE_MAP.put("surname", CLAIM_TYPE_NS + "/claims/surname");
-        DEFAULT_CLAIM_TYPE_MAP.put("givenname", CLAIM_TYPE_NS + "/claims/givenname");
-        DEFAULT_CLAIM_TYPE_MAP.put("name", CLAIM_TYPE_NS + "/claims/name");
-        DEFAULT_CLAIM_TYPE_MAP.put("upn", CLAIM_TYPE_NS + "/claims/upn");
-        DEFAULT_CLAIM_TYPE_MAP.put("nameidentifier", CLAIM_TYPE_NS + "/claims/nameidentifier");
+        Map<String, String> tmpClaimTypeMap = new HashMap<>();
+        tmpClaimTypeMap.put("emailaddress", CLAIM_TYPE_NS + "/claims/emailaddress");
+        tmpClaimTypeMap.put("role", CLAIM_TYPE_NS + "/claims/role");
+        tmpClaimTypeMap.put("roles", CLAIM_TYPE_NS + "/claims/role");
+        tmpClaimTypeMap.put("surname", CLAIM_TYPE_NS + "/claims/surname");
+        tmpClaimTypeMap.put("givenname", CLAIM_TYPE_NS + "/claims/givenname");
+        tmpClaimTypeMap.put("name", CLAIM_TYPE_NS + "/claims/name");
+        tmpClaimTypeMap.put("upn", CLAIM_TYPE_NS + "/claims/upn");
+        tmpClaimTypeMap.put("nameidentifier", CLAIM_TYPE_NS + "/claims/nameidentifier");
+        DEFAULT_CLAIM_TYPE_MAP = Collections.unmodifiableMap(tmpClaimTypeMap);
 
-        DEFAULT_TOKEN_TYPE_MAP = new HashMap<>();
-        DEFAULT_TOKEN_TYPE_MAP.put("saml", WSS4JConstants.WSS_SAML2_TOKEN_TYPE);
-        DEFAULT_TOKEN_TYPE_MAP.put("saml2.0", WSS4JConstants.WSS_SAML2_TOKEN_TYPE);
-        DEFAULT_TOKEN_TYPE_MAP.put("saml1.1", WSS4JConstants.WSS_SAML_TOKEN_TYPE);
-        DEFAULT_TOKEN_TYPE_MAP.put("jwt", JWTTokenProvider.JWT_TOKEN_TYPE);
-        DEFAULT_TOKEN_TYPE_MAP.put("sct", STSUtils.TOKEN_TYPE_SCT_05_12);
+        Map<String, String> tmpTokenTypeMap = new HashMap<>();
+        tmpTokenTypeMap.put("saml", WSS4JConstants.WSS_SAML2_TOKEN_TYPE);
+        tmpTokenTypeMap.put("saml2.0", WSS4JConstants.WSS_SAML2_TOKEN_TYPE);
+        tmpTokenTypeMap.put("saml1.1", WSS4JConstants.WSS_SAML_TOKEN_TYPE);
+        tmpTokenTypeMap.put("jwt", JWTTokenProvider.JWT_TOKEN_TYPE);
+        tmpTokenTypeMap.put("sct", STSUtils.TOKEN_TYPE_SCT_05_12);
+        DEFAULT_TOKEN_TYPE_MAP = Collections.unmodifiableMap(tmpTokenTypeMap);
 
         DEFAULT_KEY_TYPE_MAP.put("SymmetricKey", STSConstants.SYMMETRIC_KEY_KEYTYPE);
         DEFAULT_KEY_TYPE_MAP.put("PublicKey", STSConstants.PUBLIC_KEY_KEYTYPE);

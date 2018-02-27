@@ -497,17 +497,17 @@ public class JMSEndpoint {
         this.retryInterval = retryInterval;
     }
     public void setRetryInterval(String retryInterval) {
-        this.retryInterval = Integer.valueOf(retryInterval);
+        this.retryInterval = Integer.parseInt(retryInterval);
     }
-    
+
     public boolean isOneSessionPerConnection() {
         return oneSessionPerConnection;
     }
-    
+
     public void setOneSessionPerConnection(String oneSessionPerConnection) {
-        this.oneSessionPerConnection = Boolean.valueOf(oneSessionPerConnection);
+        this.oneSessionPerConnection = Boolean.parseBoolean(oneSessionPerConnection);
     }
-    
+
     public void setOneSessionPerConnection(boolean oneSessionPerConnection) {
         this.oneSessionPerConnection = oneSessionPerConnection;
     }

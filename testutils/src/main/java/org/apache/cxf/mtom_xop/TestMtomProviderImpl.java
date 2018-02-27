@@ -37,9 +37,9 @@ import javax.xml.ws.WebServiceProvider;
 import javax.xml.ws.soap.MTOM;
 
 
-@WebServiceProvider(portName = "TestMtomProviderPort", 
-serviceName = "TestMtomService", 
-targetNamespace = "http://cxf.apache.org/mime", 
+@WebServiceProvider(portName = "TestMtomProviderPort",
+serviceName = "TestMtomService",
+targetNamespace = "http://cxf.apache.org/mime",
 wsdlLocation = "testutils/mtom_xop.wsdl")
 @ServiceMode(value = Mode.MESSAGE)
 @MTOM
@@ -56,7 +56,7 @@ public class TestMtomProviderImpl implements Provider<SOAPMessage> {
             SOAPEnvelope envelope = part.getEnvelope();
             SOAPBody body = envelope.getBody();
 
-            
+
             SOAPBodyElement testResponse = body
                 .addBodyElement(envelope.createName("testXopResponse", null, "http://cxf.apache.org/mime/types"));
             SOAPElement name = testResponse.addChildElement("name", null, "http://cxf.apache.org/mime/types");
@@ -66,10 +66,11 @@ public class TestMtomProviderImpl implements Provider<SOAPMessage> {
             SOAPElement include = attachinfo.addChildElement("Include", "xop",
                                                                 "http://www.w3.org/2004/08/xop/include");
 
-            InputStream pre = this.getClass().getResourceAsStream("/wsdl/mtom_xop.wsdl");
             int fileSize = 0;
-            for (int i = pre.read(); i != -1; i = pre.read()) {
-                fileSize++;
+            try (InputStream pre = this.getClass().getResourceAsStream("/wsdl/mtom_xop.wsdl")) {
+                for (int i = pre.read(); i != -1; i = pre.read()) {
+                    fileSize++;
+                }
             }
 
             int count = 50;
@@ -79,8 +80,8 @@ public class TestMtomProviderImpl implements Provider<SOAPMessage> {
                                                                                 fileSize * x,
                                                                                 fileSize);
             }
-            
-            
+
+
             DataHandler dh = new DataHandler(new ByteArrayDataSource(data, "application/octet-stream"));
 
             // create the image attachment

@@ -110,12 +110,12 @@ import org.apache.cxf.transport.MessageObserver;
  */
 public abstract class AbstractClient implements Client {
     public static final String EXECUTOR_SERVICE_PROPERTY = "executorService";
-    
+
     protected static final String REQUEST_CONTEXT = "RequestContext";
     protected static final String RESPONSE_CONTEXT = "ResponseContext";
     protected static final String KEEP_CONDUIT_ALIVE = "KeepConduitAlive";
     protected static final String HTTP_SCHEME = "http";
-    
+
     private static final String ALLOW_EMPTY_PATH_VALUES = "allow.empty.path.template.value";
     private static final String PROXY_PROPERTY = "jaxrs.proxy";
     private static final String HEADER_SPLIT_PROPERTY = "org.apache.cxf.http.header.split";
@@ -436,7 +436,7 @@ public abstract class AbstractClient implements Client {
                     if (splitHeaders && valObject instanceof String) {
                         String val = (String)valObject;
                         String[] values;
-                        if (val == null || val.length() == 0) {
+                        if (val.length() == 0) {
                             values = new String[]{""};
                         } else if (val.charAt(0) == '"' && val.charAt(val.length() - 1) == '"') {
                             // if the value starts with a quote and ends with a quote, we do a best
@@ -606,7 +606,7 @@ public abstract class AbstractClient implements Client {
         Exchange exchange = outMessage.getExchange();
         Integer responseCode = getResponseCode(exchange);
         if (responseCode == null
-            || responseCode < 300 && !(actualEx instanceof IOException) 
+            || responseCode < 300 && !(actualEx instanceof IOException)
             || actualEx instanceof IOException && exchange.get("client.redirect.exception") != null) {
             if (actualEx instanceof ProcessingException) {
                 throw (RuntimeException)actualEx;
@@ -1098,14 +1098,14 @@ public abstract class AbstractClient implements Client {
             ExecutorService executor = (ExecutorService)cfg.getRequestContext().get(EXECUTOR_SERVICE_PROPERTY);
             if (executor != null) {
                 exchange.put(Executor.class, executor);
-                
+
                 final ClientMessageObserver observer = new ClientMessageObserver(cfg);
-                
+
                 exchange.put(MessageObserver.class, new MessageObserver() {
                     public void onMessage(final Message message) {
                         if (!message.getExchange()
                             .containsKey(Executor.class.getName() + ".USING_SPECIFIED")) {
-    
+
                             executor.execute(new Runnable() {
                                 public void run() {
                                     observer.onMessage(message);
@@ -1202,7 +1202,7 @@ public abstract class AbstractClient implements Client {
             state.reset();
         }
     }
-    
+
     protected abstract class AbstractBodyWriter extends AbstractOutDatabindingInterceptor {
 
         public AbstractBodyWriter() {

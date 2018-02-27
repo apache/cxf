@@ -54,24 +54,30 @@ public final class OidcUtils {
     public static final String EMAIL_SCOPE = "email";
     public static final String ADDRESS_SCOPE = "address";
     public static final String PHONE_SCOPE = "phone";
-    public static final List<String> PROFILE_CLAIMS = Arrays.asList(AbstractUserInfo.NAME_CLAIM,
-                                                                    AbstractUserInfo.FAMILY_NAME_CLAIM,
-                                                                    AbstractUserInfo.GIVEN_NAME_CLAIM,
-                                                                    AbstractUserInfo.MIDDLE_NAME_CLAIM,
-                                                                    AbstractUserInfo.NICKNAME_CLAIM,
-                                                                    AbstractUserInfo.PREFERRED_USERNAME_CLAIM,
-                                                                    AbstractUserInfo.PROFILE_CLAIM,
-                                                                    AbstractUserInfo.PICTURE_CLAIM,
-                                                                    AbstractUserInfo.WEBSITE_CLAIM,
-                                                                    AbstractUserInfo.GENDER_CLAIM,
-                                                                    AbstractUserInfo.BIRTHDATE_CLAIM,
-                                                                    AbstractUserInfo.ZONEINFO_CLAIM,
-                                                                    AbstractUserInfo.LOCALE_CLAIM,
-                                                                    AbstractUserInfo.UPDATED_AT_CLAIM);
-    public static final List<String> EMAIL_CLAIMS = Arrays.asList(AbstractUserInfo.EMAIL_CLAIM,
-                                                                  AbstractUserInfo.EMAIL_VERIFIED_CLAIM);
-    public static final List<String> ADDRESS_CLAIMS = Arrays.asList(AbstractUserInfo.ADDRESS_CLAIM);
-    public static final List<String> PHONE_CLAIMS = Arrays.asList(AbstractUserInfo.PHONE_CLAIM);
+
+    public static final List<String> PROFILE_CLAIMS =
+        Collections.unmodifiableList(Arrays.asList(AbstractUserInfo.NAME_CLAIM,
+                                                   AbstractUserInfo.FAMILY_NAME_CLAIM,
+                                                   AbstractUserInfo.GIVEN_NAME_CLAIM,
+                                                   AbstractUserInfo.MIDDLE_NAME_CLAIM,
+                                                   AbstractUserInfo.NICKNAME_CLAIM,
+                                                   AbstractUserInfo.PREFERRED_USERNAME_CLAIM,
+                                                   AbstractUserInfo.PROFILE_CLAIM,
+                                                   AbstractUserInfo.PICTURE_CLAIM,
+                                                   AbstractUserInfo.WEBSITE_CLAIM,
+                                                   AbstractUserInfo.GENDER_CLAIM,
+                                                   AbstractUserInfo.BIRTHDATE_CLAIM,
+                                                   AbstractUserInfo.ZONEINFO_CLAIM,
+                                                   AbstractUserInfo.LOCALE_CLAIM,
+                                                   AbstractUserInfo.UPDATED_AT_CLAIM));
+    public static final List<String> EMAIL_CLAIMS =
+        Collections.unmodifiableList(Arrays.asList(AbstractUserInfo.EMAIL_CLAIM,
+                                                   AbstractUserInfo.EMAIL_VERIFIED_CLAIM));
+    public static final List<String> ADDRESS_CLAIMS =
+        Collections.unmodifiableList(Arrays.asList(AbstractUserInfo.ADDRESS_CLAIM));
+    public static final List<String> PHONE_CLAIMS =
+        Collections.unmodifiableList(Arrays.asList(AbstractUserInfo.PHONE_CLAIM));
+
     public static final String CLAIMS_PARAM = "claims";
     public static final String CLAIM_NAMES_PROPERTY = "_claim_names";
     public static final String CLAIM_SOURCES_PROPERTY = "_claim_sources";
@@ -122,7 +128,7 @@ public final class OidcUtils {
     public static String getAllScopes() {
         return getScope(OPENID_SCOPE, PROFILE_SCOPE, EMAIL_SCOPE, ADDRESS_SCOPE, PHONE_SCOPE);
     }
-    
+
     public static List<String> getScopeClaims(String... scope) {
         List<String> claims = new ArrayList<>();
         if (scope != null) {
@@ -186,7 +192,7 @@ public final class OidcUtils {
         }
         String algoShaSizeString = sigAlgo.getJwaName().substring(2);
         String javaShaAlgo = "SHA-" + algoShaSizeString;
-        int algoShaSize = Integer.valueOf(algoShaSizeString);
+        int algoShaSize = Integer.parseInt(algoShaSizeString);
         int valueHashSize = (algoShaSize / 8) / 2;
         try {
             byte[] atBytes = StringUtils.toBytesASCII(value);

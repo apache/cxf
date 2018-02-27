@@ -241,7 +241,7 @@ public class WadlGenerator implements ContainerRequestFilter {
             context.abortWith(Response.status(404).build());
             return;
         }
-        
+
         if (whiteList != null && whiteList.size() > 0) {
             ServletRequest servletRequest = (ServletRequest)m.getContextualProperty(
                 "HTTP.REQUEST");
@@ -1594,7 +1594,7 @@ public class WadlGenerator implements ContainerRequestFilter {
             String currentPrefix = name.getPrefix();
             if (currentPrefix.startsWith(nsPrefix)) {
                 int currentIndex = currentPrefix.equals(nsPrefix) ? 0
-                    : Integer.valueOf(currentPrefix.substring(nsPrefix.length()));
+                    : Integer.parseInt(currentPrefix.substring(nsPrefix.length()));
                 if (currentIndex > index) {
                     index = currentIndex;
                 }

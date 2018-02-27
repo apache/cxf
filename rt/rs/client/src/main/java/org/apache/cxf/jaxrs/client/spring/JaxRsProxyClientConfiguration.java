@@ -53,12 +53,9 @@ public class JaxRsProxyClientConfiguration extends AbstractJaxRsClientConfigurat
         } else if (!StringUtils.isEmpty(scanPackages)) {
             try {
                 final Map< Class< ? extends Annotation >, Collection< Class< ? > > > classes =
-                    serviceClass == null ? ClasspathScanner.findClasses(scanPackages, Path.class, Provider.class)
-                    : ClasspathScanner.findClasses(scanPackages, Provider.class);
-                if (serviceClass == null) {
-                    factory.setServiceClass(
-                        JAXRSClientFactoryBeanDefinitionParser.getServiceClass(classes.get(Path.class)));
-                }
+                    ClasspathScanner.findClasses(scanPackages, Path.class, Provider.class);
+                factory.setServiceClass(
+                    JAXRSClientFactoryBeanDefinitionParser.getServiceClass(classes.get(Path.class)));
                 factory.setProviders(
                     JAXRSClientFactoryBeanDefinitionParser.getProviders(context, classes.get(Provider.class)));
             } catch (Exception ex) {

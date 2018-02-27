@@ -24,6 +24,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.jms.Destination;
@@ -54,35 +55,35 @@ public class JMSMessageHeadersType {
     private String soapjmssoapAction;
     private Boolean soapjmsIsFault;
     private String soapjmsRequestURI;
-    
+
     public JMSMessageHeadersType() {
         this.properties = new HashMap<>();
     }
-    
+
     @Deprecated
     public List<JMSPropertyType> getProperty() {
         List<JMSPropertyType> props = new ArrayList<>();
-        for (String key : properties.keySet()) {
+        for (Entry<String, Object> entry : properties.entrySet()) {
             JMSPropertyType prop = new JMSPropertyType();
-            prop.setName(key);
-            prop.setValue(properties.get(key));
+            prop.setName(entry.getKey());
+            prop.setValue(entry.getValue());
             props.add(prop);
         }
         return Collections.unmodifiableList(props);
     }
-    
+
     public void putProperty(String key, Object value) {
         properties.put(key, value);
     }
-    
+
     public Object getProperty(String key) {
         return properties.get(key);
     }
-    
+
     public Set<String> getPropertyKeys() {
         return properties.keySet();
     }
-    
+
     public String getJMSCorrelationID() {
         return jmsCorrelationID;
     }
@@ -314,7 +315,7 @@ public class JMSMessageHeadersType {
     public boolean isSOAPJMSIsFault() {
         return soapjmsIsFault;
     }
-    
+
     public String getContentType() {
         String contentType = getSOAPJMSContentType();
         if (contentType == null) {
@@ -328,13 +329,13 @@ public class JMSMessageHeadersType {
         }
         return contentType;
     }
-    
+
     public static JMSMessageHeadersType from(Message message) throws JMSException {
         JMSMessageHeadersType messageHeaders = new JMSMessageHeadersType();
         messageHeaders.read(message);
         return messageHeaders;
     }
-    
+
     private void read(Message message) throws JMSException {
         setJMSCorrelationID(message.getJMSCorrelationID());
         setJMSDeliveryMode(Integer.valueOf(message.getJMSDeliveryMode()));
@@ -377,7 +378,7 @@ public class JMSMessageHeadersType {
             putProperty(unescapedName, val);
         }
     }
-    
+
     public void writeProp(Message jmsMessage, String origName, Object value) throws JMSException {
         String name = origName.replace(".", "__");
         if (value == null) {
@@ -424,17 +425,17 @@ public class JMSMessageHeadersType {
             jmsMessage.setBooleanProperty(JMSSpecConstants.ISFAULT_FIELD, isSOAPJMSIsFault());
         }
 
-        for (String key : properties.keySet()) {
-            writeProp(jmsMessage, key, properties.get(key));
+        for (Entry<String, Object> entry : properties.entrySet()) {
+            writeProp(jmsMessage, entry.getKey(), entry.getValue());
         }
     }
-    
+
     private void setProp(Message jmsMessage, String name, String value) throws JMSException {
         if (value != null) {
             jmsMessage.setStringProperty(name, value);
         }
     }
-    
+
 
 
 }

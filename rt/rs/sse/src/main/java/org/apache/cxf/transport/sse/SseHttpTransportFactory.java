@@ -20,6 +20,7 @@ package org.apache.cxf.transport.sse;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.cxf.Bus;
@@ -37,10 +38,10 @@ public class SseHttpTransportFactory extends HTTPTransportFactory
         implements ConduitInitiator, DestinationFactory {
 
     public static final String TRANSPORT_ID = "http://cxf.apache.org/transports/http/sse";
-    public static final List<String> DEFAULT_NAMESPACES = Arrays.asList(
+    public static final List<String> DEFAULT_NAMESPACES = Collections.unmodifiableList(Arrays.asList(
         TRANSPORT_ID,
         "http://cxf.apache.org/transports/http/sse/configuration"
-    );
+    ));
 
     public SseHttpTransportFactory() {
         this(null);
@@ -52,7 +53,7 @@ public class SseHttpTransportFactory extends HTTPTransportFactory
 
     @Override
     public Destination getDestination(EndpointInfo endpointInfo, Bus bus) throws IOException {
-        final AtmosphereSseServletDestination destination = new AtmosphereSseServletDestination(bus, getRegistry(), 
+        final AtmosphereSseServletDestination destination = new AtmosphereSseServletDestination(bus, getRegistry(),
             endpointInfo, endpointInfo.getAddress());
         destination.finalizeConfig();
         return destination;
