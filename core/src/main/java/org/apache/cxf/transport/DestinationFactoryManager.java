@@ -49,7 +49,7 @@ public interface DestinationFactoryManager {
      * Returns all registered (as of the moment of the call) destination factories.
      * @return all registered (as of the moment of the call) destination factories.
      */
-    Set<String> getRegisterDestinationFactoryNames();
+    Set<String> getRegisteredDestinationFactoryNames();
 
     /**
      * Returns the <code>DestinationFactory</code> registered with the specified name,

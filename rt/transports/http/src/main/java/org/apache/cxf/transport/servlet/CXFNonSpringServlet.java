@@ -56,6 +56,7 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
     private static final long serialVersionUID = -2437897227486327166L;
     private static final String IGNORE_SERVLET_CONTEXT_RESOLVER = "ignore.servlet.context.resolver";
     private static final String DEFAULT_TRANSPORT_ID = "http://cxf.apache.org/transports/http/configuration";
+    
     protected Bus bus;
     private DestinationRegistry destinationRegistry;
     private boolean globalRegistry;
@@ -127,7 +128,7 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
             }
             
             if (StringUtils.isEmpty(peferredTransportId)) {
-                final Set<String> candidates = dfm.getRegisterDestinationFactoryNames();
+                final Set<String> candidates = dfm.getRegisteredDestinationFactoryNames();
                 
                 // If the default transport is present, fall back to it and don't even 
                 // consider other candidates

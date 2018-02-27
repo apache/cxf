@@ -135,7 +135,7 @@ public final class DestinationFactoryManagerImpl implements DestinationFactoryMa
     }
     
     @Override
-    public Set<String> getRegisterDestinationFactoryNames() {
+    public Set<String> getRegisteredDestinationFactoryNames() {
         return destinationFactories == null ? Collections.emptySet() 
                 : Collections.unmodifiableSet(destinationFactories.keySet());
     }
