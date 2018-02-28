@@ -484,7 +484,7 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         String principalName = "alice<!---->o=example.com";
         Element samlToken =
-            createSAMLAssertion(principalName, WSS4JConstants.WSS_SAML2_TOKEN_TYPE, crypto,
+            createSAMLAssertion(principalName, WSConstants.WSS_SAML2_TOKEN_TYPE, crypto,
                                 "mystskey", callbackHandler);
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
