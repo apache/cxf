@@ -37,6 +37,7 @@ import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
 
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -57,6 +58,9 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(Parameterized.class)
 public class Stax2ValidationUtilsTest {
+
+    private static final String JAVA_VERSION = System.getProperty("java.version");
+    private static final boolean IS_JAVA_7 = JAVA_VERSION != null && JAVA_VERSION.startsWith("1.7");
 
     private static final String VALID_MESSAGE_ECHO = "<echo xmlns=\"http://www.echo.org\">"
             + "<echo>Testing echo</echo>" + "</echo>";
@@ -131,6 +135,8 @@ public class Stax2ValidationUtilsTest {
 
     @Test
     public void testValidMessage() throws Exception {
+        Assume.assumeFalse(IS_JAVA_7);
+
         Throwable exception = null;
         xmlReader = createReader(validMessage);
         utils.setupValidation(xmlReader, endpoint, serviceInfo);
@@ -147,6 +153,8 @@ public class Stax2ValidationUtilsTest {
 
     @Test
     public void testInvalidMessage() throws Exception {
+        Assume.assumeFalse(IS_JAVA_7);
+
         Throwable exception = null;
         xmlReader = createReader(invalidMessage);
         utils.setupValidation(xmlReader, endpoint, serviceInfo);
