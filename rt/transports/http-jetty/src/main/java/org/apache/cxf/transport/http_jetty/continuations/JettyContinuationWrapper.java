@@ -19,6 +19,7 @@
 
 package org.apache.cxf.transport.http_jetty.continuations;
 
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -33,6 +34,7 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
     volatile boolean isNew;
     volatile boolean isResumed;
     volatile boolean isPending;
+    volatile boolean isTimeout;
     volatile long pendingTimeout;
     volatile Object obj;
     
@@ -93,6 +95,7 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
         }
         obj = null;
         pendingTimeout = 0;
+        isTimeout = false;
     }
 
 
@@ -137,6 +140,12 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
         isPending = false;
         pendingTimeout = 0;
         isResumed = true;
+        isTimeout = true;
     }
-    
+
+    @Override
+    public boolean isTimeout() {
+        return isTimeout;
+    }
+
 }

@@ -79,6 +79,7 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         volatile boolean isResumed;
         volatile boolean isPending;
         volatile boolean isComplete;
+        volatile boolean isTimeout;
         volatile Object obj;
         private ContinuationCallback callback;
         private boolean blockRestart;
@@ -141,7 +142,7 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
             isPending = false;
             isResumed = false;
             isNew = false;
-            
+            isTimeout = false;
             obj = null;
             if (callback != null) {
                 final Exception ex = inMessage.getExchange().get(Exception.class);
@@ -196,6 +197,7 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         }
         public void onTimeout(AsyncEvent event) throws IOException {
             resume();
+            isTimeout = true;
         }
         
         private Throwable isCausedByIO(final Exception ex) {
@@ -216,6 +218,10 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
                 return false;
             }
         }
-        
+
+        @Override
+        public boolean isTimeout() {
+            return isTimeout;
+        }
     }
 }
