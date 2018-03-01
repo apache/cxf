@@ -61,6 +61,12 @@ public interface Continuation {
      * @return true if the continuation is has been resumed.
      */
     boolean isResumed();
+    
+    /**
+     * Get the timeout status
+     * @return true if the continuation is has been timeout.
+     */
+    boolean isTimeout();
 
     /**
      * Get arbitrary object associated with the continuation for context
