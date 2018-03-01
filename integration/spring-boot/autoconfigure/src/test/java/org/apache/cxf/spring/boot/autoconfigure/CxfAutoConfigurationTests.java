@@ -73,7 +73,7 @@ public class CxfAutoConfigurationTests {
     public void customPathWithTrailingSlash() {
         load(CxfAutoConfiguration.class, "cxf.path=/valid/");
         assertThat(this.context.getBean(ServletRegistrationBean.class).getUrlMappings(),
-                (Matcher<Iterable<? super String>>) hasItem("/valid/*"));
+                (Matcher) hasItem("/valid/*"));
     }
 
     @Test
@@ -82,7 +82,7 @@ public class CxfAutoConfigurationTests {
         assertThat(this.context.getBeansOfType(ServletRegistrationBean.class).size(),
                 equalTo(1));
         assertThat(this.context.getBean(ServletRegistrationBean.class).getUrlMappings(),
-                (Matcher<Iterable<? super String>>) hasItem("/valid/*"));
+                (Matcher) hasItem("/valid/*"));
     }
 
     @Test
@@ -100,8 +100,8 @@ public class CxfAutoConfigurationTests {
                 "spring.cxf.servlet.init.key2=value2");
         ServletRegistrationBean registrationBean = this.context
                 .getBean(ServletRegistrationBean.class);
-        assertThat(registrationBean.getInitParameters(), hasEntry("key1", "value1"));
-        assertThat(registrationBean.getInitParameters(), hasEntry("key2", "value2"));
+        assertThat(registrationBean.getInitParameters(), (Matcher) hasEntry("key1", "value1"));
+        assertThat(registrationBean.getInitParameters(), (Matcher) hasEntry("key2", "value2"));
     }
 
     private void load(Class<?> config, String... environment) {

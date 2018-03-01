@@ -153,9 +153,9 @@
         <cxf.servlet-api-2.5.version>1.2</cxf.servlet-api-2.5.version>
         <cxf.slf4j.version>1.7.25</cxf.slf4j.version>
         <cxf.specs.jaxws.api.version>1.2</cxf.specs.jaxws.api.version>
-        <cxf.spring.version>4.3.15.RELEASE</cxf.spring.version>
-        <cxf.spring.boot.version>1.5.11.RELEASE</cxf.spring.boot.version>
-        <cxf.spring.security.version>4.2.5.RELEASE</cxf.spring.security.version>
+        <cxf.spring.version>5.0.5.RELEASE</cxf.spring.version>
+        <cxf.spring.boot.version>2.0.1.RELEASE</cxf.spring.boot.version>
+        <cxf.spring.security.version>5.0.4.RELEASE</cxf.spring.security.version>
         <cxf.spring.osgi.version>1.2.1</cxf.spring.osgi.version>
         <cxf.spring.ldap.version>2.3.2.RELEASE</cxf.spring.ldap.version>
         <cxf.spring.mock>spring-test</cxf.spring.mock>
@@ -1412,33 +1412,6 @@
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
-                <artifactId>spring-security-core-tiger</artifactId>
-                <version>2.0.8.RELEASE</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-core</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-dao</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-jdbc</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-remoting</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-support</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-acl</artifactId>
                 <version>${cxf.spring.security.version}</version>
                 <exclusions>
@@ -1450,25 +1423,6 @@
                         <groupId>org.springframework</groupId>
                         <artifactId>spring-dao</artifactId>
                     </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-jdbc</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-remoting</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-support</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-dao</artifactId>
-                <version>2.0.8</version>
-                <exclusions>
                     <exclusion>
                         <groupId>org.springframework</groupId>
                         <artifactId>spring-jdbc</artifactId>

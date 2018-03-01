@@ -46,7 +46,7 @@
         <!-- Eureka Service Discovery Client -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-eureka</artifactId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
             <version>${spring.cloud.eureka.version}</version>
         </dependency>
         <!-- Actuator  Endpoints -->

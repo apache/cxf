@@ -75,6 +75,17 @@
                 <enabled>false</enabled>
             </releases>
         </repository>
+
+        <repository>
+            <id>spring-milestone</id>
+            <url>http://repo.spring.io/milestone/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
     </repositories>
     <pluginRepositories>
         <pluginRepository>
