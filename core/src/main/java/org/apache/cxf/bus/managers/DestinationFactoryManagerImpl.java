@@ -19,6 +19,7 @@
 
 package org.apache.cxf.bus.managers;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -108,6 +109,7 @@ public final class DestinationFactoryManagerImpl implements DestinationFactoryMa
      *
      * @param namespace the namespace.
      */
+    @Override
     public DestinationFactory getDestinationFactory(String namespace) throws BusException {
         DestinationFactory factory = destinationFactories.get(namespace);
         if (factory == null && !failed.contains(namespace)) {
@@ -124,11 +126,17 @@ public final class DestinationFactoryManagerImpl implements DestinationFactoryMa
         return factory;
     }
 
+    @Override
     public DestinationFactory getDestinationFactoryForUri(String uri) {
         return new TransportFinder<DestinationFactory>(bus,
                 destinationFactories,
                 loaded,
                 DestinationFactory.class).findTransportForURI(uri);
     }
-
+    
+    @Override
+    public Set<String> getRegisteredDestinationFactoryNames() {
+        return destinationFactories == null ? Collections.emptySet() 
+                : Collections.unmodifiableSet(destinationFactories.keySet());
+    }
 }
