@@ -20,7 +20,9 @@
 package org.apache.cxf.systest.ws.wssc;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
+import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -28,18 +30,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.net.ssl.TrustManagerFactory;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.configuration.jsse.TLSClientParameters;
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.ws.addressing.policy.MetadataConstants;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
@@ -130,6 +139,50 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)port).close();
     }
     
+    @Test
+    public void testEndorsingSecureConverationViaCode() throws Exception {
+
+        URL wsdl = WSSCUnitTest.class.getResource("DoubleItWSSC.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportPort");
+        DoubleItPortType port =
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, test.getPort());
+
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(port);
+        }
+
+        // TLS configuration
+        TrustManagerFactory tmf =
+            TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        final KeyStore ts = KeyStore.getInstance("JKS");
+        try (InputStream trustStore =
+            ClassLoaderUtils.getResourceAsStream("keys/Truststore.jks", WSSCUnitTest.class)) {
+            ts.load(trustStore, "password".toCharArray());
+        }
+        tmf.init(ts);
+
+        TLSClientParameters tlsParams = new TLSClientParameters();
+        tlsParams.setTrustManagers(tmf.getTrustManagers());
+        tlsParams.setDisableCNCheck(true);
+
+        Client client = ClientProxy.getClient(port);
+        HTTPConduit http = (HTTPConduit) client.getConduit();
+        http.setTlsClientParameters(tlsParams);
+
+        // STSClient configuration
+        Bus clientBus = BusFactory.newInstance().createBus();
+        STSClient stsClient = new STSClient(clientBus);
+        stsClient.setTlsClientParameters(tlsParams);
+
+        ((BindingProvider)port).getRequestContext().put("security.sts.client", stsClient);
+
+        assertEquals(50, port.doubleIt(25));
+
+        ((java.io.Closeable)port).close();
+    }
+
     @Test
     public void testEndorsingSecureConverationSP12() throws Exception {
         
@@ -347,4 +400,5 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
         }
         
     };
+
 }

@@ -60,6 +60,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ModCountCopyOnWriteArrayList;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.Configurable;
+import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.databinding.source.SourceDataBinding;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientImpl;
@@ -86,6 +87,7 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.transport.Conduit;
+import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 import org.apache.cxf.ws.addressing.VersionTransformer;
@@ -201,6 +203,8 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
     protected List<Interceptor<? extends Message>> inFault = new ModCountCopyOnWriteArrayList<>();
     protected List<Feature> features;
 
+    protected TLSClientParameters tlsClientParameters;
+
     public AbstractSTSClient(Bus b) {
         bus = b;
     }
@@ -237,6 +241,10 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
         this.sendRenewing = sendRenewing;
     }
     
+    public void setTlsClientParameters(TLSClientParameters tlsClientParameters) {
+        this.tlsClientParameters = tlsClientParameters;
+    }
+
     /**
      * Sets the WS-P policy that is applied to communications between this client and the remote server
      * if no value is supplied for {@link #setWsdlLocation(String)}.
@@ -677,6 +685,12 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
         client.getInInterceptors().addAll(in);
         client.getOutInterceptors().addAll(out);
         client.getOutFaultInterceptors().addAll(outFault);
+
+        if (tlsClientParameters != null) {
+            HTTPConduit http = (HTTPConduit) client.getConduit();
+            http.setTlsClientParameters(tlsClientParameters);
+        }
+
         in = null;
         out = null;
         inFault = null;

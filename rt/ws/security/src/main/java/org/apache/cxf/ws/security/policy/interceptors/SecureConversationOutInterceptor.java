@@ -191,11 +191,10 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                 String s = SecureConversationTokenInterceptorProvider
                     .setupClient(client, message, aim, itok, false);
 
-                SecurityToken tok = null;
                 if (maps != null) {
                     client.setAddressingNamespace(maps.getNamespaceURI());
                 }
-                tok = client.requestSecurityToken(s);
+                SecurityToken tok = client.requestSecurityToken(s);
                 String tokenType = tok.getTokenType();
                 tok.setTokenType(tokenType);
                 if (tokenType == null || "".equals(tokenType)) {
