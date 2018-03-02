@@ -18,12 +18,16 @@
  */
 package org.apache.cxf.systest.sts.transport;
 
+import java.io.InputStream;
 import java.net.URL;
+import java.security.KeyStore;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.TrustManagerFactory;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -39,7 +43,10 @@ import org.w3c.dom.Element;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxws.DispatchImpl;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TestParam;
@@ -47,6 +54,7 @@ import org.apache.cxf.systest.sts.common.TokenTestUtils;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.systest.sts.deployment.StaxSTSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.wss4j.common.WSS4JConstants;
@@ -180,6 +188,73 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
 
         ((java.io.Closeable)transportSaml2Port).close();
         bus.shutdown(true);
+    }
+
+    @org.junit.Test
+    public void testSAML2ViaCode() throws Exception {
+
+        URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2Port");
+        DoubleItPortType transportSaml2Port =
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(transportSaml2Port, test.getPort());
+
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(transportSaml2Port);
+        }
+
+        // TLS configuration
+        TrustManagerFactory tmf =
+            TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        KeyManagerFactory kmf =
+            KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+        final KeyStore ts = KeyStore.getInstance("JKS");
+        try (InputStream trustStore =
+            ClassLoaderUtils.getResourceAsStream("keys/clientstore.jks", TransportBindingTest.class)) {
+            ts.load(trustStore, "cspass".toCharArray());
+        }
+        tmf.init(ts);
+        kmf.init(ts, "ckpass".toCharArray());
+
+        TLSClientParameters tlsParams = new TLSClientParameters();
+        tlsParams.setTrustManagers(tmf.getTrustManagers());
+        tlsParams.setKeyManagers(kmf.getKeyManagers());
+        tlsParams.setDisableCNCheck(true);
+
+        Client client = ClientProxy.getClient(transportSaml2Port);
+        HTTPConduit http = (HTTPConduit) client.getConduit();
+        http.setTlsClientParameters(tlsParams);
+
+        // STSClient configuration
+        Bus clientBus = BusFactory.newInstance().createBus();
+        STSClient stsClient = new STSClient(clientBus);
+
+        // Use a local WSDL or else we run into problems retrieving the WSDL over HTTPS
+        // due to lack of TLS config when creating the client
+        URL stsWsdl = TransportBindingTest.class.getResource("../deployment/ws-trust-1.4-service.wsdl");
+        stsClient.setWsdlLocation(stsWsdl.toString());
+        stsClient.setServiceName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService");
+        stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port");
+
+        Map<String, Object> props = new HashMap<>();
+        props.put("security.username", "alice");
+        props.put("security.callback-handler", "org.apache.cxf.systest.sts.common.CommonCallbackHandler");
+        props.put("security.sts.token.username", "myclientkey");
+        props.put("security.sts.token.properties", "clientKeystore.properties");
+        props.put("security.sts.token.usecert", "false");
+        stsClient.setProperties(props);
+
+        ((BindingProvider)transportSaml2Port).getRequestContext().put("security.sts.client", stsClient);
+
+        // Update ports + HTTPS configuration for the STSClient
+        updateAddressPort(stsClient.getClient(), test.getStsPort());
+        ((HTTPConduit) stsClient.getClient().getConduit()).setTlsClientParameters(tlsParams);
+
+        doubleIt(transportSaml2Port, 25);
+
+        ((java.io.Closeable)transportSaml2Port).close();
+        clientBus.shutdown(true);
     }
 
     /**
