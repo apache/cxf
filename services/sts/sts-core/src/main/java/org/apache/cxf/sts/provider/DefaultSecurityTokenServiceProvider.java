@@ -21,9 +21,11 @@ package org.apache.cxf.sts.provider;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.xml.transform.Source;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.claims.ClaimsManager;
 import org.apache.cxf.sts.event.STSEventListener;
@@ -50,7 +52,9 @@ import org.apache.cxf.ws.security.tokenstore.TokenStore;
  * tokens.
  */
 public class DefaultSecurityTokenServiceProvider extends SecurityTokenServiceProvider {
-    
+
+    private static final Logger LOG = LogUtils.getL7dLogger(DefaultSecurityTokenServiceProvider.class);
+
     private STSPropertiesMBean stsProperties;
     private boolean encryptIssuedToken;
     private List<ServiceMBean> services;
@@ -131,6 +135,11 @@ public class DefaultSecurityTokenServiceProvider extends SecurityTokenServicePro
     }
     
     private void populateAbstractOperation(AbstractOperation abstractOperation) {
+        if (stsProperties == null) {
+            LOG.warning("No 'stsProperties' configured on the DefaultSecurityTokenServiceProvider");
+            return;
+        }
+
         List<TokenProvider> tokenProviders = new ArrayList<>();
         tokenProviders.add(new SAMLTokenProvider());
         
