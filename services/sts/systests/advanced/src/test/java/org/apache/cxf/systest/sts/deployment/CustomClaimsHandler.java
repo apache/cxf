@@ -68,6 +68,7 @@ public class CustomClaimsHandler implements ClaimsHandler {
                     OpenSAMLUtil.initSamlEngine();
                     XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
 
+                    @SuppressWarnings("unchecked")
                     XMLObjectBuilder<XSInteger> xsIntegerBuilder =
                         (XMLObjectBuilder<XSInteger>)builderFactory.getBuilder(XSInteger.TYPE_NAME);
                     XSInteger attributeValue =
