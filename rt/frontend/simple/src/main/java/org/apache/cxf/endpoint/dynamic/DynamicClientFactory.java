@@ -940,7 +940,7 @@ public class DynamicClientFactory {
         List<Element> incElemList = DOMUtils.findAllElementsByTagNameNS(element,
                                                                         "http://www.w3.org/2001/XMLSchema",
                                                                      "include");
-        if (impElemList.size() == 0 && incElemList.size() == 0) {
+        if (impElemList.isEmpty() && incElemList.isEmpty()) {
             return element;
         }
         element = (Element)cloneNode(element.getOwnerDocument(), element, true);

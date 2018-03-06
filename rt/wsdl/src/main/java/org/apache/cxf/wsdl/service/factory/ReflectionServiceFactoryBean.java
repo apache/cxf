@@ -1190,7 +1190,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
         MessageInfo message = isOut ? opInfo.getOutput() : opInfo.getInput();
 
         final List<MessagePartInfo> messageParts = message.getMessageParts();
-        if (messageParts.size() == 0) {
+        if (messageParts.isEmpty()) {
             return;
         }
 

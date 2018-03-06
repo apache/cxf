@@ -431,7 +431,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         }
 
         if (entry.getContentElement() == null
-            && entry.getExtensions().size() == 0) {
+            && entry.getExtensions().isEmpty()) {
             createEntryContent(factory, entry, o, cls);
         }
         return entry;

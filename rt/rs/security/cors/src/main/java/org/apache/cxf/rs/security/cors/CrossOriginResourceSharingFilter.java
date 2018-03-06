@@ -136,7 +136,7 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
             getAnnotation(resourceMethod, CrossOriginResourceSharing.class);
         List<String> headerOriginValues = getHeaderValues(CorsHeaderConstants.HEADER_ORIGIN, true);
         // 5.1.1 there has to be an origin
-        if (headerOriginValues == null || headerOriginValues.size() == 0) {
+        if (headerOriginValues == null || headerOriginValues.isEmpty()) {
             return null;
         }
 

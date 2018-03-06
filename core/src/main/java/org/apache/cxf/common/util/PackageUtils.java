@@ -104,7 +104,7 @@ public final class PackageUtils {
         }
 
         List<String> tokens = tokenize(nameSpaceURI, "/: ");
-        if (tokens.size() == 0) {
+        if (tokens.isEmpty()) {
             return null;
         }
 

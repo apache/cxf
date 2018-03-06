@@ -47,7 +47,7 @@ public class JmsTopicExpressionConverter {
     }
 
     public ActiveMQTopic toActiveMQTopic(List<TopicExpressionType> topics) throws InvalidTopicException {
-        if (topics == null || topics.size() == 0) {
+        if (topics == null || topics.isEmpty()) {
             return null;
         }
         int size = topics.size();

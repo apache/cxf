@@ -178,7 +178,7 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
             }
 
             Collection<MessagePartInfo> bodyParts = msgInfo.getMessageParts();
-            if (bodyParts.size() == 0 || bodyParts.size() <= index) {
+            if (bodyParts.isEmpty() || bodyParts.size() <= index) {
                 itr.remove();
                 continue;
             }

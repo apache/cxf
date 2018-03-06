@@ -45,8 +45,8 @@ public class CacheControlHeaderProviderTest extends Assert {
         assertTrue(!c.isPrivate() && !c.isNoStore()
                    && c.isMustRevalidate() && !c.isProxyRevalidate());
         assertTrue(!c.isNoCache()
-                   && !c.isNoTransform() && c.getNoCacheFields().size() == 0
-                   && c.getPrivateFields().size() == 0);
+                   && !c.isNoTransform() && c.getNoCacheFields().isEmpty()
+                   && c.getPrivateFields().isEmpty());
     }
 
     @Test

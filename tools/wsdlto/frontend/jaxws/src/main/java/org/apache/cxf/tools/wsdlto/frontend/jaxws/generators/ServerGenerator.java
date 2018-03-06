@@ -65,7 +65,7 @@ public class ServerGenerator extends AbstractJAXWSGenerator {
             String address = "CHANGE_ME";
             Map<String, JavaInterface> interfaces = javaModel.getInterfaces();
 
-            if (javaModel.getServiceClasses().size() == 0) {
+            if (javaModel.getServiceClasses().isEmpty()) {
                 ServiceInfo serviceInfo = env.get(ServiceInfo.class);
                 String wsdl = serviceInfo.getDescription().getBaseURI();
                 Message msg = new Message("CAN_NOT_GEN_SRV", LOG, wsdl);

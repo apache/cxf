@@ -199,7 +199,7 @@ public class RequestImpl implements Request {
     private ResponseBuilder evaluateIfMatch(EntityTag eTag, Date date) {
         List<String> ifMatch = headers.getRequestHeader(HttpHeaders.IF_MATCH);
 
-        if (ifMatch == null || ifMatch.size() == 0) {
+        if (ifMatch == null || ifMatch.isEmpty()) {
             return date == null ? null : evaluateIfNotModifiedSince(date);
         }
 
@@ -223,7 +223,7 @@ public class RequestImpl implements Request {
     private ResponseBuilder evaluateIfNonMatch(EntityTag eTag, Date lastModified) {
         List<String> ifNonMatch = headers.getRequestHeader(HttpHeaders.IF_NONE_MATCH);
 
-        if (ifNonMatch == null || ifNonMatch.size() == 0) {
+        if (ifNonMatch == null || ifNonMatch.isEmpty()) {
             return lastModified == null ? null : evaluateIfModifiedSince(lastModified);
         }
 
@@ -263,7 +263,7 @@ public class RequestImpl implements Request {
     private ResponseBuilder evaluateIfModifiedSince(Date lastModified) {
         List<String> ifModifiedSince = headers.getRequestHeader(HttpHeaders.IF_MODIFIED_SINCE);
 
-        if (ifModifiedSince == null || ifModifiedSince.size() == 0) {
+        if (ifModifiedSince == null || ifModifiedSince.isEmpty()) {
             return null;
         }
 
@@ -289,7 +289,7 @@ public class RequestImpl implements Request {
     private ResponseBuilder evaluateIfNotModifiedSince(Date lastModified) {
         List<String> ifNotModifiedSince = headers.getRequestHeader(HttpHeaders.IF_UNMODIFIED_SINCE);
 
-        if (ifNotModifiedSince == null || ifNotModifiedSince.size() == 0) {
+        if (ifNotModifiedSince == null || ifNotModifiedSince.isEmpty()) {
             return null;
         }
 

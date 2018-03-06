@@ -113,7 +113,7 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
             } catch (XmlSchemaException ex) {
                 throw new ServiceConstructionException(new Message("SERVICE_CREATION_MSG", LOG), ex);
             }
-            if (services.size() == 0) {
+            if (services.isEmpty()) {
                 throw new ServiceConstructionException(new Message("NO_SERVICE_EXC", LOG));
             }
             //@@TODO  - this isn't good, need to return all the services
@@ -161,7 +161,7 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
                 services = new WSDLServiceBuilder(getBus()).buildServices(definition,
                                                                           wsdlService,
                                                                           endpointName);
-                if (services.size() == 0) {
+                if (services.isEmpty()) {
                     throw new ServiceConstructionException(
                         new Message("NO_SUCH_ENDPOINT_EXC", LOG, endpointName));
                 }

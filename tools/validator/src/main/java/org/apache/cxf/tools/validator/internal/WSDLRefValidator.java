@@ -269,7 +269,7 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
     private Map<QName, XNode> getBindings(Service service) {
         Map<QName, XNode> bindings = new HashMap<>();
 
-        if (service.getPorts().values().size() == 0) {
+        if (service.getPorts().values().isEmpty()) {
             throw new ToolException("Service " + service.getQName() + " does not contain any usable ports");
         }
         Collection<Port> ports = CastUtils.cast(service.getPorts().values());
@@ -387,7 +387,7 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
     }
 
     private void collectValidationPoints() throws Exception {
-        if (services.size() == 0) {
+        if (services.isEmpty()) {
             LOG.log(Level.WARNING, "WSDL document "
                     + this.definition.getDocumentBaseURI() + " does not define any services");
             //addWarning("WSDL document does not define any services");

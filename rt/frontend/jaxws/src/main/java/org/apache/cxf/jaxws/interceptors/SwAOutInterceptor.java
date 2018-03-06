@@ -145,7 +145,7 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
 
         SoapBodyInfo sbi = bmi.getExtensor(SoapBodyInfo.class);
 
-        if (sbi == null || sbi.getAttachments() == null || sbi.getAttachments().size() == 0) {
+        if (sbi == null || sbi.getAttachments() == null || sbi.getAttachments().isEmpty()) {
             Service s = ex.getService();
             DataBinding db = s.getDataBinding();
             if (db instanceof JAXBDataBinding

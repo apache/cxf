@@ -331,7 +331,7 @@ public class SourceGenerator {
         }
 
         List<Element> resourceEls = getWadlElements(resourcesEls.get(0), "resource");
-        if (resourceEls.size() == 0) {
+        if (resourceEls.isEmpty()) {
             throw new IllegalStateException("WADL has no resource elements");
         }
 
@@ -1155,7 +1155,7 @@ public class SourceGenerator {
                 return true;
             }
         }
-        if (repElements.size() == 0) {
+        if (repElements.isEmpty()) {
             if (useVoidForEmptyResponses && !responseRequired || suspendedAsync) {
                 sbCode.append("void ");
                 return false;
@@ -1678,7 +1678,7 @@ public class SourceGenerator {
                                         Set<String> imports,
                                         boolean inRep,
                                         Element requestRepWithElement) {
-        if (repElements.size() == 0) {
+        if (repElements.isEmpty()) {
             return;
         }
         Class<?> cls = inRep ? Consumes.class : Produces.class;

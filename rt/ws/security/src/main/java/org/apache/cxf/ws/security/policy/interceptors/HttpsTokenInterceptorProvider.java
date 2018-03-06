@@ -154,7 +154,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                     }
                     if (token.getAuthenticationType() == HttpsToken.AuthenticationType.HttpBasicAuthentication) {
                         List<String> auth = headers.get("Authorization");
-                        if (auth == null || auth.size() == 0
+                        if (auth == null || auth.isEmpty()
                             || !auth.get(0).startsWith("Basic")) {
                             ai.setNotAsserted("HttpBasicAuthentication is set, but not being used");
                         } else {
@@ -165,7 +165,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                     }
                     if (token.getAuthenticationType() == HttpsToken.AuthenticationType.HttpDigestAuthentication) {
                         List<String> auth = headers.get("Authorization");
-                        if (auth == null || auth.size() == 0
+                        if (auth == null || auth.isEmpty()
                             || !auth.get(0).startsWith("Digest")) {
                             ai.setNotAsserted("HttpDigestAuthentication is set, but not being used");
                         } else {
@@ -259,7 +259,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                 Map<String, List<String>> headers = getProtocolHeaders(message);
                 if (token.getAuthenticationType() == HttpsToken.AuthenticationType.HttpBasicAuthentication) {
                     List<String> auth = headers.get("Authorization");
-                    if (auth == null || auth.size() == 0
+                    if (auth == null || auth.isEmpty()
                         || !auth.get(0).startsWith("Basic")) {
                         asserted = false;
                     } else {
@@ -277,7 +277,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                 }
                 if (token.getAuthenticationType() == HttpsToken.AuthenticationType.HttpDigestAuthentication) {
                     List<String> auth = headers.get("Authorization");
-                    if (auth == null || auth.size() == 0
+                    if (auth == null || auth.isEmpty()
                         || !auth.get(0).startsWith("Digest")) {
                         asserted = false;
                     } else {

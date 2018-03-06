@@ -59,7 +59,7 @@ public abstract class AbstractSecurityContextInInterceptor extends AbstractPhase
             reportSecurityException("Failed Authentication : Subject has not been created, "
                                     + ex.getMessage());
         }
-        if (subject == null || subject.getPrincipals().size() == 0) {
+        if (subject == null || subject.getPrincipals().isEmpty()) {
             reportSecurityException("Failed Authentication : Invalid Subject");
         }
 

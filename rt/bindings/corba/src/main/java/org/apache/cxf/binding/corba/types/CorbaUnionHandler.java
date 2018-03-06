@@ -51,7 +51,7 @@ public class CorbaUnionHandler extends CorbaObjectHandler {
         for (Iterator<Unionbranch> branchesIter = branches.iterator(); branchesIter.hasNext();) {
             Unionbranch branch = branchesIter.next();
             List<CaseType> branchCases = branch.getCase();
-            if (branchCases.size() == 0) {
+            if (branchCases.isEmpty()) {
                 defaultIndex = index;
             } else {
                 for (Iterator<CaseType> casesIter = branchCases.iterator(); casesIter.hasNext();) {

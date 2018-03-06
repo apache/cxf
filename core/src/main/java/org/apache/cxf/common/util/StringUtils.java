@@ -81,7 +81,7 @@ public final class StringUtils {
     }
 
     public static boolean isEmpty(List<String> list) {
-        if (list == null || list.size() == 0) {
+        if (list == null || list.isEmpty()) {
             return true;
         }
         return list.size() == 1 && isEmpty(list.get(0));

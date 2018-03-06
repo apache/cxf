@@ -1212,7 +1212,7 @@ public abstract class AbstractClient implements Client {
         public void handleMessage(Message outMessage) throws Fault {
 
             MessageContentsList objs = MessageContentsList.getContentsList(outMessage);
-            if (objs == null || objs.size() == 0) {
+            if (objs == null || objs.isEmpty()) {
                 return;
             }
 

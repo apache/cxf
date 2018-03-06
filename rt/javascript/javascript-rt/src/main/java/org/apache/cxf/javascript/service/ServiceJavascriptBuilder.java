@@ -677,7 +677,7 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
                 return true;
             }
             XmlSchemaSequence sequence = getTypeSequence(complexType, parentName);
-            if (sequence.getItems().size() == 0) {
+            if (sequence.getItems().isEmpty()) {
                 return true;
             }
         }

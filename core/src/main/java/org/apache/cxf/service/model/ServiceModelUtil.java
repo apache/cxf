@@ -132,7 +132,7 @@ public final class ServiceModelUtil {
     public static List<String> getOperationInputPartNames(OperationInfo operation) {
         List<String> names = new ArrayList<>();
         List<MessagePartInfo> parts = operation.getInput().getMessageParts();
-        if (parts == null || parts.size() == 0) {
+        if (parts == null || parts.isEmpty()) {
             return names;
         }
 

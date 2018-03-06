@@ -44,7 +44,7 @@ public class BareOutInterceptor extends AbstractOutDatabindingInterceptor {
         }
 
         MessageContentsList objs = MessageContentsList.getContentsList(message);
-        if (objs == null || objs.size() == 0) {
+        if (objs == null || objs.isEmpty()) {
             return;
         }
 

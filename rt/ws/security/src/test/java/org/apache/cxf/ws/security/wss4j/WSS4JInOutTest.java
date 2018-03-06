@@ -325,7 +325,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         assertTrue(results != null && results.size() == 1);
         List<WSSecurityEngineResult> signatureResults =
             results.get(0).getActionResults().get(WSConstants.SIGN);
-        assertTrue(signatureResults == null || signatureResults.size() == 0);
+        assertTrue(signatureResults == null || signatureResults.isEmpty());
     }
 
     @Test

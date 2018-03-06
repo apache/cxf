@@ -108,7 +108,7 @@ public class WebFaultOutInterceptorTestCase {
         interceptor.handleMessage(message);
 
         Assert.assertTrue("SoapFault.subCodes are expected to be empty.",
-                soapFault.getSubCodes() == null || soapFault.getSubCodes().size() == 0);
+                soapFault.getSubCodes() == null || soapFault.getSubCodes().isEmpty());
         Assert.assertEquals(CODE, soapFault.getFaultCode());
     }
 
@@ -121,7 +121,7 @@ public class WebFaultOutInterceptorTestCase {
         interceptor.handleMessage(message);
 
         Assert.assertTrue("SoapFault.subCodes are expected to be empty.",
-                soapFault.getSubCodes() == null || soapFault.getSubCodes().size() == 0);
+                soapFault.getSubCodes() == null || soapFault.getSubCodes().isEmpty());
         Assert.assertEquals(CODE, soapFault.getFaultCode());
     }
 

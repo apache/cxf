@@ -166,7 +166,7 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION,
                                           ex);
         }
-        if (subject == null || subject.getPrincipals().size() == 0
+        if (subject == null || subject.getPrincipals().isEmpty()
             || !subject.getPrincipals().iterator().next().getName().equals(name)) {
             String errorMessage = "Failed Authentication : Invalid Subject";
             LOG.severe(errorMessage);

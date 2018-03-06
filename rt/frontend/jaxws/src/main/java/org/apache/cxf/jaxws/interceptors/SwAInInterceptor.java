@@ -66,7 +66,7 @@ public class SwAInInterceptor extends AbstractSoapInterceptor {
 
         SoapBodyInfo sbi = bmi.getExtensor(SoapBodyInfo.class);
 
-        if (sbi == null || sbi.getAttachments() == null || sbi.getAttachments().size() == 0) {
+        if (sbi == null || sbi.getAttachments() == null || sbi.getAttachments().isEmpty()) {
             return;
         }
 

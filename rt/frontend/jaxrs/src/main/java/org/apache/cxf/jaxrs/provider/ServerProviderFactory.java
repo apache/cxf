@@ -141,7 +141,7 @@ public final class ServerProviderFactory extends ProviderFactory {
         if (wadlGenerator == null) {
             return filters;
         }
-        if (filters.size() == 0) {
+        if (filters.isEmpty()) {
             return Collections.singletonList(wadlGenerator);
         } else if (!syncNeeded) {
             filters.add(0, wadlGenerator);

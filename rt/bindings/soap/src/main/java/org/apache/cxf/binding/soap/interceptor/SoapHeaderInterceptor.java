@@ -101,7 +101,7 @@ public class SoapHeaderInterceptor extends AbstractInDatabindingInterceptor {
         }
 
         List<SoapHeaderInfo> headers = bmi.getExtensors(SoapHeaderInfo.class);
-        if (headers == null || headers.size() == 0) {
+        if (headers == null || headers.isEmpty()) {
             return;
         }
 

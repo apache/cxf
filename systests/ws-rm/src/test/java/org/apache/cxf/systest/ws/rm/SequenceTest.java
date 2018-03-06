@@ -1814,7 +1814,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
                     it.remove();
                 }
             }
-            if (map.get(sid).size() == 0) {
+            if (map.get(sid).isEmpty()) {
                 map.remove(sid);
             }
         }

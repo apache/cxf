@@ -169,7 +169,7 @@ public class CorbaHandlerUtilsTest extends Assert {
         CorbaSequenceHandler seqHandler = (CorbaSequenceHandler)result;
         // This is an unbounded sequence so make sure there are no elements and the template
         // element has been set.
-        assertTrue(seqHandler.getElements().size() == 0);
+        assertTrue(seqHandler.getElements().isEmpty());
         assertNotNull(seqHandler.getTemplateElement());
 
         // Test for a bounded sequence handler

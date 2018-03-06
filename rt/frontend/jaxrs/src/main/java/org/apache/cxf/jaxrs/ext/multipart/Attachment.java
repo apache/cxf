@@ -162,7 +162,7 @@ public class Attachment implements Transferable {
 
     public String getHeader(String name) {
         List<String> header = headers.get(name);
-        if (header == null || header.size() == 0) {
+        if (header == null || header.isEmpty()) {
             return null;
         }
         StringBuilder sb = new StringBuilder();

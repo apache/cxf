@@ -205,7 +205,7 @@ public class LdapClaimsHandler implements ClaimsHandler, RealmSupport {
                 ldapAttributes = LdapUtils.getAttributesOfEntry(ldap, this.userBaseDn, this.getObjectClass(), this
                     .getUserNameAttribute(), user, searchAttributes);
             }
-            if (this.userBaseDNs != null && (ldapAttributes == null || ldapAttributes.size() == 0)) {
+            if (this.userBaseDNs != null && (ldapAttributes == null || ldapAttributes.isEmpty())) {
                 for (String userBase : userBaseDNs) {
                     ldapAttributes = LdapUtils.getAttributesOfEntry(ldap, userBase, this.getObjectClass(), this
                         .getUserNameAttribute(), user, searchAttributes);
@@ -216,7 +216,7 @@ public class LdapClaimsHandler implements ClaimsHandler, RealmSupport {
             }
         }
 
-        if (ldapAttributes == null || ldapAttributes.size() == 0) {
+        if (ldapAttributes == null || ldapAttributes.isEmpty()) {
             //No result
             if (LOG.isLoggable(Level.INFO)) {
                 LOG.info("User '" + user + "' not found");

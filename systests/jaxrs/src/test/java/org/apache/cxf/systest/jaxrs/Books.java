@@ -40,6 +40,6 @@ public class Books {
     }
 
     public Book getBook() {
-        return books.size() == 0 ? null : books.get(0);
+        return books.isEmpty() ? null : books.get(0);
     }
 }

@@ -72,7 +72,7 @@ public class X509Locator implements Locator {
 
     public X509Certificate findCertificate(List<UseKeyWithType> ids) throws CertificateException {
         X509Certificate cert = null;
-        if (ids.size() == 0) {
+        if (ids.isEmpty()) {
             throw new IllegalArgumentException("No UseKeyWithType elements found");
         }
         if (ids.size() == 1) {

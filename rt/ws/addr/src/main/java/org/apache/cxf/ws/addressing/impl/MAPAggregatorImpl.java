@@ -523,7 +523,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
                 && getWSAddressingFeature(message).isAddressingRequired()) {
                 boolean missingWsaHeader = false;
                 AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-                if (aim == null || aim.size() == 0) {
+                if (aim == null || aim.isEmpty()) {
                     missingWsaHeader = true;
                 }
                 if (aim != null && !aim.isEmpty()) {

@@ -89,7 +89,7 @@ public final class URIParserUtil {
         }
 
         List<String> tokens = tokenize(nameSpaceURI, "/: ");
-        if (tokens.size() == 0) {
+        if (tokens.isEmpty()) {
             return "cxf";
         }
 

@@ -157,12 +157,12 @@ public class HttpHeadersImpl implements HttpHeaders {
 
     public Locale getLanguage() {
         List<String> values = getListValues(HttpHeaders.CONTENT_LANGUAGE);
-        return values.size() == 0 ? null : HttpUtils.getLocale(values.get(0).trim());
+        return values.isEmpty() ? null : HttpUtils.getLocale(values.get(0).trim());
     }
 
     public MediaType getMediaType() {
         List<String> values = getListValues(HttpHeaders.CONTENT_TYPE);
-        return values.size() == 0 ? null : JAXRSUtils.toMediaType(values.get(0));
+        return values.isEmpty() ? null : JAXRSUtils.toMediaType(values.get(0));
     }
 
     public MultivaluedMap<String, String> getRequestHeaders() {

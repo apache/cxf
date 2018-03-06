@@ -178,7 +178,7 @@ public class MustUnderstandInterceptorTest extends TestBase {
 
         public Set<URI> getRoles() {
             calledGetRoles = true;
-            if (roles.size() == 0) {
+            if (roles.isEmpty()) {
                 try {
                     roles.add(new URI("http://www.w3.org/2003/05/soap-envelope/role/next"));
                     roles.add(new URI("http://www.w3.org/2003/05/soap-envelope/role/none"));

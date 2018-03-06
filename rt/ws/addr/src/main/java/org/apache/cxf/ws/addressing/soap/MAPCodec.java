@@ -772,7 +772,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
                 List<String> soapActionHeaders = mimeHeaders.get("SOAPAction");
                 // only propogate to SOAPAction header if currently non-empty
                 if (!(soapActionHeaders == null
-                      || soapActionHeaders.size() == 0
+                      || soapActionHeaders.isEmpty()
                       || "".equals(soapActionHeaders.get(0)))) {
                     LOG.log(Level.FINE,
                             "encoding wsa:Action in SOAPAction header {0}",

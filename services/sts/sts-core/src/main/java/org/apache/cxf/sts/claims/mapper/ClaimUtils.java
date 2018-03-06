@@ -154,7 +154,7 @@ public class ClaimUtils {
             List<Object> values = resultClaim.getValues();
             List<Object> mappedValues = new ArrayList<>();
 
-            if (values == null || mapping == null || mapping.size() == 0) {
+            if (values == null || mapping == null || mapping.isEmpty()) {
                 resultClaim.setValues(mappedValues);
                 return resultClaim;
             }

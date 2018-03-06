@@ -73,7 +73,7 @@ public class SEIGenerator extends AbstractJAXWSGenerator {
 
             Map<String, JavaInterface> interfaces = javaModel.getInterfaces();
 
-            if (interfaces.size() == 0) {
+            if (interfaces.isEmpty()) {
                 ServiceInfo serviceInfo = env.get(ServiceInfo.class);
                 String wsdl = serviceInfo.getDescription().getBaseURI();
                 Message msg = new Message("CAN_NOT_GEN_SEI", LOG, wsdl);

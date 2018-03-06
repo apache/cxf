@@ -194,7 +194,7 @@ public final class WSDiscoveryClientTest {
                     System.out.println(pmt.getXAddrs());
                 }
             }
-            if (pmts.getProbeMatch().size() == 0) {
+            if (pmts.getProbeMatch().isEmpty()) {
                 System.exit(0);
             }
             pmts = c.probe(pt);

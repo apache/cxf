@@ -71,7 +71,7 @@ public class ClientRequestContextImpl extends AbstractRequestContextImpl
 
     private Object getMessageContent() {
         MessageContentsList objs = MessageContentsList.getContentsList(m);
-        if (objs == null || objs.size() == 0) {
+        if (objs == null || objs.isEmpty()) {
             return null;
         }
         return objs.get(0);

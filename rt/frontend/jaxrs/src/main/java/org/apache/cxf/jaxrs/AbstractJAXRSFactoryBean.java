@@ -309,7 +309,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
                 }
             }
         }
-        if (list.size() == 0) {
+        if (list.isEmpty()) {
             org.apache.cxf.common.i18n.Message msg =
                 new org.apache.cxf.common.i18n.Message("NO_RESOURCES_AVAILABLE",
                                                        BUNDLE);

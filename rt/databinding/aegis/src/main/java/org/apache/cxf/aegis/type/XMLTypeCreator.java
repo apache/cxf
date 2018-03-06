@@ -437,7 +437,7 @@ public class XMLTypeCreator extends AbstractTypeCreator {
             // specified
             List<Element> nodes = getMatches(mapping, "./method[@name='" + m.getName()
                                                       + "']/parameter[@index='" + index + "']/parent::*");
-            if (nodes.size() == 0) {
+            if (nodes.isEmpty()) {
                 // no mapping for this method
                 return info;
             }
@@ -455,7 +455,7 @@ public class XMLTypeCreator extends AbstractTypeCreator {
         } else {
             List<Element> nodes = getMatches(mapping, "./method[@name='" + m.getName()
                                                       + "']/return-type/parent::*");
-            if (nodes.size() == 0) {
+            if (nodes.isEmpty()) {
                 return info;
             }
             Element bestMatch = getBestMatch(mapping, m, nodes);
@@ -672,7 +672,7 @@ public class XMLTypeCreator extends AbstractTypeCreator {
             nodes.retainAll(availableNodes);
         }
         // no name found, so no matches
-        if (nodes.size() == 0) {
+        if (nodes.isEmpty()) {
             return null;
         }
         // if the method has no params, then more than one mapping is pointless

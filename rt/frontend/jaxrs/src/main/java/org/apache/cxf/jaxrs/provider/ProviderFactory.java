@@ -231,7 +231,7 @@ public abstract class ProviderFactory {
                 }
             }
         }
-        if (candidates.size() == 0) {
+        if (candidates.isEmpty()) {
             return null;
         } else if (candidates.size() == 1) {
             return candidates.get(0);

@@ -263,7 +263,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
 
             List<GenericWsdlOption> effectiveWsdlOptions = createWsdlOptionsFromScansAndExplicitWsdlOptions();
 
-            if (effectiveWsdlOptions.size() == 0) {
+            if (effectiveWsdlOptions.isEmpty()) {
                 getLog().info("Nothing to generate");
                 return;
             }

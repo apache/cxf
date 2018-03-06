@@ -334,7 +334,7 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
             header = new ArrayList<>();
             protocolHeaders.put(name, header);
         }
-        if (header.size() == 0) {
+        if (header.isEmpty()) {
             header.add(value);
         } else {
             header.set(0, header.get(0) + "," + value);

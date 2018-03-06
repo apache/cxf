@@ -369,7 +369,7 @@ public class WSDLServiceBuilderTest extends Assert {
         assertEquals(elementName.getLocalPart(), "sayHiResponse");
         assertEquals(elementName.getNamespaceURI(), "http://apache.org/hello_world_soap_http/types");
 
-        assertTrue(sayHi.getFaults().size() == 0);
+        assertTrue(sayHi.getFaults().isEmpty());
 
         name = new QName(serviceInfo.getName().getNamespaceURI(), "pingMe");
         BindingOperationInfo pingMe = bindingInfo.getOperation(name);

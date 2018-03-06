@@ -218,7 +218,7 @@ public abstract class AbstractDOMStreamReader<T, I> implements XMLStreamReader {
      */
     public boolean hasNext() throws XMLStreamException {
 
-        return !(frame.ended && (frames.size() == 0 || frame.isDocumentFragment()));
+        return !(frame.ended && (frames.isEmpty() || frame.isDocumentFragment()));
 
     }
 

@@ -126,7 +126,7 @@ public class SourceSequence extends AbstractSequence {
         if (currentMessageNumber != num) {
             return true;
         }
-        if (acknowledgement.getAcknowledgementRange().size() == 0) {
+        if (acknowledgement.getAcknowledgementRange().isEmpty()) {
             return false;
         }
         if (acknowledgement.getAcknowledgementRange().size() == 1) {

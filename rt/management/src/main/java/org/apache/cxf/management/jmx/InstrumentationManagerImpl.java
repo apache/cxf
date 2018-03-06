@@ -148,7 +148,7 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
                     if (mbeanServerID != null) {
                         servers = CastUtils.cast(MBeanServerFactory.findMBeanServer(mbeanServerID));
                     }
-                    if (servers == null || servers.size() == 0) {
+                    if (servers == null || servers.isEmpty()) {
                         mbs = MBeanServerFactory.createMBeanServer(mbeanServerName);
                         try {
                             mbeanServerID = (String) mbs.getAttribute(getDelegateName(),

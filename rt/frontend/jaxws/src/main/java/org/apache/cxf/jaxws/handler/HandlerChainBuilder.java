@@ -65,7 +65,7 @@ public class HandlerChainBuilder {
         return sortHandlers(buildHandlerChain(hc, getHandlerClassLoader()));
     }
     public List<Handler> buildHandlerChainFromConfiguration(List<PortComponentHandlerType> hc) {
-        if (null == hc || hc.size() == 0) {
+        if (null == hc || hc.isEmpty()) {
             return null;
         }
         List<Handler> handlers = new ArrayList<>();
@@ -167,7 +167,7 @@ public class HandlerChainBuilder {
             return;
         }
 
-        if (h.getInitParam().size() == 0) {
+        if (h.getInitParam().isEmpty()) {
             return;
         }
 

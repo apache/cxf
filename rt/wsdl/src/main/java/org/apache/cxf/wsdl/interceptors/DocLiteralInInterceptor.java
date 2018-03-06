@@ -169,7 +169,7 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
 
                     MessagePartInfo p;
                     if (!client && msgInfo != null && msgInfo.getMessageParts() != null
-                        && msgInfo.getMessageParts().size() == 0) {
+                        && msgInfo.getMessageParts().isEmpty()) {
                         //no input messagePartInfo
                         return;
                     }

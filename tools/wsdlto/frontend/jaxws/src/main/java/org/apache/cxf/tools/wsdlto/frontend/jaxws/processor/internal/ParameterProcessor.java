@@ -239,7 +239,7 @@ public class ParameterProcessor extends AbstractProcessor {
         MessagePartInfo part = inputMessage.getFirstMessagePart();
 
         List<QName> wrappedElements = ProcessorUtil.getWrappedElementQNames(context, part.getElementQName());
-        if ((wrappedElements == null || wrappedElements.size() == 0)
+        if ((wrappedElements == null || wrappedElements.isEmpty())
             && countOutOfBandHeader(inputMessage) == 0) {
             return;
         }
@@ -399,7 +399,7 @@ public class ParameterProcessor extends AbstractProcessor {
             outputWrapElement = ProcessorUtil.getWrappedElementQNames(context, outputPart.getElementQName());
         }
 
-        if (inputWrapElement == null || outputWrapElement.size() == 0) {
+        if (inputWrapElement == null || outputWrapElement.isEmpty()) {
             addVoidReturn(method);
             return;
         }

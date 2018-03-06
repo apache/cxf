@@ -103,7 +103,7 @@ public class CustomClaimsHandler implements ClaimsHandler {
                                 claim.addValue(requestedRole);
                             }
                         }
-                        if (claim.getValues().size() == 0) {
+                        if (claim.getValues().isEmpty()) {
                             continue;
                         }
                     } else {

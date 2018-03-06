@@ -110,7 +110,7 @@ public class WADL2JavaMojo extends AbstractCodeGeneratorMojo {
 
         List<WadlOption> effectiveWsdlOptions = createWadlOptionsFromScansAndExplicitWadlOptions(classesDir);
 
-        if (effectiveWsdlOptions.size() == 0) {
+        if (effectiveWsdlOptions.isEmpty()) {
             getLog().info("Nothing to generate");
             return;
         }

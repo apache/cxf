@@ -142,7 +142,7 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
 
             final OutboundSecurityContext outboundSecurityContext = new OutboundSecurityContextImpl();
             configureProperties(mc, outboundSecurityContext, secProps);
-            if (secProps.getActions() == null || secProps.getActions().size() == 0) {
+            if (secProps.getActions() == null || secProps.getActions().isEmpty()) {
                 // If no actions configured then return
                 return;
             }

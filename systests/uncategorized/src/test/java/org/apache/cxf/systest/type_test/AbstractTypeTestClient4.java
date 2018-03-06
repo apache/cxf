@@ -589,7 +589,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
     }
 
     protected boolean isNormalized(StructWithOccuringChoice x) {
-        return x == null || x.getVarIntOrVarString().size() == 0;
+        return x == null || x.getVarIntOrVarString().isEmpty();
     }
 
     @Test

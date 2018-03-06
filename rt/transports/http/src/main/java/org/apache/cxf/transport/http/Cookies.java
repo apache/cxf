@@ -64,7 +64,7 @@ public class Cookies {
      * @return New set of cookies
      */
     private void handleSetCookie(List<String> headers) {
-        if (headers == null || headers.size() == 0) {
+        if (headers == null || headers.isEmpty()) {
             return;
         }
 

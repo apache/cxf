@@ -243,7 +243,7 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
             LdapUtils.getAttributeOfEntries(ldap, this.groupBaseDn, this.getGroupObjectClass(),
                                             filters, "cn");
 
-        if (groups == null || groups.size() == 0) {
+        if (groups == null || groups.isEmpty()) {
             if (LOG.isLoggable(Level.INFO)) {
                 LOG.info("No groups found for user '" + user + "'");
             }
@@ -311,7 +311,7 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
         }
 
         LOG.info("Filtered groups: " + filteredGroups);
-        if (filteredGroups.size() == 0) {
+        if (filteredGroups.isEmpty()) {
             LOG.info("No matching groups found for user '" + principal + "'");
             return new ProcessedClaimCollection();
         }

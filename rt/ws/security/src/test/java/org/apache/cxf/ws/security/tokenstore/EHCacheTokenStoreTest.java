@@ -74,6 +74,6 @@ public class EHCacheTokenStoreTest extends org.junit.Assert {
         assertNull(store.getToken("test3"));
         store.remove(token1.getId());
         store.remove(token2.getId());
-        assertTrue(store.getTokenIdentifiers().size() == 0);
+        assertTrue(store.getTokenIdentifiers().isEmpty());
     }
 }

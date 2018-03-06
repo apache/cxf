@@ -130,7 +130,7 @@ public class WSDLToIDLAction {
             // generate idl for all bindings in the file.
             // each idl file will have the name of the binding.
             Collection<Binding> bindings = CastUtils.cast(def.getAllBindings().values());
-            if (bindings.size() == 0) {
+            if (bindings.isEmpty()) {
                 String msgStr = "No bindings exists within this WSDL.";
                 org.apache.cxf.common.i18n.Message msg = new org.apache.cxf.common.i18n.Message(msgStr, LOG);
                 throw new Exception(msg.toString());

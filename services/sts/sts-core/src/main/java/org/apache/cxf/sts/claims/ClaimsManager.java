@@ -133,7 +133,7 @@ public class ClaimsManager {
     }
 
     public ProcessedClaimCollection retrieveClaimValues(ClaimCollection claims, ClaimsParameters parameters) {
-        if (claims == null || claims.size() == 0) {
+        if (claims == null || claims.isEmpty()) {
             return null;
         }
 

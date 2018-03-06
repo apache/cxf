@@ -359,7 +359,7 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
 
             boolean schemasFromCache = false;
             Collection<DOMSource> schemas = getSchemas();
-            if (schemas == null || schemas.size() == 0) {
+            if (schemas == null || schemas.isEmpty()) {
                 schemas = cachedContextAndSchemas.getSchemas();
                 if (schemas != null) {
                     schemasFromCache = true;

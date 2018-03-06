@@ -418,7 +418,7 @@ public final class ResourceUtils {
             }
 
         });
-        return cs.size() == 0 ? null : cs.get(0);
+        return cs.isEmpty() ? null : cs.get(0);
     }
 
     public static List<Parameter> getParameters(Method resourceMethod) {

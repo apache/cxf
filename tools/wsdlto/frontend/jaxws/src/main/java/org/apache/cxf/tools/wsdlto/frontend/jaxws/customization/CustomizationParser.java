@@ -202,7 +202,7 @@ public final class CustomizationParser {
                 DOMUtils.findAllElementsByTagNameNS(jaxwsBinding,
                                                     ToolConstants.HANDLER_CHAINS_URI,
                                                     ToolConstants.HANDLER_CHAINS);
-            if (elemList.size() == 0) {
+            if (elemList.isEmpty()) {
                 continue;
             }
             // take the first one, anyway its 1 handler-config per customization

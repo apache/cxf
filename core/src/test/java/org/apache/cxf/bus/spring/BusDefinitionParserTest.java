@@ -78,11 +78,11 @@ public class BusDefinitionParserTest extends Assert {
             Bus cxf1 = (Bus)context.getBean("cxf1");
 
             assertTrue(cxf1.getOutInterceptors().size() == 1);
-            assertTrue(cxf1.getInInterceptors().size() == 0);
+            assertTrue(cxf1.getInInterceptors().isEmpty());
 
             Bus cxf2 = (Bus)context.getBean("cxf2");
             assertTrue(cxf2.getInInterceptors().size() == 1);
-            assertTrue(cxf2.getOutInterceptors().size() == 0);
+            assertTrue(cxf2.getOutInterceptors().isEmpty());
         } finally {
             if (context != null) {
                 context.close();
@@ -98,12 +98,12 @@ public class BusDefinitionParserTest extends Assert {
             Bus cxf1 = (Bus)context.getBean("cxf1");
 
             assertTrue(cxf1.getOutInterceptors().size() == 1);
-            assertTrue(cxf1.getInInterceptors().size() == 0);
+            assertTrue(cxf1.getInInterceptors().isEmpty());
 
             Bus cxf2 = (Bus)context.getBean("cxf2");
 
             assertTrue(cxf2.getInInterceptors().size() == 1);
-            assertTrue(cxf2.getOutInterceptors().size() == 0);
+            assertTrue(cxf2.getOutInterceptors().isEmpty());
 
             cxf2.getExtension(BusLifeCycleManager.class)
                 .registerLifeCycleListener(new BusLifeCycleListener() {

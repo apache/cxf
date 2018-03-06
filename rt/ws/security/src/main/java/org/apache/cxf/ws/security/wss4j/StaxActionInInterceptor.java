@@ -56,7 +56,7 @@ public class StaxActionInInterceptor extends AbstractPhaseInterceptor<SoapMessag
     @Override
     public void handleMessage(SoapMessage soapMessage) throws Fault {
 
-        if (inActions == null || inActions.size() == 0) {
+        if (inActions == null || inActions.isEmpty()) {
             return;
         }
 

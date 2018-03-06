@@ -231,7 +231,7 @@ public class WSDLServiceBuilder {
                 }
             }
 
-            if (def.getPortTypes().size() == 0) {
+            if (def.getPortTypes().isEmpty()) {
 
                 DescriptionInfo description = new DescriptionInfo();
                 if (recordOriginal) {

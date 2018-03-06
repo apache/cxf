@@ -33,7 +33,7 @@ public final class CollectionUtils {
     }
 
     public static <T> Collection<T> diff(Collection<T> c1, Collection<T> c2) {
-        if (c1 == null || c1.size() == 0 || c2 == null || c2.size() == 0) {
+        if (c1 == null || c1.isEmpty() || c2 == null || c2.size() == 0) {
             return c1;
         }
         Collection<T> difference = new ArrayList<>();
@@ -46,7 +46,7 @@ public final class CollectionUtils {
     }
 
     public static <T> boolean isEmpty(Collection<T> c) {
-        if (c == null || c.size() == 0) {
+        if (c == null || c.isEmpty()) {
             return true;
         }
         for (Iterator<T> iter = c.iterator(); iter.hasNext();) {

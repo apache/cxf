@@ -461,7 +461,7 @@ public class WSDLToCorbaHelper {
             }
         }
 
-        if ((struct != null) && (struct.getMember().size() == 0)) {
+        if ((struct != null) && (struct.getMember().isEmpty())) {
             String msgStr = "Cannot create CORBA Struct" + struct.getName()
                             + "from container with no members";
             org.apache.cxf.common.i18n.Message msg = new org.apache.cxf.common.i18n.Message(
@@ -787,7 +787,7 @@ public class WSDLToCorbaHelper {
 
     private boolean isEnumeration(XmlSchemaSimpleTypeRestriction restriction) {
 
-        if ((restriction == null) || (restriction.getFacets().size() == 0)
+        if ((restriction == null) || (restriction.getFacets().isEmpty())
             || (restriction.getBaseTypeName() == null)) {
             return false;
         }
@@ -878,7 +878,7 @@ public class WSDLToCorbaHelper {
     public boolean isLiteralArray(XmlSchemaComplexType type) {
         boolean array = false;
 
-        if ((type.getAttributes().size() == 0)
+        if ((type.getAttributes().isEmpty())
             && (type.getParticle() instanceof XmlSchemaSequence)) {
             XmlSchemaSequence stype = (XmlSchemaSequence)type.getParticle();
 

@@ -223,7 +223,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
             }
             if (!schemaLocs.isEmpty()) {
                 this.setSchemaLocations(schemaLocs);
-                if (cris.size() == 0 && schema != null && sv != null) {
+                if (cris.isEmpty() && schema != null && sv != null) {
                     SchemaValidation.SchemaValidationType type = sv.type();
                     if (type == SchemaValidation.SchemaValidationType.OUT) {
                         validateInputIfPossible = false;

@@ -67,7 +67,7 @@ public class SequenceMonitor {
     }
 
     protected void setMonitorInterval(long i) {
-        if (receiveTimes.size() == 0) {
+        if (receiveTimes.isEmpty()) {
             firstCheck = 0;
             monitorInterval = i;
         } else {

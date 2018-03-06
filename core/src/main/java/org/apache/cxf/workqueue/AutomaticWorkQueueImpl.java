@@ -513,7 +513,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
 
 
     public boolean isEmpty() {
-        return executor == null ? true : executor.getQueue().size() == 0;
+        return executor == null ? true : executor.getQueue().isEmpty();
     }
 
     public boolean isFull() {

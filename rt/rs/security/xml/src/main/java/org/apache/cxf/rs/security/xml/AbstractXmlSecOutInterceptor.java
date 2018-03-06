@@ -90,7 +90,7 @@ public abstract class AbstractXmlSecOutInterceptor extends AbstractPhaseIntercep
 
     private Object getRequestBody(Message message) {
         MessageContentsList objs = MessageContentsList.getContentsList(message);
-        if (objs == null || objs.size() == 0) {
+        if (objs == null || objs.isEmpty()) {
             return null;
         }
         return objs.get(0);
