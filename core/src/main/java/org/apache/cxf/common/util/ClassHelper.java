@@ -28,9 +28,15 @@ import org.apache.cxf.BusFactory;
  *
  */
 public class ClassHelper {
+
+    public static final String USE_DEFAULT_CLASS_HELPER = "org.apache.cxf.useDefaultClassHelper";
+
     static final ClassHelper HELPER;
+    static final ClassHelper CXF_HELPER;
+
     static {
         HELPER = getClassHelper();
+        CXF_HELPER = new ClassHelper();
     }
 
 
@@ -60,6 +66,7 @@ public class ClassHelper {
     protected Class<?> getRealClassFromClassInternal(Class<?> cls) {
         return cls;
     }
+
     protected Object getRealObjectInternal(Object o) {
         return o instanceof Proxy ? Proxy.getInvocationHandler(o) : o;
     }
@@ -69,19 +76,44 @@ public class ClassHelper {
     }
 
     public static Class<?> getRealClassFromClass(Class<?> cls) {
-        return HELPER.getRealClassFromClassInternal(cls);
+        Bus bus = getBus(null);
+        if (checkUseDefaultClassHelper(bus)) {
+            return CXF_HELPER.getRealClassFromClassInternal(cls);
+        } else {
+            return HELPER.getRealClassFromClassInternal(cls);
+        }
+
     }
 
     public static Object getRealObject(Object o) {
-        return HELPER.getRealObjectInternal(o);
+        Bus bus = getBus(null);
+        if (checkUseDefaultClassHelper(bus)) {
+            return CXF_HELPER.getRealObjectInternal(o);
+        } else {
+            return HELPER.getRealObjectInternal(o);
+        }
+
     }
 
     public static Class<?> getRealClass(Bus bus, Object o) {
-        bus = bus == null ? BusFactory.getThreadDefaultBus() : bus;
+        bus = getBus(bus);
         if (bus != null && bus.getProperty(ClassUnwrapper.class.getName()) != null) {
-            ClassUnwrapper unwrapper = (ClassUnwrapper)bus.getProperty(ClassUnwrapper.class.getName());
+            ClassUnwrapper unwrapper = (ClassUnwrapper) bus.getProperty(ClassUnwrapper.class.getName());
             return unwrapper.getRealClass(o);
+        } else if (checkUseDefaultClassHelper(bus)) {
+            return CXF_HELPER.getRealClassInternal(o);
+        } else {
+            return HELPER.getRealClassInternal(o);
         }
-        return HELPER.getRealClassInternal(o);
     }
+
+
+    private static Bus getBus(Bus bus) {
+        return bus == null ? BusFactory.getThreadDefaultBus() : bus;
+    }
+
+    private static boolean checkUseDefaultClassHelper(Bus bus) {
+        return bus != null && Boolean.TRUE.equals(bus.getProperty(USE_DEFAULT_CLASS_HELPER));
+    }
+
 }
