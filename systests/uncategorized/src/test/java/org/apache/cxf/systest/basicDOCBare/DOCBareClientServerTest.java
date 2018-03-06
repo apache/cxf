@@ -30,6 +30,8 @@ import javax.jws.WebParam;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Holder;
 
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.hello_world_doc_lit_bare.PutLastTradedPricePortType;
 import org.apache.hello_world_doc_lit_bare.SOAPService;
@@ -37,6 +39,7 @@ import org.apache.hello_world_doc_lit_bare.types.TradePriceData;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class DOCBareClientServerTest extends AbstractBusClientServerTestBase {
@@ -123,5 +126,15 @@ public class DOCBareClientServerTest extends AbstractBusClientServerTestBase {
     }
 
 
+    @Ignore("this test failed with the commit for CXF-7653")
+    public void testBare() throws Exception {
+        ClientProxyFactoryBean factory = new ClientProxyFactoryBean();
+        factory.setServiceClass(Server.BareSoapService.class);
+        factory.setAddress("http://localhost:" + Server.PORT + "/SOAPDocLitBareService/SoapPort1");
+        factory.setBus(BusFactory.newInstance().createBus());
+        Server.BareSoapService client = (Server.BareSoapService) factory.create();
+
+        client.doSomething();
+    }
 }
 
