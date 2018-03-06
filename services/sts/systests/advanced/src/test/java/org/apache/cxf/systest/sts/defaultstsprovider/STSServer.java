@@ -16,35 +16,35 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.transport;
+package org.apache.cxf.systest.sts.defaultstsprovider;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.net.URL;
 
-/**
- * Helper methods for {@link DestinationFactory}s and {@link ConduitInitiator}s.
- */
-public abstract class AbstractTransportFactory {
-    public static final String PREFERRED_TRANSPORT_ID = "org.apache.cxf.preferred.transport.id";
-    
-    private List<String> transportIds;
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
-    public AbstractTransportFactory() {
-    }
-    public AbstractTransportFactory(List<String> ids) {
-        transportIds = ids;
+public class STSServer extends AbstractBusTestServerBase {
+
+    public STSServer() {
+
     }
 
-    public final List<String> getTransportIds() {
-        return transportIds;
+    protected void run()  {
+        URL busFile = STSServer.class.getResource("cxf-sts.xml");
+        Bus busLocal = new SpringBusFactory().createBus(busFile);
+        BusFactory.setDefaultBus(busLocal);
+        setBus(busLocal);
+
+        try {
+            new STSServer();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    public void setTransportIds(List<String> transportIds) {
-        this.transportIds = transportIds;
-    }
-
-    public Set<String> getUriPrefixes() {
-        return Collections.emptySet();
+    public static void main(String args[]) {
+        new STSServer().run();
     }
 }
