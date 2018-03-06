@@ -51,10 +51,10 @@ public @interface Logging {
     boolean pretty() default false;
 
     /**
-     * Ignore binary payloads by default
+     * Log binary payloads by default
      */
     boolean logBinary() default false;
-    
+
     /**
      * Log multipart payloads by default
      */
