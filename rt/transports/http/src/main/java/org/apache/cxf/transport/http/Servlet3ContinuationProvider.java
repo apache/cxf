@@ -29,6 +29,7 @@ import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationCallback;
@@ -44,6 +45,7 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
     HttpServletResponse resp;
     Message inMessage;
     Servlet3Continuation continuation;
+    boolean is31;
 
     public Servlet3ContinuationProvider(HttpServletRequest req,
                                         HttpServletResponse resp,
@@ -51,6 +53,14 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         this.inMessage = inMessage;
         this.req = req;
         this.resp = resp;
+        
+        
+        try {
+            ClassLoaderUtils.loadClass("javax.servlet.WriteListener", HttpServletRequest.class);
+            is31 = true;
+        } catch (Throwable t) {
+            is31 = false;
+        }
     }
 
     public void complete() {
@@ -68,7 +78,7 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         }
 
         if (continuation == null) {
-            continuation = new Servlet3Continuation();
+            continuation = is31 ? new Servlet31Continuation() : new Servlet3Continuation();
         } else {
             continuation.startAsyncAgain();
         }
@@ -86,6 +96,7 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         volatile Object obj;
         private ContinuationCallback callback;
         private boolean blockRestart;
+        
         public Servlet3Continuation() {
             req.setAttribute(AbstractHTTPDestination.CXF_CONTINUATION_MESSAGE,
                              inMessage.getExchange().getInMessage());
@@ -121,17 +132,11 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
 
             context.setTimeout(timeout);
 
-            Message currentMessage = PhaseInterceptorChain.getCurrentMessage();
-            if (currentMessage.get(WriteListener.class) != null) {
-                // CXF Continuation WriteListener will likely need to be introduced
-                // for NIO supported with non-Servlet specific mechanisms
-                getOutputStream().setWriteListener(currentMessage.get(WriteListener.class));
-                currentMessage.getInterceptorChain().suspend();
-            } else {
-                inMessage.getExchange().getInMessage().getInterceptorChain().suspend();
-            }
-
+            updateMessageForSuspend();
             return true;
+        }
+        protected void updateMessageForSuspend() {
+            inMessage.getExchange().getInMessage().getInterceptorChain().suspend();
         }
         public void redispatch() {
             if (!isComplete) {
@@ -232,10 +237,10 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
 
         @Override
         public boolean isReadyForWrite() {
-            return getOutputStream().isReady();
+            return true;
         }
 
-        private ServletOutputStream getOutputStream() {
+        protected ServletOutputStream getOutputStream() {
             try {
                 return resp.getOutputStream();
             } catch (IOException ex) {
@@ -246,6 +251,28 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         @Override
         public boolean isTimeout() {
             return isTimeout;
+        }
+    }
+    public class Servlet31Continuation extends Servlet3Continuation {
+        public Servlet31Continuation() {
+        }
+
+        @Override
+        protected void updateMessageForSuspend() {
+            Message currentMessage = PhaseInterceptorChain.getCurrentMessage();
+            if (currentMessage.get(WriteListener.class) != null) {
+                // CXF Continuation WriteListener will likely need to be introduced
+                // for NIO supported with non-Servlet specific mechanisms
+                getOutputStream().setWriteListener(currentMessage.get(WriteListener.class));
+                currentMessage.getInterceptorChain().suspend();
+            } else {
+                inMessage.getExchange().getInMessage().getInterceptorChain().suspend();
+            }
+        }
+        
+        @Override
+        public boolean isReadyForWrite() {
+            return getOutputStream().isReady();
         }
     }
 }
