@@ -99,6 +99,7 @@ public final class DOMUtils {
             DocumentBuilderFactory f = DocumentBuilderFactory.newInstance();
             f.setNamespaceAware(true);
             f.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            f.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
             return f.newDocumentBuilder();
         }
         DocumentBuilder factory = DOCUMENT_BUILDERS.get(loader);
@@ -106,6 +107,7 @@ public final class DOMUtils {
             DocumentBuilderFactory f2 = DocumentBuilderFactory.newInstance();
             f2.setNamespaceAware(true);
             f2.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            f2.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
             factory = f2.newDocumentBuilder();
             DOCUMENT_BUILDERS.put(loader, factory);
         }
