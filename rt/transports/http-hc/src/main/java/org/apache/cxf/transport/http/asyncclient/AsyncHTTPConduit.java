@@ -223,7 +223,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         Proxy p = proxyFactory.createProxy(csPolicy, uri);
         if (p != null && p.type() != Proxy.Type.DIRECT) {
             InetSocketAddress isa = (InetSocketAddress)p.address();
-            HttpHost proxy = new HttpHost(isa.getHostName(), isa.getPort());
+            HttpHost proxy = new HttpHost(isa.getHostString(), isa.getPort());
             b.setProxy(proxy);
         }
         e.setConfig(b.build());
