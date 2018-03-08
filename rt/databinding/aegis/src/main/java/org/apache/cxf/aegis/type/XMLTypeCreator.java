@@ -115,7 +115,12 @@ public class XMLTypeCreator extends AbstractTypeCreator {
     static {
         AEGIS_DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
         AEGIS_DOCUMENT_BUILDER_FACTORY.setNamespaceAware(true);
-        
+        try {
+            AEGIS_DOCUMENT_BUILDER_FACTORY.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        } catch (javax.xml.parsers.ParserConfigurationException ex) {
+            // ignore
+        }
+
         String path = "/META-INF/cxf/aegis.xsd";
         InputStream is = XMLTypeCreator.class.getResourceAsStream(path);
         if (is != null) {
