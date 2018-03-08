@@ -162,6 +162,48 @@ public class ResourceUtilsTest extends Assert {
         assertEquals("GET", ori.getHttpMethod());
     }
 
+    @Path("/synth-hello")
+    protected interface SyntheticHelloInterface<T> {
+        @GET
+        @Path("/{name}")
+        T getById(@PathParam("name") T name);
+    }
+
+    protected abstract static class AbstractSyntheticHello implements SyntheticHelloInterface<String> {
+        public abstract String getById(String name);
+    }
+
+    public static class SyntheticHelloInterfaceImpl
+            extends AbstractSyntheticHello
+            implements SyntheticHelloInterface<String> {
+        @Override
+        public String getById(String name) {
+            return "Hello " + name + "!";
+        }
+    }
+
+    @Test
+    public void testClassResourceInfoWithSyntheticMethod() throws Exception {
+        ClassResourceInfo cri =
+                ResourceUtils.createClassResourceInfo(
+                        SyntheticHelloInterfaceImpl.class,
+                        SyntheticHelloInterfaceImpl.class,
+                        true,
+                        true);
+
+        Method synthetic = SyntheticHelloInterfaceImpl.class.getMethod("getById", new Class[]{Object.class});
+        assertTrue(synthetic.isSynthetic());
+
+        assertNotNull(cri);
+        Method notSynthetic = SyntheticHelloInterfaceImpl.class.getMethod("getById", new Class[]{String.class});
+        assertFalse(notSynthetic.isSynthetic());
+
+        cri.hasSubResources();
+        assertEquals("there must be only one method, which is the getById(String)",
+                1,
+                cri.getMethodDispatcher().getOperationResourceInfos().size());
+    }
+
     @Test
     public void shouldCreateApplicationWhichInheritsApplicationPath() throws Exception {
         JAXRSServerFactoryBean application = ResourceUtils.createApplication(
