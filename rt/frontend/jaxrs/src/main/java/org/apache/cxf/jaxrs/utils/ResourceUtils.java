@@ -326,7 +326,8 @@ public final class ResourceUtils {
         cri.setMethodDispatcher(md);
     }
 
-    private static void evaluateResourceMethod(ClassResourceInfo cri, boolean enableStatic, MethodDispatcher md, Method m, Method annotatedMethod) {
+    private static void evaluateResourceMethod(ClassResourceInfo cri, boolean enableStatic, MethodDispatcher md,
+                                               Method m, Method annotatedMethod) {
         String httpMethod = AnnotationUtils.getHttpMethodValue(annotatedMethod);
         Path path = AnnotationUtils.getMethodAnnotation(annotatedMethod, Path.class);
 
