@@ -38,14 +38,15 @@ import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 
-@Consumes("text/plain")
-@Produces("text/plain")
+@Consumes(MediaType.TEXT_PLAIN)
+@Produces(MediaType.TEXT_PLAIN)
 public class PrimitiveTextProvider<T> extends AbstractConfigurableProvider
     implements MessageBodyReader<T>, MessageBodyWriter<T> {
 
     private static boolean isSupported(Class<?> type, MediaType mt) {
-        boolean isPrimitive = InjectionUtils.isPrimitiveOnly(type) || Enum.class.isAssignableFrom(type);
-        return isPrimitive && mt.isCompatible(MediaType.TEXT_PLAIN_TYPE);
+        boolean isPrimitive = InjectionUtils.isPrimitiveOnly(type);
+        return (isPrimitive || Enum.class.isAssignableFrom(type) || java.net.URI.class == type
+                || java.net.URL.class == type) && mt.isCompatible(MediaType.TEXT_PLAIN_TYPE);
     }
     
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
