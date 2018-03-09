@@ -26,8 +26,11 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -49,6 +52,8 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.ParamConverter;
 import javax.ws.rs.ext.ParamConverterProvider;
+import javax.ws.rs.ext.WriterInterceptor;
+import javax.ws.rs.ext.WriterInterceptorContext;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.validation.Schema;
@@ -297,6 +302,79 @@ public class ProviderFactoryTest extends Assert {
         assertEquals(9, readers.size());
         Object lastReader = readers.get(8).getProvider();
         assertFalse(lastReader instanceof StringTextProvider);
+    }
+
+    @Test
+    public void testCustomProviderSortingWIOnly() {
+        ProviderFactory pf = ServerProviderFactory.getInstance();
+
+        pf.setUserProviders(
+            Arrays.asList(
+                new DWriterInterceptor(), new CWriterInterceptor(),
+                new AWriterInterceptor(), new BWriterInterceptor()));
+
+        Comparator<ProviderInfo<WriterInterceptor>> comp =
+            new Comparator<ProviderInfo<WriterInterceptor>>() {
+
+                @Override
+                public int compare(
+                    ProviderInfo<WriterInterceptor> o1,
+                    ProviderInfo<WriterInterceptor> o2) {
+
+                    WriterInterceptor provider1 = o1.getProvider();
+                    WriterInterceptor provider2 = o2.getProvider();
+
+                    return provider1.getClass().getName().compareTo(
+                        provider2.getClass().getName());
+                }
+
+            };
+
+        pf.setProviderComparator(comp);
+
+        Collection<ProviderInfo<WriterInterceptor>> values =
+            pf.writerInterceptors.values();
+
+        assertEquals(4, values.size());
+
+        Iterator<ProviderInfo<WriterInterceptor>> iterator = values.iterator();
+
+        assertEquals(AWriterInterceptor.class, iterator.next().getProvider().getClass());
+        assertEquals(BWriterInterceptor.class, iterator.next().getProvider().getClass());
+        assertEquals(CWriterInterceptor.class, iterator.next().getProvider().getClass());
+        assertEquals(DWriterInterceptor.class, iterator.next().getProvider().getClass());
+    }
+
+    private static class AWriterInterceptor implements WriterInterceptor {
+        @Override
+        public void aroundWriteTo(WriterInterceptorContext context) throws
+            IOException, WebApplicationException {
+
+        }
+    }
+
+    private static class BWriterInterceptor implements WriterInterceptor {
+        @Override
+        public void aroundWriteTo(WriterInterceptorContext context) throws
+            IOException, WebApplicationException {
+
+        }
+    }
+
+    private static class CWriterInterceptor implements WriterInterceptor {
+        @Override
+        public void aroundWriteTo(WriterInterceptorContext context) throws
+            IOException, WebApplicationException {
+
+        }
+    }
+
+    private static class DWriterInterceptor implements WriterInterceptor {
+        @Override
+        public void aroundWriteTo(WriterInterceptorContext context) throws
+            IOException, WebApplicationException {
+
+        }
     }
 
     @Test
