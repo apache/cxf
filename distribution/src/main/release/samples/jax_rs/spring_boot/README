@@ -47,13 +47,13 @@ http://localhost:8080/services/helloservice/sayHello2/ApacheCxfUser
 will display "Hello2 ApacheCxfUser, Welcome to CXF RS Spring Boot World!!!"
 
 
-http://localhost:8080/services/helloservice/swagger.json will return a Swagger JSON
+http://localhost:8080/services/helloservice/openapi.json will return a Swagger JSON
 description of services.
 
-To view the Swagger document using Swagger-UI, use your Browser to 
+To view the OpenAPI document using Swagger-UI, use your browser to
 open the Swagger-UI page at
 
-  http://localhost:8080/services/helloservice/api-docs?url=/services/helloservice/swagger.json
+  http://localhost:8080/services/helloservice/api-docs?url=/services/helloservice/openapi.json
 
 or access it from the CXF Services page:
 
