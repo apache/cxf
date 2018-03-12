@@ -562,11 +562,21 @@ public abstract class HTTPConduit
 
         setHeadersByAuthorizationPolicy(message, currentAddress.getURI());
         new Headers(message).setFromClientPolicy(getClient(message));
-        message.setContent(OutputStream.class,
-                           createOutputStream(message,
-                                              needToCacheRequest,
-                                              isChunking,
-                                              chunkThreshold));
+
+        // set the OutputStream on the ProxyOutputStream
+        ProxyOutputStream pos = message.getContent(ProxyOutputStream.class);
+        if (pos != null && message.getContent(OutputStream.class) != null) {
+            pos.setWrappedOutputStream(createOutputStream(message,
+                                                          needToCacheRequest,
+                                                          isChunking,
+                                                          chunkThreshold));
+        } else {
+            message.setContent(OutputStream.class,
+                               createOutputStream(message,
+                                                  needToCacheRequest,
+                                                  isChunking,
+                                                  chunkThreshold));
+        }
         // We are now "ready" to "send" the message.
     }
 

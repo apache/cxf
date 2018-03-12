@@ -834,6 +834,27 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
                     ExceptionUtils.getRootCause(e) instanceof UnknownHostException);
         }
     }
+    
+    @Test
+    public void testGetSetEntityStream() {
+        String address = "http://localhost:" + PORT + "/bookstore/entityecho";
+        String entity = "BOOKSTORE";
+
+        Client client = ClientBuilder.newClient();
+        client.register(new ClientRequestFilter() {
+            @Override
+            public void filter(ClientRequestContext context) throws IOException {
+                context.setEntityStream(new ReplacingOutputStream(
+                                 context.getEntityStream(), 'X', 'O'));
+            }
+        });
+
+        WebTarget target = client.target(address);
+
+        Response response = target.request().post(
+                Entity.entity(entity.replace('O', 'X'), "text/plain"));
+        assertEquals(entity, response.readEntity(String.class));
+    }
 
     private static class ReplaceBodyFilter implements ClientRequestFilter {
 
