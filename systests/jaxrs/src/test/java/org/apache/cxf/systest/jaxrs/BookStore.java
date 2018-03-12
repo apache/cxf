@@ -1668,6 +1668,14 @@ public class BookStore {
     public BookSubresource getBookFromSubresource() {
         return new BookSubresourceImpl();
     }
+    
+    @POST
+    @Path("/entityecho")
+    @Consumes("text/plain")
+    @Produces("text/plain")
+    public Response echoEntity(String entity) {
+        return Response.ok().entity(entity).build();
+    }
 
     public final String init() {
         books.clear();
