@@ -37,8 +37,9 @@ public class BeanspectorTest extends Assert {
         assertTrue(getters.contains("promised"));
         
         Set<String> setters = bean.getSettersNames();
-        assertEquals(1, setters.size());
-        assertTrue(getters.contains("a"));
+        assertEquals(2, setters.size());
+        assertTrue(setters.contains("a"));
+        assertTrue(setters.contains("fluent"));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -68,6 +69,10 @@ public class BeanspectorTest extends Assert {
         }
 
         public void setA(String val) {
+        }
+        
+        public SimpleBean setFluent(String val) {
+            return this;
         }
     }
 }
