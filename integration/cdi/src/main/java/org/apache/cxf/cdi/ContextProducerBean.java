@@ -34,16 +34,19 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 
 public class ContextProducerBean extends AbstractCXFBean<Object> implements PassivationCapable {
     private final Type type;
+    private final Set<Annotation> qualifiers;
 
-    ContextProducerBean(Type type) {
+    ContextProducerBean(Type type, boolean defaultQualifier) {
         this.type = type;
+        this.qualifiers = new HashSet<>(defaultQualifier ? 2 : 1);
+        this.qualifiers.add(ContextResolved.LITERAL);
+        if (defaultQualifier) {
+            this.qualifiers.add(DEFAULT);
+        }
     }
 
     @Override
     public Set<Annotation> getQualifiers() {
-        Set<Annotation> qualifiers = new HashSet<>(2);
-        qualifiers.add(ContextResolved.LITERAL);
-        qualifiers.add(DEFAULT);
         return qualifiers;
     }
 
