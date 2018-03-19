@@ -29,6 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -87,58 +88,63 @@ public final class SwaggerToOpenApiConversionUtils {
     }
     
     public static String getOpenApiFromSwaggerJson(
-            MessageContext ctx, String json, OpenApiConfiguration cfg) throws IOException {
+            final MessageContext ctx,
+            final String json,
+            final OpenApiConfiguration cfg) throws IOException {
 
         JsonMapObjectReaderWriter readerWriter = new JsonMapObjectReaderWriter();
         JsonMapObject sw2 = readerWriter.fromJsonToJsonObject(json);
         JsonMapObject sw3 = new JsonMapObject();
-        
+
         // "openapi"
-        sw3.setProperty("openapi", "3.0.0");
-        
+        sw3.setProperty("openapi", "3.0.1");
+
         // "servers"
         setServersProperty(ctx, sw2, sw3);
-        
+
         // "info"
         JsonMapObject infoObject = sw2.getJsonMapProperty("info");
         if (infoObject != null) {
             sw3.setProperty("info", infoObject);
         }
-        
+
         // "tags"
         List<Map<String, Object>> tagsObject = sw2.getListMapProperty("tags");
         if (tagsObject != null) {
             sw3.setProperty("tags", tagsObject);
         }
-        
+
         // paths
-        Map<String, JsonMapObject> requestBodies = cfg != null && cfg.isCreateRequestBodies() 
-            ? new LinkedHashMap<String, JsonMapObject>() : null;
+        Map<String, JsonMapObject> requestBodies = cfg != null && cfg.isCreateRequestBodies()
+                ? new LinkedHashMap<String, JsonMapObject>() : null;
         setPathsProperty(sw2, sw3, requestBodies);
-        
+
         // components
         setComponentsProperty(sw2, sw3, requestBodies);
-        
+
         // externalDocs
         Object externalDocsObject = sw2.getProperty("externalDocs");
         if (externalDocsObject != null) {
             sw3.setProperty("externalDocs", externalDocsObject);
         }
-        
-        return readerWriter.toJson(sw3).replace("#/definitions/", "#/components/schemas/");
+
+        return readerWriter.toJson(sw3);
     }
-    
-    private static void setComponentsProperty(JsonMapObject sw2, JsonMapObject sw3,
-                                              Map<String, JsonMapObject> requestBodies) {
+
+    private static void setComponentsProperty(
+            final JsonMapObject sw2,
+            final JsonMapObject sw3,
+            final Map<String, JsonMapObject> requestBodies) {
+
         JsonMapObject comps = new JsonMapObject();
-        JsonMapObject requestBodiesObj = new JsonMapObject(); 
+        JsonMapObject requestBodiesObj = new JsonMapObject();
         if (requestBodies != null) {
             for (Map.Entry<String, JsonMapObject> entry : requestBodies.entrySet()) {
                 requestBodiesObj.setProperty(entry.getKey(), entry.getValue());
             }
         }
         comps.setProperty("requestBodies", requestBodiesObj);
-        
+
         JsonMapObject s2Defs = sw2.getJsonMapProperty("definitions");
         if (s2Defs != null) {
             for (Object schema : s2Defs.asMap().values()) {
@@ -152,7 +158,7 @@ public final class SwaggerToOpenApiConversionUtils {
                     }
                 }
             }
-            
+
             comps.setProperty("schemas", s2Defs);
         }
         JsonMapObject s2SecurityDefs = sw2.getJsonMapProperty("securityDefinitions");
@@ -167,30 +173,33 @@ public final class SwaggerToOpenApiConversionUtils {
                 }
             }
         }
-        
+
         sw3.setProperty("components", comps);
     }
-    
-    private static void setPathsProperty(JsonMapObject sw2, JsonMapObject sw3,
-                                         Map<String, JsonMapObject> requestBodies) {
+
+    private static void setPathsProperty(
+            final JsonMapObject sw2,
+            final JsonMapObject sw3,
+            final Map<String, JsonMapObject> requestBodies) {
+
         JsonMapObject sw2Paths = sw2.getJsonMapProperty("paths");
         for (Map.Entry<String, Object> sw2PathEntries : sw2Paths.asMap().entrySet()) {
-            Map<String, Object> map1 = CastUtils.cast((Map<?, ?>)sw2PathEntries.getValue());
+            Map<String, Object> map1 = CastUtils.cast((Map<?, ?>) sw2PathEntries.getValue());
             JsonMapObject sw2PathVerbs = new JsonMapObject(map1);
             for (Map.Entry<String, Object> sw2PathVerbEntries : sw2PathVerbs.asMap().entrySet()) {
-                Map<String, Object> map2 = CastUtils.cast((Map<?, ?>)sw2PathVerbEntries.getValue());
+                Map<String, Object> map2 = CastUtils.cast((Map<?, ?>) sw2PathVerbEntries.getValue());
                 JsonMapObject sw2PathVerbProps = new JsonMapObject(map2);
-                
+
                 prepareRequestBody(sw2PathVerbProps, requestBodies);
                 prepareResponses(sw2PathVerbProps);
-                
+
             }
         }
-        
+
         sw3.setProperty("paths", sw2Paths);
     }
-    
-    private static void prepareResponses(JsonMapObject sw2PathVerbProps) {
+
+    private static void prepareResponses(final JsonMapObject sw2PathVerbProps) {
         List<String> sw2PathVerbProduces = CastUtils.cast((List<?>) sw2PathVerbProps.removeProperty("produces"));
 
         JsonMapObject sw2PathVerbResps = sw2PathVerbProps.getJsonMapProperty("responses");
@@ -214,7 +223,7 @@ public final class SwaggerToOpenApiConversionUtils {
                 }
                 JsonMapObject headers = v2Resp.getJsonMapProperty("headers");
                 if (headers != null) {
-                    for (Map.Entry<String, Object> header: headers.asMap().entrySet()) {
+                    for (Map.Entry<String, Object> header : headers.asMap().entrySet()) {
                         JsonMapObject headerObj = new JsonMapObject(headers.getMapProperty(header.getKey()));
                         String type = headerObj.getStringProperty("type");
                         if (type != null) {
@@ -233,11 +242,12 @@ public final class SwaggerToOpenApiConversionUtils {
         }
     }
 
-    private static void prepareRequestBody(JsonMapObject sw2PathVerbProps, 
-                                           Map<String, JsonMapObject> requestBodies) {
-        List<String> sw2PathVerbConsumes =
-            CastUtils.cast((List<?>)sw2PathVerbProps.removeProperty("consumes"));
-        
+    private static void prepareRequestBody(
+            final JsonMapObject sw2PathVerbProps,
+            final Map<String, JsonMapObject> requestBodies) {
+
+        List<String> sw2PathVerbConsumes = CastUtils.cast((List<?>) sw2PathVerbProps.removeProperty("consumes"));
+
         JsonMapObject sw3RequestBody = null;
         List<JsonMapObject> sw3formBody = null;
         List<Map<String, Object>> sw2PathVerbParamsList = sw2PathVerbProps.getListMapProperty("parameters");
@@ -247,7 +257,7 @@ public final class SwaggerToOpenApiConversionUtils {
                 sw2PathVerbParamMap.removeProperty("pattern");
                 if ("body".equals(sw2PathVerbParamMap.getStringProperty("in"))) {
                     it.remove();
-                    
+
                     sw3RequestBody = new JsonMapObject();
                     String description = sw2PathVerbParamMap.getStringProperty("description");
                     if (description != null) {
@@ -260,11 +270,11 @@ public final class SwaggerToOpenApiConversionUtils {
                     JsonMapObject schema = sw2PathVerbParamMap.getJsonMapProperty("schema");
                     if (schema != null) {
                         JsonMapObject content = prepareContentFromSchema(schema, sw2PathVerbConsumes,
-                                                                         requestBodies != null);
+                                requestBodies != null);
                         if (content != null) {
                             sw3RequestBody.setProperty("content", content);
                         }
-                        
+
                     }
                 } else if ("formData".equals(sw2PathVerbParamMap.getStringProperty("in"))) {
                     it.remove();
@@ -292,7 +302,7 @@ public final class SwaggerToOpenApiConversionUtils {
                         sw2PathVerbParamMap.setProperty("style", "matrix");
                     }
 
-                    String type = (String)sw2PathVerbParamMap.removeProperty("type");
+                    String type = (String) sw2PathVerbParamMap.removeProperty("type");
                     Object enumK = sw2PathVerbParamMap.removeProperty("enum");
                     if (type != null) {
                         JsonMapObject schema = new JsonMapObject();
@@ -314,10 +324,10 @@ public final class SwaggerToOpenApiConversionUtils {
                 }
             }
         }
-        if (sw2PathVerbParamsList.isEmpty()) {
+        if (sw2PathVerbParamsList != null && sw2PathVerbParamsList.isEmpty()) {
             sw2PathVerbProps.removeProperty("parameters");
         }
-        if (sw3formBody != null) {
+        if (sw3RequestBody != null && sw3formBody != null) {
             sw3RequestBody.setProperty("content", prepareFormContent(sw3formBody, sw2PathVerbConsumes));
         }
         if (sw3RequestBody != null) {
@@ -326,28 +336,30 @@ public final class SwaggerToOpenApiConversionUtils {
             } else {
                 JsonMapObject content = sw3RequestBody.getJsonMapProperty("content");
                 if (content != null) {
-                    String requestBodyName = (String)content.removeProperty("requestBodyName");
+                    String requestBodyName = (String) content.removeProperty("requestBodyName");
                     if (requestBodyName != null) {
                         requestBodies.put(requestBodyName, sw3RequestBody);
-                        String ref = "#components/requestBodies/" + requestBodyName;
+                        String ref = "#/components/requestBodies/" + requestBodyName;
                         sw2PathVerbProps.setProperty("requestBody",
-                                                     Collections.singletonMap("$ref", ref));
+                                Collections.singletonMap("$ref", ref));
                     }
                 }
             }
         }
     }
 
-    private static JsonMapObject prepareFormContent(List<JsonMapObject> formList, List<String> mediaTypes) {
+    private static JsonMapObject prepareFormContent(
+            final List<JsonMapObject> formList, final List<String> mediaTypes) {
+
         String mediaType = StringUtils.isEmpty(mediaTypes)
-            ? "application/x-www-form-urlencoded" : mediaTypes.get(0); 
+                ? MediaType.APPLICATION_FORM_URLENCODED : mediaTypes.get(0);
         JsonMapObject content = new JsonMapObject();
         JsonMapObject formType = new JsonMapObject();
         JsonMapObject schema = new JsonMapObject();
         schema.setProperty("type", "object");
         JsonMapObject props = new JsonMapObject();
         for (JsonMapObject prop : formList) {
-            String name = (String)prop.removeProperty("name");
+            String name = (String) prop.removeProperty("name");
             props.setProperty(name, prop);
             if ("file".equals(prop.getProperty("type"))) {
                 prop.setProperty("type", "string");
@@ -362,19 +374,21 @@ public final class SwaggerToOpenApiConversionUtils {
         return content;
     }
 
-    private static JsonMapObject prepareContentFromSchema(JsonMapObject schema,
-                                                          List<String> mediaTypes,
-                                                          boolean storeModelName) {
+    private static JsonMapObject prepareContentFromSchema(
+            final JsonMapObject schema,
+            final List<String> mediaTypes,
+            final boolean storeModelName) {
+
         String type = schema.getStringProperty("type");
         String modelName = null;
         boolean isArray = false;
         if (!"object".equals(type) || !"string".equals(type)) {
-            String ref = null;
+            String ref;
             JsonMapObject items = null;
             if ("array".equals(type)) {
                 isArray = true;
                 items = schema.getJsonMapProperty("items");
-                ref = (String)items.getProperty("$ref");
+                ref = (String) items.getProperty("$ref");
             } else {
                 ref = schema.getStringProperty("$ref");
             }
@@ -382,22 +396,19 @@ public final class SwaggerToOpenApiConversionUtils {
                 int index = ref.lastIndexOf("/");
                 modelName = ref.substring(index + 1);
                 if (items == null) {
-                    schema.setProperty("$ref", "#components/schemas/" + modelName);
+                    schema.setProperty("$ref", "#/components/schemas/" + modelName);
                 } else {
-                    items.setProperty("$ref", "#components/schemas/" + modelName);
+                    items.setProperty("$ref", "#/components/schemas/" + modelName);
                 }
             }
         }
+
         JsonMapObject content = new JsonMapObject();
-        
-        List<String> mediaTypesList = mediaTypes == null 
-            ? Collections.singletonList("application/json") : mediaTypes;
-        
-        for (String mediaType : mediaTypesList) {
-            content.setProperty(mediaType, 
-                        Collections.singletonMap("schema", schema));
-            
+
+        for (String mediaType : mediaTypes == null ? Arrays.asList(MediaType.APPLICATION_JSON) : mediaTypes) {
+            content.setProperty(mediaType, Collections.singletonMap("schema", schema));
         }
+
         if (modelName != null && storeModelName) {
             content.setProperty("requestBodyName", isArray ? modelName + "Array" : modelName);
         }
@@ -405,7 +416,11 @@ public final class SwaggerToOpenApiConversionUtils {
         return content;
     }
 
-    private static void setServersProperty(MessageContext ctx, JsonMapObject sw2, JsonMapObject sw3) {
+    private static void setServersProperty(
+            final MessageContext ctx,
+            final JsonMapObject sw2,
+            final JsonMapObject sw3) {
+
         URI requestURI = ctx == null ? null : URI.create(ctx.getHttpServletRequest().getRequestURL().toString());
 
         List<String> sw2Schemes = sw2.getListStringProperty("schemes");
@@ -428,7 +443,7 @@ public final class SwaggerToOpenApiConversionUtils {
         String sw2BasePath = sw2.getStringProperty("basePath");
 
         String sw3ServerUrl = sw2Scheme + "://" + sw2Host + sw2BasePath;
-        sw3.setProperty("servers", Collections.singletonList(Collections.singletonMap("url", sw3ServerUrl)));
+        sw3.setProperty("servers", Arrays.asList(Collections.singletonMap("url", sw3ServerUrl)));
     }
 
 }

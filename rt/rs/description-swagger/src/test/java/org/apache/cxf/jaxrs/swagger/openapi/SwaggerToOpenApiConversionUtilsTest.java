@@ -35,7 +35,7 @@ public class SwaggerToOpenApiConversionUtilsTest extends Assert {
         String s = SwaggerToOpenApiConversionUtils.getOpenApiFromSwaggerLoc("/swagger2petShop.json");
         JsonMapObjectReaderWriter readerWriter = new JsonMapObjectReaderWriter();
         JsonMapObject sw3 = readerWriter.fromJsonToJsonObject(s);
-        assertEquals("3.0.0", sw3.getStringProperty("openapi"));
+        assertEquals("3.0.1", sw3.getStringProperty("openapi"));
         verifyServersProperty(sw3);
         verifyInfoProperty(sw3);
         verifyTagsProperty(sw3);
@@ -50,7 +50,7 @@ public class SwaggerToOpenApiConversionUtilsTest extends Assert {
         String s = SwaggerToOpenApiConversionUtils.getOpenApiFromSwaggerLoc("/swagger2petShop.json", cfg);
         JsonMapObjectReaderWriter readerWriter = new JsonMapObjectReaderWriter();
         JsonMapObject sw3 = readerWriter.fromJsonToJsonObject(s);
-        assertEquals("3.0.0", sw3.getStringProperty("openapi"));
+        assertEquals("3.0.1", sw3.getStringProperty("openapi"));
         verifyServersProperty(sw3);
         verifyInfoProperty(sw3);
         verifyTagsProperty(sw3);
@@ -623,8 +623,7 @@ public class SwaggerToOpenApiConversionUtilsTest extends Assert {
     private void verifyRequestBodyRef(JsonMapObject json, String refName) {
         JsonMapObject requestBody = json.getJsonMapProperty("requestBody");
         assertEquals(1, requestBody.size());
-        assertEquals("#components/requestBodies/" + refName,
-                     requestBody.getProperty("$ref"));
+        assertEquals("#/components/requestBodies/" + refName, requestBody.getProperty("$ref"));
     }
 
     private void verifyPetPathPut(JsonMapObject pet, OpenApiConfiguration cfg) {
@@ -653,7 +652,7 @@ public class SwaggerToOpenApiConversionUtilsTest extends Assert {
         assertEquals(1, content.size());
         JsonMapObject schema = content.getJsonMapProperty("schema");
         assertEquals(1, schema.size());
-        assertEquals("#components/schemas/" + modelName, schema.getStringProperty("$ref"));
+        assertEquals("#/components/schemas/" + modelName, schema.getStringProperty("$ref"));
     }
     private void verifySimpleStringContent(JsonMapObject contentMap, String mediaType) {
         JsonMapObject content = contentMap.getJsonMapProperty(mediaType);
@@ -707,7 +706,7 @@ public class SwaggerToOpenApiConversionUtilsTest extends Assert {
         assertEquals("array", schema.getStringProperty("type"));
         JsonMapObject items = schema.getJsonMapProperty("items");
         assertEquals(1, items.size());
-        assertEquals("#components/schemas/" + modelName, items.getStringProperty("$ref"));
+        assertEquals("#/components/schemas/" + modelName, items.getStringProperty("$ref"));
     }
 
     private void verifyServersProperty(JsonMapObject sw3) {
