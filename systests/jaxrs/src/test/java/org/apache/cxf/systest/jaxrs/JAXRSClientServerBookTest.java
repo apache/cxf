@@ -933,6 +933,20 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         List<Object> cookies = r.getMetadata().get("Set-Cookie");
         assertNotNull(cookies);
         assertEquals(3, cookies.size());
+        
+        boolean hasDummy1 = false;
+        boolean hasDummy2 = false;
+        boolean hasJSESSION = false;
+
+        for (Object o : cookies) {
+            String c = o.toString();
+            hasDummy1 |= c.contains("=dummy;");
+            hasDummy2 |= c.contains("=dummy2;");
+            hasJSESSION |= c.contains("JSESSIONID");
+        }
+        assertTrue("Did not contain JSESSIONID", hasJSESSION);
+        assertTrue("Did not contain dummy", hasDummy1);
+        assertTrue("Did not contain dummy2", hasDummy1);
     }
 
 
