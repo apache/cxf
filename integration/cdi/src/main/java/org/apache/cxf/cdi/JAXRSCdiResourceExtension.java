@@ -67,6 +67,7 @@ import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
+import static org.apache.cxf.cdi.AbstractCXFBean.DEFAULT;
 
 /**
  * Apache CXF portable CDI extension to support initialization of JAX-RS resources.
@@ -196,7 +197,7 @@ public class JAXRSCdiResourceExtension implements Extension {
         } else if (CdiBusBean.CXF.equals(event.getBean().getName())
                 && Bus.class.isAssignableFrom(event.getBean().getBeanClass())) {
             hasBus = true;
-        } else {
+        } else if (event.getBean().getQualifiers().contains(DEFAULT)) {
             event.getBean().getTypes().stream()
                 .filter(e -> Object.class != e && InjectionUtils.STANDARD_CONTEXT_CLASSES.contains(e.getTypeName()))
                 .findFirst()
@@ -263,11 +264,16 @@ public class JAXRSCdiResourceExtension implements Extension {
                 beanManager.createInjectionTarget(busAnnotatedType);
             event.addBean(new CdiBusBean(busInjectionTarget));
         }
+
         if (applicationBeans.isEmpty() && !serviceBeans.isEmpty()) {
             final DefaultApplicationBean applicationBean = new DefaultApplicationBean();
             applicationBeans.add(applicationBean);
             event.addBean(applicationBean);
+        } else {
+            // otherwise will be ambiguous since we scanned it with default qualifier already
+            existingStandardClasses.add(Application.class.getName());
         }
+
         // always add the standard context classes
         InjectionUtils.STANDARD_CONTEXT_CLASSES.stream()
                 .map(this::toClass)
@@ -334,8 +340,7 @@ public class JAXRSCdiResourceExtension implements Extension {
      * @return JAXRSServerFactoryBean instance
      */
     private JAXRSServerFactoryBean createFactoryInstance(final Application application, final BeanManager beanManager) {
-
-        final JAXRSServerFactoryBean instance = 
+        final JAXRSServerFactoryBean instance =
             ResourceUtils.createApplication(application, false, false, false, bus);
         final ClassifiedClasses classified = classes2singletons(application, beanManager);
 
