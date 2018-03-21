@@ -296,8 +296,9 @@ public class AttachmentSerializer {
 
     private int encodeBase64(InputStream input, OutputStream output, int bufferSize) throws IOException {
         int avail = input.available();
-        if (avail > 262144) {
-            avail = 262144;
+        if (avail > 262143) {
+            //must be divisible by 3
+            avail = 262143;
         }
         if (avail > bufferSize) {
             bufferSize = avail;
@@ -306,13 +307,31 @@ public class AttachmentSerializer {
         int n = 0;
         n = input.read(buffer);
         int total = 0;
+        int left = 0;
         while (-1 != n) {
             if (n == 0) {
                 throw new IOException("0 bytes read in violation of InputStream.read(byte[])");
             }
-            Base64Utility.encodeAndStream(buffer, 0, n, output);
-            total += n;
-            n = input.read(buffer);
+            //make sure n is divisible by 3
+            left = n % 3;
+            n -= left;
+            if (n > 0) {
+                Base64Utility.encodeAndStream(buffer, 0, n, output);
+                total += n;
+            }
+            if (left != 0) {
+                for (int x = 0; x < left; ++x) {
+                    buffer[x] = buffer[n + x];
+                }
+                n = input.read(buffer, left, buffer.length - left);
+                if (n == -1) {
+                    // we've hit the end, but still have stuff left, write it out
+                    Base64Utility.encodeAndStream(buffer, 0, left, output);
+                    total += left;
+                }
+            } else {
+                n = input.read(buffer);
+            }
         }
         return total;
     }
