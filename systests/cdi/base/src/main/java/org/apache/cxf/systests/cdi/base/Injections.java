@@ -86,12 +86,14 @@ public class Injections {
     @ContextResolved
     private Providers cxfProviders; //NOPMD
 
+    @SuppressWarnings("rawtypes")
     @Inject
-    private ContextResolver<?> contextResolver; //NOPMD
+    private ContextResolver contextResolver; //NOPMD
 
+    @SuppressWarnings("rawtypes")
     @Inject
     @ContextResolved
-    private ContextResolver<?> cxfContextResolver; //NOPMD
+    private ContextResolver cxfContextResolver; //NOPMD
 
     @Inject
     private HttpServletRequest httpServletRequest; //NOPMD
