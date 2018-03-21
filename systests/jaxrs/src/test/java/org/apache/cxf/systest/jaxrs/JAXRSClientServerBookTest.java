@@ -946,7 +946,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         }
         assertTrue("Did not contain JSESSIONID", hasJSESSION);
         assertTrue("Did not contain dummy", hasDummy1);
-        assertTrue("Did not contain dummy2", hasDummy1);
+        assertTrue("Did not contain dummy2", hasDummy2);
     }
 
 
@@ -2087,10 +2087,16 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testEchoBookElementWebClient() throws Exception {
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/books/element/echo");
-        wc.type("application/xml").accept("application/xml");
-        Book book = wc.post(new Book("CXF", 123L), Book.class);
+        wc.type("application/xml").accept("application/json");
+        Book book = wc.post(new Book("\"Jack\" & \"Jill\"", 123L), Book.class);
         assertEquals(123L, book.getId());
-        assertEquals("CXF", book.getName());
+        assertEquals("\"Jack\" & \"Jill\"", book.getName());
+        
+        wc = WebClient.create("http://localhost:" + PORT + "/bookstore/books/element/echo");
+        wc.type("application/xml").accept("application/xml");
+        book = wc.post(new Book("Jack & Jill", 123L), Book.class);
+        assertEquals(123L, book.getId());
+        assertEquals("Jack & Jill", book.getName());
     }
 
     @Test

@@ -347,6 +347,7 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
             super.marshalToOutputStream(ms, obj, os, anns, mt);
             return;
         }
+        org.apache.cxf.common.jaxb.JAXBUtils.setMinimumEscapeHandler(ms);
         TransformerHandler th = null;
         try {
             th = factory.newTransformerHandler(t);

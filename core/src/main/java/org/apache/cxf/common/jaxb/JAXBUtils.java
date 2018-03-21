@@ -1563,7 +1563,9 @@ public final class JAXBUtils {
     public static void setEscapeHandler(Marshaller marshaller, Object escapeHandler) {
         try {
             String postFix = getPostfix(marshaller.getClass());
-            marshaller.setProperty("com.sun.xml" + postFix + ".bind.characterEscapeHandler", escapeHandler);
+            if (postFix != null) {
+                marshaller.setProperty("com.sun.xml" + postFix + ".bind.characterEscapeHandler", escapeHandler);
+            }
         } catch (PropertyException e) {
             LOG.log(Level.INFO, "Failed to set MinumEscapeHandler to jaxb marshaller", e);
         }
