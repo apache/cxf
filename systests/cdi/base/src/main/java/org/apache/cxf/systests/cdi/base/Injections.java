@@ -40,6 +40,7 @@ import javax.ws.rs.ext.Providers;
 import org.apache.cxf.cdi.ContextResolved;
 
 @ApplicationScoped
+@SuppressWarnings("unused")
 public class Injections {
     /* this one is not supposed to work in the systests
     @Inject
@@ -86,11 +87,11 @@ public class Injections {
     private Providers cxfProviders; //NOPMD
 
     @Inject
-    private ContextResolver contextResolver; //NOPMD
+    private ContextResolver<?> contextResolver; //NOPMD
 
     @Inject
     @ContextResolved
-    private ContextResolver cxfContextResolver; //NOPMD
+    private ContextResolver<?> cxfContextResolver; //NOPMD
 
     @Inject
     private HttpServletRequest httpServletRequest; //NOPMD

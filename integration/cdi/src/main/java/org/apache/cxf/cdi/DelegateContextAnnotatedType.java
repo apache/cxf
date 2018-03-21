@@ -179,6 +179,7 @@ final class DelegateContextAnnotatedType<X> implements AnnotatedType<X> {
     }
 
     private static final class InjectLiteral extends AnnotationLiteral<Inject> implements Inject {
+        private static final long serialVersionUID = 1L;
 
     }
 }

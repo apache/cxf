@@ -1409,6 +1409,7 @@ public abstract class ProviderFactory {
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     public void setProviderComparator(Comparator<?> providerComparator) {
         this.providerComparator = providerComparator;
 

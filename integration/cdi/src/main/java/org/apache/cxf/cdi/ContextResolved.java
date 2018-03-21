@@ -47,6 +47,6 @@ public @interface ContextResolved {
     ContextResolved LITERAL = new ContextResolvedLiteral();
 
     final class ContextResolvedLiteral extends AnnotationLiteral<ContextResolved> implements ContextResolved {
-
+        private static final long serialVersionUID = 1L;
     }
 }
