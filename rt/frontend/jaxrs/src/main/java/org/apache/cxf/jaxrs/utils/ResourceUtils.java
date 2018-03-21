@@ -314,14 +314,24 @@ public final class ResourceUtils {
         final Set<Method> annotatedMethods = new HashSet<>();
 
         for (Method m : serviceClass.getMethods()) {
-
-            Method annotatedMethod = AnnotationUtils.getAnnotatedMethod(serviceClass, m);
-
-            if (!annotatedMethods.contains(annotatedMethod)) {
-                evaluateResourceMethod(cri, enableStatic, md, m, annotatedMethod);
-                annotatedMethods.add(annotatedMethod);
+            if (!m.isBridge() && !m.isSynthetic()) {
+                //do real methods first
+                Method annotatedMethod = AnnotationUtils.getAnnotatedMethod(serviceClass, m);
+                if (!annotatedMethods.contains(annotatedMethod)) {
+                    evaluateResourceMethod(cri, enableStatic, md, m, annotatedMethod);
+                    annotatedMethods.add(annotatedMethod);
+                }
             }
-
+        }
+        for (Method m : serviceClass.getMethods()) {
+            if (m.isBridge() || m.isSynthetic()) {
+                //if a bridge/synthetic method isn't already mapped to something, go ahead and do it
+                Method annotatedMethod = AnnotationUtils.getAnnotatedMethod(serviceClass, m);
+                if (!annotatedMethods.contains(annotatedMethod)) {
+                    evaluateResourceMethod(cri, enableStatic, md, m, annotatedMethod);
+                    annotatedMethods.add(annotatedMethod);
+                }
+            }
         }
         cri.setMethodDispatcher(md);
     }
