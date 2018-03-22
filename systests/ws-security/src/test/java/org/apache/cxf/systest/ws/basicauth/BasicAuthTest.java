@@ -93,8 +93,8 @@ public class BasicAuthTest extends AbstractBusClientServerTestBase {
         URL busFile = BasicAuthTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = BasicAuthTest.class.getResource("DoubleItBasicAuth.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
