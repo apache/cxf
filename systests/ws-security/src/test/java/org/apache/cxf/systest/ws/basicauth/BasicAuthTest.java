@@ -26,8 +26,12 @@ import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.configuration.security.AuthorizationPolicy;
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.transport.http.HTTPConduit;
 import org.example.contract.doubleit.DoubleItPortType;
 
 import org.junit.BeforeClass;
@@ -75,6 +79,37 @@ public class BasicAuthTest extends AbstractBusClientServerTestBase {
         DoubleItPortType utPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, PORT);
+
+        assertEquals(50, utPort.doubleIt(25));
+
+        ((java.io.Closeable)utPort).close();
+        bus.shutdown(true);
+    }
+
+    @org.junit.Test
+    public void testBasicAuthViaAuthorizationPolicy() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = BasicAuthTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = BasicAuthTest.class.getResource("DoubleItBasicAuth.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItBasicAuthPort2");
+        DoubleItPortType utPort =
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(utPort, PORT);
+
+        Client client = ClientProxy.getClient(utPort);
+        HTTPConduit http = (HTTPConduit) client.getConduit();
+        AuthorizationPolicy authorizationPolicy = new AuthorizationPolicy();
+        authorizationPolicy.setUserName("Alice");
+        authorizationPolicy.setPassword("ecilA");
+        authorizationPolicy.setAuthorizationType("Basic");
+        http.setAuthorization(authorizationPolicy);
 
         assertEquals(50, utPort.doubleIt(25));
 
