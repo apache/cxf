@@ -21,8 +21,10 @@ package org.apache.cxf.systest.ws.action;
 
 import java.io.StringReader;
 import java.net.URL;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.stream.StreamSource;
@@ -42,8 +44,13 @@ import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.ut.SecurityHeaderCacheInterceptor;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
+import org.apache.cxf.ws.security.wss4j.WSS4JStaxOutInterceptor;
 import org.apache.wss4j.common.ConfigurationConstants;
+import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.example.contract.doubleit.DoubleItPortType;
 
 import org.junit.BeforeClass;
@@ -477,6 +484,44 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         props.put(ConfigurationConstants.SIG_KEY_ID, "DirectReference");
         props.put(ConfigurationConstants.SIG_PROP_FILE, "alice.properties");
         WSS4JOutInterceptor outInterceptor = new WSS4JOutInterceptor(props);
+        Client client = ClientProxy.getClient(port);
+        client.getOutInterceptors().add(outInterceptor);
+
+        assertEquals(50, port.doubleIt(25));
+
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+
+    @org.junit.Test
+    public void testSignatureProgrammaticStAX() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = ActionTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = ActionTest.class.getResource("DoubleItAction.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSignatureConfigPort");
+
+        DoubleItPortType port =
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+
+        // Programmatic interceptor
+        WSSSecurityProperties properties = new WSSSecurityProperties();
+        properties.setActions(Collections.singletonList(WSSConstants.SIGNATURE));
+        properties.setSignatureUser("alice");
+        properties.setCallbackHandler(new KeystorePasswordCallback());
+        properties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
+        Properties sigProperties =
+            CryptoFactory.getProperties("alice.properties", this.getClass().getClassLoader());
+        properties.setSignatureCryptoProperties(sigProperties);
+
+        WSS4JStaxOutInterceptor outInterceptor = new WSS4JStaxOutInterceptor(properties);
         Client client = ClientProxy.getClient(port);
         client.getOutInterceptors().add(outInterceptor);
 
