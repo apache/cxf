@@ -73,7 +73,8 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
         WSSec.init();
         setPhase(Phase.PRE_STREAM);
         getBefore().add(StaxOutInterceptor.class.getName());
-        
+        getAfter().add("org.apache.cxf.interceptor.LoggingOutInterceptor");
+        getAfter().add("org.apache.cxf.ext.logging.LoggingOutInterceptor");
         ending = createEndingInterceptor();
     }
 
