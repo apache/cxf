@@ -18,9 +18,11 @@
  */
 package org.apache.cxf.microprofile.client;
 
+import java.net.URI;
 import java.net.URL;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
 
 import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.Configuration;
@@ -30,12 +32,25 @@ import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
 
 public class CxfTypeSafeClientBuilder implements RestClientBuilder, Configurable<RestClientBuilder> {
     private String baseUri;
+    private ExecutorService executorService;
     private final MicroProfileClientConfigurableImpl<RestClientBuilder> configImpl =
             new MicroProfileClientConfigurableImpl<>(this);
 
     @Override
     public RestClientBuilder baseUrl(URL url) {
         this.baseUri = Objects.requireNonNull(url).toExternalForm();
+        return this;
+    }
+
+    @Override
+    public RestClientBuilder baseUri(URI uri) {
+        this.baseUri = Objects.requireNonNull(uri).toString();
+        return this;
+    }
+
+    @Override
+    public RestClientBuilder executorService(ExecutorService executor) {
+        this.executorService = executor;
         return this;
     }
 
@@ -59,7 +74,7 @@ public class CxfTypeSafeClientBuilder implements RestClientBuilder, Configurable
             }
         }
         MicroProfileClientFactoryBean bean = new MicroProfileClientFactoryBean(configImpl,
-                baseUri, aClass);
+                baseUri, aClass, executorService);
         return bean.create(aClass);
     }
 

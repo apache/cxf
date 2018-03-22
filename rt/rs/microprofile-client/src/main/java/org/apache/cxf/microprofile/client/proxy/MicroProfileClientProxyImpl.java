@@ -19,27 +19,85 @@
 package org.apache.cxf.microprofile.client.proxy;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
+import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.client.ClientProxyImpl;
 import org.apache.cxf.jaxrs.client.ClientState;
+import org.apache.cxf.jaxrs.client.JaxrsClientCallback;
+import org.apache.cxf.jaxrs.client.LocalClientState;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.model.OperationResourceInfo;
+import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.microprofile.client.MicroProfileClientProviderFactory;
 import org.eclipse.microprofile.rest.client.ext.ResponseExceptionMapper;
 
 public class MicroProfileClientProxyImpl extends ClientProxyImpl {
+    private static final InvocationCallback<Object> MARKER_CALLBACK = new InvocationCallback<Object>() {
+
+        @Override
+        public void completed(Object paramRESPONSE) {
+            // no-op
+        }
+
+        @Override
+        public void failed(Throwable paramThrowable) {
+            // no-op
+        }
+    };
+    
+    private final MPAsyncInvocationInterceptorImpl aiiImpl = new MPAsyncInvocationInterceptorImpl();
+    
     public MicroProfileClientProxyImpl(URI baseURI, ClassLoader loader, ClassResourceInfo cri,
-                                       boolean isRoot, boolean inheritHeaders, Object... varValues) {
-        super(baseURI, loader, cri, isRoot, inheritHeaders, varValues);
+                                       boolean isRoot, boolean inheritHeaders, ExecutorService executorService,
+                                       Object... varValues) {
+        super(new LocalClientState(baseURI), loader, cri, isRoot, inheritHeaders, varValues);
+        cfg.getRequestContext().put(EXECUTOR_SERVICE_PROPERTY, executorService);
     }
 
     public MicroProfileClientProxyImpl(ClientState initialState, ClassLoader loader, ClassResourceInfo cri,
-                                       boolean isRoot, boolean inheritHeaders, Object... varValues) {
+                                       boolean isRoot, boolean inheritHeaders, ExecutorService executorService,
+                                       Object... varValues) {
         super(initialState, loader, cri, isRoot, inheritHeaders, varValues);
+        cfg.getRequestContext().put(EXECUTOR_SERVICE_PROPERTY, executorService);
+    }
+
+    
+
+    @SuppressWarnings("unchecked")
+    @Override
+    protected InvocationCallback<Object> checkAsyncCallback(OperationResourceInfo ori,
+                                                            Map<String, Object> reqContext,
+                                                            Message outMessage) {
+        if (Future.class.equals(ori.getMethodToInvoke().getReturnType())) {
+            return MARKER_CALLBACK;
+        }
+        return outMessage.getContent(InvocationCallback.class);
+    }
+
+    
+    @Override
+    protected Object doInvokeAsync(OperationResourceInfo ori, Message outMessage,
+                                   InvocationCallback<Object> asyncCallback) {
+        outMessage.getInterceptorChain().add(aiiImpl);
+        cfg.getInInterceptors().add(new MPAsyncInvocationInterceptorPostAsyncImpl(aiiImpl.getInterceptors()));
+        
+        super.doInvokeAsync(ori, outMessage, asyncCallback);
+        
+        Future<?> future = null;
+        if (asyncCallback == MARKER_CALLBACK) {
+            JaxrsClientCallback<?> cb = outMessage.getExchange().get(JaxrsClientCallback.class);
+            future = cb.createFuture();
+        }
+        return future;
     }
 
     @Override
@@ -63,5 +121,26 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
                 }
             }
         }
+    }
+
+    @Override
+    protected Class<?> getReturnType(Method method, Message outMessage) {
+        if (!outMessage.getExchange().isSynchronous()) {
+            InvocationCallback<?> callback = outMessage.getContent(InvocationCallback.class);
+            if (callback != null) {
+                Type t = getCallbackType(callback);
+                if (t instanceof Class) {
+                    return (Class<?>) t;
+                }
+            }
+        }
+        Class<?> returnType = super.getReturnType(method, outMessage);
+        if (Future.class.isAssignableFrom(returnType)) {
+            Type t = method.getGenericReturnType();
+            returnType = InjectionUtils.getActualType(t);
+            System.out.println("returnType (from future) = " + returnType);
+        }
+        System.out.println("returnType = " + returnType);
+        return returnType;
     }
 }

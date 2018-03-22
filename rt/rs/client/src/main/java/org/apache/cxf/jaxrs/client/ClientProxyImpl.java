@@ -285,7 +285,8 @@ public class ClientProxyImpl extends AbstractClient implements
             return true;
         }
         return p.getType() == ParameterType.REQUEST_BODY
-            && m.getParameterTypes()[p.getIndex()] == AsyncResponse.class;
+            && (m.getParameterTypes()[p.getIndex()] == AsyncResponse.class
+                || m.getParameterTypes()[p.getIndex()] == InvocationCallback.class);
     }
 
     private static int getBodyIndex(MultivaluedMap<ParameterType, Parameter> map,
@@ -767,15 +768,18 @@ public class ClientProxyImpl extends AbstractClient implements
             }
             outMessage.getInterceptorChain().add(bodyWriter);
 
+            int invocationCallbackIdx = Arrays.asList(ori.getInParameterTypes()).indexOf(InvocationCallback.class);
+            if (invocationCallbackIdx > -1) {
+                outMessage.setContent(InvocationCallback.class, methodParams[invocationCallbackIdx]);
+            }
             Map<String, Object> reqContext = getRequestContext(outMessage);
             reqContext.put(OperationResourceInfo.class.getName(), ori);
             reqContext.put(PROXY_METHOD_PARAM_BODY_INDEX, bodyIndex);
 
             // execute chain
-            InvocationCallback<Object> asyncCallback = checkAsyncCallback(ori, reqContext);
+            InvocationCallback<Object> asyncCallback = checkAsyncCallback(ori, reqContext, outMessage);
             if (asyncCallback != null) {
-                doInvokeAsync(ori, outMessage, asyncCallback);
-                return null;
+                return doInvokeAsync(ori, outMessage, asyncCallback);
             }
             doRunInterceptorChain(outMessage);
 
@@ -801,8 +805,9 @@ public class ClientProxyImpl extends AbstractClient implements
 
     }
 
-    private InvocationCallback<Object> checkAsyncCallback(OperationResourceInfo ori,
-                                                          Map<String, Object> reqContext) {
+    protected InvocationCallback<Object> checkAsyncCallback(OperationResourceInfo ori,
+                                                          Map<String, Object> reqContext,
+                                                          Message outMessage) {
         Object callbackProp = reqContext.get(InvocationCallback.class.getName());
         if (callbackProp != null) {
             if (callbackProp instanceof Collection) {
@@ -837,7 +842,7 @@ public class ClientProxyImpl extends AbstractClient implements
         return null;
     }
 
-    protected void doInvokeAsync(OperationResourceInfo ori, Message outMessage,
+    protected Object doInvokeAsync(OperationResourceInfo ori, Message outMessage,
                                  InvocationCallback<Object> asyncCallback) {
         outMessage.getExchange().setSynchronous(false);
         setAsyncMessageObserverIfNeeded(outMessage.getExchange());
@@ -846,7 +851,7 @@ public class ClientProxyImpl extends AbstractClient implements
         outMessage.getExchange().put(JaxrsClientCallback.class, cb);
         doRunInterceptorChain(outMessage);
 
-
+        return null;
     }
 
     @Override
@@ -873,7 +878,8 @@ public class ClientProxyImpl extends AbstractClient implements
 
             Method method = outMessage.getExchange().get(Method.class);
             checkResponse(method, r, outMessage);
-            if (method.getReturnType() == Void.class || method.getReturnType() == Void.TYPE) {
+            if (outMessage.getExchange().isSynchronous() && (method.getReturnType() == Void.class 
+                                                            || method.getReturnType() == Void.TYPE)) {
                 return null;
             }
             if (method.getReturnType() == Response.class
@@ -885,7 +891,7 @@ public class ClientProxyImpl extends AbstractClient implements
                 r.bufferEntity();
             }
 
-            Class<?> returnType = method.getReturnType();
+            Class<?> returnType = getReturnType(method, outMessage);
             Type genericType =
                 InjectionUtils.processGenericTypeIfNeeded(serviceCls,
                                                           returnType,
@@ -899,6 +905,10 @@ public class ClientProxyImpl extends AbstractClient implements
         } finally {
             ClientProviderFactory.getInstance(outMessage).clearThreadLocalProxies();
         }
+    }
+
+    protected Class<?> getReturnType(Method method, Message outMessage) {
+        return method.getReturnType();
     }
 
     public Object getInvocationHandler() {

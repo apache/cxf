@@ -19,8 +19,11 @@
 package org.apache.cxf.microprofile.client;
 
 import java.net.URL;
-
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.microprofile.client.mock.EchoClientReqFilter;

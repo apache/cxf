@@ -24,6 +24,7 @@ import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 
 import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.client.ClientResponseFilter;
@@ -48,12 +49,14 @@ public class MicroProfileClientFactoryBean extends JAXRSClientFactoryBean {
     private Configuration configuration;
     private ClassLoader proxyLoader;
     private boolean inheritHeaders;
+    private ExecutorService executorService;
 
     public MicroProfileClientFactoryBean(MicroProfileClientConfigurableImpl<RestClientBuilder> configuration,
-                                         String baseUri, Class<?> aClass) {
+                                         String baseUri, Class<?> aClass, ExecutorService executorService) {
         super();
         this.configuration = configuration.getConfiguration();
         this.comparator = MicroProfileClientProviderFactory.createComparator(this);
+        this.executorService = executorService;
         super.setAddress(baseUri);
         super.setServiceClass(aClass);
         super.setProviderComparator(comparator);
@@ -78,6 +81,10 @@ public class MicroProfileClientFactoryBean extends JAXRSClientFactoryBean {
         this.inheritHeaders = inheritHeaders;
     }
 
+    public ExecutorService getExecutorService() {
+        return executorService;
+    }
+
     @Override
     protected void initClient(AbstractClient client, Endpoint ep, boolean addHeaders) {
         super.initClient(client, ep, addHeaders);
@@ -92,10 +99,10 @@ public class MicroProfileClientFactoryBean extends JAXRSClientFactoryBean {
                                                 ClientState actualState, Object[] varValues) {
         if (actualState == null) {
             return new MicroProfileClientProxyImpl(URI.create(getAddress()), proxyLoader, cri, isRoot,
-                    inheritHeaders, varValues);
+                    inheritHeaders, executorService, varValues);
         } else {
             return new MicroProfileClientProxyImpl(actualState, proxyLoader, cri, isRoot,
-                    inheritHeaders, varValues);
+                    inheritHeaders, executorService, varValues);
         }
     }
 
