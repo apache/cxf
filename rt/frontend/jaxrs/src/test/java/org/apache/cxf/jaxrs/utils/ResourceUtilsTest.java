@@ -25,7 +25,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -181,7 +183,7 @@ public class ResourceUtilsTest extends Assert {
             return "Hello " + name + "!";
         }
     }
-
+    
     @Test
     public void testClassResourceInfoWithSyntheticMethod() throws Exception {
         ClassResourceInfo cri =
@@ -204,6 +206,52 @@ public class ResourceUtilsTest extends Assert {
                 cri.getMethodDispatcher().getOperationResourceInfos().size());
     }
 
+    protected interface OverriddenInterface<T> {
+        @GET
+        @Path("/{key}")
+        T read(@PathParam("key") String key);
+    }
+
+    @Path("overridden-string")
+    protected interface OverriddenInterfaceString extends OverriddenInterface<String> {
+        @NotNull @Override
+        String read(String key);
+        
+        @NotNull
+        Set<String> read(String key, String type);
+    }
+    
+    public static class OverriddenInterfaceImpl implements OverriddenInterfaceString {
+        @Override
+        public String read(String key) {
+            return key;
+        }
+        
+        @Override
+        public Set<String> read(String key, String type) {
+            return Collections.singleton(key);
+        }
+    }
+
+    @Test
+    public void testClassResourceInfoWithOverriddenMethods() throws Exception {
+        ClassResourceInfo cri =
+                ResourceUtils.createClassResourceInfo(
+                        OverriddenInterfaceImpl.class,
+                        OverriddenInterfaceImpl.class,
+                        true,
+                        true);
+
+        assertNotNull(cri);
+        Method notSynthetic = OverriddenInterfaceImpl.class.getMethod("read", new Class[]{String.class});
+        assertFalse(notSynthetic.isSynthetic());
+
+        cri.hasSubResources();
+        final Set<OperationResourceInfo> oris = cri.getMethodDispatcher().getOperationResourceInfos();
+        assertEquals("there must be one read method", 1, oris.size());
+        assertEquals(notSynthetic, oris.iterator().next().getMethodToInvoke());
+    }
+    
     @Test
     public void shouldCreateApplicationWhichInheritsApplicationPath() throws Exception {
         JAXRSServerFactoryBean application = ResourceUtils.createApplication(
