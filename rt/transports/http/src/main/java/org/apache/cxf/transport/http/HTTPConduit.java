@@ -75,6 +75,7 @@ import org.apache.cxf.transport.AbstractConduit;
 import org.apache.cxf.transport.Assertor;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.MessageObserver;
+import org.apache.cxf.transport.http.auth.CustomAuthSupplier;
 import org.apache.cxf.transport.http.auth.DefaultBasicAuthSupplier;
 import org.apache.cxf.transport.http.auth.DigestAuthSupplier;
 import org.apache.cxf.transport.http.auth.HttpAuthHeader;
@@ -157,10 +158,10 @@ public abstract class HTTPConduit
      */
     public static final String KEY_HTTP_CONNECTION = "http.connection";
     public static final String KEY_HTTP_CONNECTION_ADDRESS = "http.connection.address";
-    
+
     public static final String SET_HTTP_RESPONSE_MESSAGE = "org.apache.cxf.transport.http.set.response.message";
     public static final String HTTP_RESPONSE_MESSAGE = "http.responseMessage";
-    
+
     public static final String PROCESS_FAULT_ON_HTTP_400 = "org.apache.cxf.transport.process_fault_on_http_400";
     public static final String NO_IO_EXCEPTIONS = "org.apache.cxf.transport.no_io_exceptions";
     /**
@@ -515,11 +516,11 @@ public abstract class HTTPConduit
         int chunkThreshold = 0;
         final AuthorizationPolicy effectiveAuthPolicy = getEffectiveAuthPolicy(message);
         if (this.authSupplier == null) {
-            this.authSupplier = createAuthSupplier(effectiveAuthPolicy.getAuthorizationType());
+            this.authSupplier = createAuthSupplier(effectiveAuthPolicy);
         }
 
         if (this.proxyAuthSupplier == null) {
-            this.proxyAuthSupplier = createAuthSupplier(proxyAuthorizationPolicy.getAuthorizationType());
+            this.proxyAuthSupplier = createAuthSupplier(proxyAuthorizationPolicy);
         }
 
         if (this.authSupplier.requiresRequestCaching()) {
@@ -601,11 +602,15 @@ public abstract class HTTPConduit
                                                        boolean isChunking,
                                                        int chunkThreshold) throws IOException;
 
-    private HttpAuthSupplier createAuthSupplier(String authType) {
+    private HttpAuthSupplier createAuthSupplier(AuthorizationPolicy authzPolicy) {
+        String authType = authzPolicy.getAuthorizationType();
         if (HttpAuthHeader.AUTH_TYPE_NEGOTIATE.equals(authType)) {
             return new SpnegoAuthSupplier();
         } else if (HttpAuthHeader.AUTH_TYPE_DIGEST.equals(authType)) {
             return new DigestAuthSupplier();
+        } else if (authType != null && !HttpAuthHeader.AUTH_TYPE_BASIC.equals(authType)
+            && authzPolicy.getAuthorization() != null) {
+            return new CustomAuthSupplier();
         } else {
             return new DefaultBasicAuthSupplier();
         }
