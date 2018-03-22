@@ -500,8 +500,8 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         URL busFile = ActionTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = ActionTest.class.getResource("DoubleItAction.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
