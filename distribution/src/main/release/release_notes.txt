@@ -1,4 +1,4 @@
-Apache CXF 3.2.3 Release Notes
+Apache CXF 3.2.4 Release Notes
 
 1. Overview
 
@@ -17,7 +17,7 @@ New features include:
 * Preliminary support for running on Java 9  (no module support yet)
 * New http-undertow transport
 
-3.2.2 fixes over 27 JIRA issues reported by users and the community
+3.2.4 fixes over 30 JIRA issues reported by users and the community since 3.2.2.
 
 
 Important notes:
@@ -70,6 +70,10 @@ for caveats when upgrading.
 7. Specific issues, features, and improvements fixed in this version
 
 ** Bug
+* [CXF-7670] - synthetic methods: equal candidates for handling the current request
+* [CXF-7684] - Base64 encoding in AttachmentSerializer does not create correct output for large attachments
+* [CXF-7686] - WSS4JStaxOutInterceptor with WSSSecurityProperties doesn't work with LoggingOutInterceptor
+* [CXF-7687] - AuthorizationPolicy: AuthorizationType="Bearer" has no effect
 * [CXF-7048] - Response does not include SequenceAcknowledgement
 * [CXF-7508] - WSRM - CloseSequenceResponse does not have acknowledgments
 * [CXF-7522] - WSRM - Exponential backoff not configurable for Redelivery
