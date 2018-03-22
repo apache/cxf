@@ -33,12 +33,15 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.message.Message;
+import org.eclipse.microprofile.rest.client.ext.AsyncInvocationInterceptorFactory;
 import org.eclipse.microprofile.rest.client.ext.ResponseExceptionMapper;
 
 public final class MicroProfileClientProviderFactory extends ProviderFactory {
     static final String CLIENT_FACTORY_NAME = MicroProfileClientProviderFactory.class.getName();
     private List<ProviderInfo<ResponseExceptionMapper<?>>> responseExceptionMappers =
             new ArrayList<ProviderInfo<ResponseExceptionMapper<?>>>(1);
+    private List<ProviderInfo<AsyncInvocationInterceptorFactory>> asyncInvocationInterceptorFactories =
+            new ArrayList<ProviderInfo<AsyncInvocationInterceptorFactory>>();
     private final Comparator<ProviderInfo<?>> comparator;
 
     private MicroProfileClientProviderFactory(Bus bus, Comparator<ProviderInfo<?>> comparator) {
@@ -82,11 +85,16 @@ public final class MicroProfileClientProviderFactory extends ProviderFactory {
             if (ResponseExceptionMapper.class.isAssignableFrom(providerCls)) {
                 addProviderToList(responseExceptionMappers, provider);
             }
+            if (AsyncInvocationInterceptorFactory.class.isAssignableFrom(providerCls)) {
+                addProviderToList(asyncInvocationInterceptorFactories, provider);
+            }
 
         }
         responseExceptionMappers.sort(comparator);
+        asyncInvocationInterceptorFactories.sort(comparator);
 
         injectContextProxies(responseExceptionMappers);
+        injectContextProxies(asyncInvocationInterceptorFactories);
     }
 
     public List<ResponseExceptionMapper<?>> createResponseExceptionMapper(Message m, Class<?> paramType) {
@@ -101,10 +109,15 @@ public final class MicroProfileClientProviderFactory extends ProviderFactory {
                                             .collect(Collectors.toList()));
     }
 
+    public List<ProviderInfo<AsyncInvocationInterceptorFactory>> getAsyncInvocationInterceptorFactories() {
+        return asyncInvocationInterceptorFactories;
+    }
+
     @Override
     public void clearProviders() {
         super.clearProviders();
         responseExceptionMappers.clear();
+        asyncInvocationInterceptorFactories.clear();
     }
 
     @Override

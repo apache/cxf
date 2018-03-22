@@ -22,6 +22,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,6 +34,7 @@ import java.util.Set;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.client.InvocationCallback;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
@@ -45,7 +47,6 @@ final class Validator {
     private Validator() {
     }
 
-
     public static void checkValid(Class<?> userType) throws RestClientDefinitionException {
         if (!userType.isInterface()) {
             throwException("VALIDATION_NOT_AN_INTERFACE", userType);
@@ -53,6 +54,7 @@ final class Validator {
         Method[] methods = userType.getMethods();
         checkMethodsForMultipleHTTPMethodAnnotations(methods);
         checkMethodsForInvalidURITemplates(userType, methods);
+        checkAsyncMethods(userType, methods);
     }
 
     private static void checkMethodsForMultipleHTTPMethodAnnotations(Method[] clientMethods)
@@ -125,6 +127,18 @@ final class Validator {
                 if (!foundParams.isEmpty()) {
                     throwException("VALIDATION_EXTRA_PATH_PARAMS", userType, method);
                 }
+            }
+        }
+    }
+
+    private static void checkAsyncMethods(Class<?> userType, Method[] clientMethods) {
+        for (Method method : clientMethods) {
+            boolean containsInvocationCallbackParm = Arrays.asList(method.getParameterTypes())
+                .contains(InvocationCallback.class);
+            Class<?> returnType = method.getReturnType();
+            if (containsInvocationCallbackParm && returnType != void.class) {
+                throwException("VALIDATION_ASYNC_METHOD_RETURNS_UNEXPECTED_TYPE", userType.getName(), 
+                               method.getName(), returnType.getName());
             }
         }
     }
