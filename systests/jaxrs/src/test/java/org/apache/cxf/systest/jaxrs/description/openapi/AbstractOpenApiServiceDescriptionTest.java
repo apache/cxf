@@ -210,7 +210,7 @@ public abstract class AbstractOpenApiServiceDescriptionTest extends AbstractBusC
             .create(getBaseUrl() + "/swagger-ui.css")
             .accept("text/css");
         String css = uiClient.get(String.class);
-        assertThat(css, containsString(".swagger-ui{font"));
+        assertThat(css, containsString(".swagger-ui{"));
     }
     
     protected String getApplicationPath() {

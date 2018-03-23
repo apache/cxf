@@ -210,7 +210,7 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
             .create("http://localhost:" + getPort() + "/swagger-ui.css")
             .accept("text/css");
         String css = uiClient.get(String.class);
-        assertThat(css, containsString(".swagger-ui{font"));
+        assertThat(css, containsString(".swagger-ui{"));
     }
     
     @Test
