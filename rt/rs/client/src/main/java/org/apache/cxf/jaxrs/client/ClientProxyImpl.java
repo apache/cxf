@@ -245,7 +245,7 @@ public class ClientProxyImpl extends AbstractClient implements
         }
     }
 
-    private static MultivaluedMap<ParameterType, Parameter> getParametersInfo(Method m,
+    private MultivaluedMap<ParameterType, Parameter> getParametersInfo(Method m,
         Object[] params, OperationResourceInfo ori) {
         MultivaluedMap<ParameterType, Parameter> map =
             new MetadataMap<ParameterType, Parameter>();
@@ -280,13 +280,12 @@ public class ClientProxyImpl extends AbstractClient implements
         return map;
     }
 
-    private static boolean isIgnorableParameter(Method m, Parameter p) {
+    protected boolean isIgnorableParameter(Method m, Parameter p) {
         if (p.getType() == ParameterType.CONTEXT) {
             return true;
         }
         return p.getType() == ParameterType.REQUEST_BODY
-            && (m.getParameterTypes()[p.getIndex()] == AsyncResponse.class
-                || m.getParameterTypes()[p.getIndex()] == InvocationCallback.class);
+            && m.getParameterTypes()[p.getIndex()] == AsyncResponse.class;
     }
 
     private static int getBodyIndex(MultivaluedMap<ParameterType, Parameter> map,
@@ -593,7 +592,7 @@ public class ClientProxyImpl extends AbstractClient implements
         }
         return jaxrsParamAnnAvailable;
     }
-    
+
     private void handleMatrixes(Method m,
                                 Object[] params,
                                 MultivaluedMap<ParameterType, Parameter> map,
@@ -878,7 +877,7 @@ public class ClientProxyImpl extends AbstractClient implements
 
             Method method = outMessage.getExchange().get(Method.class);
             checkResponse(method, r, outMessage);
-            if (outMessage.getExchange().isSynchronous() && (method.getReturnType() == Void.class 
+            if (outMessage.getExchange().isSynchronous() && (method.getReturnType() == Void.class
                                                             || method.getReturnType() == Void.TYPE)) {
                 return null;
             }
