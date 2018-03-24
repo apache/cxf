@@ -43,7 +43,6 @@ public class ThreadLocalClientFilter implements ClientRequestFilter, ClientRespo
         List<String> list = AsyncInvocationInterceptorFactoryTestImpl.INBOUND.get();
         list.add(ThreadLocalClientFilter.class.getSimpleName());
         responseContext.getHeaders().put("CXFTestResponse", list);
-
     }
 
 }

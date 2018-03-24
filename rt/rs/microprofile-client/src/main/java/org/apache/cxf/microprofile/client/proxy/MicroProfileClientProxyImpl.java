@@ -35,6 +35,8 @@ import org.apache.cxf.jaxrs.client.JaxrsClientCallback;
 import org.apache.cxf.jaxrs.client.LocalClientState;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
+import org.apache.cxf.jaxrs.model.Parameter;
+import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.microprofile.client.MicroProfileClientProviderFactory;
@@ -53,9 +55,9 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
             // no-op
         }
     };
-    
+
     private final MPAsyncInvocationInterceptorImpl aiiImpl = new MPAsyncInvocationInterceptorImpl();
-    
+
     public MicroProfileClientProxyImpl(URI baseURI, ClassLoader loader, ClassResourceInfo cri,
                                        boolean isRoot, boolean inheritHeaders, ExecutorService executorService,
                                        Object... varValues) {
@@ -70,7 +72,7 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
         cfg.getRequestContext().put(EXECUTOR_SERVICE_PROPERTY, executorService);
     }
 
-    
+
 
     @SuppressWarnings("unchecked")
     @Override
@@ -83,15 +85,15 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
         return outMessage.getContent(InvocationCallback.class);
     }
 
-    
+
     @Override
     protected Object doInvokeAsync(OperationResourceInfo ori, Message outMessage,
                                    InvocationCallback<Object> asyncCallback) {
         outMessage.getInterceptorChain().add(aiiImpl);
         cfg.getInInterceptors().add(new MPAsyncInvocationInterceptorPostAsyncImpl(aiiImpl.getInterceptors()));
-        
+
         super.doInvokeAsync(ori, outMessage, asyncCallback);
-        
+
         Future<?> future = null;
         if (asyncCallback == MARKER_CALLBACK) {
             JaxrsClientCallback<?> cb = outMessage.getExchange().get(JaxrsClientCallback.class);
@@ -138,9 +140,16 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
         if (Future.class.isAssignableFrom(returnType)) {
             Type t = method.getGenericReturnType();
             returnType = InjectionUtils.getActualType(t);
-            System.out.println("returnType (from future) = " + returnType);
         }
-        System.out.println("returnType = " + returnType);
         return returnType;
+    }
+
+    @Override
+    protected boolean isIgnorableParameter(Method m, Parameter p) {
+        if (p.getType() == ParameterType.CONTEXT) {
+            return true;
+        }
+        return p.getType() == ParameterType.REQUEST_BODY
+            && m.getParameterTypes()[p.getIndex()] == InvocationCallback.class;
     }
 }
