@@ -135,6 +135,7 @@
         <module>jax_rs/tracing_opentracing_camel</module>
         <module>jax_rs/tracing_opentracing_osgi</module>
         <module>jax_rs/description_openapi_v3</module>
+        <module>jax_rs/sse_osgi</module>
     </modules>
     <dependencyManagement>
         <dependencies>
