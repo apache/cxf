@@ -30,7 +30,6 @@
 
     <!-- Application resources -->
     <bean id="statsResource" class="demo.jaxrs.server.StatsRestServiceImpl" />
-    <bean id="corsFilter" class="org.apache.cxf.rs.security.cors.CrossOriginResourceSharingFilter" /> 
     <bean id="jsonProvider" class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider" />
  
     <cxf:bus>
