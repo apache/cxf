@@ -76,6 +76,8 @@ public final class JMSConstants {
     public static final String MALFORMED_REQUESTURI = "malformed.requesturi";
     
     public static final String RS_CONTENT_TYPE = "org.apache.cxf.jms.rs.ContentType";
+    
+    public static final String RS_CONTENT_LENGTH = "org.apache.cxf.jms.rs.ContentLength";
 
     private JMSConstants() {
         //utility class

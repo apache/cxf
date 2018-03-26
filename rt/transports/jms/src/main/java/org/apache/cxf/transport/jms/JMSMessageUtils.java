@@ -251,13 +251,28 @@ final class JMSMessageUtils {
                                           outMessage,
                                           org.apache.cxf.message.Message.RESPONSE_CODE);
             }
+            String contentType = (String)outMessage.remove(org.apache.cxf.message.Message.CONTENT_TYPE);
+            if (contentType != null) {
+                outMessage.put(JMSConstants.RS_CONTENT_TYPE, contentType);
+            }
             addJMSPropertyFromMessage(messageHeaders,
                                       outMessage,
                                       JMSConstants.RS_CONTENT_TYPE);
+            
+            String contentLength = (String)outMessage.remove(HttpHeaderHelper.CONTENT_LENGTH);
+            if (contentLength != null) {
+                outMessage.put(JMSConstants.RS_CONTENT_LENGTH, contentLength);
+            }
+            addJMSPropertyFromMessage(messageHeaders,
+                                      outMessage,
+                                      JMSConstants.RS_CONTENT_LENGTH);
         }
         if (headers != null) {
             for (Map.Entry<String, List<String>> ent : headers.entrySet()) {
-                messageHeaders.putProperty(ent.getKey(), JMSMessageUtils.join(ent.getValue(), ','));
+                if (!ent.getKey().equals(org.apache.cxf.message.Message.CONTENT_TYPE)
+                    && !ent.getKey().equals(HttpHeaderHelper.CONTENT_LENGTH)) {
+                    messageHeaders.putProperty(ent.getKey(), JMSMessageUtils.join(ent.getValue(), ','));
+                }
             }
         }
         messageHeaders.writeTo(jmsMessage);
