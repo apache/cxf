@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -109,7 +110,14 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
         if (mc.getContent(SOAPMessage.class) == null) {
             saajOut.handleMessage(mc);
         }
-        
+
+        // If a custom Id has been set, then change the Id for the internal interceptor as well, as otherwise
+        // we can't add two WSS4JOutInterceptor instances to the interceptor chain.
+        if (!WSS4JOutInterceptor.class.getName().equals(getId())) {
+            Random random = new Random();
+            int randomInt = random.nextInt();
+            ending.setId(WSS4JOutInterceptorInternal.class.getName() + "_" + randomInt);
+        }
         mc.getInterceptorChain().add(ending);
     }    
     public void handleFault(SoapMessage message) {
@@ -122,6 +130,8 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
     
     final class WSS4JOutInterceptorInternal 
         implements PhaseInterceptor<SoapMessage> {
+        private String id = WSS4JOutInterceptorInternal.class.getName();
+
         WSS4JOutInterceptorInternal() {
             super();
         }
@@ -282,7 +292,11 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
         }
 
         public String getId() {
-            return WSS4JOutInterceptorInternal.class.getName();
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
         }
 
         public String getPhase() {

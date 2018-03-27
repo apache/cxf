@@ -87,6 +87,9 @@
         <wsdl:port name="DoubleItSignatureConfigPort" binding="tns:DoubleItNoSecurityBinding">
             <soap:address location="http://localhost:9001/DoubleItSignatureConfig"/>
         </wsdl:port>
+        <wsdl:port name="DoubleItSignatureConfigPort2" binding="tns:DoubleItNoSecurityBinding">
+            <soap:address location="http://localhost:9001/DoubleItSignatureConfig2"/>
+        </wsdl:port>
     </wsdl:service>
     
 </wsdl:definitions>

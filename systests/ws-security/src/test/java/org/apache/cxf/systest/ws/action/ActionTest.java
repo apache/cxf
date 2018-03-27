@@ -532,6 +532,52 @@ public class ActionTest extends AbstractBusClientServerTestBase {
     }
 
     @org.junit.Test
+    public void testSignatureProgrammaticMultipleActors() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = ActionTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = ActionTest.class.getResource("DoubleItAction.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSignatureConfigPort2");
+
+        DoubleItPortType port =
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        Client client = ClientProxy.getClient(port);
+
+        // Add a UsernameToken for the "dave" actor
+        Map<String, Object> props = new HashMap<>();
+        props.put(ConfigurationConstants.ACTION, "UsernameToken");
+        props.put(ConfigurationConstants.ACTOR, "dave");
+        props.put(ConfigurationConstants.USER, "alice");
+        props.put(ConfigurationConstants.PW_CALLBACK_REF, new KeystorePasswordCallback());
+        WSS4JOutInterceptor outInterceptor = new WSS4JOutInterceptor(props);
+        client.getOutInterceptors().add(outInterceptor);
+
+        // Add a Signature for the "bob" actor - this is what the service is expecting
+        Map<String, Object> props2 = new HashMap<>();
+        props2.put(ConfigurationConstants.ACTION, "Signature");
+        props2.put(ConfigurationConstants.ACTOR, "bob");
+        props2.put(ConfigurationConstants.SIGNATURE_USER, "alice");
+        props2.put(ConfigurationConstants.PW_CALLBACK_REF, new KeystorePasswordCallback());
+        props2.put(ConfigurationConstants.SIG_KEY_ID, "DirectReference");
+        props2.put(ConfigurationConstants.SIG_PROP_FILE, "alice.properties");
+        outInterceptor = new WSS4JOutInterceptor(props2);
+        outInterceptor.setId("WSS4JOutInterceptor2");
+        client.getOutInterceptors().add(outInterceptor);
+
+        assertEquals(50, port.doubleIt(25));
+
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+
+    @org.junit.Test
     public void testSignatureDispatchPayload() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
