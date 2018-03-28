@@ -121,6 +121,7 @@ public class BookStore {
             }
 
             final Builder builder = sse.newEventBuilder();
+<<<<<<< 2704cc1b413353cbc75a32dd84397e33c31dc488
             broadcaster.broadcast(createStatsEvent(builder.name("book"), 1000))
                 .thenAcceptBoth(broadcaster.broadcast(createStatsEvent(builder.name("book"), 2000)), (a, b) -> { })
                 .whenComplete((r, ex) -> { 
@@ -128,6 +129,12 @@ public class BookStore {
                         broadcaster.close();
                     }
                 });
+=======
+            broadcaster.broadcast(createStatsEvent(builder.name("book"), 1000));
+            broadcaster.broadcast(createStatsEvent(builder.name("book"), 2000));
+
+            Thread.sleep(2000);
+>>>>>>> broadcaster.broadcast is not synchronous
         } catch (final InterruptedException ex) {
             LOG.error("Wait has been interrupted", ex);
         }
