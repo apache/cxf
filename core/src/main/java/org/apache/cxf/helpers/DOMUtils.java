@@ -67,7 +67,7 @@ public final class DOMUtils {
 
 
     static {
-        if (System.getProperty("java.version").startsWith("9")) {
+        if (JavaUtils.isJava9Compatible()) {
 
             try {
                 Method[] methods = DOMUtils.class.getClassLoader().

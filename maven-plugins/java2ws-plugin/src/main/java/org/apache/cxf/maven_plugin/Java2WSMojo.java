@@ -27,6 +27,7 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.cxf.helpers.FileUtils;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.tools.common.CommandInterfaceUtils;
 import org.apache.cxf.tools.java2ws.JavaToWS;
 import org.apache.maven.artifact.Artifact;
@@ -209,7 +210,7 @@ public class Java2WSMojo extends AbstractMojo {
     private String additionalJvmArgs;
 
     public void execute() throws MojoExecutionException {
-        if (System.getProperty("java.version").startsWith("9")) {
+        if (JavaUtils.isJava9Compatible()) {
             fork = true;
             additionalJvmArgs = "--add-modules java.activation,java.xml.bind,java.xml.ws " 
                     + "--add-exports=java.xml.bind/com.sun.xml.internal.bind.v2.runtime=ALL-UNNAMED "
