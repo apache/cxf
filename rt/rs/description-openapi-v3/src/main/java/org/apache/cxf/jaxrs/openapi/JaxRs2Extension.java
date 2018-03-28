@@ -38,6 +38,8 @@ import javax.validation.constraints.Size;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.MatrixParam;
 
+import com.fasterxml.jackson.annotation.JsonView;
+
 import io.swagger.v3.core.converter.ModelConverters;
 import io.swagger.v3.core.converter.ResolvedSchema;
 import io.swagger.v3.jaxrs2.ResolvedParameter;
@@ -62,6 +64,7 @@ public class JaxRs2Extension extends AbstractOpenAPIExtension {
             final Consumes classConsumes,
             final Consumes methodConsumes,
             final boolean includeRequestBody,
+            final JsonView jsonViewAnnotation,
             final Iterator<OpenAPIExtension> chain) {
 
         if (shouldIgnoreType(type, typesToSkip)) {
@@ -88,7 +91,7 @@ public class JaxRs2Extension extends AbstractOpenAPIExtension {
         if (parameters.isEmpty()) {
             return super.extractParameters(
                     annotations, type, typesToSkip, components, classConsumes,
-                    methodConsumes, includeRequestBody, chain);
+                    methodConsumes, includeRequestBody, jsonViewAnnotation, chain);
         }
 
         ResolvedParameter resolved = new ResolvedParameter();
