@@ -24,7 +24,6 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
 import org.apache.cxf.systest.jaxrs.sse.BookStore;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-import org.apache.cxf.transport.sse.SseHttpTransportFactory;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.DefaultHandler;
@@ -57,7 +56,6 @@ public abstract class AbstractJettyServer extends AbstractBusTestServerBase {
             if (resourcePath == null) {
                 // Register and map the dispatcher servlet
                 final ServletHolder holder = new ServletHolder(new CXFNonSpringJaxrsServlet());
-                holder.setInitParameter(CXFNonSpringJaxrsServlet.TRANSPORT_ID, SseHttpTransportFactory.TRANSPORT_ID);
                 holder.setInitParameter("jaxrs.serviceClasses", BookStore.class.getName());
                 holder.setInitParameter("jaxrs.providers", JacksonJsonProvider.class.getName());
                 final ServletContextHandler context = new ServletContextHandler();

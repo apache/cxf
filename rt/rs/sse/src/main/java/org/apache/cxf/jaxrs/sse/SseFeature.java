@@ -28,7 +28,6 @@ import org.apache.cxf.annotations.Provider.Type;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
-import org.apache.cxf.jaxrs.sse.atmosphere.SseAtmosphereEventSinkContextProvider;
 
 @Provider(value = Type.Feature, scope = Scope.Server)
 public class SseFeature extends AbstractFeature {
@@ -36,8 +35,8 @@ public class SseFeature extends AbstractFeature {
     public void initialize(Server server, Bus bus) {
         final List<Object> providers = new ArrayList<>();
 
-        providers.add(new SseAtmosphereEventSinkContextProvider());
         providers.add(new SseContextProvider());
+        providers.add(new SseEventSinkContextProvider());
 
         ((ServerProviderFactory) server.getEndpoint().get(
             ServerProviderFactory.class.getName())).setUserProviders(providers);

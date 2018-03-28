@@ -16,16 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.sse.atmosphere;
+package org.apache.cxf.transport.sse;
 
-import java.io.IOException;
+import java.util.Arrays;
 
-import org.atmosphere.cpr.AtmosphereInterceptorWriter;
-import org.atmosphere.cpr.AtmosphereResponse;
+import org.apache.cxf.Bus;
+import org.apache.cxf.buslifecycle.BusCreationListener;
+import org.apache.cxf.jaxrs.sse.SseContextProvider;
+import org.apache.cxf.jaxrs.sse.SseEventSinkContextProvider;
 
-public class SseAtmosphereInterceptorWriter extends AtmosphereInterceptorWriter {
+public class SseProvidersExtension implements BusCreationListener {
+
     @Override
-    public void close(AtmosphereResponse response) throws IOException {
-        // Do not close the response, keep output stream open
+    public void busCreated(Bus bus) {
+        bus.setProperty(
+            "org.apache.cxf.jaxrs.bus.providers",
+            Arrays.asList(new SseContextProvider(), new SseEventSinkContextProvider()));
     }
+    
 }
