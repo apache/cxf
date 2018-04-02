@@ -22,7 +22,7 @@
     <groupId>org.apache.cxf.samples</groupId>
     <artifactId>cxf-samples</artifactId>
     <packaging>pom</packaging>
-    <version>3.2.3-SNAPSHOT</version>
+    <version>3.2.5-SNAPSHOT</version>
     <name>Apache CXF Samples</name>
     <description>Apache CXF Samples</description>
     <url>http://cxf.apache.org</url>
@@ -135,6 +135,7 @@
         <module>jax_rs/tracing_opentracing_camel</module>
         <module>jax_rs/tracing_opentracing_osgi</module>
         <module>jax_rs/description_openapi_v3</module>
+        <module>jax_rs/sse_osgi</module>
     </modules>
     <dependencyManagement>
         <dependencies>

@@ -210,8 +210,9 @@ public class Beanspector<T> {
     }
 
     private boolean isSetter(Method m) {
-        return m.getReturnType().equals(void.class) && m.getParameterTypes().length == 1
-               && (m.getName().startsWith("set") || m.getName().startsWith("is"));
+        return (m.getReturnType().equals(void.class) || m.getReturnType().equals(m.getDeclaringClass()))
+                && m.getParameterTypes().length == 1
+                && (m.getName().startsWith("set") || m.getName().startsWith("is"));
     }
 
 

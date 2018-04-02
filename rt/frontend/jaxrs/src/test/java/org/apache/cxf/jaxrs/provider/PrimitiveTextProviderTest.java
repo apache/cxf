@@ -215,20 +215,34 @@ public class PrimitiveTextProviderTest extends Assert {
         TEST
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Test
     public void testEnum() throws Exception {
-        PrimitiveTextProvider p = new PrimitiveTextProvider<Object>();
+        testClass(TestEnum.TEST);
+    }
 
-        assertTrue(p.isWriteable(TestEnum.class, null, null, MediaType.TEXT_PLAIN_TYPE));
+    @Test
+    public void testURI() throws Exception {
+        testClass(new java.net.URI("uri"));
+    }
+
+    @Test
+    public void testURL() throws Exception {
+        testClass(new java.net.URL("http://www.example.com"));
+    }
+
+    private void testClass(Object value) throws Exception {
+        final PrimitiveTextProvider<Object> p = new PrimitiveTextProvider<Object>();
+
+        assertTrue(p.isWriteable(value.getClass(), null, null, MediaType.TEXT_PLAIN_TYPE));
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        p.writeTo(TestEnum.TEST, null, null, null, MediaType.TEXT_PLAIN_TYPE, null, os);
-        assertTrue(Arrays.equals(TestEnum.TEST.toString().getBytes(), os.toByteArray()));
+        p.writeTo(value, null, null, null, MediaType.TEXT_PLAIN_TYPE, null, os);
+        assertTrue(Arrays.equals(value.toString().getBytes(), os.toByteArray()));
 
-        assertTrue(p.isReadable(TestEnum.class, null, null, MediaType.TEXT_PLAIN_TYPE));
-        TestEnum valueRead = (TestEnum) p.readFrom(TestEnum.class, null, null, null, null,
+        assertTrue(p.isReadable(value.getClass(), null, null, MediaType.TEXT_PLAIN_TYPE));
+        @SuppressWarnings("unchecked")
+        Object valueRead = p.readFrom((Class<Object>) value.getClass(), null, null, null, null,
                 new ByteArrayInputStream(os.toByteArray()));
-        assertSame(TestEnum.TEST, valueRead);
+        assertEquals(value, valueRead);
     }
 
 }

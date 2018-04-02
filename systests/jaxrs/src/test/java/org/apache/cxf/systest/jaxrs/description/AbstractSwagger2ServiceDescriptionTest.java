@@ -209,10 +209,29 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
         WebClient uiClient = WebClient
             .create("http://localhost:" + getPort() + "/swagger-ui.css")
             .accept("text/css");
-        String css = uiClient.get(String.class);
-        assertThat(css, containsString(".swagger-ui{font"));
+        
+        try (Response response = uiClient.get()) {
+            String css = response.readEntity(String.class);
+            assertThat(css, containsString(".swagger-ui{"));
+            assertThat(response.getMediaType(), equalTo(MediaType.valueOf("text/css")));
+        }
     }
-    
+
+    @Test
+    public void testUiRootResource() {
+        // Test that Swagger UI resources do not interfere with 
+        // application-specific ones and are accessible.
+        WebClient uiClient = WebClient
+            .create("http://localhost:" + getPort() + "/api-docs")
+            .accept("*/*");
+        
+        try (Response response = uiClient.get()) {
+            String html = response.readEntity(String.class);
+            assertThat(html, containsString("<!-- HTML"));
+            assertThat(response.getMediaType(), equalTo(MediaType.TEXT_HTML_TYPE));
+        }
+    }
+
     @Test
     @Ignore
     public void testApiListingIsProperlyReturnedYAML() throws Exception {

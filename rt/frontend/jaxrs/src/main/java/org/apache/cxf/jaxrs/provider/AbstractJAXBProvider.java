@@ -627,7 +627,6 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         if (marshallerListener != null) {
             marshaller.setListener(marshallerListener);
         }
-        JAXBUtils.setMinimumEscapeHandler(marshaller);
         validateObjectIfNeeded(marshaller, cls, obj);
         return marshaller;
     }

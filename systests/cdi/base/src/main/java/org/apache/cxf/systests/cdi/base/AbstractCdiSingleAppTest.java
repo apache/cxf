@@ -36,6 +36,35 @@ import org.junit.Test;
 
 public abstract class AbstractCdiSingleAppTest extends AbstractBusClientServerTestBase {
     @Test
+    public void testAvailableInjections() {
+        assertEquals("configuration=Configuration/"
+            + "contextResolver=ContextResolver/"
+            + "cxfApplication=Application/"
+            + "cxfConfiguration=Configuration/"
+            + "cxfContextResolver=ContextResolver/"
+            + "cxfHttpHeaders=HttpHeaders/"
+            + "cxfHttpServletRequest=HttpServletRequest/"
+            + "cxfProviders=Providers/"
+            + "cxfRequest=Request/"
+            + "cxfResourceContext=ResourceContext/"
+            + "cxfResourceInfo=ResourceInfo/"
+            + "cxfSecurityContext=SecurityContext/"
+            + "cxfServletContext=ServletContext/"
+            + "cxfUriInfo=UriInfo/"
+            + "cxfhttpServletResponse=HttpServletRequest/"
+            + "httpHeaders=HttpHeaders/"
+            + "httpServletRequest=HttpServletRequest/"
+            + "httpServletResponse=HttpServletResponse/"
+            + "providers=Providers/request=Request/"
+            + "resourceContext=ResourceContext/"
+            + "resourceInfo=ResourceInfo/"
+            + "securityContext=SecurityContext/"
+            + "servletContext=ServletContext/"
+            + "uriInfo=UriInfo",
+            createWebClient(getBasePath() + "/injections", MediaType.TEXT_PLAIN).get(String.class).trim());
+    }
+
+    @Test
     public void testInjectedVersionIsProperlyReturned() {
         Response r = createWebClient(getBasePath() + "/version", MediaType.TEXT_PLAIN).get();
         String pathInfo = r.getHeaderString(Message.PATH_INFO);

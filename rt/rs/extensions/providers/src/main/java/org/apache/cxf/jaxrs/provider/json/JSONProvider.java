@@ -501,6 +501,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         if (namespaceMap.size() > 1 || namespaceMap.size() == 1 && !namespaceMap.containsKey(JSONUtils.XSI_URI)) {
             setNamespaceMapper(ms, namespaceMap);
         }
+        org.apache.cxf.common.jaxb.JAXBUtils.setNoEscapeHandler(ms);
         ms.marshal(actualObject, writer);
         writer.close();
         if (os != actualOs) {

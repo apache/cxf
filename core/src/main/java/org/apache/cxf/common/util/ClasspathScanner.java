@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class ClasspathScanner {
-    public static final String ALL_FILES = "**/*";
+    public static final String ALL_FILES = "/**/*";
     public static final String ALL_CLASS_FILES = ALL_FILES + ".class";
     public static final String WILDCARD = "*";
     public static final String CLASSPATH_URL_SCHEME = "classpath:";

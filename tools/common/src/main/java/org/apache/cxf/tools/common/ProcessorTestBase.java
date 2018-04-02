@@ -45,6 +45,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.FileUtils;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.tools.util.ToolsStaxUtils;
 import org.apache.ws.commons.schema.constants.Constants;
 
@@ -94,7 +95,7 @@ public class ProcessorTestBase extends Assert {
 
     @Before
     public void setUp() throws Exception {
-        if (System.getProperty("java.version").startsWith("9")) {
+        if (JavaUtils.isJava9Compatible()) {
             System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
         }
     }

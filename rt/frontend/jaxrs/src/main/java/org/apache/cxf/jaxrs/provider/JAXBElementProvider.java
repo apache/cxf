@@ -542,7 +542,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
         return null;
     }
     //CHECKSTYLE:OFF
-    protected void marshal(Object obj, Class<?> cls, Type genericType,
+    protected final void marshal(Object obj, Class<?> cls, Type genericType,
                            String enc, OutputStream os,
                            Annotation[] anns, MediaType mt, Marshaller ms)
         throws Exception {
@@ -611,6 +611,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
     protected void marshalToOutputStream(Marshaller ms, Object obj, OutputStream os,
                                          Annotation[] anns, MediaType mt)
         throws Exception {
+        org.apache.cxf.common.jaxb.JAXBUtils.setMinimumEscapeHandler(ms);
         if (os == null) {
             Writer writer = getStreamHandlerFromCurrentMessage(Writer.class);
             if (writer == null) {
@@ -627,6 +628,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
     protected void marshalToWriter(Marshaller ms, Object obj, XMLStreamWriter writer,
                                    Annotation[] anns, MediaType mt)
         throws Exception {
+        org.apache.cxf.common.jaxb.JAXBUtils.setNoEscapeHandler(ms);
         ms.marshal(obj, writer);
     }
 

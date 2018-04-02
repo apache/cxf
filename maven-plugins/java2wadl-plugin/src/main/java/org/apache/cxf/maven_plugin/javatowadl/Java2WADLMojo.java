@@ -104,7 +104,6 @@ public class Java2WADLMojo extends AbstractMojo {
 
     /**
      * @parameter
-     * @required
      */
     private List<String> classResourceNames;
 
@@ -372,12 +371,20 @@ public class Java2WADLMojo extends AbstractMojo {
         return resourceClassLoader;
     }
     private List<Class<?>> loadResourceClasses() throws MojoExecutionException {
-        List<Class<?>> resourceClasses = new ArrayList<Class<?>>(classResourceNames.size());
-        for (String className : classResourceNames) {
-            try {
-                resourceClasses.add(getClassLoader().loadClass(className));
-            } catch (Exception e) {
-                throw new MojoExecutionException(e.getMessage(), e);
+        if (classResourceNames == null
+            && basePackages == null) {
+            throw new MojoExecutionException(
+                "either classResourceNames or basePackages should be specified");
+        }
+        List<Class<?>> resourceClasses = new ArrayList<Class<?>>(
+            classResourceNames == null ? 0 : classResourceNames.size());
+        if (classResourceNames != null) {
+            for (String className : classResourceNames) {
+                try {
+                    resourceClasses.add(getClassLoader().loadClass(className));
+                } catch (Exception e) {
+                    throw new MojoExecutionException(e.getMessage(), e);
+                }
             }
         }
         if (resourceClasses.isEmpty() && basePackages != null) {

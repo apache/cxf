@@ -1212,12 +1212,24 @@ public abstract class ProviderFactory {
         private String name;
         private Integer priority;
         private Class<?> providerCls;
+        private ProviderInfo<?> providerInfo;
+
         public NameKey(String name,
                        int priority,
                        Class<?> providerCls) {
+
+            this(name, priority, providerCls, null);
+        }
+
+        public NameKey(String name,
+                       int priority,
+                       Class<?> providerCls,
+                       ProviderInfo<?> provider) {
+
             this.name = name;
             this.priority = priority;
             this.providerCls = providerCls;
+            this.providerInfo = provider;
         }
 
         public String getName() {
@@ -1226,6 +1238,10 @@ public abstract class ProviderFactory {
 
         public Integer getPriority() {
             return priority;
+        }
+
+        public ProviderInfo<?> getProviderInfo() {
+            return providerInfo;
         }
 
         public boolean equals(Object o) {
@@ -1257,7 +1273,7 @@ public abstract class ProviderFactory {
             int priority = getFilterPriority(p, providerCls);
 
             for (String name : names) {
-                map.put(new NameKey(name, priority, p.getClass()), p);
+                map.put(new NameKey(name, priority, p.getClass(), p), p);
             }
         }
 
@@ -1288,8 +1304,17 @@ public abstract class ProviderFactory {
     protected static class NameKeyComparator extends AbstractPriorityComparator
         implements Comparator<NameKey> {
 
+        private final Comparator<ProviderInfo<?>> comparator;
+
         public NameKeyComparator(boolean ascending) {
+            this(null, ascending);
+        }
+
+        public NameKeyComparator(
+            Comparator<ProviderInfo<?>> comparator, boolean ascending) {
+
             super(ascending);
+            this.comparator = comparator;
         }
 
         @Override
@@ -1298,13 +1323,28 @@ public abstract class ProviderFactory {
             if (result != 0) {
                 return result;
             }
+
+            if (comparator != null) {
+                result = comparator.compare(
+                    key1.getProviderInfo(), key2.getProviderInfo());
+
+                if (result != 0) {
+                    return result;
+                }
+            }
+
             return compare(key1.hashCode(), key2.hashCode());
         }
-
     }
 
     protected static class NameKeyMap<T> extends TreeMap<NameKey, T> {
         private static final long serialVersionUID = -4352258671270502204L;
+
+        public NameKeyMap(
+            Comparator<ProviderInfo<?>> comparator, boolean ascending) {
+
+            super(new NameKeyComparator(comparator, ascending));
+        }
 
         public NameKeyMap(boolean ascending) {
             super(new NameKeyComparator(ascending));
@@ -1369,10 +1409,24 @@ public abstract class ProviderFactory {
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     public void setProviderComparator(Comparator<?> providerComparator) {
         this.providerComparator = providerComparator;
+
         sortReaders();
         sortWriters();
+
+        NameKeyMap<ProviderInfo<ReaderInterceptor>> sortedReaderInterceptors =
+            new NameKeyMap<>(
+                (Comparator<ProviderInfo<?>>) providerComparator, true);
+        sortedReaderInterceptors.putAll(readerInterceptors);
+        NameKeyMap<ProviderInfo<WriterInterceptor>> sortedWriterInterceptors =
+            new NameKeyMap<>(
+                (Comparator<ProviderInfo<?>>) providerComparator, true);
+        sortedWriterInterceptors.putAll(writerInterceptors);
+
+        readerInterceptors = sortedReaderInterceptors;
+        writerInterceptors = sortedWriterInterceptors;
     }
 
 }

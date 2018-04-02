@@ -37,6 +37,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -205,6 +206,7 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
     private Marshaller.Listener marshallerListener;
     private ValidationEventHandler validationEventHandler;
     private Object escapeHandler;
+    private Object noEscapeHandler;
 
     private boolean unwrapJAXBElement = true;
     private boolean scanPackages = true;
@@ -252,6 +254,7 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
         context = ctx;
         //create default MininumEscapeHandler
         escapeHandler = JAXBUtils.createMininumEscapeHandler(ctx.getClass());
+        noEscapeHandler = JAXBUtils.createNoEscapeHandler(ctx.getClass());
     }
 
     public Object getEscapeHandler() {
@@ -260,8 +263,16 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
     
     public void setEscapeHandler(Object handler) {
         escapeHandler = handler;
-        
     }
+    
+    public void applyEscapeHandler(boolean escape, Consumer<Object> consumer) {
+        if (escape) {
+            consumer.accept(escapeHandler);
+        } else if (noEscapeHandler != null) {
+            consumer.accept(noEscapeHandler);
+        }
+    }
+    
     
     @SuppressWarnings("unchecked")
     public <T> DataWriter<T> createWriter(Class<T> c) {
@@ -269,19 +280,19 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
         Integer mtomThresholdInt = Integer.valueOf(getMtomThreshold());
         if (c == XMLStreamWriter.class) {
             DataWriterImpl<XMLStreamWriter> r
-                = new DataWriterImpl<XMLStreamWriter>(this);
+                = new DataWriterImpl<XMLStreamWriter>(this, true);
             r.setMtomThreshold(mtomThresholdInt);
             return (DataWriter<T>)r;
         } else if (c == OutputStream.class) {
-            DataWriterImpl<OutputStream> r = new DataWriterImpl<OutputStream>(this);
+            DataWriterImpl<OutputStream> r = new DataWriterImpl<OutputStream>(this, false);
             r.setMtomThreshold(mtomThresholdInt);
             return (DataWriter<T>)r;
         } else if (c == XMLEventWriter.class) {
-            DataWriterImpl<XMLEventWriter> r = new DataWriterImpl<XMLEventWriter>(this);
+            DataWriterImpl<XMLEventWriter> r = new DataWriterImpl<XMLEventWriter>(this, true);
             r.setMtomThreshold(mtomThresholdInt);
             return (DataWriter<T>)r;
         } else if (c == Node.class) {
-            DataWriterImpl<Node> r = new DataWriterImpl<Node>(this);
+            DataWriterImpl<Node> r = new DataWriterImpl<Node>(this, false);
             r.setMtomThreshold(mtomThresholdInt);
             return (DataWriter<T>)r;
         }

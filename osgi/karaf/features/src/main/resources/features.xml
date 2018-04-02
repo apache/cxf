@@ -385,6 +385,15 @@
             cxf.http.provider;name=websocket
         </capability>
     </feature>
+    <feature name="cxf-sse" version="${project.version}">
+        <feature version="${project.version}">cxf-http</feature>
+        <feature version="${project.version}">cxf-jaxrs</feature>
+        <bundle dependency='true'>mvn:org.atmosphere/atmosphere-runtime/${cxf.atmosphere.version}</bundle>
+        <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-rs-sse/${project.version}</bundle>
+        <capability>
+            cxf.http.provider;name=sse
+        </capability>
+    </feature>
     <feature name="cxf-javascript" version="${project.version}">
         <feature version="${project.version}">cxf-core</feature>
         <feature version="${project.version}">cxf-bindings-soap</feature>

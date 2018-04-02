@@ -22,6 +22,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
@@ -35,6 +36,7 @@ import javax.enterprise.inject.spi.AfterDeploymentValidation;
 import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.inject.spi.BeforeBeanDiscovery;
 import javax.enterprise.inject.spi.BeforeShutdown;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.InjectionTarget;
@@ -63,6 +65,10 @@ import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSServerFactoryCustomizationUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
+import static java.util.Arrays.asList;
+import static java.util.Optional.ofNullable;
+import static org.apache.cxf.cdi.AbstractCXFBean.DEFAULT;
+
 /**
  * Apache CXF portable CDI extension to support initialization of JAX-RS resources.
  */
@@ -77,6 +83,8 @@ public class JAXRSCdiResourceExtension implements Extension {
     private final List< CreationalContext< ? > > disposableCreationalContexts =
         new ArrayList< CreationalContext< ? > >();
     private final Set< Type > contextTypes = new LinkedHashSet<>();
+
+    private final Collection< String > existingStandardClasses = new HashSet<>();
 
     /**
      * Holder of the classified resource classes, converted to appropriate instance
@@ -110,6 +118,46 @@ public class JAXRSCdiResourceExtension implements Extension {
         public List<CdiResourceProvider> getResourceProviders() {
             return resourceProviders;
         }
+    }
+
+    // observing JAXRSCdiResourceExtension a "container" can customize that value to prevent some instances
+    // to be added with the default qualifier
+    public Collection<String> getExistingStandardClasses() {
+        return existingStandardClasses;
+    }
+
+    /**
+     * Fires itsels, allows other extensions to modify this one.
+     * Typical example can be to modify existingStandardClasses to prevent CXF
+     * to own some beans it shouldn't create with default classifier.
+     *
+     * @param beforeBeanDiscovery the corresponding cdi event.
+     * @param beanManager the cdi bean manager.
+     */
+    void onStartup(@Observes final BeforeBeanDiscovery beforeBeanDiscovery, final BeanManager beanManager) {
+        final ClassLoader loader = ofNullable(Thread.currentThread().getContextClassLoader())
+                .orElseGet(ClassLoader::getSystemClassLoader);
+        boolean webHandled = false;
+        try { // OWB
+            loader.loadClass("org.apache.webbeans.web.lifecycle.WebContainerLifecycle");
+            webHandled = true;
+        } catch (final NoClassDefFoundError | ClassNotFoundException e) {
+            // ok to keep them all
+        }
+        if (!webHandled) {
+            try { // Weld
+                loader.loadClass("org.jboss.weld.module.web.WeldWebModule");
+                webHandled = true;
+            } catch (final NoClassDefFoundError | ClassNotFoundException e) {
+                // ok to keep them all
+            }
+        }
+        if (webHandled) {
+            existingStandardClasses.addAll(asList(
+                "javax.servlet.http.HttpServletRequest",
+                "javax.servlet.ServletContext"));
+        }
+        beanManager.fireEvent(this);
     }
 
     /**
@@ -149,6 +197,11 @@ public class JAXRSCdiResourceExtension implements Extension {
         } else if (CdiBusBean.CXF.equals(event.getBean().getName())
                 && Bus.class.isAssignableFrom(event.getBean().getBeanClass())) {
             hasBus = true;
+        } else if (event.getBean().getQualifiers().contains(DEFAULT)) {
+            event.getBean().getTypes().stream()
+                .filter(e -> Object.class != e && InjectionUtils.STANDARD_CONTEXT_CLASSES.contains(e.getTypeName()))
+                .findFirst()
+                .ifPresent(type -> existingStandardClasses.add(type.getTypeName()));
         }
     }
     
@@ -211,11 +264,16 @@ public class JAXRSCdiResourceExtension implements Extension {
                 beanManager.createInjectionTarget(busAnnotatedType);
             event.addBean(new CdiBusBean(busInjectionTarget));
         }
+
         if (applicationBeans.isEmpty() && !serviceBeans.isEmpty()) {
             final DefaultApplicationBean applicationBean = new DefaultApplicationBean();
             applicationBeans.add(applicationBean);
             event.addBean(applicationBean);
+        } else {
+            // otherwise will be ambiguous since we scanned it with default qualifier already
+            existingStandardClasses.add(Application.class.getName());
         }
+
         // always add the standard context classes
         InjectionUtils.STANDARD_CONTEXT_CLASSES.stream()
                 .map(this::toClass)
@@ -224,7 +282,8 @@ public class JAXRSCdiResourceExtension implements Extension {
         // add custom contexts
         contextTypes.addAll(getCustomContextClasses());
         // register all of the context types
-        contextTypes.forEach(t -> event.addBean(new ContextProducerBean(t)));
+        contextTypes.forEach(
+            t -> event.addBean(new ContextProducerBean(t, !existingStandardClasses.contains(t.getTypeName()))));
     }
 
     /**
@@ -281,8 +340,7 @@ public class JAXRSCdiResourceExtension implements Extension {
      * @return JAXRSServerFactoryBean instance
      */
     private JAXRSServerFactoryBean createFactoryInstance(final Application application, final BeanManager beanManager) {
-
-        final JAXRSServerFactoryBean instance = 
+        final JAXRSServerFactoryBean instance =
             ResourceUtils.createApplication(application, false, false, false, bus);
         final ClassifiedClasses classified = classes2singletons(application, beanManager);
 

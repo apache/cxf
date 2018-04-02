@@ -27,7 +27,7 @@ public final class JavaUtils {
 
     /** Use this character as suffix */
     static final char KEYWORD_PREFIX = '_';
-
+   
     /**
      * These are java keywords as specified at the following URL.
      * http://java.sun.com/docs/books/jls/third_edition/html/lexical.html#3.9
@@ -45,6 +45,17 @@ public final class JavaUtils {
         "synchronized", "this", "throw", "throws", "transient", "true", "try",
         "void", "volatile", "while"
     ));
+
+    private static boolean isJava9Compatible;
+    
+    static {
+        String version = System.getProperty("java.version");
+        if (version.indexOf(".") > 0) {
+            version = version.substring(0, version.indexOf("."));
+        }
+        
+        setJava9Compatible(Integer.valueOf(version) >= 9);
+    }
 
     private JavaUtils() {
     }
@@ -66,4 +77,11 @@ public final class JavaUtils {
         return KEYWORD_PREFIX + keyword;
     }
 
+    public static boolean isJava9Compatible() {
+        return isJava9Compatible;
+    }
+
+    private static void setJava9Compatible(boolean java9Compatible) {
+        JavaUtils.isJava9Compatible = java9Compatible;
+    }
 }

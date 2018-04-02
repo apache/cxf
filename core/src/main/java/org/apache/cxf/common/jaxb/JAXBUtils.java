@@ -1550,27 +1550,22 @@ public final class JAXBUtils {
         if (jaxbMinimumEscapeHandler == null) {
             jaxbMinimumEscapeHandler = Optional.ofNullable(createMininumEscapeHandler(marshaller.getClass()));
         }
-        //if escape handler class is not loaded
-        if (jaxbMinimumEscapeHandler.isPresent()) {
-            setEscapeHandler(marshaller, jaxbMinimumEscapeHandler.get());
-        }
-
+        jaxbMinimumEscapeHandler.ifPresent(p -> setEscapeHandler(marshaller, p));
     }
 
-    public static void setNoEscapeHandler(Marshaller marshaller) {
+    public static void setNoEscapeHandler(final Marshaller marshaller) {
         if (jaxbNoEscapeHandler == null) {
             jaxbNoEscapeHandler = Optional.ofNullable(createNoEscapeHandler(marshaller.getClass()));
         }
-        //if escape handler class is not loaded
-        if (jaxbNoEscapeHandler.isPresent()) {
-            setEscapeHandler(marshaller, jaxbNoEscapeHandler.get());
-        }
+        jaxbNoEscapeHandler.ifPresent(p -> setEscapeHandler(marshaller, p));
     }
     
     public static void setEscapeHandler(Marshaller marshaller, Object escapeHandler) {
         try {
             String postFix = getPostfix(marshaller.getClass());
-            marshaller.setProperty("com.sun.xml" + postFix + ".bind.characterEscapeHandler", escapeHandler);
+            if (postFix != null) {
+                marshaller.setProperty("com.sun.xml" + postFix + ".bind.characterEscapeHandler", escapeHandler);
+            }
         } catch (PropertyException e) {
             LOG.log(Level.INFO, "Failed to set MinumEscapeHandler to jaxb marshaller", e);
         }
@@ -1603,7 +1598,12 @@ public final class JAXBUtils {
                                         new Class[] {handlerInterface},
                                         new EscapeHandlerInvocationHandler(targetHandler));
         } catch (Exception e) {
-            LOG.log(Level.INFO, "Failed to create " + simpleClassName);
+            if ("NoEscapeHandler".equals(simpleClassName)) {
+                //this class doesn't exist in JAXB 2.2 so expected
+                LOG.log(Level.FINER, "Failed to create " + simpleClassName);
+            } else {
+                LOG.log(Level.INFO, "Failed to create " + simpleClassName);
+            }
         }
         return null;
     }

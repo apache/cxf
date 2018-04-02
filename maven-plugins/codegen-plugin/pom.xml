@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-maven-plugins</artifactId>
-        <version>3.2.3-SNAPSHOT</version>
+        <version>3.2.5-SNAPSHOT</version>
     </parent>
     <dependencies>
         <dependency>
@@ -147,6 +147,12 @@
                             <goal>descriptor</goal>
                         </goals>
                     </execution>
+                    <execution>
+                        <id>generate-helpmojo</id>
+                        <goals>
+                            <goal>helpmojo</goal>
+                        </goals>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -201,9 +207,9 @@
             </dependencies>
         </profile>
         <profile>
-            <id>java9</id>
+            <id>java9-plus</id>
             <activation>
-                <jdk>9</jdk>
+                <jdk>[9,)</jdk>
             </activation>
             <dependencies>
                 <dependency>

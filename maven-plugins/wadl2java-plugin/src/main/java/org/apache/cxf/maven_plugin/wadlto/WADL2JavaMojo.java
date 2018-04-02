@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.maven_plugin.common.ClassLoaderSwitcher;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
@@ -73,7 +74,7 @@ public class WADL2JavaMojo extends AbstractCodeGeneratorMojo {
     }
 
     public void execute() throws MojoExecutionException {
-        if (System.getProperty("java.version").startsWith("9")) {
+        if (JavaUtils.isJava9Compatible()) {
             fork = "true";
             additionalJvmArgs = "--add-modules java.activation,java.xml.bind,java.xml.ws " 
                     + "--add-exports=java.xml.bind/com.sun.xml.internal.bind.v2.runtime=ALL-UNNAMED "

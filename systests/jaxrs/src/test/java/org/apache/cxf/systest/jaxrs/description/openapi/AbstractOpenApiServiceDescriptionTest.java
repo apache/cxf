@@ -25,6 +25,7 @@ import java.util.Map;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
@@ -209,8 +210,27 @@ public abstract class AbstractOpenApiServiceDescriptionTest extends AbstractBusC
         WebClient uiClient = WebClient
             .create(getBaseUrl() + "/swagger-ui.css")
             .accept("text/css");
-        String css = uiClient.get(String.class);
-        assertThat(css, containsString(".swagger-ui{font"));
+
+        try (Response response = uiClient.get()) {
+            String css = response.readEntity(String.class);
+            assertThat(css, containsString(".swagger-ui{"));
+            assertThat(response.getMediaType(), equalTo(MediaType.valueOf("text/css")));
+        }
+    }
+    
+    @Test
+    public void testUiRootResource() {
+        // Test that Swagger UI resources do not interfere with 
+        // application-specific ones and are accessible.
+        WebClient uiClient = WebClient
+            .create(getBaseUrl() + "/api-docs")
+            .accept("*/*");
+        
+        try (Response response = uiClient.get()) {
+            String html = response.readEntity(String.class);
+            assertThat(html, containsString("<!-- HTML"));
+            assertThat(response.getMediaType(), equalTo(MediaType.TEXT_HTML_TYPE));
+        }
     }
     
     protected String getApplicationPath() {

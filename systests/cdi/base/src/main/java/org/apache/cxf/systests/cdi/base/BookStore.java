@@ -39,15 +39,24 @@ public class BookStore {
     private BookStoreService service;
     private BookStoreVersion bookStoreVersion;
     private UriInfo uriInfo;
+    private Injections injections;
 
     public BookStore() {
     }
 
     @Inject
-    public BookStore(BookStoreService service, BookStoreVersion bookStoreVersion, UriInfo uriInfo) {
+    public BookStore(BookStoreService service, BookStoreVersion bookStoreVersion, UriInfo uriInfo,
+                     Injections injections) {
         this.service = service;
         this.bookStoreVersion = bookStoreVersion;
         this.uriInfo = uriInfo;
+        this.injections = injections;
+    }
+
+    @GET
+    @Path("injections")
+    public String injections() {
+        return injections.state();
     }
 
     @Path("/version")

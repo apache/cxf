@@ -63,8 +63,12 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
     private JAXBDataBinding databinding;
 
     public DataWriterImpl(JAXBDataBinding binding) {
+        this(binding, false);
+    }
+    public DataWriterImpl(JAXBDataBinding binding, boolean noEsc) {
         super(binding.getContext());
         databinding = binding;
+        noEscape = noEsc;
     }
 
     public void write(Object obj, T output) {
@@ -80,10 +84,6 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
             }
             setEventHandler = MessageUtils.getContextualBoolean(m,
                     JAXBDataBinding.SET_VALIDATION_EVENT_HANDLER, true);
-            Object contentType = m.get(org.apache.cxf.message.Message.CONTENT_TYPE);
-            if (contentType != null && contentType.toString().contains("fastinfoset")) {
-                noEscape = true;
-            }
         }
     }
 
@@ -135,11 +135,7 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
             marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.FALSE);
             marshaller.setListener(databinding.getMarshallerListener());
-            if (noEscape || databinding.getEscapeHandler() == null) {
-                JAXBUtils.setNoEscapeHandler(marshaller);
-            } else {
-                JAXBUtils.setEscapeHandler(marshaller, databinding.getEscapeHandler());
-            }
+            databinding.applyEscapeHandler(!noEscape, eh -> JAXBUtils.setEscapeHandler(marshaller, eh));
 
             if (setEventHandler) {
                 ValidationEventHandler h = veventHandler;

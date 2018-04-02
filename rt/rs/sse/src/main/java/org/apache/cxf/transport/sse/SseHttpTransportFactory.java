@@ -29,9 +29,9 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.ConduitInitiator;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.DestinationFactory;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.http.HTTPTransportFactory;
-import org.apache.cxf.transport.sse.atmosphere.AtmosphereSseServletDestination;
 
 @NoJSR250Annotations
 public class SseHttpTransportFactory extends HTTPTransportFactory
@@ -42,6 +42,8 @@ public class SseHttpTransportFactory extends HTTPTransportFactory
         TRANSPORT_ID,
         "http://cxf.apache.org/transports/http/sse/configuration"
     ));
+    
+    private final SseDestinationFactory factory = new SseDestinationFactory();
 
     public SseHttpTransportFactory() {
         this(null);
@@ -53,9 +55,29 @@ public class SseHttpTransportFactory extends HTTPTransportFactory
 
     @Override
     public Destination getDestination(EndpointInfo endpointInfo, Bus bus) throws IOException {
-        final AtmosphereSseServletDestination destination = new AtmosphereSseServletDestination(bus, getRegistry(),
-            endpointInfo, endpointInfo.getAddress());
-        destination.finalizeConfig();
-        return destination;
+        if (endpointInfo == null) {
+            throw new IllegalArgumentException("EndpointInfo cannot be null");
+        }
+        
+        // In order to register the destination in the OSGi container, we have to 
+        // include it into 2 registries basically: for HTTP transport and the current 
+        // one. The workaround is borrow from org.apache.cxf.transport.websocket.WebSocketTransportFactory,
+        // it seems like no better option exists at the moment.
+        synchronized (registry) {
+            AbstractHTTPDestination d = registry.getDestinationForPath(endpointInfo.getAddress());
+            
+            if (d == null) {
+                d = factory.createDestination(endpointInfo, bus, registry);
+                if (d == null) {
+                    throw new IOException("No destination available. The CXF SSE transport needs Atmosphere"
+                        + " dependencies to be available");
+                }
+                registry.addDestination(d);
+                configure(bus, d);
+                d.finalizeConfig();
+            }
+            
+            return d;
+        }
     }
 }

@@ -70,11 +70,12 @@ public class SwaggerUiService {
         
         try {
             final URL resourceURL = locator.locate(resourcePath);
+            final String path = resourceURL.getPath();
 
             String mediaType = null;
-            int ind = resourcePath.lastIndexOf('.');
-            if (ind != -1 && ind < resourcePath.length()) {
-                String resourceExt = resourcePath.substring(ind + 1);
+            int ind = path.lastIndexOf('.');
+            if (ind != -1 && ind < path.length()) {
+                String resourceExt = path.substring(ind + 1);
                 if (mediaTypes != null && mediaTypes.containsKey(resourceExt)) {
                     mediaType = mediaTypes.get(resourceExt);
                 } else {

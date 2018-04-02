@@ -25,7 +25,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -162,6 +164,94 @@ public class ResourceUtilsTest extends Assert {
         assertEquals("GET", ori.getHttpMethod());
     }
 
+    @Path("/synth-hello")
+    protected interface SyntheticHelloInterface<T> {
+        @GET
+        @Path("/{name}")
+        T getById(@PathParam("name") T name);
+    }
+
+    protected abstract static class AbstractSyntheticHello implements SyntheticHelloInterface<String> {
+        public abstract String getById(String name);
+    }
+
+    public static class SyntheticHelloInterfaceImpl
+            extends AbstractSyntheticHello
+            implements SyntheticHelloInterface<String> {
+        @Override
+        public String getById(String name) {
+            return "Hello " + name + "!";
+        }
+    }
+    
+    @Test
+    public void testClassResourceInfoWithSyntheticMethod() throws Exception {
+        ClassResourceInfo cri =
+                ResourceUtils.createClassResourceInfo(
+                        SyntheticHelloInterfaceImpl.class,
+                        SyntheticHelloInterfaceImpl.class,
+                        true,
+                        true);
+
+        Method synthetic = SyntheticHelloInterfaceImpl.class.getMethod("getById", new Class[]{Object.class});
+        assertTrue(synthetic.isSynthetic());
+
+        assertNotNull(cri);
+        Method notSynthetic = SyntheticHelloInterfaceImpl.class.getMethod("getById", new Class[]{String.class});
+        assertFalse(notSynthetic.isSynthetic());
+
+        cri.hasSubResources();
+        assertEquals("there must be only one method, which is the getById(String)",
+                1,
+                cri.getMethodDispatcher().getOperationResourceInfos().size());
+    }
+
+    protected interface OverriddenInterface<T> {
+        @GET
+        @Path("/{key}")
+        T read(@PathParam("key") String key);
+    }
+
+    @Path("overridden-string")
+    protected interface OverriddenInterfaceString extends OverriddenInterface<String> {
+        @NotNull @Override
+        String read(String key);
+        
+        @NotNull
+        Set<String> read(String key, String type);
+    }
+    
+    public static class OverriddenInterfaceImpl implements OverriddenInterfaceString {
+        @Override
+        public String read(String key) {
+            return key;
+        }
+        
+        @Override
+        public Set<String> read(String key, String type) {
+            return Collections.singleton(key);
+        }
+    }
+
+    @Test
+    public void testClassResourceInfoWithOverriddenMethods() throws Exception {
+        ClassResourceInfo cri =
+                ResourceUtils.createClassResourceInfo(
+                        OverriddenInterfaceImpl.class,
+                        OverriddenInterfaceImpl.class,
+                        true,
+                        true);
+
+        assertNotNull(cri);
+        Method notSynthetic = OverriddenInterfaceImpl.class.getMethod("read", new Class[]{String.class});
+        assertFalse(notSynthetic.isSynthetic());
+
+        cri.hasSubResources();
+        final Set<OperationResourceInfo> oris = cri.getMethodDispatcher().getOperationResourceInfos();
+        assertEquals("there must be one read method", 1, oris.size());
+        assertEquals(notSynthetic, oris.iterator().next().getMethodToInvoke());
+    }
+    
     @Test
     public void shouldCreateApplicationWhichInheritsApplicationPath() throws Exception {
         JAXRSServerFactoryBean application = ResourceUtils.createApplication(
