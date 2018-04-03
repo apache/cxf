@@ -23,6 +23,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.openapi.OpenApiCustomizer;
 import org.apache.cxf.jaxrs.openapi.OpenApiFeature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -54,6 +55,9 @@ public class SampleRestApplication {
     public OpenApiFeature createOpenApiFeature() {
         OpenApiFeature openApiFeature = new OpenApiFeature();
         openApiFeature.setPrettyPrint(true);
+        OpenApiCustomizer customizer = new OpenApiCustomizer();
+        customizer.setDynamicBasePath(true);
+        openApiFeature.setCustomizer(customizer);
         openApiFeature.setTitle("Spring Boot CXF REST Application");
         openApiFeature.setContactName("The Apache CXF team");
         openApiFeature.setDescription("This sample project demonstrates how to use CXF JAX-RS services"
