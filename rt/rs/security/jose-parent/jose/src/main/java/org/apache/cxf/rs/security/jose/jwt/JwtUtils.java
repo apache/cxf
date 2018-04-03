@@ -90,12 +90,12 @@ public final class JwtUtils {
         }
 
         Instant createdDate = Instant.ofEpochMilli(issuedAtInSecs * 1000L);
-        
+
         Instant validCreation = Instant.now();
         if (clockOffset != 0) {
             validCreation = validCreation.plusSeconds(clockOffset);
         }
-        
+
         // Check to see if the IssuedAt time is in the future
         if (createdDate.isAfter(validCreation)) {
             throw new JwtException("Invalid issuedAt");
@@ -113,17 +113,17 @@ public final class JwtUtils {
     }
 
     public static void validateJwtAudienceRestriction(JwtClaims claims, Message message) {
+        if (claims.getAudiences().isEmpty()) {
+            return;
+        }
+
         String expectedAudience = (String)message.getContextualProperty(JwtConstants.EXPECTED_CLAIM_AUDIENCE);
         if (expectedAudience == null) {
             expectedAudience = (String)message.getContextualProperty(Message.REQUEST_URL);
         }
 
-        if (expectedAudience != null) {
-            for (String audience : claims.getAudiences()) {
-                if (expectedAudience.equals(audience)) {
-                    return;
-                }
-            }
+        if (expectedAudience != null && claims.getAudiences().contains(expectedAudience)) {
+            return;
         }
         throw new JwtException("Invalid audience restriction");
     }

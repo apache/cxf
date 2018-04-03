@@ -98,7 +98,7 @@ public class JwtClaims extends JsonMapObject {
             return Collections.singletonList((String)audiences);
         }
 
-        return null;
+        return Collections.emptyList();
     }
 
     public void setExpiryTime(Long expiresIn) {

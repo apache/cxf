@@ -357,7 +357,7 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("book", 123L));
-        assertNotEquals(response.getStatus(), 200);
+        assertEquals(response.getStatus(), 200);
     }
 
     @org.junit.Test
