@@ -133,6 +133,16 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
 
     public void handleMessage(SoapMessage mc) throws Fault {
         OutputStream os = mc.getContent(OutputStream.class);
+        if (os == null) {
+            String error =
+                "The message outputstream is null - Multiple WSS4JStaxOutInterceptor instances are not supported";
+            WSSecurityException exception = new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
+                                          "empty",
+                                          new Object[] {error});
+            LOG.warning(error);
+            throw new Fault(exception);
+        }
+
         String encoding = getEncoding(mc);
 
         XMLStreamWriter newXMLStreamWriter;
