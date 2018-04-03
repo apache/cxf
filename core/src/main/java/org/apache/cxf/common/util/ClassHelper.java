@@ -19,6 +19,7 @@
 
 package org.apache.cxf.common.util;
 
+
 import java.lang.reflect.Proxy;
 
 import org.apache.cxf.Bus;
@@ -29,21 +30,20 @@ import org.apache.cxf.BusFactory;
  */
 public class ClassHelper {
 
-    public static final String USE_DEFAULT_CLASS_HELPER = "org.apache.cxf.useDefaultClassHelper";
+    public static final String USE_DEFAULT_CLASS_HELPER = "org.apache.cxf.useDefaultClassHelpers";
 
     static final ClassHelper HELPER;
-    static final ClassHelper CXF_HELPER;
+    static final ClassHelper DEFAULT_HELPER;
 
     static {
-        HELPER = getClassHelper();
-        CXF_HELPER = new ClassHelper();
+        DEFAULT_HELPER = new ClassHelper();
+        HELPER = getClassHelper(DEFAULT_HELPER);
     }
-
 
     protected ClassHelper() {
     }
 
-    private static ClassHelper getClassHelper() {
+    private static ClassHelper getClassHelper(ClassHelper defaultHelper) {
         boolean useSpring = true;
         String s = SystemPropertyAction.getPropertyOrNull("org.apache.cxf.useSpringClassHelpers");
         if (!StringUtils.isEmpty(s)) {
@@ -56,7 +56,7 @@ public class ClassHelper {
                 // ignore
             }
         }
-        return new ClassHelper();
+        return defaultHelper;
     }
 
     protected Class<?> getRealClassInternal(Object o) {
@@ -76,23 +76,17 @@ public class ClassHelper {
     }
 
     public static Class<?> getRealClassFromClass(Class<?> cls) {
-        Bus bus = getBus(null);
-        if (checkUseDefaultClassHelper(bus)) {
-            return CXF_HELPER.getRealClassFromClassInternal(cls);
-        } else {
-            return HELPER.getRealClassFromClassInternal(cls);
-        }
+        return getRealClassFromClass(null, cls);
+    }
 
+    public static Class<?> getRealClassFromClass(Bus bus, Class<?> cls) {
+        bus = getBus(bus);
+        return getContextClassHelper(bus).getRealClassFromClassInternal(cls);
     }
 
     public static Object getRealObject(Object o) {
         Bus bus = getBus(null);
-        if (checkUseDefaultClassHelper(bus)) {
-            return CXF_HELPER.getRealObjectInternal(o);
-        } else {
-            return HELPER.getRealObjectInternal(o);
-        }
-
+        return getContextClassHelper(bus).getRealObjectInternal(o);
     }
 
     public static Class<?> getRealClass(Bus bus, Object o) {
@@ -100,13 +94,13 @@ public class ClassHelper {
         if (bus != null && bus.getProperty(ClassUnwrapper.class.getName()) != null) {
             ClassUnwrapper unwrapper = (ClassUnwrapper) bus.getProperty(ClassUnwrapper.class.getName());
             return unwrapper.getRealClass(o);
-        } else if (checkUseDefaultClassHelper(bus)) {
-            return CXF_HELPER.getRealClassInternal(o);
-        } else {
-            return HELPER.getRealClassInternal(o);
         }
+        return getContextClassHelper(bus).getRealClassInternal(o);
     }
 
+    private static ClassHelper getContextClassHelper(Bus bus) {
+        return (DEFAULT_HELPER == HELPER || checkUseDefaultClassHelper(bus)) ? DEFAULT_HELPER : HELPER;
+    }
 
     private static Bus getBus(Bus bus) {
         return bus == null ? BusFactory.getThreadDefaultBus() : bus;
