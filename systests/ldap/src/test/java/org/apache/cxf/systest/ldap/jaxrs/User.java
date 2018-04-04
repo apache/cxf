@@ -17,9 +17,8 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.kerberos.jaxrs.kerberos;
+package org.apache.cxf.systest.ldap.jaxrs;
 
-import javax.ws.rs.PUT;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -27,17 +26,18 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 
 @JsonTypeInfo(use = Id.CLASS, include = As.PROPERTY, property = "class")
-@XmlRootElement(name = "Book")
-public class Book {
+@XmlRootElement(name = "User")
+public class User {
     private String name;
-    private long id;
+    private String surname;
 
-    public Book() {
+    public User() {
+
     }
 
-    public Book(String name, long id) {
+    public User(String name, String surname) {
         this.name = name;
-        this.id = id;
+        this.surname = surname;
     }
 
     public void setName(String n) {
@@ -48,17 +48,12 @@ public class Book {
         return name;
     }
 
-    public void setId(long i) {
-        id = i;
-    }
-    public long getId() {
-        return id;
+    public void setSurname(String n) {
+        this.surname = n;
     }
 
-    @PUT
-    public void cloneState(Book book) {
-        id = book.getId();
-        name = book.getName();
+    public String getSurname() {
+        return surname;
     }
 
 }

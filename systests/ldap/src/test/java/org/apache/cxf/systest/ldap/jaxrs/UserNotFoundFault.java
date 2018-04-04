@@ -16,8 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.kerberos.jaxrs.kerberos;
 
-public interface SuperBookInterface {
+package org.apache.cxf.systest.ldap.jaxrs;
+
+import javax.xml.ws.WebFault;
+
+@WebFault
+public class UserNotFoundFault extends Exception {
+    private static final long serialVersionUID = 4833573020359208072L;
+
+    public UserNotFoundFault(String errorMessage) {
+        super(errorMessage);
+    }
 
 }

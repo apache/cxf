@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.kerberos.ldap;
+package org.apache.cxf.systest.ldap.sts;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -90,6 +90,9 @@ import org.junit.runner.RunWith;
 //Inject an file containing entries
 @ApplyLdifFiles("ldap.ldif")
 
+/**
+ * Test the LdapClaimsHandler that ships with the STS
+ */
 public class LDAPClaimsTest extends AbstractLdapTestUnit {
 
     private static Properties props;

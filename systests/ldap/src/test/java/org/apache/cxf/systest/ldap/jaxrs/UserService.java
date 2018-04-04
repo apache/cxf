@@ -17,29 +17,25 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.kerberos.jaxrs.kerberos;
-
-import javax.xml.bind.annotation.XmlRootElement;
+package org.apache.cxf.systest.ldap.jaxrs;
 
 
-@XmlRootElement(name = "SuperBook")
-public class SuperBook extends Book implements SuperBookInterface {
-    private boolean superBook;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 
-    public SuperBook() {
+import org.apache.cxf.jaxrs.ext.search.SearchContext;
 
-    }
+@Path("/users")
+public interface UserService {
 
-    public SuperBook(String name, long id, boolean superStatus) {
-        super(name, id);
-        this.superBook = superStatus;
-    }
-
-    public boolean isSuperBook() {
-        return superBook;
-    }
-
-    public void setSuperBook(boolean superBook) {
-        this.superBook = superBook;
-    }
+    @GET
+    @Path("/search/{query}")
+    @Produces("application/xml")
+    User searchUser(@PathParam("query") String query,
+                    @Context SearchContext searchContext) throws UserNotFoundFault;
 }
+
+
