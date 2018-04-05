@@ -122,9 +122,21 @@ public final class JwtUtils {
             expectedAudience = (String)message.getContextualProperty(Message.REQUEST_URL);
         }
 
-        if (expectedAudience != null && claims.getAudiences().contains(expectedAudience)) {
-            return;
+        if (expectedAudience != null) {
+            //Verify if aud claim is explicit match
+            if (claims.getAudiences().contains(expectedAudience)) {
+                return;
+            }
+
+            // Verify if aud claim is wildcard match using regex i.e. http://server.net/cxf/app/*
+            for (String aud: claims.getAudiences()) {
+                if (expectedAudience.matches(aud.replaceAll("\\*", ".*").replaceAll("/", "\\/"))) {
+                    return;
+                }
+            }
         }
+        
+        
         throw new JwtException("Invalid audience restriction");
     }
 
