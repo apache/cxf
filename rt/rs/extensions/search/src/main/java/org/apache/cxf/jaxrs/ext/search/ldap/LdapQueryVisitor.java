@@ -30,6 +30,8 @@ import org.apache.cxf.jaxrs.ext.search.visitor.AbstractUntypedSearchConditionVis
  */
 public class LdapQueryVisitor<T> extends AbstractUntypedSearchConditionVisitor<T, String> {
 
+    private boolean encodeQueryValues = true;
+
     public LdapQueryVisitor() {
         this(Collections.<String, String>emptyMap());
     }
@@ -58,7 +60,8 @@ public class LdapQueryVisitor<T> extends AbstractUntypedSearchConditionVisitor<T
                 }
                 
                 String ldapOperator = conditionTypeToLdapOperator(sc.getConditionType());
-                sb.append(name).append(ldapOperator).append(rvalStr);
+                String encodedRValStr = encodeQueryValues ? Util.doRFC2254Encoding(rvalStr) : rvalStr;
+                sb.append(name).append(ldapOperator).append(encodedRValStr);
                 
                 sb.append(")");
             }
@@ -101,5 +104,13 @@ public class LdapQueryVisitor<T> extends AbstractUntypedSearchConditionVisitor<T
             throw new RuntimeException(msg);
         }
         return op;
+    }
+
+    public boolean isEncodeQueryValues() {
+        return encodeQueryValues;
+    }
+
+    public void setEncodeQueryValues(boolean encodeQueryValues) {
+        this.encodeQueryValues = encodeQueryValues;
     }
 }
