@@ -1096,7 +1096,7 @@ public class BookStore {
     public String getBookQueryContext(@PathParam("expression") String expression,
                                       @Context QueryContext searchContext)
         throws BookNotFoundFault {
-        return searchContext.getConvertedExpression(expression);
+        return searchContext.getConvertedExpression(expression, Book.class);
     }
 
     @GET
@@ -1361,7 +1361,7 @@ public class BookStore {
     public Book2 getBookSubResourceInstanceRC(@Context ResourceContext rc) {
         return rc.initResource(book2Sub);
     }
-    
+
     @Path("/booksubresource/class/context")
     public Class<Book2> getBookSubResourceClass() {
         return Book2.class;
@@ -1668,7 +1668,7 @@ public class BookStore {
     public BookSubresource getBookFromSubresource() {
         return new BookSubresourceImpl();
     }
-    
+
     @POST
     @Path("/entityecho")
     @Consumes("text/plain")

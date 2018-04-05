@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotAcceptableException;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.ServerErrorException;
@@ -933,7 +934,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         List<Object> cookies = r.getMetadata().get("Set-Cookie");
         assertNotNull(cookies);
         assertEquals(3, cookies.size());
-        
+
         boolean hasDummy1 = false;
         boolean hasDummy2 = false;
         boolean hasJSESSION = false;
@@ -1815,6 +1816,15 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         assertEquals("SELECT * FROM books WHERE id >= '123'", sql);
     }
 
+    @Test (expected = InternalServerErrorException.class)
+    public void testSearchUnknownParameter() throws Exception {
+        String address = "http://localhost:" + PORT
+            + "/bookstore/books/querycontext/id=ge=123%2C1==1";
+
+        WebClient client = WebClient.create(address);
+        client.accept("text/plain");
+        client.get(String.class);
+    }
 
     @Test
     public void testGetBook123CGLIB() throws Exception {
@@ -2091,7 +2101,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         Book book = wc.post(new Book("\"Jack\" & \"Jill\"", 123L), Book.class);
         assertEquals(123L, book.getId());
         assertEquals("\"Jack\" & \"Jill\"", book.getName());
-        
+
         wc = WebClient.create("http://localhost:" + PORT + "/bookstore/books/element/echo");
         wc.type("application/xml").accept("application/xml");
         book = wc.post(new Book("Jack & Jill", 123L), Book.class);
@@ -2237,7 +2247,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         String address = "http://localhost:" + PORT + "/bookstore/booksubresource/instance/context/rc";
         doTestGetBookWithResourceContext(address);
     }
-    
+
     @Test
     public void testGetBookWithResourceContextClass() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/booksubresource/class/context/rc";
@@ -2503,7 +2513,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         }
     }
 
-    
+
     @Test
     public void testMutipleAcceptHeader() throws Exception {
         String endpointAddress =
