@@ -28,15 +28,28 @@ import org.apache.cxf.testutil.common.TestUtil;
 
 public class UserLDAPServer extends AbstractBusTestServerBase {
     public static final String PORT = TestUtil.getPortNumber("jaxrs-ldap");
+    public static final String PORT2 = TestUtil.getPortNumber("jaxrs-ldap-2");
 
     protected void run() {
-
+        // First server
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(UserService.class);
         sf.setResourceProvider(UserService.class,
                                new SingletonResourceProvider(new UserServiceImpl()));
         sf.setProviders(Collections.singletonList(new org.apache.cxf.jaxrs.ext.search.SearchContextProvider()));
         sf.setAddress("http://localhost:" + PORT + "/");
+
+        sf.create();
+
+        // Second server - don't encode query values
+        sf = new JAXRSServerFactoryBean();
+        sf.setResourceClasses(UserService.class);
+        UserServiceImpl userService = new UserServiceImpl();
+        userService.setEncodeQueryValues(false);
+        sf.setResourceProvider(UserService.class,
+                               new SingletonResourceProvider(userService));
+        sf.setProviders(Collections.singletonList(new org.apache.cxf.jaxrs.ext.search.SearchContextProvider()));
+        sf.setAddress("http://localhost:" + PORT2 + "/");
 
         sf.create();
     }

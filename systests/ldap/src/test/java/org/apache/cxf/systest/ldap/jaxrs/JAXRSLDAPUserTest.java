@@ -25,6 +25,8 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import javax.ws.rs.InternalServerErrorException;
+
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.directory.server.annotations.CreateLdapServer;
@@ -75,6 +77,7 @@ import org.junit.runner.RunWith;
  */
 public class JAXRSLDAPUserTest extends AbstractLdapTestUnit {
     public static final String PORT = UserLDAPServer.PORT;
+    public static final String PORT2 = UserLDAPServer.PORT2;
     private static boolean portUpdated;
 
     @BeforeClass
@@ -124,4 +127,29 @@ public class JAXRSLDAPUserTest extends AbstractLdapTestUnit {
         Assert.assertEquals("smith", user.getSurname());
     }
 
+    // Check that we can't inject an unknown parameter into the search query
+    @Test(expected = InternalServerErrorException.class)
+    public void testUnknownParameter() throws Exception {
+        WebClient wc = WebClient.create("http://localhost:" + PORT);
+
+        wc.path("users/search/name==alice%3Bage==40").get(User.class);
+    }
+
+    // Check that wildcards are not supported by default
+    @Test(expected = InternalServerErrorException.class)
+    public void testSearchUserWildcard() throws Exception {
+        WebClient wc = WebClient.create("http://localhost:" + PORT);
+
+        wc.path("users/search/name==a*").get(User.class);
+    }
+
+    // Here we configure the LDAPQueryVisitor not to encode the query values
+    @Test
+    public void testSearchUserWildcardAllowed() throws Exception {
+        WebClient wc = WebClient.create("http://localhost:" + PORT2);
+
+        User user = wc.path("users/search/name==a*").get(User.class);
+        Assert.assertEquals("alice", user.getName());
+        Assert.assertEquals("smith", user.getSurname());
+    }
 }

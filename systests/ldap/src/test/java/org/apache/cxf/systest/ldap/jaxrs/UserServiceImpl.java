@@ -51,6 +51,8 @@ import org.springframework.ldap.filter.HardcodedFilter;
  */
 public class UserServiceImpl implements UserService {
 
+    private boolean encodeQueryValues = true;
+
     @Override
     public User searchUser(@PathParam("query") String query, @Context SearchContext searchContext)
         throws UserNotFoundFault {
@@ -62,6 +64,7 @@ public class UserServiceImpl implements UserService {
 
         LdapQueryVisitor<User> visitor =
             new LdapQueryVisitor<User>(Collections.singletonMap("name", "cn"));
+        visitor.setEncodeQueryValues(encodeQueryValues);
         sc.accept(visitor.visitor());
         String parsedQuery = visitor.getQuery();
 
@@ -123,6 +126,14 @@ public class UserServiceImpl implements UserService {
         }
 
         return ldapAttributes;
+    }
+
+    public boolean isEncodeQueryValues() {
+        return encodeQueryValues;
+    }
+
+    public void setEncodeQueryValues(boolean encodeQueryValues) {
+        this.encodeQueryValues = encodeQueryValues;
     }
 }
 
