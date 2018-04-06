@@ -128,7 +128,7 @@ public final class SwaggerToOpenApiConversionUtils {
             sw3.setProperty("externalDocs", externalDocsObject);
         }
 
-        return readerWriter.toJson(sw3);
+        return readerWriter.toJson(sw3).replace("#/definitions/", "#/components/schemas/");
     }
 
     private static void setComponentsProperty(
@@ -340,8 +340,7 @@ public final class SwaggerToOpenApiConversionUtils {
                     if (requestBodyName != null) {
                         requestBodies.put(requestBodyName, sw3RequestBody);
                         String ref = "#/components/requestBodies/" + requestBodyName;
-                        sw2PathVerbProps.setProperty("requestBody",
-                                Collections.singletonMap("$ref", ref));
+                        sw2PathVerbProps.setProperty("requestBody", Collections.singletonMap("$ref", ref));
                     }
                 }
             }
