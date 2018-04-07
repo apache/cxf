@@ -179,7 +179,9 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
             xwriter = new PrettyPrintXMLStreamWriter(xwriter, 2);
             InputStream in = cos.getInputStream();
             try {
-                StaxUtils.copy(new StreamSource(new InputStreamReader(in, encoding)), xwriter);
+                InputStreamReader inputStreamReader = StringUtils.isEmpty(encoding)
+                    ? new InputStreamReader(in) : new InputStreamReader(in, encoding);
+                StaxUtils.copy(new StreamSource(inputStreamReader), xwriter);
             } catch (XMLStreamException xse) {
                 //ignore
             } finally {
