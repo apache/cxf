@@ -85,7 +85,7 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
         DataSource source = new FileDataSource(new File("src/test/resources/java.jpg"));
         DoubleIt4 doubleIt = new DoubleIt4();
         doubleIt.setNumberToDouble(25);
-        port.doubleIt4(25, new DataHandler(source));
+        assertEquals(50, port.doubleIt4(25, new DataHandler(source)));
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -112,7 +112,7 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
         DataSource source = new FileDataSource(new File("src/test/resources/java.jpg"));
         DoubleIt4 doubleIt = new DoubleIt4();
         doubleIt.setNumberToDouble(25);
-        port.doubleIt4(25, new DataHandler(source));
+        assertEquals(50, port.doubleIt4(25, new DataHandler(source)));
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -214,7 +214,7 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
         DataSource source = new FileDataSource(new File("src/test/resources/java.jpg"));
         DoubleIt4 doubleIt = new DoubleIt4();
         doubleIt.setNumberToDouble(25);
-        port.doubleIt4(25, new DataHandler(source));
+        assertEquals(50, port.doubleIt4(25, new DataHandler(source)));
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -240,7 +240,7 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
         DataSource source = new FileDataSource(new File("src/test/resources/java.jpg"));
         DoubleIt4 doubleIt = new DoubleIt4();
         doubleIt.setNumberToDouble(25);
-        port.doubleIt4(25, new DataHandler(source));
+        assertEquals(50, port.doubleIt4(25, new DataHandler(source)));
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -266,7 +266,7 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
         DataSource source = new FileDataSource(new File("src/test/resources/java.jpg"));
         DoubleIt4 doubleIt = new DoubleIt4();
         doubleIt.setNumberToDouble(25);
-        port.doubleIt4(25, new DataHandler(source));
+        assertEquals(50, port.doubleIt4(25, new DataHandler(source)));
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
