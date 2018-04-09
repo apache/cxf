@@ -1412,33 +1412,6 @@
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
-                <artifactId>spring-security-core-tiger</artifactId>
-                <version>2.0.8.RELEASE</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-core</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-dao</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-jdbc</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-remoting</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-support</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-acl</artifactId>
                 <version>${cxf.spring.security.version}</version>
                 <exclusions>
@@ -1450,25 +1423,6 @@
                         <groupId>org.springframework</groupId>
                         <artifactId>spring-dao</artifactId>
                     </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-jdbc</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-remoting</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-support</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-dao</artifactId>
-                <version>2.0.8</version>
-                <exclusions>
                     <exclusion>
                         <groupId>org.springframework</groupId>
                         <artifactId>spring-jdbc</artifactId>
