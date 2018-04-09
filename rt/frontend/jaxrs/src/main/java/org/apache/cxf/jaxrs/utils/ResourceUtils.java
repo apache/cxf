@@ -537,8 +537,7 @@ public final class ResourceUtils {
 
 
     public static List<UserResource> getUserResources(String loc, Bus bus) {
-        try {
-            InputStream is = ResourceUtils.getResourceStream(loc, bus);
+        try (InputStream is = ResourceUtils.getResourceStream(loc, bus)) {
             if (is == null) {
                 return null;
             }
@@ -602,8 +601,9 @@ public final class ResourceUtils {
 
     public static Properties loadProperties(String propertiesLocation, Bus bus) throws Exception {
         Properties props = new Properties();
-        InputStream is = getResourceStream(propertiesLocation, bus);
-        props.load(is);
+        try (InputStream is = getResourceStream(propertiesLocation, bus)) {
+            props.load(is);
+        }
         return props;
     }
 
@@ -823,7 +823,7 @@ public final class ResourceUtils {
         Annotation[][] anns = c.getParameterAnnotations();
         Type[] genericTypes = c.getGenericParameterTypes();
         @SuppressWarnings("unchecked")
-        MultivaluedMap<String, String> templateValues = 
+        MultivaluedMap<String, String> templateValues =
             (MultivaluedMap<String, String>)m.get(URITemplate.TEMPLATE_PARAMETERS);
         Object[] values = new Object[params.length];
         for (int i = 0; i < params.length; i++) {
@@ -848,11 +848,11 @@ public final class ResourceUtils {
         }
         return values;
     }
-    
+
     @SuppressWarnings("unchecked")
-    public static JAXRSServerFactoryBean createApplication(Application app, 
+    public static JAXRSServerFactoryBean createApplication(Application app,
                                                            boolean ignoreAppPath,
-                                                           boolean staticSubresourceResolution, 
+                                                           boolean staticSubresourceResolution,
                                                            boolean useSingletonResourceProvider,
                                                            Bus bus) {
 
