@@ -877,22 +877,34 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
     }
 
     private Artifact findWsdlArtifact(Artifact targetArtifact, Collection<Artifact> artifactSet) {
+        boolean artifactMatched = false;
         if (artifactSet != null && !artifactSet.isEmpty()) {
             for (Artifact pArtifact : artifactSet) {
-                if (targetArtifact.getGroupId().equals(pArtifact.getGroupId())
-                        && targetArtifact.getArtifactId().equals(pArtifact.getArtifactId())
-                        && targetArtifact.getVersion().equals(pArtifact.getVersion()) 
-                        && ("wsdl".equals(pArtifact.getType()) 
-                        || (
-                                targetArtifact.getClassifier() != null
-                                        && pArtifact.getType() != null
-                                        && (targetArtifact.getClassifier() + ".wsdl").equals(pArtifact.getType())
-                        ))) {
+                artifactMatched = isArtifactMatched(targetArtifact, pArtifact);
+                if (targetArtifact.getClassifier() != null && pArtifact.getClassifier() != null 
+                        && targetArtifact.getClassifier().equals(pArtifact.getClassifier()) 
+                        && artifactMatched) {
+                	//handle multile classifiers
+                    return pArtifact;
+                } else if (artifactMatched && targetArtifact.getClassifier() == null) {
                     return pArtifact;
                 }
             }
         }
         return null;
     }
+    
+    private boolean isArtifactMatched(Artifact targetArtifact, Artifact pArtifact) {
+        return targetArtifact.getGroupId().equals(pArtifact.getGroupId())
+                && targetArtifact.getArtifactId().equals(pArtifact.getArtifactId())
+                && targetArtifact.getVersion().equals(pArtifact.getVersion())
+                && ("wsdl".equals(pArtifact.getType()) 
+                || (
+                        targetArtifact.getClassifier() != null
+                                && pArtifact.getType() != null
+                                && (targetArtifact.getClassifier() + ".wsdl").equals(pArtifact.getType())
+                ));
+    }
 
 }
+
