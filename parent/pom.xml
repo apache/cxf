@@ -1421,10 +1421,6 @@
                     </exclusion>
                     <exclusion>
                         <groupId>org.springframework</groupId>
-                        <artifactId>spring-dao</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
                         <artifactId>spring-jdbc</artifactId>
                     </exclusion>
                     <exclusion>
