@@ -21,6 +21,9 @@ package org.apache.cxf.rs.security.jose.jwt;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
+
 import org.junit.Assert;
 
 /**
@@ -140,5 +143,40 @@ public class JwtUtilsTest extends Assert {
             // expected
         }
     }
+
+    @org.junit.Test
+    public void testExpectedAudience() throws Exception {
+        // Create the JWT Token
+        JwtClaims claims = new JwtClaims();
+        claims.setSubject("alice");
+        claims.setIssuer("DoubleItSTSIssuer");
+
+        // No aud claim should validate OK
+        Message message = new MessageImpl();
+        JwtUtils.validateJwtAudienceRestriction(claims, message);
+
+        // It should fail when we have an unknown aud claim
+        claims.setAudience("Receiver");
+        try {
+            JwtUtils.validateJwtAudienceRestriction(claims, message);
+            fail("Failure expected on an invalid audience");
+        } catch (JwtException ex) {
+            // expected
+        }
+
+        // Here the aud claim matches what is expected
+        message.put(JwtConstants.EXPECTED_CLAIM_AUDIENCE, "Receiver");
+        JwtUtils.validateJwtAudienceRestriction(claims, message);
+
+        // It should fail when the expected aud claim is not present
+        claims.removeProperty(JwtConstants.CLAIM_AUDIENCE);
+        try {
+            JwtUtils.validateJwtAudienceRestriction(claims, message);
+            fail("Failure expected on an invalid audience");
+        } catch (JwtException ex) {
+            // expected
+        }
+    }
+
 }
 
