@@ -124,6 +124,7 @@ public class BookStore {
             broadcaster.broadcast(createStatsEvent(builder.name("book"), 1000));
             broadcaster.broadcast(createStatsEvent(builder.name("book"), 2000));
 
+            Thread.sleep(2000);
         } catch (final InterruptedException ex) {
             LOG.error("Wait has been interrupted", ex);
         }
