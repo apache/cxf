@@ -901,7 +901,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
                 if (targetArtifact.getClassifier() != null && pArtifact.getClassifier() != null 
                         && targetArtifact.getClassifier().equals(pArtifact.getClassifier()) 
                         && artifactMatched) {
-                	//handle multile classifiers
+                    //handle multile classifiers
                     return pArtifact;
                 } else if (artifactMatched && targetArtifact.getClassifier() == null) {
                     return pArtifact;
