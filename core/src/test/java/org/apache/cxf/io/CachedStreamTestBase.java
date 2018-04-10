@@ -188,16 +188,16 @@ public abstract class CachedStreamTestBase extends Assert {
 
     @Test
     public void testUseSysProps() throws Exception {
-        String old = System.getProperty("org.apache.cxf.io.CachedOutputStream.Threshold");
+        String old = System.getProperty(CachedConstants.THRESHOLD_SYS_PROP);
         try {
-            System.clearProperty("org.apache.cxf.io.CachedOutputStream.Threshold");
+            System.clearProperty(CachedConstants.THRESHOLD_SYS_PROP);
             reloadDefaultProperties();
             Object cache = createCache();
             File tmpfile = getTmpFile("Hello World!", cache);
             assertNull("expects no tmp file", tmpfile);
             close(cache);
-            
-            System.setProperty("org.apache.cxf.io.CachedOutputStream.Threshold", "4");
+
+            System.setProperty(CachedConstants.THRESHOLD_SYS_PROP, "4");
             reloadDefaultProperties();
             cache = createCache();
             tmpfile = getTmpFile("Hello World!", cache);
@@ -207,7 +207,7 @@ public abstract class CachedStreamTestBase extends Assert {
             assertFalse("expects no tmp file", tmpfile.exists());
         } finally {
             if (old != null) {
-                System.setProperty("org.apache.cxf.io.CachedOutputStream.Threshold", old);
+                System.setProperty(CachedConstants.THRESHOLD_SYS_PROP, old);
             }
         }
     }
@@ -225,10 +225,10 @@ public abstract class CachedStreamTestBase extends Assert {
             IMocksControl control = EasyMock.createControl();
             
             Bus b = control.createMock(Bus.class);
-            EasyMock.expect(b.getProperty("bus.io.CachedOutputStream.Threshold")).andReturn("4");
-            EasyMock.expect(b.getProperty("bus.io.CachedOutputStream.MaxSize")).andReturn(null);
-            EasyMock.expect(b.getProperty("bus.io.CachedOutputStream.CipherTransformation")).andReturn(null);
-        
+            EasyMock.expect(b.getProperty(CachedConstants.THRESHOLD_BUS_PROP)).andReturn("4");
+            EasyMock.expect(b.getProperty(CachedConstants.MAX_SIZE_BUS_PROP)).andReturn(null);
+            EasyMock.expect(b.getProperty(CachedConstants.CIPHER_TRANSFORMATION_BUS_PROP)).andReturn(null);
+
             BusFactory.setThreadDefaultBus(b);
             
             control.replay();
