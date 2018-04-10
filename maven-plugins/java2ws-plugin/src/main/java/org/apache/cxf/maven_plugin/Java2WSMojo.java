@@ -465,14 +465,10 @@ public class Java2WSMojo extends AbstractMojo {
         if (attachWsdl && outputFile != null) {
             File wsdlFile = new File(outputFile);
             if (wsdlFile.exists()) {
-                if (classifier != null) {
-                    projectHelper.attachArtifact(project, wsdlFile.getName(), classifier, wsdlFile);
-                } else {
-                    projectHelper.attachArtifact(project, wsdlFile.getName(), wsdlFile);
-                }
+                
                 boolean hasWsdlAttached = false;
                 for (Artifact a : project.getAttachedArtifacts()) {
-                    if ("wsdl".equals(a.getType())) {
+                    if ("wsdl".equals(a.getType()) && classifier.equals(a.getClassifier())) {
                         hasWsdlAttached = true;
                     }
                 }
