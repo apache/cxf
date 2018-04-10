@@ -53,8 +53,10 @@ import javax.activation.MailcapCommandMap;
 import javax.activation.URLDataSource;
 
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.io.CachedConstants;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
@@ -178,7 +180,8 @@ public final class AttachmentUtil {
             } else {
                 bos.setThreshold(Long.parseLong((String)threshold));
             }
-        } else {
+        } else if (SystemPropertyAction.getProperty(CachedConstants.THRESHOLD_SYS_PROP) == null) {
+            // Use the default AttachmentDeserializer Threshold only if there is no system property defined
             bos.setThreshold(AttachmentDeserializer.THRESHOLD);
         }
 
