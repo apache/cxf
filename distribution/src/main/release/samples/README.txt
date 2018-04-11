@@ -7,11 +7,11 @@ under the root drive.  This creates the apache-cxf-x.x.x folder,
 which includes all of the product subdirectories.
 
 To build and run the demos, you must install the J2SE Development
-Kit (JDK) 5.0 or later.
+Kit (JDK) 1.8 or later.
 
 All of the samples (with the exception of the "antbuild" sample,
 which shows how to manage a project using Ant as the buildtool)
-are built using Apache Maven, version 2.2.x or 3.x.  You can 
+are built using Apache Maven, version 3.1 or newer.  You can 
 build the Mavenized samples all at once by running 
 "mvn clean install" from the samples root folder or by running
 the same command within individual sample folders.  For running
