@@ -112,6 +112,8 @@ public class OutboundSseEventBodyWriter implements MessageBodyWriter<OutboundSse
             writePayloadTo(payloadClass, payloadType, anns, p.getMediaType(), headers, p.getData(), os);
             os.write(NEW_LINE);
         }
+
+        os.write(NEW_LINE);
     }
 
     @SuppressWarnings("unchecked")

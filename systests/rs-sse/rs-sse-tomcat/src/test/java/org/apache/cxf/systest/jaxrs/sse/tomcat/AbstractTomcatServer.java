@@ -30,7 +30,6 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
 import org.apache.cxf.systest.jaxrs.sse.BookStore;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-import org.apache.cxf.transport.sse.SseHttpTransportFactory;
 
 public abstract class AbstractTomcatServer extends AbstractBusTestServerBase {
 
@@ -60,8 +59,6 @@ public abstract class AbstractTomcatServer extends AbstractBusTestServerBase {
             if (resourcePath == null) {
                 final Context context = server.addContext("/", base.getAbsolutePath());
                 final Wrapper cxfServlet = Tomcat.addServlet(context, "cxfServlet", new CXFNonSpringJaxrsServlet());
-                cxfServlet.addInitParameter(CXFNonSpringJaxrsServlet.TRANSPORT_ID,
-                    SseHttpTransportFactory.TRANSPORT_ID);
                 cxfServlet.addInitParameter("jaxrs.serviceClasses", BookStore.class.getName());
                 cxfServlet.addInitParameter("jaxrs.providers", JacksonJsonProvider.class.getName());
                 cxfServlet.setAsyncSupported(true);
