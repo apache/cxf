@@ -45,9 +45,23 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.Contact;
+import io.swagger.annotations.Info;
+import io.swagger.annotations.SwaggerDefinition;
 
 @Path("/sample")
-@Api(value = "/sample", description = "Sample JAX-RS service with Swagger documentation")
+@Api(value = "/sample")
+@SwaggerDefinition(
+    info = @Info(
+        description = "Sample JAX-RS service with Swagger documentation",
+        version="1.0.0",
+        title = "Sample REST Application",
+        contact = @Contact(
+            name = "Apache CXF",
+            email = "users@cxf.apache.org"
+        )
+    )
+)
 public class Sample {
     private Map<String, Item> items;
 
