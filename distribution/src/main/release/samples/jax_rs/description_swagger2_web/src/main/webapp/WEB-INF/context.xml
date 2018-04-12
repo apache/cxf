@@ -44,7 +44,6 @@
     <bean id="swagger2Feature" class="org.apache.cxf.jaxrs.swagger.Swagger2Feature">
         <property name="title" value="Sample REST Application"/>
         <property name="usePathBasedConfig" value="true"/>
-        <property name="scan" value="false"/>
     </bean>
 
     <!-- First Endpoint -->
@@ -68,7 +67,6 @@
     <bean id="swagger2Feature2" class="org.apache.cxf.jaxrs.swagger.Swagger2Feature">
         <property name="title" value="Sample REST Application"/>
         <property name="usePathBasedConfig" value="true"/>
-        <property name="scan" value="false"/>
     </bean>
 
     <!-- First Endpoint -->
