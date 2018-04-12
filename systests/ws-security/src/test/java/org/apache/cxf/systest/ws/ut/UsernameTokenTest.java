@@ -24,11 +24,14 @@ import java.net.URL;
 import java.security.KeyStore;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 
 import javax.net.ssl.TrustManagerFactory;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
+
+import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -37,10 +40,13 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.ws.policy.WSPolicyFeature;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.example.contract.doubleit.DoubleItPortType;
@@ -138,6 +144,58 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         assertEquals(50, utPort.doubleIt(25));
 
         ((java.io.Closeable)utPort).close();
+    }
+
+    // Here we are not using the WSDL and so need to add the policy manually on the client side
+    @org.junit.Test
+    public void testPlaintextCodeFirst() throws Exception {
+
+        String address = "https://localhost:" + PORT + "/DoubleItUTPlaintext";
+        QName portQName = new QName(NAMESPACE, "DoubleItPlaintextPort");
+
+        WSPolicyFeature policyFeature = new WSPolicyFeature();
+        Element policyElement =
+            StaxUtils.read(getClass().getResourceAsStream("plaintext-pass-timestamp-policy.xml")).getDocumentElement();
+        policyFeature.setPolicyElements(Collections.singletonList(policyElement));
+
+        JaxWsProxyFactoryBean clientFactoryBean = new JaxWsProxyFactoryBean();
+        clientFactoryBean.setFeatures(Collections.singletonList(policyFeature));
+        clientFactoryBean.setAddress(address);
+        clientFactoryBean.setServiceName(SERVICE_QNAME);
+        clientFactoryBean.setEndpointName(portQName);
+        clientFactoryBean.setServiceClass(DoubleItPortType.class);
+
+        DoubleItPortType port = (DoubleItPortType)clientFactoryBean.create();
+
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(port);
+        }
+
+        ((BindingProvider)port).getRequestContext().put(SecurityConstants.USERNAME, "Alice");
+
+        ((BindingProvider)port).getRequestContext().put(SecurityConstants.CALLBACK_HANDLER,
+                                                          "org.apache.cxf.systest.ws.common.UTPasswordCallback");
+
+        TrustManagerFactory tmf =
+            TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        final KeyStore ts = KeyStore.getInstance("JKS");
+        try (InputStream trustStore =
+            ClassLoaderUtils.getResourceAsStream("keys/Truststore.jks", UsernameTokenTest.class)) {
+            ts.load(trustStore, "password".toCharArray());
+        }
+        tmf.init(ts);
+
+        TLSClientParameters tlsParams = new TLSClientParameters();
+        tlsParams.setTrustManagers(tmf.getTrustManagers());
+        tlsParams.setDisableCNCheck(true);
+
+        Client client = ClientProxy.getClient(port);
+        HTTPConduit http = (HTTPConduit) client.getConduit();
+        http.setTlsClientParameters(tlsParams);
+
+        assertEquals(50, port.doubleIt(25));
+
+        ((java.io.Closeable)port).close();
     }
 
     @org.junit.Test
