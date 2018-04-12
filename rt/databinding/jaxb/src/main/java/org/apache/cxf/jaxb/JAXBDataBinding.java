@@ -48,6 +48,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.ValidationEventHandler;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
@@ -823,6 +824,12 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
                 && partName.equals(el.name())) {
                 return field;
             }
+
+            XmlElementRef xmlElementRefAnnotation = field.getAnnotation(XmlElementRef.class);
+            if (xmlElementRefAnnotation != null && partName.equals(xmlElementRefAnnotation.name())) {
+                return field;
+            }
+
             if (field.getName().equals(fieldName)) {
                 return field;
             }
