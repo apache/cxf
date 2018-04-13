@@ -23,21 +23,16 @@ import javax.xml.ws.Endpoint;
 
 import com.example.customerservice.CustomerService;
 
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
-import org.apache.cxf.jaxws.EndpointImpl;
+import org.apache.cxf.ext.logging.LoggingFeature;
 
 public class CustomerServiceServer {
 
     protected CustomerServiceServer() throws Exception {
         System.out.println("Starting Server");
         CustomerService implementor = new CustomerServiceImpl();
-        EndpointImpl ep = (EndpointImpl)Endpoint.publish("http://localhost:9090/CustomerServicePort",
-                                                         implementor);
-
-        // Adding logging for incoming and outgoing messages
-        ep.getServer().getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
-        ep.getServer().getEndpoint().getOutInterceptors().add(new LoggingOutInterceptor());
+        Endpoint.publish("http://localhost:9090/CustomerServicePort",
+                                                         implementor,
+                                                         new LoggingFeature());
     }
 
     public static void main(String args[]) throws Exception {
