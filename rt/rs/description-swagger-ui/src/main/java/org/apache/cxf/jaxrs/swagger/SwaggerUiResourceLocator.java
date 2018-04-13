@@ -29,10 +29,10 @@ import org.apache.cxf.common.util.StringUtils;
 /**
  * Swagger UI resource locator
  */
-class SwaggerUiResourceLocator {
+public class SwaggerUiResourceLocator {
     private final String swaggerUiRoot;
-    
-    SwaggerUiResourceLocator(String swaggerUiRoot) {
+
+    public SwaggerUiResourceLocator(String swaggerUiRoot) {
         this.swaggerUiRoot = swaggerUiRoot;
     }
 
@@ -42,26 +42,26 @@ class SwaggerUiResourceLocator {
      * @return Swagger UI resource URL
      * @throws MalformedURLException
      */
-    URL locate(String resourcePath) throws MalformedURLException {
+    public URL locate(String resourcePath) throws MalformedURLException {
         if (StringUtils.isEmpty(resourcePath) || "/".equals(resourcePath)) {
             resourcePath = "index.html";
         }
-    
+
         if (resourcePath.startsWith("/")) {
             resourcePath = resourcePath.substring(1);
         }
-        
+
         return URI.create(swaggerUiRoot + resourcePath).toURL();
     }
-    
+
     /**
      * Checks the existence of the Swagger UI resource corresponding to resource path
      * @param resourcePath resource path
      * @return "true" if Swagger UI resource exists, "false" otherwise
      */
-    boolean exists(String resourcePath) {
+    public boolean exists(String resourcePath) {
         try {
-            // The connect() will try to locate the entry (jar file, classpath resource) 
+            // The connect() will try to locate the entry (jar file, classpath resource)
             // and fail with FileNotFoundException /IOException if there is none.
             locate(resourcePath).openConnection().connect();
             return true;
