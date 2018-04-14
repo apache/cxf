@@ -120,15 +120,15 @@ public class BookStore2 {
             }
 
             final Builder builder = sse.newEventBuilder();
-            broadcaster.broadcast(createStatsEvent(builder.name("book"), 1000));
-            broadcaster.broadcast(createStatsEvent(builder.name("book"), 2000));
-
+            broadcaster.broadcast(createStatsEvent(builder.name("book"), 1000))
+                .thenAcceptBoth(broadcaster.broadcast(createStatsEvent(builder.name("book"), 2000)), (a, b) -> { })
+                .whenComplete((r, ex) -> { 
+                    if (broadcaster != null) {
+                        broadcaster.close();
+                    }
+                });
         } catch (final InterruptedException ex) {
             LOG.error("Wait has been interrupted", ex);
-        }
-
-        if (broadcaster != null) {
-            broadcaster.close();
         }
     }
 
