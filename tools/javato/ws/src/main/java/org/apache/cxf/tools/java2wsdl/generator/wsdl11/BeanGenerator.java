@@ -82,7 +82,10 @@ public class BeanGenerator extends AbstractGenerator<File> {
             }
 
                 //compile the classes
-            Compiler compiler = new Compiler();
+            Compiler compiler = (Compiler)getToolContext().get(ToolConstants.COMPILER);
+            if (compiler == null) {
+                compiler = new Compiler();
+            }
             compiler.setOutputDir(compileToDir);
             List<String> files = new ArrayList<>(generatedFiles.size());
             for (File file : generatedFiles) {
