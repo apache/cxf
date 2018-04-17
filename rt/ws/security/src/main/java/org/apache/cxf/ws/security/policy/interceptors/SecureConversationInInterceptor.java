@@ -21,7 +21,6 @@ package org.apache.cxf.ws.security.policy.interceptors;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -78,6 +77,7 @@ import org.apache.wss4j.policy.model.SignedParts;
 import org.apache.wss4j.policy.model.Trust10;
 import org.apache.wss4j.policy.model.Trust13;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
+import org.apache.xml.security.utils.XMLUtils;
 
 class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
 
@@ -341,7 +341,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                     if ("Entropy".equals(localName)) {
                         Element bs = DOMUtils.getFirstElement(el);
                         if (bs != null) {
-                            clientEntropy = Base64.getMimeDecoder().decode(bs.getTextContent());
+                            clientEntropy = XMLUtils.decode(bs.getTextContent());
                         }
                     } else if ("KeySize".equals(localName)) {
                         keySize = Integer.parseInt(el.getTextContent());

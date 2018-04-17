@@ -20,7 +20,6 @@
 package org.apache.cxf.ws.security.wss4j;
 
 import java.io.IOException;
-import java.util.Base64;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -31,6 +30,7 @@ import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.KeyUtils;
+import org.apache.xml.security.utils.XMLUtils;
 
 public class TokenStoreCallbackHandler implements CallbackHandler {
     private CallbackHandler internal;
@@ -68,7 +68,7 @@ public class TokenStoreCallbackHandler implements CallbackHandler {
     private static String getSHA1(byte[] input) {
         try {
             byte[] digestBytes = KeyUtils.generateDigest(input);
-            return Base64.getMimeEncoder().encodeToString(digestBytes);
+            return XMLUtils.encodeToString(digestBytes);
         } catch (WSSecurityException e) {
             //REVISIT
         }

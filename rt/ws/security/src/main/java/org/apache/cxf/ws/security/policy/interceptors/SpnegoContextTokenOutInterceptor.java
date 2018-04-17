@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.security.policy.interceptors;
 
-import java.util.Base64;
 import java.util.Collection;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -43,6 +42,7 @@ import org.apache.wss4j.common.spnego.SpnegoTokenContext;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.Trust10;
 import org.apache.wss4j.policy.model.Trust13;
+import org.apache.xml.security.utils.XMLUtils;
 
 class SpnegoContextTokenOutInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
     SpnegoContextTokenOutInterceptor() {
@@ -135,7 +135,7 @@ class SpnegoContextTokenOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                     client.setAddressingNamespace(maps.getNamespaceURI());
                 }
                 SecurityToken tok =
-                    client.requestSecurityToken(s, Base64.getMimeEncoder().encodeToString(spnegoToken.getToken()));
+                    client.requestSecurityToken(s, XMLUtils.encodeToString(spnegoToken.getToken()));
 
                 byte[] wrappedTok = spnegoToken.unwrapKey(tok.getSecret());
                 tok.setSecret(wrappedTok);
