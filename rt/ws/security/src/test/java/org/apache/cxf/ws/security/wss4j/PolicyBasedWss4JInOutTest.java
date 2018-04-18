@@ -414,11 +414,6 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
 
     @Test
     public void testEncryptedSignedPartsWithCompleteCoverage() throws Exception {
-        if (System.getProperty("java.version").startsWith("9")) {
-            //CXF-7270
-            return;
-        }
-
         this.runInInterceptorAndValidate(
                 "encrypted_body_content_signed.xml",
                 "encrypted_parts_policy_header_and_body_signed.xml",
@@ -435,7 +430,9 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 null,
                 Arrays.asList(CoverageType.ENCRYPTED, CoverageType.SIGNED));
 
-        this.runAndValidate(
+        if (!isJava9Compatible()) {
+            // CXF-7270
+            this.runAndValidate(
                 "wsse-request-clean.xml",
                 "encrypted_parts_policy_header_and_body_signed.xml",
                 null,
@@ -445,6 +442,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 null,
                 Arrays.asList(CoverageType.ENCRYPTED,
                         CoverageType.SIGNED));
+        }
     }
 
     @Test
@@ -558,4 +556,12 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
         // TODO: Tests for derived keys.
     }
 
+    private boolean isJava9Compatible() {
+        String version = System.getProperty("java.version");
+        if (version.indexOf(".") > 0) {
+            version = version.substring(0, version.indexOf("."));
+        }
+
+        return Integer.valueOf(version) >= 9;
+    }
 }
