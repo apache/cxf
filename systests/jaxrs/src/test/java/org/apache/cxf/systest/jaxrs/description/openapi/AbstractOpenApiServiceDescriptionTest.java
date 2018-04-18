@@ -160,10 +160,7 @@ public abstract class AbstractOpenApiServiceDescriptionTest extends AbstractBusC
             UserOperation getBooksOp = map.get("getBooks");
             assertEquals(HttpMethod.GET, getBooksOp.getVerb());
             assertEquals(getApplicationPath() + "/bookstore", getBooksOp.getPath());
-            // see https://github.com/swagger-api/swagger-core/issues/2646
-            if (getBooksOp.getProduces() != null) {
-                assertEquals(MediaType.APPLICATION_JSON, getBooksOp.getProduces());
-            }
+            assertEquals(MediaType.APPLICATION_JSON, getBooksOp.getProduces());
             List<Parameter> getBooksOpParams = getBooksOp.getParameters();
             assertEquals(1, getBooksOpParams.size());
             assertEquals(ParameterType.QUERY, getBooksOpParams.get(0).getType());
