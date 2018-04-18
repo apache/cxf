@@ -89,7 +89,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         String baseAddress = "http://localhost:" + PORT + "/the/thebooks8/books";
         WebClient wc = WebClient.create(baseAddress);
         Long id = wc.type("application/xml").accept("text/plain").post(new Book("CXF", 1L), Long.class);
-        assertEquals(new Long(1), id);
+        assertEquals(Long.valueOf(1), id);
         Book book = wc.replaceHeader("Accept", "application/xml").query("id", 1L).get(Book.class);
         assertEquals("CXF", book.getName());
     }

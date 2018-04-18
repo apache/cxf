@@ -131,7 +131,7 @@ public class CorbaObjectWriterTest extends Assert {
         OutputStream oStream = orb.create_output_stream();
 
         CorbaObjectWriter writer = new CorbaObjectWriter(oStream);
-        Integer ushortValue = new Integer(123);
+        Integer ushortValue = Integer.valueOf(123);
         writer.writeUShort(ushortValue);
 
         InputStream iStream = oStream.create_input_stream();
@@ -144,7 +144,7 @@ public class CorbaObjectWriterTest extends Assert {
         OutputStream oStream = orb.create_output_stream();
 
         CorbaObjectWriter writer = new CorbaObjectWriter(oStream);
-        Integer longValue = new Integer(-1234567);
+        Integer longValue = Integer.valueOf(-1234567);
         writer.writeLong(longValue);
 
         InputStream iStream = oStream.create_input_stream();
@@ -170,7 +170,7 @@ public class CorbaObjectWriterTest extends Assert {
         OutputStream oStream = orb.create_output_stream();
 
         CorbaObjectWriter writer = new CorbaObjectWriter(oStream);
-        Long longlongValue = new Long("-12345678900");
+        Long longlongValue = Long.valueOf("-12345678900");
         writer.writeLongLong(longlongValue);
 
         InputStream iStream = oStream.create_input_stream();
@@ -196,7 +196,7 @@ public class CorbaObjectWriterTest extends Assert {
         OutputStream oStream = orb.create_output_stream();
 
         CorbaObjectWriter writer = new CorbaObjectWriter(oStream);
-        Float floatValue = new Float((float)123456.78);
+        Float floatValue = Float.valueOf((float)123456.78);
         writer.writeFloat(floatValue);
 
         InputStream iStream = oStream.create_input_stream();
@@ -209,7 +209,7 @@ public class CorbaObjectWriterTest extends Assert {
         OutputStream oStream = orb.create_output_stream();
 
         CorbaObjectWriter writer = new CorbaObjectWriter(oStream);
-        Double doubleValue = new Double(987654.321);
+        Double doubleValue = Double.valueOf(987654.321);
         writer.writeDouble(doubleValue);
 
         InputStream iStream = oStream.create_input_stream();

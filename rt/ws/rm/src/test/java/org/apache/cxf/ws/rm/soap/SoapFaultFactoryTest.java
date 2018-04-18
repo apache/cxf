@@ -135,8 +135,8 @@ public class SoapFaultFactoryTest extends Assert {
         ack.setIdentifier(id);
         SequenceAcknowledgement.AcknowledgementRange range =
             new SequenceAcknowledgement.AcknowledgementRange();
-        range.setLower(new Long(1));
-        range.setUpper(new Long(10));
+        range.setLower(Long.valueOf(1));
+        range.setUpper(Long.valueOf(10));
         ack.getAcknowledgementRange().add(range);
         setupSequenceFault(true, RM10Constants.INVALID_ACKNOWLEDGMENT_FAULT_QNAME, ack);
         control.replay();

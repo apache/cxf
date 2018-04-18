@@ -374,7 +374,7 @@ public class RetransmissionQueueImplTest extends Assert {
     private void setupMessagePolicies(Message message) {
         RMConfiguration cfg = new RMConfiguration();
         EasyMock.expect(manager.getEffectiveConfiguration(message)).andReturn(cfg);
-        cfg.setBaseRetransmissionInterval(new Long(5000));
+        cfg.setBaseRetransmissionInterval(Long.valueOf(5000));
         cfg.setExponentialBackoff(true);
     }
 

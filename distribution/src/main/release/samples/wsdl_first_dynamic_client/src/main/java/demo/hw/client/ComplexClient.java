@@ -94,7 +94,7 @@ public final class ComplexClient {
         Object inputPartObject = partPropType.newInstance();
         partPropertyDescriptor.getWriteMethod().invoke(inputObject, inputPartObject);
         PropertyDescriptor numberPropertyDescriptor = new PropertyDescriptor("agentNumber", partPropType);
-        numberPropertyDescriptor.getWriteMethod().invoke(inputPartObject, new Integer(314159));
+        numberPropertyDescriptor.getWriteMethod().invoke(inputPartObject, Integer.valueOf(314159));
 
         Object[] result = client.invoke(opName, inputObject);
         Class<?> resultClass = result[0].getClass();

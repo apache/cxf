@@ -28,7 +28,7 @@ public class GenericsEchoImpl {
     public String echo(String request) throws GenericsException {
         GenericsException exception = new GenericsException();
         ObjectWithGenerics<Boolean, Integer> objs =
-            new ObjectWithGenerics<Boolean, Integer>(Boolean.TRUE, new Integer(100));
+            new ObjectWithGenerics<Boolean, Integer>(Boolean.TRUE, Integer.valueOf(100));
         exception.setObj(objs);
         throw exception;
     }

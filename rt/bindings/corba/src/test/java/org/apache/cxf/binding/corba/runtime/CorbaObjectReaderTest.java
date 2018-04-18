@@ -281,7 +281,7 @@ public class CorbaObjectReaderTest extends Assert {
         reader.readArray(obj);
         int length = obj.getElements().size();
         for (int i = 0; i < length; ++i) {
-            assertTrue(new Long(((CorbaPrimitiveHandler)obj.getElement(i)).getDataFromValue()).intValue()
+            assertTrue(Long.valueOf(((CorbaPrimitiveHandler)obj.getElement(i)).getDataFromValue()).intValue()
                        == data[i]);
         }
     }
@@ -385,7 +385,7 @@ public class CorbaObjectReaderTest extends Assert {
         reader.readStruct(obj);
 
         List<CorbaObjectHandler> nestedObjs = obj.getMembers();
-        assertTrue(new Integer(((CorbaPrimitiveHandler)nestedObjs.get(0)).getDataFromValue()).intValue()
+        assertTrue(Integer.valueOf(((CorbaPrimitiveHandler)nestedObjs.get(0)).getDataFromValue()).intValue()
                    == member1);
         assertTrue(((CorbaPrimitiveHandler)nestedObjs.get(1)).getDataFromValue().equals(member2));
         assertTrue(Boolean.valueOf(((CorbaPrimitiveHandler)nestedObjs.get(2))

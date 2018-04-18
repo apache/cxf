@@ -567,7 +567,7 @@ public class RMManagerTest extends Assert {
         cos.flush();
         m1.setContent(cos);
         m1.setTo("toAddress");
-        m1.setMessageNumber(new Long(10));
+        m1.setMessageNumber(Long.valueOf(10));
         m1.setContentType(MULTIPART_TYPE);
         Capture<Message> mc = Capture.newInstance();
 
@@ -646,7 +646,7 @@ public class RMManagerTest extends Assert {
         EasyMock.expect(endpoint.getBinding()).andReturn(binding).anyTimes();
 
         EasyMock.expect(ss.isLastMessage()).andReturn(true).anyTimes();
-        EasyMock.expect(ss.getCurrentMessageNr()).andReturn(new Long(10)).anyTimes();
+        EasyMock.expect(ss.getCurrentMessageNr()).andReturn(Long.valueOf(10)).anyTimes();
         if (null == m) {
             return;
         }
@@ -734,11 +734,11 @@ public class RMManagerTest extends Assert {
         EasyMock.expect(endpoint.getBinding()).andReturn(binding).anyTimes();
 
         EasyMock.expect(ss.isLastMessage()).andReturn(true).anyTimes();
-        EasyMock.expect(ss.getCurrentMessageNr()).andReturn(new Long(10)).anyTimes();
+        EasyMock.expect(ss.getCurrentMessageNr()).andReturn(Long.valueOf(10)).anyTimes();
         if (null == m) {
             return;
         }
-        EasyMock.expect(m.getMessageNumber()).andReturn(new Long(10)).times(2);
+        EasyMock.expect(m.getMessageNumber()).andReturn(Long.valueOf(10)).times(2);
         if (null == conduit) {
             EasyMock.expect(m.getTo()).andReturn("toAddress");
         }

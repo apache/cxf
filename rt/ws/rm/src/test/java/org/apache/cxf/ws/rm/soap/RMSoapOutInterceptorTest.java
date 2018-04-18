@@ -58,8 +58,8 @@ import org.junit.Test;
 
 public class RMSoapOutInterceptorTest extends Assert {
 
-    private static final Long ONE = new Long(1);
-    private static final Long TEN = new Long(10);
+    private static final Long ONE = Long.valueOf(1);
+    private static final Long TEN = Long.valueOf(10);
 
     private SequenceType s1;
     private SequenceType s2;

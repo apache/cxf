@@ -102,7 +102,7 @@ public class RetransmissionQueueTest extends AbstractBusClientServerTestBase {
         bus.getInFaultInterceptors().add(in);
         LoggingOutInterceptor out = new LoggingOutInterceptor();
         bus.getOutInterceptors().add(out);
-        bus.getExtension(RMManager.class).getConfiguration().setBaseRetransmissionInterval(new Long(4000));
+        bus.getExtension(RMManager.class).getConfiguration().setBaseRetransmissionInterval(Long.valueOf(4000));
 
         // an interceptor to simulate a transmission error
         MessageLossSimulator loser = new MessageLossSimulator();
@@ -148,7 +148,7 @@ public class RetransmissionQueueTest extends AbstractBusClientServerTestBase {
         bus.getInFaultInterceptors().add(in);
         LoggingOutInterceptor out = new LoggingOutInterceptor();
         bus.getOutInterceptors().add(out);
-        bus.getExtension(RMManager.class).getConfiguration().setBaseRetransmissionInterval(new Long(4000));
+        bus.getExtension(RMManager.class).getConfiguration().setBaseRetransmissionInterval(Long.valueOf(4000));
         SourcePolicyType sourcePolicy = new SourcePolicyType();
         RetryPolicyType retryP = new RetryPolicyType();
         retryP.setMaxRetries(0);

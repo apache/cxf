@@ -191,7 +191,7 @@ public class CorbaPrimitiveHandlerTest extends Assert {
 
     @Test
     public void testCreateCorbaLong() {
-        Integer val = new Integer(123456);
+        Integer val = Integer.valueOf(123456);
         CorbaPrimitiveHandler obj =
             new CorbaPrimitiveHandler(new QName("long"),
                                       CorbaConstants.NT_CORBA_LONG,
@@ -213,7 +213,7 @@ public class CorbaPrimitiveHandlerTest extends Assert {
 
     @Test
     public void testCreateCorbaULong() {
-        Integer val = new Integer(654321);
+        Integer val = Integer.valueOf(654321);
         CorbaPrimitiveHandler obj =
             new CorbaPrimitiveHandler(new QName("ulong"),
                                       CorbaConstants.NT_CORBA_ULONG,
@@ -235,7 +235,7 @@ public class CorbaPrimitiveHandlerTest extends Assert {
 
     @Test
     public void testCreateCorbaLongLong() {
-        Long val = new Long(123456789);
+        Long val = Long.valueOf(123456789);
         CorbaPrimitiveHandler obj =
             new CorbaPrimitiveHandler(new QName("longlong"),
                                       CorbaConstants.NT_CORBA_LONGLONG,
@@ -257,7 +257,7 @@ public class CorbaPrimitiveHandlerTest extends Assert {
 
     @Test
     public void testCreateCorbaULongLong() {
-        Long val = new Long(987654321);
+        Long val = Long.valueOf(987654321);
         CorbaPrimitiveHandler obj =
             new CorbaPrimitiveHandler(new QName("ulonglong"),
                                       CorbaConstants.NT_CORBA_ULONGLONG,
@@ -301,7 +301,7 @@ public class CorbaPrimitiveHandlerTest extends Assert {
 
     @Test
     public void testCreateCorbaDouble() {
-        Double val = new Double(123456.789);
+        Double val = Double.valueOf(123456.789);
         CorbaPrimitiveHandler obj =
             new CorbaPrimitiveHandler(new QName("double"),
                                       CorbaConstants.NT_CORBA_DOUBLE,

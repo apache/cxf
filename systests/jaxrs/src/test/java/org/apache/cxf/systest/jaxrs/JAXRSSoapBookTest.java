@@ -372,7 +372,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
                                                                   BookStoreJaxrsJaxws.class);
         HTTPConduit conduit = (HTTPConduit)WebClient.getConfig(proxy).getConduit();
 
-        Book b = proxy.getBook(new Long("123"));
+        Book b = proxy.getBook(Long.valueOf("123"));
         assertEquals(123, b.getId());
         assertEquals("CXF in Action", b.getName());
 
@@ -380,7 +380,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         assertSame(conduit, conduit2);
 
         conduit.getClient().setAutoRedirect(true);
-        b = proxy.getBook(new Long("123"));
+        b = proxy.getBook(Long.valueOf("123"));
         assertEquals(123, b.getId());
         assertEquals("CXF in Action", b.getName());
     }
@@ -781,7 +781,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
             new BookSoapService(wsdlUrl,
                                 new QName("http://books.com", "BookService"));
         BookStoreJaxrsJaxws store = service.getBookPort();
-        Book book = store.getBook(new Long(123));
+        Book book = store.getBook(Long.valueOf(123));
         assertEquals("id is wrong", book.getId(), 123);
     }
 
@@ -826,7 +826,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         cl.getInInterceptors().add(in);
         cl.getOutInterceptors().add(out);
 
-        Book book = store.getBook(new Long(123));
+        Book book = store.getBook(Long.valueOf(123));
         assertEquals("id is wrong", book.getId(), 123);
 
     }
@@ -864,7 +864,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         features.add(testFeature);
         bean.setFeatures(features);
         BookStoreJaxrsJaxws proxy = (BookStoreJaxrsJaxws)bean.create();
-        Book b = proxy.getBook(new Long("123"));
+        Book b = proxy.getBook(Long.valueOf("123"));
         assertTrue("Out Interceptor not invoked", testFeature.handleMessageOnOutInterceptorCalled());
         assertTrue("In Interceptor not invoked", testFeature.handleMessageOnInInterceptorCalled());
         assertEquals(123, b.getId());
@@ -896,7 +896,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         BookStoreJaxrsJaxws proxy = (BookStoreJaxrsJaxws)bean.create();
         try {
             //321 is special case - causes error code of 525
-            proxy.getBook(new Long("123"));
+            proxy.getBook(Long.valueOf("123"));
             fail("Method should have thrown an exception");
         } catch (Exception e) {
             assertTrue("Out Interceptor not invoked", testFeature.handleMessageOnOutInterceptorCalled());
@@ -921,7 +921,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         WebClient.getConfig(proxy).getRequestContext().put("org.apache.cxf.transport.no_io_exceptions", false);
         try {
             //321 is special case - causes error code of 525
-            proxy.getBook(new Long(param));
+            proxy.getBook(Long.valueOf(param));
             fail("Method should have thrown an exception");
         } catch (Exception e) {
             assertTrue("Out Interceptor not invoked", testFeature.handleMessageOnOutInterceptorCalled());

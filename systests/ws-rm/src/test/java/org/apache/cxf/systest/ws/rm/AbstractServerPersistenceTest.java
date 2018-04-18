@@ -140,7 +140,7 @@ public abstract class AbstractServerPersistenceTest extends AbstractBusClientSer
 
         // avoid early client resends
         greeterBus.getExtension(RMManager.class).getConfiguration()
-            .setBaseRetransmissionInterval(new Long(60000));
+            .setBaseRetransmissionInterval(Long.valueOf(60000));
         GreeterService gs = new GreeterService();
         Greeter greeter = gs.getGreeterPort();
         updateAddressPort(greeter, getPort());

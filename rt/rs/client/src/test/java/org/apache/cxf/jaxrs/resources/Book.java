@@ -60,7 +60,7 @@ public class Book implements Comparable<Book> {
     @Path("chapters/{chapterid}/")
     @GET
     public Chapter getChapter(@PathParam("chapterid") int chapterid) {
-        return chapters.get(new Long(chapterid));
+        return chapters.get(Long.valueOf(chapterid));
     }
 
     @GET
@@ -73,7 +73,7 @@ public class Book implements Comparable<Book> {
     }
 
     public int hashCode() {
-        return name.hashCode() * 37 + new Long(id).hashCode();
+        return name.hashCode() * 37 + Long.valueOf(id).hashCode();
     }
 
     public boolean equals(Object o) {
@@ -87,8 +87,8 @@ public class Book implements Comparable<Book> {
     }
 
     public int compareTo(Book b) {
-        Long i1 = new Long(getId());
-        Long i2 = new Long(b.getId());
+        Long i1 = Long.valueOf(getId());
+        Long i2 = Long.valueOf(b.getId());
         return i1.compareTo(i2);
     }
 }

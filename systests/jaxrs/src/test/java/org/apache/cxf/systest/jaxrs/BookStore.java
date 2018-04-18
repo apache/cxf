@@ -1376,7 +1376,7 @@ public class BookStore {
     @Path("/booknames/{bookId}/")
     @Produces("text/*")
     public String getBookName(@PathParam("bookId") int id) throws BookNotFoundFault {
-        Book book = books.get(new Long(id));
+        Book book = books.get(Long.valueOf(id));
         if (book != null) {
             return book.getName();
         }
@@ -1534,7 +1534,7 @@ public class BookStore {
         if (id != 123) {
             throw new WebApplicationException();
         }
-        Book b = books.get(new Long(id));
+        Book b = books.get(Long.valueOf(id));
 
         Response r;
         if (b != null) {
@@ -1551,7 +1551,7 @@ public class BookStore {
     @Consumes("text/plain")
     @Produces("text/plain")
     public Long echoBookId(long theBookId) {
-        return new Long(theBookId);
+        return Long.valueOf(theBookId);
     }
 
     @POST

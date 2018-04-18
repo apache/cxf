@@ -175,16 +175,16 @@ public class SourceSequenceTest extends Assert {
         ack = factory.createSequenceAcknowledgement();
         SequenceAcknowledgement.AcknowledgementRange r =
             factory.createSequenceAcknowledgementAcknowledgementRange();
-        r.setLower(new Long(1));
-        r.setUpper(new Long(2));
+        r.setLower(Long.valueOf(1));
+        r.setUpper(Long.valueOf(2));
         ack.getAcknowledgementRange().add(r);
         r = factory.createSequenceAcknowledgementAcknowledgementRange();
-        r.setLower(new Long(4));
-        r.setUpper(new Long(6));
+        r.setLower(Long.valueOf(4));
+        r.setUpper(Long.valueOf(6));
         ack.getAcknowledgementRange().add(r);
         r = factory.createSequenceAcknowledgementAcknowledgementRange();
-        r.setLower(new Long(8));
-        r.setUpper(new Long(10));
+        r.setLower(Long.valueOf(8));
+        r.setUpper(Long.valueOf(10));
         ack.getAcknowledgementRange().add(r);
         rq.purgeAcknowledged(seq);
         EasyMock.expectLastCall();
@@ -212,8 +212,8 @@ public class SourceSequenceTest extends Assert {
         SequenceAcknowledgement ack = factory.createSequenceAcknowledgement();
         SequenceAcknowledgement.AcknowledgementRange r =
             factory.createSequenceAcknowledgementAcknowledgementRange();
-        r.setLower(new Long(1));
-        r.setUpper(new Long(2));
+        r.setLower(Long.valueOf(1));
+        r.setUpper(Long.valueOf(2));
         ack.getAcknowledgementRange().add(r);
         rq.purgeAcknowledged(seq);
         EasyMock.expectLastCall();
@@ -221,7 +221,7 @@ public class SourceSequenceTest extends Assert {
         control.replay();
         seq.setAcknowledged(ack);
         assertTrue(!seq.allAcknowledged());
-        r.setUpper(new Long(4));
+        r.setUpper(Long.valueOf(4));
         assertTrue(seq.allAcknowledged());
         control.verify();
     }
@@ -307,7 +307,7 @@ public class SourceSequenceTest extends Assert {
         DestinationSequence dseq = control.createMock(DestinationSequence.class);
         Identifier did = control.createMock(Identifier.class);
         EasyMock.expect(destination.getSequence(did)).andReturn(dseq).anyTimes();
-        EasyMock.expect(dseq.getLastMessageNumber()).andReturn(new Long(1)).anyTimes();
+        EasyMock.expect(dseq.getLastMessageNumber()).andReturn(Long.valueOf(1)).anyTimes();
         EasyMock.expect(did.getValue()).andReturn("dseq").anyTimes();
 
         control.replay();
@@ -336,14 +336,14 @@ public class SourceSequenceTest extends Assert {
         while (i < messageNumbers.length) {
             SequenceAcknowledgement.AcknowledgementRange r =
                 factory.createSequenceAcknowledgementAcknowledgementRange();
-            Long l = new Long(messageNumbers[i]);
+            Long l = Long.valueOf(messageNumbers[i]);
             r.setLower(l);
             i++;
 
             while (i < messageNumbers.length && (messageNumbers[i] - messageNumbers[i - 1]) == 1) {
                 i++;
             }
-            Long u = new Long(messageNumbers[i - 1]);
+            Long u = Long.valueOf(messageNumbers[i - 1]);
             r.setUpper(u);
             ack.getAcknowledgementRange().add(r);
         }

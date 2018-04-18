@@ -96,11 +96,11 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
 
         SimpleContentExtWithAnyAttribute x = new SimpleContentExtWithAnyAttribute();
         x.setValue("foo");
-        x.setAttrib(new Integer(2000));
+        x.setAttrib(Integer.valueOf(2000));
 
         SimpleContentExtWithAnyAttribute y = new SimpleContentExtWithAnyAttribute();
         y.setValue("bar");
-        y.setAttrib(new Integer(2001));
+        y.setAttrib(Integer.valueOf(2001));
 
         Map<QName, String> xAttrMap = x.getOtherAttributes();
         xAttrMap.put(xAt1Name, "one");
@@ -148,7 +148,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
             return;
         }
         OccuringAll x = new OccuringAll();
-        x.setVarInt(new Integer(42));
+        x.setVarInt(Integer.valueOf(42));
         x.setVarAttrString("x_attr");
         OccuringAll yOrig = new OccuringAll();
         Holder<OccuringAll> y = new Holder<OccuringAll>(yOrig);
@@ -225,13 +225,13 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
         xVarStringAndVarInt.add("x2");
         xVarStringAndVarInt.add(1);
         x.setAtString("attribute");
-        x.setAtInt(new Integer(2000));
+        x.setAtInt(Integer.valueOf(2000));
 
         List<Serializable> yVarStringAndVarInt = y.getVarStringAndVarInt();
         yVarStringAndVarInt.add("there");
         yVarStringAndVarInt.add(1001);
         y.setAtString("another attribute");
-        y.setAtInt(new Integer(2002));
+        y.setAtInt(Integer.valueOf(2002));
 
         Map<QName, String> xAttrMap = x.getOtherAttributes();
         xAttrMap.put(xAt1Name, "one");
@@ -295,12 +295,12 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
         xVarStringOrVarInt.add("hello");
         xVarStringOrVarInt.add(1);
         x.setAtString("attribute");
-        x.setAtInt(new Integer(2000));
+        x.setAtInt(Integer.valueOf(2000));
 
         List<Serializable> yVarStringOrVarInt = y.getVarStringOrVarInt();
         yVarStringOrVarInt.add(1001);
         y.setAtString("the attribute");
-        y.setAtInt(new Integer(2002));
+        y.setAtInt(Integer.valueOf(2002));
 
         Map<QName, String> xAttrMap = x.getOtherAttributes();
         xAttrMap.put(xAt1Name, "one");
@@ -1102,13 +1102,13 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
         }
         RecSeqB6918 x = new RecSeqB6918();
         List<Object> theList = x.getNextSeqAndVarInt();
-        theList.add(new Integer(6));
+        theList.add(Integer.valueOf(6));
         theList.add(new RecSeqB6918());
-        theList.add(new Integer(42));
+        theList.add(Integer.valueOf(42));
         RecSeqB6918 yOrig = new RecSeqB6918();
         theList = yOrig.getNextSeqAndVarInt();
         theList.add(x);
-        theList.add(new Integer(2));
+        theList.add(Integer.valueOf(2));
         Holder<RecSeqB6918> y = new Holder<RecSeqB6918>(yOrig);
         Holder<RecSeqB6918> z = new Holder<RecSeqB6918>();
 

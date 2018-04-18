@@ -89,26 +89,26 @@ public class StaxBuilder {
      */
     private static final Map<String, Integer> ATTR_TYPES = new HashMap<>(32);
     static {
-        ATTR_TYPES.put("CDATA", new Integer(Attribute.CDATA_TYPE));
-        ATTR_TYPES.put("cdata", new Integer(Attribute.CDATA_TYPE));
-        ATTR_TYPES.put("ID", new Integer(Attribute.ID_TYPE));
-        ATTR_TYPES.put("id", new Integer(Attribute.ID_TYPE));
-        ATTR_TYPES.put("IDREF", new Integer(Attribute.IDREF_TYPE));
-        ATTR_TYPES.put("idref", new Integer(Attribute.IDREF_TYPE));
-        ATTR_TYPES.put("IDREFS", new Integer(Attribute.IDREFS_TYPE));
-        ATTR_TYPES.put("idrefs", new Integer(Attribute.IDREFS_TYPE));
-        ATTR_TYPES.put("ENTITY", new Integer(Attribute.ENTITY_TYPE));
-        ATTR_TYPES.put("entity", new Integer(Attribute.ENTITY_TYPE));
-        ATTR_TYPES.put("ENTITIES", new Integer(Attribute.ENTITIES_TYPE));
-        ATTR_TYPES.put("entities", new Integer(Attribute.ENTITIES_TYPE));
-        ATTR_TYPES.put("NMTOKEN", new Integer(Attribute.NMTOKEN_TYPE));
-        ATTR_TYPES.put("nmtoken", new Integer(Attribute.NMTOKEN_TYPE));
-        ATTR_TYPES.put("NMTOKENS", new Integer(Attribute.NMTOKENS_TYPE));
-        ATTR_TYPES.put("nmtokens", new Integer(Attribute.NMTOKENS_TYPE));
-        ATTR_TYPES.put("NOTATION", new Integer(Attribute.NOTATION_TYPE));
-        ATTR_TYPES.put("notation", new Integer(Attribute.NOTATION_TYPE));
-        ATTR_TYPES.put("ENUMERATED", new Integer(Attribute.ENUMERATED_TYPE));
-        ATTR_TYPES.put("enumerated", new Integer(Attribute.ENUMERATED_TYPE));
+        ATTR_TYPES.put("CDATA", Integer.valueOf(Attribute.CDATA_TYPE));
+        ATTR_TYPES.put("cdata", Integer.valueOf(Attribute.CDATA_TYPE));
+        ATTR_TYPES.put("ID", Integer.valueOf(Attribute.ID_TYPE));
+        ATTR_TYPES.put("id", Integer.valueOf(Attribute.ID_TYPE));
+        ATTR_TYPES.put("IDREF", Integer.valueOf(Attribute.IDREF_TYPE));
+        ATTR_TYPES.put("idref", Integer.valueOf(Attribute.IDREF_TYPE));
+        ATTR_TYPES.put("IDREFS", Integer.valueOf(Attribute.IDREFS_TYPE));
+        ATTR_TYPES.put("idrefs", Integer.valueOf(Attribute.IDREFS_TYPE));
+        ATTR_TYPES.put("ENTITY", Integer.valueOf(Attribute.ENTITY_TYPE));
+        ATTR_TYPES.put("entity", Integer.valueOf(Attribute.ENTITY_TYPE));
+        ATTR_TYPES.put("ENTITIES", Integer.valueOf(Attribute.ENTITIES_TYPE));
+        ATTR_TYPES.put("entities", Integer.valueOf(Attribute.ENTITIES_TYPE));
+        ATTR_TYPES.put("NMTOKEN", Integer.valueOf(Attribute.NMTOKEN_TYPE));
+        ATTR_TYPES.put("nmtoken", Integer.valueOf(Attribute.NMTOKEN_TYPE));
+        ATTR_TYPES.put("NMTOKENS", Integer.valueOf(Attribute.NMTOKENS_TYPE));
+        ATTR_TYPES.put("nmtokens", Integer.valueOf(Attribute.NMTOKENS_TYPE));
+        ATTR_TYPES.put("NOTATION", Integer.valueOf(Attribute.NOTATION_TYPE));
+        ATTR_TYPES.put("notation", Integer.valueOf(Attribute.NOTATION_TYPE));
+        ATTR_TYPES.put("ENUMERATED", Integer.valueOf(Attribute.ENUMERATED_TYPE));
+        ATTR_TYPES.put("enumerated", Integer.valueOf(Attribute.ENUMERATED_TYPE));
     }
 
     /**

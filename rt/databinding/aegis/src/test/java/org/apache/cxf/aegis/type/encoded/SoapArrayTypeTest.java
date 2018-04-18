@@ -133,7 +133,7 @@ public class SoapArrayTypeTest extends AbstractEncodedTest {
         Object[] objects;
         // round trip tests
         objects = readWriteReadRef("arrayUrType1.xml", Object[].class);
-        assertArrayEquals(new Object[]{42, new Float(42.42f), "Forty Two"}, objects);
+        assertArrayEquals(new Object[]{42, Float.valueOf(42.42f), "Forty Two"}, objects);
     }
 
     @Test

@@ -108,9 +108,9 @@ public class WSSecurity11Common extends AbstractBusClientServerTestBase {
         String javaVersion = System.getProperty("java.version");
         double javaVersionNum = 0.0;
         if (javaVersion.length() > 3) {
-            javaVersionNum = new Double(javaVersion.substring(0, 3)).doubleValue();
+            javaVersionNum = Double.valueOf(javaVersion.substring(0, 3)).doubleValue();
         } else {
-            javaVersionNum = new Double(javaVersion).doubleValue();
+            javaVersionNum = Double.valueOf(javaVersion).doubleValue();
         }
         return !(javaVersionNum < 1.6);
     }

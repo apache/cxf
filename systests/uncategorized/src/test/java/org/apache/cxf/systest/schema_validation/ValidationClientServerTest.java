@@ -149,8 +149,8 @@ public class ValidationClientServerTest extends AbstractBusClientServerTestBase 
         // Populate the list in the wrong order.
         // Client side validation should throw an exception.
         List<Serializable> floatIntStringList = occuringStruct.getVarFloatAndVarIntAndVarString();
-        floatIntStringList.add(new Integer(42));
-        floatIntStringList.add(new Float(4.2f));
+        floatIntStringList.add(Integer.valueOf(42));
+        floatIntStringList.add(Float.valueOf(4.2f));
         floatIntStringList.add("Goofus and Gallant");
         try {
             /*boolean result =*/

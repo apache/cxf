@@ -1323,7 +1323,7 @@ public class JAXRSUtilsTest extends Assert {
         assertNotNull(cb);
 
         assertEquals("aValue", cb.getA());
-        assertEquals(new Long(123), cb.getB());
+        assertEquals(Long.valueOf(123), cb.getB());
         assertTrue(cb.isCb());
     }
 
@@ -1394,7 +1394,7 @@ public class JAXRSUtilsTest extends Assert {
         assertNotNull(cb);
 
         assertEquals("aValue", cb.getA());
-        assertEquals(new Long(123), cb.getB());
+        assertEquals(Long.valueOf(123), cb.getB());
 
         params = JAXRSUtils.processParameters(new OperationResourceInfo(m,
                                                   new ClassResourceInfo(Customer.class)),
@@ -1405,7 +1405,7 @@ public class JAXRSUtilsTest extends Assert {
         assertNotNull(cb1);
 
         assertEquals("A", cb1.getA());
-        assertEquals(new Long(123), cb1.getB());
+        assertEquals(Long.valueOf(123), cb1.getB());
         List<String> list1 = cb1.getC();
         assertEquals(3, list1.size());
         assertEquals("1", list1.get(0));
@@ -1416,7 +1416,7 @@ public class JAXRSUtilsTest extends Assert {
         assertNotNull(cb2);
 
         assertEquals("B", cb2.getA());
-        assertEquals(new Long(456), cb2.getB());
+        assertEquals(Long.valueOf(456), cb2.getB());
         List<String> list2 = cb2.getC();
         assertEquals(3, list2.size());
         assertEquals("4", list2.get(0));
@@ -1431,7 +1431,7 @@ public class JAXRSUtilsTest extends Assert {
             assertNotNull(cb2E);
 
             assertEquals("B" + idx, cb2E.getA());
-            assertEquals(new Long(456 + idx), cb2E.getB());
+            assertEquals(Long.valueOf(456 + idx), cb2E.getB());
             // ensure C was stripped properly since lists within lists are not supported
             assertNull(cb2E.getC());
             assertNull(cb2E.getD());
@@ -1444,7 +1444,7 @@ public class JAXRSUtilsTest extends Assert {
         assertNotNull(cb3);
 
         assertEquals("C", cb3.getA());
-        assertEquals(new Long(789), cb3.getB());
+        assertEquals(Long.valueOf(789), cb3.getB());
         List<String> list3 = cb3.getC();
         assertEquals(3, list3.size());
         assertEquals("7", list3.get(0));
@@ -1459,7 +1459,7 @@ public class JAXRSUtilsTest extends Assert {
             assertNotNull(cb3E);
 
             assertEquals("C" + idx, cb3E.getA());
-            assertEquals(new Long(789 + idx), cb3E.getB());
+            assertEquals(Long.valueOf(789 + idx), cb3E.getB());
             // ensure C was stripped properly since lists within lists are not supported
             assertNull(cb3E.getC());
             assertNull(cb3E.getD());

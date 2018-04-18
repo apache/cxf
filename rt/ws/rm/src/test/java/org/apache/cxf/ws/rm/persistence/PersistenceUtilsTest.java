@@ -57,8 +57,8 @@ public class PersistenceUtilsTest extends Assert {
     public void testSerialiseDeserialiseAcknowledgement() {
         SequenceAcknowledgement ack = new SequenceAcknowledgement();
         AcknowledgementRange range = new AcknowledgementRange();
-        range.setLower(new Long(1));
-        range.setUpper(new Long(10));
+        range.setLower(Long.valueOf(1));
+        range.setUpper(Long.valueOf(10));
         ack.getAcknowledgementRange().add(range);
         PersistenceUtils utils = PersistenceUtils.getInstance();
         InputStream is = utils.serialiseAcknowledgment(ack);

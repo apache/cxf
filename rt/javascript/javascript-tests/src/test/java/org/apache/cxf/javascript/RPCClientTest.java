@@ -76,7 +76,7 @@ public class RPCClientTest extends JavascriptRhinoTest {
             testUtilities.rhinoCallConvert("simpleTest", Notifier.class,
                                            testUtilities.javaToJS(getAddress()),
                                            "String Parameter",
-                                           testUtilities.javaToJS(new Integer(1776)));
+                                           testUtilities.javaToJS(Integer.valueOf(1776)));
 
         boolean notified = notifier.waitForJavascript(1000 * 10);
         assertTrue(notified);

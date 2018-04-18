@@ -205,7 +205,7 @@ public class JaxRs2Extension extends AbstractSwaggerExtension {
             if (annos.containsKey(DecimalMin.class.getName())) {
                 DecimalMin min = (DecimalMin) annos.get(DecimalMin.class.getName());
                 if (min.inclusive()) {
-                    serializable.setMinimum(BigDecimal.valueOf(new Double(min.value())));
+                    serializable.setMinimum(BigDecimal.valueOf(Double.valueOf(min.value())));
                 } else {
                     serializable.setExclusiveMinimum(!min.inclusive());
                 }
@@ -213,7 +213,7 @@ public class JaxRs2Extension extends AbstractSwaggerExtension {
             if (annos.containsKey(DecimalMax.class.getName())) {
                 DecimalMax max = (DecimalMax) annos.get(DecimalMax.class.getName());
                 if (max.inclusive()) {
-                    serializable.setMaximum(BigDecimal.valueOf(new Double(max.value())));
+                    serializable.setMaximum(BigDecimal.valueOf(Double.valueOf(max.value())));
                 } else {
                     serializable.setExclusiveMaximum(!max.inclusive());
                 }

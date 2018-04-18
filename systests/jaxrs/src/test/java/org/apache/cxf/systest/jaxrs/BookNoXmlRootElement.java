@@ -62,26 +62,26 @@ public class BookNoXmlRootElement {
     @Path("chapters/{chapterid}/")
     @Produces("application/xml;charset=ISO-8859-1")
     public Chapter getChapter(@PathParam("chapterid")int chapterid) {
-        return chapters.get(new Long(chapterid));
+        return chapters.get(Long.valueOf(chapterid));
     }
 
     @GET
     @Path("chapters/acceptencoding/{chapterid}/")
     @Produces("application/xml")
     public Chapter getChapterAcceptEncoding(@PathParam("chapterid")int chapterid) {
-        return chapters.get(new Long(chapterid));
+        return chapters.get(Long.valueOf(chapterid));
     }
 
     @GET
     @Path("chapters/badencoding/{chapterid}/")
     @Produces("application/xml;charset=UTF-48")
     public Chapter getChapterBadEncoding(@PathParam("chapterid")int chapterid) {
-        return chapters.get(new Long(chapterid));
+        return chapters.get(Long.valueOf(chapterid));
     }
 
     @Path("chapters/sub/{chapterid}/")
     public Chapter getSubChapter(@PathParam("chapterid")int chapterid) {
-        return chapters.get(new Long(chapterid));
+        return chapters.get(Long.valueOf(chapterid));
     }
 
     @Path("chaptersobject/sub/{chapterid}/")

@@ -78,7 +78,7 @@ public class BookStoreWebSocket {
     @Consumes("text/plain")
     @Produces("text/plain")
     public Long echoBookId(long theBookId) {
-        return new Long(theBookId);
+        return Long.valueOf(theBookId);
     }
 
     @GET
