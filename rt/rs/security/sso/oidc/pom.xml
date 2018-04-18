@@ -226,12 +226,12 @@
   </build>
   <profiles>
         <profile>
-            <id>java9</id>
+            <id>java9plus</id>
             <properties>
                 <compilerArguments>--patch-module java.xml.ws.annotation=${project.basedir}/target//java9/javax.annotation-api-${cxf.javax.annotation-api.version}.jar --add-modules java.se.ee,java.activation,java.xml.ws,java.xml.bind -Aopenjpa.source=7 -Aopenjpa.metamodel=true</compilerArguments>
             </properties>
             <activation>
-                <jdk>9</jdk>
+                <jdk>[9,)</jdk>
             </activation>
             <build>
                 <plugins>
