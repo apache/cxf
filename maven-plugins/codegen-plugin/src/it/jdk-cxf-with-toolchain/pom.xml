@@ -17,7 +17,7 @@
         <version>1.4</version>
         <executions>
           <execution>
-            <id>enforce-jdk7-of-higher</id>
+            <id>enforce-jdk9-of-higher</id>
             <phase>verify</phase>
             <goals>
               <goal>enforce</goal>
@@ -25,29 +25,10 @@
             <configuration>
               <rules>
                 <requireJavaVersion>
-                  <version>[1.7,)</version>
+                  <version>[1.9,)</version>
                 </requireJavaVersion>
               </rules>
             </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-toolchains-plugin</artifactId>
-        <version>1.1</version>
-        <configuration>
-          <toolchains>
-            <jdk>
-              <version>6</version>
-            </jdk>
-          </toolchains>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>toolchain</goal>
-            </goals>
           </execution>
         </executions>
       </plugin>
@@ -94,4 +75,38 @@
       </plugin>
     </plugins>
   </build>
+  <profiles>
+    <profile><!-- used to avoid integration test failures for devs that have no toolchain config -->
+      <id>toolchain</id>
+      <activation>
+        <jdk>[9,)</jdk>
+        <property><!-- Jenkins -->
+          <name>env.BUILD_NUMBER</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-toolchains-plugin</artifactId>
+            <version>1.1</version>
+            <configuration>
+              <toolchains>
+                <jdk>
+                  <version>8</version>
+                </jdk>
+              </toolchains>
+            </configuration>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>toolchain</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
