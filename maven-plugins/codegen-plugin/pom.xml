@@ -185,6 +185,8 @@
                         <configuration>
                             <settingsFile>src/it/settings.xml</settingsFile>
                             <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
+                            <!-- disable toolchain till https://issues.apache.org/jira/browse/CXF-7714 is fixed -->
+                            <invokerTest>!jdk-cxf-with-toolchain</invokerTest>
                         </configuration>
                     </execution>
                 </executions>

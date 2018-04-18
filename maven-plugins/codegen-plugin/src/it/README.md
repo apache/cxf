@@ -4,6 +4,8 @@ toolchain-integration-tests
 jdk-cxf-with-toolchain
 -----------------------
 
+Currently disabled due to https://issues.apache.org/jira/browse/CXF-7714
+
 This project contains sample maven module using `cxf-codegen-plugin` to generate java from WSDL file.
 
 - it enforces usage of JDK 1.9 or higher to run the `mvn` command
