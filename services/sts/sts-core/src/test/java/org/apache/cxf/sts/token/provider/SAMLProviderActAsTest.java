@@ -353,9 +353,6 @@ public class SAMLProviderActAsTest extends org.junit.Assert {
         assertion = new SamlAssertionWrapper(token);
         Assert.assertEquals("service-A", assertion.getSubjectName());
 
-        String tokenString = DOM2Writer.nodeToString(token);
-        System.out.println(tokenString);
-
         boolean foundBob = false;
         boolean foundTechnical = false;
         for (org.opensaml.saml.saml2.core.AttributeStatement attributeStatement
