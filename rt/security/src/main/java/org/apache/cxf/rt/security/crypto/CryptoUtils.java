@@ -545,7 +545,7 @@ public final class CryptoUtils {
             } else {
                 if (blockSize == -1) {
                     String javaVersion = System.getProperty("java.version");
-                    if (javaVersion.startsWith("9") || isJava8Release161OrLater(javaVersion)) {
+                    if (isJava9Compatible(javaVersion) || isJava8Release161OrLater(javaVersion)) {
                         //the default block size is 256 when use private key under java9
                         blockSize = secretKey instanceof PublicKey ? 117 : 256;
                     } else {
@@ -573,6 +573,14 @@ public final class CryptoUtils {
         } catch (Exception ex) {
             throw new SecurityException(ex);
         }
+    }
+
+    private static boolean isJava9Compatible(String javaVersion) {
+        if (javaVersion.indexOf(".") > 0) {
+            javaVersion = javaVersion.substring(0, javaVersion.indexOf("."));
+        }
+
+        return Integer.valueOf(javaVersion) >= 9;
     }
 
     private static boolean isJava8Release161OrLater(String javaVersion) {
