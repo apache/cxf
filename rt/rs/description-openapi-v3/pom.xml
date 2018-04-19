@@ -21,8 +21,8 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cxf-rt-rs-service-description-openapi-v3</artifactId>
     <packaging>bundle</packaging>
-    <name>Apache CXF JAX-RS Service Description Swagger</name>
-    <description>Apache CXF JAX-RS Service Description Swagger</description>
+    <name>Apache CXF JAX-RS Service Description OpenAPI v3</name>
+    <description>Apache CXF JAX-RS Service Description OpenAPI v3</description>
     <url>http://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
