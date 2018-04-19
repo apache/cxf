@@ -469,6 +469,26 @@
                                     <overWriteSnapshots>true</overWriteSnapshots>
                                 </configuration>
                             </execution>
+                            <execution>
+                                <id>copy-annotation</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>javax.annotation</groupId>
+                                            <artifactId>javax.annotation-api</artifactId>
+                                            <type>jar</type>
+                                            <overWrite>false</overWrite>
+                                            <outputDirectory>${project.basedir}/target/java9</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                    <overWriteReleases>false</overWriteReleases>
+                                    <overWriteSnapshots>true</overWriteSnapshots>
+                                </configuration>
+                            </execution>
                         </executions>
                     </plugin>
                     <plugin>
