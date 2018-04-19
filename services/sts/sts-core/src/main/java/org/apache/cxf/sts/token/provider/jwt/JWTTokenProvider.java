@@ -155,7 +155,6 @@ public class JWTTokenProvider implements TokenProvider {
             LOG.fine("JWT Token successfully created");
             return response;
         } catch (Exception e) {
-            e.printStackTrace();
             LOG.log(Level.WARNING, "", e);
             throw new STSException("Can't serialize JWT token", e, STSException.REQUEST_FAILED);
         }
