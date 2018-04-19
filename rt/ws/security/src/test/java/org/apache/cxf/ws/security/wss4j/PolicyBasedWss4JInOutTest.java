@@ -22,6 +22,7 @@ import java.util.Arrays;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
 import org.apache.wss4j.policy.SP12Constants;
 
@@ -430,7 +431,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 null,
                 Arrays.asList(CoverageType.ENCRYPTED, CoverageType.SIGNED));
 
-        if (!isJava9Compatible()) {
+        if (!JavaUtils.isJava9Compatible()) {
             // CXF-7270
             this.runAndValidate(
                 "wsse-request-clean.xml",
@@ -556,12 +557,4 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
         // TODO: Tests for derived keys.
     }
 
-    private boolean isJava9Compatible() {
-        String version = System.getProperty("java.version");
-        if (version.indexOf(".") > 0) {
-            version = version.substring(0, version.indexOf("."));
-        }
-
-        return Integer.valueOf(version) >= 9;
-    }
 }
