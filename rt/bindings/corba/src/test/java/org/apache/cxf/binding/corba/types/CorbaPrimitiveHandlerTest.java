@@ -84,10 +84,10 @@ public class CorbaPrimitiveHandlerTest extends Assert {
         assertNotNull(obj);
 
         //CXF corba maps the XML char type to a Byte so we need to provide the string data as a Byte value
-        Byte byteValue = new Byte((byte)val.charValue());
+        Byte byteValue = Byte.valueOf((byte)val.charValue());
         obj.setValueFromData(byteValue.toString());
         String result = obj.getDataFromValue();
-        Byte byteResult = new Byte(result);
+        Byte byteResult = Byte.valueOf(result);
         assertTrue(byteResult.byteValue() == byteValue.byteValue());
 
         // However, internally, we also hold the data as a character to make it easier to marshal the data
@@ -125,7 +125,7 @@ public class CorbaPrimitiveHandlerTest extends Assert {
 
     @Test
     public void testCreateCorbaOctet() {
-        Byte val = new Byte((byte)100);
+        Byte val = Byte.valueOf((byte)100);
         CorbaPrimitiveHandler obj =
             new CorbaPrimitiveHandler(new QName("octet"),
                                       CorbaConstants.NT_CORBA_OCTET,
@@ -147,7 +147,7 @@ public class CorbaPrimitiveHandlerTest extends Assert {
 
     @Test
     public void testCreateCorbaShort() {
-        Short val = new Short((short)1234);
+        Short val = Short.valueOf((short)1234);
         CorbaPrimitiveHandler obj =
             new CorbaPrimitiveHandler(new QName("short"),
                                       CorbaConstants.NT_CORBA_SHORT,
@@ -169,7 +169,7 @@ public class CorbaPrimitiveHandlerTest extends Assert {
 
     @Test
     public void testCreateCorbaUShort() {
-        Short val = new Short((short)4321);
+        Short val = Short.valueOf((short)4321);
         CorbaPrimitiveHandler obj =
             new CorbaPrimitiveHandler(new QName("ushort"),
                                       CorbaConstants.NT_CORBA_USHORT,

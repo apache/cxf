@@ -296,7 +296,7 @@ public class BookServer extends AbstractBusTestServerBase {
         private static class ByteConverter implements ParamConverter<Byte> {
             @Override
             public Byte fromString(String t) {
-                return new Byte(t);
+                return Byte.valueOf(t);
             }
 
             @Override

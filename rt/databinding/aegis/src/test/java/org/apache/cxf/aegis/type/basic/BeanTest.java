@@ -488,10 +488,10 @@ public class BeanTest extends AbstractAegisTest {
         assertTrue(bigByteOk);
 
         SimpleBean bean = new SimpleBean();
-        bean.setBigByte(new Byte((byte)0xfe));
+        bean.setBigByte(Byte.valueOf((byte)0xfe));
         bean.setLittleByte((byte)0xfd);
         Element element = writeObjectToElement(type, bean, getContext());
-        Byte bb = new Byte((byte)0xfe);
+        Byte bb = Byte.valueOf((byte)0xfe);
         String bbs = bb.toString();
         assertValid("/b:root/bz:bigByte[text()='" + bbs + "']", element);
 

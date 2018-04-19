@@ -118,7 +118,7 @@ public class CorbaObjectWriterTest extends Assert {
         OutputStream oStream = orb.create_output_stream();
 
         CorbaObjectWriter writer = new CorbaObjectWriter(oStream);
-        Short shortValue = new Short((short)-123);
+        Short shortValue = Short.valueOf((short)-123);
         writer.writeShort(shortValue);
 
         InputStream iStream = oStream.create_input_stream();

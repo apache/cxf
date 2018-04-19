@@ -446,7 +446,7 @@ public class CorbaObjectReaderTest extends Assert {
         reader.readException(obj);
 
         List<CorbaObjectHandler> nestedObjs = obj.getMembers();
-        assertTrue(new Short(((CorbaPrimitiveHandler)nestedObjs.get(0))
+        assertTrue(Short.valueOf(((CorbaPrimitiveHandler)nestedObjs.get(0))
                                  .getDataFromValue()).shortValue() == code);
         assertTrue(((CorbaPrimitiveHandler)nestedObjs.get(1)).getDataFromValue().equals(message));
     }
