@@ -74,7 +74,6 @@
                                 <configuration>
                                     <executable>java</executable>
                                     <arguments>
-                                        <argument>-Dcxf.config.file=${project.build.directory}/classes/server.xml</argument>
                                         <argument>-classpath</argument>
                                         <classpath />
                                         <argument>demo.stream.server.Server</argument>
@@ -103,7 +102,6 @@
                                 <configuration>
                                     <executable>java</executable>
                                     <arguments>
-                                        <argument>-Dcxf.config.file=${project.build.directory}/classes/client.xml</argument>
                                         <argument>-classpath</argument>
                                         <classpath />
                                         <argument>demo.stream.client.Client</argument>
@@ -130,11 +128,6 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
-            <version>3.2.5-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-management</artifactId>
             <version>3.2.5-SNAPSHOT</version>
         </dependency>
     </dependencies>

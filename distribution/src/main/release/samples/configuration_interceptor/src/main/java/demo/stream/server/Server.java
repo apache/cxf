@@ -21,6 +21,11 @@ package demo.stream.server;
 
 import javax.xml.ws.Endpoint;
 
+import org.apache.cxf.ext.logging.LoggingFeature;
+import org.apache.cxf.jaxws.EndpointImpl;
+
+import demo.stream.interceptor.StreamInterceptor;
+
 public class Server {
 
     protected Server() throws Exception {
@@ -28,7 +33,9 @@ public class Server {
 
         Object implementor = new GreeterImpl();
         String address = "http://localhost:9000/SoapContext/SoapPort";
-        Endpoint.publish(address, implementor);
+        EndpointImpl ep = (EndpointImpl)Endpoint.publish(address, implementor, new LoggingFeature());
+
+        ep.getOutInterceptors().add(new StreamInterceptor());
     }
 
     public static void main(String args[]) throws Exception {
