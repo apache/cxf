@@ -283,4 +283,21 @@ public interface Client extends InterceptorProvider, MessageObserver, ConduitSel
      * @return the Bus
      */
     Bus getBus();
+
+    /**
+     * if {@link Client#isThreadLocalRequestContext()} it will clean the request context map. This method
+     * allows to avoid potential leaks programmatically, instead of waiting the garbage collector intervention.
+     */
+    default void clearThreadLocalRequestContexts() {
+
+    }
+
+    /**
+     * It will clean the response context map. This method allows to avoid potential leaks programmatically, instead
+     * of waiting the garbage collector intervention.
+     */
+    default void clearThreadLocalResponseContexts() {
+
+    }
+
 }

@@ -71,6 +71,10 @@ import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.workqueue.SynchronousExecutor;
 
+import static java.lang.Thread.currentThread;
+
+
+
 public class ClientImpl
     extends AbstractBasicInterceptorProvider
     implements Client, Retryable, MessageObserver {
@@ -96,11 +100,11 @@ public class ClientImpl
 
     protected Map<String, Object> currentRequestContext = new ConcurrentHashMap<String, Object>(8, 0.75f, 4);
     protected Thread latestContextThread;
-    protected Map<Thread, Map<String, Object>> requestContext
-        = Collections.synchronizedMap(new WeakHashMap<Thread, Map<String, Object>>());
+    protected Map<String, Map<String, Object>> requestContext = Collections
+        .synchronizedMap(new WeakHashMap<String, Map<String, Object>>());
 
-    protected Map<Thread, Map<String, Object>> responseContext
-        = Collections.synchronizedMap(new WeakHashMap<Thread, Map<String, Object>>());
+    protected Map<String, Map<String, Object>> responseContext = Collections
+        .synchronizedMap(new WeakHashMap<String, Map<String, Object>>());
 
     protected Executor executor;
 
@@ -208,7 +212,7 @@ public class ClientImpl
             }
             return epfo;
         }
-        
+
         for (ServiceInfo svcfo : svc.getServiceInfos()) {
             for (EndpointInfo e : svcfo.getEndpoints()) {
                 BindingInfo bfo = e.getBinding();
@@ -240,26 +244,26 @@ public class ClientImpl
 
     public Map<String, Object> getRequestContext() {
         if (isThreadLocalRequestContext()) {
-            final Thread t = Thread.currentThread();
-            if (!requestContext.containsKey(t)) {
+            if (!requestContext.containsKey(getThreadName())) {
                 Map<String, Object> freshRequestContext = new EchoContext(currentRequestContext);
-                requestContext.put(t, freshRequestContext);
+                requestContext.put(getThreadName(), freshRequestContext);
             }
-            latestContextThread = t;
-            return requestContext.get(t);
+            latestContextThread = currentThread();
+            return requestContext.get(getThreadName());
         }
         return currentRequestContext;
     }
+
     public Map<String, Object> getResponseContext() {
-        if (!responseContext.containsKey(Thread.currentThread())) {
-            final Thread t = Thread.currentThread();
-            responseContext.put(t, new HashMap<String, Object>() {
+        if (!responseContext.containsKey(currentThread().getName())) {
+            responseContext.put(getThreadName(), new HashMap<String, Object>() {
                 private static final long serialVersionUID = 1L;
+
                 @Override
                 public void clear() {
                     super.clear();
                     try {
-                        for (Map.Entry<Thread, Map<String, Object>> ent : responseContext.entrySet()) {
+                        for (Map.Entry<String, Map<String, Object>> ent : responseContext.entrySet()) {
                             if (ent.getValue() == this) {
                                 responseContext.remove(ent.getKey());
                                 return;
@@ -271,7 +275,7 @@ public class ClientImpl
                 }
             });
         }
-        return responseContext.get(Thread.currentThread());
+        return responseContext.get(getThreadName());
 
     }
     public boolean isThreadLocalRequestContext() {
@@ -343,7 +347,7 @@ public class ClientImpl
             return invoke(oi, params, context, exchange);
         } finally {
             if (responseContext != null) {
-                responseContext.put(Thread.currentThread(), resp);
+                responseContext.put(getThreadName(), resp);
             }
         }
     }
@@ -356,7 +360,7 @@ public class ClientImpl
             if (context != null) {
                 Map<String, Object> resp = CastUtils.cast((Map<?, ?>)context.get(RESPONSE_CONTEXT));
                 if (resp != null && responseContext != null) {
-                    responseContext.put(Thread.currentThread(), resp);
+                    responseContext.put(getThreadName(), resp);
                 }
             }
         }
@@ -514,7 +518,7 @@ public class ClientImpl
                                 // handle the right response
                                 List<Object> resList = null;
                                 Message inMsg = message.getExchange().getInMessage();
-                                Map<String, Object> ctx = responseContext.get(Thread.currentThread());
+                                Map<String, Object> ctx = responseContext.get(getThreadName());
                                 resList = CastUtils.cast(inMsg.getContent(List.class));
                                 Object[] result = resList == null ? null : resList.toArray();
                                 callback.handleResponse(ctx, result);
@@ -639,7 +643,7 @@ public class ClientImpl
                 resContext.putAll(inMsg);
                 // remove the recursive reference if present
                 resContext.remove(Message.INVOCATION_CONTEXT);
-                responseContext.put(Thread.currentThread(), resContext);
+                responseContext.put(getThreadName(), resContext);
             }
             resList = CastUtils.cast(inMsg.getContent(List.class));
         }
@@ -651,9 +655,9 @@ public class ClientImpl
             throw ex;
         }
 
-        if (resList == null   
+        if (resList == null
             && oi != null && !oi.getOperationInfo().isOneWay()) {
-            
+
             BindingOperationInfo boi = oi;
             if (boi.isUnwrapped()) {
                 boi = boi.getWrappedOperation();
@@ -815,7 +819,7 @@ public class ClientImpl
                         resCtx = CastUtils.cast((Map<?, ?>) resCtx
                                 .get(RESPONSE_CONTEXT));
                         if (resCtx != null) {
-                            responseContext.put(Thread.currentThread(), resCtx);
+                            responseContext.put(getThreadName(), resCtx);
                         }
                         // remove callback so that it won't be invoked twice
                         callback = message.getExchange().remove(ClientCallback.class);
@@ -844,7 +848,7 @@ public class ClientImpl
                                                                 .get(Message.INVOCATION_CONTEXT));
                 resCtx = CastUtils.cast((Map<?, ?>)resCtx.get(RESPONSE_CONTEXT));
                 if (resCtx != null && responseContext != null) {
-                    responseContext.put(Thread.currentThread(), resCtx);
+                    responseContext.put(getThreadName(), resCtx);
                 }
                 try {
                     Object obj[] = processResult(message, message.getExchange(),
@@ -1064,14 +1068,14 @@ public class ClientImpl
 
         public void reload() {
             super.clear();
-            super.putAll(requestContext.get(latestContextThread));
+            super.putAll(requestContext.get(latestContextThread.getName()));
         }
-        
+
         @Override
         public void clear() {
             super.clear();
             try {
-                for (Map.Entry<Thread, Map<String, Object>> ent : requestContext.entrySet()) {
+                for (Map.Entry<String, Map<String, Object>> ent : requestContext.entrySet()) {
                     if (ent.getValue() == this) {
                         requestContext.remove(ent.getKey());
                         return;
@@ -1083,12 +1087,29 @@ public class ClientImpl
         }
     }
 
-
     public void setExecutor(Executor executor) {
         if (!SynchronousExecutor.isA(executor)) {
             this.executor = executor;
         }
     }
 
+    /**
+     * Returns the current thread name. As this value will be used as a key in a {@link WeakHashMap},
+     * we should use the String constructor for avoiding scenarios where strong references are kept
+     * to the string names causing that the map entries can't be garbage collected.
+     * @return
+     */
+    private String getThreadName() {
+        return new String(currentThread().getName());
+    }
 
+    @Override
+    public void clearThreadLocalRequestContexts() {
+        requestContext.clear();
+    }
+
+    @Override
+    public void clearThreadLocalResponseContexts() {
+        responseContext.clear();
+    }
 }
