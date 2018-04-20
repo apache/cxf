@@ -2,14 +2,14 @@
   <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.apache.cxf</groupId>
-    <artifactId>cxf7067-codegen</artifactId>
+    <artifactId>cxf7708-codegen</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>cxf7067-codegen</name>
-
+    <name>cxf7708-codegen</name>
+    
     <properties>
-        <wsdl.groupid>org.apache.cxf.cxf7067</wsdl.groupid>
-        <wsdl.artifactid>Cxf7067Service</wsdl.artifactid>
+        <wsdl.groupid>org.apache.cxf.cxf7708</wsdl.groupid>
+        <wsdl.artifactid>Cxf7708Service</wsdl.artifactid>
         <wsdl.version>1.0.0</wsdl.version>
     </properties>
 
@@ -35,17 +35,9 @@
                 </executions>
             </plugin>
             <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.7.0</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-codegen-plugin</artifactId>
-                <version>@project.version@</version>
+                <version>3.2.5-SNAPSHOT</version>
                 <executions>
                     <execution>
                         <id>generate-sources</id>
@@ -59,10 +51,8 @@
                                         <version>${wsdl.version}</version>
                                     </wsdlArtifact>
                                     <wsdlLocation>classpath:${wsdl.artifactid}.wsdl</wsdlLocation>
-                                    <extraargs>
-                                        <extraarg>-verbose</extraarg>
-                                        <extraarg>-validate</extraarg>
-                                    </extraargs>
+                                    <suppressGeneratedDate>true</suppressGeneratedDate>
+                                    <markGenerated>true</markGenerated>
                                 </wsdlOption>
                             </wsdlOptions>
                         </configuration>
