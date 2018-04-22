@@ -26,7 +26,6 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import org.apache.cxf.bus.spring.SpringBus;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
-import org.apache.cxf.transport.sse.SseHttpTransportFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -50,7 +49,6 @@ public class StatsConfig {
             .createEndpoint(new StatsApplication(), JAXRSServerFactoryBean.class);
         factory.setServiceBean(statsRestService);
         factory.setProvider(new JacksonJsonProvider());
-        factory.setTransportId(SseHttpTransportFactory.TRANSPORT_ID);
         return factory.create();
     }
 }

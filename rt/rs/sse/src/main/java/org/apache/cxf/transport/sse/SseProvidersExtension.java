@@ -18,20 +18,37 @@
  */
 package org.apache.cxf.transport.sse;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.buslifecycle.BusCreationListener;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.sse.SseContextProvider;
 import org.apache.cxf.jaxrs.sse.SseEventSinkContextProvider;
 
 public class SseProvidersExtension implements BusCreationListener {
 
+    private static final String BUS_PROVIDERS = "org.apache.cxf.jaxrs.bus.providers";
+
     @Override
     public void busCreated(Bus bus) {
-        bus.setProperty(
-            "org.apache.cxf.jaxrs.bus.providers",
-            Arrays.asList(new SseContextProvider(), new SseEventSinkContextProvider()));
+        Object providers = bus.getProperty(BUS_PROVIDERS);
+        
+        final List<?> sseProviders = 
+            Arrays.asList(
+                new SseContextProvider(), 
+                new SseEventSinkContextProvider()
+            );
+        
+        if (providers instanceof List) {
+            final List<?> existing = new ArrayList<>((List<?>)providers);
+            existing.addAll(CastUtils.cast(sseProviders));
+            bus.setProperty(BUS_PROVIDERS, existing);
+        } else {
+            bus.setProperty(BUS_PROVIDERS, sseProviders);
+        }
     }
     
 }

@@ -90,11 +90,6 @@
             <artifactId>tomcat-embed-websocket</artifactId>
             <version>${cxf.tomcat.version}</version>
         </dependency>
-
-        <dependency>
-            <groupId>org.atmosphere</groupId>
-            <artifactId>atmosphere-runtime</artifactId>
-        </dependency>
     </dependencies>
     
     <profiles>

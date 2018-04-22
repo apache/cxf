@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -37,26 +38,18 @@ import javax.ws.rs.sse.SseEventSink;
 
 public class SseBroadcasterImpl implements SseBroadcaster {
     private final Set<SseEventSink> subscribers = new CopyOnWriteArraySet<>();
-
-    private final Set<Consumer<SseEventSink>> closers =
-        new CopyOnWriteArraySet<>();
-
-    private final Set<BiConsumer<SseEventSink, Throwable>> exceptioners =
-        new CopyOnWriteArraySet<>();
-
-    private volatile boolean closed;
+    private final Set<Consumer<SseEventSink>> closers = new CopyOnWriteArraySet<>();
+    private final Set<BiConsumer<SseEventSink, Throwable>> exceptioners = new CopyOnWriteArraySet<>();
+    private final AtomicBoolean closed = new AtomicBoolean(false);
 
     @Override
     public void register(SseEventSink sink) {
-        if (closed) {
-            throw new IllegalStateException("Already closed");
-        }
+        assertNotClosed();
 
-        SseEventSinkImpl sinkImpl = (SseEventSinkImpl)sink;
+        final SseEventSinkImpl sinkImpl = (SseEventSinkImpl)sink;
+        final AsyncContext ctx = sinkImpl.getAsyncContext();
 
-        AsyncContext asyncContext = sinkImpl.getAsyncContext();
-
-        asyncContext.addListener(new AsyncListener() {
+        ctx.addListener(new AsyncListener() {
             @Override
             public void onComplete(AsyncEvent asyncEvent) throws IOException {
                 subscribers.remove(sink);
@@ -83,12 +76,9 @@ public class SseBroadcasterImpl implements SseBroadcaster {
 
     @Override
     public CompletionStage<?> broadcast(OutboundSseEvent event) {
-        if (closed) {
-            throw new IllegalStateException("Already closed");
-        }
+        assertNotClosed();
 
         final Collection<CompletableFuture<?>> futures = new ArrayList<>();
-
         for (SseEventSink sink: subscribers) {
             try {
                 futures.add(sink.send(event).toCompletableFuture());
@@ -102,29 +92,29 @@ public class SseBroadcasterImpl implements SseBroadcaster {
 
     @Override
     public void onClose(Consumer<SseEventSink> subscriber) {
-        if (closed) {
-            throw new IllegalStateException("Already closed");
-        }
-
+        assertNotClosed();
         closers.add(subscriber);
     }
 
     @Override
     public void onError(BiConsumer<SseEventSink, Throwable> exceptioner) {
-        if (closed) {
-            throw new IllegalStateException("Already closed");
-        }
-
+        assertNotClosed();
         exceptioners.add(exceptioner);
     }
 
     @Override
     public void close() {
-        closed = true;
+        if (closed.compareAndSet(false, true)) {
+            subscribers.forEach(subscriber -> {
+                subscriber.close();
+                closers.forEach(closer -> closer.accept(subscriber));
+            });
+        }
+    }
 
-        subscribers.forEach(subscriber -> {
-            subscriber.close();
-            closers.forEach(closer -> closer.accept(subscriber));
-        });
+    private void assertNotClosed() {
+        if (closed.get()) {
+            throw new IllegalStateException("The SSE broadcaster is already closed");
+        }
     }
 }

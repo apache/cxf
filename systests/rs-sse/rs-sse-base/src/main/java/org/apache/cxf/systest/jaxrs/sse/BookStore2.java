@@ -20,6 +20,7 @@ package org.apache.cxf.systest.jaxrs.sse;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -90,6 +91,23 @@ public class BookStore2 {
                 }
             }
         }.start();
+    }
+
+    @GET
+    @Path("nodelay/sse/{id}")
+    @Produces(MediaType.SERVER_SENT_EVENTS)
+    public void forBookNoDelay(@Context SseEventSink sink, @PathParam("id") final String id) {
+        final Builder builder = sse.newEventBuilder();
+        
+        CompletableFuture
+            .runAsync(() -> {
+                sink.send(createStatsEvent(builder.name("book"), 1));
+                sink.send(createStatsEvent(builder.name("book"), 2));
+                sink.send(createStatsEvent(builder.name("book"), 3));
+                sink.send(createStatsEvent(builder.name("book"), 4));
+                sink.send(createStatsEvent(builder.name("book"), 5));
+            })
+            .whenComplete((r, ex) -> sink.close());
     }
 
     @GET
