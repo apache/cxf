@@ -25,6 +25,8 @@ import java.net.ServerSocket;
 
 import javax.xml.ws.Endpoint;
 
+import org.apache.cxf.ext.logging.LoggingFeature;
+
 public final class Main {
 
     private Main() {
@@ -43,6 +45,6 @@ public final class Main {
 
         String address = "http://localhost:" + port + "/Greeter";
         System.out.println("Publishing on " + address);
-        Endpoint.publish(address, new GreeterImpl(port));
+        Endpoint.publish(address, new GreeterImpl(port), new LoggingFeature());
     }
 }
