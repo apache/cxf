@@ -190,12 +190,17 @@
                             </pomIncludes>
                             <settingsFile>src/it/settings.xml</settingsFile>
                             <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
-                            <!-- CXF-7708 temporarily disabled as it fails with JDK 9
                             <postBuildHookScript>verify</postBuildHookScript>
-                            -->
                         </configuration>
                     </execution>
                 </executions>
+                <dependencies>
+                   <dependency>
+                       <groupId>javax.xml.bind</groupId>
+                       <artifactId>jaxb-api</artifactId>
+                       <version>${cxf.jaxb.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>
