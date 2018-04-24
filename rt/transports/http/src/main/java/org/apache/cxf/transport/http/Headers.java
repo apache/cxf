@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
@@ -291,16 +292,15 @@ public class Headers {
     public void readFromConnection(HttpURLConnection connection) {
         Map<String, List<String>> origHeaders = connection.getHeaderFields();
         headers.clear();
-        for (String key : connection.getHeaderFields().keySet()) {
-            if (key != null) {
-                headers.put(HttpHeaderHelper.getHeaderKey(key),
-                    origHeaders.get(key));
+        for (Entry<String, List<String>> entry : origHeaders.entrySet()) {
+            if (entry.getKey() != null) {
+                headers.put(HttpHeaderHelper.getHeaderKey(entry.getKey()), entry.getValue());
             }
         }
     }
 
     private static List<String> createMutableList(String val) {
-        return new ArrayList<>(Arrays.asList(new String[] {val}));
+        return new ArrayList<>(Arrays.asList(val));
     }
 
     /**
@@ -367,7 +367,7 @@ public class Headers {
         }
 
         transferProtocolHeadersToURLConnection(connection);
-        
+
         Map<String, List<Object>> theHeaders = CastUtils.cast(headers);
         logProtocolHeaders(LOG, Level.FINE, theHeaders, logSensitiveHeaders());
     }
@@ -405,24 +405,15 @@ public class Headers {
         boolean addHeaders = MessageUtils.getContextualBoolean(message, ADD_HEADERS_PROPERTY, false);
         for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
             String header = entry.getKey();
-            List<String> headerList = entry.getValue();
-
             if (HttpHeaderHelper.CONTENT_TYPE.equalsIgnoreCase(header)) {
                 continue;
             }
+
+            List<String> headerList = entry.getValue();
             if (addHeaders || HttpHeaderHelper.COOKIE.equalsIgnoreCase(header)) {
-                for (String s : headerList) {
-                    connection.addRequestProperty(header, s);
-                }
+                headerList.forEach(s -> connection.addRequestProperty(header, s));
             } else {
-                StringBuilder b = new StringBuilder();
-                for (int i = 0; i < headerList.size(); i++) {
-                    b.append(headerList.get(i));
-                    if (i + 1 < headerList.size()) {
-                        b.append(',');
-                    }
-                }
-                connection.setRequestProperty(header, b.toString());
+                connection.setRequestProperty(header, String.join(",", headerList));
             }
         }
         // make sure we don't add more than one User-Agent header
@@ -473,6 +464,7 @@ public class Headers {
         // Not allowed by default
         return PropertyUtils.isTrue(message.getContextualProperty(ALLOW_LOGGING_SENSITIVE_HEADERS));
     }
+
     private String getContentTypeFromMessage() {
         final String ct = (String)message.get(Message.CONTENT_TYPE);
         final String enc = (String)message.get(Message.ENCODING);

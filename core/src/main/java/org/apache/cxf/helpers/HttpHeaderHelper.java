@@ -81,8 +81,8 @@ public final class HttpHeaderHelper {
         int idx = contentType.indexOf("charset=");
         if (idx != -1) {
             String charset = contentType.substring(idx + 8);
-            if (charset.indexOf(";") != -1) {
-                charset = charset.substring(0, charset.indexOf(";")).trim();
+            if (charset.indexOf(';') != -1) {
+                charset = charset.substring(0, charset.indexOf(';')).trim();
             }
             if (charset.isEmpty()) {
                 return null;
@@ -106,7 +106,7 @@ public final class HttpHeaderHelper {
         }
         //older versions of tomcat don't properly parse ContentType headers with stuff
         //after charset=StandardCharsets.UTF_8
-        int idx = enc.indexOf(";");
+        int idx = enc.indexOf(';');
         if (idx != -1) {
             enc = enc.substring(0, idx);
         }
