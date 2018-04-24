@@ -41,17 +41,17 @@ public class WebSocketDestinationFactory implements HttpDestinationFactory {
     private static final boolean ATMOSPHERE_AVAILABLE = probeClass("org.atmosphere.cpr.ApplicationConfig");
     private static final boolean JETTY_AVAILABLE = probeClass("org.eclipse.jetty.server.Server");
     private static final boolean UNDERTOW_AVAILABLE = probeClass("io.undertow.websockets.core.WebSockets");
-    private static final Constructor<?> JETTY9_WEBSOCKET_DESTINATION_CTR = 
+    private static final Constructor<?> JETTY9_WEBSOCKET_DESTINATION_CTR =
         probeConstructor("org.apache.cxf.transport.websocket.jetty9.Jetty9WebSocketDestination");
-    private static final Constructor<?> UNDERTOW_WEBSOCKET_DESTINATION_CTR = 
+    private static final Constructor<?> UNDERTOW_WEBSOCKET_DESTINATION_CTR =
         probeUndertowConstructor("org.apache.cxf.transport.websocket.undertow.UndertowWebSocketDestination");
-    private static final Constructor<?> ATMOSPHERE_WEBSOCKET_JETTY_DESTINATION_CTR = 
+    private static final Constructor<?> ATMOSPHERE_WEBSOCKET_JETTY_DESTINATION_CTR =
         probeConstructor("org.apache.cxf.transport.websocket.atmosphere.AtmosphereWebSocketJettyDestination");
-    private static final Constructor<?> ATMOSPHERE_WEBSOCKET_UNDERTOW_DESTINATION_CTR = 
+    private static final Constructor<?> ATMOSPHERE_WEBSOCKET_UNDERTOW_DESTINATION_CTR =
         probeUndertowConstructor(
             "org.apache.cxf.transport.websocket.atmosphere.AtmosphereWebSocketUndertowDestination");
 
-    private final boolean atmosphereDisabled = Boolean.valueOf(SystemPropertyAction
+    private final boolean atmosphereDisabled = Boolean.parseBoolean(SystemPropertyAction
         .getPropertyOrNull("org.apache.cxf.transport.websocket.atmosphere.disabled"));
 
     private static boolean probeClass(String name) {

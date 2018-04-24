@@ -515,7 +515,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     protected void checkPublishPermission() {
         SecurityManager sm = System.getSecurityManager();
         boolean checkPublishEndpointPermissionWithSecurityManager
-            = Boolean.valueOf(
+            = Boolean.parseBoolean(
                       SystemPropertyAction.getProperty(
                                          CHECK_PUBLISH_ENDPOINT_PERMISSON_PROPERTY_WITH_SECURITY_MANAGER,
                                          "true"));
