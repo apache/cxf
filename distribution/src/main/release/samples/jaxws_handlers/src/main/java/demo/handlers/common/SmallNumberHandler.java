@@ -19,7 +19,6 @@
 
 package demo.handlers.common;
 
-import java.util.Map;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -60,7 +59,7 @@ public class SmallNumberHandler implements LogicalHandler<LogicalMessageContext>
                 JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
                 Object payload = msg.getPayload(jaxbContext);
                 if (payload instanceof JAXBElement) {
-                    payload = ((JAXBElement)payload).getValue();
+                    payload = ((JAXBElement<?>)payload).getValue();
                 }
 
                 if (payload instanceof AddNumbers) {
@@ -88,7 +87,7 @@ public class SmallNumberHandler implements LogicalHandler<LogicalMessageContext>
 
                         payload = msg.getPayload(jaxbContext);
                         if (payload instanceof JAXBElement) {
-                            payload = ((JAXBElement)payload).getValue();
+                            payload = ((JAXBElement<?>)payload).getValue();
                         }
 
                         AddNumbersResponse resp2 = (AddNumbersResponse)payload;
@@ -119,10 +118,6 @@ public class SmallNumberHandler implements LogicalHandler<LogicalMessageContext>
 
     public void close(MessageContext ctx) {
         System.out.println("LogicalHandler close called");
-    }
-
-    public void init(Map config) {
-        System.out.println("LogicalHandler init called");
     }
 
     public void destroy() {
