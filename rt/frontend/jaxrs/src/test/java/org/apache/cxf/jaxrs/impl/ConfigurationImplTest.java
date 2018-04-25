@@ -180,6 +180,24 @@ public class ConfigurationImplTest extends Assert {
         }
     }
 
+    public interface MyClientFilter extends ClientRequestFilter, ClientResponseFilter {
+        // reduced to just the intermediate layer. Could contain user code
+    }
+
+    public static class NestedInterfaceTestFilter implements MyClientFilter {
+
+        @Override
+        public void filter(ClientRequestContext requestContext) throws IOException {
+            // no-op
+        }
+
+        @Override
+        public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext)
+                throws IOException {
+            // no-op
+        }
+    }
+
     private Client createClientProxy() {
         return (Client) Proxy.newProxyInstance(this.getClass().getClassLoader(), 
             new Class<?>[]{Client.class},
@@ -213,6 +231,16 @@ public class ConfigurationImplTest extends Assert {
         assertTrue(contracts.containsKey(ClientResponseFilter.class));
         assertFalse(contracts.containsKey(ContainerRequestFilter.class));
         assertFalse(contracts.containsKey(ContainerResponseFilter.class));
+    }
+
+    @Test
+    public void testClientFilterWithNestedInterfacesIsAccepted() {
+        Configurable<Client> configurable = new ConfigurableImpl<>(createClientProxy(), RuntimeType.CLIENT);
+        Configuration config = configurable.getConfiguration();
+        configurable.register(NestedInterfaceTestFilter.class);
+        Map<Class<?>, Integer> contracts = config.getContracts(NestedInterfaceTestFilter.class);
+        assertTrue(contracts.containsKey(ClientRequestFilter.class));
+        assertTrue(contracts.containsKey(ClientResponseFilter.class));
     }
 
     @Test
