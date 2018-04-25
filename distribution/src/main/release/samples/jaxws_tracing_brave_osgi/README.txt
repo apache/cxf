@@ -52,6 +52,7 @@ for this demo bundle.
 
   feature:install cxf-jaxws
   feature:install cxf-tracing-brave
+  feature:install aries-blueprint
 
 Install this demo bundle (using the appropriate bundle version number)
   
@@ -63,9 +64,15 @@ You can verify if the CXF JAX-RS OpenZipkin Brave Blueprint Demo is installed an
   START LEVEL 100 , List Threshold: 50
    ID | State  | Lvl | Version | Name                              
   -----------------------------------------------------------------
-  117 | Active |  80 | 3.2.0.SNAPSHOT | JAX-RS Demo Using Distributed Tracing with OpenZipkin Brave and OSGi
+  117 | Active |  80 | 3.2.0.SNAPSHOT | JAX-WS Demo Using Distributed Tracing
   karaf@root()>
 
 Now, you will be able to access this CXF JAXWS demo service on your Karaf instance at
 
   http://localhost:8181/cxf/catalog?wsdl
+  
+Run the client test code which adds a book via:
+
+  mvn -Pclient
+  
+In the Karaf logs (data/log/karaf.log) you can see the Tracing calls.

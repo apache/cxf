@@ -22,17 +22,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
-import javax.xml.ws.AsyncHandler;
-
-import org.apache.cxf.annotations.UseAsyncMethod;
-import org.apache.cxf.jaxws.ServerAsyncResponse;
 
 import brave.Span;
 import brave.Tracer.SpanInScope;
 import brave.Tracing;
-
 import demo.jaxws.tracing.server.Book;
 import demo.jaxws.tracing.server.CatalogService;
 
@@ -45,25 +38,15 @@ public class CatalogServiceImpl implements CatalogService {
         this.brave = brave;
     }
 
-    @UseAsyncMethod
     public void addBook(Book book)  {
-        throw new UnsupportedOperationException("Please use async version of the method");
-    }
-
-    public Future<?> addBookAsync(Book book, AsyncHandler<Book> handler) {
-        final ServerAsyncResponse<Book> response = new ServerAsyncResponse<Book>();
-
         executor.submit(() -> {
             final Span span = brave.tracer().nextSpan().name("Inserting New Book").start();
             try (SpanInScope scope = brave.tracer().withSpanInScope(span)) {
                 books.put(book.getId(), book);
-                handler.handleResponse(response);
             } finally {
                 span.finish();
             }
         });
-
-        return response;
     }
 
     @Override
