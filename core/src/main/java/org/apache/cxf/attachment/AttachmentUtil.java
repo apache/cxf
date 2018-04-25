@@ -359,14 +359,7 @@ public final class AttachmentUtil {
     }
     static String getHeaderValue(List<String> v, String delim) {
         if (v != null && !v.isEmpty()) {
-            StringBuilder b = new StringBuilder();
-            for (String s : v) {
-                if (b.length() > 0) {
-                    b.append(delim);
-                }
-                b.append(s);
-            }
-            return b.toString();
+            return String.join(delim, v);
         }
         return null;
     }

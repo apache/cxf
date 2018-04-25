@@ -36,14 +36,8 @@ public class OidcDynamicRegistrationService extends DynamicRegistrationService {
         Client client = super.createNewClient(request);
         List<String> postLogoutUris = request.getListStringProperty(POST_LOGOUT_LOGOUT_URIS);
         if (postLogoutUris != null) {
-            StringBuilder sb = new StringBuilder();
-            for (String uri : postLogoutUris) {
-                if (sb.length() > 0) {
-                    sb.append(" ");
-                }
-                sb.append(uri);
-            }
-            client.getProperties().put(POST_LOGOUT_LOGOUT_URIS, sb.toString());
+            client.getProperties().put(POST_LOGOUT_LOGOUT_URIS,
+                                       String.join(" ", postLogoutUris));
         }
         String backChannelLogoutUri = request.getStringProperty(BACK_CHANNEL_LOGOUT_URI);
         if (backChannelLogoutUri != null) {

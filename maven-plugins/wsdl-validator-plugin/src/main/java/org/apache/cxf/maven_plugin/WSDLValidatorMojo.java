@@ -80,18 +80,10 @@ public class WSDLValidatorMojo extends AbstractMojo {
     private String excludes[];
 
     private String getIncludeExcludeString(String[] arr) {
-        if (arr == null) {
+        if (arr == null || arr.length == 0) {
             return "";
         }
-        StringBuilder str = new StringBuilder();
-
-        for (String s : arr) {
-            if (str.length() > 0) {
-                str.append(',');
-            }
-            str.append(s);
-        }
-        return str.toString();
+        return String.join(",", arr);
     }
 
     private List<File> getWsdlFiles(File dir)

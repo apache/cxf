@@ -271,7 +271,7 @@ final class JMSMessageUtils {
             for (Map.Entry<String, List<String>> ent : headers.entrySet()) {
                 if (!ent.getKey().equals(org.apache.cxf.message.Message.CONTENT_TYPE)
                     && !ent.getKey().equals(HttpHeaderHelper.CONTENT_LENGTH)) {
-                    messageHeaders.putProperty(ent.getKey(), JMSMessageUtils.join(ent.getValue(), ','));
+                    messageHeaders.putProperty(ent.getKey(), String.join(",", ent.getValue()));
                 }
             }
         }
@@ -289,17 +289,6 @@ final class JMSMessageUtils {
             message.put(headerName, messageProperties);
         }
         return messageProperties;
-    }
-
-    private static String join(List<String> valueList, char seperator) {
-        StringBuilder b = new StringBuilder();
-        for (String s : valueList) {
-            if (b.length() > 0) {
-                b.append(seperator);
-            }
-            b.append(s);
-        }
-        return b.toString();
     }
 
     private static String getSoapAction(JMSMessageHeadersType messageProperties,
