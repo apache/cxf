@@ -215,7 +215,7 @@
             <plugin>
                 <groupId>com.googlecode.maven-download-plugin</groupId>
                 <artifactId>download-maven-plugin</artifactId>
-                <version>1.4.0</version>
+                <version>1.3.0</version><!-- 1.4.0 fails due to old cache on Jenkins nodes https://github.com/maven-download-plugin/maven-download-plugin/issues/80 -->
                 <executions>
                     <execution>
                         <id>download-public-suffix-list</id>
@@ -227,7 +227,6 @@
                             <url>https://publicsuffix.org/list/effective_tld_names.dat</url>
                             <outputDirectory>${project.build.outputDirectory}/mozilla</outputDirectory>
                             <outputFileName>public-suffix-list.txt</outputFileName>
-                            <skipCache>true</skipCache>
                         </configuration>
                     </execution>
                 </executions>
