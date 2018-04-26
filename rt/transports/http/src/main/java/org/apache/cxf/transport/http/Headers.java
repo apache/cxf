@@ -28,11 +28,10 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
+import java.util.Map.Entry;
 import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -74,18 +73,8 @@ public class Headers {
     private static final List<String> SENSITIVE_HEADERS = Arrays.asList("Authorization", "Proxy-Authorization");
     private static final List<Object> SENSITIVE_HEADER_MARKER = Arrays.asList((Object)"***");
     private static final String ALLOW_LOGGING_SENSITIVE_HEADERS = "allow.logging.sensitive.headers";
-    /**
-     * Known HTTP headers whose values have to be represented as individual HTTP headers
-     */
-    private static final Set<String> HTTP_HEADERS_SINGLE_VALUE_ONLY;
-    private static final String USER_AGENT;
-    static {
-        HTTP_HEADERS_SINGLE_VALUE_ONLY = new HashSet<String>();
-        HTTP_HEADERS_SINGLE_VALUE_ONLY.add(HTTP_HEADERS_SETCOOKIE);
-        HTTP_HEADERS_SINGLE_VALUE_ONLY.add(HTTP_HEADERS_LINK);
-        USER_AGENT = initUserAgent();
-    }
-    
+    private static final String USER_AGENT = initUserAgent();
+
     private final Message message;
     private final Map<String, List<String>> headers;
 
@@ -291,10 +280,18 @@ public class Headers {
     public void readFromConnection(HttpURLConnection connection) {
         Map<String, List<String>> origHeaders = connection.getHeaderFields();
         headers.clear();
-        for (String key : connection.getHeaderFields().keySet()) {
-            if (key != null) {
-                headers.put(HttpHeaderHelper.getHeaderKey(key), 
-                    origHeaders.get(key));
+        for (Entry<String, List<String>> entry : origHeaders.entrySet()) {
+            if (entry.getKey() != null) {
+                String key = HttpHeaderHelper.getHeaderKey(entry.getKey());
+                List<String> old = headers.get(key);
+                if (old != null) {
+                    List<String> nl = new ArrayList<>(old.size() + entry.getValue().size()); 
+                    nl.addAll(old);
+                    nl.addAll(entry.getValue());
+                    headers.put(key, nl);
+                } else {
+                    headers.put(key, entry.getValue());
+                }
             }
         }
     }
@@ -505,6 +502,10 @@ public class Headers {
         return true;
     }
 
+    private boolean isSingleHeader(String header) {
+        return HTTP_HEADERS_SETCOOKIE.equalsIgnoreCase(header) || HTTP_HEADERS_LINK.equalsIgnoreCase(header);
+    }
+    
     /**
      * Copy the response headers into the response.
      * 
@@ -525,7 +526,7 @@ public class Headers {
             String header = entry.getKey();
             List<?> headerList = entry.getValue();
 
-            if (addHeaders || HTTP_HEADERS_SINGLE_VALUE_ONLY.contains(header)) {
+            if (addHeaders || isSingleHeader(header)) {
                 for (int i = 0; i < headerList.size(); i++) {
                     Object headerObject = headerList.get(i);
                     if (headerObject != null) {
