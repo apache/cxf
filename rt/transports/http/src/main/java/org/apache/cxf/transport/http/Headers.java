@@ -73,9 +73,6 @@ public class Headers {
     private static final List<String> SENSITIVE_HEADERS = Arrays.asList("Authorization", "Proxy-Authorization");
     private static final List<Object> SENSITIVE_HEADER_MARKER = Arrays.asList("***");
     private static final String ALLOW_LOGGING_SENSITIVE_HEADERS = "allow.logging.sensitive.headers";
-    /**
-     * Known HTTP headers whose values have to be represented as individual HTTP headers
-     */
     private static final String USER_AGENT = initUserAgent();
 
     private final Message message;
