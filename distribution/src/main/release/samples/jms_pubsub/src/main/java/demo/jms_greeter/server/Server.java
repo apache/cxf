@@ -21,12 +21,14 @@ package demo.jms_greeter.server;
 
 import javax.xml.ws.Endpoint;
 
+import org.apache.cxf.ext.logging.LoggingFeature;
+
 public class Server {
     Endpoint ep;
 
     protected Server() throws Exception {
         System.out.println("Starting Server");
-        ep = Endpoint.publish(null, new GreeterJMSImpl());
+        ep = Endpoint.publish(null, new GreeterJMSImpl(), new LoggingFeature());
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
