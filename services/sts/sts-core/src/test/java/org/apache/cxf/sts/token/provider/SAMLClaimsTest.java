@@ -20,6 +20,7 @@ package org.apache.cxf.sts.token.provider;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -367,6 +368,92 @@ public class SAMLClaimsTest extends org.junit.Assert {
         assertTrue(tokenString.contains(ClaimTypes.MOBILEPHONE.toString()));
     }
 
+    /**
+     * Here we have two ClaimsHandlers that can both add claims for the same claim type. By default we will
+     * combine the Claims into one Attribute.
+     */
+    @org.junit.Test
+    public void testSaml2CombinedClaimsMultipleClaimsHandlers() throws Exception {
+        TokenProvider samlTokenProvider = new SAMLTokenProvider();
+        TokenProviderParameters providerParameters =
+            createProviderParameters(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, null);
+
+        ClaimsManager claimsManager = new ClaimsManager();
+        ClaimsHandler claimsHandler = new CustomClaimsHandler();
+        ClaimsHandler claimsHandler2 = new CustomClaimsHandler();
+        ((CustomClaimsHandler) claimsHandler2).setRole("CustomRole");
+        claimsManager.setClaimHandlers(new ArrayList<ClaimsHandler>(Arrays.asList(claimsHandler, claimsHandler2)));
+        providerParameters.setClaimsManager(claimsManager);
+
+        ClaimCollection claims = new ClaimCollection();
+
+        Claim claim = new Claim();
+        claim.setClaimType(CustomClaimsHandler.ROLE_CLAIM);
+        claims.add(claim);
+
+        providerParameters.setRequestedPrimaryClaims(claims);
+
+        assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML2_TOKEN_TYPE));
+        TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
+        assertTrue(providerResponse != null);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+
+        Element token = (Element)providerResponse.getToken();
+        String tokenString = DOM2Writer.nodeToString(token);
+        assertTrue(tokenString.contains(providerResponse.getTokenId()));
+        assertTrue(tokenString.contains("AttributeStatement"));
+
+        String requiredClaim = CustomClaimsHandler.ROLE_CLAIM.toString();
+        assertTrue(tokenString.contains(requiredClaim));
+        assertTrue(tokenString.contains("DUMMY"));
+        assertTrue(tokenString.contains("CustomRole"));
+        // Check only one Role Claim
+        assertEquals(tokenString.indexOf(requiredClaim), tokenString.lastIndexOf(requiredClaim));
+    }
+
+    /**
+     * Here we have two ClaimsHandlers that can both add claims for the same claim type. We configure the
+     * SAMLTokenProvider not to combine the claims unlike the test above.
+     */
+    @org.junit.Test
+    public void testSaml2SeparateClaimsMultipleClaimsHandlers() throws Exception {
+        TokenProvider samlTokenProvider = new SAMLTokenProvider();
+        ((SAMLTokenProvider) samlTokenProvider).setCombineClaimAttributes(false);
+        TokenProviderParameters providerParameters =
+            createProviderParameters(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, null);
+
+        ClaimsManager claimsManager = new ClaimsManager();
+        ClaimsHandler claimsHandler = new CustomClaimsHandler();
+        ClaimsHandler claimsHandler2 = new CustomClaimsHandler();
+        ((CustomClaimsHandler) claimsHandler2).setRole("CustomRole");
+        claimsManager.setClaimHandlers(new ArrayList<ClaimsHandler>(Arrays.asList(claimsHandler, claimsHandler2)));
+        providerParameters.setClaimsManager(claimsManager);
+
+        ClaimCollection claims = new ClaimCollection();
+
+        Claim claim = new Claim();
+        claim.setClaimType(CustomClaimsHandler.ROLE_CLAIM);
+        claims.add(claim);
+
+        providerParameters.setRequestedPrimaryClaims(claims);
+
+        assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML2_TOKEN_TYPE));
+        TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
+        assertTrue(providerResponse != null);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+
+        Element token = (Element)providerResponse.getToken();
+        String tokenString = DOM2Writer.nodeToString(token);
+        assertTrue(tokenString.contains(providerResponse.getTokenId()));
+        assertTrue(tokenString.contains("AttributeStatement"));
+
+        String requiredClaim = CustomClaimsHandler.ROLE_CLAIM.toString();
+        assertTrue(tokenString.contains(requiredClaim));
+        assertTrue(tokenString.contains("DUMMY"));
+        assertTrue(tokenString.contains("CustomRole"));
+        // Check we have two Role Claims
+        assertNotEquals(tokenString.indexOf(requiredClaim), tokenString.lastIndexOf(requiredClaim));
+    }
 
     private TokenProviderParameters createProviderParameters(
         String tokenType, String keyType, String appliesTo
@@ -405,8 +492,6 @@ public class SAMLClaimsTest extends org.junit.Assert {
         parameters.setStsProperties(stsProperties);
 
         parameters.setEncryptionProperties(new EncryptionProperties());
-
-
 
         return parameters;
     }
