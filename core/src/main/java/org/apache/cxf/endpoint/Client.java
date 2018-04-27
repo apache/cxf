@@ -239,8 +239,7 @@ public interface Client extends InterceptorProvider, MessageObserver, ConduitSel
      * @return true if the request context is a thread local
      */
     boolean isThreadLocalRequestContext();
-
-
+    
     Endpoint getEndpoint();
 
     /**
