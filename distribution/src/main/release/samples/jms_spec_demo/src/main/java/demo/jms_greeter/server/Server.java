@@ -21,6 +21,8 @@ package demo.jms_greeter.server;
 
 import javax.xml.ws.Endpoint;
 
+import org.apache.cxf.ext.logging.LoggingFeature;
+
 public class Server {
 
     protected Server() throws Exception {
@@ -29,7 +31,7 @@ public class Server {
         String address = "jms:jndi:dynamicQueues/test.cxf.jmstransport.queue?jndiInitialContextFactory="
             + "org.apache.activemq.jndi.ActiveMQInitialContextFactory&jndiConnectionFactoryName="
             + "ConnectionFactory&jndiURL=tcp://localhost:61616";
-        Endpoint.publish(address, implementor);
+        Endpoint.publish(address, implementor, new LoggingFeature());
     }
 
     public static void main(String args[]) throws Exception {

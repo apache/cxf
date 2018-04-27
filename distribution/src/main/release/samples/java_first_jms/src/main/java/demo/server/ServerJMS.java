@@ -21,9 +21,11 @@ package demo.server;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collections;
 
 import javax.xml.ws.Endpoint;
 
+import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 
@@ -100,10 +102,11 @@ public final class ServerJMS {
         svrFactory.setTransportId(JMSSpecConstants.SOAP_JMS_SPECIFICATION_TRANSPORTID);
         svrFactory.setAddress(JMS_ENDPOINT_URI);
         svrFactory.setServiceBean(implementor);
+        svrFactory.setFeatures(Collections.singletonList(new LoggingFeature()));
         svrFactory.create();
     }
 
     private static void launchJaxwsApi() {
-        Endpoint.publish(JMS_ENDPOINT_URI, new HelloWorldImpl());
+        Endpoint.publish(JMS_ENDPOINT_URI, new HelloWorldImpl(), new LoggingFeature());
     }
 }
