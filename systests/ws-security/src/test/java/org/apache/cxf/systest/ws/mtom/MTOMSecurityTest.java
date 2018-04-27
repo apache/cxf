@@ -44,6 +44,7 @@ import org.junit.BeforeClass;
  */
 public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
+    public static final String STAX_PORT = allocatePort(StaxServer.class);
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
@@ -55,6 +56,12 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
                 // run the server in the same process
                 // set this to false to fork
                 launchServer(Server.class, true)
+        );
+        assertTrue(
+                 "Server failed to launch",
+                 // run the server in the same process
+                 // set this to false to fork
+                 launchServer(StaxServer.class, true)
         );
     }
 
@@ -271,4 +278,32 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
+
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testSymmetricBinaryBytesInAttachmentStAX() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = MTOMSecurityTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = MTOMSecurityTest.class.getResource("DoubleItMtom.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSymmetricBinaryPort");
+        DoubleItMtomPortType port =
+            service.getPort(portQName, DoubleItMtomPortType.class);
+        updateAddressPort(port, STAX_PORT);
+
+        DataSource source = new FileDataSource(new File("src/test/resources/java.jpg"));
+        DoubleIt4 doubleIt = new DoubleIt4();
+        doubleIt.setNumberToDouble(25);
+        assertEquals(50, port.doubleIt4(25, new DataHandler(source)));
+
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+
 }
