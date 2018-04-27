@@ -36,26 +36,46 @@ import java.util.List;
  * verify any change on 6 different application servers.
  */
 public final class ClassLoaderUtils {
+    private static final boolean SKIP_SM = System.getSecurityManager() == null;
 
     private ClassLoaderUtils() {
     }
 
     public static class ClassLoaderHolder {
         ClassLoader loader;
-        ClassLoaderHolder(ClassLoader c) {
-            loader = c;
+        Thread thread;
+
+        ClassLoaderHolder(final ClassLoader c, final Thread thread) {
+            this.loader = c;
+            this.thread = thread;
         }
 
         public void reset() {
-            ClassLoaderUtils.setThreadContextClassloader(loader);
+            if (SKIP_SM) {
+                thread.setContextClassLoader(loader);
+            } else {
+                AccessController.doPrivileged(new PrivilegedAction<Void>() {
+                    public Void run() {
+                        thread.setContextClassLoader(loader);
+                        return null;
+                    }
+                });
+            }
         }
     }
     public static ClassLoaderHolder setThreadContextClassloader(final ClassLoader newLoader) {
+        if (SKIP_SM) {
+            final Thread thread = Thread.currentThread();
+            final ClassLoader l = thread.getContextClassLoader();
+            thread.setContextClassLoader(newLoader);
+            return new ClassLoaderHolder(l, thread);
+        }
         return AccessController.doPrivileged(new PrivilegedAction<ClassLoaderHolder>() {
             public ClassLoaderHolder run() {
-                ClassLoader l = Thread.currentThread().getContextClassLoader();
-                Thread.currentThread().setContextClassLoader(newLoader);
-                return new ClassLoaderHolder(l);
+                final Thread thread = Thread.currentThread();
+                final ClassLoader l = thread.getContextClassLoader();
+                thread.setContextClassLoader(newLoader);
+                return new ClassLoaderHolder(l, thread);
             }
         });
     }
