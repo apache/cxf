@@ -228,6 +228,32 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
     }
 
     @org.junit.Test
+    public void testAsymmetricBinaryBytesInAttachmentStAX() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = MTOMSecurityTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = MTOMSecurityTest.class.getResource("DoubleItMtom.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricBinaryPort");
+        DoubleItMtomPortType port =
+                service.getPort(portQName, DoubleItMtomPortType.class);
+        updateAddressPort(port, STAX_PORT);
+
+        DataSource source = new FileDataSource(new File("src/test/resources/java.jpg"));
+        DoubleIt4 doubleIt = new DoubleIt4();
+        doubleIt.setNumberToDouble(25);
+        assertEquals(50, port.doubleIt4(25, new DataHandler(source)));
+
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+
+    @org.junit.Test
     public void testAsymmetricBinaryEncryptBeforeSigningBytesInAttachment() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -280,7 +306,6 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
     }
 
     @org.junit.Test
-    @org.junit.Ignore
     public void testSymmetricBinaryBytesInAttachmentStAX() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();

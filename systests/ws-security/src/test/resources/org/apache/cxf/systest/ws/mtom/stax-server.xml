@@ -26,6 +26,28 @@
         </cxf:features>
     </cxf:bus>
 
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="AsymmetricBinary" address="http://localhost:${testutil.ports.mtom.StaxServer}/DoubleItX509AsymmetricBinary" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricBinaryPort" implementor="org.apache.cxf.systest.ws.mtom.DoubleIt4Impl" wsdlLocation="org/apache/cxf/systest/ws/mtom/DoubleItMtom.wsdl">
+        <jaxws:properties>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
+            <entry key="security.encryption.properties" value="alice.properties"/>
+            <entry key="security.encryption.username" value="alice"/>
+            <entry key="mtom-enabled" value="true"/>
+            <entry key="ws-security.enable.streaming" value="true"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="AsymmetricBinaryEncryptBeforeSigning" address="http://localhost:${testutil.ports.mtom.StaxServer}/DoubleItX509AsymmetricBinaryEncryptBeforeSigning" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricBinaryEncryptBeforeSigningPort" implementor="org.apache.cxf.systest.ws.mtom.DoubleIt4Impl" wsdlLocation="org/apache/cxf/systest/ws/mtom/DoubleItMtom.wsdl">
+        <jaxws:properties>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
+            <entry key="security.encryption.properties" value="alice.properties"/>
+            <entry key="security.encryption.username" value="alice"/>
+            <entry key="mtom-enabled" value="true"/>
+            <entry key="ws-security.enable.streaming" value="true"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SymmetricBinary" address="http://localhost:${testutil.ports.mtom.StaxServer}/DoubleItX509SymmetricBinary" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetricBinaryPort" implementor="org.apache.cxf.systest.ws.mtom.DoubleIt4Impl" wsdlLocation="org/apache/cxf/systest/ws/mtom/DoubleItMtom.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
