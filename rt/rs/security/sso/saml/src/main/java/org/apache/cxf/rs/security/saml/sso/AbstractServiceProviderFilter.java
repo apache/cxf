@@ -83,7 +83,8 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
     private String webAppDomain;
     private boolean addWebAppContext = true;
     private boolean addEndpointAddressToContext;
-    
+    private String signatureAlgorithm = SSOConstants.RSA_SHA1;
+
     public void setAddEndpointAddressToContext(boolean add) {
         addEndpointAddressToContext = add;
     }
@@ -313,5 +314,13 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
     public void setAddWebAppContext(boolean addWebAppContext) {
         this.addWebAppContext = addWebAppContext;
     }
-        
+
+    public String getSignatureAlgorithm() {
+        return signatureAlgorithm;
+    }
+
+    public void setSignatureAlgorithm(String signatureAlgorithm) {
+        this.signatureAlgorithm = signatureAlgorithm;
+    }
+
 }

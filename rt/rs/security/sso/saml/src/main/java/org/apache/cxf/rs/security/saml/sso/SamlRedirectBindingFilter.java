@@ -44,6 +44,7 @@ import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.xml.security.utils.Base64;
+import org.apache.xml.security.algorithms.JCEMapper;
 import org.opensaml.saml.saml2.core.AuthnRequest;
 
 public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
@@ -130,14 +131,13 @@ public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
             );
         }
 
-        String sigAlgo = SSOConstants.RSA_SHA1;
+        String sigAlgo = getSignatureAlgorithm();
         String pubKeyAlgo = issuerCerts[0].getPublicKey().getAlgorithm();
-        String jceSigAlgo = "SHA1withRSA";
         LOG.fine("automatic sig algo detection: " + pubKeyAlgo);
         if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
             sigAlgo = SSOConstants.DSA_SHA1;
-            jceSigAlgo = "SHA1withDSA";
         }
+
         LOG.fine("Using Signature algorithm " + sigAlgo);
         ub.queryParam(SSOConstants.SIG_ALG, URLEncoder.encode(sigAlgo, StandardCharsets.UTF_8.name()));
         
@@ -150,6 +150,7 @@ public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
         PrivateKey privateKey = crypto.getPrivateKey(signatureUser, password);
         
         // Sign the request
+        String jceSigAlgo = JCEMapper.translateURItoJCEID(sigAlgo);
         Signature signature = Signature.getInstance(jceSigAlgo);
         signature.initSign(privateKey);
        

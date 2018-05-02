@@ -132,7 +132,7 @@ public class SamlPostBindingFilter extends AbstractServiceProviderFilter {
             );
         }
 
-        String sigAlgo = SSOConstants.RSA_SHA1;
+        String sigAlgo = getSignatureAlgorithm();
         String pubKeyAlgo = issuerCerts[0].getPublicKey().getAlgorithm();
         LOG.fine("automatic sig algo detection: " + pubKeyAlgo);
         if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
