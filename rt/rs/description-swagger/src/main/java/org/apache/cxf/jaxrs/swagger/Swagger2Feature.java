@@ -620,6 +620,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
             
             try {
                 URL resourceURL = locator.locate(resourcePath);
+                resourcePath = resourceURL.getPath();
                 
                 String mediaType = null;
                 int ind = resourcePath.lastIndexOf('.');
