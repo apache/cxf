@@ -138,6 +138,10 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
             } else {
                 result = invokeSync(method, oi, params);
             }
+            if (result == null && !method.getReturnType().equals(Void.TYPE)
+                && method.getReturnType().isPrimitive()) {
+                throw new IllegalStateException("Response message did not contain proper response data");
+            }
         } catch (WebServiceException wex) {
             throw wex;
         } catch (Exception ex) {

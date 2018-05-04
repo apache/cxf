@@ -79,6 +79,9 @@ public class ClientProxy implements InvocationHandler, Closeable {
         }
 
         Object o = invokeSync(method, oi, params);
+        if (o == null && !method.getReturnType().equals(Void.TYPE) && method.getReturnType().isPrimitive()) {
+            throw new IllegalStateException("Response message did not contain proper response data");
+        }
         //call a virtual method passing the object.  This causes the IBM JDK
         //to keep the "this" pointer references and thus "this" doesn't get
         //finalized in the midst of an invoke operation
