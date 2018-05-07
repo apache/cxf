@@ -19,18 +19,26 @@
 
 package org.apache.cxf.systest.soap;
 
+import java.io.StringReader;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.ws.Dispatch;
 import javax.xml.ws.Service;
 import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.endpoint.ClientImpl.IllegalEmptyResponseException;
+import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.hello_world_xml_http.bare.XMLService;
 import org.example.contract.doubleit.DoubleItPortType;
 
+import org.junit.Assert;
 import org.junit.BeforeClass;
 
 /**
@@ -50,6 +58,8 @@ public class EmptySOAPBodyTest extends AbstractBusClientServerTestBase {
             // set this to false to fork
             launchServer(EmptySOAPBodyServer.class, true)
         );
+        assertTrue("Server failed to launch",
+                   launchServer(EmptySoapProviderServer.class, true));
     }
 
     @org.junit.AfterClass
@@ -79,12 +89,38 @@ public class EmptySOAPBodyTest extends AbstractBusClientServerTestBase {
             fail("Should have thown an exception");
         } catch (SOAPFaultException t) {
             assertTrue("Wrong exception cause " + t.getCause(), 
-                 t.getCause() instanceof IllegalStateException);
+                 t.getCause() instanceof IllegalEmptyResponseException);
         }
 
         ((java.io.Closeable)port).close();
 
         bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testProviderSource() throws Exception {
+        QName providerServiceName = new QName("http://apache.org/hello_world_xml_http/bare",
+                                              "HelloProviderService");
+
+        QName providerPortName = new QName("http://apache.org/hello_world_xml_http/bare", "HelloProviderPort");
+
+        URL wsdl = new URL("http://localhost:" + EmptySoapProviderServer.REG_PORT
+                           + "/helloProvider/helloPort?wsdl");
+        assertNotNull(wsdl);
+
+        XMLService service = new XMLService(wsdl, providerServiceName, new LoggingFeature());
+        assertNotNull(service);
+        Dispatch<Source> dispatch = service.createDispatch(providerPortName, Source.class,
+                                                           javax.xml.ws.Service.Mode.PAYLOAD);
+
+        String str = new String("<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body>" 
+                              + "<ns2:in xmlns=\"http://apache.org/hello_world_xml_http/bare/types\""
+                              + " xmlns:ns2=\"http://apache.org/hello_world_xml_http/bare\">"
+                              + "<elem1>empty</elem1><elem2>this is element 2</elem2><elem3>42</elem3></ns2:in>"
+                              + "</soap:Body></soap:Envelope>");
+        StreamSource req = new StreamSource(new StringReader(str));
+        Source resSource = dispatch.invoke(req);
+        Assert.assertNull("null result is expected", resSource);
     }
 
 }

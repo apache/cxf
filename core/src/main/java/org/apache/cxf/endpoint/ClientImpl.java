@@ -658,9 +658,9 @@ public class ClientImpl
                 boi = boi.getWrappedOperation();
             }
             if (!boi.getOutput().getMessageParts().isEmpty()) {
-                //we were supposed to get some output, but didn't
-                throw new IllegalStateException("Response message did not contain proper response data. Expected: "
-                    + boi.getOutput().getMessageParts().get(0).getConcreteName());
+                //we were supposed to get some output, but didn't.
+                throw new IllegalEmptyResponseException("Response message did not contain proper response data."
+                    + " Expected: " + boi.getOutput().getMessageParts().get(0).getConcreteName());
             }
         }
         if (resList != null) {
@@ -1130,5 +1130,23 @@ public class ClientImpl
         }
     }
 
+    
+    public class IllegalEmptyResponseException extends IllegalStateException {
+        public IllegalEmptyResponseException() {
+            super();
+        }
+
+        public IllegalEmptyResponseException(String message) {
+            super(message);
+        }
+
+        public IllegalEmptyResponseException(String message, Throwable cause) {
+            super(message, cause);
+        }
+
+        public IllegalEmptyResponseException(Throwable cause) {
+            super(cause);
+        }
+    }
 
 }
