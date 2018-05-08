@@ -153,7 +153,7 @@ public class OidcClaimsValidator extends OAuthJoseJwtConsumer {
         }
         JwsSignatureVerifier theJwsVerifier = null;
         if (key != null) {
-            theJwsVerifier = JwsUtils.getSignatureVerifier(key);
+            theJwsVerifier = JwsUtils.getSignatureVerifier(key, jwt.getJwsHeaders().getSignatureAlgorithm());
         } else {
             theJwsVerifier = super.getInitializedSignatureVerifier(jwt.getJwsHeaders());
         }
