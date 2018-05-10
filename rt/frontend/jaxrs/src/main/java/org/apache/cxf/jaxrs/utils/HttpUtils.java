@@ -116,25 +116,29 @@ public final class HttpUtils {
     }
 
     private static String componentEncode(String reservedChars, String value) {
-        
-        StringBuilder buffer = new StringBuilder();
-        StringBuilder bufferToEncode = new StringBuilder();
-        
-        for (int i = 0; i < value.length(); i++) {
+        StringBuilder buffer = null;
+        int length = value.length();
+        int startingIndex = 0;
+        for (int i = 0; i < length; i++) {
             char currentChar = value.charAt(i);
             if (reservedChars.indexOf(currentChar) != -1) {
-                if (bufferToEncode.length() > 0) {
-                    buffer.append(urlEncode(bufferToEncode.toString()));
-                    bufferToEncode.setLength(0);
-                }    
+                if (buffer == null) {
+                    buffer = new StringBuilder(length + 8);
+                }
+                // If it is going to be an empty string nothing to encode.
+                if (i != startingIndex) {
+                    buffer.append(urlEncode(value.substring(startingIndex, i)));
+                }
                 buffer.append(currentChar);
-            } else {
-                bufferToEncode.append(currentChar);
+                startingIndex = i + 1;
             }
         }
-        
-        if (bufferToEncode.length() > 0) {
-            buffer.append(urlEncode(bufferToEncode.toString()));
+
+        if (buffer == null) {
+            return urlEncode(value);
+        }
+        if (startingIndex < length) {
+            buffer.append(urlEncode(value.substring(startingIndex, length)));
         }
         
         return buffer.toString();
@@ -186,15 +190,21 @@ public final class HttpUtils {
             return encoded;
         }
         Matcher m = ENCODE_PATTERN.matcher(encoded);
-        StringBuilder sb = new StringBuilder();
+
+        if (!m.find()) {
+            return query ? HttpUtils.queryEncode(encoded) : HttpUtils.pathEncode(encoded);
+        }
+
+        int length = encoded.length();
+        StringBuilder sb = new StringBuilder(length + 8);
         int i = 0;
-        while (m.find()) {
+        do {
             String before = encoded.substring(i, m.start());
             sb.append(query ? HttpUtils.queryEncode(before) : HttpUtils.pathEncode(before));
             sb.append(m.group());
-            i = m.end();            
-        }
-        String tail = encoded.substring(i, encoded.length());
+            i = m.end();
+        } while (m.find());
+        String tail = encoded.substring(i, length);
         sb.append(query ? HttpUtils.queryEncode(tail) : HttpUtils.pathEncode(tail));
         return sb.toString();
     }
