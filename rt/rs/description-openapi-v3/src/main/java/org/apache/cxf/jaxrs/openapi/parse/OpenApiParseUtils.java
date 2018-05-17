@@ -203,6 +203,7 @@ public final class OpenApiParseUtils {
                     opTags = Collections.singletonList("");
                 }
                 for (String opTag : opTags) {
+                    userOpsMap.putIfAbsent(opTag, new LinkedList<UserOperation>());
                     userOpsMap.get(opTag).add(userOp);
                 }
 
@@ -212,11 +213,13 @@ public final class OpenApiParseUtils {
         List<UserResource> resources = new LinkedList<UserResource>();
 
         for (Map.Entry<String, List<UserOperation>> entry : userOpsMap.entrySet()) {
-            UserResource ur = new UserResource();
-            ur.setPath("/");
-            ur.setOperations(entry.getValue());
-            ur.setName(entry.getKey());
-            resources.add(ur);
+            if (!entry.getValue().isEmpty()) {
+                UserResource ur = new UserResource();
+                ur.setPath("/");
+                ur.setOperations(entry.getValue());
+                ur.setName(entry.getKey());
+                resources.add(ur);
+            }
         }
 
         app.setResources(resources);
