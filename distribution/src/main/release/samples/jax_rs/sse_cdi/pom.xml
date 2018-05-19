@@ -88,11 +88,6 @@
             <artifactId>websocket-server</artifactId>
             <version>${cxf.jetty9.version}</version>
         </dependency>
-
-        <dependency>
-            <groupId>org.atmosphere</groupId>
-            <artifactId>atmosphere-runtime</artifactId>
-        </dependency>
         
         <dependency>
             <groupId>io.reactivex.rxjava2</groupId>

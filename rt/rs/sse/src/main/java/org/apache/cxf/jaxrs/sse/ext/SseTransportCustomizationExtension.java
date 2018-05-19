@@ -18,24 +18,15 @@
  */
 package org.apache.cxf.jaxrs.sse.ext;
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.ext.JAXRSServerFactoryCustomizationExtension;
 import org.apache.cxf.jaxrs.sse.SseContextProvider;
-import org.apache.cxf.jaxrs.sse.atmosphere.SseAtmosphereEventSinkContextProvider;
-import org.apache.cxf.transport.AbstractTransportFactory;
-import org.apache.cxf.transport.sse.SseHttpTransportFactory;
+import org.apache.cxf.jaxrs.sse.SseEventSinkContextProvider;
 
 public class SseTransportCustomizationExtension implements JAXRSServerFactoryCustomizationExtension {
     @Override
     public void customize(final JAXRSServerFactoryBean bean) {
-        bean.setTransportId(SseHttpTransportFactory.TRANSPORT_ID);
         bean.setProvider(new SseContextProvider());
-        bean.setProvider(new SseAtmosphereEventSinkContextProvider());
-        
-        final Bus bus = bean.getBus();
-        if (bus != null) {
-            bus.setProperty(AbstractTransportFactory.PREFERRED_TRANSPORT_ID, SseHttpTransportFactory.TRANSPORT_ID);
-        }
+        bean.setProvider(new SseEventSinkContextProvider());
     }
 }

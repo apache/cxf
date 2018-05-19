@@ -16,22 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.sse.atmosphere;
+
+
+package org.apache.cxf.jaxrs.sse;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.sse.OutboundSseEvent;
 import javax.ws.rs.sse.SseEventSink;
 
 import org.apache.cxf.jaxrs.ext.ContextProvider;
+import org.apache.cxf.jaxrs.impl.AsyncResponseImpl;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
-import org.apache.cxf.jaxrs.sse.OutboundSseEventBodyWriter;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
-import org.atmosphere.cpr.AtmosphereResource;
-import org.atmosphere.cpr.Broadcaster;
 
-public class SseAtmosphereEventSinkContextProvider implements ContextProvider<SseEventSink> {
+public class SseEventSinkContextProvider implements ContextProvider<SseEventSink> {
+
     @Override
     public SseEventSink createContext(Message message) {
         final HttpServletRequest request = (HttpServletRequest)message.get(AbstractHTTPDestination.HTTP_REQUEST);
@@ -39,23 +41,10 @@ public class SseAtmosphereEventSinkContextProvider implements ContextProvider<Ss
             throw new IllegalStateException("Unable to retrieve HTTP request from the context");
         }
 
-        final AtmosphereResource resource = (AtmosphereResource)request
-            .getAttribute(AtmosphereResource.class.getName());
-        if (resource == null) {
-            throw new IllegalStateException("AtmosphereResource is not present, "
-                    + "is AtmosphereServlet configured properly?");
-        }
-
-        final Broadcaster broadcaster = resource.getAtmosphereConfig()
-            .getBroadcasterFactory()
-            .lookup(resource.uuid(), true);
-
-        resource.removeFromAllBroadcasters();
-        resource.setBroadcaster(broadcaster);
-
         final MessageBodyWriter<OutboundSseEvent> writer = new OutboundSseEventBodyWriter(
             ServerProviderFactory.getInstance(message), message.getExchange());
 
-        return new SseAtmosphereEventSinkImpl(writer, resource);
+        final AsyncResponse async = new AsyncResponseImpl(message);
+        return new SseEventSinkImpl(writer, async, request.getAsyncContext());
     }
 }

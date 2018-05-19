@@ -21,7 +21,6 @@ package demo.jaxrs.sse;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
-import org.apache.cxf.transport.sse.SseHttpTransportFactory;
 
 import io.undertow.Handlers;
 import io.undertow.Undertow;
@@ -44,7 +43,6 @@ public final class StatsServer {
             .setDeploymentName("sse-demo")
             .addServlets(
                 servlet("MessageServlet", CXFNonSpringJaxrsServlet.class)
-                    .addInitParam(CXFNonSpringJaxrsServlet.TRANSPORT_ID, SseHttpTransportFactory.TRANSPORT_ID)
                     .addInitParam("jaxrs.providers", JacksonJsonProvider.class.getName())
                     .addInitParam("jaxrs.serviceClasses", StatsRestServiceImpl.class.getName())
                     .setAsyncSupported(true)
