@@ -99,6 +99,8 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
     private String configLocation;
     // Allows to pass the properties location, by default swagger.properties
     private String propertiesLocation = DEFAULT_PROPS_LOCATION;
+    // Allows to disable automatic scan of known configuration locations (enabled by default)
+    private boolean scanKnownConfigLocations = true;
 
     protected static class DefaultApplication extends Application {
 
@@ -138,7 +140,13 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
         Properties swaggerProps = null;
         GenericOpenApiContextBuilder<?> openApiConfiguration; 
         final Application application = getApplicationOrDefault(server, factory, sfb, bus);
-        if (StringUtils.isEmpty(getConfigLocation())) {
+        
+        String defaultConfigLocation = getConfigLocation();
+        if (scanKnownConfigLocations && StringUtils.isEmpty(defaultConfigLocation)) {
+            defaultConfigLocation = OpenApiDefaultConfigurationScanner.locateDefaultConfiguration().orElse(null);
+        }
+        
+        if (StringUtils.isEmpty(defaultConfigLocation)) {
             swaggerProps = getSwaggerProperties(propertiesLocation, bus);
             
             if (isScan()) {
@@ -163,7 +171,7 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
         } else {
             openApiConfiguration = new JaxrsOpenApiContextBuilder<>()
                 .application(application)
-                .configLocation(getConfigLocation());
+                .configLocation(defaultConfigLocation);
         }
 
         try {
@@ -384,6 +392,14 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
     
     public void setCustomizer(OpenApiCustomizer customizer) {
         this.customizer = customizer;
+    }
+    
+    public void setScanKnownConfigLocations(boolean scanKnownConfigLocations) {
+        this.scanKnownConfigLocations = scanKnownConfigLocations;
+    }
+    
+    public boolean isScanKnownConfigLocations() {
+        return scanKnownConfigLocations;
     }
 
     @Override
