@@ -51,7 +51,7 @@ public class BraveFeature implements Feature {
               .newBuilder(tracing)
               .serverParser(new HttpServerSpanParser())
               .build()
-         );
+        );
     }
 
     public BraveFeature(final HttpTracing brave) {

@@ -109,7 +109,7 @@ public class ClientImpl
     }
 
     public ClientImpl(Bus b, Endpoint e, Conduit c) {
-       this(b, e, new PreexistingConduitSelector(c));
+        this(b, e, new PreexistingConduitSelector(c));
     }
 
     public ClientImpl(Bus b, Endpoint e, ConduitSelector sc) {

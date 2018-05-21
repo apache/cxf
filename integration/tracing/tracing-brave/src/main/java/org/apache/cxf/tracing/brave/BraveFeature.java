@@ -55,7 +55,7 @@ public class BraveFeature extends AbstractFeature {
               .newBuilder(tracing)
               .serverParser(new HttpServerSpanParser())
               .build()
-         );
+        );
     }
 
     public BraveFeature(HttpTracing brave) {

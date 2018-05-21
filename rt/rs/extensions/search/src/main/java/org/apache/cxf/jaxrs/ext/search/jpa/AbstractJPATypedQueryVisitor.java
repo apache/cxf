@@ -75,7 +75,7 @@ public abstract class AbstractJPATypedQueryVisitor<T, T1, E>
     protected AbstractJPATypedQueryVisitor(EntityManager em,
                                            Class<T> tClass,
                                            List<String> joinProps) {
-           this(em, tClass, null, null, joinProps);
+        this(em, tClass, null, null, joinProps);
     }
 
     protected AbstractJPATypedQueryVisitor(EntityManager em,

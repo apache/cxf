@@ -26,7 +26,7 @@ public final class CountingOutputStream extends FilterOutputStream {
     private long count;
 
     public CountingOutputStream(OutputStream out) {
-      super(out);
+        super(out);
     }
 
     public long getCount() {

@@ -109,11 +109,11 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
         DefaultApplication(final List<ClassResourceInfo> cris, final Set<String> resourcePackages) {
             this.serviceClasses = cris.stream().map(ClassResourceInfo::getServiceClass).
                     filter(cls -> {
-                    return resourcePackages == null || resourcePackages.isEmpty()
-                           ? true
-                           : resourcePackages.stream().
-                               anyMatch(pkg -> cls.getPackage().getName().startsWith(pkg));
-                }).collect(Collectors.toSet());
+                        return resourcePackages == null || resourcePackages.isEmpty()
+                            ? true
+                                : resourcePackages.stream().
+                                anyMatch(pkg -> cls.getPackage().getName().startsWith(pkg));
+                    }).collect(Collectors.toSet());
         }
 
         @Override
