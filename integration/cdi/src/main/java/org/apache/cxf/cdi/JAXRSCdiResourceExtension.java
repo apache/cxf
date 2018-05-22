@@ -29,6 +29,7 @@ import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.Set;
 
+import javax.enterprise.context.Dependent;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
@@ -82,6 +83,8 @@ public class JAXRSCdiResourceExtension implements Extension {
     private final List< Bean< ? extends Feature > > featureBeans = new ArrayList< Bean< ? extends Feature > >();
     private final List< CreationalContext< ? > > disposableCreationalContexts =
         new ArrayList< CreationalContext< ? > >();
+    private final List< CdiResourceProvider > disposableResourceProviders =
+        new ArrayList<>();
     private final Set< Type > contextTypes = new LinkedHashSet<>();
 
     private final Collection< String > existingStandardClasses = new HashSet<>();
@@ -303,6 +306,10 @@ public class JAXRSCdiResourceExtension implements Extension {
             for (final CreationalContext<?> disposableCreationalContext: disposableCreationalContexts) {
                 disposableCreationalContext.release();
             }
+            disposableCreationalContexts.clear();
+        }
+        synchronized (disposableResourceProviders) {
+            disposableResourceProviders.forEach(p -> p.getLifecycle().destroy());
         }
     }
 
@@ -372,7 +379,14 @@ public class JAXRSCdiResourceExtension implements Extension {
 
             for (final Bean< ? > bean: serviceBeans) {
                 if (classes.contains(bean.getBeanClass())) {
-                    classified.addResourceProvider(new CdiResourceProvider(beanManager, bean));
+                    final CdiResourceProvider provider = new CdiResourceProvider(beanManager, bean);
+                    // if not a singleton we manage it per request
+                    // if @Singleton the container handles it
+                    // so we only need this case here
+                    if (provider.isSingleton() && Dependent.class == bean.getScope()) {
+                        disposableResourceProviders.add(provider);
+                    }
+                    classified.addResourceProvider(provider);
                 }
             }
         }
