@@ -46,6 +46,7 @@ import javax.enterprise.inject.spi.ProcessBean;
 import javax.enterprise.inject.spi.ProcessProducerField;
 import javax.enterprise.inject.spi.ProcessProducerMethod;
 import javax.enterprise.inject.spi.WithAnnotations;
+import javax.inject.Singleton;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Application;
@@ -61,6 +62,7 @@ import org.apache.cxf.feature.Feature;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.ext.ContextClassProvider;
 import org.apache.cxf.jaxrs.ext.JAXRSServerFactoryCustomizationExtension;
+import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.provider.ServerConfigurableFactory;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSServerFactoryCustomizationUtils;
@@ -83,7 +85,7 @@ public class JAXRSCdiResourceExtension implements Extension {
     private final List< Bean< ? extends Feature > > featureBeans = new ArrayList< Bean< ? extends Feature > >();
     private final List< CreationalContext< ? > > disposableCreationalContexts =
         new ArrayList< CreationalContext< ? > >();
-    private final List< CdiResourceProvider > disposableResourceProviders =
+    private final List< Lifecycle > disposableLifecycles =
         new ArrayList<>();
     private final Set< Type > contextTypes = new LinkedHashSet<>();
 
@@ -96,7 +98,7 @@ public class JAXRSCdiResourceExtension implements Extension {
     private static class ClassifiedClasses {
         private List< Object > providers = new ArrayList<>();
         private List< Feature > features = new ArrayList<>();
-        private List< CdiResourceProvider > resourceProviders = new ArrayList<>();
+        private List<ResourceProvider> resourceProviders = new ArrayList<>();
 
         public void addProviders(final Collection< Object > others) {
             this.providers.addAll(others);
@@ -106,7 +108,7 @@ public class JAXRSCdiResourceExtension implements Extension {
             this.features.addAll(others);
         }
 
-        public void addResourceProvider(final CdiResourceProvider other) {
+        public void addResourceProvider(final ResourceProvider other) {
             this.resourceProviders.add(other);
         }
 
@@ -118,7 +120,7 @@ public class JAXRSCdiResourceExtension implements Extension {
             return features;
         }
 
-        public List<CdiResourceProvider> getResourceProviders() {
+        public List<ResourceProvider> getResourceProviders() {
             return resourceProviders;
         }
     }
@@ -308,9 +310,9 @@ public class JAXRSCdiResourceExtension implements Extension {
             }
             disposableCreationalContexts.clear();
         }
-        synchronized (disposableResourceProviders) {
-            disposableResourceProviders.forEach(p -> p.getLifecycle().destroy());
-        }
+
+        disposableLifecycles.forEach(Lifecycle::destroy);
+        disposableLifecycles.clear();
     }
 
     private Class<?> toClass(String name) {
@@ -354,7 +356,7 @@ public class JAXRSCdiResourceExtension implements Extension {
         instance.setProviders(classified.getProviders());
         instance.getFeatures().addAll(classified.getFeatures());
 
-        for (final CdiResourceProvider resourceProvider: classified.getResourceProviders()) {
+        for (final ResourceProvider resourceProvider: classified.getResourceProviders()) {
             instance.setResourceProvider(resourceProvider.getResourceClass(), resourceProvider);
         }
 
@@ -379,19 +381,42 @@ public class JAXRSCdiResourceExtension implements Extension {
 
             for (final Bean< ? > bean: serviceBeans) {
                 if (classes.contains(bean.getBeanClass())) {
-                    final CdiResourceProvider provider = new CdiResourceProvider(beanManager, bean);
-                    // if not a singleton we manage it per request
-                    // if @Singleton the container handles it
-                    // so we only need this case here
-                    if (provider.isSingleton() && Dependent.class == bean.getScope()) {
-                        disposableResourceProviders.add(provider);
+                    // normal scoped beans will return us a proxy in getInstance so it is singletons for us,
+                    // @Singleton is indeed a singleton
+                    // @Dependent should be a request scoped instance but for backward compat we kept it a singleton
+                    //
+                    // other scopes are considered request scoped (for jaxrs)
+                    // and are created per request (getInstance/releaseInstance)
+                    final ResourceProvider resourceProvider;
+                    if (isCxfSingleton(beanManager, bean)) {
+                        final Lifecycle lifecycle = new Lifecycle(beanManager, bean);
+                        resourceProvider = new SingletonResourceProvider(lifecycle, bean.getBeanClass());
+
+                        // if not a singleton we manage it per request
+                        // if @Singleton the container handles it
+                        // so we only need this case here
+                        if (Dependent.class == bean.getScope()) {
+                            disposableLifecycles.add(lifecycle);
+                        }
+                    } else {
+                        resourceProvider = new PerRequestResourceProvider(
+                        () -> new Lifecycle(beanManager, bean), bean.getBeanClass());
                     }
-                    classified.addResourceProvider(provider);
+                    classified.addResourceProvider(resourceProvider);
                 }
             }
         }
 
         return classified;
+    }
+
+    boolean isCxfSingleton(final BeanManager beanManager, final Bean<?> bean) {
+        return beanManager.isNormalScope(bean.getScope()) || isConsideredSingleton(bean.getScope());
+    }
+
+    // warn: several impls use @Dependent == request so we should probably add a flag
+    private boolean isConsideredSingleton(final Class<?> scope) {
+        return Singleton.class == scope || Dependent.class == scope;
     }
 
     /**
