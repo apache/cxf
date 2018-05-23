@@ -851,7 +851,7 @@ public class SourceGenerator {
                     jaxpSourceRequired, sbMethodCode, sbMethodDocs, imports, info, suspendedAsync);
             sbMethodCode.append(")");
 
-            writeThrows(responseEls, sbMethodCode, imports, info);
+            writeThrows(responseEls, sbMethodCode, sbMethodDocs, imports, info);
 
             if (info.isInterfaceGenerated()) {
                 sbMethodCode.append(";");
@@ -918,6 +918,13 @@ public class SourceGenerator {
         if (text != null) {
             sbDoc.append(" * @param ").append(name).append(" ").append(text)
                 .append(getLineSep()).append(TAB);
+        }
+    }
+
+    private void writeMethodThrowsDocs(Element paramEl, String name, StringBuilder sbDoc) {
+        String text = getDocText(paramEl);
+        if (text != null) {
+            sbDoc.append(" * @throws ").append(name).append(" ").append(text).append(getLineSep()).append(TAB);
         }
     }
 
@@ -1729,7 +1736,8 @@ public class SourceGenerator {
         sbCode.append(getLineSep()).append(TAB);
     }
 
-    private void writeThrows(List<Element> responseEls, StringBuilder sbCode, Set<String> imports, ContextInfo info) {
+    private void writeThrows(List<Element> responseEls, StringBuilder sbCode, StringBuilder sbMethodDocs,
+            Set<String> imports, ContextInfo info) {
         final List<Element> throwsParamEls = new ArrayList<>();
         for (Element errorResp : getErrorResponses(responseEls)) {
             for (Element errorRep : getWadlElements(errorResp, "representation")) {
@@ -1739,13 +1747,17 @@ public class SourceGenerator {
         if (!throwsParamEls.isEmpty()) {
             sbCode.append(" throws ");
             boolean comma = false;
-            for (Element errorParam : throwsParamEls) {
+            for (Element paramEl : throwsParamEls) {
                 if (!comma) {
                     comma = true;
                 } else {
                     sbCode.append(", ");
                 }
-                sbCode.append(getPrimitiveType(errorParam, info, imports));
+                final String javaThrowsName = getPrimitiveType(paramEl, info, imports);
+                sbCode.append(javaThrowsName);
+                if (sbMethodDocs != null) {
+                    writeMethodThrowsDocs(paramEl, javaThrowsName, sbMethodDocs);
+                }
             }
         }
     }

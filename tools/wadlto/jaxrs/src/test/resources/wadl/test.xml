@@ -35,7 +35,11 @@
                     <response status="500">
                         <representation mediaType="text/plain">
                             <param name="error" style="plain"
-                                type="java.io.IOException" />
+                                type="java.io.IOException">
+                                <doc>
+                                    if something going wrong
+                                </doc>
+                            </param>
                         </representation>
                     </response>
                 </method>

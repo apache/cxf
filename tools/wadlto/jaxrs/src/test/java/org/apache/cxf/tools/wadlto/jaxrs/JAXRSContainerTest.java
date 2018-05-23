@@ -25,6 +25,7 @@ import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -169,10 +170,20 @@ public class JAXRSContainerTest extends ProcessorTestBase {
         context.put(WadlToolConstants.CFG_COMPILE, Boolean.TRUE);
         context.put(WadlToolConstants.CFG_INTERFACE, Boolean.TRUE);
         context.put(WadlToolConstants.CFG_IMPL, Boolean.TRUE);
+        context.put(WadlToolConstants.CFG_CREATE_JAVA_DOCS, Boolean.TRUE);
         container.setContext(context);
         container.execute();
 
         assertNotNull(output.list());
+
+        List<File> javaFiles = FileUtils.getFilesRecurse(output, ".+\\." + "java" + "$");
+        assertEquals(2, javaFiles.size());
+        for (File f : javaFiles) {
+            if (!f.getName().endsWith("Impl.java")) {
+                assertTrue(
+                        Files.readAllLines(f.toPath()).contains("     * @throws IOException if something going wrong"));
+            }
+        }
 
         ClassCollector cc = context.get(ClassCollector.class);
         assertEquals(2, cc.getServiceClassNames().size());
