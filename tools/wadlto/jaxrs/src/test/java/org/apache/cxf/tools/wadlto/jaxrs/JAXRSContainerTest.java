@@ -25,7 +25,9 @@ import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
@@ -154,6 +156,46 @@ public class JAXRSContainerTest extends ProcessorTestBase {
             final Class<?> generatedClass = loader.loadClass(cc.getServiceClassNames().values().iterator().next());
             Method m = generatedClass.getMethod(onewayMethod, String.class);
             assertNotNull(m.getAnnotation(Oneway.class));
+        }
+    }
+
+    @Test
+    public void testThrows() throws Exception {
+        JAXRSContainer container = new JAXRSContainer(null);
+
+        ToolContext context = new ToolContext();
+        context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
+        context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/test.xml"));
+        context.put(WadlToolConstants.CFG_COMPILE, Boolean.TRUE);
+        context.put(WadlToolConstants.CFG_INTERFACE, Boolean.TRUE);
+        context.put(WadlToolConstants.CFG_IMPL, Boolean.TRUE);
+        container.setContext(context);
+        container.execute();
+
+        assertNotNull(output.list());
+
+        ClassCollector cc = context.get(ClassCollector.class);
+        assertEquals(2, cc.getServiceClassNames().size());
+
+        final Map<String, Class<?>[]> methods = new HashMap<>();
+        methods.put("listRepositories", new Class<?>[] {});
+        methods.put("createRepository", new Class<?>[] {java.io.IOException.class});
+        methods.put("deleteRepository",
+                new Class<?>[] {javax.ws.rs.NotFoundException.class, java.io.IOException.class});
+        methods.put("postThename", new Class<?>[] {java.io.IOException.class, java.lang.NoSuchMethodException.class});
+        try (URLClassLoader loader = new URLClassLoader(new URL[]{output.toURI().toURL()})) {
+            for (String className : cc.getServiceClassNames().values()) {
+                final Class<?> generatedClass = loader.loadClass(className);
+                for (Map.Entry<String, Class<?>[]> entry : methods.entrySet()) {
+                    Method m; 
+                    try {
+                        m = generatedClass.getMethod(entry.getKey(), String.class);
+                    } catch (NoSuchMethodException e) {
+                        m = generatedClass.getMethod(entry.getKey(), String.class, String.class);
+                    }
+                    assertArrayEquals(entry.getValue(), m.getExceptionTypes());
+                }
+            }
         }
     }
 

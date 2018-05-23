@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -124,8 +125,12 @@ public class SourceGenerator {
     private static final String DEFAULT_RESOURCE_NAME = "Resource";
     private static final String TAB = "    ";
 
-    private static final List<String> HTTP_OK_STATUSES =
-        Arrays.asList(new String[] {"200", "201", "202", "203", "204"});
+    private static final Predicate<Integer> HTTP_OK_STATUSES = status -> {
+        return status < 300;
+    };
+    private static final Predicate<Integer> HTTP_ERROR_STATUSES = status -> {
+        return status >= 400;
+    };
 
     private static final Set<Class<?>> OPTIONAL_PARAMS =
         new HashSet<Class<?>>(Arrays.<Class<?>>asList(QueryParam.class,
@@ -845,6 +850,9 @@ public class SourceGenerator {
             writeRequestTypes(firstRequestEl, classPackage, repElement, inParamElements,
                     jaxpSourceRequired, sbMethodCode, sbMethodDocs, imports, info, suspendedAsync);
             sbMethodCode.append(")");
+
+            writeThrows(responseEls, sbMethodCode, imports, info);
+
             if (info.isInterfaceGenerated()) {
                 sbMethodCode.append(";");
             } else {
@@ -1203,20 +1211,26 @@ public class SourceGenerator {
         sbCode.append(Response.class.getSimpleName()).append(" ");
     }
 
-    private Element getOKResponse(List<Element> responseEls) {
-        for (int i = 0; i < responseEls.size(); i++) {
-            String statusValue = responseEls.get(i).getAttribute("status");
-            if (statusValue.length() == 0) {
-                return responseEls.get(i);
-            }
-            String[] statuses = statusValue.split("\\s");
-            for (String status : statuses) {
-                if (HTTP_OK_STATUSES.contains(status)) {
-                    return responseEls.get(i);
+    private static Element getOKResponse(List<Element> responseEls) {
+        final List<Element> result = getResponses(responseEls, HTTP_OK_STATUSES);
+        return !result.isEmpty() ? result.get(0) : null;
+    }
+
+    private static List<Element> getErrorResponses(List<Element> responseEls) {
+        return getResponses(responseEls, HTTP_ERROR_STATUSES);
+    }
+
+    private static List<Element> getResponses(List<Element> responseEls, Predicate<Integer> checker) {
+        final List<Element> result = new ArrayList<>();
+        for (Element responseEl : responseEls) {
+            for (String statusValue : responseEl.getAttribute("status").split("\\s")) {
+                if (checker.test(!statusValue.isEmpty() ? Integer.parseInt(statusValue) : 200)) {
+                    result.add(responseEl);
+                    break;
                 }
             }
         }
-        return null;
+        return result;
     }
 
     private void writeSubResponseType(boolean recursive, String ns, String localName,
@@ -1486,7 +1500,7 @@ public class SourceGenerator {
     private List<Element> getWadlElements(Element parent, String name) {
         List<Element> elements = parent != null
             ? DOMUtils.getChildrenWithName(parent, getWadlNamespace(), name)
-            : CastUtils.cast(Collections.emptyList(), Element.class);
+            : Collections.emptyList();
         if (!"resource".equals(name)) {
             for (int i = 0; i < elements.size(); i++) {
                 Element el = elements.get(i);
@@ -1713,6 +1727,27 @@ public class SourceGenerator {
         }
         sbCode.append(")");
         sbCode.append(getLineSep()).append(TAB);
+    }
+
+    private void writeThrows(List<Element> responseEls, StringBuilder sbCode, Set<String> imports, ContextInfo info) {
+        final List<Element> throwsParamEls = new ArrayList<>();
+        for (Element errorResp : getErrorResponses(responseEls)) {
+            for (Element errorRep : getWadlElements(errorResp, "representation")) {
+                throwsParamEls.addAll(getWadlElements(errorRep, "param"));
+            }
+        }
+        if (!throwsParamEls.isEmpty()) {
+            sbCode.append(" throws ");
+            boolean comma = false;
+            for (Element errorParam : throwsParamEls) {
+                if (!comma) {
+                    comma = true;
+                } else {
+                    sbCode.append(", ");
+                }
+                sbCode.append(getPrimitiveType(errorParam, info, imports));
+            }
+        }
     }
 
     private void createJavaSourceFile(File src, QName qname, StringBuilder sbCode, StringBuilder sbImports,
