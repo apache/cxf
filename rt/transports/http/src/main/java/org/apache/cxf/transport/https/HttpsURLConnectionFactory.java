@@ -193,7 +193,7 @@ public class HttpsURLConnectionFactory {
                         try {
                             return super.invoke(proxy, method, args);
                         } catch (Exception ex) {
-                            return true;
+                            return false;
                         }
                     }
                 };
