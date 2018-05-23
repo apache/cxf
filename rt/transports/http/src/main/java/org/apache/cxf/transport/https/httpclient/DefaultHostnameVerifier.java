@@ -130,6 +130,18 @@ public final class DefaultHostnameVerifier implements HostnameVerifier {
         }
     }
 
+    public boolean verify(final String host, final String certHostname) {
+        try {
+            matchCN(host, certHostname, this.publicSuffixMatcher);
+            return true;
+        } catch (SSLException ex) {
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.log(Level.FINE, ex.getMessage(), ex);
+            }
+            return false;
+        }
+    }
+
     static void matchIPAddress(final String host, final List<String> subjectAlts) throws SSLException {
         for (int i = 0; i < subjectAlts.size(); i++) {
             final String subjectAlt = subjectAlts.get(i);

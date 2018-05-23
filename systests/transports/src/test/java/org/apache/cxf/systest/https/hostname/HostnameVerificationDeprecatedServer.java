@@ -17,30 +17,31 @@
  * under the License.
  */
 
-package org.apache.cxf.transport.https;
+package org.apache.cxf.systest.https.hostname;
 
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
+import java.net.URL;
 
-import javax.net.ssl.SSLException;
-import javax.net.ssl.SSLSession;
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
-/**
- * Allow all hostnames. This is only suitable for use in testing, and NOT in production!
- */
-class AllowAllHostnameVerifier implements javax.net.ssl.HostnameVerifier {
+public class HostnameVerificationDeprecatedServer extends AbstractBusTestServerBase {
 
-    @Override
-    public boolean verify(String host, SSLSession session) {
-        try {
-            Certificate[] certs = session.getPeerCertificates();
-            return certs != null && certs[0] instanceof X509Certificate;
-        } catch (SSLException e) {
-            return false;
-        }
+    public HostnameVerificationDeprecatedServer() {
+
     }
 
-    public boolean verify(final String host, final String certHostname) {
-        return certHostname != null && !certHostname.isEmpty();
+    protected void run()  {
+        URL busFile = HostnameVerificationDeprecatedServer.class.getResource("hostname-server-bethal.xml");
+        Bus busLocal = new SpringBusFactory().createBus(busFile);
+        BusFactory.setDefaultBus(busLocal);
+        setBus(busLocal);
+
+        try {
+            new HostnameVerificationDeprecatedServer();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
