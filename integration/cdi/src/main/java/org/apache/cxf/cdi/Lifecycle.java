@@ -22,46 +22,28 @@ import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 
-import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
-import org.apache.cxf.message.Message;
-
-public class CdiResourceProvider implements ResourceProvider {
-    private Object instance;
-    private CreationalContext< ? > context;
-
+class Lifecycle {
     private final BeanManager beanManager;
-    private final Bean< ? > bean;
+    private final Bean<?> bean;
+    private Object instance;
+    private CreationalContext<?> context;
 
-    CdiResourceProvider(final BeanManager beanManager, final Bean< ? > bean) {
+    Lifecycle(final BeanManager beanManager, final Bean<?> bean) {
         this.beanManager = beanManager;
         this.bean = bean;
     }
 
-    @Override
-    public Object getInstance(Message m) {
-        if (instance == null) {
-            context = beanManager.createCreationalContext(bean);
-            instance = beanManager.getReference(bean, bean.getBeanClass(), context);
-        }
-
+    Object create() {
+        context = beanManager.createCreationalContext(bean);
+        instance = beanManager.getReference(bean, bean.getBeanClass(), context);
         return instance;
     }
 
-    @Override
-    public void releaseInstance(Message m, Object o) {
+    void destroy() {
         if (context != null) {
             context.release();
             instance = null;
+            context = null;
         }
-    }
-
-    @Override
-    public Class<?> getResourceClass() {
-        return bean.getBeanClass();
-    }
-
-    @Override
-    public boolean isSingleton() {
-        return !beanManager.isNormalScope(bean.getScope());
     }
 }
