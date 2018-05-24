@@ -22,8 +22,6 @@ package demo.restful.server;
 import java.io.InputStream;
 
 import javax.annotation.Resource;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.ws.Provider;
 import javax.xml.ws.Service;
@@ -33,8 +31,8 @@ import javax.xml.ws.WebServiceProvider;
 import javax.xml.ws.handler.MessageContext;
 
 import org.w3c.dom.Document;
-
 import org.apache.cxf.message.Message;
+import org.apache.cxf.staxutils.StaxUtils;
 
 @WebServiceProvider()
 @ServiceMode(value = Service.Mode.PAYLOAD)
@@ -87,18 +85,10 @@ public class RestSourcePayloadProvider implements Provider<DOMSource> {
     }
 
     private DOMSource createDOMSource(String fileName) {
-        DocumentBuilderFactory factory;
-        DocumentBuilder builder;
-        Document document = null;
         DOMSource response = null;
 
-        try {
-            factory = DocumentBuilderFactory.newInstance();
-            //factory.setValidating(true);
-            builder = factory.newDocumentBuilder();
-            InputStream greetMeResponse = getClass().getResourceAsStream(fileName);
-
-            document = builder.parse(greetMeResponse);
+        try (InputStream greetMeResponse = getClass().getResourceAsStream(fileName)) {
+            Document document = StaxUtils.read(greetMeResponse);
             response = new DOMSource(document);
         } catch (Exception e) {
             e.printStackTrace();
