@@ -43,7 +43,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -125,12 +124,8 @@ public class SourceGenerator {
     private static final String DEFAULT_RESOURCE_NAME = "Resource";
     private static final String TAB = "    ";
 
-    private static final Predicate<Integer> HTTP_OK_STATUSES = status -> {
-        return status < 300;
-    };
-    private static final Predicate<Integer> HTTP_ERROR_STATUSES = status -> {
-        return status >= 400;
-    };
+    private static final List<String> HTTP_OK_STATUSES =
+            Arrays.asList(new String[] {"200", "201", "202", "203", "204"});
 
     private static final Set<Class<?>> OPTIONAL_PARAMS =
         new HashSet<Class<?>>(Arrays.<Class<?>>asList(QueryParam.class,
@@ -1219,21 +1214,29 @@ public class SourceGenerator {
     }
 
     private static Element getOKResponse(List<Element> responseEls) {
-        final List<Element> result = getResponses(responseEls, HTTP_OK_STATUSES);
-        return !result.isEmpty() ? result.get(0) : null;
+        for (Element responseEl : responseEls) {
+            String statusValue = responseEl.getAttribute("status");
+            if (statusValue.isEmpty()) {
+                return responseEl;
+            }
+            for (String status : statusValue.split("\\s")) {
+                if (HTTP_OK_STATUSES.contains(status)) {
+                    return responseEl;
+                }
+            }
+        }
+        return null;
     }
 
     private static List<Element> getErrorResponses(List<Element> responseEls) {
-        return getResponses(responseEls, HTTP_ERROR_STATUSES);
-    }
-
-    private static List<Element> getResponses(List<Element> responseEls, Predicate<Integer> checker) {
         final List<Element> result = new ArrayList<>();
         for (Element responseEl : responseEls) {
-            for (String statusValue : responseEl.getAttribute("status").split("\\s")) {
-                if (checker.test(!statusValue.isEmpty() ? Integer.parseInt(statusValue) : 200)) {
-                    result.add(responseEl);
-                    break;
+            if (responseEl.hasAttribute("status")) {
+                for (String statusValue : responseEl.getAttribute("status").split("\\s")) {
+                    if (400 <= Integer.parseInt(statusValue)) {
+                        result.add(responseEl);
+                        break;
+                    }
                 }
             }
         }
