@@ -43,9 +43,13 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.configuration.security.FiltersType;
+import org.apache.cxf.resource.ResourceManager;
 
 
 /**
@@ -96,16 +100,24 @@ public final class SSLUtils {
         String location = getKeystore(null, log);
         String keyStorePassword = getKeystorePassword(null, log);
         String keyPassword = getKeyPassword(null, log);
+        String keyStoreType = getKeystoreType(null, log);
         InputStream is = null;
 
         try {
-            File file = new File(location);
-            if (file.exists()) {
+            if (location != null) {
+                File file = new File(location);
+                if (file.exists()) {
+                    is = Files.newInputStream(file.toPath());
+                } else {
+                    is = getResourceAsStream(location);
+                }
+            }
+
+            if (is != null) {
                 KeyManagerFactory kmf =
                     KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-                KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+                KeyStore ks = KeyStore.getInstance(keyStoreType != null ? keyStoreType : KeyStore.getDefaultType());
 
-                is = Files.newInputStream(file.toPath());
                 ks.load(is, (keyStorePassword != null) ? keyStorePassword.toCharArray() : null);
                 kmf.init(ks, (keyPassword != null) ? keyPassword.toCharArray() : null);
                 defaultManagers = kmf.getKeyManagers();
@@ -125,6 +137,63 @@ public final class SSLUtils {
                 }
             }
         }
+    }
+
+    // We don't cache the default TrustStore managers here (see above) for backwards compatibility reasons
+    // We also return null rather than an empty array in case this changes using the default trust managers when
+    // initing the SSLContext
+    public static TrustManager[] getDefaultTrustStoreManagers(Logger log) {
+        String location = getTruststore(null, log);
+        String trustStorePassword = getTruststorePassword(null, log);
+        String trustStoreType = getTrustStoreType(null, log, DEFAULT_TRUST_STORE_TYPE);
+        InputStream is = null;
+
+        try {
+            if (location != null) {
+                File file = new File(location);
+                if (file.exists()) {
+                    is = Files.newInputStream(file.toPath());
+                } else {
+                    is = getResourceAsStream(location);
+                }
+            }
+            
+            if (is != null) {
+                TrustManagerFactory tmf =
+                    TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+                KeyStore ks = KeyStore.getInstance(trustStoreType);
+
+                ks.load(is, (trustStorePassword != null) ? trustStorePassword.toCharArray() : null);
+                tmf.init(ks);
+                return tmf.getTrustManagers();
+            } else {
+                log.log(Level.FINER, "No default trust keystore {0}", location);
+            }
+        } catch (Exception e) {
+            log.log(Level.WARNING, "Default trust managers cannot be initialized: " + e.getMessage(), e);
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    log.warning("Keystore stream cannot be closed: " + e.getMessage());
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private static InputStream getResourceAsStream(String resource) {
+        InputStream is = ClassLoaderUtils.getResourceAsStream(resource, SSLUtils.class);
+        if (is == null) {
+            Bus bus = BusFactory.getThreadDefaultBus(true);
+            ResourceManager rm = bus.getExtension(ResourceManager.class);
+            if (rm != null) {
+                is = rm.getResourceAsStream(resource);
+            }
+        }
+        return is;
     }
 
     public static KeyManager[] loadKeyStore(KeyManagerFactory kmf,
@@ -429,6 +498,22 @@ public final class SSLUtils {
                 exclude ? "CIPHERSUITES_EXCLUDED" : "CIPHERSUITES_SET", ciphsStr.toString());
         }
         return cipherSuites;
+    }
+
+    public static String getTruststore(String trustStoreLocation, Logger log) {
+        String logMsg = null;
+        if (trustStoreLocation != null) {
+            logMsg = "TRUST_STORE_SET";
+        } else {
+            trustStoreLocation = SystemPropertyAction.getProperty("javax.net.ssl.trustStore");
+            if (trustStoreLocation != null) {
+                logMsg = "TRUST_STORE_SYSTEM_PROPERTY_SET";
+            } else {
+                logMsg = "TRUST_STORE_NOT_SET";
+            }
+        }
+        LogUtils.log(log, Level.FINE, logMsg, trustStoreLocation);
+        return trustStoreLocation;
     }
 
     public static String getTrustStoreType(String trustStoreType, Logger log) {
