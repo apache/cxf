@@ -32,6 +32,7 @@
     <url>http://cxf.apache.org</url>
     <properties>
         <cxf.jetty.version>${cxf.jetty9.version}</cxf.jetty.version>
+        <cxf.module.name>org.apache.cxf.systests.rs.sci</cxf.module.name>
     </properties>
     <dependencies>
         <dependency>
@@ -135,6 +136,13 @@
                         <goals>
                             <goal>test-jar</goal>
                         </goals>
+                        <configuration>
+                            <archive>
+                                <manifestEntries>
+                                    <Automatic-Module-Name>${cxf.module.name}.tests</Automatic-Module-Name>
+                                </manifestEntries>
+                            </archive>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

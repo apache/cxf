@@ -33,6 +33,7 @@
     <properties>
         <cxf.el.api.version>3.0-b02</cxf.el.api.version>
         <cxf.glassfish.el.version>3.0-b01</cxf.glassfish.el.version>
+        <cxf.module.name>org.apache.cxf.systests.jaxrs</cxf.module.name>
     </properties>
     <dependencies>
         <dependency>
@@ -556,6 +557,13 @@
                         <goals>
                             <goal>test-jar</goal>
                         </goals>
+                        <configuration>
+                            <archive>
+                                <manifestEntries>
+                                    <Automatic-Module-Name>${cxf.module.name}.tests</Automatic-Module-Name>
+                                </manifestEntries>
+                            </archive>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

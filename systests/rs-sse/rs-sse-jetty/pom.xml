@@ -31,6 +31,7 @@
     <url>http://cxf.apache.org</url>
     <properties>
         <cxf.jetty.version>${cxf.jetty9.version}</cxf.jetty.version>
+        <cxf.module.name>org.apache.cxf.systests.rs.sse.jetty</cxf.module.name>
     </properties>
     <dependencies>
         <dependency>

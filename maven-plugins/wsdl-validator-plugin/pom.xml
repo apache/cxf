@@ -30,7 +30,7 @@
         <version>3.2.5-SNAPSHOT</version>
     </parent>
     <properties>
-        <cxf.module.name>org.apache.cxf.wsdl.validator.plugin</cxf.module.name>
+        <cxf.module.name>org.apache.cxf.plugin.wsdl.validator</cxf.module.name>
     </properties>
     <dependencies>
         <dependency>

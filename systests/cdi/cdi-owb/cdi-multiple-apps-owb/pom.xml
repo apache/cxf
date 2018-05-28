@@ -29,4 +29,8 @@
     <name>Apache CXF CDI Integration System Tests - OWB with multiple apps</name>
     <description>Apache CXF CDI Integration System Tests - OpenWebBeans with multiple apps</description>
     <url>http://cxf.apache.org</url>
+    
+    <properties>
+        <cxf.module.name>org.apache.cxf.systests.cdi.owb.multiapp</cxf.module.name>
+    </properties>
 </project>

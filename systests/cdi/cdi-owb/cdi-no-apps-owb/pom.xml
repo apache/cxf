@@ -30,4 +30,8 @@
     <name>Apache CXF CDI Integration System Tests - OWB with no apps</name>
     <description>Apache CXF CDI Integration System Tests - OpenWebBeans with no apps</description>
     <url>http://cxf.apache.org</url>
+    
+    <properties>
+        <cxf.module.name>org.apache.cxf.systests.cdi.owb.noapp</cxf.module.name>
+    </properties>
 </project>

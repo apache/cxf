@@ -30,6 +30,10 @@
     <description>Apache CXF SSE Integration System base classes</description>
     <url>http://cxf.apache.org</url>
 
+    <properties>
+        <cxf.module.name>org.apache.cxf.systests.rs.sse.base</cxf.module.name>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>junit</groupId>

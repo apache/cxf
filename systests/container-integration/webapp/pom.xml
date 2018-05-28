@@ -29,6 +29,11 @@
     <name>Apache CXF Container Integration Test Webapp</name>
     <description>Apache CXF Container Integration Test Webapp</description>
     <packaging>war</packaging>
+    
+    <properties>
+        <cxf.module.name>org.apache.cxf.systests.ci.webapp</cxf.module.name>
+    </properties>
+    
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
