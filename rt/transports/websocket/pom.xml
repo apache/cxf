@@ -36,6 +36,7 @@
                     org.eclipse.jetty.websocket;version="${cxf.jetty.osgi.version}";resolution:=optional,
         
 -->
+        <cxf.module.name>org.apache.cxf.transport.websocket</cxf.module.name>
         <cxf.osgi.import>
             javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
             org.eclipse.jetty*;version="${cxf.jetty.osgi.version}";resolution:=optional,

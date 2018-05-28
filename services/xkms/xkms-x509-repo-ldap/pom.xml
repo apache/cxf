@@ -12,6 +12,10 @@
     <name>Apache CXF XKMS LDAP repository</name>
     <url>http://cxf.apache.org</url>
     
+    <properties>
+        <cxf.module.name>org.apache.cxf.xkms.x509.ldap</cxf.module.name>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf.services.xkms</groupId>

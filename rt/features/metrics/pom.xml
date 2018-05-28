@@ -11,6 +11,10 @@
     <name>Apache CXF Metrics Feature</name>
     <description>Apache CXF Metrics Feature</description>
 
+    <properties>
+        <cxf.module.name>org.apache.cxf.metrics</cxf.module.name>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>

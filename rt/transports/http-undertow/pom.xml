@@ -31,6 +31,7 @@
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
+        <cxf.module.name>org.apache.cxf.transport.http.undertow</cxf.module.name>
         <cxf.bundle.activator>org.apache.cxf.transport.http_undertow.osgi.HTTPUndertowTransportActivator</cxf.bundle.activator>
         <cxf.osgi.import>
             javax.servlet*;version="${cxf.osgi.javax.servlet.version}",

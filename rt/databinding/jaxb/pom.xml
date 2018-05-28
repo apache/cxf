@@ -31,6 +31,7 @@
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
+        <cxf.module.name>org.apache.cxf.databinding.jaxb</cxf.module.name>
         <cxf.osgi.import>
             javax.activation;version="${cxf.osgi.javax.activation.version}",
             javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",

@@ -32,6 +32,7 @@
     </parent>
     
     <properties>
+        <cxf.module.name>org.apache.cxf.databinding.aegis</cxf.module.name>
         <cxf.osgi.import>
             javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
             javax.activation;version="${cxf.osgi.javax.activation.version}",

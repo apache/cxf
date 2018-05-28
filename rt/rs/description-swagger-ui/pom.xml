@@ -30,6 +30,9 @@
         <version>3.2.5-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
+    <properties>
+        <cxf.module.name>org.apache.cxf.rs.swagger.ui</cxf.module.name>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>${cxf.servlet-api.group}</groupId>

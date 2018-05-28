@@ -10,6 +10,10 @@
     <packaging>bundle</packaging>
     <name>Apache CXF Throttling Feature</name>
     <description>Apache CXF Throttling Feature</description>
+    
+    <properties>
+        <cxf.module.name>org.apache.cxf.throttling</cxf.module.name>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -17,8 +21,6 @@
             <artifactId>cxf-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

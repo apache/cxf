@@ -10,6 +10,7 @@
     <packaging>bundle</packaging>
     
     <properties>
+        <cxf.module.name>org.apache.cxf.logging</cxf.module.name>
         <cxf.bundle.activator>org.apache.cxf.ext.logging.osgi.Activator</cxf.bundle.activator>
     </properties>
 

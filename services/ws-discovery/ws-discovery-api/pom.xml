@@ -32,6 +32,7 @@
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
+        <cxf.module.name>org.apache.cxf.ws.discovery</cxf.module.name>
         <cxf.osgi.export>
             =org.apache.cxf.ws.discovery.internal,
             org.apache.cxf.ws.discovery.*,
