@@ -27,6 +27,8 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -206,6 +208,7 @@ public abstract class CachedStreamTestBase extends Assert {
             close(cache);
             assertFalse("expects no tmp file", tmpfile.exists());
         } finally {
+            System.clearProperty(CachedConstants.THRESHOLD_SYS_PROP);
             if (old != null) {
                 System.setProperty(CachedConstants.THRESHOLD_SYS_PROP, old);
             }
@@ -228,6 +231,8 @@ public abstract class CachedStreamTestBase extends Assert {
             EasyMock.expect(b.getProperty(CachedConstants.THRESHOLD_BUS_PROP)).andReturn("4");
             EasyMock.expect(b.getProperty(CachedConstants.MAX_SIZE_BUS_PROP)).andReturn(null);
             EasyMock.expect(b.getProperty(CachedConstants.CIPHER_TRANSFORMATION_BUS_PROP)).andReturn(null);
+            Path tmpDirPath = Files.createTempDirectory("temp-dir");
+            EasyMock.expect(b.getProperty(CachedConstants.OUTPUT_DIRECTORY_BUS_PROP)).andReturn(tmpDirPath.toString());
 
             BusFactory.setThreadDefaultBus(b);
 
@@ -235,6 +240,7 @@ public abstract class CachedStreamTestBase extends Assert {
 
             cache = createCache();
             tmpfile = getTmpFile("Hello World!", cache);
+            assertEquals(tmpfile.getParent(), tmpDirPath.toString());
             assertNotNull("expects a tmp file", tmpfile);
             assertTrue("expects a tmp file", tmpfile.exists());
             close(cache);

@@ -116,6 +116,7 @@ public class CachedOutputStreamTest extends CachedStreamTestBase {
             cache.close();
             assertFalse("expects no tmp file", tmpfile.exists());
         } finally {
+            System.clearProperty(CachedConstants.THRESHOLD_SYS_PROP);
             if (old != null) {
                 System.setProperty(CachedConstants.THRESHOLD_SYS_PROP, old);
             }

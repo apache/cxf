@@ -28,6 +28,12 @@ public final class CachedConstants {
         "org.apache.cxf.io.CachedOutputStream.OutputDirectory";
 
     /**
+     * The directory name for storing the temporary files. None is specified by default.
+     */
+    public static final String OUTPUT_DIRECTORY_BUS_PROP =
+        "bus.io.CachedOutputStream.OutputDirectory";
+
+    /**
      * The threshold value in bytes to switch from memory to file caching. The default value is 128K for
      * CachedOutputStream and 64K for CachedWriter.
      */
