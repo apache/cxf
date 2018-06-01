@@ -24,6 +24,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.common.util.URIParserUtil;
 import org.apache.cxf.maven_plugin.WsdlArtifact;
 import org.apache.cxf.tools.common.ToolConstants;
@@ -225,7 +226,10 @@ public class WsdlOption extends Option implements org.apache.cxf.maven_plugin.Ge
             } else {
                 // Maven makes empty tags into null
                 // instead of empty strings. so replace null by ""
-                destList.add(key + ((value == null) ? "" : value));
+                String v = key + ((value == null) ? "" : value);
+                if (!StringUtils.isEmpty(v)) {
+                    destList.add(v);
+                }
             }
         }
     }
