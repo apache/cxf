@@ -24,7 +24,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.URIParserUtil;
 import org.apache.cxf.maven_plugin.WsdlArtifact;
 import org.apache.cxf.tools.common.ToolConstants;
