@@ -119,8 +119,12 @@ public final class FileUtils {
             }
             if (files == null || files.length == 0) {
                 //all the files are gone, we can remove the shutdownhook and reset
-                Runtime.getRuntime().removeShutdownHook(shutdownHook);
-                shutdownHook.run();
+                try {
+                    Runtime.getRuntime().removeShutdownHook(shutdownHook);
+                    shutdownHook.run();
+                } catch (IllegalStateException ex) {
+                    // The JVM is already shutting down so do nothing
+                }
                 shutdownHook = null;
                 defaultTempDir = null;
             }
