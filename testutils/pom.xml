@@ -187,7 +187,7 @@
                                     <xjcarg>-Xbug986</xjcarg>
                                 </xjcargs>
                                 <!--extraargs>
-                                    <extraarg>-verbose</extraarg>
+                                    <extraarg>${cxf.test.keep}</extraarg>
                                 </extraargs-->
                                 <markGenerated>true</markGenerated>
                                 <faultSerialVersionUID>1</faultSerialVersionUID>
