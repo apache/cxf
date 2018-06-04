@@ -26,7 +26,9 @@ import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.URL;
+import java.security.AccessController;
 import java.security.GeneralSecurityException;
+import java.security.PrivilegedAction;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 
@@ -179,7 +181,13 @@ public class HttpsURLConnectionFactory {
             // handle the expected case (javax.net.ssl)
             HttpsURLConnection conn = (HttpsURLConnection) connection;
             conn.setHostnameVerifier(verifier);
-            conn.setSSLSocketFactory(socketFactory);
+            AccessController.doPrivileged(new PrivilegedAction<Void>() {
+
+                @Override
+                public Void run() {
+                    conn.setSSLSocketFactory(socketFactory);
+                    return null;
+                } });
         } else {
             // handle the deprecated sun case and other possible hidden API's 
             // that are similar to the Sun cases
