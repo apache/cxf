@@ -28,6 +28,11 @@
 
     <artifactId>cxf-systests-cdi-base</artifactId>
     <name>Apache CXF CDI Integration System Tests - Base</name>
+    
+    <properties>
+        <cxf.module.name>org.apache.cxf.systests.cdi.base</cxf.module.name>
+    </properties>
+    
     <dependencies>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>

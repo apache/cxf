@@ -33,6 +33,7 @@
     <properties>
         <hello.world.binding.file>hello_world.xml</hello.world.binding.file>
         <doc.lit.bare.binding.file>doc_lit_bare.xml</doc.lit.bare.binding.file>
+        <cxf.module.name>org.apache.cxf.systests.databinding</cxf.module.name>
     </properties>
     <build>
         <plugins>
@@ -44,6 +45,13 @@
                         <goals>
                             <goal>test-jar</goal>
                         </goals>
+                        <configuration>
+                            <archive>
+                                <manifestEntries>
+                                    <Automatic-Module-Name>${cxf.module.name}.tests</Automatic-Module-Name>
+                                </manifestEntries>
+                            </archive>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

@@ -32,6 +32,7 @@
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
+        <cxf.module.name>org.apache.cxf.wsn.core</cxf.module.name>
         <cxf.server.launcher.vmargs />
         <cxf.surefire.enable.assertions>false</cxf.surefire.enable.assertions>
     </properties>

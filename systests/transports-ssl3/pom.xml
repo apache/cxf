@@ -30,6 +30,11 @@
     <name>Apache CXF Transport SSL3 System Tests</name>
     <description>Apache CXF Transport SSL3 System Tests</description>
     <url>http://cxf.apache.org</url>
+    
+    <properties>
+        <cxf.module.name>org.apache.cxf.systests.transport.ssl3</cxf.module.name>
+    </properties>
+
     <build>
         <testSourceDirectory>${basedir}/src/test/java</testSourceDirectory>
         <testResources>
@@ -55,6 +60,13 @@
                         <goals>
                             <goal>test-jar</goal>
                         </goals>
+                        <configuration>
+                            <archive>
+                                <manifestEntries>
+                                    <Automatic-Module-Name>${cxf.module.name}.tests</Automatic-Module-Name>
+                                </manifestEntries>
+                            </archive>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

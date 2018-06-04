@@ -33,6 +33,7 @@
       <version>3.2.5-SNAPSHOT</version>
     </parent>
     <properties>
+        <cxf.module.name>org.apache.cxf.plugin.java2swagger</cxf.module.name>
         <cxf.manifest.location />
     </properties>
 

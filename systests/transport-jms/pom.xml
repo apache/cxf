@@ -30,6 +30,11 @@
     <name>Apache CXF Transport System Tests JMS</name>
     <description>Apache CXF Transport System Tests JMS</description>
     <url>http://cxf.apache.org</url>
+    
+    <properties>
+        <cxf.module.name>org.apache.cxf.systests.transport.jms</cxf.module.name>
+    </properties>
+    
     <build>
         <plugins>
             <plugin>
@@ -59,6 +64,13 @@
                         <goals>
                             <goal>test-jar</goal>
                         </goals>
+                        <configuration>
+                            <archive>
+                                <manifestEntries>
+                                    <Automatic-Module-Name>${cxf.module.name}.tests</Automatic-Module-Name>
+                                </manifestEntries>
+                            </archive>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

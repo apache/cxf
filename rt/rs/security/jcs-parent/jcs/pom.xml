@@ -30,6 +30,9 @@
         <version>3.2.1-SNAPSHOT</version>
         <relativePath>../../../../../parent/pom.xml</relativePath>
     </parent>
+    <properties>
+        <cxf.module.name>org.apache.cxf.rs.security.jcs</cxf.module.name>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>

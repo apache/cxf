@@ -30,6 +30,9 @@
         <version>3.2.5-SNAPSHOT</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
+    <properties>
+        <cxf.module.name>org.apache.cxf.testutils</cxf.module.name>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -302,12 +305,24 @@
                             <includes>
                                 <include>**/*.*</include>
                             </includes>
+                            <archive>
+                                <manifestEntries>
+                                    <Automatic-Module-Name>${cxf.module.name}.key</Automatic-Module-Name>
+                                </manifestEntries>
+                            </archive>
                         </configuration>
                     </execution>
                     <execution>
                         <goals>
                             <goal>test-jar</goal>
                         </goals>
+                        <configuration>
+                            <archive>
+                                <manifestEntries>
+                                    <Automatic-Module-Name>${cxf.module.name}.tests</Automatic-Module-Name>
+                                </manifestEntries>
+                            </archive>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

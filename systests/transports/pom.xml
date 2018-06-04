@@ -32,6 +32,7 @@
     <url>http://cxf.apache.org</url>
     <properties>
         <cxf.surefire.fork.vmargs>-Djdk.http.auth.tunneling.disabledSchemes=""</cxf.surefire.fork.vmargs>
+        <cxf.module.name>org.apache.cxf.systests.transport</cxf.module.name>
     </properties>
     <build>
         <testSourceDirectory>${basedir}/src/test/java</testSourceDirectory>
@@ -77,6 +78,13 @@
                         <goals>
                             <goal>test-jar</goal>
                         </goals>
+                        <configuration>
+                            <archive>
+                                <manifestEntries>
+                                    <Automatic-Module-Name>${cxf.module.name}.tests</Automatic-Module-Name>
+                                </manifestEntries>
+                            </archive>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

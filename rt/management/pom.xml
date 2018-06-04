@@ -30,6 +30,9 @@
         <version>3.2.5-SNAPSHOT</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
+    <properties>
+        <cxf.module.name>org.apache.cxf.management</cxf.module.name>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>

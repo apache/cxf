@@ -25,10 +25,15 @@
         <version>3.2.5-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
+    
     <modelVersion>4.0.0</modelVersion>
-
     <artifactId>cxf-systests-microprofile-weld</artifactId>
     <name>Apache CXF System Tests - MicroProfile Rest Client TCK on Weld</name>
+    
+    <properties>
+        <cxf.module.name>org.apache.cxf.systests.microprofile.weld</cxf.module.name>
+    </properties>
+    
     <dependencies>
         <dependency>
             <groupId>org.jboss.arquillian.testng</groupId>

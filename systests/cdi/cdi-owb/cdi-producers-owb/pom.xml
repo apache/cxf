@@ -31,6 +31,10 @@
     <description>Apache CXF CDI Integration System Tests - OpenWebBeans with producers</description>
     <url>http://cxf.apache.org</url>
     
+    <properties>
+        <cxf.module.name>org.apache.cxf.systests.cdi.owb.producers</cxf.module.name>
+    </properties>
+    
     <dependencies>
         <dependency>
              <groupId>org.apache.cxf</groupId>

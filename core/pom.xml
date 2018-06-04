@@ -31,6 +31,7 @@
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
     <properties>
+        <cxf.module.name>org.apache.cxf.core</cxf.module.name>
         <cxf.bundle.activator>org.apache.cxf.bus.osgi.CXFActivator</cxf.bundle.activator>
         <cxf.osgi.export>
             !org.apache.cxf.internal,

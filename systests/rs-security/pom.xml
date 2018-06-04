@@ -32,6 +32,7 @@
     <url>http://cxf.apache.org</url>
     <properties>
         <oauth.version>20100527</oauth.version>
+        <cxf.module.name>org.apache.cxf.systests.security</cxf.module.name>
     </properties>
     <dependencies>
         <dependency>
@@ -206,6 +207,13 @@
                         <goals>
                             <goal>test-jar</goal>
                         </goals>
+                        <configuration>
+                            <archive>
+                                <manifestEntries>
+                                    <Automatic-Module-Name>${cxf.module.name}.tests</Automatic-Module-Name>
+                                </manifestEntries>
+                            </archive>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

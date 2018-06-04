@@ -30,6 +30,11 @@
         <version>3.2.5-SNAPSHOT</version>
         <relativePath>../../../../parent/pom.xml</relativePath>
     </parent>
+    
+    <properties>
+        <cxf.module.name>org.apache.cxf.systests.sts.osgi</cxf.module.name>
+    </properties>
+    
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf.services.sts</groupId>

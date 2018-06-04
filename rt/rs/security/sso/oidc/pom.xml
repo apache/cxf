@@ -34,6 +34,7 @@
     <hibernate.em.version>4.1.0.Final</hibernate.em.version>
     <hsqldb.version>1.8.0.10</hsqldb.version>
     <compilerArguments>-Aopenjpa.source=7 -Aopenjpa.metamodel=true</compilerArguments>
+    <cxf.module.name>org.apache.cxf.rs.security.sso.oidc</cxf.module.name>
   </properties>
   <dependencies>
     <dependency>

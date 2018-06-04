@@ -29,6 +29,11 @@
     <name>Apache CXF SSE Integration System Tests for Undertow</name>
     <description>Apache CXF SSE Integration System Tests Undertow</description>
     <url>http://cxf.apache.org</url>
+    
+    <properties>
+        <cxf.module.name>org.apache.cxf.systests.rs.sse.undertow</cxf.module.name>
+    </properties>
+    
     <dependencies>
         <dependency>
             <groupId>io.undertow</groupId>

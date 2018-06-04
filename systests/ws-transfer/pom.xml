@@ -32,6 +32,10 @@
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     
+    <properties>
+        <cxf.module.name>org.apache.cxf.systests.ws.transfer</cxf.module.name>
+    </properties>
+    
     <dependencies>
         <dependency>
           <groupId>junit</groupId>

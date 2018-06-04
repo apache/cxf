@@ -31,6 +31,7 @@
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
+        <cxf.module.name>org.apache.cxf.binding.corba</cxf.module.name>
         <cxf.checkstyle.extension>-corba</cxf.checkstyle.extension>
         <cxf.osgi.import>
             org.objectweb.asm*;version="${cxf.osgi.asm.version}",

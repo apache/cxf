@@ -32,6 +32,7 @@
     </parent>
     
     <properties>
+        <cxf.module.name>org.apache.cxf.tracing.opentracing</cxf.module.name>
         <cxf.osgi.export>
             org.apache.cxf.tracing,
             org.apache.cxf.tracing.opentracing,

@@ -29,6 +29,11 @@
         <version>3.2.5-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
+    
+    <properties>
+        <cxf.module.name>org.apache.cxf.systests.plugin.java2ws</cxf.module.name>
+    </properties>
+    
     <build>
         <plugins>
             <plugin>

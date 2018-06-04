@@ -31,6 +31,7 @@
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
+        <cxf.module.name>org.apache.cxf.ws.policy</cxf.module.name>
         <cxf.bundle.activator>org.apache.cxf.ws.policy.blueprint.Activator</cxf.bundle.activator>
         <cxf.osgi.import>
             org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}",

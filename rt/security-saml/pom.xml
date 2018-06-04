@@ -31,6 +31,7 @@
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     <properties>
+        <cxf.module.name>org.apache.cxf.security.saml</cxf.module.name>
         <cxf.osgi.import>
             org.opensaml*;version="${cxf.opensaml.osgi.version.range}",
         </cxf.osgi.import>
