@@ -179,7 +179,7 @@ public class HttpsURLConnectionFactory {
         
         if (connection instanceof HttpsURLConnection) {
             // handle the expected case (javax.net.ssl)
-            HttpsURLConnection conn = (HttpsURLConnection) connection;
+            final HttpsURLConnection conn = (HttpsURLConnection) connection;
             conn.setHostnameVerifier(verifier);
             AccessController.doPrivileged(new PrivilegedAction<Void>() {
 
