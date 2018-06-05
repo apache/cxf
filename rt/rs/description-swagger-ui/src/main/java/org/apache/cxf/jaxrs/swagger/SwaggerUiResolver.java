@@ -58,19 +58,15 @@ public class SwaggerUiResolver {
 
     protected static String checkUiRoot(String urlStr, String swaggerUiVersion) {
         int swaggerUiIndex = urlStr.lastIndexOf("/swagger-ui-");
-        if (swaggerUiIndex != -1) {
-            boolean urlEndsWithJarSep = urlStr.endsWith(".jar!/");
-            if (urlEndsWithJarSep || urlStr.endsWith(".jar")) {
-                int offset = urlEndsWithJarSep ? 6 : 4;
-                String version = urlStr.substring(swaggerUiIndex + 12, urlStr.length() - offset);
-                if (swaggerUiVersion != null && !swaggerUiVersion.equals(version)) {
-                    return null;
-                }
-                if (!urlEndsWithJarSep) {
-                    urlStr = "jar:" + urlStr + "!/";
-                }
-                return urlStr + UI_RESOURCES_ROOT_START + version + "/";
+        if (swaggerUiIndex != -1 && urlStr.matches("^.*\\.jar!?/?$")) {
+            String version = urlStr.substring(swaggerUiIndex + 12, urlStr.lastIndexOf(".jar"));
+            if (swaggerUiVersion != null && !swaggerUiVersion.equals(version)) {
+                return null;
             }
+            if (!urlStr.endsWith("/")) {
+                urlStr = "jar:" + urlStr + "!/";
+            }
+            return urlStr + UI_RESOURCES_ROOT_START + version + "/";
         }
         return null;
     }
