@@ -495,7 +495,22 @@
                         <maxmem>256M</maxmem>
                         <fork>${cxf.compiler.fork}</fork>
                         <encoding>UTF-8</encoding>
+                        
+                        <!--compilerId>javac-with-errorprone</compilerId>
+                        <forceJavacCompilerUse>true</forceJavacCompilerUse-->
                     </configuration>
+                    <!--dependencies>
+                        <dependency>
+                            <groupId>org.codehaus.plexus</groupId>
+                            <artifactId>plexus-compiler-javac-errorprone</artifactId>
+                            <version>2.8.4</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>com.google.errorprone</groupId>
+                            <artifactId>error_prone_core</artifactId>
+                            <version>2.3.1</version>
+                        </dependency>
+                    </dependencies-->
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

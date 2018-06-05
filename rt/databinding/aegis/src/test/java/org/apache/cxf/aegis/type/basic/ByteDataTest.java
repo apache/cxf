@@ -46,6 +46,7 @@ public class ByteDataTest extends AbstractAegisTest {
 
     }
 
+    @Test
     public void testBeanServiceWSDL() throws Exception {
         Document doc = getWSDLDocument("DataService");
         addNamespace("wsdl", WSDLConstants.NS_WSDL11);

@@ -63,6 +63,7 @@ public class FormUtilsTest extends Assert {
         assertEquals(HTTP_PARAM_VALUE2, params.get(HTTP_PARAM2).iterator().next());
     }
 
+    @Test
     public void populateMapFromStringFromHTTPWithProp() {
         mockObjects("false");
         EasyMock.replay(mockMessage, mockRequest);

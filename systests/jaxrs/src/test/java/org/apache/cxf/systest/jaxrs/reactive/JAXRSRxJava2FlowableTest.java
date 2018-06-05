@@ -39,6 +39,7 @@ import org.apache.cxf.jaxrs.rx2.client.FlowableRxInvokerProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import io.reactivex.Flowable;
+import io.reactivex.disposables.Disposable;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -73,9 +74,12 @@ public class JAXRSRxJava2FlowableTest extends AbstractBusClientServerTestBase {
             .get(HelloWorldBean.class);
         
         Holder<HelloWorldBean> holder = new Holder<HelloWorldBean>();
-        obs.subscribe(v -> {
+        Disposable d = obs.subscribe(v -> {
             holder.value = v;
         });
+        if (d == null) {
+            throw new IllegalStateException("Subscribe did not return a Disposable");
+        }
         Thread.sleep(3000);
         assertEquals("Hello", holder.value.getGreeting());
         assertEquals("World", holder.value.getAudience());
@@ -133,22 +137,29 @@ public class JAXRSRxJava2FlowableTest extends AbstractBusClientServerTestBase {
         
         Thread.sleep(2000);
 
-        obs.map(
+        Disposable d = obs.map(
             s -> {
                 return s + s;
             })
             .subscribe(s -> assertDuplicateResponse(s));
+        if (d == null) {
+            throw new IllegalStateException("Subscribe did not return a Disposable");
+        }
     }
     @Test
     public void testGetHelloWorldAsyncObservable404() throws Exception {
         String address = "http://localhost:" + PORT + "/rx2/flowable/textAsync404";
         Invocation.Builder b = ClientBuilder.newClient().register(new FlowableRxInvokerProvider())
             .target(address).request();
-        b.rx(FlowableRxInvoker.class).get(String.class).subscribe(
+        Disposable d = b.rx(FlowableRxInvoker.class).get(String.class).subscribe(
             s -> {
                 fail("Exception expected");
             },
             t -> validateT((ExecutionException)t));
+        if (d == null) {
+            throw new IllegalStateException("Subscribe did not return a Disposable");
+        }
+        
     }
 
     private void validateT(ExecutionException t) {

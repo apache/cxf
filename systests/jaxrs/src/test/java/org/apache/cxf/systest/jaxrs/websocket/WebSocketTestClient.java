@@ -134,7 +134,7 @@ class WebSocketTestClient {
         }
 
         public void onFragment(byte[] fragment, boolean last) {
-            LOG.info("[ws] received fragment bytes (last?" + last + ") --> " + fragment);
+            LOG.info("[ws] received fragment bytes (last?" + last + ") --> " + new String(fragment));
             processFragments(fragment, last);
         }
 
