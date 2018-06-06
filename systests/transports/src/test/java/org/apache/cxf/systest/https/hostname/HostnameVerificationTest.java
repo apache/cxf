@@ -206,8 +206,8 @@ public class HostnameVerificationTest extends AbstractBusClientServerTestBase {
         URL busFile = HostnameVerificationTest.class.getResource("hostname-client-disablecn.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
 
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
@@ -240,8 +240,8 @@ public class HostnameVerificationTest extends AbstractBusClientServerTestBase {
             URL busFile = HostnameVerificationTest.class.getResource("hostname-client-usedefault.xml");
 
             Bus bus = bf.createBus(busFile.toString());
-            BusFactory.setDefaultBus(bus);
-            BusFactory.setThreadDefaultBus(bus);
+            SpringBusFactory.setDefaultBus(bus);
+            SpringBusFactory.setThreadDefaultBus(bus);
 
             URL url = SOAPService.WSDL_LOCATION;
             SOAPService service = new SOAPService(url, SOAPService.SERVICE);
@@ -269,8 +269,8 @@ public class HostnameVerificationTest extends AbstractBusClientServerTestBase {
         URL busFile = HostnameVerificationTest.class.getResource("hostname-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
 
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
