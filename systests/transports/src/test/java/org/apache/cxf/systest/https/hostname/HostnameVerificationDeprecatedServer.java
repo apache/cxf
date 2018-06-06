@@ -33,7 +33,7 @@ public class HostnameVerificationDeprecatedServer extends AbstractBusTestServerB
     }
 
     protected void run()  {
-        URL busFile = HostnameVerificationDeprecatedServer.class.getResource("hostname-server-bethal.xml");
+        URL busFile = HostnameVerificationDeprecatedServer.class.getResource("hostname-server-deprecated.xml");
         Bus busLocal = new SpringBusFactory().createBus(busFile);
         BusFactory.setDefaultBus(busLocal);
         setBus(busLocal);

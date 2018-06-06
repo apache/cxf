@@ -94,7 +94,7 @@
                     <sec:keyStore type="jks" password="security" resource="keys/subjalt.jks"/>
                 </sec:keyManagers>
                 <sec:clientAuthentication want="false" required="false"/>
-                <sec:certAlias>nosubjaltnocnmatch</sec:certAlias>
+                <sec:certAlias>nosubjaltcnnomatch</sec:certAlias>
             </httpj:tlsServerParameters>
         </httpj:engine>
     </httpj:engine-factory>

@@ -28,10 +28,11 @@
     <httpj:engine-factory id="non-localhost-match-settings">
         <httpj:engine port="${testutil.ports.HostnameVerificationDeprecatedServer}">
             <httpj:tlsServerParameters>
-                <sec:keyManagers keyPassword="password">
-                    <sec:keyStore type="jks" password="password" resource="keys/Bethal.jks"/>
+                <sec:keyManagers keyPassword="security">
+                    <sec:keyStore type="jks" password="security" resource="keys/subjalt.jks"/>
                 </sec:keyManagers>
                 <sec:clientAuthentication want="false" required="false"/>
+                <sec:certAlias>nosubjaltcnnomatch</sec:certAlias>
             </httpj:tlsServerParameters>
         </httpj:engine>
     </httpj:engine-factory>

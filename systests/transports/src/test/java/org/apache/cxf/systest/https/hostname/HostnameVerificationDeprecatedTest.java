@@ -34,8 +34,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 /**
- * A test for hostname verification when the Java system property "java.protocol.handler.pkgs" is set to 
- * "com.sun.net.ssl.internal.www.protocol". This means that com.sun.net.ssl.HostnameVerifier is used 
+ * A test for hostname verification when the Java system property "java.protocol.handler.pkgs" is set to
+ * "com.sun.net.ssl.internal.www.protocol". This means that com.sun.net.ssl.HostnameVerifier is used
  * instead of the javax version.
  */
 public class HostnameVerificationDeprecatedTest extends AbstractBusClientServerTestBase {
@@ -64,7 +64,7 @@ public class HostnameVerificationDeprecatedTest extends AbstractBusClientServerT
     @org.junit.Test
     public void testLocalhostNotMatching() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = HostnameVerificationDeprecatedTest.class.getResource("hostname-client-bethal.xml");
+        URL busFile = HostnameVerificationDeprecatedTest.class.getResource("hostname-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -77,7 +77,7 @@ public class HostnameVerificationDeprecatedTest extends AbstractBusClientServerT
         assertNotNull("Port is null", port);
 
         updateAddressPort(port, PORT);
-        
+
         try {
             port.greetMe("Kitty");
             fail("Failure expected on the hostname verification");
@@ -88,7 +88,7 @@ public class HostnameVerificationDeprecatedTest extends AbstractBusClientServerT
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     // No Subject Alternative Name, but the CN matches ("localhost"), so the default HostnameVerifier
     // should work fine
     @org.junit.Test
