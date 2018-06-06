@@ -41,6 +41,7 @@ import org.junit.BeforeClass;
 public class HostnameVerificationDeprecatedTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(HostnameVerificationDeprecatedServer.class);
     static final String PORT2 = allocatePort(HostnameVerificationDeprecatedServer.class, 2);
+    static final String PORT3 = allocatePort(HostnameVerificationDeprecatedServer.class, 3);
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -131,6 +132,35 @@ public class HostnameVerificationDeprecatedTest extends AbstractBusClientServerT
         assertNotNull("Port is null", port);
 
         updateAddressPort(port, PORT2);
+
+        assertEquals(port.greetMe("Kitty"), "Hello Kitty");
+
+        // Enable Async
+        ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+
+        assertEquals(port.greetMe("Kitty"), "Hello Kitty");
+
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+
+    // No Subject Alternative Name, but the CN wildcard matches
+    @org.junit.Test
+    public void testNoSubjectAlternativeNameCNWildcardMatch() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = HostnameVerificationTest.class.getResource("hostname-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL url = SOAPService.WSDL_LOCATION;
+        SOAPService service = new SOAPService(url, SOAPService.SERVICE);
+        assertNotNull("Service is null", service);
+        final Greeter port = service.getHttpsPort();
+        assertNotNull("Port is null", port);
+
+        updateAddressPort(port, PORT3);
 
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
 
