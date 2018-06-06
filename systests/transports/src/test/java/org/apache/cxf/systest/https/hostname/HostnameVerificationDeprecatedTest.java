@@ -21,6 +21,8 @@ package org.apache.cxf.systest.https.hostname;
 
 import java.net.URL;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
 import javax.xml.ws.BindingProvider;
 
 import org.apache.cxf.Bus;
@@ -114,6 +116,52 @@ public class HostnameVerificationDeprecatedTest extends AbstractBusClientServerT
         bus.shutdown(true);
     }
 
+    // No Subject Alternative Name, no matching CN - but we are setting the JVM default hostname verifier to
+    // allow it
+    @org.junit.Test
+    public void testNoSubjectAlternativeNameNoCNMatchDefaultVerifier() throws Exception {
+        HostnameVerifier hostnameVerifier = HttpsURLConnection.getDefaultHostnameVerifier();
+        try {
+            HttpsURLConnection.setDefaultHostnameVerifier(
+                new javax.net.ssl.HostnameVerifier() {
+                    public boolean verify(String hostName, javax.net.ssl.SSLSession session) {
+                        return true;
+                    }
+
+                    // Note we need this method as well or else it won't work the with the
+                    // deprecated HostnameVerifier interface
+                    @SuppressWarnings("unused")
+                    public boolean verify(final String host, final String certHostname) {
+                        return true;
+                    }
+                });
+
+            SpringBusFactory bf = new SpringBusFactory();
+            URL busFile = HostnameVerificationTest.class.getResource("hostname-client-usedefault.xml");
+
+            Bus bus = bf.createBus(busFile.toString());
+            BusFactory.setDefaultBus(bus);
+            BusFactory.setThreadDefaultBus(bus);
+
+            URL url = SOAPService.WSDL_LOCATION;
+            SOAPService service = new SOAPService(url, SOAPService.SERVICE);
+            assertNotNull("Service is null", service);
+            final Greeter port = service.getHttpsPort();
+            assertNotNull("Port is null", port);
+
+            updateAddressPort(port, PORT);
+
+            port.greetMe("Kitty");
+
+            ((java.io.Closeable)port).close();
+            bus.shutdown(true);
+        } finally {
+            if (hostnameVerifier != null) {
+                HttpsURLConnection.setDefaultHostnameVerifier(hostnameVerifier);
+            }
+        }
+    }
+
     // No Subject Alternative Name, but the CN matches ("localhost"), so the default HostnameVerifier
     // should work fine
     @org.junit.Test
@@ -172,4 +220,5 @@ public class HostnameVerificationDeprecatedTest extends AbstractBusClientServerT
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
+
 }
