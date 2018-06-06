@@ -53,6 +53,7 @@ public class CachedOutputStream extends OutputStream {
     private static int defaultThreshold;
     private static long defaultMaxSize;
     private static String defaultCipherTransformation;
+    private static boolean thresholdSysPropSet;
 
     static {
         String s = SystemPropertyAction.getPropertyOrNull(CachedConstants.OUTPUT_DIRECTORY_SYS_PROP);
@@ -582,10 +583,19 @@ public class CachedOutputStream extends OutputStream {
             i = Integer.parseInt(s);
             if (i <= 0) {
                 i = 128 * 1024;
+            } else {
+                thresholdSysPropSet = true;
             }
         }
         defaultThreshold = i;
         
+    }
+
+    /**
+     * Returns true if the default threshold is explicitly set via CachedConstants.THRESHOLD_SYS_PROP
+     */
+    public static boolean isThresholdSysPropSet() {
+        return thresholdSysPropSet;
     }
 
     public static void setDefaultCipherTransformation(String n) {
