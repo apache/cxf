@@ -56,7 +56,7 @@ under the License.
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>swagger-ui</artifactId>
-            <version>3.13.6</version>
+            <version>3.17.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
