@@ -47,6 +47,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.util.PropertyUtils;
@@ -892,8 +893,12 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         org.apache.cxf.transport.https.SSLUtils.configureKeyManagersWithCertAlias(
             tlsClientParameters, keyManagers);
 
-        ctx.init(keyManagers, tlsClientParameters.getTrustManagers(),
-                 tlsClientParameters.getSecureRandom());
+        TrustManager[] trustManagers = tlsClientParameters.getTrustManagers();
+        if (trustManagers == null) {
+            trustManagers = org.apache.cxf.configuration.jsse.SSLUtils.getDefaultTrustStoreManagers(LOG);
+        }
+
+        ctx.init(keyManagers, trustManagers, tlsClientParameters.getSecureRandom());
 
         sslContext = ctx;
         lastTlsHash = hash;
