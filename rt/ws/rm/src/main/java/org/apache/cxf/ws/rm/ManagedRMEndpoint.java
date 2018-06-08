@@ -172,7 +172,7 @@ public class ManagedRMEndpoint implements ManagedComponent {
         }
 
         List<Long> numbers = rq.getUnacknowledgedMessageNumbers(ss);
-        return numbers.toArray(new Long[numbers.size()]);
+        return numbers.toArray(new Long[0]);
     }
 
     @ManagedOperation(description = "Total Number of Deferred Acknowledgements")
@@ -219,7 +219,7 @@ public class ManagedRMEndpoint implements ManagedComponent {
             list.add(r.getLower());
             list.add(r.getUpper());
         }
-        return list.toArray(new Long[list.size()]);
+        return list.toArray(new Long[0]);
     }
 
     @ManagedOperation(description = "Destination Sequence Acknowledged Range")
@@ -238,7 +238,7 @@ public class ManagedRMEndpoint implements ManagedComponent {
             list.add(r.getLower());
             list.add(r.getUpper());
         }
-        return list.toArray(new Long[list.size()]);
+        return list.toArray(new Long[0]);
     }
 
     @ManagedOperation(description = "Retransmission Status")
@@ -323,7 +323,7 @@ public class ManagedRMEndpoint implements ManagedComponent {
         }
 
         List<Long> numbers = rq.getUndeliveredMessageNumbers(ds);
-        return numbers.toArray(new Long[numbers.size()]);
+        return numbers.toArray(new Long[0]);
     }
 
     @ManagedOperation(description = "List of Source Sequence IDs")
@@ -338,7 +338,7 @@ public class ManagedRMEndpoint implements ManagedComponent {
                 list.add(ss.getIdentifier().getValue());
             }
         }
-        return list.toArray(new String[list.size()]);
+        return list.toArray(new String[0]);
     }
 
 
@@ -349,7 +349,7 @@ public class ManagedRMEndpoint implements ManagedComponent {
         for (DestinationSequence ds : destination.getAllSequences()) {
             list.add(ds.getIdentifier().getValue());
         }
-        return list.toArray(new String[list.size()]);
+        return list.toArray(new String[0]);
     }
 
 
@@ -449,7 +449,7 @@ public class ManagedRMEndpoint implements ManagedComponent {
             }
         }
 
-        return sps.toArray(new CompositeData[sps.size()]);
+        return sps.toArray(new CompositeData[0]);
     }
 
     @ManagedOperation(description = "Destination Sequence Properties")
@@ -471,7 +471,7 @@ public class ManagedRMEndpoint implements ManagedComponent {
             sps.add(getDestinationSequenceProperties(ds));
         }
 
-        return sps.toArray(new CompositeData[sps.size()]);
+        return sps.toArray(new CompositeData[0]);
     }
 
     private SourceSequence getSourceSeq(String sid) {

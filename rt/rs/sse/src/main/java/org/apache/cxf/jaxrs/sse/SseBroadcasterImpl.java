@@ -87,7 +87,7 @@ public class SseBroadcasterImpl implements SseBroadcaster {
             }
         }
         
-        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
     }
 
     @Override

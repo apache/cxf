@@ -103,7 +103,7 @@ public class Log4jLogger extends AbstractDelegatingLogger {
                 ret.add(((HandlerWrapper)ap).getHandler());
             }
         }
-        return ret.toArray(new Handler[ret.size()]);
+        return ret.toArray(new Handler[0]);
     }
 
     protected void internalLogFormatted(String msg, LogRecord record) {

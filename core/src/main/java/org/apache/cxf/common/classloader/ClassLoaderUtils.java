@@ -93,7 +93,7 @@ public final class ClassLoaderUtils {
     public static ClassLoader getURLClassLoader(
         final List<URL> urlList, final ClassLoader parent
     ) {
-        return getURLClassLoader(urlList.toArray(new URL[urlList.size()]), parent);
+        return getURLClassLoader(urlList.toArray(new URL[0]), parent);
     }
 
     /**

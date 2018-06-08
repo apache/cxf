@@ -484,8 +484,7 @@ public final class SSLUtils {
     private static String[] getCiphersFromList(List<String> cipherSuitesList,
                                                Logger log,
                                                boolean exclude) {
-        int numCipherSuites = cipherSuitesList.size();
-        String[] cipherSuites = cipherSuitesList.toArray(new String[numCipherSuites]);
+        String[] cipherSuites = cipherSuitesList.toArray(new String[0]);
         if (log.isLoggable(Level.FINE)) {
             StringBuilder ciphsStr = new StringBuilder();
             for (String s : cipherSuites) {

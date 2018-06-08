@@ -38,7 +38,7 @@ public class BookServiceImpl implements BookService {
     }
 
     public Book[] getBooks() {
-        return allBooks.toArray(new Book[allBooks.size()]);
+        return allBooks.toArray(new Book[0]);
     }
 
     public Book findBook(String isbn) {

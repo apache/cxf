@@ -96,7 +96,7 @@ public class WSDLValidatorMojo extends AbstractMojo {
         exList.addAll(Arrays.asList(org.codehaus.plexus.util.FileUtils.getDefaultExcludes()));
 
         String inc = getIncludeExcludeString(includes);
-        String ex = getIncludeExcludeString(exList.toArray(new String[exList.size()]));
+        String ex = getIncludeExcludeString(exList.toArray(new String[0]));
 
         try {
             List<?> newfiles = org.codehaus.plexus.util.FileUtils.getFiles(dir, inc, ex);
@@ -136,7 +136,7 @@ public class WSDLValidatorMojo extends AbstractMojo {
             getLog().debug("Calling wsdlvalidator with args: " + list);
             try {
                 list.add(file.getCanonicalPath());
-                String[] pargs = list.toArray(new String[list.size()]);
+                String[] pargs = list.toArray(new String[0]);
 
                 ToolSpec spec = null;
                 try (InputStream toolspecStream = WSDLValidator.class .getResourceAsStream("wsdlvalidator.xml")) {

@@ -91,7 +91,7 @@ public class BeanGenerator extends AbstractGenerator<File> {
             for (File file : generatedFiles) {
                 files.add(file.getAbsolutePath());
             }
-            compiler.compileFiles(files.toArray(new String[files.size()]));
+            compiler.compileFiles(files.toArray(new String[0]));
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -68,7 +68,7 @@ public final class WsdlUtilities {
         exList.addAll(Arrays.asList(org.codehaus.plexus.util.FileUtils.getDefaultExcludes()));
 
         String inc = joinWithComma(includes);
-        String ex = joinWithComma(exList.toArray(new String[exList.size()]));
+        String ex = joinWithComma(exList.toArray(new String[0]));
 
         try {
             List<?> newfiles = org.codehaus.plexus.util.FileUtils.getFiles(dir, inc, ex);

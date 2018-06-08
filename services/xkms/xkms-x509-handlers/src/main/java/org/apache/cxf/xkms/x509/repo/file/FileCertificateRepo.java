@@ -174,7 +174,7 @@ public class FileCertificateRepo implements CertificateRepo {
                                                  "File base persistence storage is not found: "
                                                      + storageDir.getPath());
         }
-        return certificateFiles.toArray(new File[certificateFiles.size()]);
+        return certificateFiles.toArray(new File[0]);
     }
 
     public X509Certificate readCertificate(File certFile) throws CertificateException, FileNotFoundException,

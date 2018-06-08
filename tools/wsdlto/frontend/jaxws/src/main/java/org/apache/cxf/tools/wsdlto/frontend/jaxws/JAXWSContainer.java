@@ -100,7 +100,7 @@ public class JAXWSContainer extends WSDLToJavaContainer {
                     n.add(arg);
                 }
             }
-            env.put(key, n.toArray(new String[n.size()]));
+            env.put(key, n.toArray(new String[0]));
         }
     }
 }

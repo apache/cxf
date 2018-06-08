@@ -146,7 +146,7 @@ public class ServiceGenerator extends AbstractJAXWSGenerator {
                     useGetResource = true;
                 }
 
-                setAttributes("cxfPortClassnames", portNames.toArray(new String[portNames.size()]));
+                setAttributes("cxfPortClassnames", portNames.toArray(new String[0]));
                 setAttributes("service", js);
                 setAttributes("wsdlLocation", location);
                 setAttributes("useGetResource", useGetResource);

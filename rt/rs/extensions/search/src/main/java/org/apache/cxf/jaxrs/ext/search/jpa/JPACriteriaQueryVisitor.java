@@ -151,7 +151,7 @@ public class JPACriteriaQueryVisitor<T, E> extends AbstractJPATypedQueryVisitor<
     }
 
     private static Selection<?>[] toSelectionsArray(List<Selection<?>> selections) {
-        return selections.toArray(new Selection[selections.size()]);
+        return selections.toArray(new Selection[0]);
     }
 
     private TypedQuery<E> getTypedQuery(CriteriaQuery<E> theCriteriaQuery) {

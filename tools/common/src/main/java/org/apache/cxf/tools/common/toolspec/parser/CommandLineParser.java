@@ -66,7 +66,7 @@ public class CommandLineParser {
         while (toker.hasMoreTokens()) {
             res.add(toker.nextToken());
         }
-        return res.toArray(new String[res.size()]);
+        return res.toArray(new String[0]);
     }
 
     public CommandDocument parseArguments(String args) throws BadUsageException, IOException {

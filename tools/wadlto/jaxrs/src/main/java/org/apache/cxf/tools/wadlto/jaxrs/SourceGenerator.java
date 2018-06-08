@@ -1953,7 +1953,7 @@ public class SourceGenerator {
                                        .getEntityResolver());
         if (!compilerArgs.isEmpty()) {
             compiler.getOptions().addGrammar(new InputSource("null"));
-            compiler.getOptions().parseArguments(compilerArgs.toArray(new String[compilerArgs.size()]));
+            compiler.getOptions().parseArguments(compilerArgs.toArray(new String[0]));
         }
         addSchemas(schemaElements, compiler);
         for (InputSource is : bindingFiles) {

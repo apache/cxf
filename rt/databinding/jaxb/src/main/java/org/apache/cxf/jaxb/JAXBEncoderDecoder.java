@@ -474,7 +474,7 @@ public final class JAXBEncoderDecoder {
         Class<?> cls = null;
         if (mObj instanceof List) {
             List<?> l = (List<?>)mObj;
-            objArray = l.toArray(new Object[l.size()]);
+            objArray = l.toArray();
             cls = null;
         } else {
             objArray = mObj;

@@ -309,7 +309,7 @@ public class BeanTypeInfo {
 
         getInterfacePropertyDescriptors(clazz, pds, new HashSet<Class<?>>());
 
-        return pds.toArray(new PropertyDescriptor[pds.size()]);
+        return pds.toArray(new PropertyDescriptor[0]);
     }
 
     private void getInterfacePropertyDescriptors(Class<?> clazz, List<PropertyDescriptor> pds,

@@ -65,7 +65,7 @@ class WrappedAttachments implements Set<Attachment> {
     }
 
     public Object[] toArray() {
-        return toArray(new Object[attachments.size()]);
+        return toArray(new Object[0]);
     }
 
     @SuppressWarnings("unchecked")

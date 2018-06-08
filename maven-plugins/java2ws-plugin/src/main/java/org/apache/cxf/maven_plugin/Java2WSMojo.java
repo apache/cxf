@@ -391,7 +391,7 @@ public class Java2WSMojo extends AbstractMojo {
         if (!fork) {
             try {
                 CommandInterfaceUtils.commandCommonMain();
-                JavaToWS j2w = new JavaToWS(args.toArray(new String[args.size()]));
+                JavaToWS j2w = new JavaToWS(args.toArray(new String[0]));
                 j2w.run();
             } catch (OutOfMemoryError e) {
                 getLog().debug(e);
@@ -418,7 +418,7 @@ public class Java2WSMojo extends AbstractMojo {
                 throw new MojoExecutionException(e.getMessage(), e);
             }
 
-            cmd.addArguments(args.toArray(new String[args.size()]));
+            cmd.addArguments(args.toArray(new String[0]));
 
             CommandLineUtils.StringStreamConsumer err = new CommandLineUtils.StringStreamConsumer();
             CommandLineUtils.StringStreamConsumer out = new CommandLineUtils.StringStreamConsumer();

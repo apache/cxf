@@ -808,10 +808,10 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
         }
 
         return createWrapperHelper(wrapperType,
-                                 setMethods.toArray(new Method[setMethods.size()]),
-                                 getMethods.toArray(new Method[getMethods.size()]),
-                                 jaxbMethods.toArray(new Method[jaxbMethods.size()]),
-                                 fields.toArray(new Field[fields.size()]),
+                                 setMethods.toArray(new Method[0]),
+                                 getMethods.toArray(new Method[0]),
+                                 jaxbMethods.toArray(new Method[0]),
+                                 fields.toArray(new Field[0]),
                                  objectFactory);
     }
 

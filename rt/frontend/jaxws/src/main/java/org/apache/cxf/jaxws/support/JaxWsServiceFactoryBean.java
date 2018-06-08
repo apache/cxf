@@ -268,7 +268,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
             asyncHandlerParams.add(AsyncHandler.class);
             Method futureMethod = ReflectionUtil
                 .getDeclaredMethod(method.getDeclaringClass(), method.getName() + "Async",
-                                   asyncHandlerParams.toArray(new Class<?>[asyncHandlerParams.size()]));
+                                   asyncHandlerParams.toArray(new Class<?>[0]));
 
             getMethodDispatcher().bind(op, method, responseMethod, futureMethod);
 

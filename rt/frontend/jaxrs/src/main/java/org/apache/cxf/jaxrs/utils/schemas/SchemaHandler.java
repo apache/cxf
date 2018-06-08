@@ -152,7 +152,7 @@ public class SchemaHandler {
                     }
                 }
             }
-            s = factory.newSchema(sources.toArray(new Source[sources.size()]));
+            s = factory.newSchema(sources.toArray(new Source[0]));
         } catch (Exception ex) {
             throw new IllegalArgumentException("Failed to load XML schema : " + ex.getMessage(), ex);
         }

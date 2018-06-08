@@ -63,7 +63,7 @@ public class WrappedAttachmentsTest extends Assert {
 
         assertEquals(1, attachments.size());
 
-        Attachment[] atts = attachments.toArray(new Attachment[attachments.size()]);
+        Attachment[] atts = attachments.toArray(new Attachment[0]);
         assertEquals(1, atts.length);
         assertEquals("att-1".equals(attx.getId()) ? "att-2" : "att-1", atts[0].getId());
 
