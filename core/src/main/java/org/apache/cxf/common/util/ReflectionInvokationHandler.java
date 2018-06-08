@@ -160,19 +160,19 @@ public class ReflectionInvokationHandler implements InvocationHandler {
 
     @Target(ElementType.PARAMETER)
     @Retention(RetentionPolicy.RUNTIME)
-    public static @interface Optional {
+    public @interface Optional {
     }
 
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
-    public static @interface WrapReturn {
+    public @interface WrapReturn {
         Class<?> value();
         boolean iterator() default false;
     }
 
     @Target(ElementType.PARAMETER)
     @Retention(RetentionPolicy.RUNTIME)
-    public static @interface UnwrapParam {
+    public @interface UnwrapParam {
         String methodName() default "getValue";
         String typeMethodName() default "#default";
     }

@@ -72,13 +72,12 @@ public class SimpleAuthorizingInterceptorTest extends Assert {
     }
 
     protected SimpleAuthorizingInterceptor createSimpleAuthorizingInterceptorWithDenyRoles(final String role) {
-        SimpleAuthorizingInterceptor in = new SimpleAuthorizingInterceptor() {
+        return new SimpleAuthorizingInterceptor() {
             @Override
             public List<String> getDenyRoles(Method m) {
                 return Collections.singletonList(role);
             }
         };
-        return in;
     }
 
     @Test(expected = AccessDeniedException.class)

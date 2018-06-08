@@ -59,12 +59,11 @@ public class OperationInfoAuthorizingInterceptorTest extends SimpleAuthorizingIn
 
     @Override
     protected SimpleAuthorizingInterceptor createSimpleAuthorizingInterceptorWithDenyRoles(final String role) {
-        SimpleAuthorizingInterceptor in = new OperationInfoAuthorizingInterceptor() {
+        return new OperationInfoAuthorizingInterceptor() {
             @Override
             public List<String> getDenyRoles(String key) {
                 return Collections.singletonList(role);
             }
         };
-        return in;
     }
 }

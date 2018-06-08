@@ -206,7 +206,7 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
         msg.getExchange().put(SecurityEvent.class.getName() + ".out", outgoingSecurityEventList);
         msg.put(SecurityEvent.class.getName() + ".out", outgoingSecurityEventList);
 
-        final SecurityEventListener securityEventListener = new SecurityEventListener() {
+        return new SecurityEventListener() {
             @Override
             public void registerSecurityEvent(SecurityEvent securityEvent) throws XMLSecurityException {
                 if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.SAML_TOKEN) {
@@ -219,8 +219,6 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
                 }
             }
         };
-
-        return securityEventListener;
     }
 
     protected void configureProperties(
