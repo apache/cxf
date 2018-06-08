@@ -71,7 +71,7 @@ class WrappedAttachments implements Set<Attachment> {
     @SuppressWarnings("unchecked")
     public <T> T[] toArray(T[] a) {
         T[] copy = a.length == attachments.size()
-            ? a : (T[])Array.newInstance(a.getClass(), attachments.size());
+            ? a : (T[])Array.newInstance(a.getClass().getComponentType(), attachments.size());
         int i = 0;
         for (Map.Entry<String, DataHandler> entry : attachments.entrySet()) {
             Attachment o = cache.get(entry.getKey());
