@@ -1145,6 +1145,8 @@ public class ClientImpl
 
     
     public class IllegalEmptyResponseException extends IllegalStateException {
+        private static final long serialVersionUID = 1L;
+
         public IllegalEmptyResponseException() {
             super();
         }

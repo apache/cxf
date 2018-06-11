@@ -514,18 +514,18 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         properties.setSignatureKeyIdentifier(getKeyIdentifierType(token));
 
         // Find out do we also need to include the token as per the Inclusion requirement
-        WSSecurityTokenConstants.KeyIdentifier keyIdentifier = properties.getSignatureKeyIdentifier();
-        if (token instanceof X509Token
-            && isTokenRequired(token.getIncludeTokenType())
-            && (WSSecurityTokenConstants.KeyIdentifier_IssuerSerial.equals(keyIdentifier)
-                || WSSecurityTokenConstants.KEYIDENTIFIER_THUMBPRINT_IDENTIFIER.equals(keyIdentifier)
-                || WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE.equals(
-                    keyIdentifier))) {
-            properties.setIncludeSignatureToken(true);
-        } else {
-            properties.setIncludeSignatureToken(false);
+        properties.setIncludeSignatureToken(false);
+        for (SecurityTokenConstants.KeyIdentifier keyIdentifier : properties.getSignatureKeyIdentifiers()) {
+            if (token instanceof X509Token
+                && isTokenRequired(token.getIncludeTokenType())
+                && (WSSecurityTokenConstants.KeyIdentifier_IssuerSerial.equals(keyIdentifier)
+                    || WSSecurityTokenConstants.KEYIDENTIFIER_THUMBPRINT_IDENTIFIER.equals(keyIdentifier)
+                    || WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE.equals(
+                        keyIdentifier))) {
+                properties.setIncludeSignatureToken(true);
+            }
         }
-
+        
         String userNameKey = SecurityConstants.SIGNATURE_USERNAME;
         if (binding instanceof SymmetricBinding) {
             userNameKey = SecurityConstants.ENCRYPT_USERNAME;

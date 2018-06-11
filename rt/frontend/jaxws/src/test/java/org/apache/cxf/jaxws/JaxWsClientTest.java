@@ -45,6 +45,7 @@ import javax.xml.ws.handler.soap.SOAPMessageContext;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxws.support.JaxWsEndpointImpl;
 import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
@@ -338,6 +339,7 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
         Greeter greeter = s.getPort(portName, Greeter.class);
         d.setMessageObserver(new MessageReplayObserver("sayHiResponse.xml"));
 
+        @SuppressWarnings("rawtypes") // JAX-WS api doesn't specify this as List<Handler<? extends MessageContext>>
         List<Handler> chain = ((BindingProvider)greeter).getBinding().getHandlerChain();
         chain.add(new LogicalHandler<LogicalMessageContext>() {
             public void close(MessageContext arg0) {
@@ -351,7 +353,7 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
 
                 Boolean outbound = (Boolean) context.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
                 if (outbound) {
-                    headers = (Map<String, List<String>>) context.get(MessageContext.HTTP_REQUEST_HEADERS);
+                    headers = CastUtils.cast((Map<?, ?>) context.get(MessageContext.HTTP_REQUEST_HEADERS));
                     if (headers == null) {
                         headers = new HashMap<String, List<String>>();
                         context.put(MessageContext.HTTP_REQUEST_HEADERS, headers);
@@ -377,6 +379,7 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
         Greeter greeter = s.getPort(portName, Greeter.class);
         d.setMessageObserver(new MessageReplayObserver("sayHiResponse.xml"));
 
+        @SuppressWarnings("rawtypes")
         List<Handler> chain = ((BindingProvider)greeter).getBinding().getHandlerChain();
         chain.add(new SOAPHandler<SOAPMessageContext>() {
 
@@ -384,7 +387,7 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
 
                     Boolean outbound = (Boolean) context.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
                     if (outbound) {
-                        headers = (Map<String, List<String>>) context.get(MessageContext.HTTP_REQUEST_HEADERS);
+                        headers = CastUtils.cast((Map<?, ?>) context.get(MessageContext.HTTP_REQUEST_HEADERS));
                         if (headers == null) {
                             headers = new HashMap<String, List<String>>();
                             context.put(MessageContext.HTTP_REQUEST_HEADERS, headers);
