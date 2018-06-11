@@ -60,10 +60,11 @@ import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.provider.json.JSONProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.InputStreamEntity;
-import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -904,8 +905,9 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         String ct = "multipart/mixed";
         post.setHeader("Content-Type", ct);
 
-        MultipartEntity entity = new MultipartEntity();
-        entity.addPart("image", new ByteArrayBody(new byte[1024 * 11], "testfile.png"));
+        HttpEntity entity = MultipartEntityBuilder.create()
+            .addPart("image", new ByteArrayBody(new byte[1024 * 11], "testfile.png"))
+            .build();
 
         post.setEntity(entity);
 
@@ -925,9 +927,10 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         String ct = "multipart/mixed";
         post.setHeader("Content-Type", ct);
 
-        MultipartEntity entity = new MultipartEntity();
-        entity.addPart("image", new ByteArrayBody(new byte[1024 * 9], "testfile.png"));
-        entity.addPart("image", new ByteArrayBody(new byte[1024 * 11], "testfile2.png"));
+        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+        
+        HttpEntity entity = builder.addPart("image", new ByteArrayBody(new byte[1024 * 9], "testfile.png"))
+                                   .addPart("image", new ByteArrayBody(new byte[1024 * 11], "testfile2.png")).build();
 
         post.setEntity(entity);
 
