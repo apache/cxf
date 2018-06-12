@@ -152,6 +152,7 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
                     public Void run() {
                         InterceptorChain chain = message.getInterceptorChain();
                         if (chain != null) {
+                            message.put("suspend.chain.on.current.interceptor", Boolean.TRUE);
                             chain.doIntercept(message);
                         }
                         return null;
