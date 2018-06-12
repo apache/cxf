@@ -108,30 +108,30 @@ public final class ServiceUtils {
 
     private static SchemaValidationType getSchemaValidationTypeFromModel(Message message) {
         Exchange exchange = message.getExchange();
+        SchemaValidationType validationType = null;
 
         if (exchange != null) {
+
             BindingOperationInfo boi = exchange.getBindingOperationInfo();
-            Endpoint endpoint = exchange.getEndpoint();
-
-            if (boi != null && endpoint != null) {
-                SchemaValidationType validationType = null;
+            if (boi != null) {
                 OperationInfo opInfo = boi.getOperationInfo();
-                EndpointInfo ep = endpoint.getEndpointInfo();
-
                 if (opInfo != null) {
                     validationType = getSchemaValidationTypeFromModel(opInfo);
+                }
+            }
 
-                    if (validationType == null && ep != null) {
+            if (validationType == null) {
+                Endpoint endpoint = exchange.getEndpoint();
+                if (endpoint != null) {
+                    EndpointInfo ep = endpoint.getEndpointInfo();
+                    if (ep != null) {
                         validationType = getSchemaValidationTypeFromModel(ep);
                     }
                 }
-
-                return validationType;
             }
         }
 
-        // else
-        return null;
+        return validationType;
     }
 
     private static SchemaValidationType getSchemaValidationTypeFromModel(
