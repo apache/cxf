@@ -74,6 +74,7 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
     private PolicyRegistry registry;
     private Collection<PolicyProvider> policyProviders;
     private Collection<PolicyProvider> preSetPolicyProviders = new LinkedList<PolicyProvider>();
+    private Policy busPolicy;
     private boolean enabled = true;
     private Boolean ignoreUnknownAssertions;
     private boolean addedBusInterceptors;
@@ -120,7 +121,16 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
     public Bus getBus() {
         return bus;
     }
+    @Override
+    public void addPolicy(Policy p) {
+        if (busPolicy == null) {
+            busPolicy = p;
+        } else {
+            busPolicy = busPolicy.merge(p);
+        }
+    }
 
+    
     public void setPolicyProviders(Collection<PolicyProvider> p) {
         policyProviders = new CopyOnWriteArrayList<PolicyProvider>(p);
     }
@@ -446,7 +456,7 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
         if (si == null) {
             return new Policy();
         }
-        Policy aggregated = null;
+        Policy aggregated = busPolicy;
         for (PolicyProvider pp : getPolicyProviders()) {
             Policy p = pp.getEffectivePolicy(si, m);
             if (null == aggregated) {

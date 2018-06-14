@@ -290,7 +290,6 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
     /**
      * The client uses the Asymmetric policy defined at the bus level - this should succeed.
      */
-    @org.junit.Ignore("See CXF-6968")
     @org.junit.Test
     public void testAsymmetricBusLevel() throws Exception {
 
