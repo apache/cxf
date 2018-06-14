@@ -287,4 +287,34 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
 
+    /**
+     * The client uses the Asymmetric policy defined at the bus level - this should succeed.
+     */
+    @org.junit.Ignore("See CXF-6968")
+    @org.junit.Test
+    public void testAsymmetricBusLevel() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = PolicyAlternativeTest.class.getResource("client-bus.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = PolicyAlternativeTest.class.getResource("DoubleItPolicy.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricPort");
+        DoubleItPortType utPort =
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(utPort, test.getPort());
+
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(utPort);
+        }
+
+        utPort.doubleIt(25);
+
+        ((java.io.Closeable)utPort).close();
+        bus.shutdown(true);
+    }
 }
