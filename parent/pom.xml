@@ -95,7 +95,7 @@
         <cxf.httpcomponents.client.version>4.5.5</cxf.httpcomponents.client.version>
         <cxf.httpcomponents.core.version>4.4.9</cxf.httpcomponents.core.version>
         <cxf.httpcomponents.core.version.range>[4.3,4.5.0)</cxf.httpcomponents.core.version.range>
-        <cxf.jackson.version>2.9.5</cxf.jackson.version>
+        <cxf.jackson.version>2.9.6</cxf.jackson.version>
         <cxf.james.mim4j.version>0.7.2</cxf.james.mim4j.version>
         <cxf.kerby.version>1.1.1</cxf.kerby.version>
         <cxf.logback.classic.version>1.2.3</cxf.logback.classic.version>
