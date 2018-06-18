@@ -164,34 +164,6 @@
                 </plugins>
             </build>
         </profile>
-        <profile>
-            <id>client.unauthenticated</id>
-            <build>
-                <defaultGoal>test</defaultGoal>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <phase>test</phase>
-                                <goals>
-                                    <goal>java</goal>
-                                </goals>
-                                <configuration>
-                                    <mainClass>demo.wssec.client.Client</mainClass>
-                                    <arguments>
-                                        <argument>${basedir}/src/main/config/hello_world_no_policy.wsdl</argument>
-                                        <argument>${basedir}/src/main/resources/ClientConfig.xml</argument>
-                                        <argument>secure</argument>
-                                    </arguments>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
     </profiles>
     <dependencies>
         <dependency>
