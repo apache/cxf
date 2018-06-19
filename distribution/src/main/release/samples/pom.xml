@@ -30,8 +30,8 @@
         <!-- don't deploy the samples, kind of pointless -->
         <maven.deploy.skip>true</maven.deploy.skip>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.boot.version>2.0.1.RELEASE</spring.boot.version>
-        <spring.cloud.eureka.version>2.0.0.M8</spring.cloud.eureka.version>
+        <spring.boot.version>2.0.3.RELEASE</spring.boot.version>
+        <spring.cloud.eureka.version>2.0.0.RELEASE</spring.cloud.eureka.version>
     </properties>
     <dependencies>
         <dependency>
@@ -238,30 +238,4 @@
             <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
     </distributionManagement>
-
-    <repositories>
-        <repository>
-            <id>spring-milestone</id>
-            <url>http://repo.spring.io/milestone/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>spring-milestone</id>
-            <url>http://repo.spring.io/milestone/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
 </project>
