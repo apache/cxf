@@ -59,6 +59,7 @@
     <bean id="bookstoreGenerics" class="org.apache.cxf.systest.jaxrs.security.SecureBookStoreGenerics"/>
     <security:authentication-manager>
 	    <security:authentication-provider>
+                <security:password-encoder ref="noopEncoder"/>
 	        <security:user-service>
 	            <security:user name="bob" password="bobspassword" authorities="ROLE_USER"/>
 	            <security:user name="baddy" password="baddyspassword" authorities="ROLE_USER"/>
@@ -67,5 +68,6 @@
 	        </security:user-service>
 	    </security:authentication-provider>
 	</security:authentication-manager>    
+    <bean id="noopEncoder" class="org.springframework.security.crypto.password.NoOpPasswordEncoder"/>
 </beans>
 <!-- END SNIPPET: beans -->
