@@ -31,6 +31,7 @@
     <!-- Application resources -->
     <bean id="statsResource" class="demo.jaxrs.server.StatsRestServiceImpl" />
     <bean id="jsonProvider" class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider" />
+    <bean id="sseFeature" class="org.apache.cxf.jaxrs.sse.SseFeature" />
  
     <cxf:bus>
         <cxf:features>
@@ -38,14 +39,16 @@
         </cxf:features>
     </cxf:bus>
 
-    <jaxrs:server id="sseSampleService" address="/" transportId="http://cxf.apache.org/transports/http/sse">
+    <jaxrs:server id="sseSampleService" address="/">
         <jaxrs:serviceBeans>
             <ref component-id="statsResource" />
         </jaxrs:serviceBeans>
         <jaxrs:providers>
-            <ref component-id="corsFilter" />
             <ref component-id="jsonProvider" />
         </jaxrs:providers>
+        <jaxrs:features>
+            <ref component-id="sseFeature" />
+        </jaxrs:features>
     </jaxrs:server>
 
 </blueprint>

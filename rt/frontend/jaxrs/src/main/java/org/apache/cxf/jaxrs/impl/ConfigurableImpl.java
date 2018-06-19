@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -71,17 +72,40 @@ public class ConfigurableImpl<C extends Configurable<C>> implements Configurable
 
     static Class<?>[] getImplementedContracts(Object provider, Class<?>[] restrictedClasses) {
         Class<?> providerClass = provider instanceof Class<?> ? ((Class<?>)provider) : provider.getClass();
-        Set<Class<?>> interfaces = Arrays.stream(providerClass.getInterfaces()).collect(Collectors.toSet());
-        providerClass = providerClass.getSuperclass();
-        for (; providerClass != null && providerClass != Object.class; providerClass = providerClass.getSuperclass()) {
-            interfaces.addAll(Arrays.stream(providerClass.getInterfaces()).collect(Collectors.toSet()));
-        }
+
+        Set<Class<?>> interfaces = collectAllInterfaces(providerClass);
+
         List<Class<?>> implementedContracts = interfaces.stream()
             .filter(el -> Arrays.stream(restrictedClasses).noneMatch(el::equals))
             .collect(Collectors.toList());
+
         return implementedContracts.toArray(new Class<?>[]{});
     }
-    
+
+    private static Set<Class<?>> collectAllInterfaces(Class<?> providerClass) {
+        Set<Class<?>> interfaces = new HashSet<>();
+        do {
+            for (Class<?> anInterface : providerClass.getInterfaces()) {
+                collectInterfaces(interfaces, anInterface);
+            }
+            providerClass = providerClass.getSuperclass();
+        } while (providerClass != null && providerClass != Object.class);
+
+        return interfaces;
+    }
+
+    /**
+     * internal helper function to recursively collect Interfaces.
+     * This is needed since {@link Class#getInterfaces()} does only return directly implemented Interfaces,
+     * But not the ones derived from those classes.
+     */
+    private static void collectInterfaces(Set<Class<?>> interfaces, Class<?> anInterface) {
+        interfaces.add(anInterface);
+        for (Class<?> superInterface : anInterface.getInterfaces()) {
+            collectInterfaces(interfaces, superInterface);
+        }
+    }
+
     protected C getConfigurable() {
         return configurable;
     }

@@ -19,6 +19,9 @@
 
 package demo.hw.server;
 
+import java.util.Collections;
+
+import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 
 public class Server {
@@ -33,6 +36,7 @@ public class Server {
         svrFactory.setWsdlLocation(wsdl);
         svrFactory.setAddress(address);
         svrFactory.setServiceBean(new GreeterImpl());
+        svrFactory.setFeatures(Collections.singletonList(new LoggingFeature()));
         svrFactory.create();
     }
 

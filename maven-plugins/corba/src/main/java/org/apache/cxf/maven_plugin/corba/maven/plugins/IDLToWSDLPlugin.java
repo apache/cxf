@@ -74,7 +74,7 @@ public class IDLToWSDLPlugin extends AbstractMojo {
                 list.addAll(idltowsdlOptions[x].getExtraargs());
                 list.add(idltowsdlOptions[x].getIDL());
                 try {
-                    IDLToWSDL.run(list.toArray(new String[list.size()]));
+                    IDLToWSDL.run(list.toArray(new String[0]));
                     doneFile.delete();
                     doneFile.createNewFile();
                 } catch (Throwable e) {

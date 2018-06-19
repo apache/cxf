@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.tools.common.CommandInterfaceUtils;
+import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.toolspec.ToolRunner;
 
 public class JavaToWS {
@@ -84,6 +85,17 @@ public class JavaToWS {
                            .getResourceAsStream("java2ws.xml"), false, args, os);
     }
 
+    /**
+     * Pass user app's (compiler) information in the context.
+     * @param context
+     * @param os
+     * @throws Exception
+     */
+    public void run(ToolContext context, OutputStream os) throws Exception {
+        ToolRunner.runTool(JavaToWSContainer.class,
+            JavaToWSContainer.class.getResourceAsStream("java2ws.xml"),
+            false, args, isExitOnFinish(), context, os);
+    }
 
     private boolean isExitOnFinish() {
         String exit = System.getProperty("exitOnFinish");

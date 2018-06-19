@@ -150,6 +150,72 @@ public class TrustManagerTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
 
+    // Here we're using spring config but getting the truststore from the standard system properties
+    @org.junit.Test
+    public void testSystemPropertiesWithEmptyTLSClientParametersConfig() throws Exception {
+        try {
+            System.setProperty("javax.net.ssl.trustStore", "keys/Bethal.jks");
+            System.setProperty("javax.net.ssl.trustStorePassword", "password");
+            System.setProperty("javax.net.ssl.trustStoreType", "JKS");
+            SpringBusFactory bf = new SpringBusFactory();
+            URL busFile = TrustManagerTest.class.getResource("client-trust-config.xml");
+
+            Bus bus = bf.createBus(busFile.toString());
+            BusFactory.setDefaultBus(bus);
+            BusFactory.setThreadDefaultBus(bus);
+
+            URL url = SOAPService.WSDL_LOCATION;
+            SOAPService service = new SOAPService(url, SOAPService.SERVICE);
+            assertNotNull("Service is null", service);
+            final Greeter port = service.getHttpsPort();
+            assertNotNull("Port is null", port);
+
+            updateAddressPort(port, PORT);
+
+            assertEquals(port.greetMe("Kitty"), "Hello Kitty");
+
+            ((java.io.Closeable)port).close();
+            bus.shutdown(true);
+        } finally {
+            System.clearProperty("javax.net.ssl.trustStore");
+            System.clearProperty("javax.net.ssl.trustStorePassword");
+            System.clearProperty("javax.net.ssl.trustStoreType");
+        }
+    }
+
+    // Here we're using spring config but getting the truststore from the standard system properties
+    @org.junit.Test
+    public void testSystemPropertiesWithEmptyKeystoreConfig() throws Exception {
+        try {
+            System.setProperty("javax.net.ssl.trustStore", "keys/Bethal.jks");
+            System.setProperty("javax.net.ssl.trustStorePassword", "password");
+            System.setProperty("javax.net.ssl.trustStoreType", "JKS");
+            SpringBusFactory bf = new SpringBusFactory();
+            URL busFile = TrustManagerTest.class.getResource("client-trust-empty-config.xml");
+
+            Bus bus = bf.createBus(busFile.toString());
+            BusFactory.setDefaultBus(bus);
+            BusFactory.setThreadDefaultBus(bus);
+
+            URL url = SOAPService.WSDL_LOCATION;
+            SOAPService service = new SOAPService(url, SOAPService.SERVICE);
+            assertNotNull("Service is null", service);
+            final Greeter port = service.getHttpsPort();
+            assertNotNull("Port is null", port);
+
+            updateAddressPort(port, PORT);
+
+            assertEquals(port.greetMe("Kitty"), "Hello Kitty");
+
+            ((java.io.Closeable)port).close();
+            bus.shutdown(true);
+        } finally {
+            System.clearProperty("javax.net.ssl.trustStore");
+            System.clearProperty("javax.net.ssl.trustStorePassword");
+            System.clearProperty("javax.net.ssl.trustStoreType");
+        }
+    }
+
     // Here the Trust Manager checks the server cert. this time we are invoking on the
     // service that is configured in code (not by spring)
     @org.junit.Test

@@ -60,6 +60,11 @@ public class CircuitBreakerFailoverFeature extends FailoverFeature {
         return this.targetSelector;
     }
 
+    @Override
+    public void setTargetSelector(FailoverTargetSelector targetSelector) {
+        this.targetSelector = targetSelector;
+    }
+
     public int getThreshold() {
         return threshold;
     }

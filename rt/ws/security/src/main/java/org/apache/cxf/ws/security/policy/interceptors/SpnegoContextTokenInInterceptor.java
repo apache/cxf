@@ -20,7 +20,6 @@
 package org.apache.cxf.ws.security.policy.interceptors;
 
 import java.time.Instant;
-import java.util.Base64;
 import java.util.Collection;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -62,6 +61,7 @@ import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SPConstants;
+import org.apache.xml.security.utils.XMLUtils;
 
 class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
 
@@ -288,7 +288,7 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             }
 
             String content = DOMUtils.getContent(binaryExchange);
-            byte[] decodedContent = Base64.getMimeDecoder().decode(content);
+            byte[] decodedContent = XMLUtils.decode(content);
 
             String jaasContext =
                 (String)message.getContextualProperty(SecurityConstants.KERBEROS_JAAS_CONTEXT_NAME);
@@ -323,7 +323,7 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             writer.writeStartElement(WSS4JConstants.ENC_PREFIX, "CipherData", WSS4JConstants.ENC_NS);
             writer.writeStartElement(WSS4JConstants.ENC_PREFIX, "CipherValue", WSS4JConstants.ENC_NS);
 
-            writer.writeCharacters(Base64.getMimeEncoder().encodeToString(key));
+            writer.writeCharacters(XMLUtils.encodeToString(key));
 
             writer.writeEndElement();
             writer.writeEndElement();

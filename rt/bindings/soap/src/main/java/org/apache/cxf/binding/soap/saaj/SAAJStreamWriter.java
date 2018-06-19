@@ -133,8 +133,13 @@ public final class SAAJStreamWriter extends OverlayW3CDOMStreamWriter {
                     setChild(adjustPrefix(getEnvelope(), prefix), false);
                     adjustPrefix(getEnvelope().getHeader(), prefix);
                     adjustPrefix(getEnvelope().getBody(), prefix);
-                    getEnvelope().removeChild(getEnvelope().getHeader());
-                    getEnvelope().removeChild(getEnvelope().getBody());
+                    if (getEnvelope().getHeader() != null) {
+                        getEnvelope().removeChild(getEnvelope().getHeader());
+                    }
+                    if (getEnvelope().getBody() != null) {
+                        getEnvelope().removeChild(getEnvelope().getBody());
+                    }
+
                     return;
                 } else if ("Body".equals(local)) {
                     if (getEnvelope().getBody() == null) {

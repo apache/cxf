@@ -71,6 +71,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientCallback;
+import org.apache.cxf.endpoint.ClientImpl.IllegalEmptyResponseException;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.helpers.DOMUtils;
@@ -318,12 +319,13 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
             Holder<T> holder = new Holder<T>(obj);
             opName = calculateOpName(holder, opName, hasOpName);
 
-            Object ret[] = client.invokeWrapped(opName,
-                                                holder.value);
+            Object ret[] = client.invokeWrapped(opName, holder.value);
             if (isOneWay || ret == null || ret.length == 0) {
                 return null;
             }
             return (T)ret[0];
+        } catch (IllegalEmptyResponseException ie) {
+            return null;
         } catch (Exception ex) {
             throw mapException(ex);
         }

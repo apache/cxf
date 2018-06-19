@@ -2,7 +2,7 @@ Java First demo using jax-ws APIs and jsr-181
 =============================================
 
 This demo illustrates how to develop a service using the JAXWSFactoryBeans.
-It also makes use of LoggingInterceptors.
+It also makes use of the LoggingFeature to log the messages.
 The demo takes the "code first" approach using JAX-WS APIs.
 
 Building and running the demo using Maven

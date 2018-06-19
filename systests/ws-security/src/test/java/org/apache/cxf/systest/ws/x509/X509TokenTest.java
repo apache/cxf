@@ -42,6 +42,7 @@ import org.apache.cxf.systest.ws.ut.SecurityHeaderCacheInterceptor;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.example.contract.doubleit.DoubleItOneWayPortType;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.example.contract.doubleit.DoubleItPortType2;
 
@@ -1597,6 +1598,33 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
+        bus.shutdown(true);
+    }
+
+    @org.junit.Test
+    public void testSymmetricAddressingOneWay() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = X509TokenTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSymmetricAddressingOneWayPort");
+        DoubleItOneWayPortType port =
+                service.getPort(portQName, DoubleItOneWayPortType.class);
+        updateAddressPort(port, test.getPort());
+
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming((BindingProvider)port);
+        }
+
+        port.doubleIt(30);
+
+        ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
 }

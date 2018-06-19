@@ -407,7 +407,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                 // keep parseArguments happy, supply dummy required command-line
                 // opts
                 opts.addGrammar(new InputSource("null"));
-                opts.parseArguments(args.toArray(new String[args.size()]));
+                opts.parseArguments(args.toArray(new String[0]));
             } catch (BadCommandLineException e) {
                 StringBuilder msg = new StringBuilder("XJC reported 'BadCommandLineException' for -xjc argument:");
                 for (String arg : args) {
@@ -431,7 +431,7 @@ public class JAXBDataBinding implements DataBindingProfile {
             // Add the @Generated annotation in the Java files generated. This is done by passing
             // '-mark-generated' attribute to jaxb xjc.
             try {
-                opts.parseArgument(new String[] {"-mark-generated" }, 0);
+                opts.parseArgument(new String[] {"-" + ToolConstants.CFG_MARK_GENERATED_OPTION}, 0);
             } catch (BadCommandLineException e) {
                 LOG.log(Level.SEVERE, e.getMessage());
                 throw new ToolException(e);

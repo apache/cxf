@@ -21,12 +21,15 @@
     <parent>
         <groupId>org.apache.cxf.karaf</groupId>
         <artifactId>karaf-parent</artifactId>
-        <version>3.2.5-SNAPSHOT</version>
+        <version>3.2.6-SNAPSHOT</version>
     </parent>
     <artifactId>cxf-karaf-commands</artifactId>
     <packaging>bundle</packaging>
     <name>Apache CXF Karaf Commands</name>
     <description>Apache CXF Karaf Commands</description>
+    <properties>
+        <cxf.module.name>org.apache.cxf.karaf.commands</cxf.module.name>
+    </properties>
     <dependencies>
         <!-- cxf -->
         <dependency>

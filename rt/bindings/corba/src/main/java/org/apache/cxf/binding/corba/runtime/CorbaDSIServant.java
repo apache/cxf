@@ -176,7 +176,7 @@ public class CorbaDSIServant extends DynamicImplementation {
     }
 
     public String[] _all_interfaces(POA poa, byte[] objectId) {
-        return interfaces.toArray(new String[interfaces.size()]);
+        return interfaces.toArray(new String[0]);
     }
 
     public POA _default_POA() {

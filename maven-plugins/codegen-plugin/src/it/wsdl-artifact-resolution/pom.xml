@@ -29,10 +29,18 @@
                             <artifactId>${wsdl.artifactid}</artifactId>
                             <version>${wsdl.version}</version>
                             <packaging>wsdl</packaging>
-                            <file>Cxf7067Service-1.0.0.wsdl</file>
+                            <file>${wsdl.artifactid}-${wsdl.version}.wsdl</file>
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.7.0</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.cxf</groupId>

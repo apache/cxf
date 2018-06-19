@@ -21,16 +21,17 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cxf-rt-rs-service-description-openapi-v3</artifactId>
     <packaging>bundle</packaging>
-    <name>Apache CXF JAX-RS Service Description Swagger</name>
-    <description>Apache CXF JAX-RS Service Description Swagger</description>
+    <name>Apache CXF JAX-RS Service Description OpenAPI v3</name>
+    <description>Apache CXF JAX-RS Service Description OpenAPI v3</description>
     <url>http://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.2.5-SNAPSHOT</version>
+        <version>3.2.6-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
+        <cxf.module.name>org.apache.cxf.rs.openapi.v3</cxf.module.name>
         <cxf.osgi.import>
             javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
             javax.annotation;version="${cxf.osgi.javax.annotation.version}",

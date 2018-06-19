@@ -143,7 +143,7 @@ public class DestinationRegistryImpl implements DestinationRegistry, ServletConf
             }
         });
 
-        return dest2.toArray(new AbstractDestination[dest2.size()]);
+        return dest2.toArray(new AbstractDestination[0]);
     }
 
     public Set<String> getDestinationsPaths() {

@@ -27,12 +27,13 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.2.5-SNAPSHOT</version>
+        <version>3.2.6-SNAPSHOT</version>
         <relativePath>../../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
         <hibernate.em.version>4.1.0.Final</hibernate.em.version>
         <hsqldb.version>1.8.0.10</hsqldb.version>
+        <cxf.module.name>org.apache.cxf.rs.search</cxf.module.name>
     </properties>
     <dependencies>
         <dependency>
@@ -155,9 +156,9 @@
     </build>
     <profiles>
         <profile>
-            <id>java9</id>
+            <id>java9plus</id>
             <activation>
-                <jdk>9</jdk>
+                <jdk>[9,)</jdk>
             </activation>
             <build>
                 <plugins>

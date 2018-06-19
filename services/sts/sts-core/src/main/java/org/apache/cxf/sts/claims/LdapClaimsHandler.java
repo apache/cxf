@@ -199,7 +199,7 @@ public class LdapClaimsHandler implements ClaimsHandler, RealmSupport {
                 }
             }
 
-            String[] searchAttributes = searchAttributeList.toArray(new String[searchAttributeList.size()]);
+            String[] searchAttributes = searchAttributeList.toArray(new String[0]);
 
             if (this.userBaseDn != null) {
                 ldapAttributes = LdapUtils.getAttributesOfEntry(ldap, this.userBaseDn, this.getObjectClass(), this

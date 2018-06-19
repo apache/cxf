@@ -66,8 +66,8 @@ public class SchemaValidationImpl implements SchemaValidation {
         // an exception.
         List<Serializable> floatIntStringList = occuringStruct.getVarFloatAndVarIntAndVarString();
         floatIntStringList.add(in + "-two");
-        floatIntStringList.add(new Integer(2));
-        floatIntStringList.add(new Float(2.5f));
+        floatIntStringList.add(Integer.valueOf(2));
+        floatIntStringList.add(Float.valueOf(2.5f));
         return occuringStruct;
     }
 

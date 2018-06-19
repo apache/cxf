@@ -127,14 +127,14 @@ public class Compiler {
         for (File file : files) {
             f.add(file.getAbsolutePath());
         }
-        return compileFiles(f.toArray(new String[files.length]));
+        return compileFiles(f.toArray(new String[0]));
     }
     public boolean compileFiles(List<File> files) {
         List<String> f = new ArrayList<>(files.size());
         for (File file : files) {
             f.add(file.getAbsolutePath());
         }
-        return compileFiles(f.toArray(new String[files.size()]));
+        return compileFiles(f.toArray(new String[0]));
     }
     public boolean compileFiles(String[] files) {
         String endorsed = SystemPropertyAction.getProperty("java.endorsed.dirs");
@@ -190,7 +190,7 @@ public class Compiler {
         int idx = list.size();
         list.addAll(Arrays.asList(files));
 
-        return internalCompile(list.toArray(new String[list.size()]), idx);
+        return internalCompile(list.toArray(new String[0]), idx);
     }
 
     protected boolean useJava6Compiler(String[] files) {

@@ -334,7 +334,7 @@ public class XMLSource {
             return null;
         }
 
-        public Iterator<?> getPrefixes(String namespace) {
+        public Iterator<String> getPrefixes(String namespace) {
             String prefix = namespaces.get(namespace);
             if (prefix == null) {
                 return null;

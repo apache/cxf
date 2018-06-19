@@ -27,8 +27,11 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-maven-plugins</artifactId>
-        <version>3.2.5-SNAPSHOT</version>
+        <version>3.2.6-SNAPSHOT</version>
     </parent>
+    <properties>
+        <cxf.module.name>org.apache.cxf.plugin.codegen</cxf.module.name>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -173,20 +176,34 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-invoker-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.0.1</version>
                 <executions>
                     <execution>
                         <id>test-integration</id>
                         <phase>integration-test</phase>
                         <goals>
                             <goal>integration-test</goal>
+                            <goal>verify</goal>
                         </goals>
                         <configuration>
+                            <pomIncludes>
+                                <!-- Enable listed it's. Exclude toolchain till https://issues.apache.org/jira/browse/CXF-7714 is fixed -->
+                                <pomInclude>wsdl-artifact-resolution/pom.xml</pomInclude>
+                                <pomInclude>mark-generated/pom.xml</pomInclude>
+                            </pomIncludes>
                             <settingsFile>src/it/settings.xml</settingsFile>
                             <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
+                            <postBuildHookScript>verify</postBuildHookScript>
                         </configuration>
                     </execution>
                 </executions>
+                <dependencies>
+                   <dependency>
+                       <groupId>javax.xml.bind</groupId>
+                       <artifactId>jaxb-api</artifactId>
+                       <version>${cxf.jaxb.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>

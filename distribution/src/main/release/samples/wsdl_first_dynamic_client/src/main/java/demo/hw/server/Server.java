@@ -22,6 +22,7 @@ package demo.hw.server;
 import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.demo.complex.ComplexImpl;
+import org.apache.cxf.ext.logging.LoggingFeature;
 
 public class Server {
 
@@ -29,7 +30,7 @@ public class Server {
         System.out.println("Starting Server");
         ComplexImpl complexImpl = new ComplexImpl();
         String address = "http://localhost:9000/Complex";
-        Endpoint.publish(address, complexImpl);
+        Endpoint.publish(address, complexImpl, new LoggingFeature());
     }
 
     public static void main(String args[]) throws Exception {

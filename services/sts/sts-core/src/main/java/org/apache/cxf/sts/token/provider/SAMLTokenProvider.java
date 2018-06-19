@@ -36,6 +36,7 @@ import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.cache.CacheUtils;
 import org.apache.cxf.sts.claims.ClaimsAttributeStatementProvider;
+import org.apache.cxf.sts.claims.CombinedClaimsAttributeStatementProvider;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.token.realm.RealmProperties;
@@ -68,6 +69,7 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
     private boolean signToken = true;
     private Map<String, RealmProperties> realmMap = new HashMap<>();
     private SamlCustomHandler samlCustomHandler;
+    private boolean combineClaimAttributes = true;
 
     /**
      * Return true if this TokenProvider implementation is capable of providing a token
@@ -388,7 +390,13 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
         // Also handle "ActAs" via the ActAsAttributeStatementProvider
         if (!statementAdded) {
             attrBeanList = new ArrayList<>();
-            AttributeStatementProvider attributeProvider = new ClaimsAttributeStatementProvider();
+            AttributeStatementProvider attributeProvider = null;
+            if (combineClaimAttributes) {
+                attributeProvider = new CombinedClaimsAttributeStatementProvider();
+            } else {
+                attributeProvider = new ClaimsAttributeStatementProvider();
+            }
+
             AttributeStatementBean attributeBean = attributeProvider.getStatement(tokenParameters);
             if (attributeBean != null && attributeBean.getSamlAttributes() != null
                 && !attributeBean.getSamlAttributes().isEmpty()) {
@@ -457,6 +465,14 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
             throw new STSException("Unknown KeyType", STSException.INVALID_REQUEST);
         }
 
+    }
+
+    public boolean isCombineClaimAttributes() {
+        return combineClaimAttributes;
+    }
+
+    public void setCombineClaimAttributes(boolean combineClaimAttributes) {
+        this.combineClaimAttributes = combineClaimAttributes;
     }
 
 

@@ -113,18 +113,26 @@ public final class JwtUtils {
     }
 
     public static void validateJwtAudienceRestriction(JwtClaims claims, Message message) {
+        // If the expected audience is configured, a matching "aud" must be present
+        String expectedAudience = (String)message.getContextualProperty(JwtConstants.EXPECTED_CLAIM_AUDIENCE);
+        if (expectedAudience != null) {
+            if (claims.getAudiences().contains(expectedAudience)) {
+                return;
+            }
+            throw new JwtException("Invalid audience restriction");
+        }
+
+        // Otherwise if we have no aud claims then the token is valid
         if (claims.getAudiences().isEmpty()) {
             return;
         }
 
-        String expectedAudience = (String)message.getContextualProperty(JwtConstants.EXPECTED_CLAIM_AUDIENCE);
-        if (expectedAudience == null) {
-            expectedAudience = (String)message.getContextualProperty(Message.REQUEST_URL);
-        }
-
+        // Otherwise one of the aud claims must match the request URL
+        expectedAudience = (String)message.getContextualProperty(Message.REQUEST_URL);
         if (expectedAudience != null && claims.getAudiences().contains(expectedAudience)) {
             return;
         }
+
         throw new JwtException("Invalid audience restriction");
     }
 

@@ -118,7 +118,7 @@ public class PlugInClassLoader extends SecureClassLoader {
             }
         }
 
-        return urlList.toArray(new String[urlList.size()]);
+        return urlList.toArray(new String[0]);
     }
 
     protected Class<?> findClass(String name) throws ClassNotFoundException {

@@ -1236,10 +1236,11 @@ public class UriBuilderImplTest extends Assert {
         assertEquals(uri.toString(), expected);
     }
 
+    @Test
     public void testToTemplate() {
         String path1 = "ab";
         String[] path2 = {"a1", "{xy}", "3b "};
-        String expected = "ab/a1/{xy}/3b ";
+        String expected = "ab/a1/{xy}/3b%20";
 
         String template = UriBuilder.fromPath(path1).segment(path2).toTemplate();
         assertEquals(template, expected);

@@ -209,7 +209,7 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
         SportsService service = (SportsService) proxyFactory.create();
         Pair<String, Integer> ret = service.getReturnGenericPair("ffang", 111);
         assertEquals("ffang", ret.getFirst());
-        assertEquals(new Integer(111), ret.getSecond());
+        assertEquals(Integer.valueOf(111), ret.getSecond());
     }
 
     @Test
@@ -223,7 +223,7 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
         proxyFactory.getOutInterceptors().add(new LoggingOutInterceptor());
         SportsService service = (SportsService) proxyFactory.create();
         Pair<Integer, String> ret = service.getReturnQualifiedPair(111, "ffang");
-        assertEquals(new Integer(111), ret.getFirst());
+        assertEquals(Integer.valueOf(111), ret.getFirst());
         assertEquals("ffang", ret.getSecond());
     }
 

@@ -24,6 +24,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.URIParserUtil;
 import org.apache.cxf.maven_plugin.WsdlArtifact;
 import org.apache.cxf.tools.common.ToolConstants;
@@ -169,9 +170,9 @@ public class WsdlOption extends Option implements org.apache.cxf.maven_plugin.Ge
             list.add("-validate=" + getValidateWsdl());
         }
         addIfTrue(list, isMarkGenerated() != null && isMarkGenerated(),
-            "-" + ToolConstants.CFG_MARK_GENERATED);
+            "-" + ToolConstants.CFG_MARK_GENERATED_OPTION);
         addIfTrue(list, isSuppressGeneratedDate() != null && isSuppressGeneratedDate(),
-            "-" + ToolConstants.CFG_SUPPRESS_GENERATED_DATE);
+            "-" + ToolConstants.CFG_SUPPRESS_GENERATED_DATE_OPTION);
         addIfNotNull(list, getDefaultExcludesNamespace(), "-dex");
         addIfNotNull(list, getDefaultNamespacePackageMapping(), "-dns");
         addIfNotNull(list, getServiceName(), "-sn");
@@ -227,7 +228,10 @@ public class WsdlOption extends Option implements org.apache.cxf.maven_plugin.Ge
             } else {
                 // Maven makes empty tags into null
                 // instead of empty strings. so replace null by ""
-                destList.add(key + ((value == null) ? "" : value));
+                String v = key + ((value == null) ? "" : value);
+                if (!StringUtils.isEmpty(v)) {
+                    destList.add(v);
+                }
             }
         }
     }

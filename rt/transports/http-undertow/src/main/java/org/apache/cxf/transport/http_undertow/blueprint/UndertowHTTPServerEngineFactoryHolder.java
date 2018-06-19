@@ -188,6 +188,9 @@ public class UndertowHTTPServerEngineFactoryHolder {
         this.parsedElement = parsedElement;
     }
 
+    public void setHandlersMap(Map<String, List<CXFUndertowHttpHandler>> handlersMap) {
+        this.handlersMap = handlersMap;
+    }
 
     protected <T> T getJaxbObject(Element parent, Class<T> c) {
 

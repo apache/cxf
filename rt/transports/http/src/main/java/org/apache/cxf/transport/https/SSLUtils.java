@@ -26,6 +26,7 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
+import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509KeyManager;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -78,8 +79,12 @@ public final class SSLUtils {
         }
         configureKeyManagersWithCertAlias(parameters, keyManagers);
 
-        ctx.init(keyManagers, parameters.getTrustManagers(),
-                 parameters.getSecureRandom());
+        TrustManager[] trustManagers = parameters.getTrustManagers();
+        if (trustManagers == null && parameters instanceof TLSClientParameters) {
+            trustManagers = org.apache.cxf.configuration.jsse.SSLUtils.getDefaultTrustStoreManagers(LOG);
+        }
+
+        ctx.init(keyManagers, trustManagers, parameters.getSecureRandom());
 
         return ctx;
     }

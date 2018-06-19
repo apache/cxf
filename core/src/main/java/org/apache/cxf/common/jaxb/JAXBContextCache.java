@@ -251,8 +251,7 @@ public final class JAXBContextCache {
                 try {
                     context = AccessController.doPrivileged(new PrivilegedExceptionAction<JAXBContext>() {
                         public JAXBContext run() throws Exception {
-                            return JAXBContext.newInstance(classes
-                                                          .toArray(new Class<?>[classes.size()]), null);
+                            return JAXBContext.newInstance(classes.toArray(new Class<?>[0]), null);
                         }
                     });
                 } catch (PrivilegedActionException e) {
@@ -319,7 +318,7 @@ public final class JAXBContextCache {
                         && m.getParameterTypes().length == 9) {
                         try {
                             return (JAXBContext)m.invoke(null,
-                                     classes.toArray(new Class<?>[classes.size()]),
+                                     classes.toArray(new Class<?>[0]),
                                      typeRefs,
                                      map.get(pfx + "subclassReplacements"),
                                      map.get(pfx + "defaultNamespaceRemap"),
@@ -344,7 +343,7 @@ public final class JAXBContextCache {
         try {
             ctx = AccessController.doPrivileged(new PrivilegedExceptionAction<JAXBContext>() {
                 public JAXBContext run() throws Exception {
-                    return JAXBContext.newInstance(classes.toArray(new Class<?>[classes.size()]), map);
+                    return JAXBContext.newInstance(classes.toArray(new Class<?>[0]), map);
                 }
             });
         } catch (PrivilegedActionException e2) {
@@ -355,7 +354,7 @@ public final class JAXBContextCache {
                     && ex.getMessage().contains("com.sun.xml.bind.defaultNamespaceRemap")) {
                     map.put("com.sun.xml.internal.bind.defaultNamespaceRemap",
                             map.remove("com.sun.xml.bind.defaultNamespaceRemap"));
-                    ctx = JAXBContext.newInstance(classes.toArray(new Class<?>[classes.size()]), map);
+                    ctx = JAXBContext.newInstance(classes.toArray(new Class<?>[0]), map);
                 } else {
                     throw ex;
                 }

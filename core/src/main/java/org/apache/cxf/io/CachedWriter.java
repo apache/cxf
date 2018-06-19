@@ -56,7 +56,7 @@ public class CachedWriter extends Writer {
 
     static {
 
-        String s = SystemPropertyAction.getPropertyOrNull("org.apache.cxf.io.CachedOutputStream.OutputDirectory");
+        String s = SystemPropertyAction.getPropertyOrNull(CachedConstants.OUTPUT_DIRECTORY_SYS_PROP);
         if (s == null) {
             // lookup the deprecated property
             s = SystemPropertyAction.getPropertyOrNull("org.apache.cxf.io.CachedWriter.OutputDirectory");
@@ -83,6 +83,8 @@ public class CachedWriter extends Writer {
     private boolean cosClosed;
     private long threshold = defaultThreshold;
     private long maxSize = defaultMaxSize;
+    private File outputDir = DEFAULT_TEMP_DIR;
+    private String cipherTransformation = defaultCipherTransformation;
 
     private long totalLength;
 
@@ -90,9 +92,7 @@ public class CachedWriter extends Writer {
 
     private boolean tempFileFailed;
     private File tempFile;
-    private File outputDir = DEFAULT_TEMP_DIR;
     private boolean allowDeleteOfFile = true;
-    private String cipherTransformation = defaultCipherTransformation;
     private CipherPair ciphers;
 
     private List<CachedWriterCallback> callbacks;
@@ -126,17 +126,24 @@ public class CachedWriter extends Writer {
     private void readBusProperties() {
         Bus b = BusFactory.getThreadDefaultBus(false);
         if (b != null) {
-            String v = getBusProperty(b, "bus.io.CachedOutputStream.Threshold", null);
+            String v = getBusProperty(b, CachedConstants.THRESHOLD_BUS_PROP, null);
             if (v != null && threshold == defaultThreshold) {
                 threshold = Integer.parseInt(v);
             }
-            v = getBusProperty(b, "bus.io.CachedOutputStream.MaxSize", null);
+            v = getBusProperty(b, CachedConstants.MAX_SIZE_BUS_PROP, null);
             if (v != null) {
                 maxSize = Integer.parseInt(v);
             }
-            v = getBusProperty(b, "bus.io.CachedOutputStream.CipherTransformation", null);
+            v = getBusProperty(b, CachedConstants.CIPHER_TRANSFORMATION_BUS_PROP, null);
             if (v != null) {
                 cipherTransformation = v;
+            }
+            v = getBusProperty(b, CachedConstants.OUTPUT_DIRECTORY_BUS_PROP, null);
+            if (v != null) {
+                File f = new File(v);
+                if (f.exists() && f.isDirectory()) {
+                    outputDir = f;
+                }
             }
         }
     }
@@ -562,7 +569,7 @@ public class CachedWriter extends Writer {
 
     public static void setDefaultMaxSize(long l) {
         if (l == -1) {
-            String s = System.getProperty("org.apache.cxf.io.CachedOutputStream.MaxSize");
+            String s = System.getProperty(CachedConstants.MAX_SIZE_SYS_PROP);
             if (s == null) {
                 // lookup the deprecated property
                 s = System.getProperty("org.apache.cxf.io.CachedWriter.MaxSize", "-1");
@@ -571,9 +578,10 @@ public class CachedWriter extends Writer {
         }
         defaultMaxSize = l;
     }
+
     public static void setDefaultThreshold(int i) {
         if (i == -1) {
-            String s = SystemPropertyAction.getProperty("org.apache.cxf.io.CachedOutputStream.Threshold");
+            String s = SystemPropertyAction.getProperty(CachedConstants.THRESHOLD_SYS_PROP);
             if (s == null) {
                 // lookup the deprecated property
                 s = SystemPropertyAction.getProperty("org.apache.cxf.io.CachedWriter.Threshold", "-1");
@@ -589,7 +597,7 @@ public class CachedWriter extends Writer {
 
     public static void setDefaultCipherTransformation(String n) {
         if (n == null) {
-            n = SystemPropertyAction.getPropertyOrNull("org.apache.cxf.io.CachedOutputStream.CipherTransformation");
+            n = SystemPropertyAction.getPropertyOrNull(CachedConstants.CIPHER_TRANSFORMATION_SYS_PROP);
         }
         defaultCipherTransformation = n;
     }

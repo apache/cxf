@@ -72,7 +72,7 @@ public class WriterTest extends AbstractCXFTest {
         nons.close();
 
         MessageWriter intval = writer.getElementWriter("int");
-        intval.writeValueAsInt(new Integer(10000));
+        intval.writeValueAsInt(Integer.valueOf(10000));
         intval.close();
 
         MessageWriter child1 = writer.getElementWriter("child1", "urn:child1");

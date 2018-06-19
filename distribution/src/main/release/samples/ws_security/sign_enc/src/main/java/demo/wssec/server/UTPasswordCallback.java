@@ -33,8 +33,7 @@ import org.apache.wss4j.common.ext.WSPasswordCallback;
 
 public class UTPasswordCallback implements CallbackHandler {
 
-    private Map<String, String> passwords =
-        new HashMap<String, String>();
+    private Map<String, String> passwords = new HashMap<>();
 
     public UTPasswordCallback() {
         passwords.put("Alice", "ecilA");

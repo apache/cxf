@@ -27,7 +27,6 @@ import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -949,7 +948,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
                 requestorEntropy = WSSecurityUtil
                     .generateNonce(algType.getMaximumSymmetricKeyLength() / 8);
             }
-            writer.writeCharacters(Base64.getMimeEncoder().encodeToString(requestorEntropy));
+            writer.writeCharacters(org.apache.xml.security.utils.XMLUtils.encodeToString(requestorEntropy));
 
             writer.writeEndElement();
             writer.writeEndElement();
@@ -1514,7 +1513,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
             if (childQname.equals(new QName(namespace, "BinarySecret"))) {
                 // First check for the binary secret
                 String b64Secret = DOMUtils.getContent(child);
-                secret = Base64.getMimeDecoder().decode(b64Secret);
+                secret = org.apache.xml.security.utils.XMLUtils.decode(b64Secret);
             } else if (childQname.equals(new QName(WSS4JConstants.ENC_NS, WSS4JConstants.ENC_KEY_LN))) {
                 secret = decryptKey(child);
             } else if (childQname.equals(new QName(namespace, "ComputedKey"))) {
@@ -1528,7 +1527,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
                         serviceEntr = decryptKey(computedKeyChild);
                     } else if (computedKeyChildQName.equals(new QName(namespace, "BinarySecret"))) {
                         String content = DOMUtils.getContent(computedKeyChild);
-                        serviceEntr = Base64.getMimeDecoder().decode(content);
+                        serviceEntr = org.apache.xml.security.utils.XMLUtils.decode(content);
                     }
                 }
 
@@ -1581,7 +1580,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
                     XMLUtils.getDirectChildElement(tmpE, "CipherValue", WSS4JConstants.ENC_NS);
                 if (tmpE != null) {
                     String content = DOMUtils.getContent(tmpE);
-                    cipherValue = Base64.getMimeDecoder().decode(content);
+                    cipherValue = org.apache.xml.security.utils.XMLUtils.decode(content);
                 }
             }
             if (cipherValue == null) {

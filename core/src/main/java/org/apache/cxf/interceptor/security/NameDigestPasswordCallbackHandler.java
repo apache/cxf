@@ -101,7 +101,10 @@ public class NameDigestPasswordCallbackHandler implements CallbackHandler {
         for (Class<?> arg : PASSWORD_CALLBACK_TYPES) {
             try {
                 Method method = callback.getClass().getMethod(cbname, arg);
-                method.invoke(callback, arg == String.class ? password : password.toCharArray());
+                Object args[] = new Object[] {
+                    arg == String.class ? password : password.toCharArray()
+                };
+                method.invoke(callback, args);
                 return true;
             } catch (Exception e) {
                 // ignore and continue

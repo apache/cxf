@@ -766,13 +766,13 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
             public void handleMessage(Message m) {
                 RMProperties rmps = RMContextUtils.retrieveRMProperties(m, true);
                 if (null != rmps && null != rmps.getSequence()) {
-                    rmps.getSequence().setMessageNumber(new Long(1));
+                    rmps.getSequence().setMessageNumber(Long.valueOf(1));
                 }
             }
         }
         greeterBus.getOutInterceptors().add(new MessageNumberInterceptor());
         RMManager manager = greeterBus.getExtension(RMManager.class);
-        manager.getConfiguration().setBaseRetransmissionInterval(new Long(2000));
+        manager.getConfiguration().setBaseRetransmissionInterval(Long.valueOf(2000));
 
         greeter.greetMe("one");
         try {
@@ -839,7 +839,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         }
         greeterBus.getOutInterceptors().add(new SequenceIdInterceptor());
         RMManager manager = greeterBus.getExtension(RMManager.class);
-        manager.getConfiguration().setBaseRetransmissionInterval(new Long(2000));
+        manager.getConfiguration().setBaseRetransmissionInterval(Long.valueOf(2000));
 
         try {
             greeter.greetMe("one");
@@ -938,7 +938,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
 
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
-        manager.getConfiguration().setBaseRetransmissionInterval(new Long(2000));
+        manager.getConfiguration().setBaseRetransmissionInterval(Long.valueOf(2000));
 
         greeter.greetMeOneWay("one");
         greeter.greetMeOneWay("two");
@@ -999,7 +999,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
 
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
-        manager.getConfiguration().setBaseRetransmissionInterval(new Long(2000));
+        manager.getConfiguration().setBaseRetransmissionInterval(Long.valueOf(2000));
 
         greeter.greetMe("one");
         greeter.greetMe("two");
@@ -1294,7 +1294,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         }
         // avoid client side resends
         greeterBus.getExtension(RMManager.class).getConfiguration()
-            .setBaseRetransmissionInterval(new Long(60000));
+            .setBaseRetransmissionInterval(Long.valueOf(60000));
 
         greeter.greetMe("one");
         greeter.greetMe("two");

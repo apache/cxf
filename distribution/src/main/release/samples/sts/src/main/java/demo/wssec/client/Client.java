@@ -65,7 +65,7 @@ public final class Client {
             busURL = new URL(args[1]);
         }
 
-        Bus bus = bf.createBus(busFile.toString());
+        Bus bus = bf.createBus(busURL);
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 

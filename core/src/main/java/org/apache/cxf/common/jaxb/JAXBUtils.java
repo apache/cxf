@@ -678,7 +678,7 @@ public final class JAXBUtils {
             for (Method m : cls.getDeclaredMethods()) {
                 if (m.getName().equals("newInstance")
                     && m.getParameterTypes().length == 6) {
-                    ctx = m.invoke(null, clses.toArray(new Class<?>[clses.size()]),
+                    ctx = m.invoke(null, clses.toArray(new Class<?>[0]),
                                          typeRefs, null, null, true, null);
 
                 }

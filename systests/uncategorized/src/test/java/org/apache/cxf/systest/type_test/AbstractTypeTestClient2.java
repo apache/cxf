@@ -208,8 +208,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         }
         StructWithNillables x = new StructWithNillables();
         StructWithNillables yOrig = new StructWithNillables();
-        yOrig.setVarFloat(new Float(1.414f));
-        yOrig.setVarInt(new Integer(13));
+        yOrig.setVarFloat(Float.valueOf(1.414f));
+        yOrig.setVarInt(Integer.valueOf(13));
         yOrig.setVarString("Cheerio");
 
         Holder<StructWithNillables> y = new Holder<StructWithNillables>(yOrig);
@@ -864,8 +864,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         }
         StructWithOptionals x = new StructWithOptionals();
         StructWithOptionals yOrig = new StructWithOptionals();
-        yOrig.setVarFloat(new Float(1.414f));
-        yOrig.setVarInt(new Integer(13));
+        yOrig.setVarFloat(Float.valueOf(1.414f));
+        yOrig.setVarInt(Integer.valueOf(13));
         yOrig.setVarString("Cheerio");
 
         Holder<StructWithOptionals> y = new Holder<StructWithOptionals>(yOrig);
@@ -1301,12 +1301,12 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
             return;
         }
         ExtColourEnum x = new ExtColourEnum();
-        x.setAttrib1(new Integer(1));
+        x.setAttrib1(Integer.valueOf(1));
         x.setAttrib2("Ax");
         x.setValue(ColourEnum.fromValue("RED"));
 
         ExtColourEnum yOrig = new ExtColourEnum();
-        yOrig.setAttrib1(new Integer(10));
+        yOrig.setAttrib1(Integer.valueOf(10));
         yOrig.setAttrib2("Ay");
         yOrig.setValue(ColourEnum.fromValue("GREEN"));
 
@@ -2057,13 +2057,13 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         }
         SimpleContent1 x1 = new SimpleContent1();
         x1.setValue("foo");
-        x1.setAttrib1A(new Byte((byte)1));
-        x1.setAttrib1B(new Short((short)2));
+        x1.setAttrib1A(Byte.valueOf((byte)1));
+        x1.setAttrib1B(Short.valueOf((short)2));
 
         SimpleContent1 y1 = new SimpleContent1();
         y1.setValue("bar");
-        y1.setAttrib1A(new Byte((byte)3));
-        y1.setAttrib1B(new Short((short)4));
+        y1.setAttrib1A(Byte.valueOf((byte)3));
+        y1.setAttrib1B(Short.valueOf((short)4));
 
         Holder<SimpleContent1> y1Holder = new Holder<SimpleContent1>(y1);
         Holder<SimpleContent1> z1 = new Holder<SimpleContent1>();
@@ -2094,17 +2094,17 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         }
         SimpleContent2 x2 = new SimpleContent2();
         x2.setValue("foo");
-        x2.setAttrib1A(new Byte((byte)1));
-        x2.setAttrib1B(new Short((short)2));
-        x2.setAttrib2A(new Integer(5));
-        x2.setAttrib2B(new Long(6));
+        x2.setAttrib1A(Byte.valueOf((byte)1));
+        x2.setAttrib1B(Short.valueOf((short)2));
+        x2.setAttrib2A(Integer.valueOf(5));
+        x2.setAttrib2B(Long.valueOf(6));
 
         SimpleContent2 y2 = new SimpleContent2();
         y2.setValue("bar");
-        y2.setAttrib1A(new Byte((byte)3));
-        y2.setAttrib1B(new Short((short)4));
-        y2.setAttrib2A(new Integer(7));
-        y2.setAttrib2B(new Long(8));
+        y2.setAttrib1A(Byte.valueOf((byte)3));
+        y2.setAttrib1B(Short.valueOf((short)4));
+        y2.setAttrib2A(Integer.valueOf(7));
+        y2.setAttrib2B(Long.valueOf(8));
 
         Holder<SimpleContent2> y2Holder = new Holder<SimpleContent2>(y2);
         Holder<SimpleContent2> z2 = new Holder<SimpleContent2>();
@@ -2135,19 +2135,19 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         }
         SimpleContent3 x3 = new SimpleContent3();
         x3.setValue("foo");
-        x3.setAttrib1A(new Byte((byte)1));
-        x3.setAttrib1B(new Short((short)2));
-        x3.setAttrib2A(new Integer(5));
-        x3.setAttrib2B(new Long(6));
+        x3.setAttrib1A(Byte.valueOf((byte)1));
+        x3.setAttrib1B(Short.valueOf((short)2));
+        x3.setAttrib2A(Integer.valueOf(5));
+        x3.setAttrib2B(Long.valueOf(6));
         x3.setAttrib3A("xxx");
         x3.setAttrib3B(Boolean.TRUE);
 
         SimpleContent3 y3 = new SimpleContent3();
         y3.setValue("bar");
-        y3.setAttrib1A(new Byte((byte)3));
-        y3.setAttrib1B(new Short((short)4));
-        y3.setAttrib2A(new Integer(7));
-        y3.setAttrib2B(new Long(8));
+        y3.setAttrib1A(Byte.valueOf((byte)3));
+        y3.setAttrib1B(Short.valueOf((short)4));
+        y3.setAttrib2A(Integer.valueOf(7));
+        y3.setAttrib2B(Long.valueOf(8));
         y3.setAttrib3A("yyy");
         y3.setAttrib3B(Boolean.FALSE);
 

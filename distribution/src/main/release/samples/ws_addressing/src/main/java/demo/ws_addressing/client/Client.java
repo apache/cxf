@@ -92,7 +92,7 @@ public final class Client {
     }
 
     /**
-     * A series of invocations with implicitly propogated
+     * A series of invocations with implicitly propagated
      * Message Addressing Properties.
      */
     private static void implicitPropagation(Greeter port) {
@@ -133,15 +133,13 @@ public final class Client {
     }
 
     /**
-     * A series of invocations with explicitly propogated
+     * A series of invocations with explicitly propagated
      * Message Addressing Properties.
      */
     private static void explicitPropagation(Greeter port) {
         System.out.println();
         System.out.println("Explicit MessageAddressingProperties propagation");
         System.out.println("------------------------------------------------");
-
-
 
         // associate MAPs with request context
         Map<String, Object> requestContext =

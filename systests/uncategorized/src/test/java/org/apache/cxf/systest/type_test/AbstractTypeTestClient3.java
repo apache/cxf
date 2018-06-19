@@ -677,11 +677,11 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         ComplexTypeWithAttributeGroup1 x = new ComplexTypeWithAttributeGroup1();
         x.setAttrInt(new BigInteger("123"));
         x.setAttrString("x123");
-        x.setAttrFloat(new Float(3.14f));
+        x.setAttrFloat(Float.valueOf(3.14f));
         ComplexTypeWithAttributeGroup1 yOrig = new ComplexTypeWithAttributeGroup1();
         yOrig.setAttrInt(new BigInteger("456"));
         yOrig.setAttrString("x456");
-        yOrig.setAttrFloat(new Float(6.28f));
+        yOrig.setAttrFloat(Float.valueOf(6.28f));
 
         Holder<ComplexTypeWithAttributeGroup1> y = new Holder<ComplexTypeWithAttributeGroup1>(yOrig);
         Holder<ComplexTypeWithAttributeGroup1> z = new Holder<ComplexTypeWithAttributeGroup1>();
@@ -933,12 +933,12 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         x.setVarInt(100);
         x.setVarString("hello");
         x.setVarFloat(1.1f);
-        x.setAttr1(new Integer(1));
+        x.setAttr1(Integer.valueOf(1));
         GroupDirectlyInComplexType yOrig = new GroupDirectlyInComplexType();
         yOrig.setVarInt(11);
         yOrig.setVarString("world");
         yOrig.setVarFloat(10.1f);
-        yOrig.setAttr1(new Integer(2));
+        yOrig.setAttr1(Integer.valueOf(2));
 
         Holder<GroupDirectlyInComplexType> y = new Holder<GroupDirectlyInComplexType>(yOrig);
         Holder<GroupDirectlyInComplexType> z = new Holder<GroupDirectlyInComplexType>();
@@ -1700,12 +1700,12 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         x.setVarString("hello");
         x.setVarInt(1000);
         x.setAtString("hello attribute");
-        x.setAtInt(new Integer(2000));
+        x.setAtInt(Integer.valueOf(2000));
 
         y.setVarString("there");
         y.setVarInt(1001);
         y.setAtString("there attribute");
-        y.setAtInt(new Integer(2002));
+        y.setAtInt(Integer.valueOf(2002));
 
         Map<QName, String> xAttrMap = x.getOtherAttributes();
         xAttrMap.put(xAt1Name, "one");
@@ -1781,11 +1781,11 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
 
         x.setVarString("hello");
         x.setAtString("hello attribute");
-        x.setAtInt(new Integer(2000));
+        x.setAtInt(Integer.valueOf(2000));
 
         y.setVarInt(1001);
         y.setAtString("there attribute");
-        y.setAtInt(new Integer(2002));
+        y.setAtInt(Integer.valueOf(2002));
 
         Map<QName, String> xAttrMap = x.getOtherAttributes();
         xAttrMap.put(xAt1Name, "one");
@@ -1865,17 +1865,17 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         OccuringStruct x = new OccuringStruct();
         List<Serializable> theList = x.getVarFloatAndVarIntAndVarString();
         theList.add(1.14f);
-        theList.add(new Integer(0));
+        theList.add(Integer.valueOf(0));
         theList.add("x1");
         theList.add(11.14f);
-        theList.add(new Integer(1));
+        theList.add(Integer.valueOf(1));
         theList.add("x2");
         x.setVarAttrib("x_attr");
 
         OccuringStruct yOriginal = new OccuringStruct();
         theList = yOriginal.getVarFloatAndVarIntAndVarString();
         theList.add(3.14f);
-        theList.add(new Integer(42));
+        theList.add(Integer.valueOf(42));
         theList.add("y");
         yOriginal.setVarAttrib("y_attr");
 
@@ -2130,9 +2130,9 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         @SuppressWarnings("rawtypes")
         List<Comparable> theList = x.getVarFloatOrVarInt();
         theList.add(0);
-        theList.add(new Float(1.14f));
+        theList.add(Float.valueOf(1.14f));
         theList.add(1);
-        theList.add(new Float(11.14f));
+        theList.add(Float.valueOf(11.14f));
         // leave y empty
         OccuringChoice1 yOriginal = new OccuringChoice1();
 

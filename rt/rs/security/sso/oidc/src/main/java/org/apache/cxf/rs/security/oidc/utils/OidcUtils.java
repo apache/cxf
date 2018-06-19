@@ -142,14 +142,7 @@ public final class OidcUtils {
     }
 
     private static String getScope(String... scopes) {
-        StringBuilder sb = new StringBuilder();
-        for (String scope : scopes) {
-            if (sb.length() > 0) {
-                sb.append(" ");
-            }
-            sb.append(scope);
-        }
-        return sb.toString();
+        return String.join(" ", scopes);
     }
     public static void validateAccessTokenHash(ClientAccessToken at, JwtToken jwt) {
         validateAccessTokenHash(at, jwt, true);

@@ -130,10 +130,34 @@ public final class URITemplate {
 
     private static String escapeCharacters(String expression) {
 
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < expression.length(); i++) {
-            char ch = expression.charAt(i);
-            sb.append(isReservedCharacter(ch) ? "\\" + ch : ch);
+        int length = expression.length();
+        int i = 0;
+        char ch = ' ';
+        for (; i < length; ++i) {
+            ch = expression.charAt(i);
+            if (isReservedCharacter(ch)) {
+                break;
+            }
+        }
+
+        if (i == length) {
+            return expression;
+        }
+
+        // Allows for up to 8 escaped characters before we start creating more
+        // StringBuilders. 8 is an arbitrary limit, but it seems to be
+        // sufficient in most cases.
+        StringBuilder sb = new StringBuilder(length + 8);
+        sb.append(expression, 0, i);
+        sb.append('\\');
+        sb.append(ch);
+        ++i;
+        for (; i < length; ++i) {
+            ch = expression.charAt(i);
+            if (isReservedCharacter(ch)) {
+                sb.append('\\');
+            }
+            sb.append(ch);
         }
         return sb.toString();
     }

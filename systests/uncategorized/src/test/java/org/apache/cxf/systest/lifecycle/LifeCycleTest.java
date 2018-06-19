@@ -235,10 +235,10 @@ public class LifeCycleTest extends Assert {
             Integer count = notificationMap.get(address);
             if (count != null) {
                 notificationMap.put(address,
-                                    new Integer(count.intValue() + 1));
+                                    Integer.valueOf(count.intValue() + 1));
             } else {
                 notificationMap.put(address,
-                                    new Integer(1));
+                                    Integer.valueOf(1));
             }
         }
     }

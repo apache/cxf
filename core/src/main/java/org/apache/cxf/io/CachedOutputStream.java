@@ -48,13 +48,15 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
 
 public class CachedOutputStream extends OutputStream {
+
     private static final File DEFAULT_TEMP_DIR;
     private static int defaultThreshold;
     private static long defaultMaxSize;
     private static String defaultCipherTransformation;
-    static {
+    private static boolean thresholdSysPropSet;
 
-        String s = SystemPropertyAction.getPropertyOrNull("org.apache.cxf.io.CachedOutputStream.OutputDirectory");
+    static {
+        String s = SystemPropertyAction.getPropertyOrNull(CachedConstants.OUTPUT_DIRECTORY_SYS_PROP);
         if (s != null) {
             File f = new File(s);
             if (f.exists() && f.isDirectory()) {
@@ -76,6 +78,8 @@ public class CachedOutputStream extends OutputStream {
 
     private long threshold = defaultThreshold;
     private long maxSize = defaultMaxSize;
+    private File outputDir = DEFAULT_TEMP_DIR;
+    private String cipherTransformation = defaultCipherTransformation;
 
     private long totalLength;
 
@@ -83,9 +87,7 @@ public class CachedOutputStream extends OutputStream {
 
     private boolean tempFileFailed;
     private File tempFile;
-    private File outputDir = DEFAULT_TEMP_DIR;
     private boolean allowDeleteOfFile = true;
-    private String cipherTransformation = defaultCipherTransformation;
     private CipherPair ciphers;
 
     private List<CachedOutputStreamCallback> callbacks;
@@ -106,17 +108,24 @@ public class CachedOutputStream extends OutputStream {
     private void readBusProperties() {
         Bus b = BusFactory.getThreadDefaultBus(false);
         if (b != null) {
-            String v = getBusProperty(b, "bus.io.CachedOutputStream.Threshold", null);
+            String v = getBusProperty(b, CachedConstants.THRESHOLD_BUS_PROP, null);
             if (v != null && threshold == defaultThreshold) {
                 threshold = Integer.parseInt(v);
             }
-            v = getBusProperty(b, "bus.io.CachedOutputStream.MaxSize", null);
+            v = getBusProperty(b, CachedConstants.MAX_SIZE_BUS_PROP, null);
             if (v != null) {
                 maxSize = Integer.parseInt(v);
             }
-            v = getBusProperty(b, "bus.io.CachedOutputStream.CipherTransformation", null);
+            v = getBusProperty(b, CachedConstants.CIPHER_TRANSFORMATION_BUS_PROP, null);
             if (v != null) {
                 cipherTransformation = v;
+            }
+            v = getBusProperty(b, CachedConstants.OUTPUT_DIRECTORY_BUS_PROP, null);
+            if (v != null) {
+                File f = new File(v);
+                if (f.exists() && f.isDirectory()) {
+                    outputDir = f;
+                }
             }
         }
     }
@@ -566,27 +575,36 @@ public class CachedOutputStream extends OutputStream {
 
     public static void setDefaultMaxSize(long l) {
         if (l == -1) {
-            String s = SystemPropertyAction.getProperty("org.apache.cxf.io.CachedOutputStream.MaxSize",
-                    "-1");
+            String s = SystemPropertyAction.getProperty(CachedConstants.MAX_SIZE_SYS_PROP, "-1");
             l = Long.parseLong(s);
         }
         defaultMaxSize = l;
     }
+
     public static void setDefaultThreshold(int i) {
         if (i == -1) {
-            String s = SystemPropertyAction.getProperty("org.apache.cxf.io.CachedOutputStream.Threshold",
-                "-1");
+            String s = SystemPropertyAction.getProperty(CachedConstants.THRESHOLD_SYS_PROP, "-1");
             i = Integer.parseInt(s);
             if (i <= 0) {
                 i = 128 * 1024;
+            } else {
+                thresholdSysPropSet = true;
             }
         }
         defaultThreshold = i;
 
     }
+
+    /**
+     * Returns true if the default threshold is explicitly set via CachedConstants.THRESHOLD_SYS_PROP
+     */
+    public static boolean isThresholdSysPropSet() {
+        return thresholdSysPropSet;
+    }
+
     public static void setDefaultCipherTransformation(String n) {
         if (n == null) {
-            n = SystemPropertyAction.getPropertyOrNull("org.apache.cxf.io.CachedOutputStream.CipherTransformation");
+            n = SystemPropertyAction.getPropertyOrNull(CachedConstants.CIPHER_TRANSFORMATION_SYS_PROP);
         }
         defaultCipherTransformation = n;
     }

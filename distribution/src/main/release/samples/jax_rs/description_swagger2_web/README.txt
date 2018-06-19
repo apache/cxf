@@ -17,7 +17,7 @@ Using either UNIX or Windows:
   mvn jetty:run-war
 
 
-Two JAX-RS endpoints are availbale after the service has started. 
+Two JAX-RS endpoints are available after the service has started. 
 Swagger API documents in JSON and YAML are available at
 
   http://localhost:9000/app/swaggerSample/swagger.json

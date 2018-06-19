@@ -160,10 +160,7 @@ public abstract class AbstractOpenApiServiceDescriptionTest extends AbstractBusC
             UserOperation getBooksOp = map.get("getBooks");
             assertEquals(HttpMethod.GET, getBooksOp.getVerb());
             assertEquals(getApplicationPath() + "/bookstore", getBooksOp.getPath());
-            // see https://github.com/swagger-api/swagger-core/issues/2646
-            if (getBooksOp.getProduces() != null) {
-                assertEquals(MediaType.APPLICATION_JSON, getBooksOp.getProduces());
-            }
+            assertEquals(MediaType.APPLICATION_JSON, getBooksOp.getProduces());
             List<Parameter> getBooksOpParams = getBooksOp.getParameters();
             assertEquals(1, getBooksOpParams.size());
             assertEquals(ParameterType.QUERY, getBooksOpParams.get(0).getType());
@@ -181,15 +178,44 @@ public abstract class AbstractOpenApiServiceDescriptionTest extends AbstractBusC
             assertEquals(1, delOpParams.size());
             assertEquals(ParameterType.PATH, delOpParams.get(0).getType());
 
-            assertThat(swaggerJson, CoreMatchers.containsString(CONTACT));
-            assertThat(swaggerJson, CoreMatchers.containsString(TITLE));
-            assertThat(swaggerJson, CoreMatchers.containsString(DESCRIPTION));
-            assertThat(swaggerJson, CoreMatchers.containsString(LICENSE));
-            assertThat(swaggerJson, CoreMatchers.containsString(LICENSE_URL));
-            assertThat(swaggerJson, CoreMatchers.containsString(SECURITY_DEFINITION_NAME));
+            assertThat(swaggerJson, CoreMatchers.containsString(getContract()));
+            assertThat(swaggerJson, CoreMatchers.containsString(getTitle()));
+            assertThat(swaggerJson, CoreMatchers.containsString(getDescription()));
+            assertThat(swaggerJson, CoreMatchers.containsString(getLicense()));
+            assertThat(swaggerJson, CoreMatchers.containsString(getLicenseUrl()));
+            assertThat(swaggerJson, CoreMatchers.containsString(getSecurityDefinitionName()));
+            assertThat(swaggerJson, CoreMatchers.containsString(getTags()));
         } finally {
             client.close();
         }
+    }
+    
+    protected String getTags() {
+        return "";
+    }
+    
+    protected String getSecurityDefinitionName() {
+        return SECURITY_DEFINITION_NAME;
+    }
+
+    protected String getLicenseUrl() {
+        return LICENSE_URL;
+    }
+
+    protected String getLicense() {
+        return LICENSE;
+    }
+
+    protected String getDescription() {
+        return DESCRIPTION;
+    }
+
+    protected String getTitle() {
+        return TITLE;
+    }
+
+    protected String getContract() {
+        return CONTACT;
     }
 
     @Test

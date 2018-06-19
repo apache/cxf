@@ -29,7 +29,6 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.webresources.DirResourceSet;
 import org.apache.catalina.webresources.StandardRoot;
 import org.apache.cxf.transport.servlet.CXFServlet;
-import org.apache.cxf.transport.sse.SseHttpTransportFactory;
 import org.springframework.web.context.ContextLoaderListener;
 
 public final class StatsServer {
@@ -51,7 +50,6 @@ public final class StatsServer {
         context.setResources(resourcesFrom(context, "target/classes"));
 
         final Wrapper cxfServlet = Tomcat.addServlet(context, "cxfServlet", new CXFServlet());
-        cxfServlet.addInitParameter(CXFServlet.TRANSPORT_ID, SseHttpTransportFactory.TRANSPORT_ID);
         cxfServlet.setAsyncSupported(true);
         context.addServletMapping("/rest/*", "cxfServlet");
 

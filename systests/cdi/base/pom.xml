@@ -22,12 +22,17 @@
     <parent>
         <artifactId>cxf-systests-cdi</artifactId>
         <groupId>org.apache.cxf.systests</groupId>
-        <version>3.2.5-SNAPSHOT</version>
+        <version>3.2.6-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>cxf-systests-cdi-base</artifactId>
     <name>Apache CXF CDI Integration System Tests - Base</name>
+    
+    <properties>
+        <cxf.module.name>org.apache.cxf.systests.cdi.base</cxf.module.name>
+    </properties>
+    
     <dependencies>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>

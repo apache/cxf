@@ -29,6 +29,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.Destination;
 import org.apache.neethi.Assertion;
+import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
 import org.apache.neethi.PolicyRegistry;
 
@@ -97,7 +98,7 @@ public interface PolicyEngine {
 
     void setEffectiveClientFaultPolicy(EndpointInfo ei, BindingFaultInfo bfi, EffectivePolicy ep);
 
-
+    void addPolicy(Policy p);
 
     PolicyRegistry getRegistry();
 

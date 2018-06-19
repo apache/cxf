@@ -376,7 +376,7 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
             list.add(0, "-encoding");
             list.add(1, encoding);
         }
-        String[] args = list.toArray(new String[list.size()]);
+        String[] args = list.toArray(new String[0]);
         getLog().debug("Calling wsdl2java with args: " + Arrays.toString(args));
 
         if (!"false".equals(fork)) {

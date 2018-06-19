@@ -39,4 +39,8 @@ class AllowAllHostnameVerifier implements javax.net.ssl.HostnameVerifier {
             return false;
         }
     }
+
+    public boolean verify(final String host, final String certHostname) {
+        return certHostname != null && !certHostname.isEmpty();
+    }
 }

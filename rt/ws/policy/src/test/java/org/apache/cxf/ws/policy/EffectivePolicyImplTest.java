@@ -57,7 +57,7 @@ public class EffectivePolicyImplTest extends Assert {
     @Before
     public void setUp() {
         control = EasyMock.createNiceControl();
-        new Integer(4);
+        Integer.valueOf(4);
     }
 
     @SuppressWarnings("unchecked")

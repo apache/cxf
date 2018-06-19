@@ -152,7 +152,7 @@ public class ExtensionManagerBus extends AbstractBasicInterceptorProvider implem
     }
 
     public ExtensionManagerBus(Map<Class<?>, Object> e, Map<String, Object> properties) {
-       this(e, properties, Thread.currentThread().getContextClassLoader());
+        this(e, properties, Thread.currentThread().getContextClassLoader());
     }
     public ExtensionManagerBus(Map<Class<?>, Object> e) {
         this(e, null, Thread.currentThread().getContextClassLoader());

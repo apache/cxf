@@ -22,12 +22,17 @@
     <parent>
         <groupId>org.apache.cxf.systests</groupId>
         <artifactId>cxf-systests-container-integration</artifactId>
-        <version>3.2.5-SNAPSHOT</version>
+        <version>3.2.6-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>cxf-systests-ci-grizzly</artifactId>
     <name>Apache CXF Container Integration Test Grizzly</name>
     <description>Apache CXF Container Integration Test Grizzly</description>
+    
+    <properties>
+        <cxf.module.name>org.apache.cxf.systests.ci.grizzly</cxf.module.name>
+    </properties>
+
     <repositories>
         <repository>
             <id>maven2-repository.dev.java.net</id>

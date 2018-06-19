@@ -84,7 +84,7 @@ public class BookStoreOpenApi {
     @Path("/{id}")
     @DELETE
     @Operation(
-        description = "Get book by Id",
+        description = "Delete book by Id",
         responses = @ApiResponse(responseCode = "200")
     )
     public Response delete(@Parameter(required = true) @PathParam("id") String id) {

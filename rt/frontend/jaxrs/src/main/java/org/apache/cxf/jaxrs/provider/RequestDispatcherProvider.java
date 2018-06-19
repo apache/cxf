@@ -256,7 +256,7 @@ public class RequestDispatcherProvider extends AbstractResponseViewProvider {
         }
 
         public void setParameters(String name, List<String> values) {
-            doSetParameters(name, values.toArray(new String[values.size()]));
+            doSetParameters(name, values.toArray(new String[0]));
         }
 
         private void doSetParameters(String name, String[] values) {

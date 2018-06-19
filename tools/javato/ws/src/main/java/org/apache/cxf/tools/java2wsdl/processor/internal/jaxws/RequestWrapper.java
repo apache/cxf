@@ -87,7 +87,7 @@ public class RequestWrapper extends Wrapper {
             }
 
             List<Annotation> jaxbAnns = WrapperUtil.getJaxbAnnotations(method, idx);
-            field.setJaxbAnnotations(jaxbAnns.toArray(new Annotation[jaxbAnns.size()]));
+            field.setJaxbAnnotations(jaxbAnns.toArray(new Annotation[0]));
             fields.add(field);
         }
 

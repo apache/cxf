@@ -264,7 +264,7 @@ public class SchemaValidator extends AbstractDefinitionValidator {
                         throw new ToolException(e);
                     }
                 }
-                return xsdUrls.toArray(new String[xsdUrls.size()]);
+                return xsdUrls.toArray(new String[0]);
             }
         }
         return null;
@@ -316,7 +316,7 @@ class NewStackTraceErrorHandler implements ErrorHandler {
         if (errors == null) {
             return null;
         }
-        return errors.toArray(new SAXParseException[errors.size()]);
+        return errors.toArray(new SAXParseException[0]);
     }
 
     void addError(String msg, SAXParseException ex) {

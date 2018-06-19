@@ -22,13 +22,18 @@
     <parent>
         <groupId>org.apache.cxf.systests</groupId>
         <artifactId>cxf-systests-container-integration</artifactId>
-        <version>3.2.5-SNAPSHOT</version>
+        <version>3.2.6-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>cxf-systests-ci-webapp</artifactId>
     <name>Apache CXF Container Integration Test Webapp</name>
     <description>Apache CXF Container Integration Test Webapp</description>
     <packaging>war</packaging>
+    
+    <properties>
+        <cxf.module.name>org.apache.cxf.systests.ci.webapp</cxf.module.name>
+    </properties>
+    
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>

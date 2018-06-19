@@ -200,14 +200,7 @@ public final class SwaggerParseUtils {
     
     private static String listToString(List<String> list) {
         if (list != null) {
-            StringBuilder sb = new StringBuilder();
-            for (String s : list) {
-                if (sb.length() > 0) {
-                    sb.append(',');
-                }
-                sb.append(s);
-            }
-            return sb.toString();
+            return String.join(",", list);
         }
         return null;
     }

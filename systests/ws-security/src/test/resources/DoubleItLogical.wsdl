@@ -139,4 +139,9 @@
             <wsdl:fault message="tns:DoubleItFault" name="DoubleItFault"/>
         </wsdl:operation>
     </wsdl:portType>
+    <wsdl:portType name="DoubleItOneWayPortType">
+        <wsdl:operation name="DoubleIt">
+            <wsdl:input message="tns:DoubleItRequest"/>
+        </wsdl:operation>
+    </wsdl:portType>
 </wsdl:definitions>

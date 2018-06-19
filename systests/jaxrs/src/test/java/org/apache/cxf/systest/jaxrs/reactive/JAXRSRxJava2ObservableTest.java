@@ -33,6 +33,7 @@ import org.apache.cxf.jaxrs.rx2.client.ObservableRxInvokerProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import io.reactivex.Observable;
+import io.reactivex.disposables.Disposable;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -59,9 +60,12 @@ public class JAXRSRxJava2ObservableTest extends AbstractBusClientServerTestBase 
             .get(HelloWorldBean.class);
         
         Holder<HelloWorldBean> holder = new Holder<HelloWorldBean>();
-        obs.subscribe(v -> {
+        Disposable d = obs.subscribe(v -> {
             holder.value = v;
         });
+        if (d == null) {
+            throw new IllegalStateException("Subscribe did not return a Disposable");
+        }
         Thread.sleep(2000);
         assertEquals("Hello", holder.value.getGreeting());
         assertEquals("World", holder.value.getAudience());

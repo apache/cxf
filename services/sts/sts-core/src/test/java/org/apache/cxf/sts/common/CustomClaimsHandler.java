@@ -42,9 +42,9 @@ import org.opensaml.saml.saml2.core.AttributeValue;
  */
 public class CustomClaimsHandler implements ClaimsHandler {
 
-    private static List<URI> knownURIs = new ArrayList<>();
-    private static final URI ROLE_CLAIM =
+    public static final URI ROLE_CLAIM =
             URI.create("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role");
+    private static List<URI> knownURIs = new ArrayList<>();
 
     static {
         knownURIs.add(ClaimTypes.FIRSTNAME);
@@ -54,6 +54,8 @@ public class CustomClaimsHandler implements ClaimsHandler {
         knownURIs.add(ClaimTypes.MOBILEPHONE);
         knownURIs.add(ROLE_CLAIM);
     }
+
+    private String role = "DUMMY";
 
     public List<URI> getSupportedClaimTypes() {
         return knownURIs;
@@ -108,7 +110,7 @@ public class CustomClaimsHandler implements ClaimsHandler {
                         }
                     } else {
                         // If no specific role was requested return DUMMY role for user
-                        claim.addValue("DUMMY");
+                        claim.addValue(role);
                     }
                 }
                 claimCollection.add(claim);
@@ -123,4 +125,7 @@ public class CustomClaimsHandler implements ClaimsHandler {
         return true;
     }
 
+    public void setRole(String role) {
+        this.role = role;
+    }
 }

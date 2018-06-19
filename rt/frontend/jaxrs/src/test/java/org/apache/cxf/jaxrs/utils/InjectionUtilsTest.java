@@ -79,6 +79,7 @@ public class InjectionUtilsTest extends Assert {
         assertEquals(value, ((Id)id).getId());
     }
 
+    @Test
     public void testCollectionTypeFromArray() {
         assertNull(InjectionUtils.getCollectionType(String[].class));
     }

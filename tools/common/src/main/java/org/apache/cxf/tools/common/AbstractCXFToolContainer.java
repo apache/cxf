@@ -253,7 +253,7 @@ public abstract class AbstractCXFToolContainer extends AbstractToolContainer {
         while (nexcludes.hasMoreElements()) {
             result.add(props.getProperty((String)nexcludes.nextElement()));
         }
-        return result.toArray(new String[result.size()]);
+        return result.toArray(new String[0]);
     }
 
     /**

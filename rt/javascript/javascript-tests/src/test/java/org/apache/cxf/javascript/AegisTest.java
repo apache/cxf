@@ -136,7 +136,7 @@ public class AegisTest extends JavascriptRhinoTest {
         assertEquals("aegis_fortest_javascript_cxf_apache_org_Mammal", marker);
         Object intValue =
             testUtilities.rhinoEvaluate("globalResponseObject._return._objects._anyType[1]");
-        assertEquals(new Float(42), new Float(intValue.toString()));
+        assertEquals(Float.valueOf(42), new Float(intValue.toString()));
         return null;
     }
 

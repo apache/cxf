@@ -48,6 +48,8 @@ public class ClaimsAttributeStatementProvider implements AttributeStatementProvi
 
         List<AttributeBean> attributeList = new ArrayList<>();
         String tokenType = providerParameters.getTokenRequirements().getTokenType();
+        boolean saml2 = WSS4JConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
+            || WSS4JConstants.SAML2_NS.equals(tokenType);
 
         AttributeStatementBean attrBean = new AttributeStatementBean();
         while (claimIterator.hasNext()) {
@@ -55,8 +57,7 @@ public class ClaimsAttributeStatementProvider implements AttributeStatementProvi
             AttributeBean attributeBean = new AttributeBean();
 
             URI claimType = claim.getClaimType();
-            if (WSS4JConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
-                || WSS4JConstants.SAML2_NS.equals(tokenType)) {
+            if (saml2) {
                 attributeBean.setQualifiedName(claimType.toString());
                 attributeBean.setNameFormat(nameFormat);
             } else {

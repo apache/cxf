@@ -22,8 +22,12 @@ package org.apache.cxf.jaxws;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.net.URL;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.xml.namespace.QName;
@@ -31,10 +35,17 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Dispatch;
 import javax.xml.ws.WebServiceException;
+import javax.xml.ws.handler.Handler;
+import javax.xml.ws.handler.LogicalHandler;
+import javax.xml.ws.handler.LogicalMessageContext;
+import javax.xml.ws.handler.MessageContext;
+import javax.xml.ws.handler.soap.SOAPHandler;
+import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxws.support.JaxWsEndpointImpl;
 import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
@@ -63,6 +74,7 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
                     "SoapPort");
     private final String address = "http://localhost:9000/SoapContext/SoapPort";
     private Destination d;
+    private Map<String, List<String>> headers = new HashMap<>();
 
     @Before
     public void setUp() throws Exception {
@@ -319,6 +331,91 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
         assertEquals("jack", ((BindingProvider)greeter3).getRequestContext().get("test"));
     }
 
+    @Test
+    public void testLogicalHandler() {
+        URL url = getClass().getResource("/wsdl/hello_world.wsdl");
+        javax.xml.ws.Service s = javax.xml.ws.Service
+            .create(url, serviceName);
+        Greeter greeter = s.getPort(portName, Greeter.class);
+        d.setMessageObserver(new MessageReplayObserver("sayHiResponse.xml"));
+
+        @SuppressWarnings("rawtypes") // JAX-WS api doesn't specify this as List<Handler<? extends MessageContext>>
+        List<Handler> chain = ((BindingProvider)greeter).getBinding().getHandlerChain();
+        chain.add(new LogicalHandler<LogicalMessageContext>() {
+            public void close(MessageContext arg0) {
+            }
+
+            public boolean handleFault(LogicalMessageContext arg0) {
+                return true;
+            }
+
+            public boolean handleMessage(LogicalMessageContext context) {
+
+                Boolean outbound = (Boolean) context.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+                if (outbound) {
+                    headers = CastUtils.cast((Map<?, ?>) context.get(MessageContext.HTTP_REQUEST_HEADERS));
+                    if (headers == null) {
+                        headers = new HashMap<String, List<String>>();
+                        context.put(MessageContext.HTTP_REQUEST_HEADERS, headers);
+                    }
+                    headers.put("My-Custom-Header", Collections.singletonList("value"));
+                }
+                return true;
+            }
+        });
+        ((BindingProvider)greeter).getBinding().setHandlerChain(chain);
+
+        String response = greeter.sayHi();
+        assertNotNull(response);
+        assertTrue("custom header should be present", headers.containsKey("My-Custom-Header"));
+        assertTrue("existing SOAPAction header should not be removed", headers.containsKey("SOAPAction"));
+    }
+
+    @Test
+    public void testSoapHandler() {
+        URL url = getClass().getResource("/wsdl/hello_world.wsdl");
+        javax.xml.ws.Service s = javax.xml.ws.Service
+            .create(url, serviceName);
+        Greeter greeter = s.getPort(portName, Greeter.class);
+        d.setMessageObserver(new MessageReplayObserver("sayHiResponse.xml"));
+
+        @SuppressWarnings("rawtypes")
+        List<Handler> chain = ((BindingProvider)greeter).getBinding().getHandlerChain();
+        chain.add(new SOAPHandler<SOAPMessageContext>() {
+
+                public boolean handleMessage(SOAPMessageContext context) {
+
+                    Boolean outbound = (Boolean) context.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+                    if (outbound) {
+                        headers = CastUtils.cast((Map<?, ?>) context.get(MessageContext.HTTP_REQUEST_HEADERS));
+                        if (headers == null) {
+                            headers = new HashMap<String, List<String>>();
+                            context.put(MessageContext.HTTP_REQUEST_HEADERS, headers);
+                        }
+                        headers.put("My-Custom-Header", Collections.singletonList("value"));
+                    }
+                    return true;
+                }
+
+                public boolean handleFault(SOAPMessageContext smc) {
+                    return true;
+                }
+
+                public Set<QName> getHeaders() {
+                    return null;
+                }
+
+                public void close(MessageContext messageContext) {
+                }
+        });
+        ((BindingProvider)greeter).getBinding().setHandlerChain(chain);
+
+        String response = greeter.sayHi();
+        assertNotNull(response);
+        assertTrue("custom header should be present", headers.containsKey("My-Custom-Header"));
+        assertTrue("existing SOAPAction header should not be removed", headers.containsKey("SOAPAction"));
+
+    }
 
     public static class FaultThrower extends AbstractPhaseInterceptor<Message> {
 

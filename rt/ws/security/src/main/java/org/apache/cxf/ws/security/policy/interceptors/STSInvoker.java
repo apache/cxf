@@ -22,7 +22,6 @@ package org.apache.cxf.ws.security.policy.interceptors;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.ZoneOffset;
-import java.util.Base64;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -56,6 +55,7 @@ import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.xml.security.utils.XMLUtils;
 
 /**
  * An abstract Invoker used by the Spnego and SecureConversationInInterceptors.
@@ -211,7 +211,7 @@ abstract class STSInvoker implements Invoker {
 
             writer.writeStartElement(prefix, "BinarySecret", namespace);
             writer.writeAttribute("Type", namespace + "/Nonce");
-            writer.writeCharacters(Base64.getMimeEncoder().encodeToString(secret));
+            writer.writeCharacters(XMLUtils.encodeToString(secret));
             writer.writeEndElement();
         } else {
             byte entropy[] = WSSecurityUtil.generateNonce(keySize / 8);
@@ -226,7 +226,7 @@ abstract class STSInvoker implements Invoker {
             writer.writeStartElement(prefix, "Entropy", namespace);
             writer.writeStartElement(prefix, "BinarySecret", namespace);
             writer.writeAttribute("Type", namespace + "/Nonce");
-            writer.writeCharacters(Base64.getMimeEncoder().encodeToString(entropy));
+            writer.writeCharacters(XMLUtils.encodeToString(entropy));
             writer.writeEndElement();
 
         }

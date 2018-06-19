@@ -23,6 +23,8 @@ package demo.hw.server;
 
 import javax.xml.ws.Endpoint;
 
+import org.apache.cxf.ext.logging.LoggingFeature;
+
 public class Server {
 
     protected Server() throws Exception {
@@ -30,7 +32,7 @@ public class Server {
 
         Object implementor = new GreeterImpl();
         String address = "http://localhost:9000/SoapContext/SoapPort";
-        Endpoint.publish(address, implementor);
+        Endpoint.publish(address, implementor, new LoggingFeature());
     }
 
     public static void main(String args[]) throws Exception {

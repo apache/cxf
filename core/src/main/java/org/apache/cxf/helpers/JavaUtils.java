@@ -50,8 +50,8 @@ public final class JavaUtils {
     
     static {
         String version = System.getProperty("java.version");
-        if (version.indexOf(".") > 0) {
-            version = version.substring(0, version.indexOf("."));
+        if (version.indexOf('.') > 0) {
+            version = version.substring(0, version.indexOf('.'));
         }
         
         setJava9Compatible(Integer.valueOf(version) >= 9);

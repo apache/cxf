@@ -38,6 +38,7 @@ import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 public class JwsJsonProducer {
     protected static final Logger LOG = LogUtils.getL7dLogger(JwsJsonProducer.class);
     private boolean supportFlattened;
+    private boolean supportDetached;
     private String plainPayload;
     private String encodedPayload;
     private List<JwsJsonSignatureEntry> signatures = new LinkedList<JwsJsonSignatureEntry>();
@@ -46,8 +47,13 @@ public class JwsJsonProducer {
         this(tbsDocument, false);
     }
     public JwsJsonProducer(String tbsDocument, boolean supportFlattened) {
-        this.supportFlattened = supportFlattened;
+        this(tbsDocument, supportFlattened, false);
+    }
+    
+    public JwsJsonProducer(String tbsDocument, boolean supportFlattened, boolean supportDetached) {
         this.plainPayload = tbsDocument;
+        this.supportFlattened = supportFlattened;
+        this.supportDetached = supportDetached;
     }
 
     public String getPlainPayload() {
@@ -60,9 +66,13 @@ public class JwsJsonProducer {
         return encodedPayload;
     }
     public String getJwsJsonSignedDocument() {
-        return getJwsJsonSignedDocument(false);
+        return doGetJwsJsonSignedDocument(supportDetached);
     }
+    @Deprecated
     public String getJwsJsonSignedDocument(boolean detached) {
+        return doGetJwsJsonSignedDocument(detached);
+    }
+    private String doGetJwsJsonSignedDocument(boolean detached) {    
         if (signatures.isEmpty()) {
             return null;
         }

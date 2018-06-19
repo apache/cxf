@@ -479,7 +479,7 @@ public final class CustomizationParser {
                 a.add((Element)item);
             }
         }
-        return a.toArray(new Element[a.size()]);
+        return a.toArray(new Element[0]);
     }
 
     private void addBinding(String bindingFile) throws XMLStreamException {

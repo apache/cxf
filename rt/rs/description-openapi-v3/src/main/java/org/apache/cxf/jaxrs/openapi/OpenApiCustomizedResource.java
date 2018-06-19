@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.jaxrs.openapi;
 
+import java.util.Objects;
+
 import javax.servlet.ServletConfig;
 import javax.ws.rs.GET;
 import javax.ws.rs.PathParam;
@@ -35,6 +37,7 @@ import io.swagger.v3.oas.integration.GenericOpenApiContext;
 import io.swagger.v3.oas.integration.OpenApiContextLocator;
 import io.swagger.v3.oas.integration.api.OpenAPIConfiguration;
 import io.swagger.v3.oas.integration.api.OpenApiContext;
+import io.swagger.v3.oas.models.OpenAPI;
 
 public class OpenApiCustomizedResource extends OpenApiResource {
 
@@ -58,14 +61,50 @@ public class OpenApiCustomizedResource extends OpenApiResource {
             // changes won't be taken into account (due to the deep copying rather than reference 
             // passing). In order to reflect any changes which customization may do, we have to 
             // update reader's configuration directly.
-            final String ctxId = ServletConfigContextUtils.getContextIdFromServletConfig(config);
-            final OpenApiContext ctx = OpenApiContextLocator.getInstance().getOpenApiContext(ctxId);
+            OpenApiContext ctx = getOpenApiContext(config);
+            if (ctx == null) {
+                // If there is no context associated with the servlet config, let us
+                // try to fallback to default one. 
+                ctx = getOpenApiContext(null);
+            }
+            
             if (ctx instanceof GenericOpenApiContext<?>) {
                 ((GenericOpenApiContext<?>) ctx).getOpenApiReader().setConfiguration(configuration);
-                customizer.customize(ctx.read());
+                
+                final OpenAPI oas = ctx.read();
+                customizer.customize(oas);
+                
+                if (!Objects.equals(configuration.getOpenAPI().getInfo(), oas.getInfo())) {
+                    configuration.getOpenAPI().setInfo(oas.getInfo());
+                }
+                
+                if (!Objects.equals(configuration.getOpenAPI().getComponents(), oas.getComponents())) {
+                    configuration.getOpenAPI().setComponents(oas.getComponents());
+                }
+                
+                if (!Objects.equals(configuration.getOpenAPI().getExternalDocs(), oas.getExternalDocs())) {
+                    configuration.getOpenAPI().setExternalDocs(oas.getExternalDocs());
+                }
+                
+                if (!Objects.equals(configuration.getOpenAPI().getPaths(), oas.getPaths())) {
+                    configuration.getOpenAPI().setPaths(oas.getPaths());
+                }
+                
+                if (!Objects.equals(configuration.getOpenAPI().getTags(), oas.getTags())) {
+                    configuration.getOpenAPI().setTags(oas.getTags());
+                }
+                
+                if (!Objects.equals(configuration.getOpenAPI().getExtensions(), oas.getExtensions())) {
+                    configuration.getOpenAPI().setExtensions(oas.getExtensions());
+                }
             }
         }
 
         return super.getOpenApi(headers, uriInfo, type);
+    }
+
+    private OpenApiContext getOpenApiContext(ServletConfig config) {
+        final String ctxId = ServletConfigContextUtils.getContextIdFromServletConfig(config);
+        return OpenApiContextLocator.getInstance().getOpenApiContext(ctxId);
     }
 }

@@ -99,7 +99,7 @@ public class AegisWSDLNSTest extends AbstractJUnit4SpringContextTests {
     @Test
     public void testUsingCorrectMethod() throws Exception {
         setupForTest(false);
-        Integer result = client.updateInteger(new Integer(20));
+        Integer result = client.updateInteger(Integer.valueOf(20));
         Assert.assertEquals(result.intValue(), 20);
     }
 

@@ -405,7 +405,6 @@
     <feature name="cxf-sse" version="${project.version}">
         <feature version="${project.version}">cxf-http</feature>
         <feature version="${project.version}">cxf-jaxrs</feature>
-        <bundle dependency='true'>mvn:org.atmosphere/atmosphere-runtime/${cxf.atmosphere.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-rs-sse/${project.version}</bundle>
         <capability>
             cxf.http.provider;name=sse
@@ -549,8 +548,8 @@
 
     <feature name="cxf-bean-validation" version="${project.version}">
         <feature version="${project.version}">cxf-bean-validation-core</feature>
-        <bundle start-level="30" dependency="true">mvn:javax.el/javax.el-api/${cxf.javax.el.version}</bundle> 
-        <bundle start-level="30" dependency="true">mvn:org.glassfish/javax.el/${cxf.javax.el.version}</bundle> 
+        <bundle start-level="30" dependency="true">mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.javax-el-api-3.0.0/${cxf.servicemix.javax.el.version}</bundle> 
+        <bundle start-level="30" dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.javax-el-impl/${cxf.servicemix.javax.el.version}</bundle>
     </feature>
 
     <feature name="cxf-jaxrs-cdi" version="${project.version}">

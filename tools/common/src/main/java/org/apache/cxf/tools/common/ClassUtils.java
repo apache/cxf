@@ -120,7 +120,7 @@ public class ClassUtils {
 
         }
 
-        if (!compiler.compileFiles(fileList.toArray(new String[fileList.size()]))) {
+        if (!compiler.compileFiles(fileList.toArray(new String[0]))) {
             Message msg = new Message("FAIL_TO_COMPILE_GENERATE_CODES", LOG);
             throw new ToolException(msg);
         }

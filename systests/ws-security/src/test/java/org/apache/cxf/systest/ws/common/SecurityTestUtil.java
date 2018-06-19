@@ -80,10 +80,14 @@ public final class SecurityTestUtil {
     }
 
     public static void enableStreaming(DoubleItPortType port) {
-        ((BindingProvider)port).getRequestContext().put(
+        enableStreaming((BindingProvider)port);
+    }
+
+    public static void enableStreaming(BindingProvider bindingProvider) {
+        bindingProvider.getRequestContext().put(
             SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
         );
-        ((BindingProvider)port).getResponseContext().put(
+        bindingProvider.getResponseContext().put(
             SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
         );
     }

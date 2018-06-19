@@ -61,7 +61,7 @@ public class PolicyUtilsTest extends Assert {
         assertTrue(RMPolicyUtilities.equals(a, b));
 
         InactivityTimeout iat = new RMAssertion.InactivityTimeout();
-        iat.setMilliseconds(new Long(10));
+        iat.setMilliseconds(Long.valueOf(10));
         a.setInactivityTimeout(iat);
         assertTrue(!RMPolicyUtilities.equals(a, b));
         b.setInactivityTimeout(iat);
@@ -81,9 +81,9 @@ public class PolicyUtilsTest extends Assert {
         assertTrue(RMPolicyUtilities.equals(cfg0, RMPolicyUtilities.intersect(rma, cfg0)));
 
         InactivityTimeout aiat = new RMAssertion.InactivityTimeout();
-        aiat.setMilliseconds(new Long(7200000));
+        aiat.setMilliseconds(Long.valueOf(7200000));
         rma.setInactivityTimeout(aiat);
-        cfg0.setInactivityTimeout(new Long(3600000));
+        cfg0.setInactivityTimeout(Long.valueOf(3600000));
 
         RMConfiguration cfg1 = RMPolicyUtilities.intersect(rma, cfg0);
         assertEquals(7200000L, cfg1.getInactivityTimeout().longValue());
@@ -92,9 +92,9 @@ public class PolicyUtilsTest extends Assert {
         assertFalse(cfg1.isExponentialBackoff());
 
         BaseRetransmissionInterval abri = new RMAssertion.BaseRetransmissionInterval();
-        abri.setMilliseconds(new Long(20000));
+        abri.setMilliseconds(Long.valueOf(20000));
         rma.setBaseRetransmissionInterval(abri);
-        cfg0.setBaseRetransmissionInterval(new Long(10000));
+        cfg0.setBaseRetransmissionInterval(Long.valueOf(10000));
 
         cfg1 = RMPolicyUtilities.intersect(rma, cfg0);
         assertEquals(7200000L, cfg1.getInactivityTimeout().longValue());
@@ -103,7 +103,7 @@ public class PolicyUtilsTest extends Assert {
         assertFalse(cfg1.isExponentialBackoff());
 
         AcknowledgementInterval aai = new RMAssertion.AcknowledgementInterval();
-        aai.setMilliseconds(new Long(2000));
+        aai.setMilliseconds(Long.valueOf(2000));
         rma.setAcknowledgementInterval(aai);
 
         cfg1 = RMPolicyUtilities.intersect(rma, cfg0);
@@ -123,7 +123,7 @@ public class PolicyUtilsTest extends Assert {
     @Test
     public void testGetRMConfiguration() {
         RMConfiguration cfg = new RMConfiguration();
-        cfg.setBaseRetransmissionInterval(new Long(3000));
+        cfg.setBaseRetransmissionInterval(Long.valueOf(3000));
         cfg.setExponentialBackoff(true);
 
         Message message = control.createMock(Message.class);
@@ -144,7 +144,7 @@ public class PolicyUtilsTest extends Assert {
         control.reset();
         RMAssertion b = new RMAssertion();
         BaseRetransmissionInterval bbri = new RMAssertion.BaseRetransmissionInterval();
-        bbri.setMilliseconds(new Long(2000));
+        bbri.setMilliseconds(Long.valueOf(2000));
         b.setBaseRetransmissionInterval(bbri);
         JaxbAssertion<RMAssertion> assertion = new JaxbAssertion<RMAssertion>();
         assertion.setName(RM10Constants.RMASSERTION_QNAME);

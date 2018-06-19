@@ -48,6 +48,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.ValidationEventHandler;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
@@ -807,10 +808,10 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
         }
 
         return createWrapperHelper(wrapperType,
-                                 setMethods.toArray(new Method[setMethods.size()]),
-                                 getMethods.toArray(new Method[getMethods.size()]),
-                                 jaxbMethods.toArray(new Method[jaxbMethods.size()]),
-                                 fields.toArray(new Field[fields.size()]),
+                                 setMethods.toArray(new Method[0]),
+                                 getMethods.toArray(new Method[0]),
+                                 jaxbMethods.toArray(new Method[0]),
+                                 fields.toArray(new Field[0]),
                                  objectFactory);
     }
 
@@ -823,6 +824,12 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
                 && partName.equals(el.name())) {
                 return field;
             }
+
+            XmlElementRef xmlElementRefAnnotation = field.getAnnotation(XmlElementRef.class);
+            if (xmlElementRefAnnotation != null && partName.equals(xmlElementRefAnnotation.name())) {
+                return field;
+            }
+
             if (field.getName().equals(fieldName)) {
                 return field;
             }

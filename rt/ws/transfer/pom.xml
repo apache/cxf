@@ -9,12 +9,13 @@
   <parent>
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-parent</artifactId>
-      <version>3.2.5-SNAPSHOT</version>
+      <version>3.2.6-SNAPSHOT</version>
       <relativePath>../../../parent/pom.xml</relativePath>
   </parent>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <cxf.module.name>org.apache.cxf.ws.transfer</cxf.module.name>
   </properties>
 
   <dependencies>

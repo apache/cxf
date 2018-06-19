@@ -75,7 +75,7 @@ public abstract class AbstractJPATypedQueryVisitor<T, T1, E>
     protected AbstractJPATypedQueryVisitor(EntityManager em,
                                            Class<T> tClass,
                                            List<String> joinProps) {
-           this(em, tClass, null, null, joinProps);
+        this(em, tClass, null, null, joinProps);
     }
 
     protected AbstractJPATypedQueryVisitor(EntityManager em,
@@ -128,7 +128,7 @@ public abstract class AbstractJPATypedQueryVisitor<T, T1, E>
                 condition.accept(this);
             }
             List<Predicate> predsList = predStack.pop();
-            Predicate[] preds = predsList.toArray(new Predicate[predsList.size()]);
+            Predicate[] preds = predsList.toArray(new Predicate[0]);
             Predicate newPred;
             if (sc instanceof OrSearchCondition) {
                 newPred = builder.or(preds);
@@ -158,7 +158,7 @@ public abstract class AbstractJPATypedQueryVisitor<T, T1, E>
     public CriteriaQuery<T1> getCriteriaQuery() {
         if (!criteriaFinalized) {
             List<Predicate> predsList = predStack.pop();
-            cq.where(predsList.toArray(new Predicate[predsList.size()]));
+            cq.where(predsList.toArray(new Predicate[0]));
             criteriaFinalized = true;
         }
         return cq;

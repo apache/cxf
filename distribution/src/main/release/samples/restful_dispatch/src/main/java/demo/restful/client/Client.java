@@ -19,19 +19,14 @@
 
 package demo.restful.client;
 
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.xml.namespace.QName;
-import javax.xml.transform.OutputKeys;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.Dispatch;
 import javax.xml.ws.Service;
@@ -89,23 +84,13 @@ public final class Client {
     }
 
     private static void printSource(Source source) {
-        try {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            StreamResult sr = new StreamResult(bos);
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            transformerFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
-            Transformer transformer = transformerFactory.newTransformer();
-            Properties oprops = new Properties();
-            oprops.put(OutputKeys.OMIT_XML_DECLARATION, "yes");
-            transformer.setOutputProperties(oprops);
-            transformer.transform(source, sr);
-            System.out.println("**** Response ******");
-            System.out.println(bos.toString());
-            bos.close();
-            System.out.println();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    	System.out.println("**** Response ******");
+    	try {
+			StaxUtils.copy(source, System.out);
+		} catch (XMLStreamException e) {
+			e.printStackTrace();
+		}
+    	System.out.println();
     }
 
 }

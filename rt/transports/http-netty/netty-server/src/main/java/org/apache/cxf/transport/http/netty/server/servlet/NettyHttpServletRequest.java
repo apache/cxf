@@ -253,7 +253,7 @@ public class NettyHttpServletRequest implements HttpServletRequest {
         if (values == null || values.isEmpty()) {
             return null;
         }
-        return values.toArray(new String[values.size()]);
+        return values.toArray(new String[0]);
     }
 
     @Override

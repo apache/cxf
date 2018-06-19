@@ -320,14 +320,7 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
     }
 
     public void setScopeList(List<String> list) {
-        StringBuilder sb = new StringBuilder();
-        for (String s : list) {
-            if (sb.length() > 0) {
-                sb.append(" ");
-            }
-            sb.append(s);
-        }
-        setScopes(sb.toString());
+        setScopes(String.join(" ", list));
     }
 
     public void setScopes(String scopes) {

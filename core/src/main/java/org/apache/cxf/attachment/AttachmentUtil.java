@@ -177,7 +177,8 @@ public final class AttachmentUtil {
             } else {
                 bos.setThreshold(Long.parseLong((String)threshold));
             }
-        } else {
+        } else if (!CachedOutputStream.isThresholdSysPropSet()) {
+            // Use the default AttachmentDeserializer Threshold only if there is no system property defined
             bos.setThreshold(AttachmentDeserializer.THRESHOLD);
         }
 
@@ -356,14 +357,7 @@ public final class AttachmentUtil {
     }
     static String getHeaderValue(List<String> v, String delim) {
         if (v != null && !v.isEmpty()) {
-            StringBuilder b = new StringBuilder();
-            for (String s : v) {
-                if (b.length() > 0) {
-                    b.append(delim);
-                }
-                b.append(s);
-            }
-            return b.toString();
+            return String.join(delim, v);
         }
         return null;
     }

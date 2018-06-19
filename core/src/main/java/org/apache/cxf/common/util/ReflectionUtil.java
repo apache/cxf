@@ -255,7 +255,7 @@ public final class ReflectionUtil {
                         throw new RuntimeException(e.getCause());
                     }
                 }
-                return descriptors.toArray(new PropertyDescriptor[descriptors.size()]);
+                return descriptors.toArray(new PropertyDescriptor[0]);
             }
             return null;
         }

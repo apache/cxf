@@ -525,8 +525,8 @@ public class BookStore {
     @Path("setmanycookies")
     public Response setTwoCookies() {
         return Response.ok().header("Set-Cookie", "JSESSIONID=0475F7F30A26E5B0C15D69; Path=/")
-            .header("Set-Cookie", "COOKIETWO=dummy; Expires=Sat, 20-Nov-2010 19:11:32 GMT; Path=/")
-            .header("Set-Cookie", "COOKIETWO=dummy2; expires=Sat, 20-Nov-2010 19:11:32 GMT; Path=/")
+            .header("Set-cookie", "COOKIETWO=dummy; Expires=Sat, 20-Nov-2010 19:11:32 GMT; Path=/")
+            .header("set-cookie", "COOKIETWO=dummy2; expires=Sat, 20-Nov-2010 19:11:32 GMT; Path=/")
             .build();
     }
 
@@ -1376,7 +1376,7 @@ public class BookStore {
     @Path("/booknames/{bookId}/")
     @Produces("text/*")
     public String getBookName(@PathParam("bookId") int id) throws BookNotFoundFault {
-        Book book = books.get(new Long(id));
+        Book book = books.get(Long.valueOf(id));
         if (book != null) {
             return book.getName();
         }
@@ -1534,7 +1534,7 @@ public class BookStore {
         if (id != 123) {
             throw new WebApplicationException();
         }
-        Book b = books.get(new Long(id));
+        Book b = books.get(Long.valueOf(id));
 
         Response r;
         if (b != null) {
@@ -1551,7 +1551,7 @@ public class BookStore {
     @Consumes("text/plain")
     @Produces("text/plain")
     public Long echoBookId(long theBookId) {
-        return new Long(theBookId);
+        return Long.valueOf(theBookId);
     }
 
     @POST

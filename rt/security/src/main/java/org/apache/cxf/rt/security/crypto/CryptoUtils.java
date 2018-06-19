@@ -62,6 +62,7 @@ import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.CompressionUtils;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.helpers.JavaUtils;
 
 
 /**
@@ -544,8 +545,7 @@ public final class CryptoUtils {
                 result = c.doFinal(bytes);
             } else {
                 if (blockSize == -1) {
-                    String javaVersion = System.getProperty("java.version");
-                    if (javaVersion.startsWith("9") || isJava8Release161OrLater(javaVersion)) {
+                    if (JavaUtils.isJava9Compatible() || isJava8Release161OrLater(System.getProperty("java.version"))) {
                         //the default block size is 256 when use private key under java9
                         blockSize = secretKey instanceof PublicKey ? 117 : 256;
                     } else {

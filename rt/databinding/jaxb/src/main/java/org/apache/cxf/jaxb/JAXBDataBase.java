@@ -103,7 +103,7 @@ public abstract class JAXBDataBase {
                 annoList = extractJAXBAnnotations(getReturnMethodAnnotations(mpi));
             }
         }
-        return annoList == null ? new Annotation[0] : annoList.toArray(new Annotation[annoList.size()]);
+        return annoList == null ? new Annotation[0] : annoList.toArray(new Annotation[0]);
     }
 
     private List<Annotation> extractJAXBAnnotations(Annotation[] anns) {

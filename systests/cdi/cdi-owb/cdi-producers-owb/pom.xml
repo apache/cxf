@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.apache.cxf.systests</groupId>
         <artifactId>cxf-systests-cdi-owb</artifactId>
-        <version>3.2.5-SNAPSHOT</version>
+        <version>3.2.6-SNAPSHOT</version>
         <relativePath>../</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -30,6 +30,10 @@
     <name>Apache CXF CDI Integration System Tests - OWB with producers</name>
     <description>Apache CXF CDI Integration System Tests - OpenWebBeans with producers</description>
     <url>http://cxf.apache.org</url>
+    
+    <properties>
+        <cxf.module.name>org.apache.cxf.systests.cdi.owb.producers</cxf.module.name>
+    </properties>
     
     <dependencies>
         <dependency>
@@ -48,7 +52,7 @@
         <dependency>
              <groupId>org.mockito</groupId>
              <artifactId>mockito-core</artifactId>
-             <version>2.7.14</version>
+             <version>${cxf.mockito.version}</version>
              <scope>test</scope>
         </dependency>
     </dependencies>

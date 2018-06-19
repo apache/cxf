@@ -98,7 +98,7 @@ public class ManagedConnectionFactoryImplTest extends Assert {
 
     @Test
     public void testSetEJBServicePropertiesPollInterval() throws Exception {
-        final Integer value = new Integer(10);
+        final Integer value = Integer.valueOf(10);
         Properties p = new Properties();
         ManagedConnectionFactoryImpl mcf = new ManagedConnectionFactoryImpl(p);
 

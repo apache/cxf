@@ -577,8 +577,8 @@ public class MAPAggregatorImpl extends MAPAggregator {
             && isAnonymous) {
             passed = true;
         } else if (WSAddressingFeature.AddressingResponses.NON_ANONYMOUS == addressingResponses
-                   && (!anonReply && (faultTo.getAddress() != null && !anonFault)
-                       || !anonReply && faultTo.getAddress() == null)) {
+                   && (!anonReply && (!anonFault && faultTo.getAddress() != null)
+                       || !anonReply && faultTo == null)) {        
             passed = true;
         }
         if (!passed) {

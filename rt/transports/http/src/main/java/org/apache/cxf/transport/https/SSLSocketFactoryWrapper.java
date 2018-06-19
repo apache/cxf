@@ -127,7 +127,7 @@ class SSLSocketFactoryWrapper extends SSLSocketFactory {
         if (list.isEmpty()) {
             return null;
         }
-        return list.toArray(new String[list.size()]);
+        return list.toArray(new String[0]);
     }
 
     /*

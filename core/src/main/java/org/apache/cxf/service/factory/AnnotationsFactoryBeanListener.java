@@ -117,7 +117,7 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
             if (docs != null) {
                 addDocumentation(ep,
                                  WSDLDocumentation.Placement.SERVICE,
-                                 docs.toArray(new WSDLDocumentation[docs.size()]));
+                                 docs.toArray(new WSDLDocumentation[0]));
             }
             addBindingOperationDocs(ep);
             for (Method method : implCls.getMethods()) {

@@ -73,6 +73,17 @@
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
+    <wsdl:binding name="DoubleItSymmetricAddressingOneWayBinding" type="tns:DoubleItOneWayPortType">
+        <wsp:PolicyReference URI="#DoubleItSymmetricAddressingPolicy"/>
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction=""/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy"/>
+            </wsdl:input>
+        </wsdl:operation>
+    </wsdl:binding>
     <wsdl:binding name="DoubleItKeyIdentifierDerivedBinding" type="tns:DoubleItPortType">
         <wsp:PolicyReference URI="#DoubleItKeyIdentifierDerivedPolicy"/>
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
@@ -669,6 +680,9 @@
         <wsdl:port name="DoubleItSymmetricAddressingPort" binding="tns:DoubleItSymmetricAddressingBinding">
             <soap:address location="http://localhost:9001/DoubleItX509SymmetricAddressing"/>
         </wsdl:port>
+        <wsdl:port name="DoubleItSymmetricAddressingOneWayPort" binding="tns:DoubleItSymmetricAddressingOneWayBinding">
+            <soap:address location="http://localhost:9001/DoubleItX509SymmetricAddressingOneWay"/>
+        </wsdl:port>
         <wsdl:port name="DoubleItKeyIdentifierDerivedPort" binding="tns:DoubleItKeyIdentifierDerivedBinding">
             <soap:address location="http://localhost:9001/DoubleItX509KeyIdentifierDerived"/>
         </wsdl:port>
@@ -828,7 +842,7 @@
     <wsp:Policy wsu:Id="DoubleItSymmetricAddressingPolicy">
         <wsp:ExactlyOne>
             <wsp:All>
-                <wsaws:UsingAddressing xmlns:wsaws="http://www.w3.org/2006/05/addressing/wsdl" wsp:Optional="true"/>
+                <wsaws:UsingAddressing xmlns:wsaws="http://www.w3.org/2006/05/addressing/wsdl" wsp:Optional="false"/>
                 <sp:SymmetricBinding>
                     <wsp:Policy>
                         <sp:ProtectionToken>

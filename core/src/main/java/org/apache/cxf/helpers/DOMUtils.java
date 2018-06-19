@@ -67,7 +67,19 @@ public final class DOMUtils {
 
 
     static {
-        if (JavaUtils.isJava9Compatible()) {
+        try {
+            Method[] methods = DOMUtils.class.getClassLoader().
+                loadClass("com.sun.xml.messaging.saaj.soap.SOAPDocumentImpl").getMethods();
+            for (Method method : methods) {
+                if (method.getName().equals("register")) {
+                    //this is the 1.4+ SAAJ impl
+                    setJava9SAAJ(true);
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException cnfe) {
+            LogUtils.getL7dLogger(DOMUtils.class).finest(
+                "can't load class com.sun.xml.messaging.saaj.soap.SOAPDocumentImpl");
 
             try {
                 Method[] methods = DOMUtils.class.getClassLoader().
@@ -79,11 +91,10 @@ public final class DOMUtils {
                         break;
                     }
                 }
-            } catch (ClassNotFoundException cnfe) {
+            } catch (ClassNotFoundException cnfe1) {
                 LogUtils.getL7dLogger(DOMUtils.class).finest(
                     "can't load class com.sun.xml.internal.messaging.saaj.soap.SOAPDocumentImpl");
             }
-
         }
     }
 
@@ -152,17 +163,17 @@ public final class DOMUtils {
             throw new RuntimeException(e);
         }
     }
-    
+
     private static synchronized Document createEmptyDocument() {
         if (emptyDocument == null) {
             emptyDocument = createDocument();
-            
+
             // uncomment this to see if anything is actually setting anything into the empty doc
             /*
             final Document doc  = createDocument();
             emptyDocument = (Document)org.apache.cxf.common.util.ProxyHelper.getProxy(
-                DOMUtils.class.getClassLoader(), 
-                new Class<?>[] {Document.class}, 
+                DOMUtils.class.getClassLoader(),
+                new Class<?>[] {Document.class},
                 new java.lang.reflect.InvocationHandler() {
                     @Override
                     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
@@ -177,9 +188,9 @@ public final class DOMUtils {
         return emptyDocument;
     }
     /**
-     * Returns a static Document that should always be "empty".  It's useful as a factory for 
-     * for creating Elements and other nodes that will be traversed later and don't need to 
-     * be attached into a document 
+     * Returns a static Document that should always be "empty".  It's useful as a factory for
+     * for creating Elements and other nodes that will be traversed later and don't need to
+     * be attached into a document
      * @return
      */
     public static Document getEmptyDocument() {

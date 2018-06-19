@@ -66,7 +66,7 @@ public class MapTestImpl implements MapTest {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public Map<?, ?> getRawMapStringToInteger() {
         Map r = new HashMap();
-        r.put("key", new Integer(12));
+        r.put("key", Integer.valueOf(12));
         return r;
     }
 

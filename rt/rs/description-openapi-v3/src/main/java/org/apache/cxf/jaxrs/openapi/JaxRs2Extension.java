@@ -139,7 +139,7 @@ public class JaxRs2Extension extends AbstractOpenAPIExtension {
         if (annos.containsKey(DecimalMin.class.getName())) {
             DecimalMin min = (DecimalMin) annos.get(DecimalMin.class.getName());
             if (min.inclusive()) {
-                schema.setMinimum(BigDecimal.valueOf(new Double(min.value())));
+                schema.setMinimum(BigDecimal.valueOf(Double.valueOf(min.value())));
             } else {
                 schema.setExclusiveMinimum(!min.inclusive());
             }
@@ -147,7 +147,7 @@ public class JaxRs2Extension extends AbstractOpenAPIExtension {
         if (annos.containsKey(DecimalMax.class.getName())) {
             DecimalMax max = (DecimalMax) annos.get(DecimalMax.class.getName());
             if (max.inclusive()) {
-                schema.setMaximum(BigDecimal.valueOf(new Double(max.value())));
+                schema.setMaximum(BigDecimal.valueOf(Double.valueOf(max.value())));
             } else {
                 schema.setExclusiveMaximum(!max.inclusive());
             }

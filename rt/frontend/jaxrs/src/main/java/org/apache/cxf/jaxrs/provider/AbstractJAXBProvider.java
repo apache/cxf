@@ -25,6 +25,8 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -352,7 +354,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
                 collectionContextClasses.add(type);
             }
             return JAXBContext.newInstance(
-                collectionContextClasses.toArray(new Class[collectionContextClasses.size()]), cProperties);
+                collectionContextClasses.toArray(new Class[0]), cProperties);
         }
     }
 
@@ -522,7 +524,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     public JAXBContext getPackageContext(Class<?> type) {
         return getPackageContext(type, type);
     }
-    protected JAXBContext getPackageContext(Class<?> type, Type genericType) {
+    protected JAXBContext getPackageContext(final Class<?> type, Type genericType) {
         if (type == null || type == JAXBElement.class) {
             return null;
         }
@@ -531,7 +533,11 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
             JAXBContext context = packageContexts.get(packageName);
             if (context == null) {
                 try {
-                    if (type.getClassLoader() != null && objectFactoryOrIndexAvailable(type)) {
+                    final ClassLoader loader = AccessController.doPrivileged((PrivilegedAction<ClassLoader>) 
+                        () -> {
+                            return type.getClassLoader();
+                        });
+                    if (loader != null && objectFactoryOrIndexAvailable(type)) {
 
                         String contextName = packageName;
                         if (extraClass != null) {
@@ -545,7 +551,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
                             contextName = sb.toString();
                         }
 
-                        context = JAXBContext.newInstance(contextName, type.getClassLoader(), cProperties);
+                        context = JAXBContext.newInstance(contextName, loader, cProperties);
                         packageContexts.put(packageName, context);
                     }
                 } catch (JAXBException ex) {

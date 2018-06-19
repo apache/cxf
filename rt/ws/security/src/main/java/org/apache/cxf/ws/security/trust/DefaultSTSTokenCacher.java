@@ -21,7 +21,6 @@ package org.apache.cxf.ws.security.trust;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -186,7 +185,7 @@ public class DefaultSTSTokenCacher implements STSTokenCacher {
                     try {
                         MessageDigest digest = MessageDigest.getInstance("SHA-256");
                         byte[] bytes = digest.digest(text.getBytes());
-                        return Base64.getMimeEncoder().encodeToString(bytes);
+                        return org.apache.xml.security.utils.XMLUtils.encodeToString(bytes);
                     } catch (NoSuchAlgorithmException e) {
                         // SHA-256 must be supported so not going to happen...
                     }

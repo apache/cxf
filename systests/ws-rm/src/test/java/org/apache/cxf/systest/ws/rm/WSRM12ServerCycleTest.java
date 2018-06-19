@@ -175,7 +175,7 @@ public class WSRM12ServerCycleTest extends AbstractBusClientServerTestBase {
 
         // avoid early client resends
         greeterBus.getExtension(RMManager.class).getConfiguration()
-            .setBaseRetransmissionInterval(new Long(60000));
+            .setBaseRetransmissionInterval(Long.valueOf(60000));
         GreeterService gs = new GreeterService();
         Greeter greeter = gs.getGreeterPort(new LoggingFeature(), new AddressingFeature(), wsrm());
         updateAddressPort(greeter, PORT);
