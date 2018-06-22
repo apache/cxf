@@ -25,13 +25,22 @@
     <version>3.2.6-SNAPSHOT</version>
   </parent>
 
+  <description>
+    Integrate https://tools.ietf.org/html/draft-cavage-http-signatures-09 as JAX-RS filters for signing and verifying requests.
+  </description>
+
   <artifactId>http-signature</artifactId>
 
   <dependencies>
     <dependency>
+      <groupId>org.tomitribe</groupId>
+      <artifactId>tomitribe-http-signatures</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.11</version>
+      <version>4.12</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
