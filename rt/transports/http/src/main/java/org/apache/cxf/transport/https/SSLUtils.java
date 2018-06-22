@@ -19,6 +19,7 @@
 package org.apache.cxf.transport.https;
 
 import java.security.GeneralSecurityException;
+import java.util.Arrays;
 import java.util.logging.Logger;
 
 import javax.net.ssl.HostnameVerifier;
@@ -76,30 +77,35 @@ public final class SSLUtils {
         if (keyManagers == null && parameters instanceof TLSClientParameters) {
             keyManagers = org.apache.cxf.configuration.jsse.SSLUtils.getDefaultKeyStoreManagers(LOG);
         }
-        configureKeyManagersWithCertAlias(parameters, keyManagers);
-        
-        ctx.init(keyManagers, parameters.getTrustManagers(),
+        KeyManager[] configuredKeyManagers = configureKeyManagersWithCertAlias(parameters, keyManagers);
+
+        ctx.init(configuredKeyManagers, parameters.getTrustManagers(),
                  parameters.getSecureRandom());
-        
+
         return ctx;
     }
-        
-    public static void configureKeyManagersWithCertAlias(TLSParameterBase tlsParameters,
+
+    public static KeyManager[] configureKeyManagersWithCertAlias(TLSParameterBase tlsParameters,
                                                       KeyManager[] keyManagers)
         throws GeneralSecurityException {
-        if (tlsParameters.getCertAlias() != null && keyManagers != null) {
-            for (int idx = 0; idx < keyManagers.length; idx++) {
-                if (keyManagers[idx] instanceof X509KeyManager
-                    && !(keyManagers[idx] instanceof AliasedX509ExtendedKeyManager)) {
-                    try {
-                        keyManagers[idx] = new AliasedX509ExtendedKeyManager(tlsParameters.getCertAlias(),
-                                                                             (X509KeyManager)keyManagers[idx]);
-                    } catch (Exception e) {
-                        throw new GeneralSecurityException(e);
-                    }
+        if (tlsParameters.getCertAlias() == null || keyManagers == null) {
+            return keyManagers;
+        }
+
+        KeyManager[] copiedKeyManagers = Arrays.copyOf(keyManagers, keyManagers.length);
+        for (int idx = 0; idx < copiedKeyManagers.length; idx++) {
+            if (copiedKeyManagers[idx] instanceof X509KeyManager
+                && !(copiedKeyManagers[idx] instanceof AliasedX509ExtendedKeyManager)) {
+                try {
+                    copiedKeyManagers[idx] = new AliasedX509ExtendedKeyManager(tlsParameters.getCertAlias(),
+                                                                         (X509KeyManager)copiedKeyManagers[idx]);
+                } catch (Exception e) {
+                    throw new GeneralSecurityException(e);
                 }
             }
         }
+
+        return copiedKeyManagers;
     }
     
     public static SSLEngine createServerSSLEngine(TLSServerParameters parameters) throws Exception {

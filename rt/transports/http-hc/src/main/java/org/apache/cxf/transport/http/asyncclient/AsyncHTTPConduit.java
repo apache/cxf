@@ -883,12 +883,12 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         ctx.getClientSessionContext().setSessionTimeout(tlsClientParameters.getSslCacheTimeout());
         
         KeyManager[] keyManagers = tlsClientParameters.getKeyManagers();
-        org.apache.cxf.transport.https.SSLUtils.configureKeyManagersWithCertAlias(
+        KeyManager[] configuredKeyManagers = org.apache.cxf.transport.https.SSLUtils.configureKeyManagersWithCertAlias(
             tlsClientParameters, keyManagers);
 
-        ctx.init(keyManagers, tlsClientParameters.getTrustManagers(),
+        ctx.init(configuredKeyManagers, tlsClientParameters.getTrustManagers(),
                  tlsClientParameters.getSecureRandom());
-        
+
         sslContext = ctx;
         lastTlsHash = hash;
         sslState = null;

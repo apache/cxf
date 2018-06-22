@@ -22,18 +22,27 @@ package org.apache.cxf.systest.https.clientauth;
 import java.io.InputStream;
 import java.net.URL;
 import java.security.KeyStore;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.configuration.jsse.TLSClientParameters;
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.hello_world.Greeter;
 import org.apache.hello_world.services.SOAPService;
 
@@ -290,7 +299,66 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
         
         connection.disconnect();
     }
-    
+
+    // https://issues.apache.org/jira/browse/CXF-7763
+    @org.junit.Test
+    public void testCheckKeyManagersWithCertAlias() throws Exception {
+        URL url = SOAPService.WSDL_LOCATION;
+        SOAPService service = new SOAPService(url, SOAPService.SERVICE);
+        assertNotNull("Service is null", service);
+
+        // Set up (shared) KeyManagers/TrustManagers
+        X509TrustManager trustManager = new NoOpX509TrustManager();
+        TrustManager[] trustManagers = new TrustManager[1];
+        trustManagers[0] = trustManager;
+
+        KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+
+        try (InputStream inputStream = ClassLoaderUtils.getResourceAsStream("keymanagers.jks", this.getClass())) {
+            KeyStore keyStore = KeyStore.getInstance("JKS");
+            keyStore.load(inputStream, "password".toCharArray());
+
+            kmf.init(keyStore, "password".toCharArray());
+        }
+        KeyManager[] keyManagers = kmf.getKeyManagers();
+
+        // First call to PORT using Morpit
+        TLSClientParameters tlsParams = new TLSClientParameters();
+        tlsParams.setKeyManagers(keyManagers);
+        tlsParams.setCertAlias("morpit");
+        tlsParams.setTrustManagers(trustManagers);
+        tlsParams.setDisableCNCheck(true);
+
+        Greeter port = service.getHttpsPort();
+        assertNotNull("Port is null", port);
+
+        updateAddressPort(port, PORT);
+        Client client = ClientProxy.getClient(port);
+        HTTPConduit http = (HTTPConduit) client.getConduit();
+        http.setTlsClientParameters(tlsParams);
+
+        assertEquals(port.greetMe("Kitty"), "Hello Kitty");
+        ((java.io.Closeable)port).close();
+
+        // Second call to PORT2 using "alice"
+        tlsParams = new TLSClientParameters();
+        tlsParams.setKeyManagers(keyManagers);
+        tlsParams.setCertAlias("alice");
+        tlsParams.setTrustManagers(trustManagers);
+        tlsParams.setDisableCNCheck(true);
+
+        port = service.getHttpsPort();
+        assertNotNull("Port is null", port);
+
+        updateAddressPort(port, PORT2);
+        client = ClientProxy.getClient(port);
+        http = (HTTPConduit) client.getConduit();
+        http.setTlsClientParameters(tlsParams);
+
+        assertEquals(port.greetMe("Kitty"), "Hello Kitty");
+        ((java.io.Closeable)port).close();
+    }
+
     private static final class DisableCNCheckVerifier implements HostnameVerifier {
 
         @Override
@@ -299,4 +367,21 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
         }
         
     };
+
+    private static class NoOpX509TrustManager implements X509TrustManager {
+
+        @Override
+        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+        }
+
+        @Override
+        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+        }
+
+        @Override
+        public X509Certificate[] getAcceptedIssuers() {
+            return null;
+        }
+
+    }
 }
