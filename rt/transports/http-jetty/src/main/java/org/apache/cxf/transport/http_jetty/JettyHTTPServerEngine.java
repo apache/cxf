@@ -706,10 +706,10 @@ public class JettyHTTPServerEngine implements ServerEngine {
                 : SSLContext.getInstance(proto, tlsServerParameters.getJsseProvider());
 
         KeyManager keyManagers[] = tlsServerParameters.getKeyManagers();
-        org.apache.cxf.transport.https.SSLUtils.configureKeyManagersWithCertAlias(
+        KeyManager[] configuredKeyManagers = org.apache.cxf.transport.https.SSLUtils.configureKeyManagersWithCertAlias(
             tlsServerParameters, keyManagers);
 
-        context.init(tlsServerParameters.getKeyManagers(),
+        context.init(configuredKeyManagers,
                      tlsServerParameters.getTrustManagers(),
                      tlsServerParameters.getSecureRandom());
 
