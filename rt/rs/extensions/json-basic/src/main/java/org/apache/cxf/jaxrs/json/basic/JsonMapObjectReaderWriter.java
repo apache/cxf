@@ -245,6 +245,11 @@ public class JsonMapObjectReaderWriter {
                 value = Double.valueOf(valueStr);
             }
         }
+
+        if (value instanceof String) {
+            // Escape an encoded forward slash
+            value = ((String) value).replace("\\/", "/");
+        }
         return value;
     }
 
@@ -264,7 +269,7 @@ public class JsonMapObjectReaderWriter {
         }
         return closingIndex;
     }
-    
+
     protected static int getNextSepCharIndex(String json, char curlyBracketChar, int from) {
         int nextCurlyBracketIndex = -1;
         boolean inString = false;
@@ -282,7 +287,7 @@ public class JsonMapObjectReaderWriter {
         }
         return nextCurlyBracketIndex;
     }
-    
+
     public void setFormat(boolean format) {
         this.format = format;
     }
