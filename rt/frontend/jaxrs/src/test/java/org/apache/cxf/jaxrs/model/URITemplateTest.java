@@ -740,4 +740,17 @@ public class URITemplateTest extends Assert {
         //System.out.println(ut.encodeLiteralCharacters());
         assertEquals("a%20{digit:[0-9]}%20b", ut.encodeLiteralCharacters(false));
     }
+
+    @Test
+    public void testCompareNumberOfLiteralCharacters() {
+        URITemplate t1 = new URITemplate("/foo");
+        URITemplate t2 = new URITemplate("/bar");
+        URITemplate t3 = new URITemplate("/foo/bar");
+        assertEquals(0, URITemplate.compareTemplates(t1, t1));
+        assertTrue(URITemplate.compareTemplates(t1, t3) > 0);
+        assertTrue(URITemplate.compareTemplates(t3, t1) < 0);
+        assertEquals(Integer.signum(URITemplate.compareTemplates(t1, t2)),
+                -Integer.signum(URITemplate.compareTemplates(t2, t1)));
+    }
+
 }
