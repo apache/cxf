@@ -124,4 +124,18 @@ public class JsonMapObjectReaderWriterTest extends Assert {
         assertEquals(1, xMap.size());
         assertEquals("{\\\"}", xMap.get("y"));
     }
+
+    @Test
+    public void testEscapedForwardSlashInString() throws Exception {
+        JsonMapObjectReaderWriter jsonMapObjectReaderWriter = new JsonMapObjectReaderWriter();
+        String s = "{\"kid\":\"4pZbe4shQQGzZXHbeIlbDvmHOc1\\/H6jH6oBk3nUrcZE=\",\"alg\":\"RS256\"}";
+
+        Map<String, Object> map = jsonMapObjectReaderWriter.fromJson(s);
+        assertEquals(2, map.size());
+
+        String kid = (String)map.get("kid");
+        String expectedKid = "4pZbe4shQQGzZXHbeIlbDvmHOc1/H6jH6oBk3nUrcZE=";
+        assertEquals(expectedKid, kid);
+    }
+
 }
