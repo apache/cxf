@@ -54,6 +54,7 @@ import io.undertow.Undertow;
 import io.undertow.Undertow.Builder;
 import io.undertow.UndertowOptions;
 import io.undertow.server.HttpHandler;
+import io.undertow.server.handlers.HttpContinueReadHandler;
 import io.undertow.server.handlers.PathHandler;
 import io.undertow.servlet.api.DeploymentInfo;
 import io.undertow.servlet.api.DeploymentManager;
@@ -209,12 +210,12 @@ public class UndertowHTTPServerEngine implements ServerEngine {
         path = Handlers.path(new NotFoundHandler());
 
         if (url.getPath().length() == 0) {
-            result = result.setHandler(Handlers.trace(undertowHTTPHandler));
+            result = result.setHandler(Handlers.trace(new HttpContinueReadHandler(undertowHTTPHandler)));
         } else {
             if (undertowHTTPHandler.isContextMatchExact()) {
-                path.addExactPath(url.getPath(), undertowHTTPHandler);
+                path.addExactPath(url.getPath(), new HttpContinueReadHandler(undertowHTTPHandler));
             } else {
-                path.addPrefixPath(url.getPath(), undertowHTTPHandler);
+                path.addPrefixPath(url.getPath(), new HttpContinueReadHandler(undertowHTTPHandler));
             }
 
             result = result.setHandler(wrapHandler(path));
