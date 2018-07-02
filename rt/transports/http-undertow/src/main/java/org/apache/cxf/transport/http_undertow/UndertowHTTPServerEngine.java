@@ -210,15 +210,15 @@ public class UndertowHTTPServerEngine implements ServerEngine {
         path = Handlers.path(new NotFoundHandler());
 
         if (url.getPath().length() == 0) {
-            result = result.setHandler(Handlers.trace(new HttpContinueReadHandler(undertowHTTPHandler)));
+            result = result.setHandler(Handlers.trace(undertowHTTPHandler));
         } else {
             if (undertowHTTPHandler.isContextMatchExact()) {
-                path.addExactPath(url.getPath(), new HttpContinueReadHandler(undertowHTTPHandler));
+                path.addExactPath(url.getPath(), undertowHTTPHandler);
             } else {
-                path.addPrefixPath(url.getPath(), new HttpContinueReadHandler(undertowHTTPHandler));
+                path.addPrefixPath(url.getPath(), undertowHTTPHandler);
             }
 
-            result = result.setHandler(wrapHandler(path));
+            result = result.setHandler(wrapHandler(new HttpContinueReadHandler(path)));
         }
 
         result = decorateUndertowSocketConnection(result);
