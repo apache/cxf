@@ -23,7 +23,7 @@ xsi:schemaLocation="http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/ja
                     http://cxf.apache.org/transports/http/configuration
                     http://cxf.apache.org/schemas/configuration/http-conf.xsd 
                     http://www.springframework.org/schema/beans
-                    http://www.springframework.org/schema/beans/spring-beans-4.2.xsd">
+                    http://www.springframework.org/schema/beans/spring-beans.xsd">
     <bean id="Sequential" class="org.apache.cxf.clustering.SequentialStrategy"/>
     <bean id="Random" class="org.apache.cxf.clustering.RandomStrategy"/>
     <jaxws:client name="{http://cxf.apache.org/greeter_control}ReplicatedPortA" createdFromAPI="true">

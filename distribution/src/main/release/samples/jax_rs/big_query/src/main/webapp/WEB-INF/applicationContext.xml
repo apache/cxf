@@ -23,7 +23,7 @@
       xmlns:jaxrsclient="http://cxf.apache.org/jaxrs-client"
       xsi:schemaLocation="
          http://www.springframework.org/schema/beans 
-         http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+         http://www.springframework.org/schema/beans/spring-beans.xsd
          http://cxf.apache.org/jaxrs
          http://cxf.apache.org/schemas/jaxrs.xsd
          http://cxf.apache.org/jaxrs-client
