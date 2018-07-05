@@ -104,7 +104,7 @@
         <dependency>
             <groupId>org.eclipse.microprofile.rest.client</groupId>
             <artifactId>microprofile-rest-client-api</artifactId>
-            <version>1.1.0.20180323</version>
+            <version>1.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -119,7 +119,7 @@
         <dependency>
             <groupId>org.eclipse.microprofile.rest.client</groupId>
             <artifactId>microprofile-rest-client-tck</artifactId>
-            <version>1.1.0.20180323</version>
+            <version>1.1</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.testng</groupId>

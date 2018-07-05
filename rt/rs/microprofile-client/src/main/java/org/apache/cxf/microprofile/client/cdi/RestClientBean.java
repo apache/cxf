@@ -20,13 +20,13 @@ package org.apache.cxf.microprofile.client.cdi;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import javax.enterprise.context.Dependent;
@@ -45,6 +45,7 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 public class RestClientBean implements Bean<Object>, PassivationCapable {
     public static final String REST_URL_FORMAT = "%s/mp-rest/url";
+    public static final String REST_URI_FORMAT = "%s/mp-rest/uri";
     public static final String REST_SCOPE_FORMAT = "%s/mp-rest/scope";
     private static final Default DEFAULT_LITERAL = new DefaultLiteral();
     private final Class<?> clientInterface;
@@ -79,12 +80,8 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
     @Override
     public Object create(CreationalContext<Object> creationalContext) {
         CxfTypeSafeClientBuilder builder = new CxfTypeSafeClientBuilder();
-        String baseUrl = getBaseUrl();
-        try {
-            return builder.baseUrl(new URL(baseUrl)).build(clientInterface);
-        } catch (MalformedURLException e) {
-            throw new IllegalArgumentException("The value of URL was invalid " + baseUrl);
-        }
+        String baseUri = getBaseUri();
+        return builder.baseUri(URI.create(baseUri)).build(clientInterface);
     }
 
     @Override
@@ -122,13 +119,24 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
         return false;
     }
 
-    private String getBaseUrl() {
-        String property = String.format(REST_URL_FORMAT, clientInterface.getName());
-        String baseURL = ConfigFacade.getValue(property, String.class);
-        if (baseURL == null) {
-            throw new IllegalStateException("Unable to determine base URL from configuration");
+    private String getBaseUri() {
+        String interfaceName = clientInterface.getName();
+        String property = String.format(REST_URI_FORMAT, interfaceName);
+        String baseURI = null;
+        try {
+            baseURI = ConfigFacade.getValue(property, String.class);
+        } catch (NoSuchElementException ex) {
+            // no-op - will revert to baseURL config value (as opposed to baseURI)
         }
-        return baseURL;
+        if (baseURI == null) {
+            // revert to baseUrl
+            property = String.format(REST_URL_FORMAT, interfaceName);
+            baseURI = ConfigFacade.getValue(property, String.class);
+            if (baseURI == null) {
+                throw new IllegalStateException("Unable to determine base URI from configuration");
+            }
+        }
+        return baseURI;
     }
 
     private Class<? extends Annotation> readScope() {

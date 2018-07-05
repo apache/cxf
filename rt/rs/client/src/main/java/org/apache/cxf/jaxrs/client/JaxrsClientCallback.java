@@ -22,6 +22,7 @@ package org.apache.cxf.jaxrs.client;
 import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -64,7 +65,7 @@ public class JaxrsClientCallback<T> extends ClientCallback {
         return result;
     }
 
-    public Future<T> createFuture() {
+    public CompletableFuture<T> createFuture() {
         return new JaxrsResponseFuture<T>(this);
     }
 
@@ -96,7 +97,7 @@ public class JaxrsClientCallback<T> extends ClientCallback {
 
 
 
-    static class JaxrsResponseFuture<T> implements Future<T> {
+    static class JaxrsResponseFuture<T> extends CompletableFuture<T> implements Future<T> {
         JaxrsClientCallback<T> callback;
         JaxrsResponseFuture(JaxrsClientCallback<T> cb) {
             callback = cb;

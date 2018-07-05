@@ -50,6 +50,9 @@ public class CxfTypeSafeClientBuilder implements RestClientBuilder, Configurable
 
     @Override
     public RestClientBuilder executorService(ExecutorService executor) {
+        if (null == executor) {
+            throw new IllegalArgumentException("executor must not be null");
+        }
         this.executorService = executor;
         return this;
     }

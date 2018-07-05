@@ -238,6 +238,9 @@ public final class ResponseImpl extends Response {
 
     public URI getLocation() {
         Object header = metadata.getFirst(HttpHeaders.LOCATION);
+        if (header == null) {
+            header = outMessage.get(Message.REQUEST_URI);
+        }
         return header == null || header instanceof URI ? (URI)header
             : URI.create(header.toString());
     }
