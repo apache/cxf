@@ -22,6 +22,7 @@ package org.apache.cxf.systest.https.clientauth;
 import java.io.InputStream;
 import java.net.URL;
 import java.security.KeyStore;
+import java.security.Security;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
@@ -46,6 +47,8 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.hello_world.Greeter;
 import org.apache.hello_world.services.SOAPService;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.jsse.provider.BouncyCastleJsseProvider;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -358,6 +361,55 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
 
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
         ((java.io.Closeable)port).close();
+    }
+
+    // See CXF-7782
+    @org.junit.Test
+    public void testBouncyCastleProvider() throws Exception {
+        try {
+            Security.addProvider(new BouncyCastleProvider());
+            Security.addProvider(new BouncyCastleJsseProvider());
+            URL url = SOAPService.WSDL_LOCATION;
+            SOAPService service = new SOAPService(url, SOAPService.SERVICE);
+            assertNotNull("Service is null", service);
+
+            // Set up (shared) KeyManagers/TrustManagers
+            X509TrustManager trustManager = new NoOpX509TrustManager();
+            TrustManager[] trustManagers = new TrustManager[1];
+            trustManagers[0] = trustManager;
+
+            KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+
+            try (InputStream inputStream = ClassLoaderUtils.getResourceAsStream("keymanagers.jks", this.getClass())) {
+                KeyStore keyStore = KeyStore.getInstance("JKS");
+                keyStore.load(inputStream, "password".toCharArray());
+
+                kmf.init(keyStore, "password".toCharArray());
+            }
+            KeyManager[] keyManagers = kmf.getKeyManagers();
+
+            // First call to PORT using Morpit
+            TLSClientParameters tlsParams = new TLSClientParameters();
+            tlsParams.setJsseProvider(new BouncyCastleJsseProvider().getName());
+            tlsParams.setKeyManagers(keyManagers);
+            tlsParams.setCertAlias("morpit");
+            tlsParams.setTrustManagers(trustManagers);
+            tlsParams.setDisableCNCheck(true);
+
+            Greeter port = service.getHttpsPort();
+            assertNotNull("Port is null", port);
+
+            updateAddressPort(port, PORT);
+            Client client = ClientProxy.getClient(port);
+            HTTPConduit http = (HTTPConduit) client.getConduit();
+            http.setTlsClientParameters(tlsParams);
+
+            assertEquals(port.greetMe("Kitty"), "Hello Kitty");
+            ((java.io.Closeable)port).close();
+        } finally {
+            Security.removeProvider(new BouncyCastleJsseProvider().getName());
+            Security.removeProvider(new BouncyCastleProvider().getName());
+        }
     }
 
     private static final class DisableCNCheckVerifier implements HostnameVerifier {

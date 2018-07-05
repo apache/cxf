@@ -264,6 +264,12 @@
             <groupId>org.littleshoot</groupId>
             <artifactId>littleproxy</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bctls-jdk15on</artifactId>
+            <version>${cxf.bcprov.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <profiles>
         <profile>
