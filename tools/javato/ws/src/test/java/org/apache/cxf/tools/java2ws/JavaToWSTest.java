@@ -32,6 +32,7 @@ import org.apache.cxf.common.util.Compiler;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.tools.common.CommandInterfaceUtils;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.ToolTestBase;
 
@@ -74,7 +75,10 @@ public class JavaToWSTest extends ToolTestBase {
     @Test
     public void testVersionOutput() throws Exception {
         String[] args = new String[] {"-v"};
-        JavaToWS.main(args);
+        CommandInterfaceUtils.commandCommonMain();
+        JavaToWS j2w = new JavaToWS(args);
+        j2w.run();
+
         assertNotNull(getStdOut());
     }
 
@@ -83,7 +87,9 @@ public class JavaToWSTest extends ToolTestBase {
         File wsdlFile = outputFile("tmp.wsdl");
         String[] args = new String[] {"-wsdl", "-o", wsdlFile.getAbsolutePath(), "-s", output.getPath(),
                                       "-client", "-server", "org.apache.hello_world_soap12_http.Greeter"};
-        JavaToWS.main(args);
+        CommandInterfaceUtils.commandCommonMain();
+        JavaToWS j2w = new JavaToWS(args);
+        j2w.run();
         checkStdErr();
         assertTrue("Failed to generate WSDL file", wsdlFile.exists());
     }
@@ -96,7 +102,10 @@ public class JavaToWSTest extends ToolTestBase {
             "-o", output.getPath() + "/cxf2941.wsdl",
             org.apache.cxf.tools.fortest.cxf2941.WebResultService.class.getName()
         };
-        JavaToWS.main(args);
+        CommandInterfaceUtils.commandCommonMain();
+        JavaToWS j2w = new JavaToWS(args);
+        j2w.run();
+
         File wrapper = outputFile("org/apache/cxf/tools/fortest/cxf2941/jaxws/HelloStringResponse.java");
         String str = FileUtils.getStringFromFile(wrapper);
         assertTrue("namespace value in annoataion @XmlElement is not correct",
@@ -114,7 +123,10 @@ public class JavaToWSTest extends ToolTestBase {
             "-o", output.getPath() + "/tmp.wsdl",
             "org.apache.cxf.tools.fortest.cxf2934.WebParamService"
         };
-        JavaToWS.main(args);
+        CommandInterfaceUtils.commandCommonMain();
+        JavaToWS j2w = new JavaToWS(args);
+        j2w.run();
+
         File wrapper = outputFile("org/apache/cxf/tools/fortest/cxf2934/jaxws/HelloStringResponse.java");
         String str = FileUtils.getStringFromFile(wrapper);
         assertTrue("namespace value in annoataion @XmlElement is not correct: " + str,
@@ -128,7 +140,10 @@ public class JavaToWSTest extends ToolTestBase {
             "-o", output.getPath() + "/tmp.wsdl",
             "org.apache.cxf.tools.fortest.cxf1450.WebParamService"
         };
-        JavaToWS.main(args);
+        CommandInterfaceUtils.commandCommonMain();
+        JavaToWS j2w = new JavaToWS(args);
+        j2w.run();
+
         File wrapper = outputFile("org/apache/cxf/tools/fortest/cxf1450/jaxws/HelloStringResponse.java");
         String str = FileUtils.getStringFromFile(wrapper);
         assertTrue("namespace value in annoataion @XmlElement is not correct: " + str,
@@ -148,7 +163,43 @@ public class JavaToWSTest extends ToolTestBase {
                                       output.getPath(), "-frontend", "jaxws", "-client", "-server",
                                       "-address", "http://localhost:1234/test",
                                       "org.apache.hello_world_doc_lit.Greeter"};
+        CommandInterfaceUtils.commandCommonMain();
+        JavaToWS j2w = new JavaToWS(args);
+        j2w.run();
+
+        //checkStdErr();
+        assertTrue("Failed to generate WSDL file", wsdlFile.exists());
+        String str = FileUtils.getStringFromFile(wsdlFile);
+        assertTrue("Port address in generated wsdl is not correct",
+                   str.indexOf("http://localhost:1234/test") > -1);
+        File client = outputFile("org/apache/hello_world_doc_lit/GreeterClient.java");
+        str = FileUtils.getStringFromFile(client);
+        assertTrue("Address generated in client side code is not correct",
+                   str.indexOf("http://localhost:1234/test") > -1);
+
+        File server = outputFile("org/apache/hello_world_doc_lit/GreeterServer.java");
+        str = FileUtils.getStringFromFile(server);
+        assertTrue("Address generated in server side code is not correct",
+                   str.indexOf("http://localhost:1234/test") > -1);
+
+        File impl = outputFile("org/apache/hello_world_doc_lit/GreeterImpl.java");
+        Compiler compiler = new Compiler();
+        String[] files = new String[]{client.getAbsoluteFile().toString(),
+                                     server.getAbsoluteFile().toString(),
+                                     impl.getAbsoluteFile().toString()};
+        compiler.setOutputDir(this.classDir);
+        compiler.compileFiles(files);
+    }
+
+    @Test
+    public void testJaxwsFrontendViaMain() throws Exception {
+        File wsdlFile = outputFile("tmp.wsdl");
+        String[] args = new String[] {"-wsdl", "-o", output.getPath() + "/tmp.wsdl", "-s",
+                                      output.getPath(), "-frontend", "jaxws", "-client", "-server",
+                                      "-address", "http://localhost:1234/test",
+                                      "org.apache.hello_world_doc_lit.Greeter"};
         JavaToWS.main(args);
+
         //checkStdErr();
         assertTrue("Failed to generate WSDL file", wsdlFile.exists());
         String str = FileUtils.getStringFromFile(wsdlFile);
@@ -179,7 +230,10 @@ public class JavaToWSTest extends ToolTestBase {
                                       output.getPath(), "-frontend", "simple", "-client", "-server",
                                       "-address", "http://localhost:1234/test",
                                       "org.apache.cxf.tools.fortest.simple.Hello"};
-        JavaToWS.main(args);
+        CommandInterfaceUtils.commandCommonMain();
+        JavaToWS j2w = new JavaToWS(args);
+        j2w.run();
+
         File client = outputFile("org/apache/cxf/tools/fortest/simple/HelloPortTypeClient.java");
         File server = outputFile("org/apache/cxf/tools/fortest/simple/HelloPortTypeServer.java");
         File impl = outputFile("org/apache/cxf/tools/fortest/simple/HelloPortTypeImpl.java");
@@ -211,13 +265,21 @@ public class JavaToWSTest extends ToolTestBase {
     }
 
     @Test
-    public void testMissingBeans() {
+    public void testMissingBeans() throws Exception {
         String[] args = new String[] {"-wsdl", "-o", output.getPath() + "/tmp.wsdl", "-verbose", "-s",
                                       output.getPath(), "-frontend", "jaxws", "-client", "-server",
                                       "-beans", "nobodyHome.xml",
                                       "-beans", "nothing.xml",
                                       "org.apache.hello_world_doc_lit.Greeter"};
-        JavaToWS.main(args);
+        CommandInterfaceUtils.commandCommonMain();
+        JavaToWS j2w = new JavaToWS(args);
+        try {
+            j2w.run();
+        } catch (Throwable ex) {
+            System.err.println("JavaToWS Error: " + ex.toString());
+            System.err.println();
+        }
+
         String err = getStdErr();
         assertTrue("Missing file error message",
                    err.indexOf("Unable to open bean definition file nobodyHome.xml") >= 0);
@@ -229,7 +291,15 @@ public class JavaToWSTest extends ToolTestBase {
         String[] args = new String[] {"-wsdl", "-o", output.getPath() + "/tmp.wsdl", "-verbose", "-s",
                                       output.getPath(), "-frontend", "jaxws", "-client", "-server",
                                       "org.apache.cxf.tools.fortest.HelloWithNoAnno"};
-        JavaToWS.main(args);
+        CommandInterfaceUtils.commandCommonMain();
+        JavaToWS j2w = new JavaToWS(args);
+        try {
+            j2w.run();
+        } catch (Throwable ex) {
+            System.err.println("JavaToWS Error: " + ex.toString());
+            System.err.println();
+        }
+
         assertTrue("Failed to generate WSDL file", wsdlFile.exists());
         assertTrue("Class does not carry WebService error should be detected", getStdErr()
             .indexOf("does not carry a WebService annotation") > -1);
@@ -241,7 +311,15 @@ public class JavaToWSTest extends ToolTestBase {
         String[] args = new String[] {"-wsdl", "-o", output.getPath() + "/tmp.wsdl", "-verbose",
                                       "-s", output.getPath(), "-frontend", "jaxws", "-client", "-server",
                                       "org.apache.cxf.tools.fortest.HelloRMI"};
-        JavaToWS.main(args);
+        CommandInterfaceUtils.commandCommonMain();
+        JavaToWS j2w = new JavaToWS(args);
+        try {
+            j2w.run();
+        } catch (Throwable ex) {
+            System.err.println("JavaToWS Error: " + ex.toString());
+            System.err.println();
+        }
+
         assertTrue("Failed to generate WSDL file", wsdlFile.exists());
         assertTrue("Parameter or return type implemented java.rmi.Remote interface error should be detected",
                    getStdErr().indexOf("implemented the java.rmi.Remote interface") > -1);
@@ -254,7 +332,10 @@ public class JavaToWSTest extends ToolTestBase {
         File impl = outputFile("org/apache/hello_world_soap12_http/GreeterImpl.java");
         String[] args = new String[] {"-s", output.getPath(), "-client", "-server",
                                       "org.apache.hello_world_soap12_http.Greeter"};
-        JavaToWS.main(args);
+        CommandInterfaceUtils.commandCommonMain();
+        JavaToWS j2w = new JavaToWS(args);
+        j2w.run();
+
         checkStdErr();
         assertTrue("Client was not generated", client.exists());
         assertTrue("Greeter_GreeterPort_Server.java was not generated", server.exists());
@@ -276,7 +357,10 @@ public class JavaToWSTest extends ToolTestBase {
 
         String[] args = new String[] {"-s", output.getPath(), "-server",
                                       "org.apache.hello_world_soap12_http.Greeter"};
-        JavaToWS.main(args);
+        CommandInterfaceUtils.commandCommonMain();
+        JavaToWS j2w = new JavaToWS(args);
+        j2w.run();
+
         checkStdErr();
         assertTrue("GreeterServer.java was not generated", server.exists());
         assertTrue("GreeterImpl.java was not generated", impl.exists());
@@ -294,7 +378,15 @@ public class JavaToWSTest extends ToolTestBase {
     public void testInvalidFlag() throws Exception {
         String[] args = new String[] {"-frontend", "tmp", "-wsdl", "-o", output.getPath() + "/tmp.wsdl",
                                       "org.apache.hello_world_soap12_http.Greeter"};
-        JavaToWS.main(args);
+        CommandInterfaceUtils.commandCommonMain();
+        JavaToWS j2w = new JavaToWS(args);
+        try {
+            j2w.run();
+        } catch (Throwable ex) {
+            System.err.println("JavaToWS Error: " + ex.toString());
+            System.err.println();
+        }
+
         assertTrue("invalid frontend flag should be detected", getStdErr()
             .indexOf("is not a valid frontend,") > -1);
     }
@@ -304,7 +396,15 @@ public class JavaToWSTest extends ToolTestBase {
         String[] args = new String[] {"-frontend", "simple", "-wrapperbean", "-wsdl", "-o",
                                       output.getPath() + "/tmp.wsdl",
                                       "org.apache.hello_world_soap12_http.Greeter"};
-        JavaToWS.main(args);
+        CommandInterfaceUtils.commandCommonMain();
+        JavaToWS j2w = new JavaToWS(args);
+        try {
+            j2w.run();
+        } catch (Throwable ex) {
+            System.err.println("JavaToWS Error: " + ex.toString());
+            System.err.println();
+        }
+
         assertTrue("wrapperbean flag error should be detected", getStdErr()
             .indexOf("-wrapperbean is only valid for the jaxws front end.") > -1);
     }
@@ -315,7 +415,15 @@ public class JavaToWSTest extends ToolTestBase {
                                       "-wsdl", "-o",
                                       output.getPath() + "/tmp.wsdl",
                                       "org.apache.hello_world_soap12_http.Greeter"};
-        JavaToWS.main(args);
+        CommandInterfaceUtils.commandCommonMain();
+        JavaToWS j2w = new JavaToWS(args);
+        try {
+            j2w.run();
+        } catch (Throwable ex) {
+            System.err.println("JavaToWS Error: " + ex.toString());
+            System.err.println();
+        }
+
         assertTrue("jaxb databinding warning should be detected", getStdErr()
                    .indexOf("Simple front end only supports aegis databinding") > -1);
     }
@@ -327,7 +435,10 @@ public class JavaToWSTest extends ToolTestBase {
         String[] args = new String[] {"-wsdl", "-o", output.getPath() + "/tmp.wsdl", "-verbose", "-s",
                                       output.getPath(), "-frontend", "jaxws", "-client", "-server",
                                       org.apache.cxf.tools.fortest.GreeterImpl.class.getName()};
-        JavaToWS.main(args);
+        CommandInterfaceUtils.commandCommonMain();
+        JavaToWS j2w = new JavaToWS(args);
+        j2w.run();
+
         assertTrue("Failed to generate WSDL file", wsdlFile.exists());
 
         File sei = outputFile("org/apache/cxf/tools/fortest/GreeterImpl_PortType.java");
@@ -342,7 +453,9 @@ public class JavaToWSTest extends ToolTestBase {
     public void testXmlList() throws Exception {
         String[] args = new String[] {"-o", output.getPath() + "/xml-list.wsdl", "-verbose",
                                       "-wsdl", "org.apache.cxf.tools.fortest.xmllist.AddNumbersPortType"};
-        JavaToWS.main(args);
+        CommandInterfaceUtils.commandCommonMain();
+        JavaToWS j2w = new JavaToWS(args);
+        j2w.run();
 
         File file = new File(output.getPath() + "/xml-list.wsdl");
 
@@ -362,7 +475,10 @@ public class JavaToWSTest extends ToolTestBase {
     public void testXmlAttachementRef() throws Exception {
         String[] args = new String[] {"-o", output.getPath() + "/swa-ref.wsdl", "-verbose",
                                       "-wsdl", "org.apache.attachment.AddNumbersImpl"};
-        JavaToWS.main(args);
+        CommandInterfaceUtils.commandCommonMain();
+        JavaToWS j2w = new JavaToWS(args);
+        j2w.run();
+
         File file = new File(output.getPath() + "/AddNumbers.wsdl");
         String str = FileUtils.getStringFromFile(file);
         String swaImport = "http://ws-i.org/profiles/basic/1.1/xsd";
@@ -378,7 +494,10 @@ public class JavaToWSTest extends ToolTestBase {
         String[] args = new String[] {"-o", output.getPath() + "/xmladapter.wsdl", "-verbose",
                                       "-wsdl", "org.apache.xmladapter.GreeterImpl"};
 
-        JavaToWS.main(args);
+        CommandInterfaceUtils.commandCommonMain();
+        JavaToWS j2w = new JavaToWS(args);
+        j2w.run();
+
         File file = new File(output.getPath() + "/xmladapter.wsdl");
 
         Document doc = StaxUtils.read(file);

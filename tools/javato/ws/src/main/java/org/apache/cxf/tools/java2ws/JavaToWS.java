@@ -98,7 +98,7 @@ public class JavaToWS {
     }
 
     private boolean isExitOnFinish() {
-        String exit = System.getProperty("exitOnFinish");
+        String exit = System.getProperty("exitOnFinish", "true");
         if (StringUtils.isEmpty(exit)) {
             return false;
         }

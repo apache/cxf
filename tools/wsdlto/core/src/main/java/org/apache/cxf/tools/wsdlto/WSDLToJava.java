@@ -75,7 +75,7 @@ public class WSDLToJava {
     }
 
     private boolean isExitOnFinish() {
-        String exit = System.getProperty("exitOnFinish");
+        String exit = System.getProperty("exitOnFinish", "true");
         if (StringUtils.isEmpty(exit)) {
             return false;
         }
@@ -177,7 +177,7 @@ public class WSDLToJava {
 
     public static void main(String[] pargs) {
         System.setProperty("org.apache.cxf.JDKBugHacks.defaultUsesCaches", "true");
-        
+
         CommandInterfaceUtils.commandCommonMain();
         WSDLToJava w2j = new WSDLToJava(pargs);
         try {
@@ -203,9 +203,6 @@ public class WSDLToJava {
             if (w2j.isExitOnFinish()) {
                 System.exit(1);
             }
-        }
-        if (w2j.isExitOnFinish()) {
-            System.exit(0);
         }
     }
 

@@ -46,7 +46,7 @@ public class WADLToJava {
 
 
     private boolean isExitOnFinish() {
-        String exit = System.getProperty("exitOnFinish");
+        String exit = System.getProperty("exitOnFinish", "true");
         if (StringUtils.isEmpty(exit)) {
             return false;
         }
@@ -117,9 +117,6 @@ public class WADLToJava {
             if (w2j.isExitOnFinish()) {
                 System.exit(1);
             }
-        }
-        if (w2j.isExitOnFinish()) {
-            System.exit(0);
         }
     }
 
