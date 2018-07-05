@@ -70,10 +70,6 @@ public final class SSLUtils {
         SSLContext ctx = provider == null ? SSLContext.getInstance(protocol) : SSLContext
             .getInstance(protocol, provider);
 
-        if (parameters instanceof TLSClientParameters) {
-            ctx.getClientSessionContext().setSessionTimeout(((TLSClientParameters)parameters).getSslCacheTimeout());
-        }
-
         KeyManager[] keyManagers = parameters.getKeyManagers();
         if (keyManagers == null && parameters instanceof TLSClientParameters) {
             keyManagers = org.apache.cxf.configuration.jsse.SSLUtils.getDefaultKeyStoreManagers(LOG);
@@ -86,6 +82,10 @@ public final class SSLUtils {
         }
 
         ctx.init(configuredKeyManagers, trustManagers, parameters.getSecureRandom());
+
+        if (parameters instanceof TLSClientParameters && ctx.getClientSessionContext() != null) {
+            ctx.getClientSessionContext().setSessionTimeout(((TLSClientParameters)parameters).getSslCacheTimeout());
+        }
 
         return ctx;
     }
