@@ -33,7 +33,7 @@
     <url>http://cxf.apache.org</url>
     <properties>
         <cxf.geronimo.config.version>1.0</cxf.geronimo.config.version>
-        <cxf.microprofile.rest.client.version>1.1.0.20180323</cxf.microprofile.rest.client.version>
+        <cxf.microprofile.rest.client.version>1.1</cxf.microprofile.rest.client.version>
         <cxf.wiremock.params>--port=8765</cxf.wiremock.params>
         <cxf.weld.se.version>2.4.5.Final</cxf.weld.se.version>
         <cxf.arquillian.weld.container.version>2.0.0.Final</cxf.arquillian.weld.container.version>

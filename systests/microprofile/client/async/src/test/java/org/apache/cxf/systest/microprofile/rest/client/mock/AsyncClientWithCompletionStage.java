@@ -19,15 +19,15 @@
 
 package org.apache.cxf.systest.microprofile.rest.client.mock;
 
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletionStage;
 
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
-public interface AsyncClientWithFuture {
+public interface AsyncClientWithCompletionStage {
 
     @PUT
     @Path("/test")
-    Future<Response> put(String text);
+    CompletionStage<Response> put(String text);
 }

@@ -23,8 +23,8 @@ import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 
 import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.core.Response;
@@ -35,25 +35,19 @@ import org.apache.cxf.jaxrs.client.JaxrsClientCallback;
 import org.apache.cxf.jaxrs.client.LocalClientState;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
-import org.apache.cxf.jaxrs.model.Parameter;
-import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.microprofile.client.MicroProfileClientProviderFactory;
 import org.eclipse.microprofile.rest.client.ext.ResponseExceptionMapper;
 
 public class MicroProfileClientProxyImpl extends ClientProxyImpl {
-    private static final InvocationCallback<Object> MARKER_CALLBACK = new InvocationCallback<Object>() {
+
+    private static final InvocationCallback<Object> NO_OP_CALLBACK = new InvocationCallback<Object>() {
+        @Override
+        public void failed(Throwable t) { }
 
         @Override
-        public void completed(Object paramRESPONSE) {
-            // no-op
-        }
-
-        @Override
-        public void failed(Throwable paramThrowable) {
-            // no-op
-        }
+        public void completed(Object o) { }
     };
 
     private final MPAsyncInvocationInterceptorImpl aiiImpl = new MPAsyncInvocationInterceptorImpl();
@@ -79,12 +73,19 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
     protected InvocationCallback<Object> checkAsyncCallback(OperationResourceInfo ori,
                                                             Map<String, Object> reqContext,
                                                             Message outMessage) {
-        if (Future.class.equals(ori.getMethodToInvoke().getReturnType())) {
-            return MARKER_CALLBACK;
+        InvocationCallback<Object> callback = outMessage.getContent(InvocationCallback.class);
+        if (callback == null && CompletionStage.class.equals(ori.getMethodToInvoke().getReturnType())) {
+            callback = NO_OP_CALLBACK;
+            outMessage.setContent(InvocationCallback.class, callback);
         }
-        return outMessage.getContent(InvocationCallback.class);
+        return callback;
     }
 
+    protected boolean checkAsyncReturnType(OperationResourceInfo ori,
+                                           Map<String, Object> reqContext,
+                                           Message outMessage) {
+        return CompletionStage.class.equals(ori.getMethodToInvoke().getReturnType());
+    }
 
     @Override
     protected Object doInvokeAsync(OperationResourceInfo ori, Message outMessage,
@@ -94,12 +95,8 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
 
         super.doInvokeAsync(ori, outMessage, asyncCallback);
 
-        Future<?> future = null;
-        if (asyncCallback == MARKER_CALLBACK) {
-            JaxrsClientCallback<?> cb = outMessage.getExchange().get(JaxrsClientCallback.class);
-            future = cb.createFuture();
-        }
-        return future;
+        JaxrsClientCallback<?> cb = outMessage.getExchange().get(JaxrsClientCallback.class);
+        return cb.createFuture();
     }
 
     @Override
@@ -127,29 +124,11 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
 
     @Override
     protected Class<?> getReturnType(Method method, Message outMessage) {
-        if (!outMessage.getExchange().isSynchronous()) {
-            InvocationCallback<?> callback = outMessage.getContent(InvocationCallback.class);
-            if (callback != null) {
-                Type t = getCallbackType(callback);
-                if (t instanceof Class) {
-                    return (Class<?>) t;
-                }
-            }
-        }
         Class<?> returnType = super.getReturnType(method, outMessage);
-        if (Future.class.isAssignableFrom(returnType)) {
+        if (CompletionStage.class.isAssignableFrom(returnType)) {
             Type t = method.getGenericReturnType();
             returnType = InjectionUtils.getActualType(t);
         }
         return returnType;
-    }
-
-    @Override
-    protected boolean isIgnorableParameter(Method m, Parameter p) {
-        if (p.getType() == ParameterType.CONTEXT) {
-            return true;
-        }
-        return p.getType() == ParameterType.REQUEST_BODY
-            && m.getParameterTypes()[p.getIndex()] == InvocationCallback.class;
     }
 }

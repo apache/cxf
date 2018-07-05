@@ -824,7 +824,6 @@ public class ClientProxyImpl extends AbstractClient implements
             }
         }
         return null;
-
     }
 
     private InvocationCallback<Object> doCheckAsyncCallback(OperationResourceInfo ori,
