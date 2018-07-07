@@ -484,10 +484,11 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
                 newRemoteAddr = (originalRemoteAddr.split(",")[0]).trim();
             }
             newRequestUri = calculateNewRequestUri(request, originalPrefix);
+            String outermostHost = (originalHost.split(",")[0]).trim();
             newRequestUrl = calculateNewRequestUrl(request, 
                                                    originalProto, 
                                                    originalPrefix,
-                                                   originalHost,
+                                                   outermostHost,
                                                    originalPort);
             newContextPath = calculateNewContextPath(request, originalPrefix);
             newServletPath = calculateNewServletPath(request, originalPrefix);
