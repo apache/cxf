@@ -43,6 +43,8 @@ public class XForwardedServletFilter implements Filter {
         HttpServletRequest httpReq = (HttpServletRequest)req;
         if (httpReq.getHeader("USE_XFORWARDED") != null) {
             httpReq = new HttpServletRequestXForwardedFilter(httpReq);
+        } else if (httpReq.getHeader("USE_XFORWARDED_MANY_HOSTS") != null) {
+            httpReq = new HttpServletRequestXForwardedFilter(httpReq, true);
         }
         chain.doFilter(httpReq, resp);
     }
@@ -54,9 +56,15 @@ public class XForwardedServletFilter implements Filter {
     }
 
     private static class HttpServletRequestXForwardedFilter extends HttpServletRequestWrapper {
+        private final boolean multihost;
 
         HttpServletRequestXForwardedFilter(HttpServletRequest request) {
+            this(request, false);
+        }
+
+        HttpServletRequestXForwardedFilter(HttpServletRequest request, boolean multihost) {
             super(request);
+            this.multihost = multihost;
         }
 
         @Override
@@ -70,7 +78,7 @@ public class XForwardedServletFilter implements Filter {
             } else if ("X-Forwarded-Port".equals(name)) {
                 return "8090";
             } else if ("X-Forwarded-Host".equals(name)) {
-                return "external";
+                return !multihost ? "external" : "external1, external2, external3";
             } else { 
                 return super.getHeader(name);
             }
