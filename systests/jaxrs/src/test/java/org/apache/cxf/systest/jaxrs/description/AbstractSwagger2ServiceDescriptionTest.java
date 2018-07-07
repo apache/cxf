@@ -62,6 +62,16 @@ import static org.hamcrest.CoreMatchers.equalTo;
 public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBusClientServerTestBase {
     static final String SECURITY_DEFINITION_NAME = "basicAuth";
     
+    protected enum XForwarded {
+        NONE,
+        ONE_HOST,
+        MANY_HOSTS;
+        
+        boolean isSet() {
+            return this != NONE;
+        }
+    }
+    
     private static final String CONTACT = "cxf@apache.org";
     private static final String TITLE = "CXF unittest";
     private static final String DESCRIPTION = "API Description";
@@ -131,23 +141,26 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
     protected abstract String getExpectedFileYaml();
 
     protected void doTestApiListingIsProperlyReturnedJSON() throws Exception {
-        doTestApiListingIsProperlyReturnedJSON(false);
+        doTestApiListingIsProperlyReturnedJSON(XForwarded.NONE);
     }
-    protected void doTestApiListingIsProperlyReturnedJSON(boolean useXForwarded) throws Exception {
+    protected void doTestApiListingIsProperlyReturnedJSON(XForwarded useXForwarded) throws Exception {
         doTestApiListingIsProperlyReturnedJSON(createWebClient("/swagger.json"), 
                                                useXForwarded);
         checkUiResource();
     }
     protected static void doTestApiListingIsProperlyReturnedJSON(final WebClient client,
-                                                          boolean useXForwarded) throws Exception {    
-        if (useXForwarded) {
+                                                          XForwarded useXForwarded) throws Exception {    
+        if (useXForwarded == XForwarded.ONE_HOST) {
             client.header("USE_XFORWARDED", true);
+        } else if (useXForwarded == XForwarded.MANY_HOSTS) {
+            client.header("USE_XFORWARDED_MANY_HOSTS", true);
         }
+        
         try {
             String swaggerJson = client.get(String.class);
             UserApplication ap = SwaggerParseUtils.getUserApplicationFromJson(swaggerJson);
             assertNotNull(ap);
-            assertEquals(useXForwarded ? "/reverse" : "/", ap.getBasePath());
+            assertEquals(useXForwarded.isSet() ? "/reverse" : "/", ap.getBasePath());
             
             List<UserResource> urs = ap.getResources();
             assertNotNull(urs);

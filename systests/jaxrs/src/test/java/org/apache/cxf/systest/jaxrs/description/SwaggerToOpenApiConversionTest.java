@@ -33,6 +33,7 @@ import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.swagger.Swagger2Feature;
 import org.apache.cxf.jaxrs.swagger.openapi.SwaggerToOpenApiConversionFilter;
+import org.apache.cxf.systest.jaxrs.description.AbstractSwagger2ServiceDescriptionTest.XForwarded;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
@@ -265,6 +266,6 @@ public class SwaggerToOpenApiConversionTest extends AbstractBusClientServerTestB
     
     private void doTestSwagger2JSON() throws Exception {    
         final WebClient client = createWebClient("/swagger.json");
-        AbstractSwagger2ServiceDescriptionTest.doTestApiListingIsProperlyReturnedJSON(client, false);
+        AbstractSwagger2ServiceDescriptionTest.doTestApiListingIsProperlyReturnedJSON(client, XForwarded.NONE);
     }
 }

@@ -40,7 +40,12 @@ public class Swagger2XForwardedDescriptionTest extends AbstractSwagger2ServiceDe
     
     @Test
     public void testApiListingIsProperlyReturnedJSONXForwarded() throws Exception {
-        doTestApiListingIsProperlyReturnedJSON(true);
+        doTestApiListingIsProperlyReturnedJSON(XForwarded.ONE_HOST);
+    }
+    
+    @Test
+    public void testApiListingIsProperlyReturnedJSONXForwardedManyHosts() throws Exception {
+        doTestApiListingIsProperlyReturnedJSON(XForwarded.MANY_HOSTS);
     }
 
     @Override

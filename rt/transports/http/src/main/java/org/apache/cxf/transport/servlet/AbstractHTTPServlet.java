@@ -484,7 +484,12 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
                 newRemoteAddr = (originalRemoteAddr.split(",")[0]).trim();
             }
             newRequestUri = calculateNewRequestUri(request, originalPrefix);
-            String outermostHost = (originalHost.split(",")[0]).trim();
+            // Although per Mozilla documentation 
+            // (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-Host) 
+            // it should contain one value, Apache's mod_proxy says the comma separated list could 
+            // be returned (http://httpd.apache.org/docs/2.2/mod/mod_proxy.html). We don't need
+            // more than 2 components.
+            String outermostHost = originalHost != null ? (originalHost.split(",", 2)[0]).trim() : originalHost;
             newRequestUrl = calculateNewRequestUrl(request, 
                                                    originalProto, 
                                                    originalPrefix,
