@@ -20,6 +20,7 @@
 package org.apache.cxf.rs.security.saml.sso;
 
 import java.util.Collections;
+import java.util.Date;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -28,11 +29,15 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
+import org.apache.wss4j.common.saml.bean.NameIDBean;
+import org.apache.wss4j.common.saml.builder.SAML2ComponentBuilder;
 import org.opensaml.saml.common.SAMLVersion;
 import org.opensaml.saml.saml2.core.AuthnContextClassRef;
 import org.opensaml.saml.saml2.core.AuthnContextComparisonTypeEnumeration;
 import org.opensaml.saml.saml2.core.AuthnRequest;
 import org.opensaml.saml.saml2.core.Issuer;
+import org.opensaml.saml.saml2.core.LogoutRequest;
+import org.opensaml.saml.saml2.core.NameID;
 import org.opensaml.saml.saml2.core.NameIDPolicy;
 import org.opensaml.saml.saml2.core.RequestedAuthnContext;
 
@@ -107,4 +112,27 @@ public class AuthnRequestBuilderTest extends org.junit.Assert {
             + "underscores, hyphens, and periods.", authnRequest.getID().matches("^[_a-zA-Z][-_0-9a-zA-Z\\.]+$"));
     }
 
+    @org.junit.Test
+    public void testCreateLogoutRequest() throws Exception {
+        Document doc = DOMUtils.createDocument();
+
+        Issuer issuer =
+            SamlpRequestComponentBuilder.createIssuer("http://localhost:9001/app");
+
+        NameIDBean nameIdBean = new NameIDBean();
+        nameIdBean.setNameValue("uid=joe,ou=people,ou=saml-demo,o=example.com");
+        nameIdBean.setNameQualifier("www.example.com");
+        NameID nameID = SAML2ComponentBuilder.createNameID(nameIdBean);
+
+        Date notOnOrAfter = new Date();
+        notOnOrAfter.setTime(notOnOrAfter.getTime() + 60L * 1000L);
+        LogoutRequest logoutRequest =
+            SamlpRequestComponentBuilder.createLogoutRequest(SAMLVersion.VERSION_20, issuer, null, null,
+                                                             notOnOrAfter, null, nameID);
+
+        Element policyElement = OpenSAMLUtil.toDom(logoutRequest, doc);
+        doc.appendChild(policyElement);
+        // String outputString = DOM2Writer.nodeToString(policyElement);
+        assertNotNull(policyElement);
+    }
 }
