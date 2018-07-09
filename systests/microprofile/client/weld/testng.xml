@@ -1,0 +1,27 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+ 
+<suite name="MPRestClientTCK1.1">
+    <test name="All tests except Executor Service Test">
+        <packages>
+            <package name="org.eclipse.microprofile.rest.client.tck" />
+            <package name="org.eclipse.microprofile.rest.client.tck.cditests" />
+        </packages>
+        <classes>
+            <class name="org.eclipse.microprofile.rest.client.tck.asynctests.CDIInvokeSimpleGetOperationTest" />
+            <class name="org.eclipse.microprofile.rest.client.tck.asynctests.AsyncMethodTest">
+                <methods>
+                    <exclude name="testExecutorService" />
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="Solo Executor Service Test">
+        <classes>
+            <class name="org.eclipse.microprofile.rest.client.tck.asynctests.AsyncMethodTest">
+                <methods>
+                    <include name="testExecutorService" />
+                </methods>
+            </class>
+        </classes>
+    </test>
+</suite>
