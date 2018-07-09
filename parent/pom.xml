@@ -170,7 +170,6 @@
         <cxf.wss4j.version>2.2.2</cxf.wss4j.version>
         <cxf.xbean.version>3.5</cxf.xbean.version>
         <cxf.xerces.version>2.11.0</cxf.xerces.version>
-        <cxf.xmlbeans.version>2.6.0</cxf.xmlbeans.version>
         <cxf.xmlschema.version>2.2.3</cxf.xmlschema.version>
         <cxf.xpp3.bundle.version>1.1.4c_6</cxf.xpp3.bundle.version>
         <cxf.validation.api.version>1.1.0.Final</cxf.validation.api.version>
@@ -198,7 +197,6 @@
         <cxf.pax.logging.version>1.6.0</cxf.pax.logging.version>
         <cxf.pax.exam.version>4.10.0</cxf.pax.exam.version>
         <cxf.felix.configadmin.version>1.2.4</cxf.felix.configadmin.version>
-        <cxf.xmlbeans.bundle.version>2.6.0_2</cxf.xmlbeans.bundle.version>
         <cxf.servicemix.aspectj.version>1.8.7_2</cxf.servicemix.aspectj.version>
         <cxf.servicemix.cglib.version>3.2.0_1</cxf.servicemix.cglib.version>
         <cxf.servicemix.jodatime.version>2.3_1</cxf.servicemix.jodatime.version>
@@ -722,11 +720,6 @@
             <dependency>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-rt-databinding-sdo</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-rt-databinding-xmlbeans</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -2278,17 +2271,6 @@
                 <groupId>org.apache.xbean</groupId>
                 <artifactId>xbean-spring</artifactId>
                 <version>${cxf.xbean.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.xmlbeans</groupId>
-                <artifactId>xmlbeans</artifactId>
-                <version>${cxf.xmlbeans.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>stax</groupId>
-                        <artifactId>stax-api</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>xml-resolver</groupId>
