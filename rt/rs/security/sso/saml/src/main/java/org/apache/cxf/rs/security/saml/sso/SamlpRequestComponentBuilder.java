@@ -19,6 +19,7 @@
 
 package org.apache.cxf.rs.security.saml.sso;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,6 +33,8 @@ import org.opensaml.saml.saml2.core.AuthnContextComparisonTypeEnumeration;
 import org.opensaml.saml.saml2.core.AuthnContextDeclRef;
 import org.opensaml.saml.saml2.core.AuthnRequest;
 import org.opensaml.saml.saml2.core.Issuer;
+import org.opensaml.saml.saml2.core.LogoutRequest;
+import org.opensaml.saml.saml2.core.NameID;
 import org.opensaml.saml.saml2.core.NameIDPolicy;
 import org.opensaml.saml.saml2.core.RequestedAuthnContext;
 
@@ -41,7 +44,9 @@ import org.opensaml.saml.saml2.core.RequestedAuthnContext;
 public final class SamlpRequestComponentBuilder {
     
     private static volatile SAMLObjectBuilder<AuthnRequest> authnRequestBuilder;
-    
+
+    private static volatile SAMLObjectBuilder<LogoutRequest> logoutRequestBuilder;
+
     private static volatile SAMLObjectBuilder<Issuer> issuerBuilder;
     
     private static volatile SAMLObjectBuilder<NameIDPolicy> nameIDBuilder;
@@ -89,7 +94,36 @@ public final class SamlpRequestComponentBuilder {
         
         return authnRequest;
     }
-    
+
+    public static LogoutRequest createLogoutRequest(
+        SAMLVersion version,
+        Issuer issuer,
+        String destination,
+        String consent,
+        Date notOnOrAfter,
+        String reason,
+        NameID nameID
+    ) {
+        if (logoutRequestBuilder == null) {
+            logoutRequestBuilder = (SAMLObjectBuilder<LogoutRequest>)
+                builderFactory.getBuilder(LogoutRequest.DEFAULT_ELEMENT_NAME);
+        }
+        LogoutRequest logoutRequest = logoutRequestBuilder.buildObject();
+        logoutRequest.setID("_" + UUID.randomUUID());
+        logoutRequest.setVersion(version);
+        logoutRequest.setIssueInstant(new DateTime());
+        logoutRequest.setDestination(destination);
+        logoutRequest.setConsent(consent);
+        logoutRequest.setIssuer(issuer);
+        if (notOnOrAfter != null) {
+            logoutRequest.setNotOnOrAfter(new DateTime(notOnOrAfter.getTime()));
+        }
+        logoutRequest.setReason(reason);
+        logoutRequest.setNameID(nameID);
+
+        return logoutRequest;
+    }
+
     @SuppressWarnings("unchecked")
     public static Issuer createIssuer(
         String issuerValue
