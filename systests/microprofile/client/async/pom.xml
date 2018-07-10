@@ -31,6 +31,7 @@
     <description>Apache CXF System Tests - MicroProfile Rest Client Async Tests</description>
     <url>http://cxf.apache.org</url>
     <properties>
+        <cxf.module.name>org.apache.cxf.systests.microprofile.async</cxf.module.name>
         <cxf.geronimo.config.version>1.0</cxf.geronimo.config.version>
         <cxf.microprofile.rest.client.version>1.1</cxf.microprofile.rest.client.version>
         <cxf.wiremock.params>--port=8765</cxf.wiremock.params>
