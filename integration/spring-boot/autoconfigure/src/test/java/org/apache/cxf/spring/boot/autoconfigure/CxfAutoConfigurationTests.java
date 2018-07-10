@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.spring.boot.autoconfigure;
 
+import java.util.Map;
+
 import org.hamcrest.Matcher;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.boot.test.util.TestPropertyValues;
@@ -34,10 +36,9 @@ import org.junit.rules.ExpectedException;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasItem;
-
-import java.util.Map;
-
 import static org.junit.Assert.assertThat;
+
+
 
 /**
  * Tests for {@link CxfAutoConfiguration}.
