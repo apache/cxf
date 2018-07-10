@@ -142,7 +142,6 @@ public class EngineLifecycleTest extends Assert {
     }
 
     public void shutdownService() throws Exception {
-        applicationContext.destroy();
         applicationContext.close();
     }
 

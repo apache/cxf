@@ -77,7 +77,6 @@ public abstract class AbstractCXFSpringTest extends AbstractCXFTest {
     @After
     public void teardownBeans() {
         applicationContext.close();
-        applicationContext.destroy();
         applicationContext = null;
     }
 

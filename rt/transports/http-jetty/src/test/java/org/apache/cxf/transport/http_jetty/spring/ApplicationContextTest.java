@@ -85,7 +85,6 @@ public class ApplicationContextTest extends Assert {
         //ctx.refresh();
         checkContext(ctx);
         ctx.close();
-        ctx.destroy();
     }
     @Test
     public void testContextWithProperties() throws Exception {
@@ -96,7 +95,6 @@ public class ApplicationContextTest extends Assert {
             new String[] {S1, s4});
         checkContext(ctx);
         ctx.close();
-        ctx.destroy();
     }
     private void checkContext(TestApplicationContext ctx) throws Exception {
         ConfigurerImpl cfg = new ConfigurerImpl(ctx);

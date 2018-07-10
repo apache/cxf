@@ -67,7 +67,7 @@ public class SpringBusFactoryTest extends Assert {
         checkBindingExtensions(bus);
         checkHTTPTransportFactories(bus);
         checkOtherCoreExtensions(bus);
-        ctx.destroy();
+        ctx.close();
     }
     @Test
     public void testLoadBusWithApplicationContext() throws BusException {

@@ -58,10 +58,10 @@ public class CxfAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(name = "cxfServletRegistration")
-    public ServletRegistrationBean cxfServletRegistration() {
+    public ServletRegistrationBean<CXFServlet> cxfServletRegistration() {
         String path = this.properties.getPath();
         String urlMapping = path.endsWith("/") ? path + "*" : path + "/*";
-        ServletRegistrationBean registration = new ServletRegistrationBean(
+        ServletRegistrationBean<CXFServlet> registration = new ServletRegistrationBean<>(
                 new CXFServlet(), urlMapping);
         CxfProperties.Servlet servletProperties = this.properties.getServlet();
         registration.setLoadOnStartup(servletProperties.getLoadOnStartup());

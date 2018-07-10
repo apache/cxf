@@ -95,6 +95,7 @@ public final class SamlpRequestComponentBuilder {
         return authnRequest;
     }
 
+    @SuppressWarnings("unchecked")
     public static LogoutRequest createLogoutRequest(
         SAMLVersion version,
         Issuer issuer,
