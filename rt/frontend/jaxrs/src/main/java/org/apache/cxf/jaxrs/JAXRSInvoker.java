@@ -158,8 +158,9 @@ public class JAXRSInvoker extends AbstractInvoker {
         final ClassResourceInfo cri = ori.getClassResourceInfo();
         final Message inMessage = exchange.getInMessage();
         final ServerProviderFactory providerFactory = ServerProviderFactory.getInstance(inMessage);
+        cri.injectContexts(resourceObject, ori, inMessage);
+
         if (cri.isRoot()) {
-            cri.injectContexts(resourceObject, ori, inMessage);
             ProviderInfo<Application> appProvider = providerFactory.getApplicationProvider();
             if (appProvider != null) {
                 InjectionUtils.injectContexts(appProvider.getProvider(),
