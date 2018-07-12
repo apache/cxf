@@ -105,6 +105,10 @@ public final class OAuth2TestUtils {
         Response response = client.get();
 
         OAuthAuthorizationData authzData = response.readEntity(OAuthAuthorizationData.class);
+        return getLocation(client, authzData, parameters.getState());
+    }
+
+    public static String getLocation(WebClient client, OAuthAuthorizationData authzData, String state) {
 
         // Now call "decision" to get the authorization code grant
         client.path("decision");
@@ -126,10 +130,10 @@ public final class OAuth2TestUtils {
         form.param("response_type", authzData.getResponseType());
         form.param("oauthDecision", "allow");
 
-        response = client.post(form);
+        Response response = client.post(form);
         String location = response.getHeaderString("Location");
-        if (parameters.getState() != null) {
-            Assert.assertTrue(location.contains("state=" + parameters.getState()));
+        if (state != null) {
+            Assert.assertTrue(location.contains("state=" + state));
         }
 
         return location;

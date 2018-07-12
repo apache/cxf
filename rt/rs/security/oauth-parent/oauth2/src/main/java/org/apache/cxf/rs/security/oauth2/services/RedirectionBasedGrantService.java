@@ -99,6 +99,19 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
     }
 
     /**
+     * Handles the initial authorization request by preparing
+     * the authorization challenge data and returning it to the user.
+     * Typically the data are expected to be presented in the HTML form
+     * @return the authorization data
+     */
+    @POST
+    @Consumes("application/x-www-form-urlencoded")
+    @Produces({"application/xhtml+xml", "text/html", "application/xml", "application/json" })
+    public Response authorizePost(MultivaluedMap<String, String> params) {
+        return startAuthorization(params);
+    }
+
+    /**
      * Processes the end user decision
      * @return The grant value, authorization code or the token
      */
@@ -389,7 +402,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
             return createErrorResponse(params, redirectUri, OAuthConstants.INVALID_SCOPE);
         }
         getMessageContext().put(AUTHORIZATION_REQUEST_PARAMETERS, params);
-        
+
         String preAuthorizedTokenKey = params.getFirst(PREAUTHORIZED_TOKEN_KEY);
         if (preAuthorizedTokenKey != null && isRevokePreauthorizedTokenOnApproval()) {
             getDataProvider().revokeToken(client, preAuthorizedTokenKey, OAuthConstants.ACCESS_TOKEN);
@@ -410,7 +423,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
     public void setRevokePreauthorizedTokenOnApproval(boolean revoke) {
         this.revokePreauthorizedTokenOnApproval = revoke;
     }
-    
+
     public void setSessionAuthenticityTokenProvider(SessionAuthenticityTokenProvider sessionAuthenticityTokenProvider) {
         this.sessionAuthenticityTokenProvider = sessionAuthenticityTokenProvider;
     }

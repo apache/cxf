@@ -104,6 +104,54 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         validateIdToken(idToken, null);
     }
 
+    // Authorization Servers MUST support the use of the HTTP GET and POST methods defined in RFC 2616
+    // [RFC2616] at the Authorization Endpoint.
+    @org.junit.Test
+    public void testAuthorizationCodeFlowPOST() throws Exception {
+        URL busFile = OIDCFlowTest.class.getResource("client.xml");
+
+        String address = "https://localhost:" + PORT + "/services/";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                            "alice", "security", busFile.toString());
+
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        // Make initial authorization request
+        client.type("application/x-www-form-urlencoded");
+
+        client.path("authorize/");
+
+        Form form = new Form();
+        form.param("client_id", "consumer-id");
+        form.param("scope", "openid");
+        form.param("redirect_uri", "http://www.blah.apache.org");
+        form.param("response_type", "code");
+        Response response = client.post(form);
+
+        OAuthAuthorizationData authzData = response.readEntity(OAuthAuthorizationData.class);
+        String location = OAuth2TestUtils.getLocation(client, authzData, null);
+        String code =  OAuth2TestUtils.getSubstring(location, "code");
+        assertNotNull(code);
+
+        // Now get the access token
+        client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                  "consumer-id", "this-is-a-secret", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        ClientAccessToken accessToken =
+            OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code);
+        assertNotNull(accessToken.getTokenKey());
+        assertTrue(accessToken.getApprovedScope().contains("openid"));
+
+        String idToken = accessToken.getParameters().get("id_token");
+        assertNotNull(idToken);
+        validateIdToken(idToken, null);
+    }
+
     // Just a normal OAuth invocation, check it all works ok
     @org.junit.Test
     public void testAuthorizationCodeOAuth() throws Exception {
@@ -341,6 +389,71 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         client.type("application/x-www-form-urlencoded");
 
         Form form = new Form();
+        form.param("session_authenticity_token", authzData.getAuthenticityToken());
+        form.param("client_id", authzData.getClientId());
+        form.param("redirect_uri", authzData.getRedirectUri());
+        form.param("scope", authzData.getProposedScope());
+        if (authzData.getResponseType() != null) {
+            form.param("response_type", authzData.getResponseType());
+        }
+        if (authzData.getNonce() != null) {
+            form.param("nonce", authzData.getNonce());
+        }
+        form.param("oauthDecision", "allow");
+
+        response = client.post(form);
+
+        String location = response.getHeaderString("Location");
+
+        // Check Access Token
+        String accessToken = OAuth2TestUtils.getSubstring(location, "access_token");
+        assertNotNull(accessToken);
+
+        // Check IdToken
+        String idToken = OAuth2TestUtils.getSubstring(location, "id_token");
+        assertNotNull(idToken);
+        validateIdToken(idToken, null);
+
+        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(idToken);
+        JwtToken jwt = jwtConsumer.getJwtToken();
+        Assert.assertNotNull(jwt.getClaims().getClaim(IdToken.ACCESS_TOKEN_HASH_CLAIM));
+        Assert.assertNotNull(jwt.getClaims().getClaim(IdToken.NONCE_CLAIM));
+        OidcUtils.validateAccessTokenHash(accessToken, jwt, true);
+    }
+
+    // Authorization Servers MUST support the use of the HTTP GET and POST methods defined in RFC 2616
+    // [RFC2616] at the Authorization Endpoint.
+    @org.junit.Test
+    public void testImplicitFlowPOST() throws Exception {
+        URL busFile = OIDCFlowTest.class.getResource("client.xml");
+
+        String address = "https://localhost:" + PORT + "/services/";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                            "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        // Get Access Token
+        client.type("application/x-www-form-urlencoded");
+
+        client.path("authorize-implicit/");
+
+        Form form = new Form();
+        form.param("client_id", "consumer-id");
+        form.param("scope", "openid");
+        form.param("redirect_uri", "http://www.blah.apache.org");
+        form.param("response_type", "id_token token");
+        form.param("nonce", "123456789");
+        Response response = client.post(form);
+
+        OAuthAuthorizationData authzData = response.readEntity(OAuthAuthorizationData.class);
+
+        // Now call "decision" to get the access token
+        client.path("decision");
+        client.type("application/x-www-form-urlencoded");
+
+        form = new Form();
         form.param("session_authenticity_token", authzData.getAuthenticityToken());
         form.param("client_id", authzData.getClientId());
         form.param("redirect_uri", authzData.getRedirectUri());
