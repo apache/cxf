@@ -50,9 +50,22 @@ public class AuthorizationService {
             service.setMessageContext(context);
         }
     }
+
     @GET
     @Produces({"application/xhtml+xml", "text/html", "application/xml", "application/json" })
     public Response authorize(@QueryParam(OAuthConstants.RESPONSE_TYPE) String responseType) {
+        RedirectionBasedGrantService service = getService(responseType);
+        if (service != null) {
+            return service.authorize();
+        }
+        return reportInvalidResponseType();
+    }
+
+    @POST
+    @Consumes("application/x-www-form-urlencoded")
+    @Produces({"application/xhtml+xml", "text/html", "application/xml", "application/json" })
+    public Response authorizePost(MultivaluedMap<String, String> params) {
+        String responseType = params.getFirst(OAuthConstants.RESPONSE_TYPE);
         RedirectionBasedGrantService service = getService(responseType);
         if (service != null) {
             return service.authorize();
