@@ -161,7 +161,8 @@ public class SchemaCollection {
      */
     public XmlSchema getSchemaByTargetNamespace(String namespaceURI) {
         for (XmlSchema schema : schemaCollection.getXmlSchemas()) {
-            if (namespaceURI.equals(schema.getTargetNamespace())) {
+            if (namespaceURI != null && namespaceURI.equals(schema.getTargetNamespace())
+                || namespaceURI == null && schema.getTargetNamespace() == null) {
                 return schema;
             }
         }
