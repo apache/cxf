@@ -37,6 +37,9 @@
             =org.apache.cxf.ws.discovery.internal,
             org.apache.cxf.ws.discovery.*,
         </cxf.osgi.export>
+        <cxf.osgi.import>
+            javax.xml.ws*;version="${cxf.osgi.javax.xml.ws.version}",
+        </cxf.osgi.import>
     </properties>
     <dependencies>
         <dependency>

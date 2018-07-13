@@ -42,6 +42,7 @@ import org.w3c.dom.Node;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.jaxb.JAXBEncoderDecoder;
 import org.apache.cxf.service.model.FaultInfo;
@@ -75,7 +76,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
 
         classPath = System.getProperty("java.class.path");
         System.setProperty("java.class.path", getClassPath());
-        if (System.getProperty("java.version").startsWith("9")) {
+        if (JavaUtils.isJava9Compatible()) {
             System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
         }
 
@@ -162,8 +163,11 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         File classFile = new java.io.File(output.getCanonicalPath() + "/classes");
         classFile.mkdir();
 
+        String java9PlusFolder = output.getParent() + "/java9";
         System.setProperty("java.class.path", getClassPath() + classFile.getCanonicalPath()
-                           + File.separatorChar);
+            + File.separatorChar + ":" + java9PlusFolder + "/jaxb-api-2.2.11.jar"
+            + ":" + java9PlusFolder + "/jaxws-api-2.2.9.jar"
+            + ":" + java9PlusFolder + "/geronimo-ws-metadata_2.0_spec-1.1.3.jar");
 
         env.put(ToolConstants.CFG_COMPILE, ToolConstants.CFG_COMPILE);
         env.put(ToolConstants.CFG_CLASSDIR, output.getCanonicalPath() + "/classes");

@@ -76,11 +76,8 @@ public class WADL2JavaMojo extends AbstractCodeGeneratorMojo {
     public void execute() throws MojoExecutionException {
         if (JavaUtils.isJava9Compatible()) {
             fork = "true";
-            additionalJvmArgs = "--add-modules java.activation,java.xml.bind,java.xml.ws " 
-                    + "--add-exports=java.xml.bind/com.sun.xml.internal.bind.v2.runtime=ALL-UNNAMED "
-                    + "--add-exports=jdk.xml.dom/org.w3c.dom.html=ALL-UNNAMED "
+            additionalJvmArgs =  "--add-exports=jdk.xml.dom/org.w3c.dom.html=ALL-UNNAMED "
                     + "--add-exports=java.xml/com.sun.org.apache.xerces.internal.impl.xs=ALL-UNNAMED "
-                    + "--add-exports=java.xml.bind/com.sun.xml.internal.bind.marshaller=ALL-UNNAMED "
                     + "--add-opens java.xml.ws/javax.xml.ws.wsaddressing=ALL-UNNAMED "
                     + "--add-opens java.base/java.security=ALL-UNNAMED "
                     + "--add-opens java.base/java.net=ALL-UNNAMED "

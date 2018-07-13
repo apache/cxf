@@ -14,6 +14,9 @@
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.ws.eventing</cxf.module.name>
+        <cxf.osgi.import>
+            javax.xml.ws*;version="${cxf.osgi.javax.xml.ws.version}",
+        </cxf.osgi.import>
     </properties>
     <dependencies>
         <dependency>

@@ -22,6 +22,7 @@ import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
 
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.wsdlto.core.DataBindingProfile;
@@ -63,7 +64,7 @@ public abstract class AbstractCodeGenTest extends ProcessorTestBase {
     @Before
     public void setUp() throws Exception {
         processor = new JAXWSContainer(null);
-        if (System.getProperty("java.version").startsWith("9")) {
+        if (JavaUtils.isJava9Compatible()) {
             System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
         }
     }

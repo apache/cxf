@@ -38,7 +38,6 @@ import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
 import org.apache.cxf.helpers.FileUtils;
-import org.apache.cxf.helpers.JavaUtils;
 
 public class Compiler {
     private long maxMemory = Runtime.getRuntime().maxMemory();
@@ -177,11 +176,6 @@ public class Compiler {
 
         //fix for CXF-2081, set maximum heap of this VM to javac.
         list.add("-J-Xmx" + maxMemory);
-
-        if (JavaUtils.isJava9Compatible()) {
-            list.add("--add-modules");
-            list.add("java.activation,java.xml.ws.annotation,java.corba,java.transaction,java.xml.bind,java.xml.ws");
-        }
 
         addArgs(list);
         int classpathIdx = list.indexOf("-classpath");

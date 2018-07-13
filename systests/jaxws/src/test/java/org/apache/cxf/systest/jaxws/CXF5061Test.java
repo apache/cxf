@@ -22,6 +22,7 @@ package org.apache.cxf.systest.jaxws;
 
 
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxws.endpoint.dynamic.JaxWsDynamicClientFactory;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
@@ -62,7 +63,7 @@ public class CXF5061Test extends AbstractBusClientServerTestBase {
 
     @Test
     public void testCxf5061() throws Exception {
-        if (System.getProperty("java.version").startsWith("9")) {
+        if (JavaUtils.isJava9Compatible()) {
             System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
         }
         //using dcf to generate client from the wsdl which ensure the wsdl is valid

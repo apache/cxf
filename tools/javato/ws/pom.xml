@@ -32,6 +32,9 @@
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.tools.java2ws</cxf.module.name>
+        <cxf.osgi.import>
+            javax.xml.ws*;version="${cxf.osgi.javax.xml.ws.version}",
+        </cxf.osgi.import>
     </properties>
     <dependencies>
         <dependency>
@@ -194,4 +197,56 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+	    <id>java9-plus</id>
+            <activation>
+        	<jdk>[9,)</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.apache.geronimo.specs</groupId>
+                                            <artifactId>geronimo-ws-metadata_2.0_spec</artifactId>
+                                            <type>jar</type>
+                                            <overWrite>false</overWrite>
+                                            <outputDirectory>${project.basedir}/target/java9</outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>javax.xml.bind</groupId>
+                                            <artifactId>jaxb-api</artifactId>
+                                            <type>jar</type>
+                                            <overWrite>false</overWrite>
+                                            <outputDirectory>${project.basedir}/target/java9</outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>javax.xml.ws</groupId>
+                                            <artifactId>jaxws-api</artifactId>
+                                            <type>jar</type>
+                                            <overWrite>false</overWrite>
+                                            <outputDirectory>${project.basedir}/target/java9</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                    <overWriteReleases>false</overWriteReleases>
+                                    <overWriteSnapshots>true</overWriteSnapshots>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

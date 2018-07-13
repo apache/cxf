@@ -25,6 +25,7 @@ import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolConstants;
@@ -42,8 +43,13 @@ public class FaultBeanGeneratorTest extends ProcessorTestBase {
     public void setUp() throws Exception {
         classPath = System.getProperty("java.class.path");
         System.setProperty("java.class.path", getClassPath());
-        if (System.getProperty("java.version").startsWith("9")) {
+        if (JavaUtils.isJava9Compatible()) {
             System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
+            String java9PlusFolder = output.getParent() + "/java9";
+            System.setProperty("java.class.path", System.getProperty("java.class.path") 
+                               + ":" + java9PlusFolder + "/jaxb-api-2.2.11.jar"
+                               + ":" + java9PlusFolder + "/jaxws-api-2.2.9.jar"
+                               + ":" + java9PlusFolder + "/geronimo-ws-metadata_2.0_spec-1.1.3.jar");
         }
         processor.setEnvironment(env);
     }

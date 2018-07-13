@@ -99,6 +99,7 @@ import org.apache.cxf.endpoint.EndpointImplFactory;
 import org.apache.cxf.endpoint.SimpleEndpointImplFactory;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.FileUtils;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.resource.URIResolver;
 import org.apache.cxf.service.Service;
@@ -627,7 +628,7 @@ public class DynamicClientFactory {
 
         javaCompiler.setClassPath(classPath);
         javaCompiler.setOutputDir(dest);
-        if (System.getProperty("java.version").startsWith("9")) {
+        if (JavaUtils.isJava9Compatible()) {
             javaCompiler.setTarget("9");
         } else {
             javaCompiler.setTarget("1.8");

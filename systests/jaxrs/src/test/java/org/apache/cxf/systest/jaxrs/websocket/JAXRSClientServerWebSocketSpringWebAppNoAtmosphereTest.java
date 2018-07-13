@@ -36,7 +36,7 @@ public class JAXRSClientServerWebSocketSpringWebAppNoAtmosphereTest extends JAXR
 
     @AfterClass
     public static void cleanup() {
-        System.clearProperty("org.apache.cxf.transport.websocket.atmosphere.disabled");
+        //System.clearProperty("org.apache.cxf.transport.websocket.atmosphere.disabled");
     }
 
     protected String getPort() {

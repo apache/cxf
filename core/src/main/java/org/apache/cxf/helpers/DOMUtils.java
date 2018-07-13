@@ -21,6 +21,7 @@ package org.apache.cxf.helpers;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -42,6 +43,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -739,13 +741,13 @@ public final class DOMUtils {
     }
 
     /**
-     * Try to get the DOM Node from the SAAJ Node with JAVA9
+     * Try to get the DOM Node from the SAAJ Node with JAVA9 afterwards
      * @param node The original node we need check
      * @return The DOM node
      */
     public static Node getDomElement(Node node) {
         if (node != null && isJava9SAAJ()) {
-            //java9 hack since EA 159
+            //java9plus hack
             try {
                 Method method = node.getClass().getMethod("getDomElement");
                 node = (Node)method.invoke(node);
@@ -756,6 +758,27 @@ public final class DOMUtils {
             }
         }
         return node;
+    }
+    
+    /**
+     * Try to get the DOM DocumentFragment from the SAAJ DocumentFragment with JAVA9 afterwards
+     * @param DocumentFragment The original documentFragment we need check
+     * @return The DOM DocumentFragment
+     */
+    public static DocumentFragment getDomDocumentFragment(DocumentFragment fragment) {
+        if (fragment != null && isJava9SAAJ()) {
+            //java9 plus hack
+            try {
+                Field f = fragment.getClass().getDeclaredField("documentFragment");
+                f.setAccessible(true);
+                fragment = (DocumentFragment) f.get(fragment);
+            } catch (NoSuchFieldException e) {
+                //best effort to try, do nothing if NoSuchMethodException
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return fragment;
     }
 
     private static void findAllElementsByTagNameNS(Element el, String nameSpaceURI, String localName,

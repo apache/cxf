@@ -446,60 +446,6 @@
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>copy</id>
-                                <phase>validate</phase>
-                                <goals>
-                                    <goal>unpack</goal>
-                                </goals>
-                                <configuration>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>org.apache.geronimo.specs</groupId>
-                                            <artifactId>geronimo-jta_1.1_spec</artifactId>
-                                            <type>jar</type>
-                                            <overWrite>false</overWrite>
-                                            <outputDirectory>${project.basedir}/target/java9</outputDirectory>
-                                            <excludes>**/xa/*.class</excludes>
-                                        </artifactItem>
-                                        <artifactItem>
-                                            <groupId>org.jacorb</groupId>
-                                            <artifactId>jacorb-omgapi</artifactId>
-                                            <type>jar</type>
-                                            <overWrite>false</overWrite>
-                                            <outputDirectory>${project.basedir}/target/java9-jacorb</outputDirectory>
-                                        </artifactItem>
-                                    </artifactItems>
-                                    <overWriteReleases>false</overWriteReleases>
-                                    <overWriteSnapshots>true</overWriteSnapshots>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>copy-annotation</id>
-                                <phase>validate</phase>
-                                <goals>
-                                    <goal>copy</goal>
-                                </goals>
-                                <configuration>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>javax.annotation</groupId>
-                                            <artifactId>javax.annotation-api</artifactId>
-                                            <type>jar</type>
-                                            <overWrite>false</overWrite>
-                                            <outputDirectory>${project.basedir}/target/java9</outputDirectory>
-                                        </artifactItem>
-                                    </artifactItems>
-                                    <overWriteReleases>false</overWriteReleases>
-                                    <overWriteSnapshots>true</overWriteSnapshots>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
                             <systemPropertyVariables>
@@ -507,15 +453,6 @@
                             </systemPropertyVariables>
                             <argLine>
                                 ${cxf.surefire.fork.vmargs}
-                                --patch-module java.corba=target/java9-jacorb
-                                --add-exports=java.corba/org.omg.CONV_FRAME=ALL-UNNAMED
-                                --add-exports=java.corba/org.omg.CORBA_2_5=ALL-UNNAMED
-                                --add-exports=java.corba/org.omg.CSIIOP=ALL-UNNAMED
-                                --add-exports=java.corba/org.omg.ETF=ALL-UNNAMED
-                                --add-exports=java.corba/org.omg.GIOP=ALL-UNNAMED
-                                --add-exports=java.corba/org.omg.PortableGroup=ALL-UNNAMED
-                                --add-exports=java.corba/org.omg.SSLIOP=ALL-UNNAMED
-                                --add-exports=java.corba/com.sun.corba.se.spi.orb=ALL-UNNAMED
                             </argLine>
                             <includes>
                                 <include>**/*Test.java</include>
@@ -524,6 +461,8 @@
                             </includes>
                             <excludes>
                                 <exclude>**/*CORBADocLitClientTypeTest.java</exclude>
+                                <exclude>**/*CorbaTest.java</exclude>
+                                <exclude>**/*CorbaTimeoutTest.java</exclude>
                             </excludes>
                         </configuration>
                     </plugin>

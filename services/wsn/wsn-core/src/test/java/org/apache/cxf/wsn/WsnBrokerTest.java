@@ -78,11 +78,12 @@ public abstract class WsnBrokerTest extends Assert {
     public void setUp() throws Exception {
         loader = Thread.currentThread().getContextClassLoader();
         String impl = getProviderImpl();
+        System.setProperty("javax.xml.ws.spi.Provider", impl);
         Thread.currentThread()
             .setContextClassLoader(new FakeClassLoader(impl));
         WSNHelper.getInstance().setClassLoader(false);
 
-        System.setProperty("javax.xml.ws.spi.Provider", impl);
+        
 
         port2 = getFreePort();
         if (!useExternal) {
