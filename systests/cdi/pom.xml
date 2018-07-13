@@ -37,11 +37,6 @@
         <cxf.tomcat.version>8.0.32</cxf.tomcat.version>
         <cxf.openwebbeans.version>1.7.4</cxf.openwebbeans.version>
     </properties>
-    <modules>
-        <module>base</module>
-        <module>cdi-weld</module>
-        <module>cdi-owb</module>
-    </modules>
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -165,4 +160,28 @@
             </plugins>
         </pluginManagement>
     </build>
+    <profiles>
+        <profile>
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>base</module>
+                <module>cdi-weld</module>
+                <module>cdi-owb</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>java9plus</id>
+            <activation>
+                <jdk>[9,)</jdk>
+            </activation>
+            <modules>
+                <!--need a new release from owb which can work with asm6.2-->                
+                <module>base</module>
+                <module>cdi-weld</module>
+            </modules>
+        </profile>
+    </profiles>
 </project>
