@@ -74,6 +74,48 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         assertNotNull(accessToken.getTokenKey());
     }
 
+    // The authorization server MUST support the use of the HTTP "GET"
+    // method [RFC2616] for the authorization endpoint and MAY support the
+    // use of the "POST" method as well.
+    @org.junit.Test
+    public void testAuthorizationCodeGrantPOST() throws Exception {
+        URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
+
+        String address = "https://localhost:" + PORT + "/services/";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                            "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        // Make initial authorization request
+        client.type("application/x-www-form-urlencoded");
+
+        client.path("authorize/");
+
+        Form form = new Form();
+        form.param("client_id", "consumer-id");
+        form.param("redirect_uri", "http://www.blah.apache.org");
+        form.param("response_type", "code");
+        Response response = client.post(form);
+
+        OAuthAuthorizationData authzData = response.readEntity(OAuthAuthorizationData.class);
+        String location = OAuth2TestUtils.getLocation(client, authzData, null);
+        String code =  OAuth2TestUtils.getSubstring(location, "code");
+        assertNotNull(code);
+
+        // Now get the access token
+        client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                  "consumer-id", "this-is-a-secret", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        ClientAccessToken accessToken =
+            OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code);
+        assertNotNull(accessToken.getTokenKey());
+    }
+
     @org.junit.Test
     public void testAuthorizationCodeGrantRefresh() throws Exception {
         URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
