@@ -36,7 +36,6 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class JPAOAuthDataProviderTest extends Assert {
@@ -180,7 +179,6 @@ public class JPAOAuthDataProviderTest extends Assert {
     }
 
     @Test
-    @Ignore("uncomment when CXF-7264 is fixed")
     public void testAddGetDeleteAccessTokenWithNullSubject() {
         Client c = addClient("102", "bob");
 
@@ -282,7 +280,7 @@ public class JPAOAuthDataProviderTest extends Assert {
         assertEquals("http://client/redirect", c.getRedirectUris().get(0));
         assertEquals(c.getResourceOwnerSubject().getLogin(), c2.getResourceOwnerSubject().getLogin());
     }
-    
+
     protected void tearDownClient(String clientId) {
         if (getProvider() == null) {
             return;
@@ -319,8 +317,8 @@ public class JPAOAuthDataProviderTest extends Assert {
                 emFactory.close();
             }
         } catch (Throwable ex) {
-            ex.printStackTrace();    
-        } finally {    
+            ex.printStackTrace();
+        } finally {
             try {
                 //connection.createStatement().execute("SHUTDOWN");
             } catch (Throwable ex) {
