@@ -110,7 +110,7 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
                                                     UserSubject subject,
                                                     String requestedGrant,
                                                     List<String> requestedScopes) {
-        return doCreateAccessToken(client, subject, requestedGrant, requestedScopes, null);
+        return doCreateAccessToken(client, subject, requestedGrant, requestedScopes, Collections.emptyList());
     }
     
     protected ServerAccessToken doCreateAccessToken(Client client,
@@ -136,7 +136,7 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
     }
 
     protected List<String> getApprovedScopes(Client client, UserSubject subject, List<String> requestedScopes) {
-        // This method can be overridden if the down-scoping is required 
+        // This method can be overridden if the down-scoping is required
         return Collections.emptyList();
     }
 
