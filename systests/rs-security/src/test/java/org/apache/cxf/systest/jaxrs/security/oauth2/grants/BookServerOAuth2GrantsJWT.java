@@ -26,9 +26,9 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
-public class BookServerOAuth2Grants extends AbstractBusTestServerBase {
+public class BookServerOAuth2GrantsJWT extends AbstractBusTestServerBase {
     private static final URL SERVER_CONFIG_FILE =
-        BookServerOAuth2Grants.class.getResource("grants-server.xml");
+        BookServerOAuth2GrantsJWT.class.getResource("grants-server-jwt.xml");
 
     protected void run() {
         SpringBusFactory bf = new SpringBusFactory();
@@ -37,7 +37,7 @@ public class BookServerOAuth2Grants extends AbstractBusTestServerBase {
         setBus(springBus);
 
         try {
-            new BookServerOAuth2Grants();
+            new BookServerOAuth2GrantsJWT();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
