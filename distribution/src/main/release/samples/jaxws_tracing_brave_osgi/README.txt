@@ -1,9 +1,8 @@
 JAX-RS Brave/OpenZipkin Tracing Demo in OSGi container
 =================
 
-The demo shows a basic usage of Brave/OpenZipkin distributed tracer with REST based 
-Web Services using  JAX-RS 2.0 (JSR-339). The REST server provides the 
-following services: 
+The demo shows a basic usage of Brave/OpenZipkin distributed tracer with SOAP
+based Web Services.
 
 A SOAP catalog service is provided on URL http://localhost:8181/cxf/catalog. The WSDL 
 contract is available at http://localhost:8181/cxf/catalog?wsdl.
