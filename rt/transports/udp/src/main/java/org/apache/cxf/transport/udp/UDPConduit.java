@@ -32,8 +32,9 @@ import java.net.NetworkInterface;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Enumeration;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -61,6 +62,12 @@ import org.apache.mina.transport.socket.nio.NioDatagramConnector;
  *
  */
 public class UDPConduit extends AbstractConduit {
+    /**
+     * For broadcast/multicast, the specific network interface to use.   This can either be
+     * a specific  java.net.NetworkInterface or a string for NetworkInterface.getByName(String name)
+     */
+    public static final String NETWORK_INTERFACE = UDPConduit.class.getName() + ".NETWORK_INTERFACE";
+
     private static final String CXF_MESSAGE_ATTR = "CXFMessage";
     private static final String MULTI_RESPONSE_TIMEOUT = "udp.multi.response.timeout";
     private static final String HOST_PORT = UDPConduit.class + ".host:port";
@@ -244,14 +251,24 @@ public class UDPConduit extends AbstractConduit {
                 socket.setReceiveBufferSize(64 * 1024);
                 socket.setBroadcast(true);
                 socket.setReuseAddress(true);
+                Object netIntFromMsg = message.getContextualProperty(NETWORK_INTERFACE);
+                NetworkInterface netInf = null;
+                if (netIntFromMsg instanceof String) {
+                    netInf = NetworkInterface.getByName((String)netIntFromMsg);
+                } else if (netIntFromMsg instanceof NetworkInterface) {
+                    netInf = (NetworkInterface)netIntFromMsg;
+                }
                 if (multicast != null) {
                     ((MulticastSocket)socket).setLoopbackMode(false);
+                    if (netInf != null) {
+                        ((MulticastSocket)socket).setNetworkInterface(netInf);
+                    }
                 }
 
                 if (multicast == null) {
-                    Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-                    while (interfaces.hasMoreElements()) {
-                        NetworkInterface networkInterface = interfaces.nextElement();
+                    List<NetworkInterface> interfaces = netInf == null 
+                        ? Collections.list(NetworkInterface.getNetworkInterfaces()) : Collections.singletonList(netInf);
+                    for (NetworkInterface networkInterface : interfaces) {
                         if (!networkInterface.isUp() || networkInterface.isLoopback()) {
                             continue;
                         }
