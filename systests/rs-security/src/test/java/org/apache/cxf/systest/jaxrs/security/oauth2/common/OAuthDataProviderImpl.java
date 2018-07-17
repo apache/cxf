@@ -24,8 +24,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
@@ -47,6 +49,12 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
     }
 
     public OAuthDataProviderImpl(String servicePort, String partnerPort) throws Exception {
+        // Create random cache files, as this provider could be called by several test implementations
+        super(DEFAULT_CONFIG_URL, BusFactory.getThreadDefaultBus(true),
+              CLIENT_CACHE_KEY + "_" + Math.abs(new Random().nextInt()),
+              CODE_GRANT_CACHE_KEY + "_" + Math.abs(new Random().nextInt()),
+              ACCESS_TOKEN_CACHE_KEY + "_" + Math.abs(new Random().nextInt()),
+              REFRESH_TOKEN_CACHE_KEY + "_" + Math.abs(new Random().nextInt()));
         // filters/grants test client
         Client client = new Client("consumer-id", "this-is-a-secret", true);
         List<String> redirectUris = new ArrayList<>();
@@ -152,7 +160,7 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
 
     private Certificate loadCert() throws Exception {
         try (InputStream is = ClassLoaderUtils.getResourceAsStream("keys/Truststore.jks", this.getClass())) {
-            return CryptoUtils.loadCertificate(is, new char[]{'p', 'a', 's', 's', 'w', 'o', 'r', 'd'}, "morpit", null);
+            return CryptoUtils.loadCertificate(is, "password".toCharArray(), "morpit", null);
         }
     }
 
