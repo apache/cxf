@@ -65,10 +65,10 @@ public class AccessTokenService extends AbstractTokenService {
     protected void injectContextIntoOAuthProviders() {
         super.injectContextIntoOAuthProviders();
         for (AccessTokenGrantHandler grantHandler : grantHandlers) {
-            OAuthUtils.injectContextIntoOAuthProvider(getMessageContext(), grantHandler);    
+            OAuthUtils.injectContextIntoOAuthProvider(getMessageContext(), grantHandler);
         }
     }
-    
+
     /**
      * Sets a grant handler
      * @param handler the grant handler
@@ -125,9 +125,10 @@ public class AccessTokenService extends AbstractTokenService {
         } catch (WebApplicationException ex) {
             throw ex;
         } catch (RuntimeException ex) {
-            // This is done to bypass a Check-Style 
-            // restriction on a number of return statements 
-            OAuthServiceException oauthEx = ex instanceof OAuthServiceException 
+            LOG.log(Level.FINE, "Error creating the access token", ex);
+            // This is done to bypass a Check-Style
+            // restriction on a number of return statements
+            OAuthServiceException oauthEx = ex instanceof OAuthServiceException
                 ? (OAuthServiceException)ex : new OAuthServiceException(ex);
             return handleException(oauthEx, OAuthConstants.INVALID_GRANT);
         }
