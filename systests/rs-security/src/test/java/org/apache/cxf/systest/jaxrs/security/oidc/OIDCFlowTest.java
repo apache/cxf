@@ -27,6 +27,8 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 
 import javax.ws.rs.core.Form;
@@ -45,21 +47,36 @@ import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
 import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
+import org.apache.cxf.systest.jaxrs.security.SecurityTestUtil;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils.AuthorizationCodeParameters;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.xml.security.utils.ClassLoaderUtils;
 
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
- * Some unit tests to test the various flows in OpenID Connect.
+ * Some unit tests to test the various flows in OpenID Connect. The tests are run multiple times
+ * with different OAuthDataProvider implementations:
+ * a) PORT - EhCache
+ * b) JWT_PORT - EhCache with useJwtFormatForAccessTokens enabled
  */
+@RunWith(value = org.junit.runners.Parameterized.class)
 public class OIDCFlowTest extends AbstractBusClientServerTestBase {
 
     static final String PORT = TestUtil.getPortNumber("jaxrs-oidc");
+    static final String JWT_PORT = TestUtil.getPortNumber("jaxrs-oidc-jwt");
+
+    final String port;
+
+    public OIDCFlowTest(String port) {
+        this.port = port;
+    }
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -69,13 +86,30 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
                 // set this to false to fork
                 launchServer(OIDCServer.class, true)
         );
+        assertTrue(
+                   "Server failed to launch",
+                   // run the server in the same process
+                   // set this to false to fork
+                   launchServer(OIDCServerJWT.class, true)
+        );
+    }
+
+    @AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
+    }
+
+    @Parameters(name = "{0}")
+    public static Collection<String> data() {
+
+        return Arrays.asList(PORT, JWT_PORT);
     }
 
     @org.junit.Test
     public void testAuthorizationCodeFlow() throws Exception {
         URL busFile = OIDCFlowTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
 
@@ -102,6 +136,10 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         String idToken = accessToken.getParameters().get("id_token");
         assertNotNull(idToken);
         validateIdToken(idToken, null);
+
+        if (JWT_PORT.equals(port)) {
+            validateAccessToken(accessToken.getTokenKey());
+        }
     }
 
     // Authorization Servers MUST support the use of the HTTP GET and POST methods defined in RFC 2616
@@ -110,7 +148,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
     public void testAuthorizationCodeFlowPOST() throws Exception {
         URL busFile = OIDCFlowTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
 
@@ -150,6 +188,10 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         String idToken = accessToken.getParameters().get("id_token");
         assertNotNull(idToken);
         validateIdToken(idToken, null);
+
+        if (JWT_PORT.equals(port)) {
+            validateAccessToken(accessToken.getTokenKey());
+        }
     }
 
     // Just a normal OAuth invocation, check it all works ok
@@ -157,7 +199,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
     public void testAuthorizationCodeOAuth() throws Exception {
         URL busFile = OIDCFlowTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address,  OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -182,13 +224,17 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         String idToken = accessToken.getParameters().get("id_token");
         assertNull(idToken);
         assertFalse(accessToken.getApprovedScope().contains("openid"));
+
+        if (JWT_PORT.equals(port)) {
+            validateAccessToken(accessToken.getTokenKey());
+        }
     }
 
     @org.junit.Test
     public void testAuthorizationCodeFlowWithNonce() throws Exception {
         URL busFile = OIDCFlowTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address,  OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -215,13 +261,17 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         String idToken = accessToken.getParameters().get("id_token");
         assertNotNull(idToken);
         validateIdToken(idToken, "123456789");
+
+        if (JWT_PORT.equals(port)) {
+            validateAccessToken(accessToken.getTokenKey());
+        }
     }
 
     @org.junit.Test
     public void testAuthorizationCodeFlowWithScope() throws Exception {
         URL busFile = OIDCFlowTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address,  OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -248,13 +298,17 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         String idToken = accessToken.getParameters().get("id_token");
         assertNotNull(idToken);
         validateIdToken(idToken, null);
+
+        if (JWT_PORT.equals(port)) {
+            validateAccessToken(accessToken.getTokenKey());
+        }
     }
 
     @org.junit.Test
     public void testAuthorizationCodeFlowWithRefresh() throws Exception {
         URL busFile = OIDCFlowTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address,  OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -297,13 +351,17 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         assertNotNull(accessToken.getRefreshToken());
         accessToken.getParameters().get("id_token");
         assertNotNull(idToken);
+
+        if (JWT_PORT.equals(port)) {
+            validateAccessToken(accessToken.getTokenKey());
+        }
     }
 
     @org.junit.Test
     public void testAuthorizationCodeFlowWithState() throws Exception {
         URL busFile = OIDCFlowTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address,  OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -330,13 +388,17 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         String idToken = accessToken.getParameters().get("id_token");
         assertNotNull(idToken);
         validateIdToken(idToken, null);
+
+        if (JWT_PORT.equals(port)) {
+            validateAccessToken(accessToken.getTokenKey());
+        }
     }
 
     @org.junit.Test
     public void testAuthorizationCodeFlowWithAudience() throws Exception {
         URL busFile = OIDCFlowTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address,  OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -355,17 +417,21 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         WebClient.getConfig(client).getRequestContext().put(
             org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
 
-        String audience = "https://localhost:" + PORT + "/secured/bookstore/books";
+        String audience = "https://localhost:" + port + "/secured/bookstore/books";
         ClientAccessToken accessToken =
             OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code, "consumer-id-aud", audience);
         assertNotNull(accessToken.getTokenKey());
+
+        if (JWT_PORT.equals(port)) {
+            validateAccessToken(accessToken.getTokenKey());
+        }
     }
 
     @org.junit.Test
     public void testImplicitFlow() throws Exception {
         URL busFile = OIDCFlowTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -419,6 +485,10 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         Assert.assertNotNull(jwt.getClaims().getClaim(IdToken.ACCESS_TOKEN_HASH_CLAIM));
         Assert.assertNotNull(jwt.getClaims().getClaim(IdToken.NONCE_CLAIM));
         OidcUtils.validateAccessTokenHash(accessToken, jwt, true);
+
+        if (JWT_PORT.equals(port)) {
+            validateAccessToken(accessToken);
+        }
     }
 
     // Authorization Servers MUST support the use of the HTTP GET and POST methods defined in RFC 2616
@@ -427,7 +497,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
     public void testImplicitFlowPOST() throws Exception {
         URL busFile = OIDCFlowTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -484,13 +554,17 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         Assert.assertNotNull(jwt.getClaims().getClaim(IdToken.ACCESS_TOKEN_HASH_CLAIM));
         Assert.assertNotNull(jwt.getClaims().getClaim(IdToken.NONCE_CLAIM));
         OidcUtils.validateAccessTokenHash(accessToken, jwt, true);
+
+        if (JWT_PORT.equals(port)) {
+            validateAccessToken(accessToken);
+        }
     }
 
     @org.junit.Test
     public void testImplicitFlowNoAccessToken() throws Exception {
         URL busFile = OIDCFlowTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -549,7 +623,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
     public void testHybridCodeIdToken() throws Exception {
         URL busFile = OIDCFlowTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(100000000);
@@ -601,13 +675,17 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         jwtConsumer = new JwsJwtCompactConsumer(idToken);
         jwt = jwtConsumer.getJwtToken();
         Assert.assertNotNull(jwt.getClaims().getClaim(IdToken.AUTH_CODE_HASH_CLAIM));
+
+        if (JWT_PORT.equals(port)) {
+            validateAccessToken(accessToken.getTokenKey());
+        }
     }
 
     @org.junit.Test
     public void testHybridCodeToken() throws Exception {
         URL busFile = OIDCFlowTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -660,13 +738,17 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(idToken);
         // returning c_hash in the id_token returned after exchanging the code is optional
         Assert.assertNull(jwtConsumer.getJwtClaims().getClaim(IdToken.AUTH_CODE_HASH_CLAIM));
+
+        if (JWT_PORT.equals(port)) {
+            validateAccessToken(accessToken.getTokenKey());
+        }
     }
 
     @org.junit.Test
     public void testHybridCodeIdTokenToken() throws Exception {
         URL busFile = OIDCFlowTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -707,13 +789,17 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         Assert.assertNotNull(jwt.getClaims().getClaim(IdToken.ACCESS_TOKEN_HASH_CLAIM));
         OidcUtils.validateAccessTokenHash(accessToken, jwt, true);
         Assert.assertNotNull(jwt.getClaims().getClaim(IdToken.AUTH_CODE_HASH_CLAIM));
+
+        if (JWT_PORT.equals(port)) {
+            validateAccessToken(accessToken);
+        }
     }
 
     @org.junit.Test
     public void testAuthorizationCodeFlowUnsignedJWT() throws Exception {
         URL busFile = OIDCFlowTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/unsignedjwtservices/";
+        String address = "https://localhost:" + port + "/unsignedjwtservices/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -724,7 +810,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         claims.setIssuer("consumer-id");
         claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(
-            Collections.singletonList("https://localhost:" + PORT + "/unsignedjwtservices/"));
+            Collections.singletonList("https://localhost:" + port + "/unsignedjwtservices/"));
 
         JwsHeaders headers = new JwsHeaders();
         headers.setAlgorithm("none");
@@ -751,7 +837,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
     public void testAuthorizationCodeFlowUnsignedJWTWithState() throws Exception {
         URL busFile = OIDCFlowTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/unsignedjwtservices/";
+        String address = "https://localhost:" + port + "/unsignedjwtservices/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -762,7 +848,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         claims.setIssuer("consumer-id");
         claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(
-            Collections.singletonList("https://localhost:" + PORT + "/unsignedjwtservices/"));
+            Collections.singletonList("https://localhost:" + port + "/unsignedjwtservices/"));
 
         JwsHeaders headers = new JwsHeaders();
         headers.setAlgorithm("none");
@@ -790,7 +876,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
     public void testGetKeys() throws Exception {
         URL busFile = OIDCFlowTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         client.accept("application/json");
@@ -806,7 +892,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
     public void testAuthorizationCodeFlowWithKey() throws Exception {
         URL busFile = OIDCFlowTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -861,6 +947,26 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         if (nonce != null) {
             Assert.assertEquals(nonce, jwt.getClaim(IdToken.NONCE_CLAIM));
         }
+
+        KeyStore keystore = KeyStore.getInstance("JKS");
+        keystore.load(ClassLoaderUtils.getResourceAsStream("keys/alice.jks", this.getClass()),
+                      "password".toCharArray());
+        Certificate cert = keystore.getCertificate("alice");
+        Assert.assertNotNull(cert);
+
+        Assert.assertTrue(jwtConsumer.verifySignatureWith((X509Certificate)cert,
+                                                          SignatureAlgorithm.RS256));
+    }
+
+    private void validateAccessToken(String accessToken)
+        throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
+        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(accessToken);
+        JwtToken jwt = jwtConsumer.getJwtToken();
+
+        // Validate claims
+        Assert.assertNotNull(jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
+        Assert.assertNotNull(jwt.getClaim(JwtConstants.CLAIM_EXPIRY));
+        Assert.assertNotNull(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT));
 
         KeyStore keystore = KeyStore.getInstance("JKS");
         keystore.load(ClassLoaderUtils.getResourceAsStream("keys/alice.jks", this.getClass()),

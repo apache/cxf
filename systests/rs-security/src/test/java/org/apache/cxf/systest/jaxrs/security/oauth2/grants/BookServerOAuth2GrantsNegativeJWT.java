@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.jaxrs.security.oidc;
+package org.apache.cxf.systest.jaxrs.security.oauth2.grants;
 
 import java.net.URL;
 
@@ -26,9 +26,9 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
-public class UserInfoServer extends AbstractBusTestServerBase {
+public class BookServerOAuth2GrantsNegativeJWT extends AbstractBusTestServerBase {
     private static final URL SERVER_CONFIG_FILE =
-        UserInfoServer.class.getResource("userinfo-server.xml");
+        BookServerOAuth2GrantsNegativeJWT.class.getResource("grants-negative-server-jwt.xml");
 
     protected void run() {
         SpringBusFactory bf = new SpringBusFactory();
@@ -37,7 +37,7 @@ public class UserInfoServer extends AbstractBusTestServerBase {
         setBus(springBus);
 
         try {
-            new UserInfoServer();
+            new BookServerOAuth2GrantsNegativeJWT();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

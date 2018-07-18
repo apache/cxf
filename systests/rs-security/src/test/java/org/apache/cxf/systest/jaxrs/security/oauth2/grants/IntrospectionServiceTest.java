@@ -19,6 +19,8 @@
 package org.apache.cxf.systest.jaxrs.security.oauth2.grants;
 
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
@@ -26,31 +28,60 @@ import javax.ws.rs.core.Response;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.TokenIntrospection;
+import org.apache.cxf.systest.jaxrs.security.SecurityTestUtil;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.TestUtil;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
- * Some unit tests for the token introspection service in CXF.
+ * Some unit tests for the token introspection service in CXF. The tests are run multiple times with different
+ * OAuthDataProvider implementations:
+ * a) PORT - EhCache
+ * b) JWT_PORT - EhCache with useJwtFormatForAccessTokens enabled
  */
+@RunWith(value = org.junit.runners.Parameterized.class)
 public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
 
-    public static final String PORT = BookServerOAuth2Introspection.PORT;
+    public static final String PORT = TestUtil.getPortNumber("jaxrs-oauth2-introspection");
     public static final String PORT2 = TestUtil.getPortNumber("jaxrs-oauth2-introspection2");
+    public static final String JWT_PORT = TestUtil.getPortNumber("jaxrs-oauth2-introspection-jwt");
+    public static final String JWT_PORT2 = TestUtil.getPortNumber("jaxrs-oauth2-introspection2-jwt");
+
+    final String port;
+
+    public IntrospectionServiceTest(String port) {
+        this.port = port;
+    }
 
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
                    launchServer(BookServerOAuth2Introspection.class, true));
+        assertTrue("server did not launch correctly",
+                   launchServer(BookServerOAuth2IntrospectionJWT.class, true));
+    }
+
+    @AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
+    }
+
+    @Parameters(name = "{0}")
+    public static Collection<String> data() {
+
+        return Arrays.asList(PORT, JWT_PORT);
     }
 
     @org.junit.Test
     public void testTokenIntrospection() throws Exception {
         URL busFile = IntrospectionServiceTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -93,7 +124,7 @@ public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
     public void testTokenIntrospectionWithAudience() throws Exception {
         URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -111,7 +142,11 @@ public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
         WebClient.getConfig(client).getRequestContext().put(
             org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
 
-        String audience = "https://localhost:" + PORT2 + "/secured/bookstore/books";
+        String audPort = PORT2;
+        if (JWT_PORT.equals(port)) {
+            audPort = JWT_PORT2;
+        }
+        String audience = "https://localhost:" + audPort + "/secured/bookstore/books";
         ClientAccessToken accessToken =
             OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code, "consumer-id-aud", audience);
         assertNotNull(accessToken.getTokenKey());
@@ -139,7 +174,7 @@ public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
     public void testInvalidToken() throws Exception {
         URL busFile = IntrospectionServiceTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -177,7 +212,7 @@ public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
     public void testRefreshedToken() throws Exception {
         URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
@@ -240,7 +275,7 @@ public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
     public void testTokenIntrospectionWithScope() throws Exception {
         URL busFile = IntrospectionServiceTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/";
+        String address = "https://localhost:" + port + "/services/";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
