@@ -110,7 +110,7 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
                                                     UserSubject subject,
                                                     String requestedGrant,
                                                     List<String> requestedScopes) {
-        return doCreateAccessToken(client, subject, requestedGrant, requestedScopes, Collections.emptyList());
+        return doCreateAccessToken(client, subject, requestedGrant, requestedScopes, Collections.<String>emptyList());
     }
     
     protected ServerAccessToken doCreateAccessToken(Client client,
