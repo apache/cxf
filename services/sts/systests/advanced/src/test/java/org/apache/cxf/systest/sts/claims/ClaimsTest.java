@@ -94,17 +94,17 @@ public class ClaimsTest extends AbstractBusClientServerTestBase {
     }
 
     @Parameters(name = "{0}")
-    public static Collection<TestParam[]> data() {
+    public static Collection<TestParam> data() {
 
-        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false, STSPORT)},
-                                                {new TestParam(PORT, true, STSPORT)},
-                                                {new TestParam(STAX_PORT, false, STSPORT)},
-                                                {new TestParam(STAX_PORT, true, STSPORT)},
+        return Arrays.asList(new TestParam[] {new TestParam(PORT, false, STSPORT),
+                                              new TestParam(PORT, true, STSPORT),
+                                              new TestParam(STAX_PORT, false, STSPORT),
+                                              new TestParam(STAX_PORT, true, STSPORT),
 
-                                                {new TestParam(PORT, false, STAX_STSPORT)},
-                                                {new TestParam(PORT, true, STAX_STSPORT)},
-                                                {new TestParam(STAX_PORT, false, STAX_STSPORT)},
-                                                {new TestParam(STAX_PORT, true, STAX_STSPORT)},
+                                              new TestParam(PORT, false, STAX_STSPORT),
+                                              new TestParam(PORT, true, STAX_STSPORT),
+                                              new TestParam(STAX_PORT, false, STAX_STSPORT),
+                                              new TestParam(STAX_PORT, true, STAX_STSPORT),
         });
     }
 

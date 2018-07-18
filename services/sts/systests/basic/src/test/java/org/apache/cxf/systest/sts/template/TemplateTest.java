@@ -86,10 +86,10 @@ public class TemplateTest extends AbstractBusClientServerTestBase {
     }
 
     @Parameters(name = "{0}")
-    public static Collection<TestParam[]> data() {
+    public static Collection<TestParam> data() {
 
-        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false, STSPORT)},
-                                                {new TestParam(STAX_PORT, false, STSPORT)},
+        return Arrays.asList(new TestParam[] {new TestParam(PORT, false, STSPORT),
+                                              new TestParam(STAX_PORT, false, STSPORT),
         });
     }
 
