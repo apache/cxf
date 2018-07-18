@@ -17,11 +17,11 @@
  * under the License.
  */
 
-package org.apache.cxf.jaxrs.client;
+package org.apache.cxf.microprofile.client;
 
 import java.lang.reflect.Type;
 import java.util.Map;
-import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -29,76 +29,24 @@ import java.util.concurrent.TimeoutException;
 
 import javax.ws.rs.client.InvocationCallback;
 
-import org.apache.cxf.endpoint.ClientCallback;
+import org.apache.cxf.jaxrs.client.JaxrsClientCallback;
 
-public class JaxrsClientCallback<T> extends ClientCallback {
-    private final InvocationCallback<T> handler;
-    private final Type outType;
-    private final Class<?> responseClass;
+public class MPRestClientCallback<T> extends JaxrsClientCallback {
 
-    public JaxrsClientCallback(final InvocationCallback<T> handler,
-                        Class<?> responseClass,
-                        Type outGenericType) {
-        this.handler = handler;
-        this.outType = outGenericType;
-        this.responseClass = responseClass;
-    }
-
-    public InvocationCallback<T> getHandler() {
-        return handler;
-    }
-
-    public Type getOutGenericType() {
-        return outType;
-    }
-    public Class<?> getResponseClass() {
-        return responseClass;
+    public MPRestClientCallback(InvocationCallback<T> handler,
+                                Class<?> responseClass,
+                                Type outGenericType) {
+        super(handler, responseClass, outGenericType);
     }
 
     @Override
-    public boolean cancel(boolean mayInterruptIfRunning) {
-        boolean result = super.cancel(mayInterruptIfRunning);
-        if (result && handler != null) {
-            handler.failed(new CancellationException());
-        }
-        return result;
-    }
-
     public Future<T> createFuture() {
-        return new JaxrsResponseFuture<T>(this);
+        return new MPRestClientResponseFuture<T>(this);
     }
 
-    @SuppressWarnings("unchecked")
-    public void handleResponse(Map<String, Object> ctx, Object[] res) {
-        context = ctx;
-        result = res;
-        if (handler != null) {
-            handler.completed((T)res[0]);
-        }
-        done = true;
-        synchronized (this) {
-            notifyAll();
-        }
-    }
-
-    @Override
-    public void handleException(Map<String, Object> ctx, final Throwable ex) {
-        context = ctx;
-        exception = ex;
-        if (handler != null) {
-            handler.failed(exception);
-        }
-        done = true;
-        synchronized (this) {
-            notifyAll();
-        }
-    }
-
-
-
-    static class JaxrsResponseFuture<T> implements Future<T> {
-        JaxrsClientCallback<T> callback;
-        JaxrsResponseFuture(JaxrsClientCallback<T> cb) {
+    static class MPRestClientResponseFuture<T> extends CompletableFuture<T> implements Future<T> {
+        MPRestClientCallback<T> callback;
+        MPRestClientResponseFuture(MPRestClientCallback<T> cb) {
             callback = cb;
         }
 
@@ -117,8 +65,9 @@ public class JaxrsClientCallback<T> extends ClientCallback {
             try {
                 return getObject(callback.get()[0]);
             } catch (InterruptedException ex) {
-                if (callback.handler != null) {
-                    callback.handler.failed(ex);
+                InvocationCallback<T> handler = callback.getHandler();
+                if (handler != null) {
+                    handler.failed(ex);
                 }
                 throw ex;
             }
@@ -128,8 +77,9 @@ public class JaxrsClientCallback<T> extends ClientCallback {
             try {
                 return getObject(callback.get(timeout, unit)[0]);
             } catch (InterruptedException ex) {
-                if (callback.handler != null) {
-                    callback.handler.failed(ex);
+                InvocationCallback<T> handler = callback.getHandler();
+                if (handler != null) {
+                    handler.failed(ex);
                 }
                 throw ex;
             }
