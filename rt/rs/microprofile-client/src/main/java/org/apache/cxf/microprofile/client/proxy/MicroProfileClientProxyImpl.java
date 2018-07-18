@@ -37,6 +37,7 @@ import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.microprofile.client.MPRestClientCallback;
 import org.apache.cxf.microprofile.client.MicroProfileClientProviderFactory;
 import org.eclipse.microprofile.rest.client.ext.ResponseExceptionMapper;
 
@@ -97,6 +98,13 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
 
         JaxrsClientCallback<?> cb = outMessage.getExchange().get(JaxrsClientCallback.class);
         return cb.createFuture();
+    }
+
+    @Override
+    protected JaxrsClientCallback<?> newJaxrsClientCallback(InvocationCallback<Object> asyncCallback,
+                                                            Class<?> responseClass,
+                                                            Type outGenericType) {
+        return new MPRestClientCallback<Object>(asyncCallback, responseClass, outGenericType);
     }
 
     @Override
