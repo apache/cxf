@@ -86,25 +86,25 @@ public class WSSecurity10Test extends AbstractBusClientServerTestBase {
     }
 
     @Parameters(name = "{0}")
-    public static Collection<TestParam[]> data() {
+    public static Collection<TestParam> data() {
 
-        return Arrays.asList(new TestParam[][] {
-            {new TestParam("UserName", PORT, false)},
-            {new TestParam("UserNameOverTransport", SSL_PORT, false)},
-            {new TestParam("MutualCertificate10SignEncrypt", PORT, false)},
-            {new TestParam("MutualCertificate10SignEncryptRsa15TripleDes", PORT, false)},
-            {new TestParam("UserName", PORT, true)},
-            {new TestParam("UserNameOverTransport", SSL_PORT, true)},
-            {new TestParam("MutualCertificate10SignEncrypt", PORT, true)},
-            {new TestParam("MutualCertificate10SignEncryptRsa15TripleDes", PORT, true)},
-            {new TestParam("UserName", STAX_PORT, false)},
-            {new TestParam("UserNameOverTransport", STAX_SSL_PORT, false)},
-            {new TestParam("MutualCertificate10SignEncrypt", STAX_PORT, false)},
-            {new TestParam("MutualCertificate10SignEncryptRsa15TripleDes", STAX_PORT, false)},
-            {new TestParam("UserName", STAX_PORT, true)},
-            {new TestParam("UserNameOverTransport", STAX_SSL_PORT, true)},
-            {new TestParam("MutualCertificate10SignEncrypt", STAX_PORT, true)},
-            {new TestParam("MutualCertificate10SignEncryptRsa15TripleDes", STAX_PORT, true)}
+        return Arrays.asList(new TestParam[] {
+            new TestParam("UserName", PORT, false),
+            new TestParam("UserNameOverTransport", SSL_PORT, false),
+            new TestParam("MutualCertificate10SignEncrypt", PORT, false),
+            new TestParam("MutualCertificate10SignEncryptRsa15TripleDes", PORT, false),
+            new TestParam("UserName", PORT, true),
+            new TestParam("UserNameOverTransport", SSL_PORT, true),
+            new TestParam("MutualCertificate10SignEncrypt", PORT, true),
+            new TestParam("MutualCertificate10SignEncryptRsa15TripleDes", PORT, true),
+            new TestParam("UserName", STAX_PORT, false),
+            new TestParam("UserNameOverTransport", STAX_SSL_PORT, false),
+            new TestParam("MutualCertificate10SignEncrypt", STAX_PORT, false),
+            new TestParam("MutualCertificate10SignEncryptRsa15TripleDes", STAX_PORT, false),
+            new TestParam("UserName", STAX_PORT, true),
+            new TestParam("UserNameOverTransport", STAX_SSL_PORT, true),
+            new TestParam("MutualCertificate10SignEncrypt", STAX_PORT, true),
+            new TestParam("MutualCertificate10SignEncryptRsa15TripleDes", STAX_PORT, true)
         });
     }
 

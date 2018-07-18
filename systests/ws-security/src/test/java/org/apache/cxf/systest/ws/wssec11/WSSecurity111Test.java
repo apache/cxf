@@ -105,7 +105,7 @@ public class WSSecurity111Test extends WSSecurity11Common {
     }
 
     @Parameters(name = "{0}")
-    public static Collection<TestParam[]> data() {
+    public static Collection<TestParam> data() {
         String domPort = null;
         if (unrestrictedPoliciesInstalled) {
             domPort = Server11.PORT;
@@ -120,50 +120,50 @@ public class WSSecurity111Test extends WSSecurity11Common {
             staxPort = StaxServer11Restricted.PORT;
         }
 
-        return Arrays.asList(new TestParam[][] {
-            {new TestParam("A", domPort, false)},
-            {new TestParam("A-NoTimestamp", domPort, false)},
-            {new TestParam("AD", domPort, false)},
-            {new TestParam("A-ES", domPort, false)},
-            {new TestParam("AD-ES", domPort, false)},
-            {new TestParam("UX", domPort, false)},
-            {new TestParam("UX-NoTimestamp", domPort, false)},
-            {new TestParam("UXD", domPort, false)},
-            {new TestParam("UX-SEES", domPort, false)},
-            {new TestParam("UXD-SEES", domPort, false)},
+        return Arrays.asList(new TestParam[] {
+            new TestParam("A", domPort, false),
+            new TestParam("A-NoTimestamp", domPort, false),
+            new TestParam("AD", domPort, false),
+            new TestParam("A-ES", domPort, false),
+            new TestParam("AD-ES", domPort, false),
+            new TestParam("UX", domPort, false),
+            new TestParam("UX-NoTimestamp", domPort, false),
+            new TestParam("UXD", domPort, false),
+            new TestParam("UX-SEES", domPort, false),
+            new TestParam("UXD-SEES", domPort, false),
 
-            {new TestParam("A", domPort, true)},
-            {new TestParam("A-NoTimestamp", domPort, true)},
-            {new TestParam("AD", domPort, true)},
-            {new TestParam("A-ES", domPort, true)},
-            {new TestParam("AD-ES", domPort, true)},
-            {new TestParam("UX", domPort, true)},
-            {new TestParam("UX-NoTimestamp", domPort, true)},
-            {new TestParam("UXD", domPort, true)},
-            {new TestParam("UX-SEES", domPort, true)},
-            {new TestParam("UXD-SEES", domPort, true)},
+            new TestParam("A", domPort, true),
+            new TestParam("A-NoTimestamp", domPort, true),
+            new TestParam("AD", domPort, true),
+            new TestParam("A-ES", domPort, true),
+            new TestParam("AD-ES", domPort, true),
+            new TestParam("UX", domPort, true),
+            new TestParam("UX-NoTimestamp", domPort, true),
+            new TestParam("UXD", domPort, true),
+            new TestParam("UX-SEES", domPort, true),
+            new TestParam("UXD-SEES", domPort, true),
 
-            {new TestParam("A", staxPort, false)},
-            {new TestParam("A-NoTimestamp", staxPort, false)},
-            {new TestParam("AD", staxPort, false)},
-            {new TestParam("A-ES", staxPort, false)},
-            {new TestParam("AD-ES", staxPort, false)},
-            {new TestParam("UX", staxPort, false)},
-            {new TestParam("UX-NoTimestamp", staxPort, false)},
-            {new TestParam("UXD", staxPort, false)},
-            {new TestParam("UX-SEES", staxPort, false)},
-            {new TestParam("UXD-SEES", staxPort, false)},
+            new TestParam("A", staxPort, false),
+            new TestParam("A-NoTimestamp", staxPort, false),
+            new TestParam("AD", staxPort, false),
+            new TestParam("A-ES", staxPort, false),
+            new TestParam("AD-ES", staxPort, false),
+            new TestParam("UX", staxPort, false),
+            new TestParam("UX-NoTimestamp", staxPort, false),
+            new TestParam("UXD", staxPort, false),
+            new TestParam("UX-SEES", staxPort, false),
+            new TestParam("UXD-SEES", staxPort, false),
 
-            {new TestParam("A", staxPort, true)},
-            {new TestParam("A-NoTimestamp", staxPort, true)},
-            {new TestParam("AD", staxPort, true)},
-            {new TestParam("A-ES", staxPort, true)},
-            {new TestParam("AD-ES", staxPort, true)},
-            {new TestParam("UX", staxPort, true)},
-            {new TestParam("UX-NoTimestamp", staxPort, true)},
-            {new TestParam("UXD", staxPort, true)},
-            {new TestParam("UX-SEES", staxPort, true)},
-            {new TestParam("UXD-SEES", staxPort, true)},
+            new TestParam("A", staxPort, true),
+            new TestParam("A-NoTimestamp", staxPort, true),
+            new TestParam("AD", staxPort, true),
+            new TestParam("A-ES", staxPort, true),
+            new TestParam("AD-ES", staxPort, true),
+            new TestParam("UX", staxPort, true),
+            new TestParam("UX-NoTimestamp", staxPort, true),
+            new TestParam("UXD", staxPort, true),
+            new TestParam("UX-SEES", staxPort, true),
+            new TestParam("UXD-SEES", staxPort, true),
         });
     }
 

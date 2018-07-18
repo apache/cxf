@@ -90,17 +90,17 @@ public class X509SymmetricBindingTest extends AbstractBusClientServerTestBase {
     }
 
     @Parameters(name = "{0}")
-    public static Collection<TestParam[]> data() {
+    public static Collection<TestParam> data() {
 
-        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false, STSPORT2)},
-                                                {new TestParam(PORT, true, STSPORT2)},
-                                                {new TestParam(STAX_PORT, false, STSPORT2)},
-                                                {new TestParam(STAX_PORT, true, STSPORT2)},
+        return Arrays.asList(new TestParam[] {new TestParam(PORT, false, STSPORT2),
+                                              new TestParam(PORT, true, STSPORT2),
+                                              new TestParam(STAX_PORT, false, STSPORT2),
+                                              new TestParam(STAX_PORT, true, STSPORT2),
 
-                                                {new TestParam(PORT, false, STAX_STSPORT2)},
-                                                {new TestParam(PORT, true, STAX_STSPORT2)},
-                                                {new TestParam(STAX_PORT, false, STAX_STSPORT2)},
-                                                {new TestParam(STAX_PORT, true, STAX_STSPORT2)},
+                                              new TestParam(PORT, false, STAX_STSPORT2),
+                                              new TestParam(PORT, true, STAX_STSPORT2),
+                                              new TestParam(STAX_PORT, false, STAX_STSPORT2),
+                                              new TestParam(STAX_PORT, true, STAX_STSPORT2),
         });
     }
 
