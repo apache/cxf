@@ -27,6 +27,8 @@ import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.ws.rs.core.Response;
 
@@ -40,20 +42,34 @@ import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
 import org.apache.cxf.rs.security.oidc.common.UserInfo;
+import org.apache.cxf.systest.jaxrs.security.SecurityTestUtil;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.TestUtil;
 
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Some unit tests for the UserInfo Service in OpenId Connect. This can be used to return the User's claims given
- * an access token.
+ * an access token. The tests are run multiple times with different OAuthDataProvider implementations:
+ * a) PORT - EhCache
+ * b) JWT_PORT - EhCache with useJwtFormatForAccessTokens enabled
  */
+@RunWith(value = org.junit.runners.Parameterized.class)
 public class UserInfoTest extends AbstractBusClientServerTestBase {
 
     static final String PORT = TestUtil.getPortNumber("jaxrs-userinfo");
+    static final String JWT_PORT = TestUtil.getPortNumber("jaxrs-userinfo-jwt");
+
+    final String port;
+
+    public UserInfoTest(String port) {
+        this.port = port;
+    }
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -63,13 +79,30 @@ public class UserInfoTest extends AbstractBusClientServerTestBase {
                 // set this to false to fork
                 launchServer(UserInfoServer.class, true)
         );
+        assertTrue(
+                   "Server failed to launch",
+                   // run the server in the same process
+                   // set this to false to fork
+                   launchServer(UserInfoServerJWT.class, true)
+        );
+    }
+
+    @AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
+    }
+
+    @Parameters(name = "{0}")
+    public static Collection<String> data() {
+
+        return Arrays.asList(PORT, JWT_PORT);
     }
 
     @org.junit.Test
     public void testPlainUserInfo() throws Exception {
         URL busFile = UserInfoTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/oidc";
+        String address = "https://localhost:" + port + "/services/oidc";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
 
@@ -98,7 +131,7 @@ public class UserInfoTest extends AbstractBusClientServerTestBase {
         validateIdToken(idToken, null);
 
         // Now invoke on the UserInfo service with the access token
-        String userInfoAddress = "https://localhost:" + PORT + "/services/plain/userinfo";
+        String userInfoAddress = "https://localhost:" + port + "/services/plain/userinfo";
         WebClient userInfoClient = WebClient.create(userInfoAddress, OAuth2TestUtils.setupProviders(),
                                                     busFile.toString());
         userInfoClient.accept("application/json");
@@ -118,7 +151,7 @@ public class UserInfoTest extends AbstractBusClientServerTestBase {
     public void testSignedUserInfo() throws Exception {
         URL busFile = UserInfoTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/oidc";
+        String address = "https://localhost:" + port + "/services/oidc";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
 
@@ -147,7 +180,7 @@ public class UserInfoTest extends AbstractBusClientServerTestBase {
         validateIdToken(idToken, null);
 
         // Now invoke on the UserInfo service with the access token
-        String userInfoAddress = "https://localhost:" + PORT + "/services/signed/userinfo";
+        String userInfoAddress = "https://localhost:" + port + "/services/signed/userinfo";
         WebClient userInfoClient = WebClient.create(userInfoAddress, OAuth2TestUtils.setupProviders(),
                                                     busFile.toString());
         userInfoClient.accept("application/jwt");
@@ -179,7 +212,7 @@ public class UserInfoTest extends AbstractBusClientServerTestBase {
     public void testEncryptedUserInfo() throws Exception {
         URL busFile = UserInfoTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/services/oidc";
+        String address = "https://localhost:" + port + "/services/oidc";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             "alice", "security", busFile.toString());
 
@@ -208,7 +241,7 @@ public class UserInfoTest extends AbstractBusClientServerTestBase {
         validateIdToken(idToken, null);
 
         // Now invoke on the UserInfo service with the access token
-        String userInfoAddress = "https://localhost:" + PORT + "/services/encrypted/userinfo";
+        String userInfoAddress = "https://localhost:" + port + "/services/encrypted/userinfo";
         WebClient userInfoClient = WebClient.create(userInfoAddress, OAuth2TestUtils.setupProviders(),
                                                     busFile.toString());
         userInfoClient.accept("application/jwt");

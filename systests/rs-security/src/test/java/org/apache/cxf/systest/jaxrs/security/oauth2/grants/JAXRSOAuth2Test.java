@@ -20,6 +20,8 @@
 package org.apache.cxf.systest.jaxrs.security.oauth2.grants;
 
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,9 +53,11 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.saml.SAMLUtils;
 import org.apache.cxf.rs.security.saml.SAMLUtils.SelfSignInfo;
 import org.apache.cxf.rt.security.SecurityConstants;
+import org.apache.cxf.systest.jaxrs.security.SecurityTestUtil;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.SamlCallbackHandler;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
@@ -61,30 +65,62 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.DOM2Writer;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
 
+/**
+ * Some tests for OAuth 2.0. The tests are run multiple times with different OAuthDataProvider implementations:
+ * a) PORT - EhCache
+ * b) JWT_PORT - EhCache with useJwtFormatForAccessTokens enabled
+ */
+@RunWith(value = org.junit.runners.Parameterized.class)
 public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
-    public static final String PORT = BookServerOAuth2.PORT;
+    public static final String PORT = TestUtil.getPortNumber("jaxrs-oauth2");
+    public static final String PORT_PUBLIC = TestUtil.getPortNumber("jaxrs-oauth2-public");
+    public static final String JWT_PORT = TestUtil.getPortNumber("jaxrs-oauth2-jwt");
+    public static final String JWT_PORT_PUBLIC = TestUtil.getPortNumber("jaxrs-oauth2-public-jwt");
+
     private static final String CRYPTO_RESOURCE_PROPERTIES =
         "org/apache/cxf/systest/jaxrs/security/alice.properties";
+
+    final String port;
+
+    public JAXRSOAuth2Test(String port) {
+        this.port = port;
+    }
 
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
                    launchServer(BookServerOAuth2.class, true));
+        assertTrue("server did not launch correctly",
+                   launchServer(BookServerOAuth2JWT.class, true));
+    }
+
+    @AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
+    }
+
+    @Parameters(name = "{0}")
+    public static Collection<String> data() {
+
+        return Arrays.asList(PORT, JWT_PORT);
     }
 
     @Test
     public void testSAML2BearerGrant() throws Exception {
-        String address = "https://localhost:" + PORT + "/oauth2/token";
+        String address = "https://localhost:" + port + "/oauth2/token";
         WebClient wc = createWebClient(address);
 
         Crypto crypto = new CryptoLoader().loadCrypto(CRYPTO_RESOURCE_PROPERTIES);
         SelfSignInfo signInfo = new SelfSignInfo(crypto, "alice", "password");
 
         SamlCallbackHandler samlCallbackHandler = new SamlCallbackHandler(false);
-        String audienceURI = "https://localhost:" + PORT + "/oauth2/token";
+        String audienceURI = "https://localhost:" + port + "/oauth2/token";
         samlCallbackHandler.setAudience(audienceURI);
         SamlAssertionWrapper assertionWrapper = SAMLUtils.createAssertion(samlCallbackHandler,
                                                                           signInfo);
@@ -102,7 +138,7 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
 
     @Test
     public void testSAML2BearerAuthenticationDirect() throws Exception {
-        String address = "https://localhost:" + PORT + "/oauth2-auth/token";
+        String address = "https://localhost:" + port + "/oauth2-auth/token";
         WebClient wc = createWebClient(address);
 
         Crypto crypto = new CryptoLoader().loadCrypto(CRYPTO_RESOURCE_PROPERTIES);
@@ -110,7 +146,7 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
 
         SamlCallbackHandler samlCallbackHandler = new SamlCallbackHandler(true);
         samlCallbackHandler.setIssuer("alice");
-        String audienceURI = "https://localhost:" + PORT + "/oauth2-auth/token";
+        String audienceURI = "https://localhost:" + port + "/oauth2-auth/token";
         samlCallbackHandler.setAudience(audienceURI);
         SamlAssertionWrapper assertionWrapper = SAMLUtils.createAssertion(samlCallbackHandler,
                                                                           signInfo);
@@ -132,7 +168,7 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
 
     @Test()
     public void testConfidentialClientIdOnly() throws Exception {
-        String address = "https://localhost:" + PORT + "/oauth2/token";
+        String address = "https://localhost:" + port + "/oauth2/token";
         WebClient wc = createWebClient(address);
 
         try {
@@ -148,33 +184,37 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
 
     @Test
     public void testConfidentialClientIdAndSecret() throws Exception {
-        String address = "https://localhost:" + PORT + "/oauth2/token";
+        String address = "https://localhost:" + port + "/oauth2/token";
         WebClient wc = createWebClient(address);
 
-        
+
         ClientAccessToken at = OAuthClientUtils.getAccessToken(wc,
                                                                new Consumer("fred", "password"),
                                                                new CustomGrant(),
                                                                false);
         assertNotNull(at.getTokenKey());
     }
-    
+
     @Test
     public void testPublicClientIdOnly() throws Exception {
-        String address = "http://localhost:" + BookServerOAuth2.PORT_PUBLIC + "/oauth2Public/token";
+        String pubPort = PORT_PUBLIC;
+        if (JWT_PORT.equals(port)) {
+            pubPort = JWT_PORT_PUBLIC;
+        }
+        String address = "http://localhost:" + pubPort + "/oauth2Public/token";
         WebClient wc = WebClient.create(address);
 
-        
+
         ClientAccessToken at = OAuthClientUtils.getAccessToken(wc,
                                                                new Consumer("fredPublic"),
                                                                new CustomGrant(),
                                                                false);
         assertNotNull(at.getTokenKey());
     }
-    
+
     @Test
     public void testTwoWayTLSAuthenticationCustomGrant() throws Exception {
-        String address = "https://localhost:" + PORT + "/oauth2/token";
+        String address = "https://localhost:" + port + "/oauth2/token";
         WebClient wc = createWebClient(address);
 
         ClientAccessToken at = OAuthClientUtils.getAccessToken(wc, new CustomGrant());
@@ -183,7 +223,7 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
 
     @Test
     public void testBasicAuthClientCred() throws Exception {
-        String address = "https://localhost:" + PORT + "/oauth2/token";
+        String address = "https://localhost:" + port + "/oauth2/token";
         WebClient wc = createWebClient(address);
         ClientCredentialsGrant grant = new ClientCredentialsGrant();
         // Pass client_id & client_secret as form properties
@@ -196,8 +236,8 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
         } catch (OAuthServiceException ex) {
             assertEquals(OAuthConstants.UNAUTHORIZED_CLIENT, ex.getError().getError());
         }
-        
-        ClientAccessToken at = OAuthClientUtils.getAccessToken(wc,  
+
+        ClientAccessToken at = OAuthClientUtils.getAccessToken(wc,
                                                                new Consumer("bob", "bobPassword"),
                                                                new ClientCredentialsGrant(),
                                                                true);
@@ -206,7 +246,7 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
 
     @Test
     public void testSAML2BearerAuthenticationInterceptor() throws Exception {
-        String address = "https://localhost:" + PORT + "/oauth2-auth/token";
+        String address = "https://localhost:" + port + "/oauth2-auth/token";
         WebClient wc = createWebClientWithProps(address);
 
         ClientAccessToken at = OAuthClientUtils.getAccessToken(wc,
@@ -216,7 +256,7 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
 
     @Test
     public void testJWTBearerGrant() throws Exception {
-        String address = "https://localhost:" + PORT + "/oauth2/token";
+        String address = "https://localhost:" + port + "/oauth2/token";
         WebClient wc = createWebClient(address);
 
         // Create the JWT Token
@@ -232,7 +272,7 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
 
     @Test
     public void testJWTBearerAuthenticationDirect() throws Exception {
-        String address = "https://localhost:" + PORT + "/oauth2-auth-jwt/token";
+        String address = "https://localhost:" + port + "/oauth2-auth-jwt/token";
         WebClient wc = createWebClient(address);
 
         // Create the JWT Token
@@ -255,10 +295,10 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
 
     @Test
     public void testSAML11() throws Exception {
-        String address = "https://localhost:" + PORT + "/oauth2-auth/token";
+        String address = "https://localhost:" + port + "/oauth2-auth/token";
         WebClient wc = createWebClient(address);
 
-        String audienceURI = "https://localhost:" + PORT + "/oauth2-auth/token";
+        String audienceURI = "https://localhost:" + port + "/oauth2-auth/token";
         String assertion = OAuth2TestUtils.createToken(audienceURI, false, true);
         String encodedAssertion = Base64UrlUtility.encode(assertion);
 
@@ -276,10 +316,10 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
 
     @Test
     public void testSAMLAudRestr() throws Exception {
-        String address = "https://localhost:" + PORT + "/oauth2-auth/token";
+        String address = "https://localhost:" + port + "/oauth2-auth/token";
         WebClient wc = createWebClient(address);
 
-        String audienceURI = "https://localhost:" + PORT + "/oauth2-auth/token2";
+        String audienceURI = "https://localhost:" + port + "/oauth2-auth/token2";
         String assertion = OAuth2TestUtils.createToken(audienceURI, true, true);
         String encodedAssertion = Base64UrlUtility.encode(assertion);
 
@@ -297,10 +337,10 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
 
     @Test
     public void testSAMLBadSubjectName() throws Exception {
-        String address = "https://localhost:" + PORT + "/oauth2-auth/token";
+        String address = "https://localhost:" + port + "/oauth2-auth/token";
         WebClient wc = createWebClient(address);
 
-        String audienceURI = "https://localhost:" + PORT + "/oauth2-auth/token";
+        String audienceURI = "https://localhost:" + port + "/oauth2-auth/token";
 
         // Create the SAML Assertion
         SamlCallbackHandler samlCallbackHandler = new SamlCallbackHandler(true);
@@ -340,10 +380,10 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
 
     @Test
     public void testSAMLUnsigned() throws Exception {
-        String address = "https://localhost:" + PORT + "/oauth2-auth/token";
+        String address = "https://localhost:" + port + "/oauth2-auth/token";
         WebClient wc = createWebClient(address);
 
-        String audienceURI = "https://localhost:" + PORT + "/oauth2-auth/token";
+        String audienceURI = "https://localhost:" + port + "/oauth2-auth/token";
         String assertion = OAuth2TestUtils.createToken(audienceURI, true, false);
         String encodedAssertion = Base64UrlUtility.encode(assertion);
 
@@ -361,10 +401,10 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
 
     @Test
     public void testSAMLHolderOfKey() throws Exception {
-        String address = "https://localhost:" + PORT + "/oauth2-auth/token";
+        String address = "https://localhost:" + port + "/oauth2-auth/token";
         WebClient wc = createWebClient(address);
 
-        String audienceURI = "https://localhost:" + PORT + "/oauth2-auth/token";
+        String audienceURI = "https://localhost:" + port + "/oauth2-auth/token";
 
         // Create the SAML Assertion
         SamlCallbackHandler samlCallbackHandler = new SamlCallbackHandler(true);
@@ -405,7 +445,7 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
 
     @Test
     public void testJWTBadSubjectName() throws Exception {
-        String address = "https://localhost:" + PORT + "/oauth2-auth-jwt/token";
+        String address = "https://localhost:" + port + "/oauth2-auth-jwt/token";
         WebClient wc = createWebClient(address);
 
         // Create the JWT Token
@@ -426,7 +466,7 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
 
     @Test
     public void testJWTUnsigned() throws Exception {
-        String address = "https://localhost:" + PORT + "/oauth2-auth-jwt/token";
+        String address = "https://localhost:" + port + "/oauth2-auth-jwt/token";
         WebClient wc = createWebClient(address);
 
         // Create the JWT Token
@@ -448,7 +488,7 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
 
     @Test
     public void testJWTNoIssuer() throws Exception {
-        String address = "https://localhost:" + PORT + "/oauth2-auth-jwt/token";
+        String address = "https://localhost:" + port + "/oauth2-auth-jwt/token";
         WebClient wc = createWebClient(address);
 
         // Create the JWT Token
@@ -469,7 +509,7 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
 
     @Test
     public void testJWTNoExpiry() throws Exception {
-        String address = "https://localhost:" + PORT + "/oauth2-auth-jwt/token";
+        String address = "https://localhost:" + port + "/oauth2-auth-jwt/token";
         WebClient wc = createWebClient(address);
 
         // Create the JWT Token
@@ -491,7 +531,7 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
 
     @Test
     public void testJWTBadAudienceRestriction() throws Exception {
-        String address = "https://localhost:" + PORT + "/oauth2-auth-jwt/token";
+        String address = "https://localhost:" + port + "/oauth2-auth-jwt/token";
         WebClient wc = createWebClient(address);
 
         // Create the JWT Token
@@ -540,7 +580,7 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
 
         SamlCallbackHandler samlCallbackHandler = new SamlCallbackHandler(true);
         samlCallbackHandler.setIssuer("alice");
-        String audienceURI = "https://localhost:" + PORT + "/oauth2-auth/token";
+        String audienceURI = "https://localhost:" + port + "/oauth2-auth/token";
         samlCallbackHandler.setAudience(audienceURI);
         properties.put(SecurityConstants.SAML_CALLBACK_HANDLER, samlCallbackHandler);
 

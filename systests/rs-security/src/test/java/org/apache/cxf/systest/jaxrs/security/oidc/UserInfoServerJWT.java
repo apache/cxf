@@ -26,9 +26,9 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
-public class UserInfoServer extends AbstractBusTestServerBase {
+public class UserInfoServerJWT extends AbstractBusTestServerBase {
     private static final URL SERVER_CONFIG_FILE =
-        UserInfoServer.class.getResource("userinfo-server.xml");
+        UserInfoServerJWT.class.getResource("userinfo-server-jwt.xml");
 
     protected void run() {
         SpringBusFactory bf = new SpringBusFactory();
@@ -37,7 +37,7 @@ public class UserInfoServer extends AbstractBusTestServerBase {
         setBus(springBus);
 
         try {
-            new UserInfoServer();
+            new UserInfoServerJWT();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

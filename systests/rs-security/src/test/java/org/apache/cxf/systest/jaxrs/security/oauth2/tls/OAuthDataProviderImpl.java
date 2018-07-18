@@ -43,13 +43,13 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
         client1.getAllowedGrantTypes().add("custom_grant");
         registerCert(client1);
         this.setClient(client1);
-        
+
         Client client2 = new Client("bound",
                                    null,
                                    true,
                                    null,
                                    null);
-        client2.getProperties().put(OAuthConstants.TLS_CLIENT_AUTH_SUBJECT_DN, 
+        client2.getProperties().put(OAuthConstants.TLS_CLIENT_AUTH_SUBJECT_DN,
                                     "CN=whateverhost.com,OU=Morpit,O=ApacheTest,L=Syracuse,C=US");
         client2.getAllowedGrantTypes().add("custom_grant");
         this.setClient(client2);
@@ -67,12 +67,12 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
         Certificate cert = loadCert();
         String encodedCert = Base64Utility.encode(cert.getEncoded());
         client.setApplicationCertificates(Collections.singletonList(encodedCert));
-        
+
     }
 
     private Certificate loadCert() throws Exception {
         try (InputStream is = ClassLoaderUtils.getResourceAsStream("keys/Truststore.jks", this.getClass())) {
-            return CryptoUtils.loadCertificate(is, new char[]{'p', 'a', 's', 's', 'w', 'o', 'r', 'd'}, "morpit", null);
+            return CryptoUtils.loadCertificate(is, "password".toCharArray(), "morpit", null);
         }
     }
 }
