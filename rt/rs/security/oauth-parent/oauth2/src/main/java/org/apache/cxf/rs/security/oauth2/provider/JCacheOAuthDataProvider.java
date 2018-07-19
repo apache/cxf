@@ -182,6 +182,12 @@ public class JCacheOAuthDataProvider extends AbstractOAuthDataProvider {
     }
 
     @Override
+    protected void linkRefreshTokenToAccessToken(RefreshToken rt, ServerAccessToken at) {
+        super.linkRefreshTokenToAccessToken(rt,  at);
+        accessTokenCache.replace(at.getTokenKey(), at);
+    }
+
+    @Override
     public void close() {
         
         clientCache.close();

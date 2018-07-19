@@ -33,7 +33,6 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class JCacheOAuthDataProviderTest extends Assert {
@@ -42,6 +41,8 @@ public class JCacheOAuthDataProviderTest extends Assert {
     @Before
     public void setUp() throws Exception {
         provider = new JCacheOAuthDataProvider();
+        provider.setSupportedScopes(Collections.singletonMap("a", "A Scope"));
+        provider.setSupportedScopes(Collections.singletonMap("refreshToken", "RefreshToken"));
     }
 
     @Test
@@ -91,7 +92,6 @@ public class JCacheOAuthDataProviderTest extends Assert {
         assertEquals(0, allClients.size());
     }
 
-    @Ignore
     @Test
     public void testAddGetDeleteAccessToken() {
         Client c = addClient("101", "bob");
@@ -134,7 +134,6 @@ public class JCacheOAuthDataProviderTest extends Assert {
         assertNull(provider.getAccessToken(at.getTokenKey()));
     }
 
-    @Ignore
     @Test
     public void testAddGetDeleteAccessToken2() {
         Client c = addClient("102", "bob");
@@ -156,7 +155,6 @@ public class JCacheOAuthDataProviderTest extends Assert {
         assertEquals(0, tokens.size());
     }
 
-    @Ignore
     @Test
     public void testAddGetDeleteRefreshToken() {
         Client c = addClient("101", "bob");
