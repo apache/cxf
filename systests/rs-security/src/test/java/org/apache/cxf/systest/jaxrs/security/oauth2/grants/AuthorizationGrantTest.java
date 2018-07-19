@@ -33,6 +33,9 @@ import java.util.Collection;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
@@ -44,6 +47,7 @@ import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;
 import org.apache.cxf.systest.jaxrs.security.SecurityTestUtil;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.xml.security.utils.ClassLoaderUtils;
 
@@ -58,6 +62,8 @@ import org.junit.runners.Parameterized.Parameters;
  * implementations:
  * a) PORT - EhCache
  * b) JWT_PORT - EhCache with useJwtFormatForAccessTokens enabled
+ * c) JCACHE_PORT - JCache
+ * d) JWT_JCACHE_PORT - JCache with useJwtFormatForAccessTokens enabled
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
@@ -65,6 +71,10 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
     public static final String PORT2 = TestUtil.getPortNumber("jaxrs-oauth2-grants2");
     public static final String JWT_PORT = TestUtil.getPortNumber("jaxrs-oauth2-grants-jwt");
     public static final String JWT_PORT2 = TestUtil.getPortNumber("jaxrs-oauth2-grants2-jwt");
+    public static final String JCACHE_PORT = TestUtil.getPortNumber("jaxrs-oauth2-grants-jcache");
+    public static final String JCACHE_PORT2 = TestUtil.getPortNumber("jaxrs-oauth2-grants2-jcache");
+    public static final String JWT_JCACHE_PORT = TestUtil.getPortNumber("jaxrs-oauth2-grants-jcache-jwt");
+    public static final String JWT_JCACHE_PORT2 = TestUtil.getPortNumber("jaxrs-oauth2-grants2-jcache-jwt");
 
     final String port;
 
@@ -78,6 +88,10 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
                    launchServer(BookServerOAuth2Grants.class, true));
         assertTrue("server did not launch correctly",
                    launchServer(BookServerOAuth2GrantsJWT.class, true));
+        assertTrue("server did not launch correctly",
+                   launchServer(BookServerOAuth2GrantsJCache.class, true));
+        assertTrue("server did not launch correctly",
+                   launchServer(BookServerOAuth2GrantsJCacheJWT.class, true));
     }
 
     @AfterClass
@@ -88,7 +102,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
     @Parameters(name = "{0}")
     public static Collection<String> data() {
 
-        return Arrays.asList(PORT, JWT_PORT);
+        return Arrays.asList(PORT, JWT_PORT, JCACHE_PORT, JWT_JCACHE_PORT);
     }
 
     @org.junit.Test
@@ -340,6 +354,10 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         String audPort = PORT2;
         if (JWT_PORT.equals(port)) {
             audPort = JWT_PORT2;
+        } else if (JCACHE_PORT.equals(port)) {
+            audPort = JCACHE_PORT2;
+        } else if (JWT_JCACHE_PORT.equals(port)) {
+            audPort = JWT_JCACHE_PORT2;
         }
         String audience = "https://localhost:" + audPort + "/secured/bookstore/books";
         ClientAccessToken accessToken =
@@ -536,4 +554,83 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
                                                           SignatureAlgorithm.RS256));
     }
 
+    //
+    // Server implementations
+    //
+
+    public static class BookServerOAuth2Grants extends AbstractBusTestServerBase {
+        private static final URL SERVER_CONFIG_FILE =
+            BookServerOAuth2Grants.class.getResource("grants-server.xml");
+
+        protected void run() {
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
+            BusFactory.setDefaultBus(springBus);
+            setBus(springBus);
+
+            try {
+                new BookServerOAuth2Grants();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+
+    public static class BookServerOAuth2GrantsJWT extends AbstractBusTestServerBase {
+        private static final URL SERVER_CONFIG_FILE =
+            BookServerOAuth2GrantsJWT.class.getResource("grants-server-jwt.xml");
+
+        protected void run() {
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
+            BusFactory.setDefaultBus(springBus);
+            setBus(springBus);
+
+            try {
+                new BookServerOAuth2GrantsJWT();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+
+    public static class BookServerOAuth2GrantsJCache extends AbstractBusTestServerBase {
+        private static final URL SERVER_CONFIG_FILE =
+            BookServerOAuth2GrantsJCache.class.getResource("grants-server-jcache.xml");
+
+        protected void run() {
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
+            BusFactory.setDefaultBus(springBus);
+            setBus(springBus);
+
+            try {
+                new BookServerOAuth2GrantsJCache();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+
+    public static class BookServerOAuth2GrantsJCacheJWT extends AbstractBusTestServerBase {
+        private static final URL SERVER_CONFIG_FILE =
+            BookServerOAuth2GrantsJCacheJWT.class.getResource("grants-server-jcache-jwt.xml");
+
+        protected void run() {
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
+            BusFactory.setDefaultBus(springBus);
+            setBus(springBus);
+
+            try {
+                new BookServerOAuth2GrantsJCacheJWT();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
 }

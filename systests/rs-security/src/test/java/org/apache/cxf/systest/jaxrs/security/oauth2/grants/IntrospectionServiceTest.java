@@ -25,12 +25,16 @@ import java.util.Collection;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.TokenIntrospection;
 import org.apache.cxf.systest.jaxrs.security.SecurityTestUtil;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
 
 import org.junit.AfterClass;
@@ -43,6 +47,8 @@ import org.junit.runners.Parameterized.Parameters;
  * OAuthDataProvider implementations:
  * a) PORT - EhCache
  * b) JWT_PORT - EhCache with useJwtFormatForAccessTokens enabled
+ * c) JCACHE_PORT - JCache
+ * d) JWT_JCACHE_PORT - JCache with useJwtFormatForAccessTokens enabled
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
@@ -51,6 +57,10 @@ public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
     public static final String PORT2 = TestUtil.getPortNumber("jaxrs-oauth2-introspection2");
     public static final String JWT_PORT = TestUtil.getPortNumber("jaxrs-oauth2-introspection-jwt");
     public static final String JWT_PORT2 = TestUtil.getPortNumber("jaxrs-oauth2-introspection2-jwt");
+    public static final String JCACHE_PORT = TestUtil.getPortNumber("jaxrs-oauth2-introspection-jcache");
+    public static final String JCACHE_PORT2 = TestUtil.getPortNumber("jaxrs-oauth2-introspection2-jcache");
+    public static final String JWT_JCACHE_PORT = TestUtil.getPortNumber("jaxrs-oauth2-introspection-jcache-jwt");
+    public static final String JWT_JCACHE_PORT2 = TestUtil.getPortNumber("jaxrs-oauth2-introspection2-jcache-jwt");
 
     final String port;
 
@@ -64,6 +74,10 @@ public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
                    launchServer(BookServerOAuth2Introspection.class, true));
         assertTrue("server did not launch correctly",
                    launchServer(BookServerOAuth2IntrospectionJWT.class, true));
+        assertTrue("server did not launch correctly",
+                   launchServer(BookServerOAuth2IntrospectionJCache.class, true));
+        assertTrue("server did not launch correctly",
+                   launchServer(BookServerOAuth2IntrospectionJCacheJWT.class, true));
     }
 
     @AfterClass
@@ -74,7 +88,7 @@ public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
     @Parameters(name = "{0}")
     public static Collection<String> data() {
 
-        return Arrays.asList(PORT, JWT_PORT);
+        return Arrays.asList(PORT, JWT_PORT, JCACHE_PORT, JWT_JCACHE_PORT);
     }
 
     @org.junit.Test
@@ -145,6 +159,10 @@ public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
         String audPort = PORT2;
         if (JWT_PORT.equals(port)) {
             audPort = JWT_PORT2;
+        } else if (JCACHE_PORT.equals(port)) {
+            audPort = JCACHE_PORT2;
+        } else if (JWT_JCACHE_PORT.equals(port)) {
+            audPort = JWT_JCACHE_PORT2;
         }
         String audience = "https://localhost:" + audPort + "/secured/bookstore/books";
         ClientAccessToken accessToken =
@@ -315,4 +333,83 @@ public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
         assertTrue(validity == accessToken.getExpiresIn());
     }
 
+    //
+    // Server implementations
+    //
+
+    public static class BookServerOAuth2Introspection extends AbstractBusTestServerBase {
+        private static final URL SERVER_CONFIG_FILE =
+            BookServerOAuth2Introspection.class.getResource("introspection-server.xml");
+
+        protected void run() {
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
+            BusFactory.setDefaultBus(springBus);
+            setBus(springBus);
+
+            try {
+                new BookServerOAuth2Introspection();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+
+    public static class BookServerOAuth2IntrospectionJWT extends AbstractBusTestServerBase {
+        private static final URL SERVER_CONFIG_FILE =
+            BookServerOAuth2IntrospectionJWT.class.getResource("introspection-server-jwt.xml");
+
+        protected void run() {
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
+            BusFactory.setDefaultBus(springBus);
+            setBus(springBus);
+
+            try {
+                new BookServerOAuth2IntrospectionJWT();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+
+    public static class BookServerOAuth2IntrospectionJCache extends AbstractBusTestServerBase {
+        private static final URL SERVER_CONFIG_FILE =
+            BookServerOAuth2Introspection.class.getResource("introspection-server-jcache.xml");
+
+        protected void run() {
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
+            BusFactory.setDefaultBus(springBus);
+            setBus(springBus);
+
+            try {
+                new BookServerOAuth2IntrospectionJCache();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+
+    public static class BookServerOAuth2IntrospectionJCacheJWT extends AbstractBusTestServerBase {
+        private static final URL SERVER_CONFIG_FILE =
+            BookServerOAuth2IntrospectionJWT.class.getResource("introspection-server-jcache-jwt.xml");
+
+        protected void run() {
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
+            BusFactory.setDefaultBus(springBus);
+            setBus(springBus);
+
+            try {
+                new BookServerOAuth2IntrospectionJCacheJWT();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
 }

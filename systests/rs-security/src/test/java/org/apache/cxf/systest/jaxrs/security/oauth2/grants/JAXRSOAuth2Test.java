@@ -32,6 +32,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.helpers.DOMUtils;
@@ -56,7 +57,9 @@ import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.systest.jaxrs.security.SecurityTestUtil;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.SamlCallbackHandler;
+import org.apache.cxf.systest.jaxrs.security.oauth2.grants.AuthorizationGrantTest.BookServerOAuth2Grants;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.saml.SAMLCallback;
@@ -75,6 +78,8 @@ import org.junit.runners.Parameterized.Parameters;
  * Some tests for OAuth 2.0. The tests are run multiple times with different OAuthDataProvider implementations:
  * a) PORT - EhCache
  * b) JWT_PORT - EhCache with useJwtFormatForAccessTokens enabled
+ * c) JCACHE_PORT - JCache
+ * d) JWT_JCACHE_PORT - JCache with useJwtFormatForAccessTokens enabled
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
@@ -82,6 +87,10 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
     public static final String PORT_PUBLIC = TestUtil.getPortNumber("jaxrs-oauth2-public");
     public static final String JWT_PORT = TestUtil.getPortNumber("jaxrs-oauth2-jwt");
     public static final String JWT_PORT_PUBLIC = TestUtil.getPortNumber("jaxrs-oauth2-public-jwt");
+    public static final String JCACHE_PORT = TestUtil.getPortNumber("jaxrs-oauth2-jcache");
+    public static final String JCACHE_PORT_PUBLIC = TestUtil.getPortNumber("jaxrs-oauth2-public-jcache");
+    public static final String JWT_JCACHE_PORT = TestUtil.getPortNumber("jaxrs-oauth2-jcache-jwt");
+    public static final String JWT_JCACHE_PORT_PUBLIC = TestUtil.getPortNumber("jaxrs-oauth2-public-jcache-jwt");
 
     private static final String CRYPTO_RESOURCE_PROPERTIES =
         "org/apache/cxf/systest/jaxrs/security/alice.properties";
@@ -98,6 +107,10 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
                    launchServer(BookServerOAuth2.class, true));
         assertTrue("server did not launch correctly",
                    launchServer(BookServerOAuth2JWT.class, true));
+        assertTrue("server did not launch correctly",
+                   launchServer(BookServerOAuth2JCache.class, true));
+        assertTrue("server did not launch correctly",
+                   launchServer(BookServerOAuth2JCacheJWT.class, true));
     }
 
     @AfterClass
@@ -108,7 +121,7 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
     @Parameters(name = "{0}")
     public static Collection<String> data() {
 
-        return Arrays.asList(PORT, JWT_PORT);
+        return Arrays.asList(PORT, JWT_PORT, JCACHE_PORT, JWT_JCACHE_PORT);
     }
 
     @Test
@@ -613,4 +626,83 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
 
     }
 
+    //
+    // Server implementations
+    //
+
+    public static class BookServerOAuth2 extends AbstractBusTestServerBase {
+        private static final URL SERVER_CONFIG_FILE =
+            BookServerOAuth2Grants.class.getResource("server.xml");
+
+        protected void run() {
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
+            BusFactory.setDefaultBus(springBus);
+            setBus(springBus);
+
+            try {
+                new BookServerOAuth2();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+
+    public static class BookServerOAuth2JWT extends AbstractBusTestServerBase {
+        private static final URL SERVER_CONFIG_FILE =
+            BookServerOAuth2Grants.class.getResource("server-jwt.xml");
+
+        protected void run() {
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
+            BusFactory.setDefaultBus(springBus);
+            setBus(springBus);
+
+            try {
+                new BookServerOAuth2JWT();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+
+    public static class BookServerOAuth2JCache extends AbstractBusTestServerBase {
+        private static final URL SERVER_CONFIG_FILE =
+            BookServerOAuth2Grants.class.getResource("server-jcache.xml");
+
+        protected void run() {
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
+            BusFactory.setDefaultBus(springBus);
+            setBus(springBus);
+
+            try {
+                new BookServerOAuth2JCache();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+
+    public static class BookServerOAuth2JCacheJWT extends AbstractBusTestServerBase {
+        private static final URL SERVER_CONFIG_FILE =
+            BookServerOAuth2Grants.class.getResource("server-jcache-jwt.xml");
+
+        protected void run() {
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
+            BusFactory.setDefaultBus(springBus);
+            setBus(springBus);
+
+            try {
+                new BookServerOAuth2JCacheJWT();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
 }
