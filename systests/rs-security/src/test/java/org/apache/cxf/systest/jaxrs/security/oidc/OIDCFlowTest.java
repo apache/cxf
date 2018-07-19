@@ -34,6 +34,9 @@ import java.util.Collections;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKeys;
@@ -51,6 +54,7 @@ import org.apache.cxf.systest.jaxrs.security.SecurityTestUtil;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils.AuthorizationCodeParameters;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.xml.security.utils.ClassLoaderUtils;
 
@@ -65,12 +69,16 @@ import org.junit.runners.Parameterized.Parameters;
  * with different OAuthDataProvider implementations:
  * a) PORT - EhCache
  * b) JWT_PORT - EhCache with useJwtFormatForAccessTokens enabled
+ * c) JCACHE_PORT - JCache
+ * d) JWT_JCACHE_PORT - JCache with useJwtFormatForAccessTokens enabled
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class OIDCFlowTest extends AbstractBusClientServerTestBase {
 
     static final String PORT = TestUtil.getPortNumber("jaxrs-oidc");
     static final String JWT_PORT = TestUtil.getPortNumber("jaxrs-oidc-jwt");
+    static final String JCACHE_PORT = TestUtil.getPortNumber("jaxrs-oidc-jcache");
+    static final String JWT_JCACHE_PORT = TestUtil.getPortNumber("jaxrs-oidc-jcache-jwt");
 
     final String port;
 
@@ -92,6 +100,18 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
                    // set this to false to fork
                    launchServer(OIDCServerJWT.class, true)
         );
+        assertTrue(
+                   "Server failed to launch",
+                   // run the server in the same process
+                   // set this to false to fork
+                   launchServer(OIDCServerJCache.class, true)
+        );
+        assertTrue(
+                   "Server failed to launch",
+                   // run the server in the same process
+                   // set this to false to fork
+                   launchServer(OIDCServerJCacheJWT.class, true)
+        );
     }
 
     @AfterClass
@@ -102,7 +122,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
     @Parameters(name = "{0}")
     public static Collection<String> data() {
 
-        return Arrays.asList(PORT, JWT_PORT);
+        return Arrays.asList(PORT, JWT_PORT, JCACHE_PORT, JWT_JCACHE_PORT);
     }
 
     @org.junit.Test
@@ -976,5 +996,85 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
 
         Assert.assertTrue(jwtConsumer.verifySignatureWith((X509Certificate)cert,
                                                           SignatureAlgorithm.RS256));
+    }
+
+    //
+    // Server implementations
+    //
+
+    public static class OIDCServer extends AbstractBusTestServerBase {
+        private static final URL SERVER_CONFIG_FILE =
+            OIDCServer.class.getResource("oidc-server.xml");
+
+        protected void run() {
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
+            BusFactory.setDefaultBus(springBus);
+            setBus(springBus);
+
+            try {
+                new OIDCServer();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+
+    public static class OIDCServerJWT extends AbstractBusTestServerBase {
+        private static final URL SERVER_CONFIG_FILE =
+            OIDCServerJWT.class.getResource("oidc-server-jwt.xml");
+
+        protected void run() {
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
+            BusFactory.setDefaultBus(springBus);
+            setBus(springBus);
+
+            try {
+                new OIDCServerJWT();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+
+    public static class OIDCServerJCache extends AbstractBusTestServerBase {
+        private static final URL SERVER_CONFIG_FILE =
+            OIDCServer.class.getResource("oidc-server-jcache.xml");
+
+        protected void run() {
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
+            BusFactory.setDefaultBus(springBus);
+            setBus(springBus);
+
+            try {
+                new OIDCServerJCache();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+
+    public static class OIDCServerJCacheJWT extends AbstractBusTestServerBase {
+        private static final URL SERVER_CONFIG_FILE =
+            OIDCServerJWT.class.getResource("oidc-server-jcache-jwt.xml");
+
+        protected void run() {
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
+            BusFactory.setDefaultBus(springBus);
+            setBus(springBus);
+
+            try {
+                new OIDCServerJCacheJWT();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
     }
 }
