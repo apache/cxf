@@ -39,6 +39,7 @@ public class AddressingProperties  {
     private String namespaceURI;
     private QName duplicate;
     private List<QName> mustUnderstand;
+    private boolean isRequired;
 
     /**
      * Constructor, defaults to 2005/08 namespace.
@@ -212,6 +213,12 @@ public class AddressingProperties  {
             mustUnderstand = new ArrayList<>();
         }
         return mustUnderstand;
+    }
+    public boolean isRequired() {
+        return isRequired;
+    }
+    public void setRequired(boolean b) {
+        isRequired = b;
     }
 
     public String toString() {
