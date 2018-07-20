@@ -999,7 +999,8 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
                         "http://localhost:" + PORT + "/SoapContext/AsyncEchoProvider");
         Dispatch<StreamSource> dispatcher = service.createDispatch(fakePortName,
                                                                    StreamSource.class,
-                                                                   Service.Mode.PAYLOAD);
+                                                                   Service.Mode.PAYLOAD, 
+                                                                   new LoggingFeature());
 
         Client client = ((DispatchImpl<StreamSource>)dispatcher).getClient();
         WSAddressingFeature wsAddressingFeature = new WSAddressingFeature();

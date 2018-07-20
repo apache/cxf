@@ -465,9 +465,8 @@ public class MAPCodec extends AbstractSoapInterceptor {
             LOG.log(Level.FINE,
                     "{0} : {1}",
                     new Object[] {name.getLocalPart(), getLogText(value)});
-            
-            boolean mu = maps.getMustUnderstand().contains(name);
-                
+            boolean mu = maps.isRequired() || maps.getMustUnderstand().contains(name);
+
             transformer.encodeAsExposed(message,
                                         maps.getNamespaceURI(),
                                         value,

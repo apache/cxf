@@ -433,6 +433,10 @@ public class MAPAggregatorImpl extends MAPAggregator {
             }
             AddressingProperties theMaps = 
                 ContextUtils.retrieveMAPs(message, false, ContextUtils.isOutbound(message));
+            
+            if (isAddressingRequired() && ContextUtils.isRequestor(message)) {
+                theMaps.setRequired(true);
+            }
             if (null != theMaps) {
                 if (ContextUtils.isRequestor(message)) {            
                     assertAddressing(message, 
@@ -631,7 +635,6 @@ public class MAPAggregatorImpl extends MAPAggregator {
                 maps.setAction(ContextUtils.getAttributedURI(getActionUri(message, true)));
             }
         }
-
         return maps;
     }
     
