@@ -95,6 +95,35 @@ public final class SamlpRequestComponentBuilder {
         return authnRequest;
     }
 
+    public static LogoutRequest createLogoutRequest(
+        SAMLVersion version,
+        Issuer issuer,
+        String destination,
+        String consent,
+        Date notOnOrAfter,
+        String reason,
+        NameID nameID
+    ) {
+        if (logoutRequestBuilder == null) {
+            logoutRequestBuilder = (SAMLObjectBuilder<LogoutRequest>)
+                builderFactory.getBuilder(LogoutRequest.DEFAULT_ELEMENT_NAME);
+        }
+        LogoutRequest logoutRequest = logoutRequestBuilder.buildObject();
+        logoutRequest.setID("_" + UUID.randomUUID());
+        logoutRequest.setVersion(version);
+        logoutRequest.setIssueInstant(new DateTime());
+        logoutRequest.setDestination(destination);
+        logoutRequest.setConsent(consent);
+        logoutRequest.setIssuer(issuer);
+        if (notOnOrAfter != null) {
+            logoutRequest.setNotOnOrAfter(new DateTime(notOnOrAfter.getTime()));
+        }
+        logoutRequest.setReason(reason);
+        logoutRequest.setNameID(nameID);
+
+        return logoutRequest;
+    }
+
     @SuppressWarnings("unchecked")
     public static LogoutRequest createLogoutRequest(
         SAMLVersion version,
