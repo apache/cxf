@@ -28,6 +28,7 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToOne;
@@ -66,7 +67,7 @@ public class Client implements Serializable {
     private String homeRealm;
     private boolean registeredDynamically;
     private String tokenEndpointAuthMethod;
-    
+
     public Client() {
 
     }
@@ -346,6 +347,7 @@ public class Client implements Serializable {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @OrderColumn
+    @Lob
     public List<String> getApplicationCertificates() {
         return applicationCertificates;
     }
