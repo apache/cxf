@@ -16,31 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.cxf.systest.jaxrs.security.oauth2.common;
 
-package org.apache.cxf.systest.jaxrs.security.oidc;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.rs.security.oauth2.common.UserSubject;
+import org.apache.cxf.rs.security.oauth2.grants.saml.Saml2BearerGrantHandler;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 
-import java.net.URL;
+/**
+ * Extend Saml2BearerGrantHandler not to use SamlUserSubject, which is not an entity and hence causes problems with JPA.
+ */
+public class JPASaml2BearerGrantHandler extends Saml2BearerGrantHandler {
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-
-public class OIDCNegativeServer extends AbstractBusTestServerBase {
-    private static final URL SERVER_CONFIG_FILE =
-        OIDCNegativeServer.class.getResource("oidc-negative-server.xml");
-
-    protected void run() {
-        SpringBusFactory bf = new SpringBusFactory();
-        Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
-        BusFactory.setDefaultBus(springBus);
-        setBus(springBus);
-
-        try {
-            new OIDCNegativeServer();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    @Override
+    protected UserSubject getGrantSubject(Message message, SamlAssertionWrapper wrapper) {
+        UserSubject userSubject = super.getGrantSubject(message, wrapper);
+        return new UserSubject(userSubject.getLogin(), userSubject.getRoles());
     }
 
 }
