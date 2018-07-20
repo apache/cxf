@@ -138,7 +138,7 @@ public class Saml2BearerGrantHandler extends AbstractGrantHandler {
             SAMLSecurityContext jaxrsSc = (SAMLSecurityContext)sc;
             Set<Principal> rolesP = jaxrsSc.getUserRoles();
             List<String> roles = new ArrayList<String>();
-            if (roles != null) {
+            if (rolesP != null) {
                 for (Principal p : rolesP) {
                     roles.add(p.getName());
                 }
