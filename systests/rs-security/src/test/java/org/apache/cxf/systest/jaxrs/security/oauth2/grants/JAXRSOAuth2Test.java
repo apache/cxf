@@ -80,6 +80,7 @@ import org.junit.runners.Parameterized.Parameters;
  * b) JWT_PORT - EhCache with useJwtFormatForAccessTokens enabled
  * c) JCACHE_PORT - JCache
  * d) JWT_JCACHE_PORT - JCache with useJwtFormatForAccessTokens enabled
+ * e) JPA_PORT - JPA provider
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
@@ -91,6 +92,8 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
     public static final String JCACHE_PORT_PUBLIC = TestUtil.getPortNumber("jaxrs-oauth2-public-jcache");
     public static final String JWT_JCACHE_PORT = TestUtil.getPortNumber("jaxrs-oauth2-jcache-jwt");
     public static final String JWT_JCACHE_PORT_PUBLIC = TestUtil.getPortNumber("jaxrs-oauth2-public-jcache-jwt");
+    public static final String JPA_PORT = TestUtil.getPortNumber("jaxrs-oauth2-jpa");
+    public static final String JPA_PORT_PUBLIC = TestUtil.getPortNumber("jaxrs-oauth2-public-jpa");
 
     private static final String CRYPTO_RESOURCE_PROPERTIES =
         "org/apache/cxf/systest/jaxrs/security/alice.properties";
@@ -111,6 +114,8 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
                    launchServer(BookServerOAuth2JCache.class, true));
         assertTrue("server did not launch correctly",
                    launchServer(BookServerOAuth2JCacheJWT.class, true));
+        assertTrue("server did not launch correctly",
+                   launchServer(BookServerOAuth2JPA.class, true));
     }
 
     @AfterClass
@@ -121,7 +126,7 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
     @Parameters(name = "{0}")
     public static Collection<String> data() {
 
-        return Arrays.asList(PORT, JWT_PORT, JCACHE_PORT, JWT_JCACHE_PORT);
+        return Arrays.asList(PORT, JWT_PORT, JCACHE_PORT, JWT_JCACHE_PORT, JPA_PORT);
     }
 
     @Test
@@ -699,6 +704,25 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
 
             try {
                 new BookServerOAuth2JCacheJWT();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+
+    public static class BookServerOAuth2JPA extends AbstractBusTestServerBase {
+        private static final URL SERVER_CONFIG_FILE =
+            BookServerOAuth2Grants.class.getResource("server-jpa.xml");
+
+        protected void run() {
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
+            BusFactory.setDefaultBus(springBus);
+            setBus(springBus);
+
+            try {
+                new BookServerOAuth2JPA();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

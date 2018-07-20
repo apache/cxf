@@ -71,6 +71,7 @@ import org.junit.runners.Parameterized.Parameters;
  * b) JWT_PORT - EhCache with useJwtFormatForAccessTokens enabled
  * c) JCACHE_PORT - JCache
  * d) JWT_JCACHE_PORT - JCache with useJwtFormatForAccessTokens enabled
+ * e) JPA_PORT - JPA provider
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class OIDCFlowTest extends AbstractBusClientServerTestBase {
@@ -79,6 +80,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
     static final String JWT_PORT = TestUtil.getPortNumber("jaxrs-oidc-jwt");
     static final String JCACHE_PORT = TestUtil.getPortNumber("jaxrs-oidc-jcache");
     static final String JWT_JCACHE_PORT = TestUtil.getPortNumber("jaxrs-oidc-jcache-jwt");
+    static final String JPA_PORT = TestUtil.getPortNumber("jaxrs-oidc-jpa");
 
     final String port;
 
@@ -112,6 +114,12 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
                    // set this to false to fork
                    launchServer(OIDCServerJCacheJWT.class, true)
         );
+        assertTrue(
+                   "Server failed to launch",
+                   // run the server in the same process
+                   // set this to false to fork
+                   launchServer(OIDCServerJPA.class, true)
+        );
     }
 
     @AfterClass
@@ -122,7 +130,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
     @Parameters(name = "{0}")
     public static Collection<String> data() {
 
-        return Arrays.asList(PORT, JWT_PORT, JCACHE_PORT, JWT_JCACHE_PORT);
+        return Arrays.asList(PORT, JWT_PORT, JCACHE_PORT, JWT_JCACHE_PORT, JPA_PORT);
     }
 
     @org.junit.Test
@@ -1071,6 +1079,25 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
 
             try {
                 new OIDCServerJCacheJWT();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+
+    public static class OIDCServerJPA extends AbstractBusTestServerBase {
+        private static final URL SERVER_CONFIG_FILE =
+            OIDCServer.class.getResource("oidc-server-jpa.xml");
+
+        protected void run() {
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
+            BusFactory.setDefaultBus(springBus);
+            setBus(springBus);
+
+            try {
+                new OIDCServerJPA();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

@@ -64,6 +64,7 @@ import org.junit.runners.Parameterized.Parameters;
  * b) JWT_PORT - EhCache with useJwtFormatForAccessTokens enabled
  * c) JCACHE_PORT - JCache
  * d) JWT_JCACHE_PORT - JCache with useJwtFormatForAccessTokens enabled
+ * e) JPA_PORT - JPA provider
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class UserInfoTest extends AbstractBusClientServerTestBase {
@@ -72,6 +73,7 @@ public class UserInfoTest extends AbstractBusClientServerTestBase {
     static final String JWT_PORT = TestUtil.getPortNumber("jaxrs-userinfo-jwt");
     static final String JCACHE_PORT = TestUtil.getPortNumber("jaxrs-userinfo-jcache");
     static final String JCACHE_JWT_PORT = TestUtil.getPortNumber("jaxrs-userinfo-jcache-jwt");
+    static final String JPA_PORT = TestUtil.getPortNumber("jaxrs-userinfo-jpa");
 
     final String port;
 
@@ -105,6 +107,12 @@ public class UserInfoTest extends AbstractBusClientServerTestBase {
                    // set this to false to fork
                    launchServer(UserInfoServerJCacheJWT.class, true)
         );
+        assertTrue(
+                   "Server failed to launch",
+                   // run the server in the same process
+                   // set this to false to fork
+                   launchServer(UserInfoServerJPA.class, true)
+        );
     }
 
     @AfterClass
@@ -115,7 +123,7 @@ public class UserInfoTest extends AbstractBusClientServerTestBase {
     @Parameters(name = "{0}")
     public static Collection<String> data() {
 
-        return Arrays.asList(PORT, JWT_PORT, JCACHE_PORT, JCACHE_JWT_PORT);
+        return Arrays.asList(PORT, JWT_PORT, JCACHE_PORT, JCACHE_JWT_PORT, JPA_PORT);
     }
 
     @org.junit.Test
@@ -390,4 +398,22 @@ public class UserInfoTest extends AbstractBusClientServerTestBase {
 
     }
 
+    public static class UserInfoServerJPA extends AbstractBusTestServerBase {
+        private static final URL SERVER_CONFIG_FILE =
+            UserInfoServer.class.getResource("userinfo-server-jpa.xml");
+
+        protected void run() {
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
+            BusFactory.setDefaultBus(springBus);
+            setBus(springBus);
+
+            try {
+                new UserInfoServerJPA();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
 }
