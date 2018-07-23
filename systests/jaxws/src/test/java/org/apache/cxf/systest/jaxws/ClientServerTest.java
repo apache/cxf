@@ -48,6 +48,7 @@ import javax.xml.ws.Endpoint;
 import javax.xml.ws.Response;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceException;
+import javax.xml.ws.soap.SOAPFaultException;
 
 import org.w3c.dom.Document;
 
@@ -710,6 +711,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
 
         String noSuchCodeFault = "NoSuchCodeLitFault";
         String badRecordFault = "BadRecordLitFault";
+        String illegalArgumentException = "IllegalArgumentException";
 
         Greeter greeter = service.getPort(portName, Greeter.class);
         updateAddressPort(greeter, PORT);
@@ -720,6 +722,13 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
             } catch (NoSuchCodeLitFault nslf) {
                 assertNotNull(nslf.getFaultInfo());
                 assertNotNull(nslf.getFaultInfo().getCode());
+            }
+            try {
+                greeter.testDocLitFault(illegalArgumentException);
+                fail("Should have thrown SOAPFaultException exception");
+            } catch (SOAPFaultException sfe) {
+                assertEquals("TestIllegalArgumentException", sfe.getCause().getMessage());
+                sfe.printStackTrace();
             }
 
             try {
@@ -735,9 +744,24 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
                 assertNotNull(brlf.getFaultInfo());
                 assertEquals("BadRecordLitFault", brlf.getFaultInfo());
             }
+            
+            try {
+                greeter.testDocLitFaultAsync(noSuchCodeFault).get();
+                fail("Should have thrown NoSuchCodeLitFault exception");
+            } catch (ExecutionException ee) {
+                NoSuchCodeLitFault nslf = (NoSuchCodeLitFault)ee.getCause();
+                assertNotNull(nslf.getFaultInfo());
+                assertNotNull(nslf.getFaultInfo().getCode());
+            }
 
+            try {
+                greeter.testDocLitFaultAsync(illegalArgumentException).get();
+                fail("Should have thrown SOAPFaultException exception");
+            } catch (ExecutionException ee) {
+                SOAPFaultException sfe = (SOAPFaultException)ee.getCause();
+                assertEquals("TestIllegalArgumentException", sfe.getCause().getMessage());
+            }
         }
-
     }
 
     @Test

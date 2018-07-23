@@ -422,7 +422,17 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
         checkError();
         client.setExecutor(getClient().getEndpoint().getExecutor());
 
-        ClientCallback callback = new JaxwsClientCallback<T>(asyncHandler, this);
+        ClientCallback callback = new JaxwsClientCallback<T>(asyncHandler, this) {
+            @Override
+            protected Throwable mapThrowable(Throwable t) {
+                if (t instanceof IOException) {
+                    return t;
+                } else if (t instanceof Exception) {
+                    t = mapException((Exception)t);
+                }
+                return t;
+            }
+        };            
 
         Response<T> ret = new JaxwsResponseCallback<T>(callback);
         try {

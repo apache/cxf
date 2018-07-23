@@ -33,6 +33,7 @@ import javax.xml.ws.Dispatch;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.Response;
 import javax.xml.ws.Service;
+import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
@@ -178,8 +179,8 @@ public class DispatchClientServerWithHugeResponseTest extends AbstractBusClientS
                 throw e;
             }
             Throwable t = e.getCause();
-            if (t instanceof SoapFault) {
-                SoapFault sf = (SoapFault)e.getCause();
+            if (t instanceof SOAPFaultException) {
+                SoapFault sf = (SoapFault)t.getCause();
                 if (sf.getCause() == null) {
                     throw e;
                 }
@@ -236,8 +237,8 @@ public class DispatchClientServerWithHugeResponseTest extends AbstractBusClientS
                 throw e;
             }
             Throwable t = e.getCause();
-            if (t instanceof SoapFault) {
-                SoapFault sf = (SoapFault)e.getCause();
+            if (t instanceof SOAPFaultException) {
+                SoapFault sf = (SoapFault)t.getCause();
                 if (sf.getCause() == null) {
                     throw e;
                 }
