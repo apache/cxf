@@ -944,13 +944,13 @@ public class JAXRSUtilsTest extends Assert {
         assertEquals(2, queryList6.size());
         assertEquals(Integer.valueOf(1), queryList6.get(0).get());
         assertEquals(Integer.valueOf(2), queryList6.get(1).get());
-        
+
         List<Integer> queryList7 = (List<Integer>)params.get(7);
         assertNotNull(queryList7);
         assertEquals(2, queryList7.size());
         assertEquals(Long.valueOf(1), queryList7.get(0));
         assertEquals(Long.valueOf(2), queryList7.get(1));
-        
+
         List<Integer> queryList8 = (List<Integer>)params.get(8);
         assertNotNull(queryList8);
         assertEquals(2, queryList8.size());
@@ -1101,6 +1101,26 @@ public class JAXRSUtilsTest extends Assert {
         @SuppressWarnings("unchecked")
         Query<String> query = (Query<String>)params.get(0);
         assertEquals("thequery", query.getEntity());
+    }
+
+    @Test
+    public void testQueryParameterDefaultValue() throws Exception {
+        Message messageImpl = createMessage();
+        ProviderFactory.getInstance(messageImpl).registerUserProvider(
+            new GenericObjectParameterHandler());
+        Class<?>[] argType = {String.class, String.class};
+        Method m = Customer.class.getMethod("testGenericObjectParamDefaultValue", argType);
+
+        messageImpl.put(Message.QUERY_STRING, "p1=thequery&p2");
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m,
+                                                               new ClassResourceInfo(Customer.class)),
+                                                           null,
+                                                           messageImpl);
+        assertEquals(2, params.size());
+        String query = (String)params.get(0);
+        assertEquals("thequery", query);
+        query = (String)params.get(1);
+        assertEquals("thequery", query);
     }
 
     @Test
