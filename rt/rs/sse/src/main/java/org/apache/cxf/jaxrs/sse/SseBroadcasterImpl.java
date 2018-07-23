@@ -36,7 +36,7 @@ import javax.ws.rs.sse.OutboundSseEvent;
 import javax.ws.rs.sse.SseBroadcaster;
 import javax.ws.rs.sse.SseEventSink;
 
-public class SseBroadcasterImpl implements SseBroadcaster {
+public final class SseBroadcasterImpl implements SseBroadcaster {
     private final Set<SseEventSink> subscribers = new CopyOnWriteArraySet<>();
     private final Set<Consumer<SseEventSink>> closers = new CopyOnWriteArraySet<>();
     private final Set<BiConsumer<SseEventSink, Throwable>> exceptioners = new CopyOnWriteArraySet<>();
@@ -53,6 +53,8 @@ public class SseBroadcasterImpl implements SseBroadcaster {
             @Override
             public void onComplete(AsyncEvent asyncEvent) throws IOException {
                 subscribers.remove(sink);
+                // The SseEventSinkImpl completes the asynchronous operation on close() method call.
+                closers.forEach(closer -> closer.accept(sink));
             }
 
             @Override
@@ -63,6 +65,8 @@ public class SseBroadcasterImpl implements SseBroadcaster {
             @Override
             public void onError(AsyncEvent asyncEvent) throws IOException {
                 subscribers.remove(sink);
+                // Propagate the error from SseEventSinkImpl asynchronous context
+                exceptioners.forEach(exceptioner -> exceptioner.accept(sink, asyncEvent.getThrowable()));
             }
 
             @Override
@@ -107,7 +111,6 @@ public class SseBroadcasterImpl implements SseBroadcaster {
         if (closed.compareAndSet(false, true)) {
             subscribers.forEach(subscriber -> {
                 subscriber.close();
-                closers.forEach(closer -> closer.accept(subscriber));
             });
         }
     }
