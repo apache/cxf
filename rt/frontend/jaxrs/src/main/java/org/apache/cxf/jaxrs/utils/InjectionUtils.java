@@ -121,7 +121,7 @@ public final class InjectionUtils {
         // JAX-RS 2.1
         STANDARD_CONTEXT_CLASSES.add("javax.ws.rs.sse.Sse");
         STANDARD_CONTEXT_CLASSES.add("javax.ws.rs.sse.SseEventSink");
-        
+
         VALUE_CONTEXTS.add(Application.class.getName());
         VALUE_CONTEXTS.add("javax.ws.rs.sse.Sse");
     }
@@ -1011,7 +1011,7 @@ public final class InjectionUtils {
                                                Message message) {
     //CHECKSTYLE:ON
 
-        if (paramValues == null) {
+        if (paramValues == null || paramValues.size() == 1 && paramValues.get(0) == null) {
             if (defaultValue != null) {
                 paramValues = Collections.singletonList(defaultValue);
             } else {
@@ -1515,7 +1515,7 @@ public final class InjectionUtils {
                 }
             }
         }
-            
+
         if (type == null || type == Object.class) {
             type = paramCls;
         }

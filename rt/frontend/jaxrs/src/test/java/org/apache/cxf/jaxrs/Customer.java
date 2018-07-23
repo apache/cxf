@@ -212,6 +212,11 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
 
     }
 
+    public void testGenericObjectParamDefaultValue(@QueryParam("p1") String query1,
+                                                   @QueryParam("p2") @DefaultValue("thequery") String query2) {
+
+    }
+
     public void testXmlAdapter(@QueryParam("a")
                                @XmlJavaTypeAdapter(CustomerBeanAdapter.class)
                                CustomerBean cb) {
