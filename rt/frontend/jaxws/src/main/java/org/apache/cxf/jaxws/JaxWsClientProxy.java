@@ -61,6 +61,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.jaxws.support.JaxWsEndpointImpl;
 import org.apache.cxf.service.invoker.MethodDispatcher;
+import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 
 public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implements
@@ -141,33 +142,7 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
         } catch (WebServiceException wex) {
             throw wex;
         } catch (Exception ex) {
-            for (Class<?> excls : method.getExceptionTypes()) {
-                if (excls.isInstance(ex)) {
-                    throw ex;
-                }
-            }
-            if (ex instanceof Fault && ex.getCause() instanceof IOException) {
-                throw new WebServiceException(ex.getMessage(), ex.getCause());
-            }
-            if (getBinding() instanceof HTTPBinding) {
-                HTTPException exception = new HTTPException(HttpURLConnection.HTTP_INTERNAL_ERROR);
-                exception.initCause(ex);
-                throw exception;
-            } else if (getBinding() instanceof SOAPBinding) {
-                SOAPFault soapFault = createSoapFault((SOAPBinding)getBinding(), ex);
-                if (soapFault == null) {
-                    throw new WebServiceException(ex);
-                }
-                SOAPFaultException exception = new SOAPFaultException(soapFault);
-                if (ex instanceof Fault && ex.getCause() != null) {
-                    exception.initCause(ex.getCause());
-                } else {
-                    exception.initCause(ex);
-                }
-                throw exception;
-            } else {
-                throw new WebServiceException(ex);
-            }
+            throw mapException(method, oi, ex);
         } finally {
             if (addressChanged(address)) {
                 setupEndpointAddressContext(getClient().getEndpoint());
@@ -185,6 +160,52 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
         }
         return adjustObject(result);
     }
+    Exception mapException(Method method, BindingOperationInfo boi, Exception ex) {
+        if (method != null) {
+            for (Class<?> excls : method.getExceptionTypes()) {
+                if (excls.isInstance(ex)) {
+                    return ex;
+                }
+            }
+        } else if (boi != null) {
+            for (BindingFaultInfo fi : boi.getFaults()) {
+                Class<?> c = fi.getFaultInfo().getProperty(Class.class.getName(), Class.class);
+                if (c != null && c.isInstance(ex)) {
+                    return ex;
+                }
+            }
+            if (ex instanceof IOException) {
+                return ex;
+            }
+        }
+        
+        if (ex instanceof Fault && ex.getCause() instanceof IOException) {
+            return new WebServiceException(ex.getMessage(), ex.getCause());
+        }
+        if (getBinding() instanceof HTTPBinding) {
+            HTTPException exception = new HTTPException(HttpURLConnection.HTTP_INTERNAL_ERROR);
+            exception.initCause(ex);
+            return exception;
+        } else if (getBinding() instanceof SOAPBinding) {
+            try {
+                SOAPFault soapFault = createSoapFault((SOAPBinding)getBinding(), ex);
+                if (soapFault == null) {
+                    throw new WebServiceException(ex);
+                }
+                SOAPFaultException exception = new SOAPFaultException(soapFault);
+                if (ex instanceof Fault && ex.getCause() != null) {
+                    exception.initCause(ex.getCause());
+                } else {
+                    exception.initCause(ex);
+                }
+                return exception;
+            } catch (SOAPException e) {
+                return new WebServiceException(ex);
+            }
+        }
+        return new WebServiceException(ex);
+    }
+    
     boolean isAsync(Method m) {
         return m.getName().endsWith("Async")
             && (Future.class.equals(m.getReturnType())
@@ -277,7 +298,7 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
     }
 
     @SuppressWarnings("unchecked")
-    private Object invokeAsync(Method method, BindingOperationInfo oi, Object[] params) throws Exception {
+    private Object invokeAsync(Method method, final BindingOperationInfo oi, Object[] params) throws Exception {
 
         client.setExecutor(getClient().getEndpoint().getExecutor());
 
@@ -292,7 +313,15 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
         } else {
             handler = null;
         }
-        ClientCallback callback = new JaxwsClientCallback<Object>(handler, this);
+        ClientCallback callback = new JaxwsClientCallback<Object>(handler, this) {
+            @Override
+            protected Throwable mapThrowable(Throwable t) {
+                if (t instanceof Exception) {
+                    t = mapException(null, oi, (Exception)t);
+                }
+                return t;
+            }
+        };
 
         Response<Object> ret = new JaxwsResponseCallback<Object>(callback);
         client.invoke(callback, oi, params);

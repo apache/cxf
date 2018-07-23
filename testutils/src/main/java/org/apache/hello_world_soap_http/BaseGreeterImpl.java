@@ -111,6 +111,9 @@ public class BaseGreeterImpl implements Greeter {
             nscl.setCode(ec);
             throw new NoSuchCodeLitFault("TestNoSuchCodeLit", nscl);
         }
+        if ("IllegalArgumentException".equals(faultType)) {
+            throw new IllegalArgumentException("TestIllegalArgumentException");
+        }
         throw new RuntimeException("Unknown source", new IOException("dummy io exception"));
     }
 
