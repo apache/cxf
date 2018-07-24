@@ -112,10 +112,6 @@ public class JAXRSHttpsBookTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testCustomVerbProxyFromSpringWildcard() throws Exception {
-        if (System.getProperty("java.version").startsWith("9")) {
-            //CXF-7270
-            return;
-        }
         ClassPathXmlApplicationContext ctx =
             new ClassPathXmlApplicationContext(new String[] {CLIENT_CONFIG_FILE3});
         Object bean = ctx.getBean("bookService.proxyFactory");

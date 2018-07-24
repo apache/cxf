@@ -27,6 +27,7 @@ import java.nio.file.Files;
 
 import javax.xml.bind.annotation.XmlList;
 
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolConstants;
@@ -57,7 +58,7 @@ public class WrapperBeanGeneratorTest extends ProcessorTestBase {
     @Before
     public void setUp() throws Exception {
         processor.setEnvironment(env);
-        if (System.getProperty("java.version").startsWith("9")) {
+        if (JavaUtils.isJava9Compatible()) {
             System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
         }
     }

@@ -21,6 +21,7 @@ package org.apache.cxf.tools.java2js.processor;
 
 import java.io.File;
 
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
@@ -43,7 +44,7 @@ public class JavaToJSProcessorTest extends ProcessorTestBase {
         env = new ToolContext();
         classPath = System.getProperty("java.class.path");
         System.setProperty("java.class.path", getClassPath());
-        if (System.getProperty("java.version").startsWith("9")) {
+        if (JavaUtils.isJava9Compatible()) {
             System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
         }
     }

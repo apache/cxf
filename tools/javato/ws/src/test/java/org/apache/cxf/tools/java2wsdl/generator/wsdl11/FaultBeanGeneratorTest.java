@@ -25,6 +25,7 @@ import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolConstants;
@@ -42,7 +43,7 @@ public class FaultBeanGeneratorTest extends ProcessorTestBase {
     public void setUp() throws Exception {
         classPath = System.getProperty("java.class.path");
         System.setProperty("java.class.path", getClassPath());
-        if (System.getProperty("java.version").startsWith("9")) {
+        if (JavaUtils.isJava9Compatible()) {
             System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
         }
         processor.setEnvironment(env);

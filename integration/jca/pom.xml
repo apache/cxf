@@ -124,7 +124,7 @@
                     <!-- needed for easymock-->
                     <groupId>org.ow2.asm</groupId>
                     <artifactId>asm</artifactId>
-                    <version>6.0_ALPHA</version>
+                    <version>6.2</version>
                 </dependency>
                 <dependency>
                     <groupId>org.easymock</groupId>

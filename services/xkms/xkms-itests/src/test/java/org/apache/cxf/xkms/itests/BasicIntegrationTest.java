@@ -33,9 +33,12 @@ import org.w3._2002._03.xkms_wsdl.XKMSPortType;
 import org.junit.Assert;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.karaf.container.internal.JavaVersionUtil;
 import org.ops4j.pax.exam.options.MavenArtifactUrlReference;
+import org.ops4j.pax.exam.options.extra.VMOption;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
+
 
 import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
@@ -62,7 +65,7 @@ public class BasicIntegrationTest {
         System.setProperty("BasicIntegrationTest.PORT", port);
         String xkmsEndpoint = "http://localhost:" + port + "/cxf/XKMS";
 
-        String karafVersion = System.getProperty("karaf.version", "4.0.8");
+        String karafVersion = System.getProperty("karaf.version", "4.2.1-SNAPSHOT");
         String localRepository = System.getProperty("localRepository");
         MavenArtifactUrlReference karafUrl = maven() //
             .groupId("org.apache.karaf") //
@@ -74,32 +77,90 @@ public class BasicIntegrationTest {
             .artifactId("cxf-services-xkms-features") //
             .versionAsInProject() //
             .type("xml");
+        if (JavaVersionUtil.getMajorVersion() >= 9) {
+            return new Option[] {
+                 karafDistributionConfiguration().frameworkUrl(karafUrl)
+                                     .karafVersion(karafVersion)
+                                     .unpackDirectory(new File("target/paxexam/unpack/"))
+                                     .useDeployFolder(false),
+                                 systemProperty("java.awt.headless").value("true"),
+                                 systemProperty("BasicIntegrationTest.PORT").value(port),
 
-        return new Option[] {
-            karafDistributionConfiguration().frameworkUrl(karafUrl).karafVersion(karafVersion)
-                .unpackDirectory(new File("target/paxexam/unpack/")).useDeployFolder(false),
-            systemProperty("java.awt.headless").value("true"),
-            systemProperty("BasicIntegrationTest.PORT").value(port),
+                copy("data/xkms/certificates/trusted_cas/root.cer"),
+                                 copy("data/xkms/certificates/trusted_cas/wss40CA.cer"),
+                                 copy("data/xkms/certificates/cas/alice.cer"),
+                                 copy("data/xkms/certificates/dave.cer"),
+                                 copy("data/xkms/certificates/http___localhost_8080_services_TestService.cer"),
+                                 copy("etc/org.ops4j.pax.logging.cfg"),
+                                 // editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
+                                 // "org.ops4j.pax.url.mvn.repositories", REPOS),
+                                 editConfigurationFilePut("etc/org.ops4j.pax.web.cfg",
+                                                          "org.osgi.service.http.port", port),
+                                 editConfigurationFilePut("etc/org.apache.cxf.xkms.client.cfg",
+                                                          "xkms.endpoint", xkmsEndpoint),
+                                 when(localRepository != null)
+                                     .useOptions(editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
+                                                                          "org.ops4j.pax.url.mvn.localRepository",
+                                                                          localRepository)),
+                                 features(xkmsFeatures, "cxf-xkms-service", "cxf-xkms-client",
+                                          "cxf-xkms-ldap"),
+                                 editConfigurationFilePut("etc/org.apache.karaf.features.cfg", "featuresBoot", 
+                                                          "(transaction, instance, package, log, ssh, framework, "
+                                                          + "system, eventadmin, "
+                                                          + "feature, shell, management, service, "
+                                                          + "jaas, deployer, diagnostic, "
+                                                          + "wrap, bundle, config, kar),"
+                                                          + "cxf-xkms-service,cxf-xkms-client,"
+                                                          + "cxf-xkms-ldap,exam,test-dependencies"),
+                                 configureConsole().ignoreLocalConsole(), 
+                new VMOption("--add-opens"),
+                new VMOption("java.base/java.security=ALL-UNNAMED"),
+                new VMOption("--add-opens"), new VMOption("java.base/java.net=ALL-UNNAMED"),
+                new VMOption("--add-opens"), new VMOption("java.base/java.lang=ALL-UNNAMED"),
+                new VMOption("--add-opens"), new VMOption("java.base/java.util=ALL-UNNAMED"),
+                new VMOption("--add-opens"),
+                new VMOption("java.naming/javax.naming.spi=ALL-UNNAMED"),
+                new VMOption("--add-opens"),
+                new VMOption("java.rmi/sun.rmi.transport.tcp=ALL-UNNAMED"),
+                new VMOption("--add-exports=java.base/sun.net.www.protocol.http=ALL-UNNAMED"),
+                new VMOption("--add-exports=java.base/sun.net.www.protocol.https=ALL-UNNAMED"),
+                new VMOption("--add-exports=java.base/sun.net.www.protocol.jar=ALL-UNNAMED"),
+                new VMOption("--add-exports=jdk.naming.rmi/com.sun.jndi.url.rmi=ALL-UNNAMED")
+            };
 
-            copy("data/xkms/certificates/trusted_cas/root.cer"),
-            copy("data/xkms/certificates/trusted_cas/wss40CA.cer"),
-            copy("data/xkms/certificates/cas/alice.cer"),
-            copy("data/xkms/certificates/dave.cer"),
-            copy("data/xkms/certificates/http___localhost_8080_services_TestService.cer"),
-            copy("etc/org.ops4j.pax.logging.cfg"),
-            //editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg", "org.ops4j.pax.url.mvn.repositories", REPOS),
-            editConfigurationFilePut("etc/org.ops4j.pax.web.cfg", "org.osgi.service.http.port", port),
-            editConfigurationFilePut("etc/org.apache.cxf.xkms.client.cfg", "xkms.endpoint", xkmsEndpoint),
-            when(localRepository != null)
-                .useOptions(editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
-                            "org.ops4j.pax.url.mvn.localRepository",
-                            localRepository)),
-            features(xkmsFeatures, "cxf-xkms-service", "cxf-xkms-client", "cxf-xkms-ldap"),
-            configureConsole().ignoreLocalConsole(),
+        } else {
+            return new Option[] {
+                                 karafDistributionConfiguration().frameworkUrl(karafUrl)
+                                     .karafVersion(karafVersion)
+                                     .unpackDirectory(new File("target/paxexam/unpack/"))
+                                     .useDeployFolder(false),
+                                 systemProperty("java.awt.headless").value("true"),
+                                 systemProperty("BasicIntegrationTest.PORT").value(port),
 
-            //org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder(),
-            //CoreOptions.vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005")
-        };
+                copy("data/xkms/certificates/trusted_cas/root.cer"),
+                                 copy("data/xkms/certificates/trusted_cas/wss40CA.cer"),
+                                 copy("data/xkms/certificates/cas/alice.cer"),
+                                 copy("data/xkms/certificates/dave.cer"),
+                                 copy("data/xkms/certificates/http___localhost_8080_services_TestService.cer"),
+                                 copy("etc/org.ops4j.pax.logging.cfg"),
+                                 // editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
+                                 // "org.ops4j.pax.url.mvn.repositories", REPOS),
+                                 editConfigurationFilePut("etc/org.ops4j.pax.web.cfg",
+                                                          "org.osgi.service.http.port", port),
+                                 editConfigurationFilePut("etc/org.apache.cxf.xkms.client.cfg",
+                                                          "xkms.endpoint", xkmsEndpoint),
+                                 when(localRepository != null)
+                                     .useOptions(editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
+                                                                          "org.ops4j.pax.url.mvn.localRepository",
+                                                                          localRepository)),
+                                 features(xkmsFeatures, "cxf-xkms-service", "cxf-xkms-client",
+                                          "cxf-xkms-ldap"),
+                                 configureConsole().ignoreLocalConsole(),
+
+                // org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder(),
+                // CoreOptions.vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005")
+            };
+        }
     }
 
     protected Option copy(String path) {

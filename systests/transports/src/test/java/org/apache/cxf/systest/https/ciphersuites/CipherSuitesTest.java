@@ -37,6 +37,7 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.hello_world.Greeter;
@@ -240,8 +241,9 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testRC4Included() throws Exception {
         String version = System.getProperty("java.version");
-        if (version.length() > 1 && 1.8D <= Double.parseDouble(version.substring(0, 3))
-            || version.length() == 1 && 9 <= Integer.parseInt(version.substring(0, 1))) {
+        if (JavaUtils.isJava9Compatible() 
+            || version.length() > 1 && 1.8D <= Double.parseDouble(version.substring(0, 3))
+            ) {
             // RC4 not supported since JDK8
             return;
         }
@@ -270,8 +272,9 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testRC4IncludedAsync() throws Exception {
         String version = System.getProperty("java.version");
-        if (version.length() > 1 && 1.8D <= Double.parseDouble(version.substring(0, 3))
-            || version.length() == 1 && 9 <= Integer.parseInt(version.substring(0, 1))) {
+        if (JavaUtils.isJava9Compatible()
+            || version.length() > 1 && 1.8D <= Double.parseDouble(version.substring(0, 3))
+            ) {
             // RC4 not supported since JDK8
             return;
         }

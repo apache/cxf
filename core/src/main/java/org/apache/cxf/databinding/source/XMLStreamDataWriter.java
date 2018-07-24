@@ -84,6 +84,9 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
                 }
 
             } else if (obj instanceof Node) {
+                if (obj instanceof DocumentFragment) {
+                    obj = org.apache.cxf.helpers.DOMUtils.getDomDocumentFragment((DocumentFragment)obj);
+                }
                 if (schema != null) {
                     Validator schemaValidator = schema.newValidator();
                     schemaValidator.setErrorHandler(

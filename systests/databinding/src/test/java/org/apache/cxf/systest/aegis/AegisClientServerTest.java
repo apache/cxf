@@ -39,6 +39,7 @@ import org.apache.cxf.endpoint.dynamic.DynamicClientFactory;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.systest.aegis.SportsService.Pair;
@@ -259,7 +260,7 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testDynamicClient() throws Exception {
-        if (System.getProperty("java.version").startsWith("9")) {
+        if (JavaUtils.isJava9Compatible()) {
             System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
         }
         DynamicClientFactory dcf = DynamicClientFactory.newInstance();

@@ -42,6 +42,7 @@ import org.w3c.dom.Node;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.jaxb.JAXBEncoderDecoder;
 import org.apache.cxf.service.model.FaultInfo;
@@ -75,7 +76,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
 
         classPath = System.getProperty("java.class.path");
         System.setProperty("java.class.path", getClassPath());
-        if (System.getProperty("java.version").startsWith("9")) {
+        if (JavaUtils.isJava9Compatible()) {
             System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
         }
 

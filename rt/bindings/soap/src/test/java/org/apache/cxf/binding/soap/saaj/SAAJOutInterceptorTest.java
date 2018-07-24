@@ -66,6 +66,7 @@ public class SAAJOutInterceptorTest extends TestBase {
         m.getSOAPPart().setContent(new StreamSource(ins));
 
         Element el = DOMUtils.getFirstElement(m.getSOAPPart().getEnvelope().getHeader());
+        el = (Element)DOMUtils.getDomElement(el);
         List<Header> h = soapMessage.getHeaders();
         while (el != null) {
             h.add(new SoapHeader(DOMUtils.getElementQName(el), el));
