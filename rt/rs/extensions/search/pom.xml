@@ -31,8 +31,6 @@
         <relativePath>../../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
-        <hibernate.em.version>4.1.0.Final</hibernate.em.version>
-        <hsqldb.version>1.8.0.10</hsqldb.version>
         <cxf.module.name>org.apache.cxf.rs.search</cxf.module.name>
     </properties>
     <dependencies>
@@ -125,20 +123,13 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
-            <version>${hibernate.em.version}</version>
+            <version>${cxf.hibernate.em.version}</version>
             <scope>test</scope>
-            <!-- Conflicts with Apache Tika dependencies -->
-            <exclusions>
-                <exclusion>
-                    <groupId>xml-apis</groupId>
-                    <artifactId>xml-apis</artifactId>                
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
-            <groupId>hsqldb</groupId>
+            <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
-            <version>${hsqldb.version}</version>
+            <version>${cxf.hsqldb.version}</version>
             <scope>test</scope>
         </dependency>
         <!--

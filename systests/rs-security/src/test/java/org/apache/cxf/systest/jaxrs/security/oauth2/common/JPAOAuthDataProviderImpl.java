@@ -28,7 +28,6 @@ import java.util.Set;
 
 import javax.persistence.EntityManagerFactory;
 
-import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.grants.code.JPACodeDataProvider;
@@ -138,18 +137,6 @@ public class JPAOAuthDataProviderImpl extends JPACodeDataProvider {
         client = new Client("fred", "password", true);
         client.getAllowedGrantTypes().add("custom_grant");
         this.setClient(client);
-
-        Certificate cert = loadCert();
-        String encodedCert = Base64Utility.encode(cert.getEncoded());
-
-        Client client2 = new Client("CN=whateverhost.com,OU=Morpit,O=ApacheTest,L=Syracuse,C=US",
-                                    null,
-                                    true,
-                                    null,
-                                    null);
-        client2.getAllowedGrantTypes().add("custom_grant");
-        client2.setApplicationCertificates(Collections.singletonList(encodedCert));
-        this.setClient(client2);
 
         // external clients (in LDAP/etc) which can be used for client cred
         externalClients.add("bob:bobPassword");

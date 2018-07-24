@@ -4,7 +4,7 @@
              version="2.0">
 
     <persistence-unit name="testUnitHibernate" transaction-type="RESOURCE_LOCAL">
-        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <class>org.apache.cxf.rs.security.oauth2.common.Client</class>
         <class>org.apache.cxf.rs.security.oauth2.common.UserSubject</class>
         <class>org.apache.cxf.rs.security.oauth2.grants.code.ServerAuthorizationCodeGrant</class>
