@@ -36,8 +36,6 @@
       net.sf.ehcache*;resolution:=optional;version="[2.5, 3.0.0)",
       javax.servlet*;version="${cxf.osgi.javax.servlet.version}"
     </cxf.osgi.import>
-    <hibernate.em.version>4.1.0.Final</hibernate.em.version>
-    <hsqldb.version>2.3.4</hsqldb.version>
     <compilerArguments>-Aopenjpa.source=7 -Aopenjpa.metamodel=true</compilerArguments>
   </properties>
   <dependencies>
@@ -107,7 +105,7 @@
     <dependency>
       <groupId>org.hsqldb</groupId>
       <artifactId>hsqldb</artifactId>
-      <version>${hsqldb.version}</version>
+      <version>${cxf.hsqldb.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -126,14 +124,14 @@
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-entitymanager</artifactId>
-      <version>${hibernate.em.version}</version>
+      <version>${cxf.hibernate.em.version}</version>
       <scope>test</scope>
       <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-ehcache</artifactId>
-      <version>${hibernate.em.version}</version>
+      <version>${cxf.hibernate.em.version}</version>
       <scope>test</scope>
       <optional>true</optional>
     </dependency>
