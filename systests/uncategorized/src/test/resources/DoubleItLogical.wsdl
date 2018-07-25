@@ -58,6 +58,13 @@
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>
+            <xsd:element name="DoubleItResponse2">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="doubledResult" type="xsd:int"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
             <xsd:element name="DoubleItHeader" type="xsd:int"/>
             <xsd:element name="DoubleItFault">
                 <xsd:complexType>
@@ -90,7 +97,7 @@
         <wsdl:part element="di:DoubleItResponse" name="parameters"/>
     </wsdl:message>
     <wsdl:message name="DoubleIt2Response">
-        <wsdl:part element="di:DoubleItResponse" name="parameters"/>
+        <wsdl:part element="di:DoubleItResponse2" name="parameters"/>
     </wsdl:message>
     <wsdl:message name="DoubleIt3Response">
         <wsdl:part element="di:DoubleItResponse" name="parameters"/>
