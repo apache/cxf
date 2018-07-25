@@ -174,7 +174,13 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
         return execute(new EntityManagerOperation<ServerAccessToken>() {
             @Override
             public ServerAccessToken execute(EntityManager em) {
-                return em.find(BearerAccessToken.class, accessToken);
+                TypedQuery<BearerAccessToken> query = em.createQuery("SELECT t FROM BearerAccessToken t"
+                                      + " WHERE t.tokenKey = :tokenKey", BearerAccessToken.class)
+                                      .setParameter("tokenKey", accessToken);
+                if (query.getResultList().isEmpty()) {
+                    return null;
+                }
+                return query.getSingleResult();
             }
         });
     }

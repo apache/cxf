@@ -177,6 +177,10 @@ public class OAuthPermission implements Serializable {
             return false;
         }
 
+        if (object == this) {
+            return true;
+        }
+
         OAuthPermission that = (OAuthPermission)object;
         if (getHttpVerbs() != null && that.getHttpVerbs() == null
             || getHttpVerbs() == null && that.getHttpVerbs() != null
