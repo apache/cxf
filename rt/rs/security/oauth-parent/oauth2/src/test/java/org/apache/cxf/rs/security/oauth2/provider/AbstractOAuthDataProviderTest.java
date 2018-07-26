@@ -18,10 +18,20 @@
  */
 package org.apache.cxf.rs.security.oauth2.provider;
 
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
+import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
+import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
+import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
+import org.apache.cxf.rs.security.jose.jws.PrivateKeyJwsSignatureProvider;
+import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
+import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
@@ -35,11 +45,34 @@ import org.junit.Assert;
 import org.junit.Test;
 
 abstract class AbstractOAuthDataProviderTest extends Assert {
+    private static KeyPair keyPair;
     private AbstractOAuthDataProvider provider;
 
-    protected void initializeProvider(AbstractOAuthDataProvider dataProvider) {
+    static {
+        try {
+            keyPair = KeyPairGenerator.getInstance("RSA").generateKeyPair();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected static void initializeProvider(AbstractOAuthDataProvider dataProvider) {
         dataProvider.setSupportedScopes(Collections.singletonMap("a", "A Scope"));
         dataProvider.setSupportedScopes(Collections.singletonMap("refreshToken", "RefreshToken"));
+
+        // Configure the means of signing the issued JWT tokens
+        if (dataProvider.isUseJwtFormatForAccessTokens()) {
+            final JwsSignatureProvider signatureProvider =
+                new PrivateKeyJwsSignatureProvider(keyPair.getPrivate(), SignatureAlgorithm.RS256);
+
+            OAuthJoseJwtProducer jwtAccessTokenProducer = new OAuthJoseJwtProducer() {
+                @Override
+                protected JwsSignatureProvider getInitializedSignatureProvider(JwsHeaders jwsHeaders) {
+                    return signatureProvider;
+                }
+            };
+            dataProvider.setJwtAccessTokenProducer(jwtAccessTokenProducer);
+        }
     }
 
     protected AbstractOAuthDataProvider getProvider() {
@@ -107,7 +140,9 @@ abstract class AbstractOAuthDataProviderTest extends Assert {
         atr.setSubject(c.getResourceOwnerSubject());
 
         ServerAccessToken at = getProvider().createAccessToken(atr);
+        validateAccessToken(at);
         ServerAccessToken at2 = getProvider().getAccessToken(at.getTokenKey());
+        validateAccessToken(at2);
         assertEquals(at.getTokenKey(), at2.getTokenKey());
         List<OAuthPermission> scopes = at2.getScopes();
         assertNotNull(scopes);
@@ -119,21 +154,25 @@ abstract class AbstractOAuthDataProviderTest extends Assert {
         assertNotNull(tokens);
         assertEquals(1, tokens.size());
         assertEquals(at.getTokenKey(), tokens.get(0).getTokenKey());
+        validateAccessToken(tokens.get(0));
 
         tokens = getProvider().getAccessTokens(c, null);
         assertNotNull(tokens);
         assertEquals(1, tokens.size());
         assertEquals(at.getTokenKey(), tokens.get(0).getTokenKey());
+        validateAccessToken(tokens.get(0));
 
         tokens = getProvider().getAccessTokens(null, c.getResourceOwnerSubject());
         assertNotNull(tokens);
         assertEquals(1, tokens.size());
         assertEquals(at.getTokenKey(), tokens.get(0).getTokenKey());
+        validateAccessToken(tokens.get(0));
 
         tokens = getProvider().getAccessTokens(null, null);
         assertNotNull(tokens);
         assertEquals(1, tokens.size());
         assertEquals(at.getTokenKey(), tokens.get(0).getTokenKey());
+        validateAccessToken(tokens.get(0));
 
         getProvider().revokeToken(c, at.getTokenKey(), OAuthConstants.ACCESS_TOKEN);
         assertNull(getProvider().getAccessToken(at.getTokenKey()));
@@ -152,6 +191,7 @@ abstract class AbstractOAuthDataProviderTest extends Assert {
         List<ServerAccessToken> tokens = getProvider().getAccessTokens(c, null);
         assertNotNull(tokens);
         assertEquals(1, tokens.size());
+        validateAccessToken(tokens.get(0));
 
         getProvider().removeClient(c.getClientId());
 
@@ -173,6 +213,7 @@ abstract class AbstractOAuthDataProviderTest extends Assert {
         List<ServerAccessToken> tokens = getProvider().getAccessTokens(c, null);
         assertNotNull(tokens);
         assertEquals(1, tokens.size());
+        validateAccessToken(tokens.get(0));
 
         getProvider().removeClient(c.getClientId());
 
@@ -194,14 +235,18 @@ abstract class AbstractOAuthDataProviderTest extends Assert {
         atr.setApprovedScope(Collections.singletonList("a"));
         atr.setSubject(c.getResourceOwnerSubject());
         ServerAccessToken at = getProvider().createAccessToken(atr);
+        validateAccessToken(at);
         at = getProvider().getAccessToken(at.getTokenKey());
+        validateAccessToken(at);
 
         AccessTokenRegistration atr2 = new AccessTokenRegistration();
         atr2.setClient(c);
         atr2.setApprovedScope(Collections.singletonList("a"));
         atr2.setSubject(new TestingUserSubject(c.getResourceOwnerSubject().getLogin()));
         ServerAccessToken at2 = getProvider().createAccessToken(atr2);
+        validateAccessToken(at2);
         at2 = getProvider().getAccessToken(at2.getTokenKey());
+        validateAccessToken(at2);
 
         assertNotNull(at.getSubject().getId());
         assertTrue(at.getSubject() instanceof UserSubject);
@@ -221,7 +266,9 @@ abstract class AbstractOAuthDataProviderTest extends Assert {
         atr.setSubject(c.getResourceOwnerSubject());
 
         ServerAccessToken at = getProvider().createAccessToken(atr);
+        validateAccessToken(at);
         ServerAccessToken at2 = getProvider().getAccessToken(at.getTokenKey());
+        validateAccessToken(at2);
         assertEquals(at.getTokenKey(), at2.getTokenKey());
         List<OAuthPermission> scopes = at2.getScopes();
         assertNotNull(scopes);
@@ -303,6 +350,19 @@ abstract class AbstractOAuthDataProviderTest extends Assert {
             } catch (Throwable ex) {
                 ex.printStackTrace();
             }
+        }
+    }
+
+    private void validateAccessToken(ServerAccessToken accessToken) {
+        if (getProvider().isUseJwtFormatForAccessTokens()) {
+            JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(accessToken.getTokenKey());
+            JwtToken jwt = jwtConsumer.getJwtToken();
+
+            // Validate claims
+            Assert.assertNotNull(jwt.getClaim(JwtConstants.CLAIM_EXPIRY));
+            Assert.assertNotNull(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT));
+
+            Assert.assertTrue(jwtConsumer.verifySignatureWith(keyPair.getPublic(), SignatureAlgorithm.RS256));
         }
     }
 
