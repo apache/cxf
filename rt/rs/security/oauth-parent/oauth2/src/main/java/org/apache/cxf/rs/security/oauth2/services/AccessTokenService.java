@@ -154,7 +154,9 @@ public class AccessTokenService extends AbstractTokenService {
     protected void checkAudience(Client c, MultivaluedMap<String, String> params) {
         String audienceParam = params.getFirst(OAuthConstants.CLIENT_AUDIENCE);
         if (!OAuthUtils.validateAudience(audienceParam, c.getRegisteredAudiences())) {
-            LOG.fine("Error validating the audience parameter");
+            LOG.log(Level.FINE, "Error validating the audience parameter. Supplied audience {0} "
+                    + "does not match with the registered audiences {1}",
+                    new Object[] {audienceParam, c.getRegisteredAudiences() });
             throw new OAuthServiceException(new OAuthError(OAuthConstants.ACCESS_DENIED));
         }
 
