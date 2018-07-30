@@ -28,20 +28,18 @@ import javax.ws.rs.core.Configuration;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.message.Message;
-import org.eclipse.microprofile.rest.client.ext.AsyncInvocationInterceptorFactory;
 import org.eclipse.microprofile.rest.client.ext.ResponseExceptionMapper;
 
 public final class MicroProfileClientProviderFactory extends ProviderFactory {
     static final String CLIENT_FACTORY_NAME = MicroProfileClientProviderFactory.class.getName();
-    private List<ProviderInfo<ResponseExceptionMapper<?>>> responseExceptionMappers =
-            new ArrayList<ProviderInfo<ResponseExceptionMapper<?>>>(1);
-    private List<ProviderInfo<AsyncInvocationInterceptorFactory>> asyncInvocationInterceptorFactories =
-            new ArrayList<ProviderInfo<AsyncInvocationInterceptorFactory>>();
+    private List<ProviderInfo<ResponseExceptionMapper<?>>> responseExceptionMappers = new ArrayList<>(1);
+    private List<ProviderInfo<Object>> asyncInvocationInterceptorFactories = new ArrayList<>();
     private final Comparator<ProviderInfo<?>> comparator;
 
     private MicroProfileClientProviderFactory(Bus bus, Comparator<ProviderInfo<?>> comparator) {
@@ -85,8 +83,16 @@ public final class MicroProfileClientProviderFactory extends ProviderFactory {
             if (ResponseExceptionMapper.class.isAssignableFrom(providerCls)) {
                 addProviderToList(responseExceptionMappers, provider);
             }
-            if (AsyncInvocationInterceptorFactory.class.isAssignableFrom(providerCls)) {
-                addProviderToList(asyncInvocationInterceptorFactories, provider);
+            String className = "org.eclipse.microprofile.rest.client.ext.AsyncInvocationInterceptorFactory";
+            try {
+                
+                Class<?> asyncIIFactoryClass = ClassLoaderUtils.loadClass(className,
+                                                                          MicroProfileClientProviderFactory.class);
+                if (asyncIIFactoryClass.isAssignableFrom(providerCls)) {
+                    addProviderToList(asyncInvocationInterceptorFactories, provider);
+                }
+            } catch (ClassNotFoundException ex) {
+                // expected if using the MP Rest Client 1.0 APIs
             }
 
         }
@@ -109,7 +115,7 @@ public final class MicroProfileClientProviderFactory extends ProviderFactory {
                                             .collect(Collectors.toList()));
     }
 
-    public List<ProviderInfo<AsyncInvocationInterceptorFactory>> getAsyncInvocationInterceptorFactories() {
+    public List<ProviderInfo<Object>> getAsyncInvocationInterceptorFactories() {
         return asyncInvocationInterceptorFactories;
     }
 
