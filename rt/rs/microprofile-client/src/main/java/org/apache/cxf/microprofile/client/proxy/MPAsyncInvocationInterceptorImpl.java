@@ -53,11 +53,12 @@ public class MPAsyncInvocationInterceptorImpl extends AbstractPhaseInterceptor<M
     @Override
     public void handleMessage(Message message) throws Fault {
         MicroProfileClientProviderFactory factory = MicroProfileClientProviderFactory.getInstance(message);
-        List<ProviderInfo<AsyncInvocationInterceptorFactory>> aiiProviderList = 
+        List<ProviderInfo<Object>> aiiProviderList = 
             factory.getAsyncInvocationInterceptorFactories();
-        //interceptors.addAll(aiiProviderList.size());
-        for (ProviderInfo<AsyncInvocationInterceptorFactory> providerInfo: aiiProviderList) {
-            AsyncInvocationInterceptor aiInterceptor = providerInfo.getProvider().newInterceptor();
+
+        for (ProviderInfo<Object> providerInfo: aiiProviderList) {
+            AsyncInvocationInterceptor aiInterceptor = 
+                ((AsyncInvocationInterceptorFactory) providerInfo.getProvider()).newInterceptor();
             try {
                 aiInterceptor.prepareContext();
                 interceptors.add(0, aiInterceptor); // sort in reverse order
