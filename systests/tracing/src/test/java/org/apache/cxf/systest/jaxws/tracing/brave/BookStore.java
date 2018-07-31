@@ -39,7 +39,7 @@ public class BookStore implements BookStoreService {
     public BookStore() {
         brave = Tracing.newBuilder()
             .localServiceName("book-store")
-            .reporter(new TestSpanReporter())
+            .spanReporter(new TestSpanReporter())
             .build();
     }
 
