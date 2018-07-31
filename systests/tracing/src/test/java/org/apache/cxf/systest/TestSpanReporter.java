@@ -21,8 +21,8 @@ package org.apache.cxf.systest;
 import java.util.ArrayList;
 import java.util.List;
 
-import zipkin.Span;
-import zipkin.reporter.Reporter;
+import zipkin2.Span;
+import zipkin2.reporter.Reporter;
 
 public class TestSpanReporter implements Reporter<Span> {
     private static List<Span> spans = new ArrayList<>();

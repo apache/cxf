@@ -18,6 +18,7 @@
  */
 package demo.jaxws.tracing.server.impl;
 
+import brave.ScopedSpan;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -29,8 +30,6 @@ import javax.xml.ws.AsyncHandler;
 import org.apache.cxf.annotations.UseAsyncMethod;
 import org.apache.cxf.jaxws.ServerAsyncResponse;
 
-import brave.Span;
-import brave.Tracer.SpanInScope;
 import brave.Tracing;
 
 import demo.jaxws.tracing.server.Book;
@@ -56,8 +55,8 @@ public class CatalogServiceImpl implements CatalogService {
         executor.submit(new Runnable() {
             @Override
             public void run() {
-                final Span span = brave.tracer().nextSpan().name("Inserting New Book").start();
-                try (final SpanInScope scope = brave.tracer().withSpanInScope(span)) {
+                final ScopedSpan span = brave.tracer().startScopedSpan("Inserting New Book");
+                try {
                     books.put(book.getId(), book);
                     handler.handleResponse(response);
                 } finally {

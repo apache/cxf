@@ -69,7 +69,7 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
         protected void run() {
             final Tracing brave = Tracing.newBuilder()
                 .localServiceName("book-store")
-                .reporter(new TestSpanReporter())
+                .spanReporter(new TestSpanReporter())
                 .build();
 
             final JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
@@ -102,8 +102,8 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
         assertThat(service.getBooks().size(), equalTo(2));
 
         assertThat(TestSpanReporter.getAllSpans().size(), equalTo(2));
-        assertThat(TestSpanReporter.getAllSpans().get(0).name, equalTo("get books"));
-        assertThat(TestSpanReporter.getAllSpans().get(1).name, equalTo("post /bookstore"));
+        assertThat(TestSpanReporter.getAllSpans().get(0).name(), equalTo("get books"));
+        assertThat(TestSpanReporter.getAllSpans().get(1).name(), equalTo("post /bookstore"));
 
         final Map<String, List<String>> headers = getResponseHeaders(service);
         assertFalse(headers.containsKey(TRACE_ID_NAME));
@@ -132,8 +132,8 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
         assertThat(service.getBooks().size(), equalTo(2));
 
         assertThat(TestSpanReporter.getAllSpans().size(), equalTo(2));
-        assertThat(TestSpanReporter.getAllSpans().get(0).name, equalTo("get books"));
-        assertThat(TestSpanReporter.getAllSpans().get(1).name, equalTo("post /bookstore"));
+        assertThat(TestSpanReporter.getAllSpans().get(0).name(), equalTo("get books"));
+        assertThat(TestSpanReporter.getAllSpans().get(1).name(), equalTo("post /bookstore"));
 
         final Map<String, List<String>> response = getResponseHeaders(service);
         assertThatTraceIsPresent(response, spanId);
@@ -143,7 +143,7 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
     public void testThatNewChildSpanIsCreatedWhenParentIsProvided() throws MalformedURLException {
         final Tracing brave = Tracing.newBuilder()
             .localServiceName("book-store")
-            .reporter(new TestSpanReporter())
+            .spanReporter(new TestSpanReporter())
             .build();
 
         final BookStoreService service = createJaxWsService(new Configurator() {
@@ -155,10 +155,10 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
         assertThat(service.getBooks().size(), equalTo(2));
 
         assertThat(TestSpanReporter.getAllSpans().size(), equalTo(3));
-        assertThat(TestSpanReporter.getAllSpans().get(0).name, equalTo("get books"));
-        assertThat(TestSpanReporter.getAllSpans().get(0).parentId, not(nullValue()));
-        assertThat(TestSpanReporter.getAllSpans().get(1).name, equalTo("post /bookstore"));
-        assertThat(TestSpanReporter.getAllSpans().get(2).name,
+        assertThat(TestSpanReporter.getAllSpans().get(0).name(), equalTo("get books"));
+        assertThat(TestSpanReporter.getAllSpans().get(0).parentId(), not(nullValue()));
+        assertThat(TestSpanReporter.getAllSpans().get(1).name(), equalTo("post /bookstore"));
+        assertThat(TestSpanReporter.getAllSpans().get(2).name(),
             equalTo("post http://localhost:" + PORT + "/bookstore"));
 
         final Map<String, List<String>> response = getResponseHeaders(service);
@@ -169,7 +169,7 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
     public void testThatProvidedSpanIsNotClosedWhenActive() throws MalformedURLException {
         final Tracing brave = Tracing.newBuilder()
             .localServiceName("book-store")
-            .reporter(new TestSpanReporter())
+            .spanReporter(new TestSpanReporter())
             .build();
 
         final BookStoreService service = createJaxWsService(new Configurator() {
@@ -186,10 +186,10 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
                 assertThat(brave.tracer().currentSpan(), not(nullValue()));
     
                 assertThat(TestSpanReporter.getAllSpans().size(), equalTo(3));
-                assertThat(TestSpanReporter.getAllSpans().get(0).name, equalTo("get books"));
-                assertThat(TestSpanReporter.getAllSpans().get(0).parentId, not(nullValue()));
-                assertThat(TestSpanReporter.getAllSpans().get(1).name, equalTo("post /bookstore"));
-                assertThat(TestSpanReporter.getAllSpans().get(2).name,
+                assertThat(TestSpanReporter.getAllSpans().get(0).name(), equalTo("get books"));
+                assertThat(TestSpanReporter.getAllSpans().get(0).parentId(), not(nullValue()));
+                assertThat(TestSpanReporter.getAllSpans().get(1).name(), equalTo("post /bookstore"));
+                assertThat(TestSpanReporter.getAllSpans().get(2).name(),
                     equalTo("post http://localhost:" + PORT + "/bookstore"));
     
                 final Map<String, List<String>> response = getResponseHeaders(service);
@@ -202,7 +202,7 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
         }
 
         assertThat(TestSpanReporter.getAllSpans().size(), equalTo(4));
-        assertThat(TestSpanReporter.getAllSpans().get(3).name, equalTo("test span"));
+        assertThat(TestSpanReporter.getAllSpans().get(3).name(), equalTo("test span"));
     }
 
     @Test
@@ -217,7 +217,7 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
         }
 
         assertThat(TestSpanReporter.getAllSpans().size(), equalTo(1));
-        assertThat(TestSpanReporter.getAllSpans().get(0).name, equalTo("post /bookstore"));
+        assertThat(TestSpanReporter.getAllSpans().get(0).name(), equalTo("post /bookstore"));
 
         final Map<String, List<String>> headers = getResponseHeaders(service);
         assertFalse(headers.containsKey(TRACE_ID_NAME));
@@ -230,7 +230,7 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
     public void testThatNewChildSpanIsCreatedWhenParentIsProvidedInCaseOfFault() throws MalformedURLException {
         final Tracing brave = Tracing.newBuilder()
             .localServiceName("book-store")
-            .reporter(new TestSpanReporter())
+            .spanReporter(new TestSpanReporter())
             .build();
 
         final BookStoreService service = createJaxWsService(new Configurator() {
@@ -250,8 +250,8 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
         }
 
         assertThat(TestSpanReporter.getAllSpans().size(), equalTo(2));
-        assertThat(TestSpanReporter.getAllSpans().get(0).name, equalTo("post /bookstore"));
-        assertThat(TestSpanReporter.getAllSpans().get(1).name,
+        assertThat(TestSpanReporter.getAllSpans().get(0).name(), equalTo("post /bookstore"));
+        assertThat(TestSpanReporter.getAllSpans().get(1).name(),
             equalTo("post http://localhost:" + PORT + "/bookstore"));
 
         final Map<String, List<String>> response = getResponseHeaders(service);

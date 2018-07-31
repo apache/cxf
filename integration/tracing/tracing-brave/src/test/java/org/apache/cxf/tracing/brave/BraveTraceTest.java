@@ -33,8 +33,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import brave.Tracing;
-import zipkin.Span;
-import zipkin.reporter.Reporter;
+import zipkin2.Span;
+import zipkin2.reporter.Reporter;
 
 public class BraveTraceTest {
 
@@ -85,12 +85,14 @@ public class BraveTraceTest {
     }
 
     private static BraveFeature createLoggingFeature(Reporter<Span> reporter) {
-        Tracing brave = Tracing.newBuilder().localServiceName("myservice").reporter(reporter).build();
+        Tracing brave =
+            Tracing.newBuilder().localServiceName("myservice").spanReporter(reporter).build();
         return new BraveFeature(brave);
     }
 
     private static BraveClientFeature createClientLoggingFeature(Reporter<Span> reporter) {
-        Tracing brave = Tracing.newBuilder().localServiceName("myservice").reporter(reporter).build();
+        Tracing brave =
+            Tracing.newBuilder().localServiceName("myservice").spanReporter(reporter).build();
         return new BraveClientFeature(brave);
     }
 
