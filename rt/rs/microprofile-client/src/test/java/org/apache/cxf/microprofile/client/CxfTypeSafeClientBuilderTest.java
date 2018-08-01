@@ -119,7 +119,7 @@ public class CxfTypeSafeClientBuilderTest extends Assert {
         Response r = client.getEntity();
         fail(r, "Did not throw expected mapped exception: NoSuchEntityException");
     }
-    
+
     @Test(expected = WebApplicationException.class)
     public void testDefaultResponseExceptionMapper() throws Exception {
         ExceptionMappingClient client = new CxfTypeSafeClientBuilder()
@@ -130,7 +130,7 @@ public class CxfTypeSafeClientBuilderTest extends Assert {
         Response r = client.getEntity();
         fail(r, "Did not throw expected mapped exception: WebApplicationException");
     }
-    
+
     private void fail(Response r, String failureMessage) {
         System.out.println(r.getStatus());
         fail(failureMessage);

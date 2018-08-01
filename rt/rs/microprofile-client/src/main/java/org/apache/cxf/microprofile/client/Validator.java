@@ -45,7 +45,7 @@ final class Validator {
     private Validator() {
     }
 
-
+    
     public static void checkValid(Class<?> userType) throws RestClientDefinitionException {
         if (!userType.isInterface()) {
             throwException("VALIDATION_NOT_AN_INTERFACE", userType);

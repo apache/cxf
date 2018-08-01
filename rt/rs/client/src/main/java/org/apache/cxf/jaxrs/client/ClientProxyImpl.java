@@ -245,7 +245,7 @@ public class ClientProxyImpl extends AbstractClient implements
         }
     }
 
-    private static MultivaluedMap<ParameterType, Parameter> getParametersInfo(Method m,
+    private MultivaluedMap<ParameterType, Parameter> getParametersInfo(Method m,
         Object[] params, OperationResourceInfo ori) {
         MultivaluedMap<ParameterType, Parameter> map =
             new MetadataMap<ParameterType, Parameter>();
@@ -280,7 +280,7 @@ public class ClientProxyImpl extends AbstractClient implements
         return map;
     }
 
-    private static boolean isIgnorableParameter(Method m, Parameter p) {
+    protected boolean isIgnorableParameter(Method m, Parameter p) {
         if (p.getType() == ParameterType.CONTEXT) {
             return true;
         }
@@ -592,7 +592,7 @@ public class ClientProxyImpl extends AbstractClient implements
         }
         return jaxrsParamAnnAvailable;
     }
-    
+
     private void handleMatrixes(Method m,
                                 Object[] params,
                                 MultivaluedMap<ParameterType, Parameter> map,
@@ -772,10 +772,9 @@ public class ClientProxyImpl extends AbstractClient implements
             reqContext.put(PROXY_METHOD_PARAM_BODY_INDEX, bodyIndex);
 
             // execute chain
-            InvocationCallback<Object> asyncCallback = checkAsyncCallback(ori, reqContext);
+            InvocationCallback<Object> asyncCallback = checkAsyncCallback(ori, reqContext, outMessage);
             if (asyncCallback != null) {
-                doInvokeAsync(ori, outMessage, asyncCallback);
-                return null;
+                return doInvokeAsync(ori, outMessage, asyncCallback);
             }
             doRunInterceptorChain(outMessage);
 
@@ -801,8 +800,9 @@ public class ClientProxyImpl extends AbstractClient implements
 
     }
 
-    private InvocationCallback<Object> checkAsyncCallback(OperationResourceInfo ori,
-                                                          Map<String, Object> reqContext) {
+    protected InvocationCallback<Object> checkAsyncCallback(OperationResourceInfo ori,
+                                                            Map<String, Object> reqContext,
+                                                            Message outMessage) {
         Object callbackProp = reqContext.get(InvocationCallback.class.getName());
         if (callbackProp != null) {
             if (callbackProp instanceof Collection) {
@@ -820,7 +820,6 @@ public class ClientProxyImpl extends AbstractClient implements
             }
         }
         return null;
-
     }
 
     private InvocationCallback<Object> doCheckAsyncCallback(OperationResourceInfo ori,
@@ -837,16 +836,23 @@ public class ClientProxyImpl extends AbstractClient implements
         return null;
     }
 
-    protected void doInvokeAsync(OperationResourceInfo ori, Message outMessage,
-                                 InvocationCallback<Object> asyncCallback) {
+    protected Object doInvokeAsync(OperationResourceInfo ori, 
+                                   Message outMessage,
+                                   InvocationCallback<Object> asyncCallback) {
         outMessage.getExchange().setSynchronous(false);
         setAsyncMessageObserverIfNeeded(outMessage.getExchange());
-        JaxrsClientCallback<?> cb = new JaxrsClientCallback<Object>(asyncCallback,
+        JaxrsClientCallback<?> cb = newJaxrsClientCallback(asyncCallback,
             ori.getMethodToInvoke().getReturnType(), ori.getMethodToInvoke().getGenericReturnType());
         outMessage.getExchange().put(JaxrsClientCallback.class, cb);
         doRunInterceptorChain(outMessage);
 
+        return null;
+    }
 
+    protected JaxrsClientCallback<?> newJaxrsClientCallback(InvocationCallback<Object> asyncCallback,
+                                                            Class<?> responseClass,
+                                                            Type outGenericType) {
+        return new JaxrsClientCallback<Object>(asyncCallback, responseClass, outGenericType);
     }
 
     @Override
@@ -885,7 +891,7 @@ public class ClientProxyImpl extends AbstractClient implements
                 r.bufferEntity();
             }
 
-            Class<?> returnType = method.getReturnType();
+            Class<?> returnType = getReturnType(method, outMessage);
             Type genericType =
                 InjectionUtils.processGenericTypeIfNeeded(serviceCls,
                                                           returnType,
@@ -899,6 +905,10 @@ public class ClientProxyImpl extends AbstractClient implements
         } finally {
             ClientProviderFactory.getInstance(outMessage).clearThreadLocalProxies();
         }
+    }
+
+    protected Class<?> getReturnType(Method method, Message outMessage) {
+        return method.getReturnType();
     }
 
     public Object getInvocationHandler() {
