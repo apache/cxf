@@ -31,7 +31,7 @@
     
     <properties>
         <cxf.version>${project.version}</cxf.version>
-        <cxf.camel.version>2.19.2</cxf.camel.version>
+        <cxf.camel.version>2.22.0</cxf.camel.version>
     </properties>
     
     <profiles>
@@ -176,10 +176,14 @@
             <artifactId>jetty-webapp</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.uber.jaeger</groupId>
+            <groupId>io.jaegertracing</groupId>
             <artifactId>jaeger-core</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>io.jaegertracing</groupId>
+            <artifactId>jaeger-thrift</artifactId>
+        </dependency>
+        
         <!-- spring-boot -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

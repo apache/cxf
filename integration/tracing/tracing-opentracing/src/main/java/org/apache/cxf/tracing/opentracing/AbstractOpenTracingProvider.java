@@ -28,8 +28,8 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.tracing.AbstractTracingProvider;
 
-import io.opentracing.ActiveSpan;
-import io.opentracing.ActiveSpan.Continuation;
+import io.opentracing.Scope;
+import io.opentracing.Span;
 import io.opentracing.SpanContext;
 import io.opentracing.Tracer;
 import io.opentracing.propagation.Format.Builtin;
@@ -57,29 +57,28 @@ public abstract class AbstractOpenTracingProvider extends AbstractTracingProvide
                     .collect(Collectors.toMap(Map.Entry::getKey, this::getFirstValueOrEmpty))
             ));
         
-        ActiveSpan scope = null;
+        Scope scope = null;
         if (parent == null) {
-            scope = tracer.buildSpan(buildSpanDescription(uri.getPath(), method)).startActive();
+            scope = tracer.buildSpan(buildSpanDescription(uri.getPath(), method)).startActive(false);
         } else {
-            scope = tracer.buildSpan(buildSpanDescription(uri.getPath(), method)).asChildOf(parent).startActive();
+            scope = tracer.buildSpan(buildSpanDescription(uri.getPath(), method)).asChildOf(parent).startActive(false);
         }
         
         // Set additional tags
-        scope.setTag(Tags.HTTP_METHOD.getKey(), method);
-        scope.setTag(Tags.HTTP_URL.getKey(), uri.toString());
+        scope.span().setTag(Tags.HTTP_METHOD.getKey(), method);
+        scope.span().setTag(Tags.HTTP_URL.getKey(), uri.toString());
         
         // If the service resource is using asynchronous processing mode, the trace
         // scope will be closed in another thread and as such should be detached.
-        Continuation continuation = null;
+        Span span = null;
         if (isAsyncResponse()) {
            // Do not modify the current context span
-            continuation = scope.capture();
-            propagateContinuationSpan(continuation);
-            scope.deactivate();
+            span = scope.span();
+            propagateContinuationSpan(span);
+            scope.close();
         } 
 
-        return new TraceScopeHolder<TraceScope>(new TraceScope(scope, continuation), 
-            continuation != null);
+        return new TraceScopeHolder<TraceScope>(new TraceScope(span, scope), span != null);
     }
 
     protected void stopTraceSpan(final Map<String, List<String>> requestHeaders,
@@ -91,19 +90,22 @@ public abstract class AbstractOpenTracingProvider extends AbstractTracingProvide
             return;
         }
 
-        final TraceScope scope = holder.getScope();
-        if (scope != null) {
-            ActiveSpan span = scope.getSpan();
+        final TraceScope traceScope = holder.getScope();
+        if (traceScope != null) {
+            Span span = traceScope.getSpan();
+            Scope scope = traceScope.getScope();
 
             // If the service resource is using asynchronous processing mode, the trace
             // scope has been created in another thread and should be re-attached to the current
             // one.
             if (holder.isDetached()) {
-                span = scope.getContinuation().activate();
+                scope = tracer.scopeManager().activate(span, false);
             }
 
-            span.setTag(Tags.HTTP_STATUS.getKey(), responseStatus);
-            span.close();
+            scope.span().setTag(Tags.HTTP_STATUS.getKey(), responseStatus);
+            scope.span().finish();
+            
+            scope.close();
         }
     }
 
@@ -111,8 +113,8 @@ public abstract class AbstractOpenTracingProvider extends AbstractTracingProvide
         return !PhaseInterceptorChain.getCurrentMessage().getExchange().isSynchronous();
     }
 
-    private void propagateContinuationSpan(final Continuation continuationScope) {
-        PhaseInterceptorChain.getCurrentMessage().put(Continuation.class, continuationScope);
+    private void propagateContinuationSpan(final Span continuation) {
+        PhaseInterceptorChain.getCurrentMessage().put(Span.class, continuation);
     }
 
     private String getFirstValueOrEmpty(Map.Entry<String, List<String>> entry) {

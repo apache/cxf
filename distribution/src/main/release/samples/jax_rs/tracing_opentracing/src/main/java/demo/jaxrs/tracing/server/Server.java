@@ -19,13 +19,18 @@
 
 package demo.jaxrs.tracing.server;
 
-import com.uber.jaeger.Configuration;
-import com.uber.jaeger.samplers.ConstSampler;
+import io.jaegertracing.Configuration;
+import io.jaegertracing.Configuration.ReporterConfiguration;
+import io.jaegertracing.Configuration.SamplerConfiguration;
+import io.jaegertracing.Configuration.SenderConfiguration;
+import io.jaegertracing.internal.samplers.ConstSampler;
+import io.jaegertracing.spi.Sender;
 
 import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
+import demo.jaxrs.tracing.Slf4jLogSender;
 import io.opentracing.Tracer;
 import io.opentracing.util.GlobalTracer;
 
@@ -42,10 +47,17 @@ public class Server {
         servletHolder.setInitParameter("javax.ws.rs.Application",
             CatalogApplication.class.getName());
 
-        final Tracer tracer = new Configuration("tracer-server", 
-                new Configuration.SamplerConfiguration(ConstSampler.TYPE, 1),
-                new Configuration.ReporterConfiguration()
-            ).getTracer();
+        final Tracer tracer = new Configuration("tracer-server")
+            .withSampler(new SamplerConfiguration().withType(ConstSampler.TYPE).withParam(1))
+            .withReporter(new ReporterConfiguration().withSender(
+                new SenderConfiguration() {
+                    @Override
+                    public Sender getSender() {
+                        return new Slf4jLogSender();
+                    }
+                }
+            ))
+            .getTracer();
         GlobalTracer.register(tracer);
         
         server.setHandler(context);

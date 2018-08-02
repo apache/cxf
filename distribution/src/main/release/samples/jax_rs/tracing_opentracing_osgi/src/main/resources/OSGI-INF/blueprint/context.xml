@@ -32,40 +32,58 @@
 
     <bean id="tracingFeature" class="org.apache.cxf.tracing.opentracing.jaxrs.OpenTracingFeature">
         <argument index="0">
-            <bean factory-ref="builder" factory-method="build" />
+            <bean factory-ref="withReporter" factory-method="getTracer" />
         </argument>
     </bean>
+
+    <bean id="samplerBuilder" class="io.jaegertracing.Configuration.SamplerConfiguration" />
     
-    <bean id="metrics" class="com.uber.jaeger.metrics.Metrics">
+    <bean id="withType" factory-ref="samplerBuilder" factory-method="withType">
+        <argument index="0" value="const"/>
+    </bean>
+    
+    <bean id="sampler" factory-ref="withType" factory-method="withParam">
         <argument index="0">
-            <bean class="com.uber.jaeger.metrics.StatsFactoryImpl">
-                <argument index="0">
-                    <bean class="com.uber.jaeger.metrics.NullStatsReporter" />
-                </argument>
+            <bean class="java.lang.Integer">
+                <argument value="1" />
             </bean>
         </argument>
     </bean>
     
-    <bean id="builder" class="com.uber.jaeger.Tracer.Builder">
+    <bean id="senderBuilder" class="io.jaegertracing.Configuration.SenderConfiguration" />
+    
+    <bean id="sender" factory-ref="senderBuilder" factory-method="withEndpoint">
+    	<argument index="0" value="http://localhost:14268/api/traces"/>
+    </bean>
+    
+    <bean id="reporterBuilder" class="io.jaegertracing.Configuration.ReporterConfiguration" />
+    
+    <bean id="reporter" factory-ref="reporterBuilder" factory-method="withSender">
+    	<argument index="0" ref="sender"/>
+    </bean>
+    
+    <bean id="builder" class="io.jaegertracing.Configuration">
         <argument index="0" value="cxf-server" />
-        <argument index="1">
-            <bean class="com.uber.jaeger.reporters.RemoteReporter">
-                <argument index="0" ref="sender" />
-                <argument index="1" value="1000"/>
-                <argument index="2" value="100"/>
-                <argument index="3" ref="metrics"/>
-            </bean>
-        </argument>
-        <argument index="2">
-            <bean class="com.uber.jaeger.samplers.ConstSampler">
-                <argument index="0" value="true" />
-            </bean>
-        </argument>
+    </bean>
+
+	<bean id="withSampler" factory-ref="builder" factory-method="withSampler">
+        <argument index="0" ref="sampler"/>
     </bean>
     
-    <bean id="sender" class="com.uber.jaeger.senders.HttpSender">
-        <argument index="0" value="http://localhost:14268/api/traces" />
+    <bean id="withReporter" factory-ref="withSampler" factory-method="withReporter">
+        <argument index="0" ref="reporter"/>
     </bean>
+    
+<!--         <property name="withReporter" ref="reporter" /> -->
+<!--         <argument index="2"> -->
+<!--             <bean class="com.uber.jaeger.samplers.ConstSampler"> -->
+<!--                 <argument index="0" value="true" /> -->
+<!--             </bean> -->
+<!--         </argument> -->
+    
+<!--     <bean id="sender" class="com.uber.jaeger.senders.HttpSender"> -->
+<!--         <argument index="0" value="http://localhost:14268/api/traces" /> -->
+<!--     </bean> -->
     
     <!-- Application resources -->
     <bean id="catalogResource" class="demo.jaxrs.tracing.server.Catalog" />

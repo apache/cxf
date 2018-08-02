@@ -18,23 +18,23 @@
  */
 package org.apache.cxf.tracing.opentracing;
 
-import io.opentracing.ActiveSpan;
-import io.opentracing.ActiveSpan.Continuation;
+import io.opentracing.Scope;
+import io.opentracing.Span;
 
 public class TraceScope {
-    private final ActiveSpan span;
-    private final Continuation continuation;
+    private final Span span;
+    private final Scope scope;
     
-    TraceScope(final ActiveSpan span, final Continuation continuation) {
+    TraceScope(final Span span, final Scope scope) {
         this.span = span;
-        this.continuation = continuation;
+        this.scope = scope;
     }
     
-    public ActiveSpan getSpan() {
+    public Span getSpan() {
         return span;
     }
     
-    public Continuation getContinuation() {
-        return continuation;
+    public Scope getScope() {
+        return scope;
     }
 }

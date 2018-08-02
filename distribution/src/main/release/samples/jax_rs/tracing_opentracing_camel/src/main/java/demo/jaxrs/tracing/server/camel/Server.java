@@ -19,21 +19,21 @@
 
 package demo.jaxrs.tracing.server.camel;
 
-import com.uber.jaeger.Tracer;
-import com.uber.jaeger.metrics.Metrics;
-import com.uber.jaeger.metrics.NullStatsReporter;
-import com.uber.jaeger.metrics.StatsFactoryImpl;
-import com.uber.jaeger.propagation.TextMapCodec;
-import com.uber.jaeger.reporters.RemoteReporter;
-import com.uber.jaeger.samplers.ConstSampler;
-import com.uber.jaeger.senders.HttpSender;
-
 import org.apache.camel.opentracing.starter.CamelOpenTracing;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.context.annotation.Bean;
 
+import io.jaegertracing.Configuration;
+import io.jaegertracing.Configuration.CodecConfiguration;
+import io.jaegertracing.Configuration.ReporterConfiguration;
+import io.jaegertracing.Configuration.SamplerConfiguration;
+import io.jaegertracing.Configuration.SenderConfiguration;
+import io.jaegertracing.internal.propagation.TextMapCodec;
+import io.jaegertracing.internal.samplers.ConstSampler;
+import io.opentracing.Tracer;
 import io.opentracing.propagation.Format.Builtin;
 
 @EnableAutoConfiguration
@@ -42,24 +42,27 @@ import io.opentracing.propagation.Format.Builtin;
 public class Server {
     public static void main(String[] args) {
         new SpringApplicationBuilder(Server.class)
-            .web(false)
+            .web(WebApplicationType.NONE)
             .build()
             .run(args);
     }
     
     @Bean
     Tracer tracer() {
-        final Metrics metrics = new Metrics(new StatsFactoryImpl(new NullStatsReporter()));
-        
-        final Tracer.Builder builder = 
-            new Tracer.Builder(
-                "camel-server", 
-                new RemoteReporter(new HttpSender("http://localhost:14268/api/traces"), 1000, 100, metrics),
-                new ConstSampler(true)
+        return new Configuration("camel-server")
+            .withSampler(
+                new SamplerConfiguration()
+                    .withType(ConstSampler.TYPE)
+                    .withParam(1))
+            .withReporter(new ReporterConfiguration().withSender(
+                new SenderConfiguration()
+                    .withEndpoint("http://localhost:14268/api/traces")
+            ))
+            .withCodec(
+                new CodecConfiguration()
+                    .withCodec(Builtin.TEXT_MAP, new TextMapCodec(true))
             )
-            .registerExtractor(Builtin.TEXT_MAP, new TextMapCodec(true));
-        
-        return builder.build();
+            .getTracer();
     }
 }
 

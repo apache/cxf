@@ -23,13 +23,12 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.uber.jaeger.Tracer;
-import com.uber.jaeger.metrics.Metrics;
-import com.uber.jaeger.metrics.NullStatsReporter;
-import com.uber.jaeger.metrics.StatsFactoryImpl;
-import com.uber.jaeger.reporters.RemoteReporter;
-import com.uber.jaeger.samplers.ConstSampler;
-import com.uber.jaeger.senders.HttpSender;
+import io.jaegertracing.Configuration;
+import io.jaegertracing.Configuration.ReporterConfiguration;
+import io.jaegertracing.Configuration.SamplerConfiguration;
+import io.jaegertracing.Configuration.SenderConfiguration;
+import io.jaegertracing.internal.samplers.ConstSampler;
+import io.opentracing.Tracer;
 
 import org.apache.cxf.tracing.opentracing.jaxrs.OpenTracingClientProvider;
 import org.slf4j.Logger;
@@ -42,15 +41,15 @@ public final class Client {
     }
 
     public static void main(final String[] args) throws Exception {
-        final Metrics metrics = new Metrics(new StatsFactoryImpl(new NullStatsReporter()));
+        final Tracer tracer = new Configuration("cxf-client")
+            .withSampler(new SamplerConfiguration().withType(ConstSampler.TYPE).withParam(1))
+            .withReporter(new ReporterConfiguration().withSender(
+                new SenderConfiguration()
+                    .withEndpoint("http://localhost:14268/api/traces")
+            ))
+            .getTracer();
         
-        final Tracer.Builder builder = new Tracer.Builder(
-                "cxf-client", 
-                new RemoteReporter(new HttpSender("http://localhost:14268/api/traces"), 1000, 100, metrics),
-                new ConstSampler(true)
-            );
-        
-        final OpenTracingClientProvider provider = new OpenTracingClientProvider(builder.build());
+        final OpenTracingClientProvider provider = new OpenTracingClientProvider(tracer);
         final javax.ws.rs.client.Client client = ClientBuilder.newClient().register(provider);
         
         final Response response = client

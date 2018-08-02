@@ -28,8 +28,8 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.tracing.AbstractTracingProvider;
 import org.apache.cxf.tracing.opentracing.internal.TextMapInjectAdapter;
 
-import io.opentracing.ActiveSpan;
-import io.opentracing.ActiveSpan.Continuation;
+import io.opentracing.Scope;
+import io.opentracing.Span;
 import io.opentracing.Tracer;
 import io.opentracing.propagation.Format.Builtin;
 import io.opentracing.tag.Tags;
@@ -47,30 +47,30 @@ public abstract class AbstractOpenTracingClientProvider extends AbstractTracingP
     protected TraceScopeHolder<TraceScope> startTraceSpan(final Map<String, List<String>> requestHeaders,
             URI uri, String method) {
 
-        final ActiveSpan parent = tracer.activeSpan();
-        ActiveSpan span = null; 
+        final Span parent = tracer.activeSpan();
+        Scope scope = null; 
         if (parent == null) {
-            span = tracer.buildSpan(buildSpanDescription(uri.toString(), method)).startActive();
+            scope = tracer.buildSpan(buildSpanDescription(uri.toString(), method)).startActive(false);
         } else {
-            span = tracer.buildSpan(buildSpanDescription(uri.toString(), method)).asChildOf(parent).startActive();
+            scope = tracer.buildSpan(buildSpanDescription(uri.toString(), method)).asChildOf(parent).startActive(false);
         }
 
         // Set additional tags 
-        span.setTag(Tags.HTTP_METHOD.getKey(), method);
-        span.setTag(Tags.HTTP_URL.getKey(), uri.toString());
+        scope.span().setTag(Tags.HTTP_METHOD.getKey(), method);
+        scope.span().setTag(Tags.HTTP_URL.getKey(), uri.toString());
 
-        tracer.inject(span.context(), Builtin.HTTP_HEADERS, new TextMapInjectAdapter(requestHeaders));
+        tracer.inject(scope.span().context(), Builtin.HTTP_HEADERS, new TextMapInjectAdapter(requestHeaders));
         
         // In case of asynchronous client invocation, the span should be detached as JAX-RS
         // client request / response filters are going to be executed in different threads.
-        Continuation continuation = null;
+        Span span = null;
         if (isAsyncInvocation()) {
-            continuation = span.capture();
-            span.deactivate();
+            span = scope.span();
+            scope.close();
         }
 
-        return new TraceScopeHolder<TraceScope>(new TraceScope(span, continuation), 
-            continuation != null /* detached */);
+        return new TraceScopeHolder<TraceScope>(new TraceScope(span, scope), 
+                span != null /* detached */);
     }
 
     private boolean isAsyncInvocation() {
@@ -82,18 +82,21 @@ public abstract class AbstractOpenTracingClientProvider extends AbstractTracingP
             return;
         }
 
-        final TraceScope scope = holder.getScope();
-        if (scope != null) {
-            ActiveSpan span = scope.getSpan();
+        final TraceScope traceScope = holder.getScope();
+        if (traceScope != null) {
+            Span span = traceScope.getSpan();
+            Scope scope = traceScope.getScope();
             
             // If the client invocation was asynchronous , the trace span has been created
             // in another thread and should be re-attached to the current one.
             if (holder.isDetached()) {
-                span = scope.getContinuation().activate();
+                scope = tracer.scopeManager().activate(span, false);
             }
 
-            span.setTag(Tags.HTTP_STATUS.getKey(), responseStatus);
-            span.close();
+            scope.span().setTag(Tags.HTTP_STATUS.getKey(), responseStatus);
+            scope.span().finish();
+            
+            scope.close();
         }
     }
 }

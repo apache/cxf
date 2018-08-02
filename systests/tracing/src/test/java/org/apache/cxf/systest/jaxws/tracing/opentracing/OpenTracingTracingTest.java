@@ -26,10 +26,6 @@ import java.util.Random;
 
 import javax.xml.ws.soap.SOAPFaultException;
 
-import com.uber.jaeger.Configuration;
-import com.uber.jaeger.SpanContext;
-import com.uber.jaeger.samplers.ConstSampler;
-
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
@@ -46,7 +42,14 @@ import org.apache.cxf.tracing.opentracing.OpenTracingFeature;
 import org.apache.cxf.tracing.opentracing.internal.TextMapInjectAdapter;
 import org.awaitility.Duration;
 
-import io.opentracing.ActiveSpan;
+import io.jaegertracing.Configuration;
+import io.jaegertracing.Configuration.ReporterConfiguration;
+import io.jaegertracing.Configuration.SamplerConfiguration;
+import io.jaegertracing.Configuration.SenderConfiguration;
+import io.jaegertracing.internal.JaegerSpanContext;
+import io.jaegertracing.internal.samplers.ConstSampler;
+import io.jaegertracing.spi.Sender;
+import io.opentracing.Scope;
 import io.opentracing.Tracer;
 import io.opentracing.propagation.Format.Builtin;
 import io.opentracing.util.GlobalTracer;
@@ -71,10 +74,17 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
     @Ignore
     public static class Server extends AbstractBusTestServerBase {
         protected void run() {
-            final Tracer tracer = new Configuration("book-store", 
-                    new Configuration.SamplerConfiguration(ConstSampler.TYPE, 1),
-                    new Configuration.ReporterConfiguration(new TestSender())
-                ).getTracer();
+            final Tracer tracer = new Configuration("book-store")
+                .withSampler(new SamplerConfiguration().withType(ConstSampler.TYPE).withParam(1))
+                .withReporter(new ReporterConfiguration().withSender(
+                    new SenderConfiguration() {
+                        @Override
+                        public Sender getSender() {
+                            return new TestSender();
+                        }
+                    }
+                ))
+                .getTracer();
             GlobalTracer.register(tracer);
             
             final JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
@@ -100,10 +110,17 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
     public void setUp() {
         random = new Random();
         
-        tracer = new Configuration("tracer", 
-                new Configuration.SamplerConfiguration(ConstSampler.TYPE, 1),
-                new Configuration.ReporterConfiguration(new TestSender())
-            ).getTracer();
+        tracer = new Configuration("tracer")
+            .withSampler(new SamplerConfiguration().withType(ConstSampler.TYPE).withParam(1))
+            .withReporter(new ReporterConfiguration().withSender(
+                new SenderConfiguration() {
+                    @Override
+                    public Sender getSender() {
+                        return new TestSender();
+                    }
+                }
+            ))
+            .getTracer();
 
         TestSender.clear();
     }
@@ -120,7 +137,7 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testThatNewInnerSpanIsCreated() throws MalformedURLException {
-        final SpanContext spanId = fromRandom();
+        final JaegerSpanContext spanId = fromRandom();
 
         final Map<String, List<String>> headers = new HashMap<>();
         tracer.inject(spanId, Builtin.HTTP_HEADERS, new TextMapInjectAdapter(headers));
@@ -160,7 +177,7 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
             }
         });
 
-        try (ActiveSpan scope = tracer.buildSpan("test span").startActive()) {
+        try (Scope scope = tracer.buildSpan("test span").startActive(true)) {
             assertThat(service.getBooks().size(), equalTo(2));
             assertThat(tracer.activeSpan(), not(nullValue()));
 
@@ -253,8 +270,8 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
         return service;
     }
 
-    private SpanContext fromRandom() {
-        return new SpanContext(random.nextLong(), /* traceId */ random.nextLong() /* spanId */, 
+    private JaegerSpanContext fromRandom() {
+        return new JaegerSpanContext(random.nextLong(), /* traceId */ random.nextLong() /* spanId */, 
             random.nextLong() /* parentId */, (byte)1 /* sampled */);
     }
 }

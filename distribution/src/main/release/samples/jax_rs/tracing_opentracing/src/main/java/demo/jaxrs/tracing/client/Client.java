@@ -24,13 +24,16 @@ import java.util.Arrays;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.uber.jaeger.Configuration;
-import com.uber.jaeger.samplers.ConstSampler;
-
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.tracing.opentracing.jaxrs.OpenTracingClientProvider;
 
 import demo.jaxrs.tracing.Slf4jLogSender;
+import io.jaegertracing.Configuration;
+import io.jaegertracing.Configuration.ReporterConfiguration;
+import io.jaegertracing.Configuration.SamplerConfiguration;
+import io.jaegertracing.Configuration.SenderConfiguration;
+import io.jaegertracing.internal.samplers.ConstSampler;
+import io.jaegertracing.spi.Sender;
 import io.opentracing.Tracer;
 
 public final class Client {
@@ -38,10 +41,17 @@ public final class Client {
     }
 
     public static void main(final String[] args) throws Exception {
-        final Tracer tracer = new Configuration("tracer-client", 
-                new Configuration.SamplerConfiguration(ConstSampler.TYPE, 1),
-                new Configuration.ReporterConfiguration(new Slf4jLogSender())
-            ).getTracer();
+        final Tracer tracer = new Configuration("tracer-client") 
+            .withSampler(new SamplerConfiguration().withType(ConstSampler.TYPE).withParam(1))
+            .withReporter(new ReporterConfiguration().withSender(
+                new SenderConfiguration() {
+                    @Override
+                    public Sender getSender() {
+                        return new Slf4jLogSender();
+                    }
+                }
+            ))
+            .getTracer();
         final OpenTracingClientProvider provider = new OpenTracingClientProvider(tracer);
 
         final Response response = WebClient

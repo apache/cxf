@@ -23,42 +23,42 @@ import java.util.concurrent.Callable;
 import org.apache.cxf.tracing.Traceable;
 import org.apache.cxf.tracing.TracerContext;
 
-import io.opentracing.ActiveSpan;
-import io.opentracing.ActiveSpan.Continuation;
+import io.opentracing.Scope;
+import io.opentracing.Span;
 import io.opentracing.Tracer;
 
 public class OpenTracingContext implements TracerContext {
     private final Tracer tracer;
-    private final Continuation continuation;
+    private final Span continuation;
 
     public OpenTracingContext(final Tracer tracer) {
         this(tracer, null);
     }
 
-    public OpenTracingContext(final Tracer tracer, final Continuation continuation) {
+    public OpenTracingContext(final Tracer tracer, final Span continuation) {
         this.tracer = tracer;
         this.continuation = continuation;
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public ActiveSpan startSpan(final String description) {
+    public Scope startSpan(final String description) {
         return newOrChildSpan(description, null);
     }
 
     @Override
     public <T> T continueSpan(final Traceable<T> traceable) throws Exception {
-        ActiveSpan scope = null;
+        Scope scope = null;
         
         if (tracer.activeSpan() == null && continuation != null) {
-            scope = continuation.activate();
+            scope = tracer.scopeManager().activate(continuation, false);
         }
 
         try {
             return traceable.call(new OpenTracingContext(tracer));
         } finally {
             if (continuation != null && scope != null) {
-                scope.deactivate();
+                scope.close();
             }
         }
     }
@@ -73,9 +73,9 @@ public class OpenTracingContext implements TracerContext {
         };
 
         // Carry over parent from the current thread
-        final ActiveSpan parent = tracer.activeSpan();
+        final Span parent = tracer.activeSpan();
         return () -> {
-            try (ActiveSpan span = newOrChildSpan(description, parent)) {
+            try (Scope scope = newOrChildSpan(description, parent)) {
                 return callable.call();
             }
         };
@@ -83,7 +83,7 @@ public class OpenTracingContext implements TracerContext {
 
     @Override
     public void annotate(String key, String value) {
-        final ActiveSpan current = tracer.activeSpan();
+        final Span current = tracer.activeSpan();
         if (current != null) {
             current.setTag(key, value);
         }
@@ -91,17 +91,17 @@ public class OpenTracingContext implements TracerContext {
 
     @Override
     public void timeline(String message) {
-        final ActiveSpan current = tracer.activeSpan();
+        final Span current = tracer.activeSpan();
         if (current != null) {
             current.log(message);
         }
     }
     
-    private ActiveSpan newOrChildSpan(final String description, final ActiveSpan parent) {
+    private Scope newOrChildSpan(final String description, final Span parent) {
         if (parent == null) {
-            return tracer.buildSpan(description).startActive();
+            return tracer.buildSpan(description).startActive(true);
         } else {
-            return tracer.buildSpan(description).asChildOf(parent).startActive();
+            return tracer.buildSpan(description).asChildOf(parent).startActive(true);
         }
     }
 }

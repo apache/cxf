@@ -21,15 +21,15 @@ package org.apache.cxf.systest.jaeger;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.uber.jaeger.Span;
-import com.uber.jaeger.exceptions.SenderException;
-import com.uber.jaeger.senders.Sender;
+import io.jaegertracing.internal.JaegerSpan;
+import io.jaegertracing.internal.exceptions.SenderException;
+import io.jaegertracing.spi.Sender;
 
 public class TestSender implements Sender {
-    private static List<Span> spans = new ArrayList<>();
+    private static List<JaegerSpan> spans = new ArrayList<>();
     
     @Override
-    public int append(Span span) throws SenderException {
+    public int append(JaegerSpan span) throws SenderException {
         spans.add(span);
         return 0;
     }
@@ -44,7 +44,7 @@ public class TestSender implements Sender {
         return 0;
     }
 
-    public static List<Span> getAllSpans() {
+    public static List<JaegerSpan> getAllSpans() {
         return spans;
     }
 

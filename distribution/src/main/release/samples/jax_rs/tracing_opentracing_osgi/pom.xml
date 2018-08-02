@@ -81,17 +81,17 @@
             <artifactId>jetty-webapp</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.uber.jaeger</groupId>
+            <groupId>io.jaegertracing</groupId>
             <artifactId>jaeger-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.uber.jaeger</groupId>
+            <groupId>io.jaegertracing</groupId>
             <artifactId>jaeger-thrift</artifactId>
         </dependency>
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
-            <version>3.8.1</version>
+            <version>3.9.0</version>
         </dependency>
         <dependency>
             <groupId>com.squareup.okio</groupId>
@@ -118,7 +118,7 @@
                             org.osgi.service.blueprint,
                             javax.annotation;version="[1.2,2)",
                             org.apache.johnzon.core,
-                            !com.uber.jaeger.Tracer,
+                            !io.jaegertracing.Configuration,
                             *
                         </Import-Package>
                         <Export-Package>

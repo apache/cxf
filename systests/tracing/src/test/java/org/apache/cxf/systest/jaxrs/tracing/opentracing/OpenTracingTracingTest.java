@@ -36,9 +36,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-import com.uber.jaeger.Configuration;
-import com.uber.jaeger.SpanContext;
-import com.uber.jaeger.samplers.ConstSampler;
 
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -52,7 +49,14 @@ import org.apache.cxf.tracing.opentracing.jaxrs.OpenTracingClientProvider;
 import org.apache.cxf.tracing.opentracing.jaxrs.OpenTracingFeature;
 import org.awaitility.Duration;
 
-import io.opentracing.ActiveSpan;
+import io.jaegertracing.Configuration;
+import io.jaegertracing.Configuration.ReporterConfiguration;
+import io.jaegertracing.Configuration.SamplerConfiguration;
+import io.jaegertracing.Configuration.SenderConfiguration;
+import io.jaegertracing.internal.JaegerSpanContext;
+import io.jaegertracing.internal.samplers.ConstSampler;
+import io.jaegertracing.spi.Sender;
+import io.opentracing.Scope;
 import io.opentracing.Tracer;
 import io.opentracing.propagation.Format.Builtin;
 import io.opentracing.propagation.TextMap;
@@ -80,14 +84,21 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
     @Ignore
     public static class Server extends AbstractBusTestServerBase {
         protected void run() {
-            final Tracer tracer = new Configuration("tracer-test-server", 
-                    new Configuration.SamplerConfiguration(ConstSampler.TYPE, 1),
-                    new Configuration.ReporterConfiguration(new TestSender())
-                ).getTracer();
-
+            final Tracer tracer = new Configuration("tracer-test-server")
+                .withSampler(new SamplerConfiguration().withType(ConstSampler.TYPE).withParam(1))
+                .withReporter(new ReporterConfiguration().withSender(
+                    new SenderConfiguration() {
+                        @Override
+                        public Sender getSender() {
+                            return new TestSender();
+                        }
+                    }
+                ))
+                .getTracer();
+            
             final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setResourceClasses(BookStore.class);
-            sf.setResourceProvider(BookStore.class, new SingletonResourceProvider(new BookStore<ActiveSpan>()));
+            sf.setResourceProvider(BookStore.class, new SingletonResourceProvider(new BookStore<Scope>()));
             sf.setAddress("http://localhost:" + PORT);
             sf.setProvider(new JacksonJsonProvider());
             sf.setProvider(new OpenTracingFeature(tracer));
@@ -107,10 +118,17 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
     public void setUp() {
         TestSender.clear();
 
-        tracer = new Configuration("tracer-test-client", 
-                new Configuration.SamplerConfiguration(ConstSampler.TYPE, 1),
-                new Configuration.ReporterConfiguration(new TestSender())
-            ).getTracer();
+        tracer = new Configuration("tracer-test-client")
+            .withSampler(new SamplerConfiguration().withType(ConstSampler.TYPE).withParam(1))
+            .withReporter(new ReporterConfiguration().withSender(
+                new SenderConfiguration() {
+                    @Override
+                    public Sender getSender() {
+                        return new TestSender();
+                    }
+                }
+            ))
+            .getTracer();
 
         openTracingClientProvider = new OpenTracingClientProvider(tracer);
         random = new Random();
@@ -128,7 +146,7 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testThatNewInnerSpanIsCreated() {
-        final SpanContext spanId = fromRandom();
+        final JaegerSpanContext spanId = fromRandom();
 
         final Response r = withTrace(createWebClient("/bookstore/books"), spanId).get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
@@ -140,7 +158,7 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testThatCurrentSpanIsAnnotatedWithKeyValue() {
-        final SpanContext spanId = fromRandom();
+        final JaegerSpanContext spanId = fromRandom();
 
         final Response r = withTrace(createWebClient("/bookstore/book/1"), spanId).get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
@@ -152,7 +170,7 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testThatParallelSpanIsAnnotatedWithTimeline() {
-        final SpanContext spanId = fromRandom();
+        final JaegerSpanContext spanId = fromRandom();
 
         final Response r = withTrace(createWebClient("/bookstore/process"), spanId).put("");
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
@@ -174,22 +192,22 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testThatNewInnerSpanIsCreatedUsingAsyncInvocation() {
-        final SpanContext spanId = fromRandom();
+        final JaegerSpanContext spanId = fromRandom();
 
         final Response r = withTrace(createWebClient("/bookstore/books/async"), spanId).get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
         assertThat(TestSender.getAllSpans().size(), equalTo(2));
-        assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("GET /bookstore/books/async"));
-        assertThat(TestSender.getAllSpans().get(1).getOperationName(), equalTo("Processing books"));
-        assertThat(TestSender.getAllSpans().get(0).getReferences(), not(empty()));
-        assertThat(TestSender.getAllSpans().get(0).getReferences().get(0).getSpanContext().getSpanId(), 
+        assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("Processing books"));
+        assertThat(TestSender.getAllSpans().get(1).getOperationName(), equalTo("GET /bookstore/books/async"));
+        assertThat(TestSender.getAllSpans().get(1).getReferences(), not(empty()));
+        assertThat(TestSender.getAllSpans().get(1).getReferences().get(0).getSpanContext().getSpanId(), 
             equalTo(spanId.getSpanId()));
     }
 
     @Test
     public void testThatOuterSpanIsCreatedUsingAsyncInvocation() {
-        final SpanContext spanId = fromRandom();
+        final JaegerSpanContext spanId = fromRandom();
 
         final Response r = withTrace(createWebClient("/bookstore/books/async/notrace"), spanId).get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
@@ -204,8 +222,8 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
         assertThat(TestSender.getAllSpans().size(), equalTo(2));
-        assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("GET /bookstore/books/async"));
-        assertThat(TestSender.getAllSpans().get(1).getOperationName(), equalTo("Processing books"));
+        assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("Processing books"));
+        assertThat(TestSender.getAllSpans().get(1).getOperationName(), equalTo("GET /bookstore/books/async"));
     }
 
     @Test
@@ -287,7 +305,7 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
     public void testThatProvidedSpanIsNotClosedWhenActive() throws MalformedURLException {
         final WebClient client = createWebClient("/bookstore/books", openTracingClientProvider);
 
-        try (ActiveSpan span = tracer.buildSpan("test span").startActive()) {
+        try (Scope span = tracer.buildSpan("test span").startActive(true)) {
             final Response r = client.get();
             assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
@@ -312,12 +330,12 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
     public void testThatProvidedSpanIsNotDetachedWhenActiveUsingAsyncClient() throws Exception {
         final WebClient client = createWebClient("/bookstore/books", openTracingClientProvider);
 
-        try (ActiveSpan span = tracer.buildSpan("test span").startActive()) {
+        try (Scope scope = tracer.buildSpan("test span").startActive(true)) {
             final Future<Response> f = client.async().get();
 
             final Response r = f.get(1, TimeUnit.HOURS);
             assertEquals(Status.OK.getStatusCode(), r.getStatus());
-            assertThat(tracer.activeSpan().context(), equalTo(span.context()));
+            assertThat(tracer.activeSpan().context(), equalTo(scope.span().context()));
 
             assertThat(TestSender.getAllSpans().size(), equalTo(3));
             assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("Get Books"));
@@ -338,7 +356,7 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testThatInnerSpanIsCreatedUsingPseudoAsyncInvocation() {
-        final SpanContext spanId = fromRandom();
+        final JaegerSpanContext spanId = fromRandom();
 
         final Response r = withTrace(createWebClient("/bookstore/books/pseudo-async"), spanId).get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
@@ -354,7 +372,7 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
             .accept(MediaType.APPLICATION_JSON);
     }
 
-    protected WebClient withTrace(final WebClient client, final SpanContext spanContext) {
+    protected WebClient withTrace(final WebClient client, final JaegerSpanContext spanContext) {
         tracer.inject(spanContext, Builtin.HTTP_HEADERS, new TextMap() {
             
             @Override
@@ -379,8 +397,8 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
         }
     }
 
-    private SpanContext fromRandom() {
-        return new SpanContext(random.nextLong(), /* traceId */ random.nextLong() /* spanId */, 
+    private JaegerSpanContext fromRandom() {
+        return new JaegerSpanContext(random.nextLong(), /* traceId */ random.nextLong() /* spanId */, 
             random.nextLong() /* parentId */, (byte)1 /* sampled */);
     }
 }

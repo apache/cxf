@@ -18,21 +18,21 @@
  */
 package org.apache.cxf.systest.jaxrs.tracing.opentracing;
 
-import com.uber.jaeger.LogData;
-import com.uber.jaeger.Span;
-
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.hamcrest.core.IsCollectionContaining;
 
-public class HasSpan extends IsCollectionContaining<Span> {
+import io.jaegertracing.internal.JaegerSpan;
+import io.jaegertracing.internal.LogData;
+
+public class HasSpan extends IsCollectionContaining<JaegerSpan> {
     public HasSpan(final String name) {
         this(name, null);
     }
 
     public HasSpan(final String name, final Matcher<Iterable<? super LogData>> matcher) {
-        super(new TypeSafeMatcher<Span>() {
+        super(new TypeSafeMatcher<JaegerSpan>() {
             @Override
             public void describeTo(Description description) {
                 description
@@ -47,7 +47,7 @@ public class HasSpan extends IsCollectionContaining<Span> {
             }
 
             @Override
-            protected boolean matchesSafely(Span item) {
+            protected boolean matchesSafely(JaegerSpan item) {
                 if (!name.equals(item.getOperationName())) {
                     return false;
                 }

@@ -19,9 +19,9 @@
 
 package demo.jaxrs.tracing;
 
-import com.uber.jaeger.Span;
-import com.uber.jaeger.exceptions.SenderException;
-import com.uber.jaeger.senders.Sender;
+import io.jaegertracing.internal.JaegerSpan;
+import io.jaegertracing.internal.exceptions.SenderException;
+import io.jaegertracing.spi.Sender;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 public class Slf4jLogSender implements Sender {
     private static final Logger LOG = LoggerFactory.getLogger(Slf4jLogSender.class);
     @Override
-    public int append(Span span) throws SenderException {
+    public int append(JaegerSpan span) throws SenderException {
         LOG.info("{}", span);
         return 0;
     }

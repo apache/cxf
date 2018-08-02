@@ -20,9 +20,6 @@
 package demo.jaxrs.tracing.server.cxf;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-import com.uber.jaeger.Configuration;
-import com.uber.jaeger.samplers.ConstSampler;
-import com.uber.jaeger.senders.HttpSender;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
@@ -34,6 +31,11 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+import io.jaegertracing.Configuration;
+import io.jaegertracing.Configuration.ReporterConfiguration;
+import io.jaegertracing.Configuration.SamplerConfiguration;
+import io.jaegertracing.Configuration.SenderConfiguration;
+import io.jaegertracing.internal.samplers.ConstSampler;
 import io.opentracing.Tracer;
 
 @EnableAutoConfiguration
@@ -58,10 +60,13 @@ public class Server {
     
     @Bean @Qualifier("cxf")
     Tracer cxfTracer() {
-        return new Configuration("cxf-service", 
-                new Configuration.SamplerConfiguration(ConstSampler.TYPE, 1),
-                new Configuration.ReporterConfiguration(new HttpSender("http://localhost:14268/api/traces"))
-            ).getTracer();
+        return new Configuration("cxf-service")
+                .withSampler(new SamplerConfiguration().withType(ConstSampler.TYPE).withParam(1))
+                .withReporter(new ReporterConfiguration().withSender(
+                    new SenderConfiguration()
+                        .withEndpoint("http://localhost:14268/api/traces")
+                ))
+                .getTracer();
     }
 }
 

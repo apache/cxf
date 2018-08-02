@@ -23,7 +23,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.tracing.TracerContext;
 import org.apache.cxf.tracing.opentracing.OpenTracingContext;
 
-import io.opentracing.ActiveSpan.Continuation;
+import io.opentracing.Span;
 import io.opentracing.Tracer;
 
 public class OpenTracingContextProvider implements ContextProvider< TracerContext > {
@@ -36,7 +36,7 @@ public class OpenTracingContextProvider implements ContextProvider< TracerContex
     @Override
     public TracerContext createContext(final Message message) {
         // Check if there is a server span passed along with the message
-        final Continuation continuation = message.get(Continuation.class);
+        final Span continuation = message.get(Span.class);
 
         // If server span is already present, let us check if it is detached
         // (asynchronous invocation)
