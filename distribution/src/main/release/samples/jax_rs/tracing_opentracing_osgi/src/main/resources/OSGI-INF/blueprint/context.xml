@@ -50,7 +50,11 @@
         </argument>
     </bean>
     
-    <bean id="sender" class="io.jaegertracing.Configuration.SenderConfiguration" factory-method="fromEnv" />
+    <bean id="senderBuilder" class="io.jaegertracing.Configuration.SenderConfiguration" />
+    
+    <bean id="sender" factory-ref="senderBuilder" factory-method="withEndpoint">
+    	<argument index="0" value="http://localhost:14268/api/traces"/>
+    </bean>
     
     <bean id="reporterBuilder" class="io.jaegertracing.Configuration.ReporterConfiguration" />
     

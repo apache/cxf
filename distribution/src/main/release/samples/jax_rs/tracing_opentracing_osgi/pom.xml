@@ -108,6 +108,8 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
+                        <SPI-Consumer>*</SPI-Consumer>
+                        <SPI-Provider>*</SPI-Provider>
                         <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
                         <Import-Package>
                             javax.ws.rs,
