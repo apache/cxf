@@ -50,11 +50,7 @@
         </argument>
     </bean>
     
-    <bean id="senderBuilder" class="io.jaegertracing.Configuration.SenderConfiguration" />
-    
-    <bean id="sender" factory-ref="senderBuilder" factory-method="withEndpoint">
-    	<argument index="0" value="http://localhost:14268/api/traces"/>
-    </bean>
+    <bean id="sender" class="io.jaegertracing.Configuration.SenderConfiguration" factory-method="fromEnv" />
     
     <bean id="reporterBuilder" class="io.jaegertracing.Configuration.ReporterConfiguration" />
     
@@ -73,17 +69,6 @@
     <bean id="withReporter" factory-ref="withSampler" factory-method="withReporter">
         <argument index="0" ref="reporter"/>
     </bean>
-    
-<!--         <property name="withReporter" ref="reporter" /> -->
-<!--         <argument index="2"> -->
-<!--             <bean class="com.uber.jaeger.samplers.ConstSampler"> -->
-<!--                 <argument index="0" value="true" /> -->
-<!--             </bean> -->
-<!--         </argument> -->
-    
-<!--     <bean id="sender" class="com.uber.jaeger.senders.HttpSender"> -->
-<!--         <argument index="0" value="http://localhost:14268/api/traces" /> -->
-<!--     </bean> -->
     
     <!-- Application resources -->
     <bean id="catalogResource" class="demo.jaxrs.tracing.server.Catalog" />
