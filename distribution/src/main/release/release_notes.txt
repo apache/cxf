@@ -1,4 +1,4 @@
-Apache CXF 3.2.5 Release Notes
+Apache CXF 3.2.6 Release Notes
 
 1. Overview
 
@@ -17,7 +17,7 @@ New features include:
 * Preliminary support for running on Java 9  (no module support yet)
 * New http-undertow transport
 
-3.2.5 fixes over 50 JIRA issues reported by users and the community since 3.2.4.
+3.2.6 fixes over 25 JIRA issues reported by users and the community since 3.2.5.
 
 
 Important notes:
@@ -69,64 +69,41 @@ for caveats when upgrading.
 
 7. Specific issues, features, and improvements fixed in this version
 
-
 ** Bug
-* [CXF-6324] - cxf-codegen-plugin|cxf-java2ws-plugin: classifier ignored when there are more then one wsdl with different classifier is involved
-* [CXF-6443] - CXF streaming-enabled web service cannot process MTOM/XOP-optimized content within a CipherValue element
-* [CXF-6968] - WS-Security policies placed on bus level are not registered
-* [CXF-7317] - Non-URL encoded Content-Id href does not seem be serialized by CXF's AttachmentSerializer
-* [CXF-7363] - Support saaj-impl 1.4
-* [CXF-7658] - SSE destinations unreachable deployed in OSGi
-* [CXF-7682] - context.get(MessageContext.HTTP_REQUEST_HEADERS) always returns null for client
-* [CXF-7683] - Codegen fails when using JDK10 with maven and cxf-plugin
-* [CXF-7688] - AttachmentDeserializer does not respect "org.apache.cxf.io.CachedOutputStream.Threshold" -property
-* [CXF-7689] - ensure don't have content-type|content-length as jms message headers when use REST on JMS Transport
-* [CXF-7691] - Can't add multiple instances of the same security interceptor to the same interceptor chain
-* [CXF-7692] - Swagger UI is not shown in OSGi deployment
-* [CXF-7694] - spring boot jax-rs sample creates incorrect urls in swagger
-* [CXF-7700] - LoggingOutInterceptor doesn't write message body if encoding wasn't set
-* [CXF-7703] - Public constructor of SwaggerUiService takes package-private argument of SwaggerUiResourceLocator
-* [CXF-7705] - Use Java EL api and impl bundle from Servicemix for cxf-bean-validation feature
-* [CXF-7707] - JAXB doesn't (un)marshall property with @XmlElementRef
-* [CXF-7708] - Options mark-generated and suppress-generated-date don't effect on generating Java classes
-* [CXF-7713] - CLONE - JAXRS CTS/TCK issue:  register(...) should ignore components when invalid contracts are passed in
-* [CXF-7716] - IBM Performance Team has found several performance increases
-* [CXF-7720] - Header values are lost
-* [CXF-7721] - JwkUtils throws NPE if Message is null
-* [CXF-7726] - CircuitBreakerFailoverFeature should allow targetSelector to be set
-* [CXF-7736] - DispatchImpl doesn't work for an empty Source
-* [CXF-7737] - Missing setter in UndertowHTTPServerEngineFactoryHolder
-* [CXF-7740] - add NPE guard for SAAJStreamWriter
-* [CXF-7742] - CdiResourceProvider is not thread safe
-* [CXF-7745] - NPE thrown from MAPAggregatorImpl when replyto is non-anonymous and faultto doesn't exists
-* [CXF-7746] - Swagger2Feature - SwaggerUiResolver & JBoss 7.0 EAP
-* [CXF-7747] - FileUtils.maybeDeleteDefaultTempDir causes an IllegalStateException if it tries to remove the shutdown hook while the JVM is already shutting down
-* [CXF-7751] - Codegen plugin can't work with empty extraarg tag
-* [CXF-7754] - WrappedAttachments.toArray failure
-* [CXF-7758] - MTOM + SchemaValidation results in empty input stream from data handler
+* [CXF-7759] - Null pointer from the ThreadLocalServletContext class
+* [CXF-7760] - JOSE: JwsCompactConsumer parsing headers issue
+* [CXF-7763] - SSLUtils.configureKeyManagersWithCertAlias modifies keyManagers array
+* [CXF-7765] - URITemplate.compareTemplates returns inconsistent results
+* [CXF-7768] - ensure we close all temp queue/topic before we close a JMS connection
+* [CXF-7782] - Client session context is null before SSL context initialization
+* [CXF-7798] - Mapping of SOAP Faults in Asynchronous JAX-WS Client
+* [CXF-7799] - Query parameters are not handled properly when WebSocket transport is used
+* [CXF-7802] - URI query parameter without value causing crash
+* [CXF-7804] - SSE SseBroadcaster implementation not performing onClose / onError callbacks
+* [CXF-7805] - Transform feature outDropElements has no effect
+* [CXF-7811] - _wadl links missing in OSGi containers
 
 ** New Feature
-* [CXF-7743] - wadl2java: generate throws declaration for fault response
+* [CXF-7673] - Implement MicroProfile Rest Client 1.1
 
 ** Improvement
-* [CXF-6857] - Provide CXF BOM
-* [CXF-7600] - Add Automatic-Module-Name MANIFEST entry for Java 9 compatibility
-* [CXF-7634] - Enrich support for Swagger Core 2.0 (OpenApi Spec 3.0)
-* [CXF-7640] -  Create a form to set the use of Spring in the classHelper on a per client way
-* [CXF-7693] - Allow JWT audience claims validation not RFC 7519 compliant
-* [CXF-7701] - Encode JAX-RS Search query values for the LdapQueryVisitor
-* [CXF-7702] - Remove methods in QueryContext that don't use a custom bean class
-* [CXF-7704] - False positive warning log: "Unable to recognize the addressing policy"
-* [CXF-7711] - Allow providing CXF compiler instance to be used in JavaToWS
-* [CXF-7728] - Scan for OpenAPI config files
-* [CXF-7729] - Merge duplicate Attribute elements within an AttributeStatement
-* [CXF-7733] - Support different signature algorithms for the SAML SSO filters
-* [CXF-7744] - CXF clients do not fall back to use the javax.net.ssl.trustStore System property
-* [CXF-7750] - cxf parent pom should have dependencyManagement entries for cxf artifacts
-* [CXF-7752] - CVE-2018-5968 and CVE-2018-7489
+* [CXF-7767] - Support 100-Continue in Undertow transport
+* [CXF-7779] - Spring "version-less" xsd import
+* [CXF-7796] - Support setting outbound network interface for UDP transport
 
 ** Test
-* [CXF-7715] - EmptySOAPBodyTest fails on master with Java 9
+* [CXF-7787] - NullPointerException from wsdl2java
 
 ** Task
-* [CXF-7756] - JAASLoginInterceptor with server continuation enabled will cause the interceptor before ServiceInvokerInterceptor get invoked twice
+* [CXF-7725] - ensure all tests on 3.2.x branch can pass with java10
+* [CXF-7773] - Upgrade pax-cdi to 1.0.0
+* [CXF-7788] - Support POST method for OAuth authorization service
+* [CXF-7793] - NPE when using authorization grants with setUseJwtFormatForAccessTokens
+* [CXF-7797] - Refreshed access tokens are not issued in JWT format when setUseJwtFormatForAccessTokens is set
+* [CXF-7803] - JCache OAuthDataProvider implementation doesn't work with refresh tokens
+
+
+
+
+
+
