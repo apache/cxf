@@ -81,7 +81,7 @@ public class OsgiSwaggerUiResolver extends SwaggerUiResolver {
 
     private String getSwaggerUiRoot(Bundle b, String swaggerUiVersion) {
         if (swaggerUiVersion == null) { 
-            swaggerUiVersion = "";
+            swaggerUiVersion = b.getVersion().toString();
         }
         URL entry = b.getEntry(SwaggerUiResolver.UI_RESOURCES_ROOT_START + swaggerUiVersion);
         if (entry != null) {
