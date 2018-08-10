@@ -48,8 +48,8 @@ public class OsgiSwaggerUiResolver extends SwaggerUiResolver {
                 return null;
             }
             if (bundle.getState() != Bundle.ACTIVE) {
-				bundle.start();
-			}
+                bundle.start();
+            }
             String[] locations = swaggerUiMavenGroupAndArtifact == null ? DEFAULT_LOCATIONS
                 : new String[]{"mvn:" + swaggerUiMavenGroupAndArtifact + "/",
                                "wrap:mvn:" + swaggerUiMavenGroupAndArtifact + "/"};
