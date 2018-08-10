@@ -1183,7 +1183,7 @@ public abstract class ProviderFactory {
             instance = c.newInstance(cArgs);
         } catch (Throwable ex) {
             throw new RuntimeException("Resource or provider class " + c.getDeclaringClass().getName()
-                                       + " can not be instantiated");
+                                       + " can not be instantiated", ex);
         }
         Map<Class<?>, ThreadLocalProxy<?>> proxies =
             new LinkedHashMap<Class<?>, ThreadLocalProxy<?>>();
