@@ -30,7 +30,6 @@
     <description>Apache CXF SSE Integration System Tests Tomcat</description>
     <url>http://cxf.apache.org</url>
     <properties>
-        <cxf.tomcat.version>8.0.32</cxf.tomcat.version>
         <cxf.module.name>org.apache.cxf.systests.rs.sse.tomcat</cxf.module.name>
     </properties>
     <dependencies>
