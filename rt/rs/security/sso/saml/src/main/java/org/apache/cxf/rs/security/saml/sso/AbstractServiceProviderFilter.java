@@ -24,6 +24,7 @@ import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
+import java.time.Instant;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -211,6 +212,16 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
             return null;
         }
         return responseState;
+    }
+
+    protected boolean isStateExpired(long stateCreatedAt, long expiresAt) {
+        Instant currentTime = Instant.now();
+        Instant expires = Instant.ofEpochMilli(stateCreatedAt + getStateTimeToLive());
+        if (currentTime.isAfter(expires)) {
+            return true;
+        }
+
+        return expiresAt > 0 && currentTime.isAfter(Instant.ofEpochMilli(expiresAt));
     }
 
     protected SamlRequestInfo createSamlRequestInfo(Message m) throws Exception {

@@ -139,16 +139,6 @@ public class AbstractSSOSpHandler {
         return contextCookie;
     }
 
-    protected boolean isStateExpired(long stateCreatedAt, long expiresAt) {
-        Instant currentTime = Instant.now();
-        Instant expires = Instant.ofEpochMilli(stateCreatedAt + getStateTimeToLive());
-        if (currentTime.isAfter(expires)) {
-            return true;
-        }
-
-        return expiresAt > 0 && currentTime.isAfter(Instant.ofEpochMilli(expiresAt));
-    }
-
     public void setStateProvider(SPStateManager stateProvider) {
         this.stateProvider = stateProvider;
     }

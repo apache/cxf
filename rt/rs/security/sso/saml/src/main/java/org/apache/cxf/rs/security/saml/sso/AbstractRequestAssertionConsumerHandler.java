@@ -428,7 +428,6 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
         this.checkClientAddress = checkClientAddress;
     }
 
-    @Override
     protected boolean isStateExpired(long stateCreatedAt, long expiresAt) {
         Instant currentTime = Instant.now();
         return expiresAt > 0 && currentTime.isAfter(Instant.ofEpochMilli(stateCreatedAt + expiresAt));
