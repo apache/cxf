@@ -496,7 +496,6 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty</artifactId>
-            <version>${cxf.netty3.version}</version>
             <scope>test</scope>
         </dependency>
          <dependency>
