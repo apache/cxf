@@ -39,7 +39,9 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxws.DispatchImpl;
+import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.systest.ws.common.DoubleItImpl;
 import org.apache.cxf.systest.ws.common.KeystorePasswordCallback;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.ut.SecurityHeaderCacheInterceptor;
@@ -61,6 +63,7 @@ import org.junit.BeforeClass;
  */
 public class ActionTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
+    public static final String PORT2 = allocatePort(Server.class, 2);
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
@@ -274,6 +277,50 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         assertEquals(50, port.doubleIt(25));
 
         ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+
+    // Here the client is using "Actions", where the server is using an AsymmetricBinding policy,
+    // and we are building the service in code using JaxWsServerFactoryBean instead of Spring
+    @org.junit.Test
+    public void testAsymmetricActionToPolicyServerFactory() throws Exception {
+
+        JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
+        URL serviceWSDL = ActionTest.class.getResource("DoubleItActionPolicy.wsdl");
+        svrFactory.setWsdlLocation(serviceWSDL.toString());
+        String address = "http://localhost:" + PORT2 + "/DoubleItAsymmetric";
+        svrFactory.setAddress(address);
+        svrFactory.setServiceBean(new DoubleItImpl());
+        QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricPort");
+        svrFactory.setEndpointName(portQName);
+
+        Map<String, Object> props = new HashMap<>();
+        props.put("security.callback-handler", "org.apache.cxf.systest.ws.common.KeystorePasswordCallback");
+        props.put("security.signature.properties", "bob.properties");
+        props.put("security.encryption.properties", "alice.properties");
+        props.put("security.encryption.username", "alice");
+        svrFactory.setProperties(props);
+
+        org.apache.cxf.endpoint.Server server = svrFactory.create();
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = ActionTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = ActionTest.class.getResource("DoubleItAction.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        DoubleItPortType port =
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT2);
+
+        // Successful call
+        assertEquals(50, port.doubleIt(25));
+
+        ((java.io.Closeable)port).close();
+        server.destroy();
         bus.shutdown(true);
     }
 
