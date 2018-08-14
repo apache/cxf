@@ -209,7 +209,8 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
             if (relayState != null && relayState.getBytes().length > 0 && relayState.getBytes().length < 80) {
                 // First see if we have a valid RequestState
                 RequestState requestState = getStateProvider().removeRequestState(relayState);
-                if (requestState != null && !isStateExpired(requestState.getCreatedAt(), 0)) {
+                if (requestState != null
+                    && !isStateExpired(requestState.getCreatedAt(), requestState.getTimeToLive())) {
                     return requestState;
                 }
 
@@ -227,7 +228,8 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
                                     getIssuerId(JAXRSUtils.getCurrentMessage()),
                                     "/",
                                     null,
-                                    now.toEpochMilli());
+                                    now.toEpochMilli(),
+                                    getStateTimeToLive());
         }
 
         if (relayState == null) {
@@ -243,7 +245,7 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
             reportError("MISSING_REQUEST_STATE");
             throw ExceptionUtils.toBadRequestException(null, null);
         }
-        if (isStateExpired(requestState.getCreatedAt(), 0)) {
+        if (isStateExpired(requestState.getCreatedAt(), requestState.getTimeToLive())) {
             reportError("EXPIRED_REQUEST_STATE");
             throw ExceptionUtils.toBadRequestException(null, null);
         }
@@ -424,6 +426,12 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
 
     public void setCheckClientAddress(boolean checkClientAddress) {
         this.checkClientAddress = checkClientAddress;
+    }
+
+    @Override
+    protected boolean isStateExpired(long stateCreatedAt, long expiresAt) {
+        Instant currentTime = Instant.now();
+        return expiresAt > 0 && currentTime.isAfter(Instant.ofEpochMilli(stateCreatedAt + expiresAt));
     }
 
 }
