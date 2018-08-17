@@ -44,10 +44,12 @@
     </security:http>
     <security:authentication-manager>
       <security:authentication-provider>
+        <security:password-encoder ref="noopEncoder"/>
         <security:user-service>
             <security:user name="bob" password="bobspassword" authorities="ROLE_CUSTOMER"/>
             <security:user name="fred" password="fredspassword" authorities="ROLE_CUSTOMER, ROLE_ADMIN"/>
         </security:user-service>
       </security:authentication-provider>
     </security:authentication-manager>
+    <bean id="noopEncoder" class="org.springframework.security.crypto.password.NoOpPasswordEncoder"/>
 </beans>
