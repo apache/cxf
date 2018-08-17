@@ -219,12 +219,22 @@
         <dependency>
             <groupId>httpunit</groupId>
             <artifactId>httpunit</artifactId>
+            <version>1.7</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>nekohtml</groupId>
-            <artifactId>nekohtml</artifactId>
-            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xmlParserAPIs</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
