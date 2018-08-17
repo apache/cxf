@@ -70,7 +70,7 @@
         <!-- please maintain alphabetical order here -->
         <cxf.abdera.version>1.1.3</cxf.abdera.version>
         <cxf.abdera.osgi.version>1.1.3_2</cxf.abdera.osgi.version>
-        <cxf.activemq.version>5.14.5</cxf.activemq.version>
+        <cxf.activemq.version>5.15.5</cxf.activemq.version>
         <cxf.artemis.version>2.4.0</cxf.artemis.version>
         <cxf.ahc.version>1.9.40</cxf.ahc.version>
         <cxf.apacheds.version>2.0.0-M24</cxf.apacheds.version>
@@ -96,7 +96,7 @@
         <cxf.httpcomponents.asyncclient.version>4.1.4</cxf.httpcomponents.asyncclient.version>
         <cxf.httpcomponents.asyncclient.version.range>[4.0,4.2)</cxf.httpcomponents.asyncclient.version.range>
         <cxf.httpcomponents.client.version>4.5.6</cxf.httpcomponents.client.version>
-        <cxf.httpcomponents.core.version>4.4.9</cxf.httpcomponents.core.version>
+        <cxf.httpcomponents.core.version>4.4.10</cxf.httpcomponents.core.version>
         <cxf.httpcomponents.core.version.range>[4.3,4.5.0)</cxf.httpcomponents.core.version.range>
         <cxf.hsqldb.version>2.4.1</cxf.hsqldb.version>
         <cxf.jackson.version>2.9.6</cxf.jackson.version>
@@ -232,7 +232,7 @@
         <cxf.brave.zipkin.version>2.10.4</cxf.brave.zipkin.version>
         <cxf.brave.reporter.version>2.7.7</cxf.brave.reporter.version>
         <cxf.opentracing.version>0.31.0</cxf.opentracing.version>
-        <cxf.jaeger.version>0.30.3</cxf.jaeger.version>
+        <cxf.jaeger.version>0.30.4</cxf.jaeger.version>
         <cxf.findbugs.version>3.0.2</cxf.findbugs.version>
         <cxf.checkstyle.extension />
         <cxf.jaxb.context.class />
@@ -1365,7 +1365,7 @@
             <dependency>
                 <groupId>org.awaitility</groupId>
                 <artifactId>awaitility</artifactId>
-                <version>3.0.0</version>
+                <version>3.1.2</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
