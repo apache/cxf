@@ -337,6 +337,10 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
         // complete
     }
 
+    protected Result getStreamResult(OutputStream os, Annotation[] anns, MediaType mt) throws Exception {
+        return new StreamResult(os);
+    }
+    
     @Override
     protected void marshalToOutputStream(Marshaller ms, Object obj, OutputStream os,
                                          Annotation[] anns, MediaType mt)
@@ -356,7 +360,7 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
             th = factory.newTransformerHandler(ti.getTemplates());
             this.trySettingProperties(th, ti);
         }
-        Result result = new StreamResult(os);
+        Result result = getStreamResult(os, anns, mt);
         if (systemId != null) {
             result.setSystemId(systemId);
         }
