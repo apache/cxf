@@ -62,6 +62,7 @@ import org.junit.runners.Parameterized.Parameters;
  * c) JCACHE_PORT - JCache
  * d) JWT_JCACHE_PORT - JCache with useJwtFormatForAccessTokens enabled
  * e) JPA_PORT - JPA provider
+ * f) JWT_NON_PERSIST_JCACHE_PORT-  JCache with useJwtFormatForAccessTokens + !persistJwtEncoding
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class OIDCNegativeTest extends AbstractBusClientServerTestBase {
@@ -71,6 +72,8 @@ public class OIDCNegativeTest extends AbstractBusClientServerTestBase {
     static final String JCACHE_PORT = TestUtil.getPortNumber("jaxrs-negative-oidc-jcache");
     static final String JWT_JCACHE_PORT = TestUtil.getPortNumber("jaxrs-negative-oidc-jcache-jwt");
     static final String JPA_PORT = TestUtil.getPortNumber("jaxrs-negative-oidc-jpa");
+    static final String JWT_NON_PERSIST_JCACHE_PORT =
+        TestUtil.getPortNumber("jaxrs-negative-oidc-jcache-jwt-non-persist");
 
     final String port;
 
@@ -110,6 +113,12 @@ public class OIDCNegativeTest extends AbstractBusClientServerTestBase {
                    // set this to false to fork
                    launchServer(OIDCNegativeServerJPA.class, true)
         );
+        assertTrue(
+                   "Server failed to launch",
+                   // run the server in the same process
+                   // set this to false to fork
+                   launchServer(OIDCNegativeServerJCacheJWTNonPersist.class, true)
+        );
     }
 
     @AfterClass
@@ -120,7 +129,7 @@ public class OIDCNegativeTest extends AbstractBusClientServerTestBase {
     @Parameters(name = "{0}")
     public static Collection<String> data() {
 
-        return Arrays.asList(PORT, JWT_PORT, JCACHE_PORT, JWT_JCACHE_PORT, JPA_PORT);
+        return Arrays.asList(PORT, JWT_PORT, JCACHE_PORT, JWT_JCACHE_PORT, JPA_PORT, JWT_NON_PERSIST_JCACHE_PORT);
     }
 
     @org.junit.Test
@@ -543,6 +552,25 @@ public class OIDCNegativeTest extends AbstractBusClientServerTestBase {
 
             try {
                 new OIDCNegativeServerJPA();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+
+    public static class OIDCNegativeServerJCacheJWTNonPersist extends AbstractBusTestServerBase {
+        private static final URL SERVER_CONFIG_FILE =
+            OIDCNegativeServerJWT.class.getResource("oidc-negative-server-jcache-jwt-non-persist.xml");
+
+        protected void run() {
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
+            BusFactory.setDefaultBus(springBus);
+            setBus(springBus);
+
+            try {
+                new OIDCNegativeServerJCacheJWTNonPersist();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

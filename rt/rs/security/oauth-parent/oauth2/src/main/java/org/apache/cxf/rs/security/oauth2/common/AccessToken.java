@@ -27,6 +27,7 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
 
 /**
  * Base Access Token representation
@@ -42,6 +43,7 @@ public abstract class AccessToken implements Serializable {
     private long expiresIn = -1;
     private long issuedAt = -1;
     private String issuer;
+    private String encodedToken;
 
 
     private Map<String, String> parameters = new LinkedHashMap<String, String>();
@@ -158,5 +160,14 @@ public abstract class AccessToken implements Serializable {
 
     public void setIssuer(String issuer) {
         this.issuer = issuer;
+    }
+
+    @Transient
+    public String getEncodedToken() {
+        return encodedToken;
+    }
+
+    public void setEncodedToken(String encodedToken) {
+        this.encodedToken = encodedToken;
     }
 }

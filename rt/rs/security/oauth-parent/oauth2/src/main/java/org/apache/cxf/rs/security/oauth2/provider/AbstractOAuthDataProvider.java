@@ -56,6 +56,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     private boolean supportPreauthorizedTokens;
 
     private boolean useJwtFormatForAccessTokens;
+    private boolean persistJwtEncoding = true;
     private OAuthJoseJwtProducer jwtAccessTokenProducer;
     private Map<String, String> jwtAccessTokenClaimMap;
     private ProviderAuthenticationStrategy authenticationStrategy;
@@ -100,7 +101,11 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         if (isUseJwtFormatForAccessTokens()) {
             JwtClaims claims = createJwtAccessToken(at);
             String jose = processJwtAccessToken(claims);
-            at.setTokenKey(jose);
+            if (isPersistJwtEncoding()) {
+                at.setTokenKey(jose);
+            } else {
+                at.setEncodedToken(jose);
+            }
         }
 
         return at;
@@ -414,7 +419,11 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         if (isUseJwtFormatForAccessTokens()) {
             JwtClaims claims = createJwtAccessToken(at);
             String jose = processJwtAccessToken(claims);
-            at.setTokenKey(jose);
+            if (isPersistJwtEncoding()) {
+                at.setTokenKey(jose);
+            } else {
+                at.setEncodedToken(jose);
+            }
         }
 
         return at;
@@ -641,5 +650,13 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
 
     public void setJwtAccessTokenClaimMap(Map<String, String> jwtAccessTokenClaimMap) {
         this.jwtAccessTokenClaimMap = jwtAccessTokenClaimMap;
+    }
+
+    public boolean isPersistJwtEncoding() {
+        return persistJwtEncoding;
+    }
+
+    public void setPersistJwtEncoding(boolean persistJwtEncoding) {
+        this.persistJwtEncoding = persistJwtEncoding;
     }
 }

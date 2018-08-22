@@ -65,6 +65,7 @@ import org.junit.runners.Parameterized.Parameters;
  * c) JCACHE_PORT - JCache
  * d) JWT_JCACHE_PORT - JCache with useJwtFormatForAccessTokens enabled
  * e) JPA_PORT - JPA provider
+ * f) JWT_NON_PERSIST_JCACHE_PORT-  JCache with useJwtFormatForAccessTokens + !persistJwtEncoding
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestBase {
@@ -78,6 +79,10 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
     public static final String JWT_JCACHE_PORT2 = TestUtil.getPortNumber("jaxrs-oauth2-grants2-negative-jcache-jwt");
     public static final String JPA_PORT = TestUtil.getPortNumber("jaxrs-oauth2-grants-negative-jpa");
     public static final String JPA_PORT2 = TestUtil.getPortNumber("jaxrs-oauth2-grants2-negative-jpa");
+    public static final String JWT_NON_PERSIST_JCACHE_PORT =
+        TestUtil.getPortNumber("jaxrs-oauth2-grants-negative-jcache-jwt-non-persist");
+    public static final String JWT_NON_PERSIST_JCACHE_PORT2 =
+        TestUtil.getPortNumber("jaxrs-oauth2-grants2-negative-jcache-jwt-non-persist");
 
     final String port;
 
@@ -97,6 +102,8 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
                    launchServer(BookServerOAuth2GrantsNegativeJCacheJWT.class, true));
         assertTrue("server did not launch correctly",
                    launchServer(BookServerOAuth2GrantsNegativeJPA.class, true));
+        assertTrue("server did not launch correctly",
+                   launchServer(BookServerOAuth2GrantsNegativeJCacheJWTNonPersist.class, true));
     }
 
     @AfterClass
@@ -107,7 +114,7 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
     @Parameters(name = "{0}")
     public static Collection<String> data() {
 
-        return Arrays.asList(PORT, JWT_PORT, JCACHE_PORT, JWT_JCACHE_PORT, JPA_PORT);
+        return Arrays.asList(PORT, JWT_PORT, JCACHE_PORT, JWT_JCACHE_PORT, JPA_PORT, JWT_NON_PERSIST_JCACHE_PORT);
     }
 
     //
@@ -1002,6 +1009,25 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
 
             try {
                 new BookServerOAuth2GrantsNegativeJPA();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+
+    public static class BookServerOAuth2GrantsNegativeJCacheJWTNonPersist extends AbstractBusTestServerBase {
+        private static final URL SERVER_CONFIG_FILE =
+            BookServerOAuth2GrantsNegativeJWT.class.getResource("grants-negative-server-jcache-jwt-non-persist.xml");
+
+        protected void run() {
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
+            BusFactory.setDefaultBus(springBus);
+            setBus(springBus);
+
+            try {
+                new BookServerOAuth2GrantsNegativeJCacheJWTNonPersist();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

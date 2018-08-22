@@ -65,6 +65,7 @@ import org.junit.runners.Parameterized.Parameters;
  * c) JCACHE_PORT - JCache
  * d) JWT_JCACHE_PORT - JCache with useJwtFormatForAccessTokens enabled
  * e) JPA_PORT - JPA provider
+ * f) JWT_NON_PERSIST_JCACHE_PORT-  JCache with useJwtFormatForAccessTokens + !persistJwtEncoding
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class UserInfoTest extends AbstractBusClientServerTestBase {
@@ -74,6 +75,8 @@ public class UserInfoTest extends AbstractBusClientServerTestBase {
     static final String JCACHE_PORT = TestUtil.getPortNumber("jaxrs-userinfo-jcache");
     static final String JCACHE_JWT_PORT = TestUtil.getPortNumber("jaxrs-userinfo-jcache-jwt");
     static final String JPA_PORT = TestUtil.getPortNumber("jaxrs-userinfo-jpa");
+    static final String JWT_NON_PERSIST_JCACHE_PORT =
+        TestUtil.getPortNumber("jaxrs-userinfo-jcache-jwt-non-persist");
 
     final String port;
 
@@ -113,6 +116,12 @@ public class UserInfoTest extends AbstractBusClientServerTestBase {
                    // set this to false to fork
                    launchServer(UserInfoServerJPA.class, true)
         );
+        assertTrue(
+                   "Server failed to launch",
+                   // run the server in the same process
+                   // set this to false to fork
+                   launchServer(UserInfoServerJCacheJWTNonPersist.class, true)
+        );
     }
 
     @AfterClass
@@ -123,7 +132,7 @@ public class UserInfoTest extends AbstractBusClientServerTestBase {
     @Parameters(name = "{0}")
     public static Collection<String> data() {
 
-        return Arrays.asList(PORT, JWT_PORT, JCACHE_PORT, JCACHE_JWT_PORT, JPA_PORT);
+        return Arrays.asList(PORT, JWT_PORT, JCACHE_PORT, JCACHE_JWT_PORT, JPA_PORT, JWT_NON_PERSIST_JCACHE_PORT);
     }
 
     @org.junit.Test
@@ -282,11 +291,11 @@ public class UserInfoTest extends AbstractBusClientServerTestBase {
         assertNotNull(token);
 
         KeyStore keystore = KeyStore.getInstance("JKS");
-        keystore.load(ClassLoaderUtils.getResourceAsStream("keys/bob.jks", this.getClass()),
+        keystore.load(ClassLoaderUtils.getResourceAsStream("keys/alice.jks", this.getClass()),
                       "password".toCharArray());
 
         JweJwtCompactConsumer jwtConsumer = new JweJwtCompactConsumer(token);
-        PrivateKey privateKey = (PrivateKey)keystore.getKey("bob", "password".toCharArray());
+        PrivateKey privateKey = (PrivateKey)keystore.getKey("alice", "password".toCharArray());
         JwtToken jwt = jwtConsumer.decryptWith(privateKey);
 
         assertEquals("alice", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
@@ -410,6 +419,25 @@ public class UserInfoTest extends AbstractBusClientServerTestBase {
 
             try {
                 new UserInfoServerJPA();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+
+    public static class UserInfoServerJCacheJWTNonPersist extends AbstractBusTestServerBase {
+        private static final URL SERVER_CONFIG_FILE =
+            UserInfoServerJWT.class.getResource("userinfo-server-jcache-jwt-non-persist.xml");
+
+        protected void run() {
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
+            BusFactory.setDefaultBus(springBus);
+            setBus(springBus);
+
+            try {
+                new UserInfoServerJCacheJWTNonPersist();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
