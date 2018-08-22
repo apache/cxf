@@ -50,6 +50,7 @@ import org.junit.runners.Parameterized.Parameters;
  * c) JCACHE_PORT - JCache
  * d) JWT_JCACHE_PORT - JCache with useJwtFormatForAccessTokens enabled
  * e) JPA_PORT - JPA provider
+ * f) JWT_NON_PERSIST_JCACHE_PORT-  JCache with useJwtFormatForAccessTokens + !persistJwtEncoding
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
@@ -64,6 +65,10 @@ public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
     public static final String JWT_JCACHE_PORT2 = TestUtil.getPortNumber("jaxrs-oauth2-introspection2-jcache-jwt");
     public static final String JPA_PORT = TestUtil.getPortNumber("jaxrs-oauth2-introspection-jpa");
     public static final String JPA_PORT2 = TestUtil.getPortNumber("jaxrs-oauth2-introspection2-jpa");
+    public static final String JWT_NON_PERSIST_JCACHE_PORT =
+        TestUtil.getPortNumber("jaxrs-oauth2-introspection-jcache-jwt-non-persist");
+    public static final String JWT_NON_PERSIST_JCACHE_PORT2 =
+        TestUtil.getPortNumber("jaxrs-oauth2-introspection2-jcache-jwt-non-persist");
 
     final String port;
 
@@ -83,6 +88,8 @@ public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
                    launchServer(BookServerOAuth2IntrospectionJCacheJWT.class, true));
         assertTrue("server did not launch correctly",
                    launchServer(BookServerOAuth2IntrospectionJPA.class, true));
+        assertTrue("server did not launch correctly",
+                   launchServer(BookServerOAuth2IntrospectionJCacheJWTNonPersist.class, true));
     }
 
     @AfterClass
@@ -93,7 +100,7 @@ public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
     @Parameters(name = "{0}")
     public static Collection<String> data() {
 
-        return Arrays.asList(PORT, JWT_PORT, JCACHE_PORT, JWT_JCACHE_PORT, JPA_PORT);
+        return Arrays.asList(PORT, JWT_PORT, JCACHE_PORT, JWT_JCACHE_PORT, JPA_PORT, JWT_NON_PERSIST_JCACHE_PORT);
     }
 
     @org.junit.Test
@@ -170,6 +177,8 @@ public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
             audPort = JWT_JCACHE_PORT2;
         } else if (JPA_PORT.equals(port)) {
             audPort = JPA_PORT2;
+        } else if (JWT_NON_PERSIST_JCACHE_PORT.equals(port)) {
+            audPort = JWT_NON_PERSIST_JCACHE_PORT2;
         }
         String audience = "https://localhost:" + audPort + "/secured/bookstore/books";
         ClientAccessToken accessToken =
@@ -432,6 +441,25 @@ public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
 
             try {
                 new BookServerOAuth2IntrospectionJPA();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+
+    public static class BookServerOAuth2IntrospectionJCacheJWTNonPersist extends AbstractBusTestServerBase {
+        private static final URL SERVER_CONFIG_FILE =
+            BookServerOAuth2IntrospectionJWT.class.getResource("introspection-server-jcache-jwt-non-persist.xml");
+
+        protected void run() {
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
+            BusFactory.setDefaultBus(springBus);
+            setBus(springBus);
+
+            try {
+                new BookServerOAuth2IntrospectionJCacheJWTNonPersist();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

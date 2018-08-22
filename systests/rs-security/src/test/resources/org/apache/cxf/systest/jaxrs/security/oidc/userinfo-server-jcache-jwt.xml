@@ -172,9 +172,9 @@ under the License.
         </jaxrs:providers>
         <jaxrs:properties>
            <entry key="rs.security.keystore.type" value="jks" />
-           <entry key="rs.security.keystore.alias" value="bob"/>
+           <entry key="rs.security.keystore.alias" value="alice"/>
            <entry key="rs.security.keystore.password" value="password"/>
-           <entry key="rs.security.keystore.file"  value="keys/bob.jks" />
+           <entry key="rs.security.keystore.file"  value="keys/alice.jks" />
            <entry key="rs.security.signature.algorithm" value="RS256" />
        </jaxrs:properties>
 

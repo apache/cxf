@@ -88,7 +88,7 @@ public final class OAuthUtils {
             throw new OAuthServiceException(ex);
         }
     }
-    
+
     public static boolean compareCertificateThumbprints(X509Certificate cert, String encodedThumbprint) {
         try {
             byte[] thumbprint = createCertificateThumbprint(cert);
@@ -98,7 +98,7 @@ public final class OAuthUtils {
             return false;
         }
     }
-    
+
 
     public static boolean compareTlsCertificates(TLSSessionInfo tlsInfo,
                                           List<String> base64EncodedCerts) {
@@ -120,24 +120,24 @@ public final class OAuthUtils {
         }
         return false;
     }
-    
+
     public static boolean isMutualTls(javax.ws.rs.core.SecurityContext sc, TLSSessionInfo tlsSessionInfo) {
         // Pure 2-way TLS authentication
-        return tlsSessionInfo != null 
+        return tlsSessionInfo != null
             && StringUtils.isEmpty(sc.getAuthenticationScheme())
             && getRootTLSCertificate(tlsSessionInfo) != null;
     }
-    
+
     public static String getSubjectDnFromTLSCertificates(X509Certificate cert) {
         X500Principal x509Principal = cert.getSubjectX500Principal();
         return x509Principal.getName();
     }
-    
+
     public static String getIssuerDnFromTLSCertificates(X509Certificate cert) {
         X500Principal x509Principal = cert.getIssuerX500Principal();
         return x509Principal.getName();
     }
-    
+
     public static X509Certificate getRootTLSCertificate(TLSSessionInfo tlsInfo) {
         Certificate[] clientCerts = tlsInfo.getPeerCertificates();
         if (clientCerts != null && clientCerts.length > 0) {
@@ -145,7 +145,7 @@ public final class OAuthUtils {
         }
         return null;
     }
-    
+
     public static void injectContextIntoOAuthProvider(MessageContext context, Object provider) {
         Method dataProviderContextMethod = null;
         try {
@@ -162,7 +162,7 @@ public final class OAuthUtils {
             }
         }
     }
-    
+
     public static String setSessionToken(MessageContext mc) {
         return setSessionToken(mc, 0);
     }
@@ -374,8 +374,10 @@ public final class OAuthUtils {
     }
 
     public static ClientAccessToken toClientAccessToken(ServerAccessToken serverToken, boolean supportOptionalParams) {
+        String tokenKey =
+            serverToken.getEncodedToken() != null ? serverToken.getEncodedToken() : serverToken.getTokenKey();
         ClientAccessToken clientToken = new ClientAccessToken(serverToken.getTokenType(),
-                                                              serverToken.getTokenKey());
+                                                              tokenKey);
         clientToken.setRefreshToken(serverToken.getRefreshToken());
         if (supportOptionalParams) {
             clientToken.setExpiresIn(serverToken.getExpiresIn());

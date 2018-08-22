@@ -72,6 +72,7 @@ import org.junit.runners.Parameterized.Parameters;
  * c) JCACHE_PORT - JCache
  * d) JWT_JCACHE_PORT - JCache with useJwtFormatForAccessTokens enabled
  * e) JPA_PORT - JPA provider
+ * f) JWT_NON_PERSIST_JCACHE_PORT-  JCache with useJwtFormatForAccessTokens + !persistJwtEncoding
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class OIDCFlowTest extends AbstractBusClientServerTestBase {
@@ -81,6 +82,8 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
     static final String JCACHE_PORT = TestUtil.getPortNumber("jaxrs-oidc-jcache");
     static final String JWT_JCACHE_PORT = TestUtil.getPortNumber("jaxrs-oidc-jcache-jwt");
     static final String JPA_PORT = TestUtil.getPortNumber("jaxrs-oidc-jpa");
+    static final String JWT_NON_PERSIST_JCACHE_PORT =
+        TestUtil.getPortNumber("jaxrs-oidc-jcache-jwt-non-persist");
 
     final String port;
 
@@ -120,6 +123,12 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
                    // set this to false to fork
                    launchServer(OIDCServerJPA.class, true)
         );
+        assertTrue(
+                   "Server failed to launch",
+                   // run the server in the same process
+                   // set this to false to fork
+                   launchServer(OIDCServerJCacheJWTNonPersist.class, true)
+        );
     }
 
     @AfterClass
@@ -130,7 +139,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
     @Parameters(name = "{0}")
     public static Collection<String> data() {
 
-        return Arrays.asList(PORT, JWT_PORT, JCACHE_PORT, JWT_JCACHE_PORT, JPA_PORT);
+        return Arrays.asList(PORT, JWT_PORT, JCACHE_PORT, JWT_JCACHE_PORT, JPA_PORT, JWT_NON_PERSIST_JCACHE_PORT);
     }
 
     @org.junit.Test
@@ -165,7 +174,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         assertNotNull(idToken);
         validateIdToken(idToken, null);
 
-        if (JWT_PORT.equals(port)) {
+        if (isAccessTokenInJWTFormat()) {
             validateAccessToken(accessToken.getTokenKey());
         }
     }
@@ -217,7 +226,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         assertNotNull(idToken);
         validateIdToken(idToken, null);
 
-        if (JWT_PORT.equals(port)) {
+        if (isAccessTokenInJWTFormat()) {
             validateAccessToken(accessToken.getTokenKey());
         }
     }
@@ -253,7 +262,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         assertNull(idToken);
         assertFalse(accessToken.getApprovedScope().contains("openid"));
 
-        if (JWT_PORT.equals(port)) {
+        if (isAccessTokenInJWTFormat()) {
             validateAccessToken(accessToken.getTokenKey());
         }
     }
@@ -290,7 +299,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         assertNotNull(idToken);
         validateIdToken(idToken, "123456789");
 
-        if (JWT_PORT.equals(port)) {
+        if (isAccessTokenInJWTFormat()) {
             validateAccessToken(accessToken.getTokenKey());
         }
     }
@@ -327,7 +336,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         assertNotNull(idToken);
         validateIdToken(idToken, null);
 
-        if (JWT_PORT.equals(port)) {
+        if (isAccessTokenInJWTFormat()) {
             validateAccessToken(accessToken.getTokenKey());
         }
     }
@@ -380,7 +389,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         accessToken.getParameters().get("id_token");
         assertNotNull(idToken);
 
-        if (JWT_PORT.equals(port)) {
+        if (isAccessTokenInJWTFormat()) {
             validateAccessToken(accessToken.getTokenKey());
         }
     }
@@ -417,7 +426,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         assertNotNull(idToken);
         validateIdToken(idToken, null);
 
-        if (JWT_PORT.equals(port)) {
+        if (isAccessTokenInJWTFormat()) {
             validateAccessToken(accessToken.getTokenKey());
         }
     }
@@ -450,7 +459,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
             OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code, "consumer-id-aud", audience);
         assertNotNull(accessToken.getTokenKey());
 
-        if (JWT_PORT.equals(port)) {
+        if (isAccessTokenInJWTFormat()) {
             validateAccessToken(accessToken.getTokenKey());
         }
     }
@@ -514,7 +523,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         Assert.assertNotNull(jwt.getClaims().getClaim(IdToken.NONCE_CLAIM));
         OidcUtils.validateAccessTokenHash(accessToken, jwt, true);
 
-        if (JWT_PORT.equals(port)) {
+        if (isAccessTokenInJWTFormat()) {
             validateAccessToken(accessToken);
         }
     }
@@ -583,7 +592,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         Assert.assertNotNull(jwt.getClaims().getClaim(IdToken.NONCE_CLAIM));
         OidcUtils.validateAccessTokenHash(accessToken, jwt, true);
 
-        if (JWT_PORT.equals(port)) {
+        if (isAccessTokenInJWTFormat()) {
             validateAccessToken(accessToken);
         }
     }
@@ -704,7 +713,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         jwt = jwtConsumer.getJwtToken();
         Assert.assertNotNull(jwt.getClaims().getClaim(IdToken.AUTH_CODE_HASH_CLAIM));
 
-        if (JWT_PORT.equals(port)) {
+        if (isAccessTokenInJWTFormat()) {
             validateAccessToken(accessToken.getTokenKey());
         }
     }
@@ -767,7 +776,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         // returning c_hash in the id_token returned after exchanging the code is optional
         Assert.assertNull(jwtConsumer.getJwtClaims().getClaim(IdToken.AUTH_CODE_HASH_CLAIM));
 
-        if (JWT_PORT.equals(port)) {
+        if (isAccessTokenInJWTFormat()) {
             validateAccessToken(accessToken.getTokenKey());
         }
     }
@@ -818,7 +827,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         OidcUtils.validateAccessTokenHash(accessToken, jwt, true);
         Assert.assertNotNull(jwt.getClaims().getClaim(IdToken.AUTH_CODE_HASH_CLAIM));
 
-        if (JWT_PORT.equals(port)) {
+        if (isAccessTokenInJWTFormat()) {
             validateAccessToken(accessToken);
         }
     }
@@ -1006,6 +1015,10 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
                                                           SignatureAlgorithm.RS256));
     }
 
+    private boolean isAccessTokenInJWTFormat() {
+        return JWT_PORT.equals(port) || JWT_JCACHE_PORT.equals(port) || JWT_NON_PERSIST_JCACHE_PORT.equals(port);
+    }
+
     //
     // Server implementations
     //
@@ -1098,6 +1111,25 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
 
             try {
                 new OIDCServerJPA();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+
+    public static class OIDCServerJCacheJWTNonPersist extends AbstractBusTestServerBase {
+        private static final URL SERVER_CONFIG_FILE =
+            OIDCServerJWT.class.getResource("oidc-server-jcache-jwt-non-persist.xml");
+
+        protected void run() {
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
+            BusFactory.setDefaultBus(springBus);
+            setBus(springBus);
+
+            try {
+                new OIDCServerJCacheJWTNonPersist();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

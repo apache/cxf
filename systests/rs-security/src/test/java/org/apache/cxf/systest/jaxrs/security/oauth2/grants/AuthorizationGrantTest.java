@@ -65,6 +65,7 @@ import org.junit.runners.Parameterized.Parameters;
  * c) JCACHE_PORT - JCache
  * d) JWT_JCACHE_PORT - JCache with useJwtFormatForAccessTokens enabled
  * e) JPA_PORT - JPA provider
+ * f) JWT_NON_PERSIST_JCACHE_PORT-  JCache with useJwtFormatForAccessTokens + !persistJwtEncoding
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
@@ -78,6 +79,10 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
     public static final String JWT_JCACHE_PORT2 = TestUtil.getPortNumber("jaxrs-oauth2-grants2-jcache-jwt");
     public static final String JPA_PORT = TestUtil.getPortNumber("jaxrs-oauth2-grants-jpa");
     public static final String JPA_PORT2 = TestUtil.getPortNumber("jaxrs-oauth2-grants2-jpa");
+    public static final String JWT_NON_PERSIST_JCACHE_PORT =
+        TestUtil.getPortNumber("jaxrs-oauth2-grants-jcache-jwt-non-persist");
+    public static final String JWT_NON_PERSIST_JCACHE_PORT2 =
+        TestUtil.getPortNumber("jaxrs-oauth2-grants2-jcache-jwt-non-persist");
 
     final String port;
 
@@ -97,6 +102,8 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
                    launchServer(BookServerOAuth2GrantsJCacheJWT.class, true));
         assertTrue("server did not launch correctly",
                    launchServer(BookServerOAuth2GrantsJPA.class, true));
+        assertTrue("server did not launch correctly",
+                   launchServer(BookServerOAuth2GrantsJCacheJWTNonPersist.class, true));
     }
 
     @AfterClass
@@ -107,7 +114,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
     @Parameters(name = "{0}")
     public static Collection<String> data() {
 
-        return Arrays.asList(PORT, JWT_PORT, JCACHE_PORT, JWT_JCACHE_PORT, JPA_PORT);
+        return Arrays.asList(PORT, JWT_PORT, JCACHE_PORT, JWT_JCACHE_PORT, JPA_PORT, JWT_NON_PERSIST_JCACHE_PORT);
     }
 
     @org.junit.Test
@@ -136,7 +143,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
             OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code);
         assertNotNull(accessToken.getTokenKey());
 
-        if (JWT_PORT.equals(port)) {
+        if (isAccessTokenInJWTFormat()) {
             validateAccessToken(accessToken.getTokenKey());
         }
     }
@@ -182,7 +189,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
             OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code);
         assertNotNull(accessToken.getTokenKey());
 
-        if (JWT_PORT.equals(port)) {
+        if (isAccessTokenInJWTFormat()) {
             validateAccessToken(accessToken.getTokenKey());
         }
     }
@@ -227,7 +234,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         assertNotNull(accessToken.getTokenKey());
         assertNotNull(accessToken.getRefreshToken());
 
-        if (JWT_PORT.equals(port)) {
+        if (isAccessTokenInJWTFormat()) {
             validateAccessToken(accessToken.getTokenKey());
         }
     }
@@ -273,7 +280,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         assertNotNull(accessToken.getTokenKey());
         assertNotNull(accessToken.getRefreshToken());
 
-        if (JWT_PORT.equals(port)) {
+        if (isAccessTokenInJWTFormat()) {
             validateAccessToken(accessToken.getTokenKey());
         }
     }
@@ -365,6 +372,8 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
             audPort = JWT_JCACHE_PORT2;
         } else if (JPA_PORT.equals(port)) {
             audPort = JPA_PORT2;
+        } else if (JWT_NON_PERSIST_JCACHE_PORT.equals(port)) {
+            audPort = JWT_NON_PERSIST_JCACHE_PORT2;
         }
         String audience = "https://localhost:" + audPort + "/secured/bookstore/books";
         ClientAccessToken accessToken =
@@ -410,7 +419,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         String accessToken = OAuth2TestUtils.getSubstring(location, "access_token");
         assertNotNull(accessToken);
 
-        if (JWT_PORT.equals(port)) {
+        if (isAccessTokenInJWTFormat()) {
             validateAccessToken(accessToken);
         }
     }
@@ -438,7 +447,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         assertNotNull(accessToken.getTokenKey());
         assertNotNull(accessToken.getRefreshToken());
 
-        if (JWT_PORT.equals(port)) {
+        if (isAccessTokenInJWTFormat()) {
             validateAccessToken(accessToken.getTokenKey());
         }
     }
@@ -464,7 +473,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         assertNotNull(accessToken.getTokenKey());
         assertNotNull(accessToken.getRefreshToken());
 
-        if (JWT_PORT.equals(port)) {
+        if (isAccessTokenInJWTFormat()) {
             // We don't have a Subject for the client credential grant,
             // so validate manually here as opposed to calling validateAccessToken
             JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(accessToken.getTokenKey());
@@ -505,7 +514,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         assertNotNull(accessToken.getTokenKey());
         assertNotNull(accessToken.getRefreshToken());
 
-        if (JWT_PORT.equals(port)) {
+        if (isAccessTokenInJWTFormat()) {
             validateAccessToken(accessToken.getTokenKey());
         }
     }
@@ -536,7 +545,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         assertNotNull(accessToken.getTokenKey());
         assertNotNull(accessToken.getRefreshToken());
 
-        if (JWT_PORT.equals(port)) {
+        if (isAccessTokenInJWTFormat()) {
             validateAccessToken(accessToken.getTokenKey());
         }
     }
@@ -559,6 +568,10 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
 
         Assert.assertTrue(jwtConsumer.verifySignatureWith((X509Certificate)cert,
                                                           SignatureAlgorithm.RS256));
+    }
+
+    private boolean isAccessTokenInJWTFormat() {
+        return JWT_PORT.equals(port) || JWT_JCACHE_PORT.equals(port) || JWT_NON_PERSIST_JCACHE_PORT.equals(port);
     }
 
     //
@@ -653,6 +666,25 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
 
             try {
                 new BookServerOAuth2GrantsJPA();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+
+    public static class BookServerOAuth2GrantsJCacheJWTNonPersist extends AbstractBusTestServerBase {
+        private static final URL SERVER_CONFIG_FILE =
+            BookServerOAuth2GrantsJCacheJWT.class.getResource("grants-server-jcache-jwt-non-persist.xml");
+
+        protected void run() {
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
+            BusFactory.setDefaultBus(springBus);
+            setBus(springBus);
+
+            try {
+                new BookServerOAuth2GrantsJCacheJWTNonPersist();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

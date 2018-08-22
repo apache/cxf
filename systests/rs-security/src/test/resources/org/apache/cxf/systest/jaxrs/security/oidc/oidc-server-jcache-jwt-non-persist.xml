@@ -48,7 +48,7 @@ under the License.
     <bean id="oauthJson" class="org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider"/>
     
     <httpj:engine-factory id="tls-config">
-        <httpj:engine port="${testutil.ports.jaxrs-userinfo-jcache}">
+        <httpj:engine port="${testutil.ports.jaxrs-oidc-jcache-jwt-non-persist}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
                     <sec:keyStore type="JKS" password="password" resource="keys/Bethal.jks"/>
@@ -63,10 +63,22 @@ under the License.
     </httpj:engine-factory>
     
    <bean id="oauthProvider" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.JCacheOAuthDataProviderImpl">
-       <constructor-arg><value>${testutil.ports.jaxrs-userinfo-jcache}</value></constructor-arg>
+       <constructor-arg><value>${testutil.ports.jaxrs-oidc-jcache-jwt-non-persist}</value></constructor-arg>
+       <property name="useJwtFormatForAccessTokens" value="true"/>
+       <property name="persistJwtEncoding" value="false"/>
    </bean>
    
    <bean id="authorizationService" class="org.apache.cxf.rs.security.oidc.idp.OidcAuthorizationCodeService">
+      <property name="dataProvider" ref="oauthProvider"/>
+   </bean>
+   
+   <bean id="implicitService" class="org.apache.cxf.rs.security.oidc.idp.OidcImplicitService">
+      <property name="dataProvider" ref="oauthProvider"/>
+      <property name="responseFilter" ref="idTokenFilter"/>
+      <property name="idTokenProvider" ref="idTokenProviderImpl"/>
+   </bean>
+   
+   <bean id="refreshGrantHandler" class="org.apache.cxf.rs.security.oauth2.grants.refresh.RefreshTokenGrantHandler">
       <property name="dataProvider" ref="oauthProvider"/>
    </bean>
    
@@ -78,23 +90,41 @@ under the License.
    
    <bean id="tokenService" class="org.apache.cxf.rs.security.oauth2.services.AccessTokenService">
       <property name="dataProvider" ref="oauthProvider"/>
+      <property name="grantHandlers">
+         <list>
+             <ref bean="refreshGrantHandler"/>
+         </list>
+      </property>
       <property name="responseFilter" ref="idTokenFilter"/>
    </bean>
- 
+   
+   <bean id="hybridService" class="org.apache.cxf.rs.security.oidc.idp.OidcHybridService">
+      <property name="dataProvider" ref="oauthProvider"/>
+      <property name="responseFilter" ref="idTokenFilter"/>
+      <property name="idTokenProvider" ref="idTokenProviderImpl"/>
+      <property name="codeService" ref="authorizationService"/>
+   </bean>
+   
    <bean id="callbackHandler" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.CallbackHandlerImpl"/>
    <bean id="basicAuthFilter" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.WSS4JBasicAuthFilter">
        <property name="callbackHandler" ref="callbackHandler"/>
    </bean>
    
+   <bean id="oidcKeysService" class="org.apache.cxf.rs.security.oidc.idp.OidcKeysService"/>
+   
    <jaxrs:server 
        depends-on="tls-config" 
-       address="https://localhost:${testutil.ports.jaxrs-userinfo-jcache}/services/oidc">
+       address="https://localhost:${testutil.ports.jaxrs-oidc-jcache-jwt-non-persist}/services">
        <jaxrs:serviceBeans>
            <ref bean="authorizationService"/>
+           <ref bean="hybridService"/>
+           <ref bean="implicitService"/>
            <ref bean="tokenService"/>
+           <ref bean="oidcKeysService"/>
        </jaxrs:serviceBeans>
        <jaxrs:providers>
            <ref bean="basicAuthFilter"/>
+           <bean class="org.apache.cxf.rs.security.jose.jaxrs.JsonWebKeysProvider"/>
        </jaxrs:providers>
        <jaxrs:properties>
            <entry key="rs.security.keystore.type" value="jks" />
@@ -106,87 +136,25 @@ under the License.
        </jaxrs:properties>
    </jaxrs:server>
    
-   <bean id="oAuthFilter" class="org.apache.cxf.rs.security.oauth2.filters.OAuthRequestFilter">
-       <property name="dataProvider" ref="oauthProvider"/>
-   </bean>
-      
-   <bean id="userInfoProvider" class="org.apache.cxf.systest.jaxrs.security.oidc.UserInfoProviderImpl" />
-   <bean id="userInfoService" class="org.apache.cxf.rs.security.oidc.idp.UserInfoService">
-       <property name="userInfoProvider" ref="userInfoProvider"/>
-       <property name="jwsRequired" value="false"/>
-   </bean>
+   <bean id="jwtRequestFilter" class="org.apache.cxf.rs.security.oauth2.grants.code.JwtRequestCodeFilter"/>
    
-   <bean id="jsonProvider" class="org.apache.cxf.jaxrs.provider.json.JsonMapObjectProvider"/>
-   
-   <jaxrs:server 
-        depends-on="tls-config" 
-        address="https://localhost:${testutil.ports.jaxrs-userinfo-jcache}/services/plain">
-        <jaxrs:serviceBeans>
-            <ref bean="userInfoService"/>
-        </jaxrs:serviceBeans>
-        <jaxrs:providers>
-            <ref bean="oAuthFilter"/>
-            <ref bean="jsonProvider"/>
-        </jaxrs:providers>
-   </jaxrs:server>
-   
-   <bean id="signedUserInfoService" class="org.apache.cxf.rs.security.oidc.idp.UserInfoService">
-       <property name="userInfoProvider" ref="userInfoProvider"/>
-   </bean>
-
-   <jaxrs:server 
-        depends-on="tls-config" 
-        address="https://localhost:${testutil.ports.jaxrs-userinfo-jcache}/services/signed">
-        <jaxrs:serviceBeans>
-            <ref bean="signedUserInfoService"/>
-        </jaxrs:serviceBeans>
-        <jaxrs:providers>
-            <ref bean="oAuthFilter"/>
-            <ref bean="jsonProvider"/>
-        </jaxrs:providers>
-        <jaxrs:properties>
-           <entry key="rs.security.keystore.type" value="jks" />
-           <entry key="rs.security.keystore.alias" value="alice"/>
-           <entry key="rs.security.keystore.password" value="password"/>
-           <entry key="rs.security.key.password" value="password"/>
-           <entry key="rs.security.keystore.file" value="keys/alice.jks" />
-           <entry key="rs.security.signature.algorithm" value="RS256" />
-        </jaxrs:properties>
-   </jaxrs:server>
-   
-   <bean id="encryptedUserInfoService" class="org.apache.cxf.rs.security.oidc.idp.UserInfoService">
-       <property name="userInfoProvider" ref="userInfoProvider"/>
-       <property name="jwsRequired" value="false"/>
-       <property name="jweRequired" value="true"/>
+   <bean id="jwtAuthorizationService" class="org.apache.cxf.rs.security.oauth2.services.AuthorizationCodeGrantService">
+      <property name="dataProvider" ref="oauthProvider"/>
+      <property name="authorizationFilter" ref="jwtRequestFilter"/>
    </bean>
    
    <jaxrs:server 
-        depends-on="tls-config"
-        address="https://localhost:${testutil.ports.jaxrs-userinfo-jcache}/services/encrypted">
-        <jaxrs:serviceBeans>
-            <ref bean="encryptedUserInfoService"/>
-        </jaxrs:serviceBeans>
-        <jaxrs:providers>
-            <ref bean="oAuthFilter"/>
-        </jaxrs:providers>
-        <jaxrs:properties>
-           <entry key="rs.security.keystore.type" value="jks" />
-           <entry key="rs.security.keystore.alias" value="alice"/>
-           <entry key="rs.security.keystore.password" value="password"/>
-           <entry key="rs.security.keystore.file"  value="keys/alice.jks" />
-           <entry key="rs.security.signature.algorithm" value="RS256" />
+       depends-on="tls-config" 
+       address="https://localhost:${testutil.ports.jaxrs-oidc-jcache-jwt-non-persist}/unsignedjwtservices">
+       <jaxrs:serviceBeans>
+           <ref bean="jwtAuthorizationService"/>
+       </jaxrs:serviceBeans>
+       <jaxrs:providers>
+           <ref bean="basicAuthFilter"/>
+       </jaxrs:providers>
+       <jaxrs:properties>
+           <entry key="rs.security.signature.algorithm" value="none" />
        </jaxrs:properties>
-
    </jaxrs:server>
-   
-    <http:conduit name="https://localhost.*">
-        <http:client ConnectionTimeout="3000000" ReceiveTimeout="3000000"/>
-        <http:tlsClientParameters disableCNCheck="true">
-            <sec:trustManagers>
-                <sec:keyStore type="JKS" password="password" resource="keys/Truststore.jks"/>
-            </sec:trustManagers>
-        </http:tlsClientParameters>
-    </http:conduit>
-
 
 </beans>

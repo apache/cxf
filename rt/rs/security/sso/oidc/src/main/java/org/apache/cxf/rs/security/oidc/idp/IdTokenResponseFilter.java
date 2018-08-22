@@ -106,7 +106,8 @@ public class IdTokenResponseFilter extends OAuthServerJoseJwtProducer implements
             }
             if (sigAlgo != SignatureAlgorithm.NONE) {
                 if (atHashRequired) {
-                    String atHash = OidcUtils.calculateAccessTokenHash(st.getTokenKey(), sigAlgo);
+                    String tokenKey = st.getEncodedToken() != null ? st.getEncodedToken() : st.getTokenKey();
+                    String atHash = OidcUtils.calculateAccessTokenHash(tokenKey, sigAlgo);
                     idToken.setAccessTokenHash(atHash);
                 }
                 if (cHashRequired) {

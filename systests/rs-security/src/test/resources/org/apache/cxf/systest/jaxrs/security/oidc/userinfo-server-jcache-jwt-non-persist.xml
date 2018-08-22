@@ -48,7 +48,7 @@ under the License.
     <bean id="oauthJson" class="org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider"/>
     
     <httpj:engine-factory id="tls-config">
-        <httpj:engine port="${testutil.ports.jaxrs-userinfo-jcache}">
+        <httpj:engine port="${testutil.ports.jaxrs-userinfo-jcache-jwt-non-persist}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
                     <sec:keyStore type="JKS" password="password" resource="keys/Bethal.jks"/>
@@ -63,7 +63,9 @@ under the License.
     </httpj:engine-factory>
     
    <bean id="oauthProvider" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.JCacheOAuthDataProviderImpl">
-       <constructor-arg><value>${testutil.ports.jaxrs-userinfo-jcache}</value></constructor-arg>
+       <constructor-arg><value>${testutil.ports.jaxrs-userinfo-jcache-jwt-non-persist}</value></constructor-arg>
+       <property name="useJwtFormatForAccessTokens" value="true"/>
+       <property name="persistJwtEncoding" value="false"/>
    </bean>
    
    <bean id="authorizationService" class="org.apache.cxf.rs.security.oidc.idp.OidcAuthorizationCodeService">
@@ -88,7 +90,7 @@ under the License.
    
    <jaxrs:server 
        depends-on="tls-config" 
-       address="https://localhost:${testutil.ports.jaxrs-userinfo-jcache}/services/oidc">
+       address="https://localhost:${testutil.ports.jaxrs-userinfo-jcache-jwt-non-persist}/services/oidc">
        <jaxrs:serviceBeans>
            <ref bean="authorizationService"/>
            <ref bean="tokenService"/>
@@ -108,6 +110,7 @@ under the License.
    
    <bean id="oAuthFilter" class="org.apache.cxf.rs.security.oauth2.filters.OAuthRequestFilter">
        <property name="dataProvider" ref="oauthProvider"/>
+       <property name="persistJwtEncoding" value="false"/>
    </bean>
       
    <bean id="userInfoProvider" class="org.apache.cxf.systest.jaxrs.security.oidc.UserInfoProviderImpl" />
@@ -120,7 +123,7 @@ under the License.
    
    <jaxrs:server 
         depends-on="tls-config" 
-        address="https://localhost:${testutil.ports.jaxrs-userinfo-jcache}/services/plain">
+        address="https://localhost:${testutil.ports.jaxrs-userinfo-jcache-jwt-non-persist}/services/plain">
         <jaxrs:serviceBeans>
             <ref bean="userInfoService"/>
         </jaxrs:serviceBeans>
@@ -128,6 +131,13 @@ under the License.
             <ref bean="oAuthFilter"/>
             <ref bean="jsonProvider"/>
         </jaxrs:providers>
+        <jaxrs:properties>
+           <entry key="rs.security.keystore.type" value="jks" />
+           <entry key="rs.security.keystore.alias" value="alice"/>
+           <entry key="rs.security.keystore.password" value="password"/>
+           <entry key="rs.security.keystore.file" value="keys/alice.jks" />
+           <entry key="rs.security.signature.algorithm" value="RS256" />
+        </jaxrs:properties>
    </jaxrs:server>
    
    <bean id="signedUserInfoService" class="org.apache.cxf.rs.security.oidc.idp.UserInfoService">
@@ -136,7 +146,7 @@ under the License.
 
    <jaxrs:server 
         depends-on="tls-config" 
-        address="https://localhost:${testutil.ports.jaxrs-userinfo-jcache}/services/signed">
+        address="https://localhost:${testutil.ports.jaxrs-userinfo-jcache-jwt-non-persist}/services/signed">
         <jaxrs:serviceBeans>
             <ref bean="signedUserInfoService"/>
         </jaxrs:serviceBeans>
@@ -162,7 +172,7 @@ under the License.
    
    <jaxrs:server 
         depends-on="tls-config"
-        address="https://localhost:${testutil.ports.jaxrs-userinfo-jcache}/services/encrypted">
+        address="https://localhost:${testutil.ports.jaxrs-userinfo-jcache-jwt-non-persist}/services/encrypted">
         <jaxrs:serviceBeans>
             <ref bean="encryptedUserInfoService"/>
         </jaxrs:serviceBeans>
