@@ -31,6 +31,9 @@ import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.MessageContextImpl;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.rs.security.jose.jwt.JoseJwtConsumer;
+import org.apache.cxf.rs.security.jose.jwt.JwtException;
+import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenValidation;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenValidator;
@@ -41,41 +44,43 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
 public abstract class AbstractAccessTokenValidator {
-    
+
     private static final String DEFAULT_AUTH_SCHEME = OAuthConstants.BEARER_AUTHORIZATION_SCHEME;
-    
+
 
     protected Set<String> supportedSchemes = new HashSet<String>();
     protected String realm;
-    
+
     private MessageContext mc;
     private List<AccessTokenValidator> tokenHandlers = Collections.emptyList();
     private OAuthDataProvider dataProvider;
-    
+
     private int maxValidationDataCacheSize;
     private ConcurrentHashMap<String, AccessTokenValidation> accessTokenValidations =
         new ConcurrentHashMap<String, AccessTokenValidation>();
-    
+    private JoseJwtConsumer jwtTokenConsumer;
+    private boolean persistJwtEncoding = true;
+
     public void setTokenValidator(AccessTokenValidator validator) {
         setTokenValidators(Collections.singletonList(validator));
     }
-    
+
     public void setTokenValidators(List<AccessTokenValidator> validators) {
         tokenHandlers = validators;
         for (AccessTokenValidator handler : validators) {
             supportedSchemes.addAll(handler.getSupportedAuthorizationSchemes());
         }
     }
-    
+
     public void setDataProvider(OAuthDataProvider provider) {
         dataProvider = provider;
     }
-    
+
     @Context
     public void setMessageContext(MessageContext context) {
         this.mc = context;
     }
-    
+
     public MessageContext getMessageContext() {
         return mc != null ? mc : new MessageContextImpl(PhaseInterceptorChain.getCurrentMessage());
     }
@@ -88,9 +93,9 @@ public abstract class AbstractAccessTokenValidator {
                 return handler;
             }
         }
-        return null;        
+        return null;
     }
-    
+
     /**
      * Get the access token
      */
@@ -100,10 +105,10 @@ public abstract class AbstractAccessTokenValidator {
         if (dataProvider == null && tokenHandlers.isEmpty()) {
             throw ExceptionUtils.toInternalServerErrorException(null, null);
         }
-        
+
         if (maxValidationDataCacheSize > 0) {
             accessTokenV = accessTokenValidations.get(authSchemeData);
-        } 
+        }
         ServerAccessToken localAccessToken = null;
         if (accessTokenV == null) {
             // Get the registered handler capable of processing the token
@@ -111,7 +116,7 @@ public abstract class AbstractAccessTokenValidator {
             if (handler != null) {
                 try {
                     // Convert the HTTP Authorization scheme data into a token
-                    accessTokenV = handler.validateAccessToken(getMessageContext(), authScheme, authSchemeData, 
+                    accessTokenV = handler.validateAccessToken(getMessageContext(), authScheme, authSchemeData,
                                                                extraProps);
                 } catch (OAuthServiceException ex) {
                     AuthorizationUtils.throwAuthorizationFailure(Collections.singleton(authScheme), realm);
@@ -122,8 +127,16 @@ public abstract class AbstractAccessTokenValidator {
             // Default processing if no registered providers available
             if (accessTokenV == null && dataProvider != null && authScheme.equals(DEFAULT_AUTH_SCHEME)) {
                 try {
-                    localAccessToken = dataProvider.getAccessToken(authSchemeData);
-                } catch (OAuthServiceException ex) {
+                    String cacheKey = authSchemeData;
+                    if (!persistJwtEncoding) {
+                        JoseJwtConsumer theConsumer =
+                            jwtTokenConsumer == null ? new JoseJwtConsumer() : jwtTokenConsumer;
+                        JwtToken token = theConsumer.getJwtToken(authSchemeData);
+                        cacheKey = token.getClaims().getTokenId();
+                    }
+
+                    localAccessToken = dataProvider.getAccessToken(cacheKey);
+                } catch (JwtException | OAuthServiceException ex) {
                     // to be handled next
                 }
                 if (localAccessToken == null) {
@@ -168,5 +181,20 @@ public abstract class AbstractAccessTokenValidator {
         this.maxValidationDataCacheSize = maxValidationDataCacheSize;
     }
 
-    
+    public JoseJwtConsumer getJwtTokenConsumer() {
+        return jwtTokenConsumer;
+    }
+
+    public void setJwtTokenConsumer(JoseJwtConsumer jwtTokenConsumer) {
+        this.jwtTokenConsumer = jwtTokenConsumer;
+    }
+
+    public boolean isPersistJwtEncoding() {
+        return persistJwtEncoding;
+    }
+
+    public void setPersistJwtEncoding(boolean persistJwtEncoding) {
+        this.persistJwtEncoding = persistJwtEncoding;
+    }
+
 }

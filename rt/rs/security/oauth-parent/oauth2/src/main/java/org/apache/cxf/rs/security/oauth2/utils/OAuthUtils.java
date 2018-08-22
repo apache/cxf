@@ -68,7 +68,7 @@ import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 
 /**
- * Various utility methods 
+ * Various utility methods
  */
 public final class OAuthUtils {
 
@@ -88,7 +88,7 @@ public final class OAuthUtils {
             throw new OAuthServiceException(ex);
         }
     }
-    
+
     public static boolean compareCertificateThumbprints(X509Certificate cert, String encodedThumbprint) {
         try {
             byte[] thumbprint = createCertificateThumbprint(cert);
@@ -98,7 +98,7 @@ public final class OAuthUtils {
             return false;
         }
     }
-    
+
 
     public static boolean compareTlsCertificates(TLSSessionInfo tlsInfo,
                                           List<String> base64EncodedCerts) {
@@ -120,24 +120,24 @@ public final class OAuthUtils {
         }
         return false;
     }
-    
+
     public static boolean isMutualTls(javax.ws.rs.core.SecurityContext sc, TLSSessionInfo tlsSessionInfo) {
         // Pure 2-way TLS authentication
-        return tlsSessionInfo != null 
+        return tlsSessionInfo != null
             && StringUtils.isEmpty(sc.getAuthenticationScheme())
             && getRootTLSCertificate(tlsSessionInfo) != null;
     }
-    
+
     public static String getSubjectDnFromTLSCertificates(X509Certificate cert) {
         X500Principal x509Principal = cert.getSubjectX500Principal();
         return x509Principal.getName();
     }
-    
+
     public static String getIssuerDnFromTLSCertificates(X509Certificate cert) {
         X500Principal x509Principal = cert.getIssuerX500Principal();
         return x509Principal.getName();
     }
-    
+
     public static X509Certificate getRootTLSCertificate(TLSSessionInfo tlsInfo) {
         Certificate[] clientCerts = tlsInfo.getPeerCertificates();
         if (clientCerts != null && clientCerts.length > 0) {
@@ -145,7 +145,7 @@ public final class OAuthUtils {
         }
         return null;
     }
-    
+
     public static void injectContextIntoOAuthProvider(MessageContext context, Object provider) {
         Method dataProviderContextMethod = null;
         try {
@@ -162,7 +162,7 @@ public final class OAuthUtils {
             }
         }
     }
-    
+
     public static String setSessionToken(MessageContext mc) {
         return setSessionToken(mc, 0);
     }
@@ -175,8 +175,8 @@ public final class OAuthUtils {
     public static String setSessionToken(MessageContext mc, String sessionToken, int maxInactiveInterval) {
         return setSessionToken(mc, sessionToken, null, 0);
     }
-    public static String setSessionToken(MessageContext mc, String sessionToken, 
-                                                String attribute, int maxInactiveInterval) {    
+    public static String setSessionToken(MessageContext mc, String sessionToken,
+                                                String attribute, int maxInactiveInterval) {
         HttpSession session = mc.getHttpServletRequest().getSession();
         if (maxInactiveInterval > 0) {
             session.setMaxInactiveInterval(maxInactiveInterval);
@@ -192,12 +192,12 @@ public final class OAuthUtils {
     public static String getSessionToken(MessageContext mc, String attribute) {
         return getSessionToken(mc, attribute, true);
     }
-    public static String getSessionToken(MessageContext mc, String attribute, boolean remove) {    
+    public static String getSessionToken(MessageContext mc, String attribute, boolean remove) {
         HttpSession session = mc.getHttpServletRequest().getSession();
-        String theAttribute = attribute == null ? OAuthConstants.SESSION_AUTHENTICITY_TOKEN : attribute;  
+        String theAttribute = attribute == null ? OAuthConstants.SESSION_AUTHENTICITY_TOKEN : attribute;
         String sessionToken = (String)session.getAttribute(theAttribute);
         if (sessionToken != null && remove) {
-            session.removeAttribute(theAttribute);    
+            session.removeAttribute(theAttribute);
         }
         return sessionToken;
     }
@@ -225,7 +225,7 @@ public final class OAuthUtils {
         }
         return subject;
     }
-    
+
     public static String convertPermissionsToScope(List<OAuthPermission> perms) {
         StringBuilder sb = new StringBuilder();
         for (OAuthPermission perm : perms) {
@@ -239,7 +239,7 @@ public final class OAuthUtils {
         }
         return sb.toString();
     }
-    
+
     public static List<String> convertPermissionsToScopeList(List<OAuthPermission> perms) {
         List<String> list = new LinkedList<String>();
         for (OAuthPermission perm : perms) {
@@ -247,9 +247,9 @@ public final class OAuthUtils {
         }
         return list;
     }
-    
-    public static boolean isGrantSupportedForClient(Client client, 
-                                                    boolean canSupportPublicClients, 
+
+    public static boolean isGrantSupportedForClient(Client client,
+                                                    boolean canSupportPublicClients,
                                                     String grantType) {
         if (grantType == null || !client.isConfidential() && !canSupportPublicClients) {
             return false;
@@ -257,13 +257,13 @@ public final class OAuthUtils {
         List<String> allowedGrants = client.getAllowedGrantTypes();
         return allowedGrants.isEmpty() || allowedGrants.contains(grantType);
     }
-    
+
     public static List<String> parseScope(String requestedScope) {
         List<String> list = new LinkedList<String>();
         if (requestedScope != null) {
             String[] scopeValues = requestedScope.split(" ");
             for (String scope : scopeValues) {
-                if (!StringUtils.isEmpty(scope)) {        
+                if (!StringUtils.isEmpty(scope)) {
                     list.add(scope);
                 }
             }
@@ -280,34 +280,34 @@ public final class OAuthUtils {
         }
         return StringUtils.toHexString(CryptoUtils.generateSecureRandomBytes(byteSize));
     }
-    
+
     public static long getIssuedAt() {
         return System.currentTimeMillis() / 1000L;
     }
-    
+
     public static boolean isExpired(Long issuedAt, Long lifetime) {
         // At some point -1 was used to indicate an unlimited lifetime
-        // with 0 being introduced instead at a later stage. 
-        // In theory there still could be a code around initializing the tokens with -1. 
+        // with 0 being introduced instead at a later stage.
+        // In theory there still could be a code around initializing the tokens with -1.
         // Treating -1 and 0 the same way is reasonable and it also makes it easier to
         // deal with the token introspection responses with no issuedAt time reported
         return lifetime == null
             || lifetime < -1
             || lifetime > 0L && issuedAt + lifetime < System.currentTimeMillis() / 1000L;
     }
-    
-    public static boolean validateAudience(String providedAudience, 
+
+    public static boolean validateAudience(String providedAudience,
                                            List<String> allowedAudiences) {
-        return providedAudience == null 
+        return providedAudience == null
             || validateAudiences(Collections.singletonList(providedAudience), allowedAudiences);
     }
-    public static boolean validateAudiences(List<String> providedAudiences, 
+    public static boolean validateAudiences(List<String> providedAudiences,
                                             List<String> allowedAudiences) {
-        return StringUtils.isEmpty(providedAudiences) 
+        return StringUtils.isEmpty(providedAudiences)
                && StringUtils.isEmpty(allowedAudiences)
                || allowedAudiences.containsAll(providedAudiences);
     }
-    
+
     public static boolean checkRequestURI(String servletPath, String uri) {
         boolean wildcard = uri.endsWith("*");
         String theURI = wildcard ? uri.substring(0, uri.length() - 1) : uri;
@@ -325,8 +325,8 @@ public final class OAuthUtils {
         }
         return false;
     }
-    
-    public static List<String> getRequestedScopes(Client client, 
+
+    public static List<String> getRequestedScopes(Client client,
                                                   String scopeParameter,
                                                   boolean useAllClientScopes,
                                                   boolean partialMatchScopeValidation) {
@@ -346,21 +346,21 @@ public final class OAuthUtils {
                 }
             }
         }
-        
+
         return requestScopes;
     }
-    
+
     public static boolean validateScopes(List<String> requestScopes, List<String> registeredScopes,
                                          boolean partialMatchScopeValidation) {
         if (!registeredScopes.isEmpty()) {
-            // if it is a strict validation then pre-registered scopes have to contains all 
+            // if it is a strict validation then pre-registered scopes have to contains all
             // the current request scopes
             if (!partialMatchScopeValidation) {
                 return registeredScopes.containsAll(requestScopes);
             } else {
                 for (String requestScope : requestScopes) {
                     boolean match = false;
-                    for (String registeredScope : registeredScopes) { 
+                    for (String registeredScope : registeredScopes) {
                         if (requestScope.startsWith(registeredScope)) {
                             match = true;
                             break;
@@ -376,15 +376,17 @@ public final class OAuthUtils {
     }
 
     public static ClientAccessToken toClientAccessToken(ServerAccessToken serverToken, boolean supportOptionalParams) {
+        String tokenKey =
+            serverToken.getEncodedToken() != null ? serverToken.getEncodedToken() : serverToken.getTokenKey();
         ClientAccessToken clientToken = new ClientAccessToken(serverToken.getTokenType(),
-                                                              serverToken.getTokenKey());
+                                                              tokenKey);
         clientToken.setRefreshToken(serverToken.getRefreshToken());
         if (supportOptionalParams) {
             clientToken.setExpiresIn(serverToken.getExpiresIn());
             List<OAuthPermission> perms = serverToken.getScopes();
             String scopeString = OAuthUtils.convertPermissionsToScope(perms);
             if (!StringUtils.isEmpty(scopeString)) {
-                clientToken.setApprovedScope(scopeString);    
+                clientToken.setApprovedScope(scopeString);
             }
             clientToken.setParameters(new HashMap<String, String>(serverToken.getParameters()));
         }
@@ -393,27 +395,27 @@ public final class OAuthUtils {
 
     public static JwsSignatureProvider getClientSecretSignatureProvider(String clientSecret) {
         Properties sigProps = JwsUtils.loadSignatureOutProperties(false);
-        return JwsUtils.getHmacSignatureProvider(clientSecret, 
+        return JwsUtils.getHmacSignatureProvider(clientSecret,
                                                  getClientSecretSignatureAlgorithm(sigProps));
     }
     public static JwsSignatureVerifier getClientSecretSignatureVerifier(String clientSecret) {
         Properties sigProps = JwsUtils.loadSignatureOutProperties(false);
-        return JwsUtils.getHmacSignatureVerifier(clientSecret, 
+        return JwsUtils.getHmacSignatureVerifier(clientSecret,
                                                  getClientSecretSignatureAlgorithm(sigProps));
     }
-    
+
     public static JweDecryptionProvider getClientSecretDecryptionProvider(String clientSecret) {
         Properties props = JweUtils.loadEncryptionInProperties(false);
         byte[] key = StringUtils.toBytesUTF8(clientSecret);
         return JweUtils.getDirectKeyJweDecryption(key, getClientSecretContentAlgorithm(props));
     }
-    
+
     public static JweEncryptionProvider getClientSecretEncryptionProvider(String clientSecret) {
         Properties props = JweUtils.loadEncryptionInProperties(false);
         byte[] key = StringUtils.toBytesUTF8(clientSecret);
         return JweUtils.getDirectKeyJweEncryption(key, getClientSecretContentAlgorithm(props));
     }
-    
+
     private static ContentAlgorithm getClientSecretContentAlgorithm(Properties props) {
         String ctAlgoProp = props.getProperty(OAuthConstants.CLIENT_SECRET_CONTENT_ENCRYPTION_ALGORITHM);
         if (ctAlgoProp == null) {
@@ -423,9 +425,9 @@ public final class OAuthUtils {
         ctAlgo = ctAlgo != null ? ctAlgo : ContentAlgorithm.A128GCM;
         return ctAlgo;
     }
-    
+
     public static SignatureAlgorithm getClientSecretSignatureAlgorithm(Properties sigProps) {
-        
+
         String clientSecretSigProp = sigProps.getProperty(OAuthConstants.CLIENT_SECRET_SIGNATURE_ALGORITHM);
         if (clientSecretSigProp == null) {
             String sigProp = sigProps.getProperty(JoseConstants.RSSEC_SIGNATURE_ALGORITHM);

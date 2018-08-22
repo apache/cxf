@@ -59,13 +59,13 @@ public class IdTokenResponseFilter extends OAuthServerJoseJwtProducer implements
         String idToken = getProcessedIdToken(st);
         if (idToken != null) {
             ct.getParameters().put(OidcUtils.ID_TOKEN, idToken);
-        } 
-        
+        }
+
     }
     private String getProcessedIdToken(ServerAccessToken st) {
         if (idTokenProvider != null) {
-            IdToken idToken = 
-                idTokenProvider.getIdToken(st.getClient().getClientId(), st.getSubject(), 
+            IdToken idToken =
+                idTokenProvider.getIdToken(st.getClient().getClientId(), st.getSubject(),
                                            OAuthUtils.convertPermissionsToScopeList(st.getScopes()));
             setAtHashAndNonce(idToken, st);
             return processJwt(new JwtToken(idToken), st.getClient());
@@ -84,17 +84,17 @@ public class IdTokenResponseFilter extends OAuthServerJoseJwtProducer implements
             }
         }
         return null;
-        
+
     }
     private void setAtHashAndNonce(IdToken idToken, ServerAccessToken st) {
         String rType = st.getResponseType();
         boolean atHashRequired = idToken.getAccessTokenHash() == null
             && (rType == null || !rType.equals(OidcUtils.ID_TOKEN_RESPONSE_TYPE));
-        boolean cHashRequired = idToken.getAuthorizationCodeHash() == null 
-            && rType != null 
+        boolean cHashRequired = idToken.getAuthorizationCodeHash() == null
+            && rType != null
             && (rType.equals(OidcUtils.CODE_ID_TOKEN_AT_RESPONSE_TYPE)
                 || rType.equals(OidcUtils.CODE_ID_TOKEN_RESPONSE_TYPE));
-        
+
         Message m = JAXRSUtils.getCurrentMessage();
         if (atHashRequired || cHashRequired) {
             Properties props = JwsUtils.loadSignatureOutProperties(false);
@@ -106,7 +106,8 @@ public class IdTokenResponseFilter extends OAuthServerJoseJwtProducer implements
             }
             if (sigAlgo != SignatureAlgorithm.NONE) {
                 if (atHashRequired) {
-                    String atHash = OidcUtils.calculateAccessTokenHash(st.getTokenKey(), sigAlgo);
+                    String tokenKey = st.getEncodedToken() != null ? st.getEncodedToken() : st.getTokenKey();
+                    String atHash = OidcUtils.calculateAccessTokenHash(tokenKey, sigAlgo);
                     idToken.setAccessTokenHash(atHash);
                 }
                 if (cHashRequired) {
@@ -125,13 +126,13 @@ public class IdTokenResponseFilter extends OAuthServerJoseJwtProducer implements
                 }
             }
         }
-        
+
         if (m != null && m.getExchange().containsKey(OAuthConstants.NONCE)) {
             idToken.setNonce((String)m.getExchange().get(OAuthConstants.NONCE));
         } else if (st.getNonce() != null) {
             idToken.setNonce(st.getNonce());
         }
-        
+
     }
     public void setIdTokenProvider(IdTokenProvider idTokenProvider) {
         this.idTokenProvider = idTokenProvider;
