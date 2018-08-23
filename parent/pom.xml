@@ -198,7 +198,7 @@
         <cxf.aries.parser.version>1.3.1</cxf.aries.parser.version> 
         <cxf.aries.version.range>[1.0,2)</cxf.aries.version.range>
         <cxf.osgi.version>5.0.0</cxf.osgi.version>
-        <cxf.karaf.version>4.1.6</cxf.karaf.version>
+        <cxf.karaf.version>4.2.1</cxf.karaf.version>
         <cxf.pax.logging.version>1.6.0</cxf.pax.logging.version>
         <cxf.pax.exam.version>4.12.0</cxf.pax.exam.version>
         <cxf.felix.configadmin.version>1.2.4</cxf.felix.configadmin.version>
@@ -209,8 +209,9 @@
         <cxf.servicemix.specs.version>2.9.0</cxf.servicemix.specs.version>
         <cxf.servicemix.jaxrs.specs.version>2.9.1</cxf.servicemix.jaxrs.specs.version>
         <cxf.javax.mail.version>1.4.4</cxf.javax.mail.version>
-        <cxf.jaxb.bundle.version>2.2.11_1</cxf.jaxb.bundle.version>
+        <cxf.jaxb.bundle.version>2.3.0</cxf.jaxb.bundle.version>
         <cxf.saaj-impl.bundle.version>1.3.23_2</cxf.saaj-impl.bundle.version>
+        <cxf.osgi.saaj.version>[1.3,2)</cxf.osgi.saaj.version>
         <cxf.stax-ex.version>1.7.6</cxf.stax-ex.version>
         <cxf.wsdl4j.bundle.version>1.6.3_1</cxf.wsdl4j.bundle.version>
         <cxf.xmlsec.bundle.version>2.1.2</cxf.xmlsec.bundle.version>
@@ -2877,10 +2878,11 @@
 	    <id>java9-plus</id>
 	    <properties>
                 <cxf.xjc-utils.version>3.2.3-SNAPSHOT</cxf.xjc-utils.version>
+                <cxf.jaxb.version>2.3.0</cxf.jaxb.version>
                 <cxf.asm.version>6.2</cxf.asm.version>
                 <cxf.easymock.version>3.6</cxf.easymock.version>
-                <cxf.karaf.version>4.2.1</cxf.karaf.version>
-                <cxf.pax.exam.version>4.12.0</cxf.pax.exam.version>
+                <cxf.karaf.version>4.2.2-SNAPSHOT</cxf.karaf.version>
+                <cxf.pax.exam.version>4.13.0-SNAPSHOT</cxf.pax.exam.version>
                 <cxf.server.launcher.vmargs>-ea --add-exports=java.naming/com.sun.jndi.ldap=ALL-UNNAMED --add-exports=java.base/java.io=ALL-UNNAMED --add-opens java.rmi/sun.rmi.transport=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED --add-opens java.base/java.security=ALL-UNNAMED --add-opens java.base/java.net=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.util.concurrent=ALL-UNNAMED --add-exports=java.base/sun.security.util=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xerces.internal.impl.xs=ALL-UNNAMED --add-exports=java.base/sun.reflect=ALL-UNNAMED --add-exports=java.base/sun.reflect.generics.reflectiveObjects=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xerces.internal.impl.xs.util=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xerces.internal.jaxp=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xerces.internal.dom=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xml.internal.resolver=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xml.internal.resolver.tools=ALL-UNNAMED</cxf.server.launcher.vmargs>
                 <cxf.surefire.fork.vmargs>-ea --add-exports=java.naming/com.sun.jndi.ldap=ALL-UNNAMED --add-exports=java.base/java.io=ALL-UNNAMED --add-opens java.rmi/sun.rmi.transport=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED --add-opens java.base/java.security=ALL-UNNAMED --add-opens java.base/java.net=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.util.concurrent=ALL-UNNAMED --add-exports=java.base/sun.security.util=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xerces.internal.impl.xs=ALL-UNNAMED --add-exports=java.base/sun.reflect=ALL-UNNAMED --add-exports=java.base/sun.reflect.generics.reflectiveObjects=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xerces.internal.impl.xs.util=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xerces.internal.jaxp=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xerces.internal.dom=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xml.internal.resolver=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xml.internal.resolver.tools=ALL-UNNAMED</cxf.surefire.fork.vmargs>
                 <org.apache.cxf.transport.websocket.atmosphere.disabled>true</org.apache.cxf.transport.websocket.atmosphere.disabled>
@@ -2917,7 +2919,7 @@
                 <dependency>
                     <groupId>javax.xml.bind</groupId>
                     <artifactId>jaxb-api</artifactId>
-                    <version>2.2.11</version>
+                    <version>${cxf.jaxb.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>javax.annotation</groupId>
@@ -2927,12 +2929,12 @@
                 <dependency>
                     <groupId>javax.xml.ws</groupId>
                     <artifactId>jaxws-api</artifactId>
-                    <version>2.2.9</version>
-                    </dependency>
+                    <version>2.3.0</version>
+                </dependency>
                 <dependency>
                     <groupId>javax.activation</groupId>
-                    <artifactId>activation</artifactId>
-                    <version>1.1.1</version>
+                    <artifactId>javax.activation-api</artifactId>
+                    <version>1.2.0</version>
                 </dependency>
                 <dependency>
                     <groupId>org.apache.geronimo.specs</groupId>

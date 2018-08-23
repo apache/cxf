@@ -74,8 +74,8 @@ public class JavaToJSProcessorTest extends ProcessorTestBase {
         classFile.mkdir();
         String java9PlusFolder = output.getParent() + "/java9";
         System.setProperty("java.class.path", getClassPath() + classFile.getCanonicalPath()
-                           + File.separatorChar + ":" + java9PlusFolder + "/jaxb-api-2.2.11.jar"
-                           + ":" + java9PlusFolder + "/jaxws-api-2.2.9.jar"
+                           + File.separatorChar + ":" + java9PlusFolder + "/jaxb-api-2.3.0.jar"
+                           + ":" + java9PlusFolder + "/jaxws-api-2.3.0.jar"
                            + ":" + java9PlusFolder + "/geronimo-ws-metadata_2.0_spec-1.1.3.jar");
         
 

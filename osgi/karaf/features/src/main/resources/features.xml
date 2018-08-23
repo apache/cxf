@@ -33,14 +33,15 @@
         <bundle start-level="10" dependency="true">mvn:javax.mail/mail/${cxf.javax.mail.version}</bundle>
         <bundle start-level="20">mvn:org.codehaus.woodstox/stax2-api/${cxf.woodstox.stax2-api.version}</bundle>
         <bundle start-level="20">mvn:com.fasterxml.woodstox/woodstox-core/${cxf.woodstox.core.version}</bundle>
-        <bundle start-level="20">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-impl/${cxf.jaxb.bundle.version}</bundle>
-        <bundle start-level="20">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-xjc/${cxf.jaxb.bundle.version}</bundle>
+        <bundle start-level="20">mvn:com.sun.xml.bind/jaxb-impl/${cxf.jaxb.bundle.version}</bundle>
+        <bundle start-level="20">mvn:com.sun.xml.bind/jaxb-xjc/${cxf.jaxb.bundle.version}</bundle>
+        <bundle start-level="20">mvn:com.sun.xml.bind/jaxb-core/${cxf.jaxb.bundle.version}</bundle>
     </feature>
     <feature name="cxf-jaxb" version="${project.version}">
         <feature version="${project.version}">cxf-specs</feature>
         <feature version="${project.version}">cxf-wsdl</feature>
-        <bundle start-level="20">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-impl/${cxf.jaxb.bundle.version}</bundle>
-        <bundle start-level="20">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-xjc/${cxf.jaxb.bundle.version}</bundle>
+        <bundle start-level="20">mvn:com.sun.xml.bind/jaxb-impl/${cxf.jaxb.bundle.version}</bundle>        
+        <bundle start-level="20">mvn:com.sun.xml.bind/jaxb-xjc/${cxf.jaxb.bundle.version}</bundle>
     </feature>
     <!-- Current the abdera bundle is not working as we expect -->
     <feature name="cxf-abdera" version="${project.version}">

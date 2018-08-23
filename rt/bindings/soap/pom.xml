@@ -33,6 +33,7 @@
     <properties>
         <cxf.module.name>org.apache.cxf.binding.soap</cxf.module.name>
         <cxf.osgi.import>
+            javax.xml.soap;version="${cxf.osgi.saaj.version}",
             org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
             org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}"
         </cxf.osgi.import>

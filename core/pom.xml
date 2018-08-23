@@ -63,6 +63,7 @@
             com.sun.xml.bind.api.impl;resolution:=optional,
             com.sun.xml.internal.bind.api;resolution:=optional,
             com.sun.xml.internal.bind.api.impl;resolution:=optional,
+            com.sun.xml.bind.v2.model.annotation;resolution:=optional,
             org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional
         </cxf.osgi.import>
         <cxf.osgi.dynamic.import>

@@ -449,6 +449,7 @@
                                 <exclude>**/*CORBADocLitClientTypeTest.java</exclude>
                                 <exclude>**/*CorbaTest.java</exclude>
                                 <exclude>**/*CorbaTimeoutTest.java</exclude>
+                                <exclude>**/*ValidationClientServerTest.java</exclude>
                             </excludes>
                         </configuration>
                     </plugin>

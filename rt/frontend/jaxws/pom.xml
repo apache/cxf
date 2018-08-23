@@ -33,6 +33,7 @@
     <properties>
         <cxf.module.name>org.apache.cxf.frontend.jaxws</cxf.module.name>
         <cxf.osgi.import>
+            javax.xml.soap;version="${cxf.osgi.saaj.version}",
             javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
             org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
             javax.xml.ws.spi.http;version="${cxf.osgi.javax.xml.ws.version}";resolution:="optional",

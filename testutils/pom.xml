@@ -33,6 +33,7 @@
     <properties>
         <cxf.module.name>org.apache.cxf.testutils</cxf.module.name>
         <cxf.osgi.import>
+            javax.xml.soap;version="${cxf.osgi.saaj.version}",
             javax.xml.ws*;version="${cxf.osgi.javax.xml.ws.version}",
         </cxf.osgi.import>
     </properties>

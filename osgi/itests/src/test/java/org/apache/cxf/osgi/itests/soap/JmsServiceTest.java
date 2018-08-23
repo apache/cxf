@@ -75,7 +75,7 @@ public class JmsServiceTest extends CXFOSGiTestSupport {
         return new Option[] {
             cxfBaseConfig(),
             testUtils(),
-            features(karafUrl, "spring"),
+            //features(karafUrl, "spring"),
             features(cxfUrl, "cxf-core", "cxf-jaxws", "cxf-transports-jms"),
             features(amqUrl, "aries-blueprint", "shell-compat", "activemq-broker-noweb"),
             provision(serviceBundle())

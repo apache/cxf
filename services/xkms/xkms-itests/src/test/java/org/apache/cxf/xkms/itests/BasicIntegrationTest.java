@@ -113,19 +113,25 @@ public class BasicIntegrationTest {
                                                           + "cxf-xkms-service,cxf-xkms-client,"
                                                           + "cxf-xkms-ldap,exam,test-dependencies"),
                                  configureConsole().ignoreLocalConsole(), 
-                new VMOption("--add-opens"),
-                new VMOption("java.base/java.security=ALL-UNNAMED"),
-                new VMOption("--add-opens"), new VMOption("java.base/java.net=ALL-UNNAMED"),
-                new VMOption("--add-opens"), new VMOption("java.base/java.lang=ALL-UNNAMED"),
-                new VMOption("--add-opens"), new VMOption("java.base/java.util=ALL-UNNAMED"),
-                new VMOption("--add-opens"),
-                new VMOption("java.naming/javax.naming.spi=ALL-UNNAMED"),
-                new VMOption("--add-opens"),
-                new VMOption("java.rmi/sun.rmi.transport.tcp=ALL-UNNAMED"),
-                new VMOption("--add-exports=java.base/sun.net.www.protocol.http=ALL-UNNAMED"),
-                new VMOption("--add-exports=java.base/sun.net.www.protocol.https=ALL-UNNAMED"),
-                new VMOption("--add-exports=java.base/sun.net.www.protocol.jar=ALL-UNNAMED"),
-                new VMOption("--add-exports=jdk.naming.rmi/com.sun.jndi.url.rmi=ALL-UNNAMED")
+            new VMOption("--patch-module"),
+            new VMOption("java.xml=lib/endorsed/org.apache.karaf.specs.java.xml-"
+                + System.getProperty("karaf.version", "4.2.2-SNAPSHOT")
+                + ".jar"),
+            new VMOption("--add-opens"),
+            new VMOption("java.base/java.security=ALL-UNNAMED"),
+            new VMOption("--add-opens"), new VMOption("java.base/java.net=ALL-UNNAMED"),
+            new VMOption("--add-opens"), new VMOption("java.base/java.lang=ALL-UNNAMED"),
+            new VMOption("--add-opens"), new VMOption("java.base/java.util=ALL-UNNAMED"),
+            new VMOption("--add-opens"),
+            new VMOption("java.naming/javax.naming.spi=ALL-UNNAMED"),
+            new VMOption("--add-opens"),
+            new VMOption("java.rmi/sun.rmi.transport.tcp=ALL-UNNAMED"),
+            new VMOption("--add-exports=java.base/sun.net.www.protocol.http=ALL-UNNAMED"),
+            new VMOption("--add-exports=java.base/sun.net.www.protocol.https=ALL-UNNAMED"),
+            new VMOption("--add-exports=java.base/sun.net.www.protocol.jar=ALL-UNNAMED"),
+            new VMOption("--add-exports=jdk.naming.rmi/com.sun.jndi.url.rmi=ALL-UNNAMED"),
+            new VMOption("-classpath"),
+            new VMOption("lib/jdk9plus/*" + File.pathSeparator + "lib/boot/*"),
             };
 
         } else {

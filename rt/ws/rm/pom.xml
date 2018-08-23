@@ -34,6 +34,7 @@
         <cxf.module.name>org.apache.cxf.ws.rm</cxf.module.name>
         <cxf.bundle.activator>org.apache.cxf.ws.rm.blueprint.Activator</cxf.bundle.activator>
         <cxf.osgi.import>
+            javax.xml.soap;version="${cxf.osgi.saaj.version}",
             org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
             org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}"
         </cxf.osgi.import>

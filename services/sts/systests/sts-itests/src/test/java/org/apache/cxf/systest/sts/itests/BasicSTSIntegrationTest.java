@@ -24,7 +24,9 @@ import org.apache.cxf.testutil.common.TestUtil;
 
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.karaf.container.internal.JavaVersionUtil;
 import org.ops4j.pax.exam.options.MavenArtifactUrlReference;
+import org.ops4j.pax.exam.options.extra.VMOption;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 
@@ -58,24 +60,77 @@ public class BasicSTSIntegrationTest {
             .artifactId("cxf-services-sts-systests-features") //
             .versionAsInProject() //
             .type("xml");
+        
+        if (JavaVersionUtil.getMajorVersion() >= 9) {
+            return new Option[] {
+                                 karafDistributionConfiguration().frameworkUrl(karafUrl)
+                                     .karafVersion(karafVersion)
+                                     .unpackDirectory(new File("target/paxexam/unpack/"))
+                                     .useDeployFolder(false),
+                                 systemProperty("java.awt.headless").value("true"),
+                                 systemProperty("BasicSTSIntegrationTest.PORT").value(port),
 
-        return new Option[] {
-            karafDistributionConfiguration().frameworkUrl(karafUrl).karafVersion(karafVersion)
-                .unpackDirectory(new File("target/paxexam/unpack/")).useDeployFolder(false),
-            systemProperty("java.awt.headless").value("true"),
-            systemProperty("BasicSTSIntegrationTest.PORT").value(port),
+                copy("clientKeystore.properties"), copy("clientstore.jks"),
+                                 copy("etc/org.ops4j.pax.logging.cfg"),
+                                 editConfigurationFilePut("etc/org.ops4j.pax.web.cfg",
+                                                          "org.osgi.service.http.port", port),
+                                 when(localRepository != null)
+                                     .useOptions(editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
+                                                                          "org.ops4j.pax.url.mvn.localRepository",
+                                                                          localRepository)),
+                                 features(stsFeatures, "cxf-sts-service"),
+                                 configureConsole().ignoreLocalConsole().ignoreRemoteShell(),
+            new VMOption("--add-reads=java.xml=java.logging"),
+            new VMOption("--add-exports=java.base/"
+                + "org.apache.karaf.specs.locator=java.xml,ALL-UNNAMED"),
+            new VMOption("--patch-module"),
+            new VMOption("java.base=lib/endorsed/org.apache.karaf.specs.locator-"
+                + System.getProperty("karaf.version", "4.2.2-SNAPSHOT")
+                + ".jar"),
+            new VMOption("--patch-module"),
+            new VMOption("java.xml=lib/endorsed/org.apache.karaf.specs.java.xml-"
+                + System.getProperty("karaf.version", "4.2.2-SNAPSHOT")
+                + ".jar"),
+            new VMOption("--add-opens"),
+            new VMOption("java.base/java.security=ALL-UNNAMED"),
+            new VMOption("--add-opens"), new VMOption("java.base/java.net=ALL-UNNAMED"),
+            new VMOption("--add-opens"), new VMOption("java.base/java.lang=ALL-UNNAMED"),
+            new VMOption("--add-opens"), new VMOption("java.base/java.util=ALL-UNNAMED"),
+            new VMOption("--add-opens"),
+            new VMOption("java.naming/javax.naming.spi=ALL-UNNAMED"),
+            new VMOption("--add-opens"),
+            new VMOption("java.rmi/sun.rmi.transport.tcp=ALL-UNNAMED"),
+            new VMOption("--add-exports=java.base/sun.net.www.protocol.http=ALL-UNNAMED"),
+            new VMOption("--add-exports=java.base/sun.net.www.protocol.https=ALL-UNNAMED"),
+            new VMOption("--add-exports=java.base/sun.net.www.protocol.jar=ALL-UNNAMED"),
+            new VMOption("--add-exports=jdk.naming.rmi/com.sun.jndi.url.rmi=ALL-UNNAMED"),
+            new VMOption("-classpath"),
+            new VMOption("lib/jdk9plus/*" + File.pathSeparator + "lib/boot/*"),
 
-            copy("clientKeystore.properties"),
-            copy("clientstore.jks"),
-            copy("etc/org.ops4j.pax.logging.cfg"),
-            editConfigurationFilePut("etc/org.ops4j.pax.web.cfg", "org.osgi.service.http.port", port),
-            when(localRepository != null)
-                .useOptions(editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
-                            "org.ops4j.pax.url.mvn.localRepository",
-                            localRepository)),
-            features(stsFeatures, "cxf-sts-service"),
-            configureConsole().ignoreLocalConsole().ignoreRemoteShell(),
-        };
+            };
+        } else {
+
+            return new Option[] {
+                                 karafDistributionConfiguration().frameworkUrl(karafUrl)
+                                     .karafVersion(karafVersion)
+                                     .unpackDirectory(new File("target/paxexam/unpack/"))
+                                     .useDeployFolder(false),
+                                 systemProperty("java.awt.headless").value("true"),
+                                 systemProperty("BasicSTSIntegrationTest.PORT").value(port),
+
+                copy("clientKeystore.properties"), copy("clientstore.jks"),
+                                 copy("etc/org.ops4j.pax.logging.cfg"),
+                                 editConfigurationFilePut("etc/org.ops4j.pax.web.cfg",
+                                                          "org.osgi.service.http.port", port),
+                                 when(localRepository != null)
+                                     .useOptions(editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
+                                                                          "org.ops4j.pax.url.mvn.localRepository",
+                                                                          localRepository)),
+                                 features(stsFeatures, "cxf-sts-service"),
+                                 configureConsole().ignoreLocalConsole().ignoreRemoteShell(),
+
+            };
+        }
     }
 
     protected Option copy(String path) {
