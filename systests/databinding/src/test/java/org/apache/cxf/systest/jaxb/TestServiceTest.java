@@ -27,7 +27,6 @@ import javax.xml.ws.BindingProvider;
 import org.w3c.dom.Document;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.ext.logging.event.LogEvent;
@@ -80,7 +79,7 @@ public class TestServiceTest extends AbstractJUnit4SpringContextTests {
 
     @Test
     public void testExceptionPropertyOrder() throws Throwable {
-        BusFactory.getThreadDefaultBus().getOutFaultInterceptors().add(new LoggingOutInterceptor(fault));
+        ((Bus)applicationContext.getBean("cxf")).getOutFaultInterceptors().add(new LoggingOutInterceptor(fault));
         TestService testClient = getTestClient();
         ((BindingProvider)testClient).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
                                                               "http://localhost:" + PORT
@@ -100,7 +99,7 @@ public class TestServiceTest extends AbstractJUnit4SpringContextTests {
         public String getMessage() {
             return logMessage;
         }
-        public void cleaerMessage() {
+        public void clearMessage() {
             logMessage = null;
         }
         @Override
