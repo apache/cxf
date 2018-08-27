@@ -56,6 +56,7 @@ import javax.xml.bind.annotation.XmlAccessOrder;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorOrder;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import javax.xml.bind.attachment.AttachmentMarshaller;
 import javax.xml.bind.attachment.AttachmentUnmarshaller;
@@ -428,7 +429,28 @@ public final class JAXBEncoderDecoder {
                     }
                 });
             }
-
+            XmlType xmlType = cls.getAnnotation(XmlType.class);
+            if (xmlType != null && xmlType.propOrder().length > 1 && !xmlType.propOrder()[0].isEmpty()) {
+                final List<String> orderList = Arrays.asList(xmlType.propOrder());
+                Collections.sort(combinedMembers, new Comparator<Member>() {
+                    public int compare(Member m1, Member m2) {
+                        String m1Name = getName(m1);
+                        String m2Name = getName(m2);
+                        int m1Index = orderList.indexOf(m1Name);
+                        int m2Index = orderList.indexOf(m2Name);
+                        if (m1Index != -1 && m2Index != -1) {
+                            return m1Index - m2Index;
+                        }
+                        if (m1Index == -1 && m2Index != -1) {
+                            return 1;
+                        }
+                        if (m1Index != -1 && m2Index == -1) {
+                            return -1;
+                        }
+                        return 0;
+                    }
+                });
+            }
             for (Member member : combinedMembers) {
                 if (member instanceof Field) {
                     Field f = (Field)member;
@@ -463,8 +485,20 @@ public final class JAXBEncoderDecoder {
             StaxUtils.close(writer);
         }
     }
-    
-    private static void writeArrayObject(Marshaller marshaller, 
+
+    private static String getName(Member m1) {
+        String m1Name = null;
+        if (m1 instanceof Field) {
+            m1Name = ((Field)m1).getName();
+        } else {
+            int idx = m1.getName().startsWith("get") ? 3 : 2;
+            String name = m1.getName().substring(idx);
+            m1Name = Character.toLowerCase(name.charAt(0)) + name.substring(1);
+        }
+        return m1Name;
+    }
+
+    private static void writeArrayObject(Marshaller marshaller,
                                          Object source,
                                          QName mname,
                                          Object mObj) throws Fault, JAXBException {
