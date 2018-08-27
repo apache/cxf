@@ -89,7 +89,7 @@ public class ServerImpl implements Server {
             RegexLoggingFilter filter = new RegexLoggingFilter();
             filter.setPattern("jms(.*?)password=+([^ ]+)[.]");
             filter.setGroup(2);
-            wantFilter = (String)filter.filter(wantFilter);
+            wantFilter = filter.filter(wantFilter).toString();
         }
         LOG.info("Setting the server's publish address to be " + wantFilter);
         serverRegistry = bus.getExtension(ServerRegistry.class);
