@@ -34,5 +34,8 @@ public interface TestService {
 
     @WebMethod
     void testExceptionMarshalling() throws TestServiceException;
+    
+    @WebMethod
+    String echo(String test) throws PropertyOrderException;
 
 }
