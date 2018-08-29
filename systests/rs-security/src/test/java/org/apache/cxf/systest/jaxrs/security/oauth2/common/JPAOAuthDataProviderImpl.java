@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.systest.jaxrs.security.oauth2.common;
 
-import java.io.InputStream;
-import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -34,8 +32,6 @@ import org.apache.cxf.rs.security.oauth2.grants.code.JPACodeDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.saml.Constants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
-import org.apache.cxf.rt.security.crypto.CryptoUtils;
-import org.apache.xml.security.utils.ClassLoaderUtils;
 
 /**
  * Extend the JPACodeDataProvider to allow refreshing of tokens
@@ -141,12 +137,6 @@ public class JPAOAuthDataProviderImpl extends JPACodeDataProvider {
         // external clients (in LDAP/etc) which can be used for client cred
         externalClients.add("bob:bobPassword");
 
-    }
-
-    private Certificate loadCert() throws Exception {
-        try (InputStream is = ClassLoaderUtils.getResourceAsStream("keys/Truststore.jks", this.getClass())) {
-            return CryptoUtils.loadCertificate(is, "password".toCharArray(), "morpit", null);
-        }
     }
 
     @Override

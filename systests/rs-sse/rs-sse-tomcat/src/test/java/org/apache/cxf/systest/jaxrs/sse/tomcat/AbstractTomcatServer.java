@@ -62,7 +62,7 @@ public abstract class AbstractTomcatServer extends AbstractBusTestServerBase {
                 cxfServlet.addInitParameter("jaxrs.serviceClasses", BookStore.class.getName());
                 cxfServlet.addInitParameter("jaxrs.providers", JacksonJsonProvider.class.getName());
                 cxfServlet.setAsyncSupported(true);
-                context.addServletMapping("/rest/*", "cxfServlet");
+                context.addServletMappingDecoded("/rest/*", "cxfServlet");
             } else {
                 server.getHost().setAppBase(base.getAbsolutePath());
                 server.getHost().setAutoDeploy(true);

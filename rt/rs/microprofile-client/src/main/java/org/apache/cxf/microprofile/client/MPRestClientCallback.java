@@ -31,7 +31,7 @@ import javax.ws.rs.client.InvocationCallback;
 
 import org.apache.cxf.jaxrs.client.JaxrsClientCallback;
 
-public class MPRestClientCallback<T> extends JaxrsClientCallback {
+public class MPRestClientCallback<T> extends JaxrsClientCallback<T> {
 
     public MPRestClientCallback(InvocationCallback<T> handler,
                                 Class<?> responseClass,

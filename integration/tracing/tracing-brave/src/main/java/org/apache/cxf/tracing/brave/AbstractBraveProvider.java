@@ -53,7 +53,6 @@ public abstract class AbstractBraveProvider extends AbstractTracingProvider {
         final Request request = HttpAdapterFactory.request(requestHeaders, uri, method);
         final HttpServerAdapter<Request, ?> adapter = HttpServerAdapterFactory.create(request);
         
-        @SuppressWarnings("unchecked")
         final HttpServerHandler<Request, ?> handler = HttpServerHandler.create(brave, adapter);
         
         Span span = handler.handleReceive(
@@ -105,7 +104,6 @@ public abstract class AbstractBraveProvider extends AbstractTracingProvider {
                 final Response response = HttpAdapterFactory.response(responseStatus);
                 final HttpServerAdapter<?, Response> adapter = HttpServerAdapterFactory.create(response);
                 
-                @SuppressWarnings("unchecked")
                 final HttpServerHandler<?, Response> handler = HttpServerHandler.create(brave, adapter);
                 handler.handleSend(response, null, scope.getSpan());
             } finally {
