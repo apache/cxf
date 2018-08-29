@@ -54,7 +54,6 @@ public abstract class AbstractBraveClientProvider extends AbstractTracingProvide
         final Request request = HttpAdapterFactory.request(requestHeaders, uri, method);
         final HttpClientAdapter<Request, ?> adapter = HttpClientAdapterFactory.create(request);
         
-        @SuppressWarnings("unchecked")
         final HttpClientHandler<Request, ?> handler = HttpClientHandler.create(brave, adapter);
         final Span span = handler.handleSend(
             brave
@@ -102,7 +101,6 @@ public abstract class AbstractBraveClientProvider extends AbstractTracingProvide
                 final Response response = HttpAdapterFactory.response(responseStatus);
                 final HttpClientAdapter<?, Response> adapter = HttpClientAdapterFactory.create(response);
                 
-                @SuppressWarnings("unchecked")
                 final HttpClientHandler<?, Response> handler = HttpClientHandler.create(brave, adapter);
                 handler.handleReceive(response, null, scope.getSpan());
             } finally {
