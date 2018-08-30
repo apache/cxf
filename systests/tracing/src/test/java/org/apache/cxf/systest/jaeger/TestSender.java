@@ -19,6 +19,7 @@
 package org.apache.cxf.systest.jaeger;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.uber.jaeger.Span;
