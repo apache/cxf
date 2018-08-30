@@ -119,6 +119,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
+    @Deprecated
     public void logrb(Level level, String sourceClass, String sourceMethod, String bundleName, String msg) {
         if (isLoggable(level)) {
             LogRecord lr = new LogRecord(level, msg);
@@ -128,6 +129,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
+    @Deprecated
     public void logrb(Level level, String sourceClass, String sourceMethod,
                       String bundleName, String msg, Object param1) {
         if (isLoggable(level)) {
@@ -140,6 +142,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
+    @Deprecated
     public void logrb(Level level, String sourceClass, String sourceMethod,
                       String bundleName, String msg, Object params[]) {
         if (isLoggable(level)) {
@@ -151,6 +154,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
+    @Deprecated
     public void logrb(Level level, String sourceClass, String sourceMethod,
                       String bundleName, String msg, Throwable thrown) {
         if (isLoggable(level)) {
