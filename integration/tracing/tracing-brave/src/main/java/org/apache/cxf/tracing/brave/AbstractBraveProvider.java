@@ -92,13 +92,14 @@ public abstract class AbstractBraveProvider extends AbstractTracingProvider {
         }
 
         final TraceScope scope = holder.getScope();
+        Span span = null;
         if (scope != null) {
             try {
                 // If the service resource is using asynchronous processing mode, the trace
                 // scope has been created in another thread and should be re-attached to the current
                 // one.
                 if (holder.isDetached()) {
-                    brave.tracing().tracer().joinSpan(scope.getSpan().context());
+                    span = brave.tracing().tracer().joinSpan(scope.getSpan().context());
                 }
     
                 final Response response = HttpAdapterFactory.response(responseStatus);
@@ -108,6 +109,11 @@ public abstract class AbstractBraveProvider extends AbstractTracingProvider {
                 handler.handleSend(response, null, scope.getSpan());
             } finally {
                 scope.close();
+                if (span != null) {
+                    // We do not care about the span created by joinSpan, since it 
+                    // should be managed by the scope.getSpan() itself. 
+                    span.abandon();
+                }
             }
         }
     }

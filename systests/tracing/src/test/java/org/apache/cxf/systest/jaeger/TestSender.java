@@ -19,6 +19,7 @@
 package org.apache.cxf.systest.jaeger;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import io.jaegertracing.internal.JaegerSpan;
@@ -26,7 +27,7 @@ import io.jaegertracing.internal.exceptions.SenderException;
 import io.jaegertracing.spi.Sender;
 
 public class TestSender implements Sender {
-    private static List<JaegerSpan> spans = new ArrayList<>();
+    private static List<JaegerSpan> spans = Collections.synchronizedList(new ArrayList<>());
     
     @Override
     public int append(JaegerSpan span) throws SenderException {

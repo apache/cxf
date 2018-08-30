@@ -21,6 +21,7 @@ package org.apache.cxf.systest.htrace;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.htrace.core.HTraceConfiguration;
@@ -31,7 +32,7 @@ import org.apache.htrace.core.SpanReceiver;
  * Test HTrace Span receiver
  */
 public class TestSpanReceiver extends SpanReceiver {
-    private static List<Span> spans = new ArrayList<>();
+    private static List<Span> spans = Collections.synchronizedList(new ArrayList<>());
 
     public TestSpanReceiver(final HTraceConfiguration conf) {
     }
