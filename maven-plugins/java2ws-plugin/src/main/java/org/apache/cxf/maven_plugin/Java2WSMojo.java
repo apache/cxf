@@ -209,18 +209,40 @@ public class Java2WSMojo extends AbstractMojo {
      */
     private String additionalJvmArgs;
 
+    /**
+     * Determines how the classpath is applied to the executed command,
+     * either as a command line argument, or as an environment variable
+     * for the executing process. Only applicable when fork is set to <code>true</code>
+     * (which is always the case for JDK 9+).
+     * <p>
+     * Primarily useful on Windows because of length limitations for command arguments,
+     * which is why the default is <code>true</code> in that case.
+     *
+     * @parameter default-value="false"
+     * @since 3.3
+     */
+    private Boolean classpathAsEnvVar;
+
     public void execute() throws MojoExecutionException {
-        if (JavaUtils.isJava9Compatible()) {
+        boolean requiresModules = JavaUtils.isJava9Compatible();
+        if (requiresModules) {
+            // Since JEP 261 ("Jigsaw"), access to some packages must be granted
             fork = true;
+            boolean skipXmlWsModule = JavaUtils.isJava11Compatible(); //
             additionalJvmArgs = "--add-exports=jdk.xml.dom/org.w3c.dom.html=ALL-UNNAMED "
                     + "--add-exports=java.xml/com.sun.org.apache.xerces.internal.impl.xs=ALL-UNNAMED "
-                    + "--add-opens java.xml.ws/javax.xml.ws.wsaddressing=ALL-UNNAMED "
+                    + (skipXmlWsModule ? "" : "--add-opens java.xml.ws/javax.xml.ws.wsaddressing=ALL-UNNAMED ")
                     + "--add-opens java.base/java.security=ALL-UNNAMED "
                     + "--add-opens java.base/java.net=ALL-UNNAMED "
                     + "--add-opens java.base/java.lang=ALL-UNNAMED "
                     + "--add-opens java.base/java.util=ALL-UNNAMED "
                     + "--add-opens java.base/java.util.concurrent=ALL-UNNAMED " 
                     + (additionalJvmArgs == null ? "" : additionalJvmArgs); 
+        }
+        if (fork && SystemUtils.IS_OS_WINDOWS) {
+            // Windows does not allow for very long command lines,
+            // so by default CLASSPATH environment variable is used.
+            classpathAsEnvVar = true;
         }
         System.setProperty("org.apache.cxf.JDKBugHacks.defaultUsesCaches", "true");
         if (skip) {
@@ -247,8 +269,8 @@ public class Java2WSMojo extends AbstractMojo {
                 cp = StringUtils.join(artifactsPath.iterator(), File.pathSeparator) + File.pathSeparator + cp;
             }
 
-            List<String> args = initArgs(cp);
-            processJavaClass(args);
+            List<String> args = initArgs(classpathAsEnvVar ? null : cp);
+            processJavaClass(args, classpathAsEnvVar ? cp : null);
         } finally {
             classLoaderSwitcher.restoreClassLoader();
         }
@@ -268,9 +290,11 @@ public class Java2WSMojo extends AbstractMojo {
             args.add("-DexitOnFinish=true");
         }
 
-        // classpath arg
-        args.add("-cp");
-        args.add(cp);
+        if (!StringUtils.isEmpty(cp)) {
+            // classpath arg
+            args.add("-cp");
+            args.add(cp);
+        }
 
         if (fork) {
             args.add(JavaToWS.class.getCanonicalName());
@@ -384,7 +408,7 @@ public class Java2WSMojo extends AbstractMojo {
         return args;
     }
 
-    private void processJavaClass(List<String> args) throws MojoExecutionException {
+    private void processJavaClass(List<String> args, String cp) throws MojoExecutionException {
         if (!fork) {
             try {
                 CommandInterfaceUtils.commandCommonMain();
@@ -416,21 +440,36 @@ public class Java2WSMojo extends AbstractMojo {
             }
 
             cmd.addArguments(args.toArray(new String[0]));
+            if (classpathAsEnvVar && !StringUtils.isEmpty(cp)) {
+                cmd.addEnvironment("CLASSPATH", cp);
+            }
 
             CommandLineUtils.StringStreamConsumer err = new CommandLineUtils.StringStreamConsumer();
             CommandLineUtils.StringStreamConsumer out = new CommandLineUtils.StringStreamConsumer();
+
+            String cmdLine = CommandLineUtils.toString(cmd.getCommandline());
 
             int exitCode;
             try {
                 exitCode = CommandLineUtils.executeCommandLine(cmd, out, err);
             } catch (CommandLineException e) {
                 getLog().debug(e);
-                throw new MojoExecutionException(e.getMessage(), e);
+                StringBuilder msg = new StringBuilder(e.getMessage());
+                if (!(fork && classpathAsEnvVar)) {
+                    msg.append('\n');
+                    msg.append("Try to run this goal using <fork>true</fork> and "
+                            + "<classpathAsEnvVar>true</classpathAsEnvVar>.");
+                }
+                msg.append('\n');
+                msg.append("Command line was: ").append(cmdLine).append('\n');
+                if (classpathAsEnvVar && !StringUtils.isEmpty(cp)) {
+                    msg.append("   CLASSPATH env: ").append(cp).append('\n');
+                }
+                msg.append('\n');
+                throw new MojoExecutionException(msg.toString(), e);
             }
 
             String output = StringUtils.isEmpty(out.getOutput()) ? null : '\n' + out.getOutput().trim();
-
-            String cmdLine = CommandLineUtils.toString(cmd.getCommandline());
 
             if (exitCode != 0) {
                 if (StringUtils.isNotEmpty(output)) {
@@ -443,7 +482,11 @@ public class Java2WSMojo extends AbstractMojo {
                     msg.append(" - ").append(err.getOutput());
                 }
                 msg.append('\n');
-                msg.append("Command line was: ").append(cmdLine).append('\n').append('\n');
+                msg.append("Command line was: ").append(cmdLine).append('\n');
+                if (classpathAsEnvVar && !StringUtils.isEmpty(cp)) {
+                    msg.append("   CLASSPATH env: ").append(cp).append('\n');
+                }
+                msg.append('\n');
 
                 throw new MojoExecutionException(msg.toString());
             }
@@ -452,7 +495,11 @@ public class Java2WSMojo extends AbstractMojo {
                 StringBuilder msg = new StringBuilder();
                 msg.append(err.getOutput());
                 msg.append('\n');
-                msg.append("Command line was: ").append(cmdLine).append('\n').append('\n');
+                msg.append("Command line was: ").append(cmdLine).append('\n');
+                if (classpathAsEnvVar && !StringUtils.isEmpty(cp)) {
+                    msg.append("   CLASSPATH env: ").append(cp).append('\n');
+                }
+                msg.append('\n');
                 throw new MojoExecutionException(msg.toString());
             }
         }
@@ -465,7 +512,7 @@ public class Java2WSMojo extends AbstractMojo {
                 
                 boolean hasWsdlAttached = false;
                 for (Artifact a : project.getAttachedArtifacts()) {
-                    if ("wsdl".equals(a.getType()) && classifier.equals(a.getClassifier())) {
+                    if ("wsdl".equals(a.getType()) && classifier != null && classifier.equals(a.getClassifier())) {
                         hasWsdlAttached = true;
                     }
                 }
