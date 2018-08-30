@@ -58,6 +58,7 @@ import static org.apache.cxf.systest.brave.BraveTestSupport.SPAN_ID_NAME;
 import static org.apache.cxf.systest.brave.BraveTestSupport.TRACE_ID_NAME;
 import static org.apache.cxf.systest.jaxrs.tracing.brave.HasSpan.hasSpan;
 import static org.apache.cxf.systest.jaxrs.tracing.brave.IsAnnotationContaining.hasItem;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -317,7 +318,7 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
         } finally {
             span.finish();
         }
-
+        
         assertThat(TestSpanReporter.getAllSpans().size(), equalTo(4));
         assertThat(TestSpanReporter.getAllSpans().get(3).name(), equalTo("test span"));
     }
@@ -334,7 +335,7 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
                 final Response r = f.get(1, TimeUnit.SECONDS);
                 assertEquals(Status.OK.getStatusCode(), r.getStatus());
                 assertThat(brave.tracer().currentSpan().context().spanId(), equalTo(span.context().spanId()));
-    
+
                 assertThat(TestSpanReporter.getAllSpans().size(), equalTo(3));
                 assertThat(TestSpanReporter.getAllSpans().get(0).name(), equalTo("get books"));
                 assertThat(TestSpanReporter.getAllSpans().get(1).name(), equalTo("get /bookstore/books"));
