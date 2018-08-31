@@ -46,6 +46,7 @@ public final class JavaUtils {
         "void", "volatile", "while"
     ));
 
+    private static boolean isJava11Compatible;
     private static boolean isJava9Compatible;
     private static boolean isJava8Before161;
 
@@ -66,6 +67,7 @@ public final class JavaUtils {
         }
 
         setJava9Compatible(Integer.valueOf(version) >= 9);
+        setJava11Compatible(Integer.valueOf(version) >= 11);
     }
 
     private JavaUtils() {
@@ -91,9 +93,17 @@ public final class JavaUtils {
     public static boolean isJava9Compatible() {
         return isJava9Compatible;
     }
+    
+    public static boolean isJava11Compatible() {
+        return isJava11Compatible;
+    }
 
     private static void setJava9Compatible(boolean java9Compatible) {
         JavaUtils.isJava9Compatible = java9Compatible;
+    }
+    
+    private static void setJava11Compatible(boolean java11Compatible) {
+        JavaUtils.isJava11Compatible = java11Compatible;
     }
 
     public static boolean isJava8Before161() {
