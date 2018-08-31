@@ -27,10 +27,10 @@ public class RegexLoggingFilterTest extends Assert {
     public void testFilter() throws Exception {
         String wantFilter = "jms:queue:soapRequestQueue?username=admin&password=admin123.";
         RegexLoggingFilter filter = new RegexLoggingFilter();
-        filter.setPattern("jms(.*?)password=+([^ ]+)[.]");
+        filter.setPattern("jms(.*?)password=+([^ ]+)");
         filter.setGroup(2);
         wantFilter = filter.filter(wantFilter).toString();
-        assertEquals(wantFilter, "jms:queue:soapRequestQueue?username=admin&password=*****.");
+        assertEquals(wantFilter, "jms:queue:soapRequestQueue?username=admin&password=*****");
     }
 
 }

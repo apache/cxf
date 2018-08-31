@@ -87,7 +87,7 @@ public class ServerImpl implements Server {
         
         if (wantFilter != null && wantFilter.startsWith("jms")) {
             RegexLoggingFilter filter = new RegexLoggingFilter();
-            filter.setPattern("jms(.*?)password=+([^ ]+)[.]");
+            filter.setPattern("jms(.*?)password=+([^ ]+)");
             filter.setGroup(2);
             wantFilter = filter.filter(wantFilter).toString();
         }
