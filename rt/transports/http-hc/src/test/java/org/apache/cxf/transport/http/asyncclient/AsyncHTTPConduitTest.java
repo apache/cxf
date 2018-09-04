@@ -20,6 +20,7 @@
 package org.apache.cxf.transport.http.asyncclient;
 
 import java.net.URL;
+import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -54,6 +55,7 @@ import org.junit.Test;
 public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(AsyncHTTPConduitTest.class);
     public static final String PORT_INV = allocatePort(AsyncHTTPConduitTest.class, 2);
+    public static final String FILL_BUFFER = "FillBuffer";
 
     static Endpoint ep;
     static String request;
@@ -94,7 +96,11 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
                     return "Hello, finally! " + cnt;
                 }
                 public String greetMe(String me) {
-                    return "Hello " + me;
+                    if (me.equals(FILL_BUFFER)) {
+                        return String.join("", Collections.nCopies(16093, " "));
+                    } else {
+                        return "Hello " + me;
+                    }
                 }
             });
 
@@ -120,6 +126,20 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
         ep.stop();
         ep = null;
     }
+    
+    @Test
+    public void testResponseSameBufferSize() throws Exception {
+        updateAddressPort(g, PORT);
+        HTTPConduit c = (HTTPConduit)ClientProxy.getClient(g).getConduit();
+        c.getClient().setReceiveTimeout(12000);
+        try {
+            g.greetMe(FILL_BUFFER);
+            g.greetMe("Hello");
+        } catch (Exception ex) {
+            fail();
+        }
+    }
+    
     @Test
     public void testTimeout() throws Exception {
         updateAddressPort(g, PORT);
