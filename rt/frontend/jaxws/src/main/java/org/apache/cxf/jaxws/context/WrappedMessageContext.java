@@ -193,7 +193,8 @@ public class WrappedMessageContext implements MessageContext {
     }
 
     public final boolean containsKey(Object key) {
-        return message.containsKey(mapKey((String)key));
+        return message.containsKey(mapKey((String)key))
+            || get(key) != null;
     }
 
     public final boolean containsValue(Object value) {

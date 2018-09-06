@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxws.context;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -80,5 +81,19 @@ public class WrappedMessageContextTest extends Assert {
                 fail("unknown attachment");
             }
         }
+    }
+    
+    
+    @Test
+    public void testContainsKey() throws Exception {
+        WrappedMessageContext context =
+            new WrappedMessageContext(new HashMap<String, Object>(), null, Scope.APPLICATION);
+
+        Map<String, List<String>> headers = new HashMap<>();
+        context.put(MessageContext.HTTP_REQUEST_HEADERS, headers);
+
+        assertNotNull(context.get(MessageContext.HTTP_REQUEST_HEADERS));
+
+        assertTrue(context.containsKey(MessageContext.HTTP_REQUEST_HEADERS));
     }
 }
