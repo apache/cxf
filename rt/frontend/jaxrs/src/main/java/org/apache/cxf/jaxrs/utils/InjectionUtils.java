@@ -49,6 +49,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.ws.rs.WebApplicationException;
@@ -366,6 +367,7 @@ public final class InjectionUtils {
         } catch (IllegalAccessException ex) {
             reportServerError("METHOD_ACCESS_FAILURE", method.getName());
         } catch (InvocationTargetException ex) {
+            LOG.severe(ex.getCause().getMessage(), ex.getCause());
             Response r = JAXRSUtils.convertFaultToResponse(ex.getCause(), inMessage);
             if (r != null) {
                 inMessage.getExchange().put(Response.class, r);
