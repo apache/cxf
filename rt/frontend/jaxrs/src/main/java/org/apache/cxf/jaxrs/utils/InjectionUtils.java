@@ -367,7 +367,7 @@ public final class InjectionUtils {
         } catch (IllegalAccessException ex) {
             reportServerError("METHOD_ACCESS_FAILURE", method.getName());
         } catch (InvocationTargetException ex) {
-            LOG.severe(ex.getCause().getMessage(), ex.getCause());
+            LOG.log(Level.SEVERE, ex.getCause().getMessage(), ex);
             Response r = JAXRSUtils.convertFaultToResponse(ex.getCause(), inMessage);
             if (r != null) {
                 inMessage.getExchange().put(Response.class, r);
