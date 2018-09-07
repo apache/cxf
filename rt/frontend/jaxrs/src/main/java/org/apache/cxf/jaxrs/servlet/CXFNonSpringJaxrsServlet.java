@@ -417,9 +417,9 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         if (scope == null) {
             scope = (String)app.getProperties().get(SERVICE_SCOPE_PARAM);
         }
-        return SERVICE_SCOPE_SINGLETON.equals(scope);    
+        return SERVICE_SCOPE_SINGLETON.equals(scope);
     }
-    
+
     protected Object createSingletonInstance(Class<?> cls, Map<String, List<String>> props, ServletConfig sc)
         throws ServletException {
         Constructor<?> c = ResourceUtils.findResourceConstructor(cls, false);
@@ -517,6 +517,12 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
             setExtensions(bean, servletConfig);
             setDocLocation(bean, servletConfig);
             setSchemasLocations(bean, servletConfig);
+
+            List<?> providers = getProviders(servletConfig, splitChar);
+            bean.setProviders(providers);
+            List<? extends Feature> features = getFeatures(servletConfig, splitChar);
+            bean.setFeatures(features);
+
             bean.setBus(getBus());
             bean.setApplicationInfo(providerApp);
             bean.create();
@@ -538,6 +544,18 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
                                           getStaticSubResolutionValue(servletConfig),
                                           isAppResourceLifecycleASingleton(app, servletConfig),
                                           getBus());
+        String splitChar = getParameterSplitChar(servletConfig);
+        setAllInterceptors(bean, servletConfig, splitChar);
+        setInvoker(bean, servletConfig);
+        setExtensions(bean, servletConfig);
+        setDocLocation(bean, servletConfig);
+        setSchemasLocations(bean, servletConfig);
+
+        List<?> providers = getProviders(servletConfig, splitChar);
+        bean.setProviders(providers);
+        List<? extends Feature> features = getFeatures(servletConfig, splitChar);
+        bean.setFeatures(features);
+
         bean.setBus(getBus());
         bean.setApplication(getApplication());
         bean.create();
