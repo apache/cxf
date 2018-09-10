@@ -110,6 +110,18 @@ public class ClientServerSessionTest extends AbstractBusClientServerTestBase {
             assertEquals("Hello Hello", greeting);
             assertTrue(cookie.contains("a=a"));
             assertTrue(cookie.contains("b=b"));
+            
+            Thread.sleep(30 * 1000); //let session expire
+            greeting = greeter.greetMe("SessionExpire");
+            cookie = "";
+            if (greeting.indexOf(';') != -1) {
+                cookie = greeting.substring(greeting.indexOf(';'));
+                greeting = greeting.substring(0, greeting.indexOf(';'));
+            }
+            assertNotNull("no response received from service", greeting);
+            assertEquals("Hello SessionExpire", greeting);
+            assertTrue(cookie.contains("a=a"));
+            assertTrue(cookie.contains("b=b"));
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }

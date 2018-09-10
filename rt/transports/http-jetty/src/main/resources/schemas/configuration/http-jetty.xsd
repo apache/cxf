@@ -126,6 +126,7 @@
          <xs:element name="connector" type="xsd:anyType" minOccurs="0"/>
          <xs:element name="handlers" type="xsd:anyType" minOccurs="0"/>
          <xs:element name="sessionSupport" type="ptp:ParameterizedBoolean" minOccurs="0"/>
+         <xs:element name="sessionTimeout" type="xs:int" minOccurs="0"/>
          <xs:element name="reuseAddress" type="ptp:ParameterizedBoolean" minOccurs="0" />          
        </xs:sequence>
        
