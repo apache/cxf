@@ -61,6 +61,7 @@
                 <beans:bean class="org.eclipse.jetty.server.handler.DefaultHandler"/>
             </hj:handlers>
             <hj:sessionSupport>true</hj:sessionSupport>
+            <hj:sessionTimeout>600</hj:sessionTimeout>
         </hj:engine>
         <hj:engine port="${engine.port.nine.two}">
             <hj:tlsServerParameters>

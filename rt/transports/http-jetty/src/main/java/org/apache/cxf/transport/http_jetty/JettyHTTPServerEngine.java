@@ -105,6 +105,7 @@ public class JettyHTTPServerEngine implements ServerEngine {
     private String protocol = "http";
 
     private Boolean isSessionSupport = false;
+    private int sessionTimeout = -1;
     private Boolean isReuseAddress = true;
     private Boolean continuationsEnabled = true;
     private int maxIdleTime = 200000;
@@ -489,28 +490,8 @@ public class JettyHTTPServerEngine implements ServerEngine {
         context.setContextPath(contextName);
         // bind the jetty http handler with the context handler
         if (isSessionSupport) {
-            // If we have sessions, we need two handlers.
-            SessionHandler sh = null;
-            if (Server.getVersion().startsWith("9.2")
-                || Server.getVersion().startsWith("9.3")) {
-                if (sessionHandler == null) {
-                    sessionHandler = new SessionHandler();
-                }
-                sh = new SessionHandler();
-                try {
-                    Method get = ReflectionUtil.getDeclaredMethod(SessionHandler.class, "getSessionManager");
-                    Method set = ReflectionUtil.getDeclaredMethod(SessionHandler.class,
-                                                                  "setSessionManager",
-                                                                  get.getReturnType());
-                    ReflectionUtil.setAccessible(set)
-                        .invoke(sh, ReflectionUtil.setAccessible(get).invoke(sessionHandler));
-                } catch (Throwable t) {
-                    //ignore, just use the new session manager
-                }
-            } else {
-                //9.4+ stores the session id handling and cache and everything on the server, just need the handler
-                sh = new SessionHandler();
-            }
+            SessionHandler sh = configureSession();
+
             if (securityHandler != null) {
                 //use the securityHander which already wrap the jetty http handler
                 sh.setHandler(securityHandler);
@@ -545,6 +526,45 @@ public class JettyHTTPServerEngine implements ServerEngine {
 
         registedPaths.add(url.getPath());
         ++servantCount;
+    }
+
+    private SessionHandler configureSession() {
+        // If we have sessions, we need two handlers.
+        SessionHandler sh = null;
+        try {
+            if (Server.getVersion().startsWith("9.2") || Server.getVersion().startsWith("9.3")) {
+                if (sessionHandler == null) {
+                    sessionHandler = new SessionHandler();
+                }
+                sh = new SessionHandler();
+                Method get = ReflectionUtil.getDeclaredMethod(SessionHandler.class, "getSessionManager");
+                Method set = ReflectionUtil.getDeclaredMethod(SessionHandler.class, "setSessionManager",
+                                                              get.getReturnType());
+                if (this.getSessionTimeout() >= 0) {
+                    Method setMaxInactiveInterval = ReflectionUtil
+                        .getDeclaredMethod(get.getReturnType(), "setMaxInactiveInterval", int.class);
+                    ReflectionUtil.setAccessible(setMaxInactiveInterval)
+                        .invoke(ReflectionUtil.setAccessible(get).invoke(sessionHandler), 20);
+                }
+                ReflectionUtil.setAccessible(set)
+                    .invoke(sh, ReflectionUtil.setAccessible(get).invoke(sessionHandler));
+
+            } else {
+                // 9.4+ stores the session id handling and cache and everything on the server, just need
+                // the handler
+
+                sh = new SessionHandler();
+                if (this.getSessionTimeout() >= 0) {
+                    Method setMaxInactiveInterval = ReflectionUtil
+                        .getDeclaredMethod(SessionHandler.class, "setMaxInactiveInterval", int.class);
+                    ReflectionUtil.setAccessible(setMaxInactiveInterval).invoke(sh, 20);
+                }
+
+            }
+        } catch (Throwable t) {
+
+        }
+        return sh;
     }
 
     private String getHandlerName(URL url, ContextHandler context) {
@@ -1087,6 +1107,14 @@ public class JettyHTTPServerEngine implements ServerEngine {
 
     public Boolean getSendServerVersion() {
         return sendServerVersion;
+    }
+
+    public int getSessionTimeout() {
+        return sessionTimeout;
+    }
+
+    public void setSessionTimeout(int sessionTimeout) {
+        this.sessionTimeout = sessionTimeout;
     }
 
 }

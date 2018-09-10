@@ -143,6 +143,8 @@ public class HTTPJettyTransportActivator
                 e.setReuseAddress(Boolean.parseBoolean((String)properties.get(k)));
             } else if ("maxIdleTime".equals(k)) {
                 e.setMaxIdleTime(Integer.parseInt((String)properties.get(k)));
+            } else if ("sessionTimeout".equals(k)) {
+                e.setSessionTimeout(Integer.parseInt((String)properties.get(k)));
             }
         }
     }

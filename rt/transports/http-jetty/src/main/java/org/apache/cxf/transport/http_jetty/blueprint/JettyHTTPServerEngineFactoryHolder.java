@@ -158,6 +158,9 @@ public class JettyHTTPServerEngineFactoryHolder {
                 if (engine.isSessionSupport() != null) {
                     eng.setSessionSupport(engine.isSessionSupport());
                 }
+                if (engine.getSessionTimeout() != null) {
+                    eng.setSessionTimeout(engine.getSessionTimeout().intValue());
+                }
                 if (engine.getThreadingParameters() != null) {
                     ThreadingParametersType threads = engine.getThreadingParameters();
                     ThreadingParameters rThreads = new ThreadingParameters();

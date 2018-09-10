@@ -136,6 +136,7 @@ public class ApplicationContextTest extends Assert {
         assertEquals(777, engine.getThreadingParameters().getMaxThreads());
         assertEquals("AnotherPrefix", engine.getThreadingParameters().getThreadNamePrefix());
 
+        assertEquals("session timeout should be 600 secs", 600, engine.getSessionTimeout());
         assertTrue("The engine should support session manager", engine.isSessionSupport());
         assertNotNull("The handlers should not be null", engine.getHandlers());
         assertEquals(1, engine.getHandlers().size());
