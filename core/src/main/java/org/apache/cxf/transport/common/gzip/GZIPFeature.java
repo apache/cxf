@@ -21,6 +21,7 @@ package org.apache.cxf.transport.common.gzip;
 import java.util.List;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.annotations.Provider;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.Interceptor;
@@ -48,6 +49,7 @@ import org.apache.cxf.message.Message;
  * that your client can accept compressed responses.
  */
 @NoJSR250Annotations
+@Provider(value = Provider.Type.Feature)
 public class GZIPFeature extends AbstractFeature {
     private static final GZIPInInterceptor IN = new GZIPInInterceptor();
     private static final GZIPOutInterceptor OUT = new GZIPOutInterceptor();
