@@ -187,7 +187,7 @@
                         </goals>
                         <configuration>
                             <pomIncludes>
-                                <!-- Enable listed it's. Exclude toolchain till https://issues.apache.org/jira/browse/CXF-7714 is fixed -->
+                                <pomInclude>jdk-cxf-with-toolchain</pomInclude>
                                 <pomInclude>wsdl-artifact-resolution/pom.xml</pomInclude>
                                 <pomInclude>mark-generated/pom.xml</pomInclude>
                             </pomIncludes>
