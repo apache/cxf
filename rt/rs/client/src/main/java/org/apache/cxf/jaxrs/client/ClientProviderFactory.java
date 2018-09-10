@@ -74,6 +74,10 @@ public final class ClientProviderFactory extends ProviderFactory {
         super.setCommonProviders(theProviders);
         for (ProviderInfo<? extends Object> provider : theProviders) {
             Class<?> providerCls = ClassHelper.getRealClass(getBus(), provider.getProvider());
+            if (providerCls == Object.class) {
+                // If the provider is a lambda, ClassHelper.getRealClass returns Object.class
+                providerCls = provider.getProvider().getClass();
+            }
             if (filterContractSupported(provider, providerCls, ClientRequestFilter.class)) {
                 addProviderToList(clientRequestFilters, provider);
             }
