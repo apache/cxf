@@ -119,7 +119,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         Book book = echoEndpointTarget.request().accept("text/xml").get(Book.class);
         assertEquals(1023L, book.getId());
     }
-    
+
     @Test
     public void testGetGenericBook() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/genericbooks/123";
@@ -281,7 +281,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
                      response.getHeaderString("ServerWriterInterceptorHttpResponse"));
         assertEquals("text/plain;charset=us-ascii", response.getMediaType().toString());
     }
-    
+
     @Test
     public void testPreMatchContainerFilterThrowsIOException() {
         String address = "http://localhost:" + PORT + "/throwExceptionIO";
@@ -720,6 +720,28 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     }
 
     @Test
+    public void testClientFiltersLocalResponseLambdas() {
+        String address = "http://localhost:" + PORT + "/bookstores";
+        List<Object> providers = new ArrayList<>();
+
+        providers.add((ClientRequestFilter) ctx -> {
+            ctx.abortWith(Response.status(201).entity(ctx.getEntity()).type(MediaType.TEXT_XML_TYPE).build());
+        });
+
+        providers.add((ClientResponseFilter) (reqContext, respContext) -> {
+            MultivaluedMap<String, String> headers = respContext.getHeaders();
+            headers.putSingle(HttpHeaders.LOCATION, "http://localhost/redirect");
+        });
+        WebClient wc = WebClient.create(address, providers);
+        Book theBook = new Book("Echo", 123L);
+        Response r = wc.post(theBook);
+        assertEquals(201, r.getStatus());
+        assertEquals("http://localhost/redirect", r.getHeaderString(HttpHeaders.LOCATION));
+        Book responseBook = r.readEntity(Book.class);
+        assertSame(theBook, responseBook);
+    }
+
+    @Test
     public void testPostBook() {
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple";
         WebClient wc = createWebClientPost(address);
@@ -834,7 +856,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
                     ExceptionUtils.getRootCause(e) instanceof UnknownHostException);
         }
     }
-    
+
     @Test
     public void testGetSetEntityStream() {
         String address = "http://localhost:" + PORT + "/bookstore/entityecho";
@@ -847,6 +869,23 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
                 context.setEntityStream(new ReplacingOutputStream(
                                  context.getEntityStream(), 'X', 'O'));
             }
+        });
+
+        WebTarget target = client.target(address);
+
+        Response response = target.request().post(
+                Entity.entity(entity.replace('O', 'X'), "text/plain"));
+        assertEquals(entity, response.readEntity(String.class));
+    }
+
+    @Test
+    public void testGetSetEntityStreamLambda() {
+        String address = "http://localhost:" + PORT + "/bookstore/entityecho";
+        String entity = "BOOKSTORE";
+
+        Client client = ClientBuilder.newClient();
+        client.register((ClientRequestFilter) context -> {
+            context.setEntityStream(new ReplacingOutputStream(context.getEntityStream(), 'X', 'O'));
         });
 
         WebTarget target = client.target(address);
