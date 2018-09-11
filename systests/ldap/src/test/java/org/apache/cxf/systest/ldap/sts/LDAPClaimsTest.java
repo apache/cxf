@@ -22,7 +22,6 @@ package org.apache.cxf.systest.ldap.sts;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -144,10 +143,10 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
 
         ClaimCollection requestedClaims = createRequestClaimCollection();
 
-        List<URI> expectedClaims = new ArrayList<>();
-        expectedClaims.add(ClaimTypes.FIRSTNAME);
-        expectedClaims.add(ClaimTypes.LASTNAME);
-        expectedClaims.add(ClaimTypes.EMAILADDRESS);
+        List<String> expectedClaims = new ArrayList<>();
+        expectedClaims.add(ClaimTypes.FIRSTNAME.toString());
+        expectedClaims.add(ClaimTypes.LASTNAME.toString());
+        expectedClaims.add(ClaimTypes.EMAILADDRESS.toString());
 
         ClaimsParameters params = new ClaimsParameters();
         params.setPrincipal(new CustomTokenPrincipal(user));
@@ -177,10 +176,10 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
 
         ClaimCollection requestedClaims = createRequestClaimCollection();
 
-        List<URI> expectedClaims = new ArrayList<>();
-        expectedClaims.add(ClaimTypes.FIRSTNAME);
-        expectedClaims.add(ClaimTypes.LASTNAME);
-        expectedClaims.add(ClaimTypes.EMAILADDRESS);
+        List<String> expectedClaims = new ArrayList<>();
+        expectedClaims.add(ClaimTypes.FIRSTNAME.toString());
+        expectedClaims.add(ClaimTypes.LASTNAME.toString());
+        expectedClaims.add(ClaimTypes.EMAILADDRESS.toString());
 
         ClaimsParameters params = new ClaimsParameters();
         params.setPrincipal(new CustomTokenPrincipal("cn=alice,ou=users,dc=example,dc=com"));
@@ -215,10 +214,10 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
 
         ClaimCollection requestedClaims = createRequestClaimCollection();
 
-        List<URI> expectedClaims = new ArrayList<>();
-        expectedClaims.add(ClaimTypes.FIRSTNAME);
-        expectedClaims.add(ClaimTypes.LASTNAME);
-        expectedClaims.add(ClaimTypes.EMAILADDRESS);
+        List<String> expectedClaims = new ArrayList<>();
+        expectedClaims.add(ClaimTypes.FIRSTNAME.toString());
+        expectedClaims.add(ClaimTypes.LASTNAME.toString());
+        expectedClaims.add(ClaimTypes.EMAILADDRESS.toString());
 
         // First user
         ClaimsParameters params = new ClaimsParameters();
@@ -244,9 +243,9 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
         params.setPrincipal(new CustomTokenPrincipal(otherUser));
         retrievedClaims = claimsManager.retrieveClaimValues(requestedClaims, params);
 
-        expectedClaims.add(ClaimTypes.FIRSTNAME);
-        expectedClaims.add(ClaimTypes.LASTNAME);
-        expectedClaims.add(ClaimTypes.EMAILADDRESS);
+        expectedClaims.add(ClaimTypes.FIRSTNAME.toString());
+        expectedClaims.add(ClaimTypes.LASTNAME.toString());
+        expectedClaims.add(ClaimTypes.EMAILADDRESS.toString());
 
         Assert.assertTrue(
                       "Retrieved number of claims [" + retrievedClaims.size()
@@ -301,10 +300,10 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
         requestedClaims.add(claim);
 
         // Gender is not expected to be returned because not supported
-        List<URI> expectedClaims = new ArrayList<>();
-        expectedClaims.add(ClaimTypes.FIRSTNAME);
-        expectedClaims.add(ClaimTypes.LASTNAME);
-        expectedClaims.add(ClaimTypes.EMAILADDRESS);
+        List<String> expectedClaims = new ArrayList<>();
+        expectedClaims.add(ClaimTypes.FIRSTNAME.toString());
+        expectedClaims.add(ClaimTypes.LASTNAME.toString());
+        expectedClaims.add(ClaimTypes.EMAILADDRESS.toString());
 
         ClaimsParameters params = new ClaimsParameters();
         params.setPrincipal(new CustomTokenPrincipal(user));
@@ -335,7 +334,7 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
         LdapClaimsHandler cHandler = new LdapClaimsHandler();
         cHandler.setClaimsLdapAttributeMapping(mapping);
 
-        List<URI> supportedClaims = cHandler.getSupportedClaimTypes();
+        List<String> supportedClaims = cHandler.getSupportedClaimTypes();
 
         Assert.assertTrue(
                       "Supported claims and claims/ldap attribute mapping size different",
@@ -345,7 +344,7 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
         for (String claim : mapping.keySet()) {
             Assert.assertTrue(
                           "Claim '" + claim + "' not listed in supported list",
-                          supportedClaims.contains(new URI(claim))
+                          supportedClaims.contains(claim)
             );
         }
     }
@@ -362,15 +361,15 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
         ClaimCollection requestedClaims = createRequestClaimCollection();
         // Ask for the (binary) cert as well
         Claim claim = new Claim();
-        claim.setClaimType(URI.create("http://custom/x509"));
+        claim.setClaimType("http://custom/x509");
         claim.setOptional(true);
         requestedClaims.add(claim);
 
-        List<URI> expectedClaims = new ArrayList<>();
-        expectedClaims.add(ClaimTypes.FIRSTNAME);
-        expectedClaims.add(ClaimTypes.LASTNAME);
-        expectedClaims.add(ClaimTypes.EMAILADDRESS);
-        expectedClaims.add(URI.create("http://custom/x509"));
+        List<String> expectedClaims = new ArrayList<>();
+        expectedClaims.add(ClaimTypes.FIRSTNAME.toString());
+        expectedClaims.add(ClaimTypes.LASTNAME.toString());
+        expectedClaims.add(ClaimTypes.EMAILADDRESS.toString());
+        expectedClaims.add("http://custom/x509");
 
         ClaimsParameters params = new ClaimsParameters();
         params.setPrincipal(new CustomTokenPrincipal(user));
@@ -385,7 +384,7 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
 
         boolean foundCert = false;
         for (ProcessedClaim c : retrievedClaims) {
-            if (URI.create("http://custom/x509").equals(c.getClaimType())) {
+            if ("http://custom/x509".equals(c.getClaimType())) {
                 foundCert = true;
                 Assert.assertTrue(c.getValues().get(0) instanceof byte[]);
                 CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
@@ -410,7 +409,7 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
 
         ClaimCollection requestedClaims = new ClaimCollection();
         Claim claim = new Claim();
-        URI roleURI = URI.create("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role");
+        String roleURI = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role";
         claim.setClaimType(roleURI);
         requestedClaims.add(claim);
 
@@ -433,7 +432,7 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
 
         ClaimCollection requestedClaims = new ClaimCollection();
         Claim claim = new Claim();
-        URI roleURI = URI.create("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role");
+        String roleURI = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role";
         claim.setClaimType(roleURI);
         requestedClaims.add(claim);
 
@@ -459,7 +458,7 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
 
         ClaimCollection requestedClaims = new ClaimCollection();
         Claim claim = new Claim();
-        URI roleURI = URI.create("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role");
+        String roleURI = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role";
         claim.setClaimType(roleURI);
         requestedClaims.add(claim);
 
@@ -485,7 +484,7 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
 
         ClaimCollection requestedClaims = new ClaimCollection();
         Claim claim = new Claim();
-        URI roleURI = URI.create("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role");
+        String roleURI = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role";
         claim.setClaimType(roleURI);
         requestedClaims.add(claim);
 

@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.sts.token.provider;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -61,11 +60,11 @@ import org.opensaml.saml.saml2.core.Attribute;
  */
 public class SAMLClaimsTest extends org.junit.Assert {
 
-    public static final URI CLAIM_STATIC_COMPANY =
-        URI.create("http://apache.org/claims/test/company");
+    public static final String CLAIM_STATIC_COMPANY =
+        "http://apache.org/claims/test/company";
 
-    public static final URI CLAIM_APPLICATION =
-        URI.create("http://apache.org/claims/test/applicationId");
+    public static final String CLAIM_APPLICATION =
+        "http://apache.org/claims/test/applicationId";
 
     private static final String CLAIM_STATIC_COMPANY_VALUE = "myc@mpany";
 
@@ -256,7 +255,7 @@ public class SAMLClaimsTest extends org.junit.Assert {
         staticClaims.put(APPLICATION_APPLIES_TO, endpointClaimsMap);
         claimsHandler.setEndpointClaims(staticClaims);
 
-        List<URI> supportedClaims = new ArrayList<>();
+        List<String> supportedClaims = new ArrayList<>();
         supportedClaims.add(CLAIM_APPLICATION);
         claimsHandler.setSupportedClaims(supportedClaims);
 
@@ -311,7 +310,7 @@ public class SAMLClaimsTest extends org.junit.Assert {
         staticClaims.put(APPLICATION_APPLIES_TO, endpointClaimsMap);
         claimsHandler.setEndpointClaims(staticClaims);
 
-        List<URI> supportedClaims = new ArrayList<>();
+        List<String> supportedClaims = new ArrayList<>();
         supportedClaims.add(CLAIM_APPLICATION);
         claimsHandler.setSupportedClaims(supportedClaims);
 

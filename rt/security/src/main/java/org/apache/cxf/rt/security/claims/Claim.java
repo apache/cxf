@@ -39,7 +39,7 @@ public class Claim implements Serializable, Cloneable {
 
     private static final Logger LOG = LogUtils.getL7dLogger(Claim.class);
 
-    private URI claimType;
+    private String claimType;
     private boolean optional;
     private List<Object> values = new ArrayList<>(1);
 
@@ -55,19 +55,21 @@ public class Claim implements Serializable, Cloneable {
         if (claim == null) {
             throw new IllegalArgumentException("Claim cannot be null");
         }
-        if (claim.getClaimType() != null) {
-            claimType = URI.create(claim.getClaimType().toString());
-        }
+        claimType = claim.getClaimType();
         optional = claim.isOptional();
         values.addAll(claim.getValues());
     }
 
-    public URI getClaimType() {
+    public String getClaimType() {
         return claimType;
     }
 
-    public void setClaimType(URI claimType) {
+    public void setClaimType(String claimType) {
         this.claimType = claimType;
+    }
+
+    public void setClaimType(URI claimType) {
+        this.claimType = claimType.toString();
     }
 
     public boolean isOptional() {

@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.rt.security.saml.utils;
 
-import java.net.URI;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -58,7 +57,7 @@ public final class SAMLUtils {
             for (AttributeStatement as : statements) {
                 for (Attribute atr : as.getAttributes()) {
                     SAMLClaim claim = new SAMLClaim();
-                    claim.setClaimType(URI.create(atr.getName()));
+                    claim.setClaimType(atr.getName());
 
                     claim.setName(atr.getName());
                     claim.setNameFormat(atr.getNameFormat());
@@ -84,7 +83,7 @@ public final class SAMLUtils {
                     if (atr.getAttributeNamespace() != null) {
                         claimType = atr.getAttributeNamespace() + "/" + claimType;
                     }
-                    claim.setClaimType(URI.create(claimType));
+                    claim.setClaimType(claimType);
 
                     claim.setName(atr.getAttributeName());
                     claim.setNameFormat(atr.getAttributeNamespace());

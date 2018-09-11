@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.sts.common;
 
-import java.net.URI;
 import java.util.List;
 
 import org.apache.cxf.rt.security.claims.Claim;
@@ -38,7 +37,7 @@ public class RealmSupportClaimsHandler implements ClaimsHandler, RealmSupport {
 
     private List<String> supportedRealms;
     private String realm;
-    private List<URI> supportedClaimTypes;
+    private List<String> supportedClaimTypes;
 
 
     public void setSupportedRealms(List<String> supportedRealms) {
@@ -50,11 +49,11 @@ public class RealmSupportClaimsHandler implements ClaimsHandler, RealmSupport {
     }
 
 
-    public List<URI> getSupportedClaimTypes() {
+    public List<String> getSupportedClaimTypes() {
         return supportedClaimTypes;
     }
 
-    public void setSupportedClaimTypes(List<URI> supportedClaimTypes) {
+    public void setSupportedClaimTypes(List<String> supportedClaimTypes) {
         this.supportedClaimTypes = supportedClaimTypes;
     }
 

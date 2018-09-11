@@ -51,7 +51,7 @@ public class ClaimsManager {
 
     private List<ClaimsParser> claimParsers;
     private List<ClaimsHandler> claimHandlers;
-    private List<URI> supportedClaimTypes = new ArrayList<>();
+    private List<String> supportedClaimTypes = new ArrayList<>();
     private boolean stopProcessingOnException = true;
     private IdentityMapper identityMapper;
 
@@ -72,7 +72,7 @@ public class ClaimsManager {
         this.stopProcessingOnException = stopProcessingOnException;
     }
 
-    public List<URI> getSupportedClaimTypes() {
+    public List<String> getSupportedClaimTypes() {
         return supportedClaimTypes;
     }
 
@@ -279,7 +279,7 @@ public class ClaimsManager {
     }
 
     private ClaimCollection filterHandlerClaims(ClaimCollection claims,
-                                                         List<URI> handlerClaimTypes) {
+                                                         List<String> handlerClaimTypes) {
         ClaimCollection supportedClaims = new ClaimCollection();
         supportedClaims.setDialect(claims.getDialect());
         for (Claim claim : claims) {
@@ -292,7 +292,7 @@ public class ClaimsManager {
 
     private boolean validateClaimValues(ClaimCollection requestedClaims, ProcessedClaimCollection claims) {
         for (Claim claim : requestedClaims) {
-            URI claimType = claim.getClaimType();
+            String claimType = claim.getClaimType();
             boolean found = false;
             if (!claim.isOptional()) {
                 for (ProcessedClaim c : claims) {

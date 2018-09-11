@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.sts.common;
 
-import java.net.URI;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,22 +41,22 @@ import org.opensaml.saml.saml2.core.AttributeValue;
  */
 public class CustomClaimsHandler implements ClaimsHandler {
 
-    public static final URI ROLE_CLAIM =
-            URI.create("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role");
-    private static List<URI> knownURIs = new ArrayList<>();
+    public static final String ROLE_CLAIM =
+            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role";
+    private static List<String> knownURIs = new ArrayList<>();
 
     static {
-        knownURIs.add(ClaimTypes.FIRSTNAME);
-        knownURIs.add(ClaimTypes.LASTNAME);
-        knownURIs.add(ClaimTypes.EMAILADDRESS);
-        knownURIs.add(ClaimTypes.STREETADDRESS);
-        knownURIs.add(ClaimTypes.MOBILEPHONE);
+        knownURIs.add(ClaimTypes.FIRSTNAME.toString());
+        knownURIs.add(ClaimTypes.LASTNAME.toString());
+        knownURIs.add(ClaimTypes.EMAILADDRESS.toString());
+        knownURIs.add(ClaimTypes.STREETADDRESS.toString());
+        knownURIs.add(ClaimTypes.MOBILEPHONE.toString());
         knownURIs.add(ROLE_CLAIM);
     }
 
     private String role = "DUMMY";
 
-    public List<URI> getSupportedClaimTypes() {
+    public List<String> getSupportedClaimTypes() {
         return knownURIs;
     }
 
@@ -69,7 +68,7 @@ public class CustomClaimsHandler implements ClaimsHandler {
             for (Claim requestClaim : claims) {
                 ProcessedClaim claim = new ProcessedClaim();
                 claim.setClaimType(requestClaim.getClaimType());
-                if (ClaimTypes.FIRSTNAME.equals(requestClaim.getClaimType())) {
+                if (ClaimTypes.FIRSTNAME.toString().equals(requestClaim.getClaimType())) {
                     if (requestClaim instanceof CustomRequestClaim) {
                         CustomRequestClaim customClaim = (CustomRequestClaim) requestClaim;
                         String customName = customClaim.getValues().get(0) + "@"
@@ -78,13 +77,13 @@ public class CustomClaimsHandler implements ClaimsHandler {
                     } else {
                         claim.addValue("alice");
                     }
-                } else if (ClaimTypes.LASTNAME.equals(requestClaim.getClaimType())) {
+                } else if (ClaimTypes.LASTNAME.toString().equals(requestClaim.getClaimType())) {
                     claim.addValue("doe");
-                } else if (ClaimTypes.EMAILADDRESS.equals(requestClaim.getClaimType())) {
+                } else if (ClaimTypes.EMAILADDRESS.toString().equals(requestClaim.getClaimType())) {
                     claim.addValue("alice@cxf.apache.org");
-                } else if (ClaimTypes.STREETADDRESS.equals(requestClaim.getClaimType())) {
+                } else if (ClaimTypes.STREETADDRESS.toString().equals(requestClaim.getClaimType())) {
                     claim.addValue("1234 1st Street");
-                } else if (ClaimTypes.MOBILEPHONE.equals(requestClaim.getClaimType())) {
+                } else if (ClaimTypes.MOBILEPHONE.toString().equals(requestClaim.getClaimType())) {
                     // Test custom (Integer) attribute value
                     XMLObjectBuilderFactory builderFactory =
                         XMLObjectProviderRegistrySupport.getBuilderFactory();
@@ -98,7 +97,7 @@ public class CustomClaimsHandler implements ClaimsHandler {
 
                     claim.addValue(attributeValue);
 
-                } else if (ROLE_CLAIM.equals(requestClaim.getClaimType())) {
+                } else if (ROLE_CLAIM.toString().equals(requestClaim.getClaimType())) {
                     if (requestClaim.getValues().size() > 0) {
                         for (Object requestedRole : requestClaim.getValues()) {
                             if (isUserInRole(parameters.getPrincipal(), requestedRole.toString())) {

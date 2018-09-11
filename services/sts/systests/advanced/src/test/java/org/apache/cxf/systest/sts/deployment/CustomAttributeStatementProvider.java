@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.systest.sts.deployment;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -79,13 +78,13 @@ public class CustomAttributeStatementProvider implements AttributeStatementProvi
             ProcessedClaim claim = claimIterator.next();
             AttributeBean attributeBean = new AttributeBean();
 
-            URI claimType = claim.getClaimType();
+            String claimType = claim.getClaimType();
             if (WSS4JConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
                 || WSS4JConstants.SAML2_NS.equals(tokenType)) {
-                attributeBean.setQualifiedName(claimType.toString());
+                attributeBean.setQualifiedName(claimType);
                 attributeBean.setNameFormat(nameFormat);
             } else {
-                String uri = claimType.toString();
+                String uri = claimType;
                 int lastSlash = uri.lastIndexOf("/");
                 if (lastSlash == (uri.length() - 1)) {
                     uri = uri.substring(0, lastSlash);

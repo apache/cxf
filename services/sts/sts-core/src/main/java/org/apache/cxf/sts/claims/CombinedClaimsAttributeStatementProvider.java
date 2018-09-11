@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.sts.claims;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -85,11 +84,11 @@ public class CombinedClaimsAttributeStatementProvider implements AttributeStatem
 
     private AttributeKey createAttributeKey(ProcessedClaim claim, boolean saml2) {
 
-        URI claimType = claim.getClaimType();
+        String claimType = claim.getClaimType();
         if (saml2) {
-            return new AttributeKey(claimType.toString(), nameFormat, null);
+            return new AttributeKey(claimType, nameFormat, null);
         } else {
-            String uri = claimType.toString();
+            String uri = claimType;
             int lastSlash = uri.lastIndexOf("/");
             if (lastSlash == (uri.length() - 1)) {
                 uri = uri.substring(0, lastSlash);

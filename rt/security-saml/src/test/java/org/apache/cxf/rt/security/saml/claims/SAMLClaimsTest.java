@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.rt.security.saml.claims;
 
-import java.net.URI;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -66,7 +65,7 @@ public class SAMLClaimsTest extends Assert {
 
         // Check Claim values
         Claim claim = claims.get(0);
-        assertEquals(claim.getClaimType(), URI.create(SAMLClaim.SAML_ROLE_ATTRIBUTENAME_DEFAULT));
+        assertEquals(claim.getClaimType(), SAMLClaim.SAML_ROLE_ATTRIBUTENAME_DEFAULT);
         assertEquals(1, claim.getValues().size());
         assertTrue(claim.getValues().contains("employee"));
 
@@ -111,7 +110,7 @@ public class SAMLClaimsTest extends Assert {
 
         // Check Claim values
         Claim claim = claims.get(0);
-        assertEquals(claim.getClaimType(), URI.create(SAMLClaim.SAML_ROLE_ATTRIBUTENAME_DEFAULT));
+        assertEquals(claim.getClaimType(), SAMLClaim.SAML_ROLE_ATTRIBUTENAME_DEFAULT);
         assertEquals(2, claim.getValues().size());
         assertTrue(claim.getValues().contains("employee"));
         assertTrue(claim.getValues().contains("boss"));
@@ -196,7 +195,7 @@ public class SAMLClaimsTest extends Assert {
 
         // Check Claim values
         Claim claim = claims.get(0);
-        assertEquals(claim.getClaimType(), URI.create(SAMLClaim.SAML_ROLE_ATTRIBUTENAME_DEFAULT));
+        assertEquals(claim.getClaimType(), SAMLClaim.SAML_ROLE_ATTRIBUTENAME_DEFAULT);
         assertEquals(1, claim.getValues().size());
         assertTrue(claim.getValues().contains("employee"));
 

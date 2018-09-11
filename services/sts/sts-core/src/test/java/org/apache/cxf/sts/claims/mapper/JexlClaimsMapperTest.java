@@ -91,9 +91,8 @@ public class JexlClaimsMapperTest extends org.junit.Assert {
         ProcessedClaimCollection result = jcm.mapClaims("A", createClaimCollection(), "B", createProperties());
 
         for (ProcessedClaim c : result) {
-            URI claimType = c.getClaimType();
-            if (claimType != null
-                && "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/unused".equals(claimType.toString())) {
+            String claimType = c.getClaimType();
+            if ("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/unused".equals(claimType)) {
                 fail("Claims not handled within the script should not be copied to the target token");
             }
         }

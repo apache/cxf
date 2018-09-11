@@ -19,9 +19,9 @@
 package org.apache.cxf.sts.claims;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -169,14 +169,8 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
         this.groupNameScopedFilter = groupNameScopedFilter;
     }
 
-    public List<URI> getSupportedClaimTypes() {
-        List<URI> list = new ArrayList<>();
-        try {
-            list.add(new URI(this.groupURI));
-        } catch (URISyntaxException e) {
-            LOG.warning("Invalid groupURI '" + this.groupURI + "'");
-        }
-        return list;
+    public List<String> getSupportedClaimTypes() {
+        return Collections.singletonList(groupURI);
     }
 
     public ProcessedClaimCollection retrieveClaimValues(
