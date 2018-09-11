@@ -138,11 +138,15 @@ public class HttpsURLConnectionFactory {
             socketFactory = tlsClientParameters.getSSLSocketFactory();
 
         } else if (socketFactory == null) {
-            // ssl socket factory not yet instantiated, create a new one with tlsClientParameters's Trust
-            // Managers, Key Managers, etc
 
-            SSLContext ctx =
-                org.apache.cxf.transport.https.SSLUtils.getSSLContext(tlsClientParameters);
+            SSLContext ctx = null;
+            if (tlsClientParameters.getSslContext() != null) {
+                // Use the SSLContext which was set
+                ctx = tlsClientParameters.getSslContext();
+            } else {
+                // Create socketfactory with tlsClientParameters's Trust Managers, Key Managers, etc
+                ctx = org.apache.cxf.transport.https.SSLUtils.getSSLContext(tlsClientParameters);
+            }
 
             String[] cipherSuites =
                 SSLUtils.getCiphersuitesToInclude(tlsClientParameters.getCipherSuites(),
@@ -150,10 +154,10 @@ public class HttpsURLConnectionFactory {
                                                   ctx.getSocketFactory().getDefaultCipherSuites(),
                                                   SSLUtils.getSupportedCipherSuites(ctx),
                                                   LOG);
-            // The SSLSocketFactoryWrapper enables certain cipher suites
-            // from the policy.
+
+            // The SSLSocketFactoryWrapper enables certain cipher suites from the policy.
             String protocol = tlsClientParameters.getSecureSocketProtocol() != null ? tlsClientParameters
-                .getSecureSocketProtocol() : "TLS";
+                .getSecureSocketProtocol() : ctx.getProtocol();
             socketFactory = new SSLSocketFactoryWrapper(ctx.getSocketFactory(), cipherSuites,
                                                         protocol);
             //recalc the hashcode since some of the above MAY have changed the tlsClientParameters
