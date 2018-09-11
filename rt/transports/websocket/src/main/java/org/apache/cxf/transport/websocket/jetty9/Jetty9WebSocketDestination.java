@@ -56,7 +56,6 @@ import org.apache.cxf.workqueue.WorkQueueManager;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandler;
-import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 import org.eclipse.jetty.websocket.server.WebSocketHandler;
@@ -122,7 +121,7 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
     }
     
     Server getServer(ServletConfig config, ServletContext context) {
-        WebAppContext.Context c = (WebAppContext.Context)context;
+        ContextHandler.Context c = (ContextHandler.Context)context;
         ContextHandler h = c.getContextHandler();
         return h.getServer();
     }
