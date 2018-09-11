@@ -880,25 +880,31 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             return sslContext;
         }
 
-        String provider = tlsClientParameters.getJsseProvider();
+        SSLContext ctx = null;
+        if (tlsClientParameters.getSslContext() != null) {
+            ctx = tlsClientParameters.getSslContext();
+        } else {
+            String provider = tlsClientParameters.getJsseProvider();
 
-        String protocol = tlsClientParameters.getSecureSocketProtocol() != null ? tlsClientParameters
-            .getSecureSocketProtocol() : "TLS";
+            String protocol = tlsClientParameters.getSecureSocketProtocol() != null ? tlsClientParameters
+                .getSecureSocketProtocol() : "TLS";
 
-        SSLContext ctx = provider == null ? SSLContext.getInstance(protocol) : SSLContext
-            .getInstance(protocol, provider);
-        ctx.getClientSessionContext().setSessionTimeout(tlsClientParameters.getSslCacheTimeout());
+            ctx = provider == null ? SSLContext.getInstance(protocol) : SSLContext
+                .getInstance(protocol, provider);
+            ctx.getClientSessionContext().setSessionTimeout(tlsClientParameters.getSslCacheTimeout());
 
-        KeyManager[] keyManagers = tlsClientParameters.getKeyManagers();
-        KeyManager[] configuredKeyManagers = org.apache.cxf.transport.https.SSLUtils.configureKeyManagersWithCertAlias(
-            tlsClientParameters, keyManagers);
+            KeyManager[] keyManagers = tlsClientParameters.getKeyManagers();
+            KeyManager[] configuredKeyManagers =
+                org.apache.cxf.transport.https.SSLUtils.configureKeyManagersWithCertAlias(
+                    tlsClientParameters, keyManagers);
 
-        TrustManager[] trustManagers = tlsClientParameters.getTrustManagers();
-        if (trustManagers == null) {
-            trustManagers = org.apache.cxf.configuration.jsse.SSLUtils.getDefaultTrustStoreManagers(LOG);
+            TrustManager[] trustManagers = tlsClientParameters.getTrustManagers();
+            if (trustManagers == null) {
+                trustManagers = org.apache.cxf.configuration.jsse.SSLUtils.getDefaultTrustStoreManagers(LOG);
+            }
+
+            ctx.init(configuredKeyManagers, trustManagers, tlsClientParameters.getSecureRandom());
         }
-
-        ctx.init(configuredKeyManagers, trustManagers, tlsClientParameters.getSecureRandom());
 
         sslContext = ctx;
         lastTlsHash = hash;
@@ -923,9 +929,9 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         sslengine.setEnabledCipherSuites(cipherSuites);
 
         String protocol = tlsClientParameters.getSecureSocketProtocol() != null ? tlsClientParameters
-            .getSecureSocketProtocol() : "TLS";
+            .getSecureSocketProtocol() : sslcontext.getProtocol();
 
-        String p[] = findProtocols(protocol, sslengine.getSupportedProtocols());
+        String[] p = findProtocols(protocol, sslengine.getSupportedProtocols());
         if (p != null) {
             sslengine.setEnabledProtocols(p);
         }

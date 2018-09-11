@@ -21,6 +21,7 @@ package org.apache.cxf.configuration.jsse;
 import java.util.List;
 
 import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 
 /**
@@ -35,6 +36,7 @@ public class TLSClientParameters extends TLSParameterBase {
     private boolean useHttpsURLConnectionDefaultSslSocketFactory;
     private boolean useHttpsURLConnectionDefaultHostnameVerifier;
     private HostnameVerifier hostnameVerifier;
+    private SSLContext sslContext;
 
     /**
      * Set custom HostnameVerifier
@@ -147,6 +149,9 @@ public class TLSClientParameters extends TLSParameterBase {
         if (sslSocketFactory != null) {
             hash = hash * 41 + System.identityHashCode(sslSocketFactory);
         }
+        if (sslContext != null) {
+            hash = hash * 41 + System.identityHashCode(sslContext);
+        }
         hash = hash(hash, useHttpsURLConnectionDefaultSslSocketFactory);
         hash = hash(hash, useHttpsURLConnectionDefaultHostnameVerifier);
         hash = hash(hash, sslCacheTimeout);
@@ -193,6 +198,7 @@ public class TLSClientParameters extends TLSParameterBase {
             TLSClientParameters that = (TLSClientParameters)o;
             boolean eq = disableCNCheck == that.disableCNCheck;
             eq &= sslSocketFactory == that.sslSocketFactory;
+            eq &= sslContext == that.sslContext;
             eq &= useHttpsURLConnectionDefaultSslSocketFactory == that.useHttpsURLConnectionDefaultSslSocketFactory;
             eq &= useHttpsURLConnectionDefaultHostnameVerifier == that.useHttpsURLConnectionDefaultHostnameVerifier;
             eq &= sslCacheTimeout == that.sslCacheTimeout;
@@ -257,5 +263,19 @@ public class TLSClientParameters extends TLSParameterBase {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Get the SSLContext parameter to use (if it has been set)
+     */
+    public SSLContext getSslContext() {
+        return sslContext;
+    }
+
+    /**
+     * Set an SSLContext parameter to use to create https connections
+     */
+    public void setSslContext(SSLContext sslContext) {
+        this.sslContext = sslContext;
     }
 }
