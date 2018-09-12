@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rt.security.saml.interceptor;
+package org.apache.cxf.rt.security.claims.interceptor;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -25,24 +25,26 @@ import java.lang.annotation.Target;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
+import javax.security.auth.Subject;
+
+import org.apache.cxf.common.security.SimpleGroup;
 import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.interceptor.security.AccessDeniedException;
 import org.apache.cxf.interceptor.security.SecureAnnotationsInterceptor;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.rt.security.claims.ClaimBean;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
-import org.apache.cxf.rt.security.saml.claims.ClaimBean;
-import org.apache.cxf.rt.security.saml.claims.SAMLClaim;
-import org.apache.cxf.rt.security.saml.claims.SAMLSecurityContext;
-import org.apache.cxf.rt.security.saml.utils.SAMLUtils;
+import org.apache.cxf.rt.security.claims.ClaimsSecurityContext;
+import org.apache.cxf.rt.security.claims.SAMLClaim;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.security.claims.authorization.Claim;
 import org.apache.cxf.security.claims.authorization.ClaimMode;
 import org.apache.cxf.security.claims.authorization.Claims;
-import org.apache.wss4j.common.saml.builder.SAML2Constants;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -182,8 +184,7 @@ public class ClaimsAuthorizingInterceptorTest extends Assert {
         in.handleMessage(m);
 
         ClaimsAuthorizingInterceptor in2 = new ClaimsAuthorizingInterceptor();
-        org.apache.cxf.rt.security.saml.claims.SAMLClaim claim =
-            new org.apache.cxf.rt.security.saml.claims.SAMLClaim();
+        SAMLClaim claim = new SAMLClaim();
         claim.setNameFormat("a");
         claim.setName("b");
         claim.addValue("c");
@@ -217,10 +218,47 @@ public class ClaimsAuthorizingInterceptorTest extends Assert {
         claims.addAll(Arrays.asList(claim));
 
         Set<Principal> roles =
-            SAMLUtils.parseRolesFromClaims(claims, SAMLClaim.SAML_ROLE_ATTRIBUTENAME_DEFAULT,
-                                           SAML2Constants.ATTRNAME_FORMAT_UNSPECIFIED);
+            parseRolesFromClaims(claims, SAMLClaim.SAML_ROLE_ATTRIBUTENAME_DEFAULT,
+                                 "urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified");
 
-        SecurityContext sc = new SAMLSecurityContext(new SimplePrincipal("user"), roles, claims);
+        ClaimsSecurityContext sc = new ClaimsSecurityContext() {
+
+            private Principal p = new SimplePrincipal("user");
+
+            @Override
+            public Principal getUserPrincipal() {
+                return p;
+            }
+
+            @Override
+            public boolean isUserInRole(String role) {
+                if (roles == null) {
+                    return false;
+                }
+                for (Principal principalRole : roles) {
+                    if (principalRole != p && principalRole.getName().equals(role)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            @Override
+            public Subject getSubject() {
+                return null;
+            }
+
+            @Override
+            public Set<Principal> getUserRoles() {
+                return roles;
+            }
+
+            @Override
+            public ClaimCollection getClaims() {
+                return claims;
+            }
+
+        };
         Message m = new MessageImpl();
         m.setExchange(new ExchangeImpl());
         m.put(SecurityContext.class, sc);
@@ -232,7 +270,7 @@ public class ClaimsAuthorizingInterceptorTest extends Assert {
     private org.apache.cxf.rt.security.claims.Claim createDefaultClaim(
             Object... values) {
         return createClaim(SAMLClaim.SAML_ROLE_ATTRIBUTENAME_DEFAULT,
-                           SAML2Constants.ATTRNAME_FORMAT_UNSPECIFIED,
+                           "urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified",
                            values);
     }
 
@@ -295,5 +333,36 @@ public class ClaimsAuthorizingInterceptorTest extends Assert {
     @Retention(RetentionPolicy.RUNTIME)
     public @interface SecureRole {
         String[] value();
+    }
+
+    private static Set<Principal> parseRolesFromClaims(
+                                                       ClaimCollection claims,
+                                                       String name,
+                                                       String nameFormat
+    ) {
+        String roleAttributeName = name;
+        if (roleAttributeName == null) {
+            roleAttributeName = SAMLClaim.SAML_ROLE_ATTRIBUTENAME_DEFAULT;
+        }
+
+        Set<Principal> roles = new HashSet<>();
+
+        for (org.apache.cxf.rt.security.claims.Claim claim : claims) {
+            if (claim instanceof SAMLClaim && ((SAMLClaim)claim).getName().equals(name)
+                && (nameFormat == null
+                || nameFormat.equals(((SAMLClaim)claim).getNameFormat()))) {
+                for (Object claimValue : claim.getValues()) {
+                    if (claimValue instanceof String) {
+                        roles.add(new SimpleGroup((String)claimValue));
+                    }
+                }
+                if (claim.getValues().size() > 1) {
+                    // Don't search for other attributes with the same name if > 1 claim value
+                    break;
+                }
+            }
+        }
+
+        return roles;
     }
 }

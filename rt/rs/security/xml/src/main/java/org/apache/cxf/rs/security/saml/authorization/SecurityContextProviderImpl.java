@@ -27,7 +27,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.saml.assertion.Subject;
 import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
-import org.apache.cxf.rt.security.saml.claims.SAMLClaim;
+import org.apache.cxf.rt.security.claims.SAMLClaim;
 import org.apache.cxf.rt.security.saml.claims.SAMLSecurityContext;
 import org.apache.cxf.rt.security.saml.utils.SAMLUtils;
 import org.apache.cxf.rt.security.utils.SecurityUtils;

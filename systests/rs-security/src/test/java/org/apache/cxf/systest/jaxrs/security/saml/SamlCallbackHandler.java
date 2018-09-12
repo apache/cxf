@@ -35,7 +35,7 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.common.CryptoLoader;
 import org.apache.cxf.rs.security.common.RSSecurityUtils;
 import org.apache.cxf.rt.security.SecurityConstants;
-import org.apache.cxf.rt.security.saml.claims.SAMLClaim;
+import org.apache.cxf.rt.security.claims.SAMLClaim;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.bean.ActionBean;

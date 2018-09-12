@@ -17,10 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.rt.security.saml.claims;
-
-import org.apache.cxf.rt.security.claims.Claim;
-
+package org.apache.cxf.rt.security.claims;
 
 /**
  * This represents a Claim that is coupled to a SAML Assertion

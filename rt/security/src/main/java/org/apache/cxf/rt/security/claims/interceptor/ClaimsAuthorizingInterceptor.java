@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rt.security.saml.interceptor;
+package org.apache.cxf.rt.security.claims.interceptor;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -36,9 +36,9 @@ import org.apache.cxf.interceptor.security.AccessDeniedException;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
-import org.apache.cxf.rt.security.saml.claims.ClaimBean;
-import org.apache.cxf.rt.security.saml.claims.SAMLClaim;
-import org.apache.cxf.rt.security.saml.claims.SAMLSecurityContext;
+import org.apache.cxf.rt.security.claims.ClaimBean;
+import org.apache.cxf.rt.security.claims.ClaimsSecurityContext;
+import org.apache.cxf.rt.security.claims.SAMLClaim;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.security.claims.authorization.Claim;
 import org.apache.cxf.security.claims.authorization.ClaimMode;
@@ -69,13 +69,13 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
 
     public void handleMessage(Message message) throws Fault {
         SecurityContext sc = message.get(SecurityContext.class);
-        if (!(sc instanceof SAMLSecurityContext)) {
+        if (!(sc instanceof ClaimsSecurityContext)) {
             throw new AccessDeniedException("Security Context is unavailable or unrecognized");
         }
 
         Method method = getTargetMethod(message);
 
-        if (authorize((SAMLSecurityContext)sc, method)) {
+        if (authorize((ClaimsSecurityContext)sc, method)) {
             return;
         }
 
@@ -100,7 +100,7 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
         throw new AccessDeniedException("Method is not available : Unauthorized");
     }
 
-    protected boolean authorize(SAMLSecurityContext sc, Method method) {
+    protected boolean authorize(ClaimsSecurityContext sc, Method method) {
         List<ClaimBean> list = claims.get(method.getName());
         org.apache.cxf.rt.security.claims.ClaimCollection actualClaims = sc.getClaims();
 

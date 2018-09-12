@@ -29,6 +29,7 @@ import org.w3c.dom.Document;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.rt.security.claims.Claim;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
+import org.apache.cxf.rt.security.claims.SAMLClaim;
 import org.apache.cxf.rt.security.saml.utils.SAMLUtils;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;

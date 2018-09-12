@@ -32,7 +32,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.rt.security.claims.Claim;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
-import org.apache.cxf.rt.security.saml.claims.SAMLClaim;
+import org.apache.cxf.rt.security.claims.SAMLClaim;
 import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.opensaml.core.xml.XMLObject;
