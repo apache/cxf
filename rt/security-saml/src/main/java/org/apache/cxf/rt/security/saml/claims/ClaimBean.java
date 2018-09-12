@@ -18,26 +18,30 @@
  */
 package org.apache.cxf.rt.security.saml.claims;
 
+import org.apache.cxf.rt.security.claims.Claim;
 import org.apache.cxf.security.claims.authorization.ClaimMode;
 
 public class ClaimBean {
-    private SAMLClaim claim;
-    private ClaimMode claimMode;
-    private boolean matchAll;
+    private final Claim claim;
+    private final String claimFormat;
+    private final ClaimMode claimMode;
+    private final boolean matchAll;
 
-    public ClaimBean(SAMLClaim claim) {
-        this.claim = claim;
-    }
-
-    public ClaimBean(SAMLClaim claim,
+    public ClaimBean(Claim claim,
+                     String claimFormat,
                      ClaimMode claimMode,
                      boolean matchAll) {
         this.claim = claim;
+        this.claimFormat = claimFormat;
         this.claimMode = claimMode;
         this.matchAll = matchAll;
     }
 
-    public SAMLClaim getClaim() {
+    public String getClaimFormat() {
+        return claimFormat;
+    }
+
+    public Claim getClaim() {
         return claim;
     }
 

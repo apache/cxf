@@ -105,12 +105,11 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
         org.apache.cxf.rt.security.claims.ClaimCollection actualClaims = sc.getClaims();
 
         for (ClaimBean claimBean : list) {
-            org.apache.cxf.rt.security.claims.Claim claim = claimBean.getClaim();
             org.apache.cxf.rt.security.claims.Claim matchingClaim = null;
             for (org.apache.cxf.rt.security.claims.Claim cl : actualClaims) {
                 if (cl instanceof SAMLClaim
-                    && ((SAMLClaim)cl).getName().equals(((SAMLClaim)claim).getName())
-                    && ((SAMLClaim)cl).getNameFormat().equals(((SAMLClaim)claim).getNameFormat())) {
+                    && ((SAMLClaim)cl).getName().equals(claimBean.getClaim().getClaimType())
+                    && ((SAMLClaim)cl).getNameFormat().equals(claimBean.getClaimFormat())) {
                     matchingClaim = cl;
                     break;
                 }
@@ -121,7 +120,7 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
                 }
                 continue;
             }
-            List<Object> claimValues = claim.getValues();
+            List<Object> claimValues = claimBean.getClaim().getValues();
             List<Object> matchingClaimValues = matchingClaim.getValues();
             if (claimBean.isMatchAll()
                 && !matchingClaimValues.containsAll(claimValues)) {
@@ -189,8 +188,8 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
 
     private static boolean isClaimOverridden(ClaimBean bean, List<ClaimBean> mClaims) {
         for (ClaimBean methodBean : mClaims) {
-            if (bean.getClaim().getName().equals(methodBean.getClaim().getName())
-                && bean.getClaim().getNameFormat().equals(methodBean.getClaim().getNameFormat())) {
+            if (bean.getClaim().getClaimType().equals(methodBean.getClaim().getClaimType())
+                && bean.getClaimFormat().equals(methodBean.getClaimFormat())) {
                 return true;
             }
         }
@@ -208,7 +207,7 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
             annClaims.add(claimAnn);
         }
         for (Claim ann : annClaims) {
-            SAMLClaim claim = new SAMLClaim();
+            org.apache.cxf.rt.security.claims.Claim claim = new org.apache.cxf.rt.security.claims.Claim();
 
             String claimName = ann.name();
             if (nameAliases.containsKey(claimName)) {
@@ -219,13 +218,12 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
                 claimFormat = formatAliases.get(claimFormat);
             }
 
-            claim.setName(claimName);
-            claim.setNameFormat(claimFormat);
+            claim.setClaimType(claimName);
             for (String value : ann.value()) {
                 claim.addValue(value);
             }
 
-            claimsList.add(new ClaimBean(claim, ann.mode(), ann.matchAll()));
+            claimsList.add(new ClaimBean(claim, claimFormat, ann.mode(), ann.matchAll()));
         }
         return claimsList;
     }

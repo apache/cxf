@@ -189,7 +189,7 @@ public class ClaimsAuthorizingInterceptorTest extends Assert {
         claim.addValue("c");
         in2.setClaims(Collections.singletonMap("test",
                 Collections.singletonList(
-                   new ClaimBean(claim))));
+                   new ClaimBean(claim, "a", null, false))));
         in2.handleMessage(m);
 
         try {
