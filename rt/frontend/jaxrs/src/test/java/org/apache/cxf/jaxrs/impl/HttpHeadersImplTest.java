@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -176,6 +177,38 @@ public class HttpHeadersImplTest extends Assert {
         assertEquals("text/*;q=1", acceptValues.get(1));
         assertEquals("application/xml", acceptValues.get(2));
         assertEquals(hs.getFirst("Content-Type"), "*/*");
+    }
+
+    @Test
+    public void testGetHeadersShouldSplitByDefault() {
+        MessageImpl m = new MessageImpl();
+        final Map<String,List<String>> protocolHeaders = new HashMap<>();
+        protocolHeaders.put("foo", Collections.singletonList("bar,baz"));
+        m.put(Message.PROTOCOL_HEADERS, protocolHeaders);
+        final HttpHeadersImpl headers = new HttpHeadersImpl(m);
+        final MultivaluedMap<String, String> actual = headers.getRequestHeaders();
+        assertEquals(1, actual.size());
+        assertEquals(2, actual.get("foo").size());
+    }
+
+    @Test
+    public void testGetHeadersShouldConcatenateWhenSplitDisabled() {
+        MessageImpl m = new MessageImpl();
+        final Map<String,List<String>> protocolHeaders = new HashMap<>();
+        protocolHeaders.put("foo", Collections.singletonList("bar,baz"));
+        m.put(Message.PROTOCOL_HEADERS, protocolHeaders);
+        m.put("org.apache.cxf.http.header.split", false);
+        final HttpHeadersImpl headers = new HttpHeadersImpl(m);
+        final MultivaluedMap<String, String> actual = headers.getRequestHeaders();
+        assertEquals(1, actual.size());
+        assertEquals(1, actual.get("foo").size());
+        assertEquals("bar,baz", actual.getFirst("foo"));
+    }
+
+    @Test
+    public void testGetHeadersWhenMissing() {
+        final HttpHeadersImpl headers = new HttpHeadersImpl(new MessageImpl());
+        assertEquals(0, headers.getRequestHeaders().size());
     }
 
     @Test
