@@ -65,9 +65,14 @@ under the License.
            <map>
                <entry key="echoBook" value="boss"/>
                <entry key="echoBook2" value="boss"/>
+               <entry key="echoBook3" value="boss"/>
                <entry key="echoText" value="boss"/>
            </map>
        </property> 
+    </bean>
+    
+    <bean id="claimsHandler" class="org.apache.cxf.rs.security.claims.ClaimsAuthorizingFilter">
+        <property name="securedObject" ref="serviceBean"/>
     </bean>
     
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt-authn-authz}/signedjwtauthz">
@@ -76,6 +81,7 @@ under the License.
         </jaxrs:serviceBeans>
         <jaxrs:providers>
             <ref bean="jwtAuthzFilter"/>
+            <ref bean="claimsHandler"/>
         </jaxrs:providers>
         <jaxrs:inInterceptors>
             <ref bean="authorizationInterceptor"/>

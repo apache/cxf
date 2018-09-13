@@ -26,6 +26,7 @@ import java.security.Principal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.security.auth.Subject;
@@ -69,12 +70,34 @@ public class ClaimsAuthorizingInterceptorTest extends Assert {
     @Test
     public void testClaimDefaultNameAndFormat() throws Exception {
         doTestClaims("claimWithDefaultNameAndFormat",
-                createDefaultClaim("admin", "user"),
-                createClaim("http://authentication", "http://claims", "password"));
+                     createDefaultClaim("admin", "user"),
+                     createClaim("http://authentication", "http://claims", "password"));
         try {
             doTestClaims("claimWithDefaultNameAndFormat",
-                    createDefaultClaim("user"),
-                    createClaim("http://authentication", "http://claims", "password"));
+                         createDefaultClaim("user"),
+                         createClaim("http://authentication", "http://claims", "password"));
+            fail("AccessDeniedException expected");
+        } catch (AccessDeniedException ex) {
+            // expected
+        }
+    }
+
+    @Test
+    public void testNonSAMLClaimDefaultNameAndFormat() throws Exception {
+        org.apache.cxf.rt.security.claims.Claim claim1 = new org.apache.cxf.rt.security.claims.Claim();
+        claim1.setClaimType("role");
+        claim1.setValues(Arrays.asList("admin", "user"));
+        org.apache.cxf.rt.security.claims.Claim claim2 = new org.apache.cxf.rt.security.claims.Claim();
+        claim2.setClaimType("http://authentication");
+        claim2.setValues(Arrays.asList("password"));
+
+        Message m = prepareMessage(TestService.class, "claimWithSpecificName", "role", claim1, claim2);
+        interceptor.handleMessage(m);
+
+        try {
+            claim1.setValues(Arrays.asList("user"));
+            m = prepareMessage(TestService.class, "claimWithSpecificName", "role", claim1, claim2);
+            interceptor.handleMessage(m);
             fail("AccessDeniedException expected");
         } catch (AccessDeniedException ex) {
             // expected
@@ -202,7 +225,6 @@ public class ClaimsAuthorizingInterceptorTest extends Assert {
         }
     }
 
-
     private void doTestClaims(String methodName,
             org.apache.cxf.rt.security.claims.Claim... claim)
         throws Exception {
@@ -214,11 +236,19 @@ public class ClaimsAuthorizingInterceptorTest extends Assert {
             String methodName,
             org.apache.cxf.rt.security.claims.Claim... claim)
         throws Exception {
+        return prepareMessage(cls, methodName, SAMLClaim.SAML_ROLE_ATTRIBUTENAME_DEFAULT, claim);
+    }
+
+    private Message prepareMessage(Class<?> cls,
+                                   String methodName,
+                                   String roleName,
+                                   org.apache.cxf.rt.security.claims.Claim... claim)
+                               throws Exception {
         ClaimCollection claims = new ClaimCollection();
         claims.addAll(Arrays.asList(claim));
 
         Set<Principal> roles =
-            parseRolesFromClaims(claims, SAMLClaim.SAML_ROLE_ATTRIBUTENAME_DEFAULT,
+            parseRolesFromClaims(claims, roleName,
                                  "urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified");
 
         ClaimsSecurityContext sc = new ClaimsSecurityContext() {
@@ -299,6 +329,12 @@ public class ClaimsAuthorizingInterceptorTest extends Assert {
 
         }
 
+        // explicit name
+        @Claim(name = "role", value = {"admin", "manager" })
+        public void claimWithSpecificName() {
+
+        }
+
         @Claim(name = "http://authentication", format = "http://claims",
                value = "password", mode = ClaimMode.LAX)
         public void claimLaxMode() {
@@ -348,14 +384,17 @@ public class ClaimsAuthorizingInterceptorTest extends Assert {
         Set<Principal> roles = new HashSet<>();
 
         for (org.apache.cxf.rt.security.claims.Claim claim : claims) {
-            if (claim instanceof SAMLClaim && ((SAMLClaim)claim).getName().equals(name)
-                && (nameFormat == null
-                || nameFormat.equals(((SAMLClaim)claim).getNameFormat()))) {
-                for (Object claimValue : claim.getValues()) {
-                    if (claimValue instanceof String) {
-                        roles.add(new SimpleGroup((String)claimValue));
+            if (claim instanceof SAMLClaim) {
+                if (((SAMLClaim)claim).getName().equals(roleAttributeName)
+                    && (nameFormat == null || nameFormat.equals(((SAMLClaim)claim).getNameFormat()))) {
+                    addValues(roles, claim.getValues());
+                    if (claim.getValues().size() > 1) {
+                        // Don't search for other attributes with the same name if > 1 claim value
+                        break;
                     }
                 }
+            } else if (claim.getClaimType().equals(roleAttributeName)) {
+                addValues(roles, claim.getValues());
                 if (claim.getValues().size() > 1) {
                     // Don't search for other attributes with the same name if > 1 claim value
                     break;
@@ -364,5 +403,13 @@ public class ClaimsAuthorizingInterceptorTest extends Assert {
         }
 
         return roles;
+    }
+
+    private static void addValues(Set<Principal> roles, List<Object> values) {
+        for (Object claimValue : values) {
+            if (claimValue instanceof String) {
+                roles.add(new SimpleGroup((String)claimValue));
+            }
+        }
     }
 }

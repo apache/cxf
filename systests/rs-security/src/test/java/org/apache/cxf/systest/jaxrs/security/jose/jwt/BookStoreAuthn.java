@@ -27,6 +27,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.security.claims.authorization.Claim;
+import org.apache.cxf.security.claims.authorization.Claims;
 import org.apache.cxf.systest.jaxrs.security.Book;
 
 import org.junit.Assert;
@@ -63,6 +65,19 @@ public class BookStoreAuthn {
     @Produces("application/xml")
     @Consumes("application/xml")
     public Book echoBook2(Book book) {
+        checkAuthentication();
+        return book;
+    }
+
+    @POST
+    @Path("/booksclaims")
+    @Produces("application/json")
+    @Consumes("application/json")
+    @Claims({
+        @Claim(name = "http://claims/authentication",
+               value = {"fingertip", "smartcard" })
+    })
+    public Book echoBook3(Book book) {
         checkAuthentication();
         return book;
     }

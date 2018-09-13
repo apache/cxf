@@ -107,9 +107,14 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
         for (ClaimBean claimBean : list) {
             org.apache.cxf.rt.security.claims.Claim matchingClaim = null;
             for (org.apache.cxf.rt.security.claims.Claim cl : actualClaims) {
-                if (cl instanceof SAMLClaim
-                    && ((SAMLClaim)cl).getName().equals(claimBean.getClaim().getClaimType())
-                    && ((SAMLClaim)cl).getNameFormat().equals(claimBean.getClaimFormat())) {
+                if (cl instanceof SAMLClaim) {
+                    // If it's a SAMLClaim the name + nameformat must match what's configured
+                    if (((SAMLClaim)cl).getName().equals(claimBean.getClaim().getClaimType())
+                        && ((SAMLClaim)cl).getNameFormat().equals(claimBean.getClaimFormat())) {
+                        matchingClaim = cl;
+                        break;
+                    }
+                } else if (cl.getClaimType().equals(claimBean.getClaim().getClaimType())) {
                     matchingClaim = cl;
                     break;
                 }
