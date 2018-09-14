@@ -71,7 +71,7 @@ under the License.
        </property> 
     </bean>
     
-    <bean id="claimsHandler" class="org.apache.cxf.rs.security.claims.ClaimsAuthorizingFilter">
+    <bean id="claimsHandler" class="org.apache.cxf.jaxrs.security.ClaimsAuthorizingFilter">
         <property name="securedObject" ref="serviceBean"/>
     </bean>
     

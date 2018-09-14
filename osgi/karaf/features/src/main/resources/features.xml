@@ -136,7 +136,6 @@
     </feature>
     <feature name="cxf-rt-security" version="${project.version}">
         <feature version="${project.version}">cxf-core</feature>
-        <feature version="${project.version}">cxf-wsdl</feature>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-security/${project.version}</bundle>
     </feature>
     <feature name="cxf-rt-security-saml" version="${project.version}">
@@ -235,6 +234,7 @@
         <feature version="${project.version}">cxf-core</feature>
         <feature version="${project.version}">cxf-http</feature>
         <feature version="${project.version}">cxf-jackson</feature>
+        <feature version="${project.version}">cxf-rt-security</feature>
         <bundle start-level="30" dependency="true">mvn:org.codehaus.jettison/jettison/${cxf.jettison.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-rs-extension-providers/${project.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-rs-extension-search/${project.version}</bundle>

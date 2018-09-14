@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.claims;
+package org.apache.cxf.jaxrs.security;
 
 import java.util.List;
 import java.util.Map;
