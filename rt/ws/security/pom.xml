@@ -182,7 +182,10 @@
                                 <xsdOption>
                                     <extension>true</extension>
                                     <xsd>${basedir}/src/main/model/ws-trust-1.3.xsd</xsd>
-                                    <bindingFile>${basedir}/src/main/model/binding.xjb</bindingFile>
+                                    <bindingFiles>
+                                        <bindingFile>${basedir}/src/main/model/binding.xjb</bindingFile>
+                                        <bindingFile>${basedir}/src/main/model/xmlsig.xjb</bindingFile>
+                                    </bindingFiles>
                                     <extensionArgs>
                                         <extensionArg>-Xdv</extensionArg>
                                     </extensionArgs>
