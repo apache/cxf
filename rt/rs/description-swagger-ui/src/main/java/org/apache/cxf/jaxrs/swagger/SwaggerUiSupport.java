@@ -25,6 +25,7 @@ import java.util.Properties;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.util.PropertyUtils;
+import org.apache.cxf.jaxrs.swagger.ui.SwaggerUiConfig;
 
 /**
  * Generic trait to support Swagger UI integration for Swagger 1.5.x and
@@ -67,6 +68,7 @@ public interface SwaggerUiSupport {
             if (swaggerUiRoot != null) {
                 final SwaggerUiResourceLocator locator = new SwaggerUiResourceLocator(swaggerUiRoot);
                 SwaggerUiService swaggerUiService = new SwaggerUiService(locator, getSwaggerUiMediaTypes());
+                swaggerUiService.setConfig(getSwaggerUiConfig());
                 
                 if (!runAsFilter) {
                     registration.resources.add(swaggerUiService);
@@ -116,4 +118,10 @@ public interface SwaggerUiSupport {
      * @return media types supported by Swagger UI
      */
     Map<String, String> getSwaggerUiMediaTypes();
+    
+    /**
+     * Returns Swagger UI configuration parameters.
+     * @return Swagger UI configuration parameters or "null" if not available
+     */
+    SwaggerUiConfig getSwaggerUiConfig();
 }

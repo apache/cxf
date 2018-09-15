@@ -25,6 +25,7 @@ import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.openapi.OpenApiCustomizer;
 import org.apache.cxf.jaxrs.openapi.OpenApiFeature;
+import org.apache.cxf.jaxrs.swagger.ui.SwaggerUiConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -64,6 +65,9 @@ public class SampleRestApplication {
                 + " with Spring Boot. This demo has two JAX-RS class resources being"
                 + " deployed in a single JAX-RS endpoint.");
         openApiFeature.setVersion("1.0.0");
+        openApiFeature.setSwaggerUiConfig(
+            new SwaggerUiConfig()
+                .url("/services/helloservice/openapi.json"));
         return openApiFeature;
     }
 }

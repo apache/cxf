@@ -31,7 +31,11 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+
+import org.apache.cxf.jaxrs.swagger.ui.SwaggerUiConfig;
+
 
 @Path("api-docs")
 public class SwaggerUiService {
@@ -55,10 +59,15 @@ public class SwaggerUiService {
     
     private final SwaggerUiResourceLocator locator;
     private final Map<String, String> mediaTypes;
+    private SwaggerUiConfig config;
 
     public SwaggerUiService(SwaggerUiResourceLocator locator, Map<String, String> mediaTypes) {
         this.locator = locator;
         this.mediaTypes = mediaTypes;
+    }
+    
+    public void setConfig(SwaggerUiConfig config) {
+        this.config = config;
     }
 
     @GET
@@ -71,7 +80,7 @@ public class SwaggerUiService {
         try {
             final URL resourceURL = locator.locate(resourcePath);
             final String path = resourceURL.getPath();
-
+            
             String mediaType = null;
             int ind = path.lastIndexOf('.');
             if (ind != -1 && ind < path.length()) {
@@ -83,6 +92,33 @@ public class SwaggerUiService {
                 }
             }
 
+            // If there are no query parameters and Swagger UI configuration is
+            // provided, let us do temporary redirect with the Swagger UI configuration
+            // wrapped into the query string. For example, the request to
+            //
+            //    http://localhost:8080/services/helloservice/api-docs
+            //
+            // might be redirect to
+            //
+            //    http://localhost:8080/services/helloservice/api-docs?url=/services/helloservice/openapi.json
+            //
+            // in case the "url" configuration parameter is provided for Swagger UI.
+            if (config != null && uriInfo.getQueryParameters().isEmpty() && path.endsWith("/index.html")) {
+                final Map<String, String> params = config.getConfigParameters();
+                
+                if (params != null && !params.isEmpty()) {
+                    final UriBuilder builder = params
+                        .entrySet()
+                        .stream()
+                        .reduce(
+                            uriInfo.getRequestUriBuilder(), 
+                            (b, e) -> b.queryParam(e.getKey(), e.getValue()),
+                            (left, right) -> left
+                        );
+                    return Response.temporaryRedirect(builder.build()).build();
+                }
+            }
+            
             ResponseBuilder rb = Response.ok(resourceURL.openStream());
             if (mediaType != null) {
                 rb.type(mediaType);

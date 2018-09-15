@@ -53,6 +53,7 @@ import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.model.ApplicationInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
+import org.apache.cxf.jaxrs.swagger.ui.SwaggerUiConfig;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
@@ -111,6 +112,8 @@ public class Swagger2Feature extends AbstractSwaggerFeature implements SwaggerUi
     private Boolean usePathBasedConfig;
 
     private String propertiesLocation = DEFAULT_PROPS_LOCATION;
+    // Swagger UI configuration parameters (to be passed as query string).
+    private SwaggerUiConfig swaggerUiConfig;
 
     @Override
     protected void calculateDefaultBasePath(Server server) {
@@ -451,6 +454,15 @@ public class Swagger2Feature extends AbstractSwaggerFeature implements SwaggerUi
 
     public void setScan(boolean scan) {
         this.scan = scan;
+    }
+    
+    public void setSwaggerUiConfig(final SwaggerUiConfig swaggerUiConfig) {
+        this.swaggerUiConfig = swaggerUiConfig;
+    }
+    
+    @Override
+    public SwaggerUiConfig getSwaggerUiConfig() {
+        return swaggerUiConfig;
     }
 
     @Override

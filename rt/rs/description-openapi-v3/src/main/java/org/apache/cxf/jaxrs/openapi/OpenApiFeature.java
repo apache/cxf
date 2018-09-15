@@ -44,6 +44,7 @@ import org.apache.cxf.jaxrs.model.ApplicationInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.swagger.SwaggerUiSupport;
+import org.apache.cxf.jaxrs.swagger.ui.SwaggerUiConfig;
 
 import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
@@ -101,6 +102,8 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
     private String propertiesLocation = DEFAULT_PROPS_LOCATION;
     // Allows to disable automatic scan of known configuration locations (enabled by default)
     private boolean scanKnownConfigLocations = true;
+    // Swagger UI configuration parameters (to be passed as query string).
+    private SwaggerUiConfig swaggerUiConfig;
 
     protected static class DefaultApplication extends Application {
 
@@ -400,6 +403,15 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
     
     public boolean isScanKnownConfigLocations() {
         return scanKnownConfigLocations;
+    }
+    
+    public void setSwaggerUiConfig(final SwaggerUiConfig swaggerUiConfig) {
+        this.swaggerUiConfig = swaggerUiConfig;
+    }
+    
+    @Override
+    public SwaggerUiConfig getSwaggerUiConfig() {
+        return swaggerUiConfig;
     }
 
     @Override
