@@ -125,6 +125,10 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
                 sb.append(",");
                 appendJsonPair(sb, "exp", obj.getExp(), false);
             }
+            if (obj.getNbf() != null) {
+                sb.append(",");
+                appendJsonPair(sb, "nbf", obj.getNbf(), false);
+            }
             if (!obj.getExtensions().isEmpty()) {
                 for (Map.Entry<String, String> entry : obj.getExtensions().entrySet()) {
                     sb.append(",");
@@ -277,6 +281,10 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
         Long exp = (Long)params.get("exp");
         if (exp != null) {
             resp.setExp(exp);
+        }
+        Long nbf = (Long)params.get("nbf");
+        if (nbf != null) {
+            resp.setNbf(nbf);
         }
         Map<String, Object> cnf = CastUtils.cast((Map<?, ?>)params.get("cnf"));
         if (cnf != null) {

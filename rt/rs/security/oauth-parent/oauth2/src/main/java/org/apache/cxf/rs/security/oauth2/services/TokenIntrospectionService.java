@@ -98,7 +98,9 @@ public class TokenIntrospectionService {
         if (at.getExpiresIn() > 0) {
             response.setExp(at.getIssuedAt() + at.getExpiresIn());
         }
-
+        if (at.getNotBefore() > 0) {
+            response.setNbf(at.getNotBefore());
+        }
         response.setTokenType(at.getTokenType());
 
         if (reportExtraTokenProperties) {

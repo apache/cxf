@@ -144,6 +144,9 @@ public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
         assertEquals(tokenIntrospection.getScope(), accessToken.getApprovedScope());
         Long validity = tokenIntrospection.getExp() - tokenIntrospection.getIat();
         assertTrue(validity == accessToken.getExpiresIn());
+        Long nbf = tokenIntrospection.getNbf();
+        long now = System.currentTimeMillis() / 1000L;
+        assertTrue(nbf < now);
     }
 
     @org.junit.Test

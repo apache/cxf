@@ -28,6 +28,8 @@ import javax.persistence.EntityManagerFactory;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
+import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
+import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.grants.code.JPACodeDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.saml.Constants;
@@ -137,6 +139,13 @@ public class JPAOAuthDataProviderImpl extends JPACodeDataProvider {
         // external clients (in LDAP/etc) which can be used for client cred
         externalClients.add("bob:bobPassword");
 
+    }
+
+    @Override
+    protected ServerAccessToken createNewAccessToken(Client client, UserSubject userSub) {
+        ServerAccessToken token = super.createNewAccessToken(client, userSub);
+        token.setNotBefore((System.currentTimeMillis() / 1000L) - 5L);
+        return token;
     }
 
     @Override

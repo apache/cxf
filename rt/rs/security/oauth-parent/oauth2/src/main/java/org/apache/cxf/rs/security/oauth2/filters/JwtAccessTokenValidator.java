@@ -89,6 +89,9 @@ public class JwtAccessTokenValidator extends JoseJwtConsumer implements AccessTo
         if (claims.getIssuer() != null) {
             atv.setTokenIssuer(claims.getIssuer());
         }
+        if (claims.getNotBefore() != null) {
+            atv.setTokenNotBefore(claims.getNotBefore());
+        }
         Object scope = claims.getClaim(OAuthConstants.SCOPE);
         if (scope != null) {
             String[] scopes = scope instanceof String
@@ -125,7 +128,7 @@ public class JwtAccessTokenValidator extends JoseJwtConsumer implements AccessTo
                 atv.getExtraProps().put(JoseConstants.HEADER_X509_THUMBPRINT_SHA256, certCnf.toString());
             }
         }
-        
+
         return atv;
     }
 

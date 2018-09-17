@@ -42,6 +42,7 @@ public abstract class AccessToken implements Serializable {
     private String refreshToken;
     private long expiresIn = -1;
     private long issuedAt = -1;
+    private long notBefore = -1;
     private String issuer;
     private String encodedToken;
 
@@ -169,5 +170,16 @@ public abstract class AccessToken implements Serializable {
 
     public void setEncodedToken(String encodedToken) {
         this.encodedToken = encodedToken;
+    }
+
+    /**
+     * @return the Not Before" timestamp, -1 means no 'nbf' parameter was returned
+     */
+    public long getNotBefore() {
+        return notBefore;
+    }
+
+    public void setNotBefore(long notBefore) {
+        this.notBefore = notBefore;
     }
 }

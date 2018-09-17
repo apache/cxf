@@ -31,6 +31,8 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
+import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
+import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.grants.code.DefaultEHCacheCodeDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.saml.Constants;
@@ -162,6 +164,13 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
         try (InputStream is = ClassLoaderUtils.getResourceAsStream("keys/Truststore.jks", this.getClass())) {
             return CryptoUtils.loadCertificate(is, "password".toCharArray(), "morpit", null);
         }
+    }
+
+    @Override
+    protected ServerAccessToken createNewAccessToken(Client client, UserSubject userSub) {
+        ServerAccessToken token = super.createNewAccessToken(client, userSub);
+        token.setNotBefore((System.currentTimeMillis() / 1000L) - 5L);
+        return token;
     }
 
     @Override

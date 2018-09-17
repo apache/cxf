@@ -76,6 +76,9 @@ public class AccessTokenIntrospectionClient implements AccessTokenValidator {
         if (response.getExp() != null) {
             atv.setTokenLifetime(response.getExp() - atv.getTokenIssuedAt());
         }
+        if (response.getNbf() != null) {
+            atv.setTokenNotBefore(response.getNbf());
+        }
         if (!StringUtils.isEmpty(response.getAud())) {
             atv.setAudiences(response.getAud());
         }
@@ -96,7 +99,7 @@ public class AccessTokenIntrospectionClient implements AccessTokenValidator {
             atv.setTokenSubject(new UserSubject(response.getUsername()));
         }
         atv.getExtraProps().putAll(response.getExtensions());
-        
+
         return atv;
     }
 

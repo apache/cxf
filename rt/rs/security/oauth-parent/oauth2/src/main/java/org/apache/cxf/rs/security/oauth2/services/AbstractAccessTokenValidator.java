@@ -158,6 +158,12 @@ public abstract class AbstractAccessTokenValidator {
             }
             AuthorizationUtils.throwAuthorizationFailure(supportedSchemes, realm);
         }
+
+        // Check nbf property
+        if (accessTokenV.getTokenNotBefore() > 0
+            && accessTokenV.getTokenNotBefore() > System.currentTimeMillis() / 1000L) {
+            AuthorizationUtils.throwAuthorizationFailure(supportedSchemes, realm);
+        }
         if (maxValidationDataCacheSize > 0) {
             if (accessTokenValidations.size() >= maxValidationDataCacheSize) {
                 // or delete the ones expiring sooner than others, etc
