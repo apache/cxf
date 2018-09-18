@@ -246,6 +246,86 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
     }
 
     @org.junit.Test
+    public void testAuthorizationRolesAllowedAnnotation() throws Exception {
+
+        URL busFile = JWTAuthnAuthzTest.class.getResource("client.xml");
+
+        List<Object> providers = new ArrayList<>();
+        providers.add(new JacksonJsonProvider());
+        providers.add(new JwtAuthenticationClientFilter());
+
+        String address = "https://localhost:" + PORT + "/signedjwtauthzannotations/bookstore/booksrolesallowed";
+        WebClient client =
+            WebClient.create(address, providers, busFile.toString());
+        client.type("application/json").accept("application/json");
+
+        // Create the JWT Token
+        JwtClaims claims = new JwtClaims();
+        claims.setSubject("alice");
+        claims.setIssuer("DoubleItSTSIssuer");
+        claims.setIssuedAt(Instant.now().getEpochSecond());
+        claims.setAudiences(toList(address));
+        // The endpoint requires a role of "boss"
+        claims.setProperty("role", "boss");
+
+        JwtToken token = new JwtToken(claims);
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("rs.security.keystore.type", "jwk");
+        properties.put("rs.security.keystore.alias", "2011-04-29");
+        properties.put("rs.security.keystore.file",
+                       "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
+        properties.put("rs.security.signature.algorithm", "RS256");
+        properties.put(JwtConstants.JWT_TOKEN, token);
+        WebClient.getConfig(client).getRequestContext().putAll(properties);
+
+        Response response = client.post(new Book("book", 123L));
+        assertEquals(response.getStatus(), 200);
+
+        Book returnedBook = response.readEntity(Book.class);
+        assertEquals(returnedBook.getName(), "book");
+        assertEquals(returnedBook.getId(), 123L);
+    }
+
+    @org.junit.Test
+    public void testAuthorizationWrongRolesAllowedAnnotation() throws Exception {
+
+        URL busFile = JWTAuthnAuthzTest.class.getResource("client.xml");
+
+        List<Object> providers = new ArrayList<>();
+        providers.add(new JacksonJsonProvider());
+        providers.add(new JwtAuthenticationClientFilter());
+
+        String address = "https://localhost:" + PORT + "/signedjwtauthzannotations/bookstore/booksrolesallowed";
+        WebClient client =
+            WebClient.create(address, providers, busFile.toString());
+        client.type("application/json").accept("application/json");
+
+        // Create the JWT Token
+        JwtClaims claims = new JwtClaims();
+        claims.setSubject("alice");
+        claims.setIssuer("DoubleItSTSIssuer");
+        claims.setIssuedAt(Instant.now().getEpochSecond());
+        claims.setAudiences(toList(address));
+        // The endpoint requires a role of "boss"
+        claims.setProperty("role", "manager");
+
+        JwtToken token = new JwtToken(claims);
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("rs.security.keystore.type", "jwk");
+        properties.put("rs.security.keystore.alias", "2011-04-29");
+        properties.put("rs.security.keystore.file",
+                       "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
+        properties.put("rs.security.signature.algorithm", "RS256");
+        properties.put(JwtConstants.JWT_TOKEN, token);
+        WebClient.getConfig(client).getRequestContext().putAll(properties);
+
+        Response response = client.post(new Book("book", 123L));
+        assertNotEquals(response.getStatus(), 200);
+    }
+
+    @org.junit.Test
     public void testClaimsAuthorization() throws Exception {
 
         URL busFile = JWTAuthnAuthzTest.class.getResource("client.xml");

@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.jaxrs.security.jose.jwt;
 
 
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -78,6 +79,16 @@ public class BookStoreAuthn {
                value = {"fingertip", "smartcard" })
     })
     public Book echoBook3(Book book) {
+        checkAuthentication();
+        return book;
+    }
+
+    @POST
+    @Path("/booksrolesallowed")
+    @Produces("application/json")
+    @Consumes("application/json")
+    @RolesAllowed({"boss" })
+    public Book echoBook4(Book book) {
         checkAuthentication();
         return book;
     }

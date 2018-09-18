@@ -92,4 +92,25 @@ under the License.
         </jaxrs:properties>
     </jaxrs:server>
     
+    <bean id="annotationsInterceptor" class="org.apache.cxf.interceptor.security.SecureAnnotationsInterceptor">
+        <property name="securedObject" ref="serviceBean"/>
+    </bean>
+    <bean id="rolesHandler" class="org.apache.cxf.jaxrs.security.SimpleAuthorizingFilter">
+        <property name="interceptor" ref="annotationsInterceptor"/>
+    </bean>
+    
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt-authn-authz}/signedjwtauthzannotations">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jwtAuthzFilter"/>
+            <ref bean="rolesHandler"/>
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="rs.security.signature.in.properties" 
+                   value="org/apache/cxf/systest/jaxrs/security/bob.jwk.properties"/>
+        </jaxrs:properties>
+    </jaxrs:server>
+    
 </beans>
