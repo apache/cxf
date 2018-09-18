@@ -82,8 +82,8 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             newOut.setThreshold(threshold);
         }
         if (limit > 0) {
-            // make the limit for the cache greater than the limit for the truncated payload in the log event, 
-            // this is necessary for finding out that the payload was truncated 
+            // make the limit for the cache greater than the limit for the truncated payload in the log event,
+            // this is necessary for finding out that the payload was truncated
             //(see boolean isTruncated = cos.size() > limit && limit != -1;)  in method copyPayload
             newOut.setCacheLimit(getCacheLimit());
         }
@@ -155,15 +155,11 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
 
         private String getPayload(final LogEvent event, StringWriter w2) {
             StringBuilder payload = new StringBuilder();
-            try {
-                writePayload(payload, w2, event);
-            } catch (Exception ex) {
-                // ignore
-            }
+            writePayload(payload, w2, event);
             return payload.toString();
         }
 
-        protected void writePayload(StringBuilder builder, StringWriter stringWriter, LogEvent event) throws Exception {
+        private void writePayload(StringBuilder builder, StringWriter stringWriter, LogEvent event) {
             StringBuffer buffer = stringWriter.getBuffer();
             if (buffer.length() > lim) {
                 builder.append(buffer.subSequence(0, lim));
