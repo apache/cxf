@@ -96,7 +96,7 @@
             <configuration>
               <toolchains>
                 <jdk>
-                  <version>1.8</version>
+                  <version>${java.version}</version>
                 </jdk>
               </toolchains>
             </configuration>
