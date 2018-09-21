@@ -19,18 +19,14 @@
 package demo.jaxws.tracing.server.impl;
 
 import brave.ScopedSpan;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
-import javax.xml.ws.AsyncHandler;
-
-import org.apache.cxf.annotations.UseAsyncMethod;
-import org.apache.cxf.jaxws.ServerAsyncResponse;
 
 import brave.Tracing;
+import brave.propagation.TraceContext;
 
 import demo.jaxws.tracing.server.Book;
 import demo.jaxws.tracing.server.CatalogService;
@@ -44,28 +40,20 @@ public class CatalogServiceImpl implements CatalogService {
         this.brave = brave;
     }
 
-    @UseAsyncMethod
-    public void addBook(Book book)  {
-        throw new UnsupportedOperationException("Please use async version of the method");
-    }
-
-    public Future<?> addBookAsync(final Book book, final AsyncHandler<Book> handler) {
-        final ServerAsyncResponse<Book> response = new ServerAsyncResponse<Book>();
-
+    public void addBook(final Book book)  {
+        final TraceContext parent = brave.tracer().currentSpan().context();
+        
         executor.submit(new Runnable() {
             @Override
             public void run() {
-                final ScopedSpan span = brave.tracer().startScopedSpan("Inserting New Book");
+                final ScopedSpan span = brave.tracer().startScopedSpanWithParent("Inserting New Book", parent);
                 try {
                     books.put(book.getId(), book);
-                    handler.handleResponse(response);
                 } finally {
                     span.finish();
                 }
             }
         });
-
-        return response;
     }
 
     @Override

@@ -29,7 +29,7 @@
 
     <!-- CXF BraveFeature -->
     <bean id="braveFeature" class="org.apache.cxf.tracing.brave.BraveFeature">
-        <argument index="0" ref="brave" />
+        <argument index="0" ref="tracing" />
     </bean>
     
     <cxf:bus>
@@ -39,17 +39,18 @@
     </cxf:bus>
     
     <bean id="catalogServiceImpl" class="demo.jaxws.tracing.server.impl.CatalogServiceImpl">
-        <argument index="0" ref="brave" />
+        <argument index="0" ref="tracing" />
     </bean>
     
-    <bean id="braveBuilder" class="brave.Tracing" factory-method="newBuilder" />
+    <bean id="sender" class="zipkin2.reporter.okhttp3.OkHttpSender" factory-method="create">
+        <argument index="0" value="http://localhost:9411/api/v2/spans" />
+    </bean>
 
-    <bean id="braveCatalogBuilder" factory-ref="braveBuilder" factory-method="localServiceName">
+	<bean id="tracing" class="demo.jaxws.tracing.server.CatalogTracingFactory" factory-method="create">
         <argument index="0" value="catalog-service" />
+        <argument index="1" ref="sender" />
     </bean>
-    
-    <bean id="brave" factory-ref="braveCatalogBuilder" factory-method="build" />
-    
+
     <jaxws:endpoint
         implementor="#catalogServiceImpl"
         address="/catalog"
