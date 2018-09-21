@@ -27,11 +27,20 @@
                            http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd
                            http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd">
 
+    <bean id="sender" class="zipkin2.reporter.okhttp3.OkHttpSender" factory-method="create">
+        <argument index="0" value="http://localhost:9411/api/v2/spans" />
+    </bean>
+
+	<bean id="tracing" class="demo.jaxrs.tracing.server.CatalogTracingFactory" factory-method="create">
+        <argument index="0" value="catalog-service" />
+        <argument index="1" ref="sender" />
+    </bean>
+  
     <!-- JAXRS providers -->
     <bean id="jsonProvider" class="org.apache.cxf.jaxrs.provider.jsrjsonp.JsrJsonpProvider" />
 
     <bean id="braveFeature" class="org.apache.cxf.tracing.brave.jaxrs.BraveFeature">
-        <argument index="0" value="catalog-service" />
+        <argument index="0" ref="tracing" />
     </bean>
     
     <!-- Application resources -->

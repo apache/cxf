@@ -22,6 +22,10 @@ located), the Maven pom.xml file can be used to build and run the demo.
 Using either UNIX or Windows:
 
   mvn install
+
+Run OpenZipkin server (or point OSGI-INF/blueprint/context.xml to the existing one): 
+
+  docker run -d -p 9411:9411 openzipkin/zipkin
   
 Starting Karaf (refer to http://karaf.apache.org/manual/latest-4.0.x/quick-start.html)
 
@@ -56,6 +60,9 @@ for this demo bundle.
 
 Install this demo bundle (using the appropriate bundle version number)
   
+  install -s mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.okio/1.15.0_1
+  install -s mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.okhttp/3.11.0_1
+  install -s mvn:io.zipkin.reporter2/zipkin-sender-okhttp3/2.7.8
   install -s mvn:org.apache.cxf.samples/jax_rs_tracing_brave_osgi/3.n.m
 
 You can verify if the CXF JAX-RS OpenZipkin Brave Blueprint Demo is installed and started.
@@ -70,3 +77,7 @@ You can verify if the CXF JAX-RS OpenZipkin Brave Blueprint Demo is installed an
 Now, you will be able to access this CXF JAXRS demo service on your Karaf instance at
 
   http://localhost:8181/cxf/catalog
+  
+Navigate to Zipkin UI to explore the traces (or point to existing deployment): 
+  
+  http://localhost:9411/ 

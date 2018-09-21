@@ -13,6 +13,10 @@ following services at URL http://localhost:9000/catalog:
 Building and running the demo using Maven
 ---------------------------------------
 
+Run OpenZipkin server (or point CatalogTracing to the existing one): 
+
+  docker run -d -p 9411:9411 openzipkin/zipkin
+
 From the base directory of this sample (i.e., where this README file is
 located), the Maven pom.xml file can be used to build and run the demo. 
 
@@ -25,6 +29,10 @@ Using either UNIX or Windows:
     
 
 To remove the target dir, run mvn clean".
+
+Navigate to Zipkin UI to explore the traces (or point to existing deployment): 
+  
+  http://localhost:9411/ 
 
 
 

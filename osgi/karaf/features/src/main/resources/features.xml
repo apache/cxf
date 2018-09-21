@@ -294,7 +294,6 @@
     </feature>
     <feature name="cxf-tracing-brave" version="${project.version}">
         <feature version="${project.version}">cxf-core</feature>
-        <bundle start-level="10" dependency="true">mvn:com.google.code.findbugs/jsr305/${cxf.findbugs.version}</bundle>
         <bundle start-level="35">mvn:io.zipkin.zipkin2/zipkin/${cxf.brave.zipkin.version}</bundle>
         <bundle start-level="35">mvn:io.zipkin.reporter2/zipkin-reporter/${cxf.brave.reporter.version}</bundle>
         <bundle start-level="35">mvn:io.zipkin.brave/brave/${cxf.brave.version}</bundle>
