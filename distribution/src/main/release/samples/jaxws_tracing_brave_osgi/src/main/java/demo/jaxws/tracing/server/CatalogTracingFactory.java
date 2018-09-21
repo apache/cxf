@@ -17,31 +17,24 @@
  * under the License.
  */
 
-package demo.jaxrs.tracing.server;
+package demo.jaxws.tracing.server;
 
+import brave.Tracing;
+import brave.propagation.ThreadLocalCurrentTraceContext;
+import zipkin2.reporter.AsyncReporter;
+import zipkin2.reporter.Sender;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
-
-import org.apache.cxf.jaxrs.provider.jsrjsonp.JsrJsonpProvider;
-import org.apache.cxf.tracing.brave.jaxrs.BraveFeature;
-
-@ApplicationPath("/")
-public class CatalogApplication extends Application {
-    private final CatalogTracing tracing = new CatalogTracing("catalog-server");
-    
-    @Override
-    public Set<Object> getSingletons() {
-        return new HashSet<>(
-            Arrays.asList(
-                new Catalog(),
-                new BraveFeature(tracing.getHttpTracing()),
-                new JsrJsonpProvider()
-            )
-        );
+public class CatalogTracingFactory {
+    public static Tracing create(final String serviceName, final Sender sender) {
+        return Tracing
+            .newBuilder()
+            .localServiceName(serviceName)
+            .currentTraceContext(
+                ThreadLocalCurrentTraceContext
+                    .newBuilder()
+                    .build()
+              )
+            .spanReporter(AsyncReporter.create(sender))
+            .build();
     }
 }

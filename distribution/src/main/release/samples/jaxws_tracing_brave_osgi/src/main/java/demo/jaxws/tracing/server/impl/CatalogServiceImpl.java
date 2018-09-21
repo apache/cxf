@@ -19,12 +19,14 @@
 package demo.jaxws.tracing.server.impl;
 
 import brave.ScopedSpan;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import brave.Tracing;
+import brave.propagation.TraceContext;
 import demo.jaxws.tracing.server.Book;
 import demo.jaxws.tracing.server.CatalogService;
 
@@ -38,8 +40,9 @@ public class CatalogServiceImpl implements CatalogService {
     }
 
     public void addBook(Book book)  {
+        final TraceContext parent = brave.tracer().currentSpan().context();
         executor.submit(() -> {
-            final ScopedSpan span = brave.tracer().startScopedSpan("Inserting New Book");
+            final ScopedSpan span = brave.tracer().startScopedSpanWithParent("Inserting New Book", parent);
             try {
                 books.put(book.getId(), book);
             } finally {
