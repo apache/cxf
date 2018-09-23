@@ -19,10 +19,14 @@
 
 package org.apache.cxf.jaxrs.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -41,7 +45,7 @@ import javax.ws.rs.core.Feature;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 
-public class ConfigurableImpl<C extends Configurable<C>> implements Configurable<C> {
+public class ConfigurableImpl<C extends Configurable<C>> implements Configurable<C>, AutoCloseable {
     private static final Logger LOG = LogUtils.getL7dLogger(ConfigurableImpl.class);
     
     private static final Class<?>[] RESTRICTED_CLASSES_IN_SERVER = {ClientRequestFilter.class, 
@@ -51,11 +55,19 @@ public class ConfigurableImpl<C extends Configurable<C>> implements Configurable
     
     private ConfigurationImpl config;
     private final C configurable;
-    
+    private final ClassLoader classLoader;
+
     private final Class<?>[] restrictedContractTypes;
+
+    private final Collection<Object> instantiatorInstances = new ArrayList<>();
+    private volatile Instantiator instantiator;
 
     public interface Instantiator {
         <T> Object create(Class<T> cls);
+
+        default void release(Object instance) {
+            // no-op
+        }
     }
     
     public ConfigurableImpl(C configurable, RuntimeType rt) {
@@ -66,7 +78,8 @@ public class ConfigurableImpl<C extends Configurable<C>> implements Configurable
         this.configurable = configurable;
         this.config = config instanceof ConfigurationImpl
             ? (ConfigurationImpl)config : new ConfigurationImpl(config);
-        restrictedContractTypes = RuntimeType.CLIENT.equals(config.getRuntimeType()) ? RESTRICTED_CLASSES_IN_CLIENT 
+        this.classLoader = Thread.currentThread().getContextClassLoader();
+        restrictedContractTypes = RuntimeType.CLIENT.equals(config.getRuntimeType()) ? RESTRICTED_CLASSES_IN_CLIENT
             : RESTRICTED_CLASSES_IN_SERVER;
     }
 
@@ -111,6 +124,17 @@ public class ConfigurableImpl<C extends Configurable<C>> implements Configurable
     }
 
     @Override
+    public void close() {
+        synchronized (instantiatorInstances) {
+            if (instantiatorInstances.isEmpty()) {
+                return;
+            }
+            instantiatorInstances.forEach(instantiator::release);
+            instantiatorInstances.clear();
+        }
+    }
+
+    @Override
     public Configuration getConfiguration() {
         return config;
     }
@@ -128,6 +152,12 @@ public class ConfigurableImpl<C extends Configurable<C>> implements Configurable
 
     @Override
     public C register(Object provider, int bindingPriority) {
+        if (Instantiator.class.isInstance(provider)) {
+            synchronized (this) {
+                instantiator = Instantiator.class.cast(provider);
+            }
+            return configurable;
+        }
         return doRegister(provider, bindingPriority, getImplementedContracts(provider, restrictedContractTypes));
     }
 
@@ -148,7 +178,7 @@ public class ConfigurableImpl<C extends Configurable<C>> implements Configurable
 
     @Override
     public C register(Class<?> providerClass, int bindingPriority) {
-        return doRegister(getInstantiator().create(providerClass), bindingPriority, 
+        return doRegister(createProvider(providerClass), bindingPriority,
                           getImplementedContracts(providerClass, restrictedContractTypes));
     }
 
@@ -159,11 +189,25 @@ public class ConfigurableImpl<C extends Configurable<C>> implements Configurable
 
     @Override
     public C register(Class<?> providerClass, Map<Class<?>, Integer> contracts) {
-        return register(getInstantiator().create(providerClass), contracts);
+        return register(createProvider(providerClass), contracts);
     }
 
     protected Instantiator getInstantiator() {
-        return ConfigurationImpl::createProvider;
+        if (instantiator != null) {
+            return instantiator;
+        }
+        synchronized (this) {
+            if (instantiator != null) {
+                return instantiator;
+            }
+            final Iterator<Instantiator> instantiators = ServiceLoader.load(Instantiator.class, classLoader).iterator();
+            if (instantiators.hasNext()) {
+                instantiator = instantiators.next();
+            } else {
+                instantiator = ConfigurationImpl::createProvider;
+            }
+        }
+        return instantiator;
     }
 
     private C doRegister(Object provider, int bindingPriority, Class<?>... contracts) {
@@ -217,4 +261,13 @@ public class ConfigurableImpl<C extends Configurable<C>> implements Configurable
         }
         return true;
     }
+
+    private Object createProvider(final Class<?> providerClass) {
+        final Object instance = getInstantiator().create(providerClass);
+        synchronized (instantiatorInstances) {
+            instantiatorInstances.add(instance);
+        }
+        return instance;
+    }
 }
+
