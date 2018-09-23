@@ -32,14 +32,13 @@ import javax.ws.rs.ProcessingException;
 import javax.ws.rs.RuntimeType;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.Configuration;
 
 import org.apache.cxf.jaxrs.client.AbstractClient;
 
 public class ClientBuilderImpl extends ClientBuilder {
 
-    private Configurable<ClientBuilder> configImpl;
+    private ClientConfigurableImpl<ClientBuilder> configImpl;
     private TLSConfiguration secConfig = new TLSConfiguration();
 
     public ClientBuilderImpl() {
@@ -98,7 +97,13 @@ public class ClientBuilderImpl extends ClientBuilder {
 
     @Override
     public Client build() {
-        return new ClientImpl(configImpl.getConfiguration(), secConfig);
+        return new ClientImpl(configImpl.getConfiguration(), secConfig) {
+            @Override
+            public void close() {
+                super.close();
+                configImpl.close();
+            }
+        };
     }
 
     @Override
@@ -181,3 +186,4 @@ public class ClientBuilderImpl extends ClientBuilder {
         }
     }
 }
+
