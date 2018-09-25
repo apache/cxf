@@ -97,6 +97,9 @@ public final class DOMUtils {
                 LogUtils.getL7dLogger(DOMUtils.class).finest(
                     "can't load class com.sun.xml.internal.messaging.saaj.soap.SOAPDocumentImpl");
             }
+        } catch (Throwable throwable) {
+            LogUtils.getL7dLogger(DOMUtils.class).finest(
+                "Other JDK vendor");
         }
     }
 
