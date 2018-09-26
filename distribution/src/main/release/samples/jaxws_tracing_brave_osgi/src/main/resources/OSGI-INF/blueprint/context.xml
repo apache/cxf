@@ -42,7 +42,7 @@
         <argument index="0" ref="tracing" />
     </bean>
     
-    <bean id="sender" class="zipkin2.reporter.okhttp3.OkHttpSender" factory-method="create">
+    <bean id="sender" class="zipkin2.reporter.okhttp3.OkHttpSender" factory-method="create" destroy-method="close">
         <argument index="0" value="http://localhost:9411/api/v2/spans" />
     </bean>
 
