@@ -57,6 +57,7 @@ for this demo bundle.
   feature:install cxf-jaxrs
   feature:install cxf-jsr-json
   feature:install cxf-tracing-brave
+  feature:install aries-blueprint
 
 Install this demo bundle (using the appropriate bundle version number)
   
