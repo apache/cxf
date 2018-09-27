@@ -166,7 +166,7 @@
         <cxf.spring.mock>spring-test</cxf.spring.mock>
         <cxf.swagger2.version>1.5.17</cxf.swagger2.version><!-- updating to 1.5.18 will cause systest failures -->
         <cxf.swagger.v3.version>2.0.0</cxf.swagger.v3.version>
-        <cxf.swagger.ui.version>3.17.6</cxf.swagger.ui.version>
+        <cxf.swagger.ui.version>3.19.0</cxf.swagger.ui.version>
         <cxf.tomcat.version>8.0.53</cxf.tomcat.version>
         <cxf.velocity.version>2.0</cxf.velocity.version>
         <cxf.woodstox.core.version>5.1.0</cxf.woodstox.core.version>
