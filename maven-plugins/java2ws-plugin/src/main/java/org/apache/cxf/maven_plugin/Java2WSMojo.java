@@ -468,7 +468,7 @@ public class Java2WSMojo extends AbstractMojo {
                 
                 boolean hasWsdlAttached = false;
                 for (Artifact a : project.getAttachedArtifacts()) {
-                    if ("wsdl".equals(a.getType()) && classifier.equals(a.getClassifier())) {
+                    if ("wsdl".equals(a.getType()) && classifier != null && classifier.equals(a.getClassifier())) {
                         hasWsdlAttached = true;
                     }
                 }
