@@ -208,7 +208,7 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
                 for (BindingFaultInfo bfi : bop.getFaults()) {
                     if (bfi.getFaultInfo().getMessagePartByIndex(0).getConcreteName().equals(qn)) {
                         //Found a fault with the correct QName, we can validate it
-                        schema.newValidator().validate(new DOMSource(el));
+                        schema.newValidator().validate(new DOMSource(DOMUtils.getDomElement(el)));
                     }
                 }
                 el = DOMUtils.getNextElement(el);
