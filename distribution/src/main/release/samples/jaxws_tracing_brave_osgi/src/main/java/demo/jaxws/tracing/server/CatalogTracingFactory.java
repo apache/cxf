@@ -22,10 +22,9 @@ package demo.jaxws.tracing.server;
 import brave.Tracing;
 import brave.propagation.ThreadLocalCurrentTraceContext;
 import zipkin2.reporter.AsyncReporter;
-import zipkin2.reporter.Sender;
 
 public class CatalogTracingFactory {
-    public static Tracing create(final String serviceName, final Sender sender) {
+    public static Tracing create(final String serviceName, final AsyncReporter<zipkin2.Span> reporter) {
         return Tracing
             .newBuilder()
             .localServiceName(serviceName)
@@ -34,7 +33,7 @@ public class CatalogTracingFactory {
                     .newBuilder()
                     .build()
               )
-            .spanReporter(AsyncReporter.create(sender))
+            .spanReporter(reporter)
             .build();
     }
 }
