@@ -27,11 +27,15 @@
                            http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd
                            http://cxf.apache.org/blueprint/jaxws http://cxf.apache.org/schemas/blueprint/jaxws.xsd">
 
+    <type-converters>
+        <bean class="demo.jaxws.tracing.server.AsyncReporterConverter" />
+    </type-converters>
+
     <!-- CXF BraveFeature -->
     <bean id="braveFeature" class="org.apache.cxf.tracing.brave.BraveFeature">
         <argument index="0" ref="tracing" />
     </bean>
-    
+
     <cxf:bus>
         <cxf:features>
             <cxf:logging />
@@ -45,10 +49,14 @@
     <bean id="sender" class="zipkin2.reporter.okhttp3.OkHttpSender" factory-method="create" destroy-method="close">
         <argument index="0" value="http://localhost:9411/api/v2/spans" />
     </bean>
+    
+    <bean id="reporter" class="zipkin2.reporter.AsyncReporter" factory-method="create" destroy-method="close">
+        <argument index="0" ref="sender" />
+    </bean>
 
 	<bean id="tracing" class="demo.jaxws.tracing.server.CatalogTracingFactory" factory-method="create">
         <argument index="0" value="catalog-service" />
-        <argument index="1" ref="sender" />
+        <argument index="1" ref="reporter" />
     </bean>
 
     <jaxws:endpoint
