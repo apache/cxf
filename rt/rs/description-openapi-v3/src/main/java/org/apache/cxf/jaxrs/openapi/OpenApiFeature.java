@@ -111,12 +111,8 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
 
         DefaultApplication(final List<ClassResourceInfo> cris, final Set<String> resourcePackages) {
             this.serviceClasses = cris.stream().map(ClassResourceInfo::getServiceClass).
-                    filter(cls -> {
-                        return resourcePackages == null || resourcePackages.isEmpty()
-                            ? true
-                                : resourcePackages.stream().
-                                anyMatch(pkg -> cls.getPackage().getName().startsWith(pkg));
-                    }).collect(Collectors.toSet());
+                    filter(cls -> (resourcePackages == null || resourcePackages.isEmpty()) || resourcePackages.stream().
+                            anyMatch(pkg -> cls.getPackage().getName().startsWith(pkg))).collect(Collectors.toSet());
         }
 
         @Override
@@ -578,7 +574,7 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
     
         boolean hasComponents = false;
         if (securityDefinitions != null && !securityDefinitions.isEmpty()) {
-            securityDefinitions.forEach((key, value) -> components.addSecuritySchemes(key, value));
+            securityDefinitions.forEach(components::addSecuritySchemes);
             hasComponents |= true;
         }
         
