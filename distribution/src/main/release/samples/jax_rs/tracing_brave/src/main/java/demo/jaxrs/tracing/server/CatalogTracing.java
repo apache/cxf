@@ -28,7 +28,9 @@ import zipkin2.reporter.AsyncReporter;
 import zipkin2.reporter.Sender;
 import zipkin2.reporter.okhttp3.OkHttpSender;
 
-public class CatalogTracing {
+public class CatalogTracing implements AutoCloseable {
+    private volatile AsyncReporter<Span> reporter;
+    private volatile Sender sender;
     private volatile HttpTracing httpTracing;
     private final String serviceName;
     
@@ -43,7 +45,9 @@ public class CatalogTracing {
             synchronized(this) {
                 result = httpTracing;
                 if (result == null) {
-                    httpTracing = result = createHttpTracing();
+                    sender = OkHttpSender.create("http://localhost:9411/api/v2/spans");
+                    reporter = AsyncReporter.create(sender);
+                    httpTracing = result = createHttpTracing(serviceName, reporter);
                 }
             }
         }
@@ -51,10 +55,18 @@ public class CatalogTracing {
         return result;
     }
     
-    private HttpTracing createHttpTracing() {
-        final Sender sender = OkHttpSender.create("http://localhost:9411/api/v2/spans");
-        final AsyncReporter<Span> reporter = AsyncReporter.create(sender);
+    @Override
+    public void close() throws Exception {
+        if (reporter != null) {
+            reporter.close();
+        }
         
+        if (sender != null) {
+            sender.close();
+        }
+    }
+    
+    private static HttpTracing createHttpTracing(String serviceName, AsyncReporter<Span> reporter) {
         final Tracing tracing = Tracing
             .newBuilder()
             .localServiceName(serviceName)
