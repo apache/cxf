@@ -23,7 +23,11 @@ import brave.Tracing;
 import brave.propagation.ThreadLocalCurrentTraceContext;
 import zipkin2.reporter.AsyncReporter;
 
-public class CatalogTracingFactory {
+public final class CatalogTracingFactory {
+
+    private CatalogTracingFactory() {
+    }
+
     public static Tracing create(final String serviceName, final AsyncReporter<zipkin2.Span> reporter) {
         return Tracing
             .newBuilder()
