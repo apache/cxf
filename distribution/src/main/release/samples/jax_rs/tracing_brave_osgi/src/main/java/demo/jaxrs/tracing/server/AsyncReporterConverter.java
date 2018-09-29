@@ -34,7 +34,7 @@ import zipkin2.reporter.AsyncReporter;
 public class AsyncReporterConverter implements Converter {
     @Override
     public boolean canConvert(Object source, ReifiedType target) {
-        return (source instanceof AsyncReporter<?> && target.getRawClass() == AsyncReporter.class);
+        return source instanceof AsyncReporter<?> && target.getRawClass() == AsyncReporter.class;
     }
 
     @SuppressWarnings("unchecked")

@@ -42,12 +42,13 @@ public class CatalogTracing implements AutoCloseable {
         HttpTracing result = httpTracing;
         
         if (result == null) {
-            synchronized(this) {
+            synchronized (this) {
                 result = httpTracing;
                 if (result == null) {
                     sender = OkHttpSender.create("http://localhost:9411/api/v2/spans");
                     reporter = AsyncReporter.create(sender);
-                    httpTracing = result = createHttpTracing(serviceName, reporter);
+                    result = createHttpTracing(serviceName, reporter);
+                    httpTracing = result;
                 }
             }
         }

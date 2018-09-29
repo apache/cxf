@@ -18,13 +18,12 @@
  */
 package demo.jaxws.tracing.server.impl;
 
-import brave.ScopedSpan;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import brave.ScopedSpan;
 import brave.Tracing;
 import brave.propagation.TraceContext;
 import demo.jaxws.tracing.server.Book;
