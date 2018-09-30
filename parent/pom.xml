@@ -228,7 +228,7 @@
         <cxf.jexl.version>2.1.1</cxf.jexl.version>
         <cxf.htrace.version>4.2.0-incubating</cxf.htrace.version>
         <cxf.zest.version>2.1</cxf.zest.version>
-        <cxf.brave.version>5.4.1</cxf.brave.version>
+        <cxf.brave.version>5.4.2</cxf.brave.version>
         <cxf.brave.zipkin.version>2.11.6</cxf.brave.zipkin.version>
         <cxf.brave.reporter.version>2.7.9</cxf.brave.reporter.version>
         <cxf.opentracing.version>0.31.0</cxf.opentracing.version>
