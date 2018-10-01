@@ -148,21 +148,8 @@ public class ObservableRxInvokerImpl implements ObservableRxInvoker {
 
     @Override
     public <T> Observable<T> method(String name, Entity<?> entity, Class<T> responseType) {
-        if (sc == null) {
-            return Observable.create(new ObservableOnSubscribe<T>() {
-                @Override
-                public void subscribe(ObservableEmitter<T> emitter) throws Exception {
-                        try {
-                            T response = syncInvoker.method(name, entity, responseType);
-                            emitter.onNext(response);
-                            emitter.onComplete();
-                        } catch (Throwable e) {
-                            emitter.onError(e);
-                        }
-                }
-            });
-        }
-        return Observable.create(new ObservableOnSubscribe<T>() {
+        
+        Observable<T> observable = Observable.create(new ObservableOnSubscribe<T>() {
             @Override
             public void subscribe(ObservableEmitter<T> emitter) throws Exception {
                     try {
@@ -173,27 +160,18 @@ public class ObservableRxInvokerImpl implements ObservableRxInvoker {
                         emitter.onError(e);
                     }
             }
-        }).subscribeOn(sc).observeOn(sc); 
+        });
+        
+        if (sc == null) {
+            return observable;
+        }
+        return observable.subscribeOn(sc).observeOn(sc); 
     }
 
     @Override
     public <T> Observable<T> method(String name, Entity<?> entity, GenericType<T> responseType) {
-        if (sc == null) {
-            return Observable.create(new ObservableOnSubscribe<T>() {
-                @Override
-                public void subscribe(ObservableEmitter<T> emitter) throws Exception {
-                        try {
-                            T response = syncInvoker.method(name, entity, responseType);
-                            emitter.onNext(response);
-                            emitter.onComplete();
-                        } catch (Throwable e) {
-                            emitter.onError(e);
-                        }
-                }
-            });            
-
-        }
-        return Observable.create(new ObservableOnSubscribe<T>() {
+        
+        Observable<T> observable = Observable.create(new ObservableOnSubscribe<T>() {
             @Override
             public void subscribe(ObservableEmitter<T> emitter) throws Exception {
                     try {
@@ -204,26 +182,18 @@ public class ObservableRxInvokerImpl implements ObservableRxInvoker {
                         emitter.onError(e);
                     }
             }
-        }).subscribeOn(sc).observeOn(sc);
+        }); 
+        
+        if (sc == null) {
+            return observable;
+        }
+        return observable.subscribeOn(sc).observeOn(sc);
     }
 
     @Override
     public <T> Observable<T> method(String name, Class<T> responseType) {
-        if (sc == null) {
-            return Observable.create(new ObservableOnSubscribe<T>() {
-                @Override
-                public void subscribe(ObservableEmitter<T> emitter) throws Exception {
-                        try {
-                            T response = syncInvoker.method(name, responseType);
-                            emitter.onNext(response);
-                            emitter.onComplete();
-                        } catch (Throwable e) {
-                            emitter.onError(e);
-                        }
-                }
-            });
-        }
-        return Observable.create(new ObservableOnSubscribe<T>() {
+        
+        Observable<T> observable = Observable.create(new ObservableOnSubscribe<T>() {
             @Override
             public void subscribe(ObservableEmitter<T> emitter) throws Exception {
                     try {
@@ -234,26 +204,18 @@ public class ObservableRxInvokerImpl implements ObservableRxInvoker {
                         emitter.onError(e);
                     }
             }
-        }).subscribeOn(sc).observeOn(sc);
+        });
+        
+        if (sc == null) {
+            return observable;
+        }
+        return observable.subscribeOn(sc).observeOn(sc);
     }
 
     @Override
     public <T> Observable<T> method(String name, GenericType<T> responseType) {
-        if (sc == null) {
-            return Observable.create(new ObservableOnSubscribe<T>() {
-                @Override
-                public void subscribe(ObservableEmitter<T> emitter) throws Exception {
-                        try {
-                            T response = syncInvoker.method(name, responseType);
-                            emitter.onNext(response);
-                            emitter.onComplete();
-                        } catch (Exception e) {
-                            emitter.onError(e);
-                        }
-                }
-            });
-        }
-        return Observable.create(new ObservableOnSubscribe<T>() {
+        
+        Observable<T> observable = Observable.create(new ObservableOnSubscribe<T>() {
             @Override
             public void subscribe(ObservableEmitter<T> emitter) throws Exception {
                     try {
@@ -264,7 +226,12 @@ public class ObservableRxInvokerImpl implements ObservableRxInvoker {
                         emitter.onError(e);
                     }
             }
-        }).subscribeOn(sc).observeOn(sc);
+        });
+        
+        if (sc == null) {
+            return observable;
+        }
+        return observable.subscribeOn(sc).observeOn(sc);
     }
 
 }

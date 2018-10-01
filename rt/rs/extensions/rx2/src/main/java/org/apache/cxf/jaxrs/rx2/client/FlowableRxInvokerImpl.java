@@ -150,21 +150,8 @@ public class FlowableRxInvokerImpl implements FlowableRxInvoker {
 
     @Override
     public <T> Flowable<T> method(String name, Entity<?> entity, Class<T> responseType) {
-        if (sc == null) {
-            return Flowable.create(new FlowableOnSubscribe<T>() {
-                @Override
-                public void subscribe(FlowableEmitter<T> emitter) throws Exception {
-                        try {
-                            T response = syncInvoker.method(name, entity, responseType);
-                            emitter.onNext(response);
-                            emitter.onComplete();
-                        } catch (Throwable e) {
-                            emitter.onError(e);
-                        }
-                }
-            }, BackpressureStrategy.DROP);
-        }
-        return Flowable.create(new FlowableOnSubscribe<T>() {
+        
+        Flowable<T> flowable = Flowable.create(new FlowableOnSubscribe<T>() {
             @Override
             public void subscribe(FlowableEmitter<T> emitter) throws Exception {
                     try {
@@ -175,27 +162,18 @@ public class FlowableRxInvokerImpl implements FlowableRxInvoker {
                         emitter.onError(e);
                     }
             }
-        }, BackpressureStrategy.DROP).subscribeOn(sc).observeOn(sc);        
+        }, BackpressureStrategy.DROP);
+        
+        if (sc == null) {
+            return flowable;
+        }
+        return flowable.subscribeOn(sc).observeOn(sc);        
     }
 
     @Override
     public <T> Flowable<T> method(String name, Entity<?> entity, GenericType<T> responseType) {
-        if (sc == null) {
-            return Flowable.create(new FlowableOnSubscribe<T>() {
-                @Override
-                public void subscribe(FlowableEmitter<T> emitter) throws Exception {
-                        try {
-                            T response = syncInvoker.method(name, entity, responseType);
-                            emitter.onNext(response);
-                            emitter.onComplete();
-                        } catch (Throwable e) {
-                            emitter.onError(e);
-                        }
-                }
-            }, BackpressureStrategy.DROP);            
-
-        }
-        return Flowable.create(new FlowableOnSubscribe<T>() {
+        
+        Flowable<T> flowable = Flowable.create(new FlowableOnSubscribe<T>() {
             @Override
             public void subscribe(FlowableEmitter<T> emitter) throws Exception {
                     try {
@@ -206,26 +184,18 @@ public class FlowableRxInvokerImpl implements FlowableRxInvoker {
                         emitter.onError(e);
                     }
             }
-        }, BackpressureStrategy.DROP).subscribeOn(sc).observeOn(sc);
+        }, BackpressureStrategy.DROP);
+        
+        if (sc == null) {
+            return flowable; 
+        }
+        return flowable.subscribeOn(sc).observeOn(sc);
     }
 
     @Override
     public <T> Flowable<T> method(String name, Class<T> responseType) {
-        if (sc == null) {
-            return Flowable.create(new FlowableOnSubscribe<T>() {
-                @Override
-                public void subscribe(FlowableEmitter<T> emitter) throws Exception {
-                        try {
-                            T response = syncInvoker.method(name, responseType);
-                            emitter.onNext(response);
-                            emitter.onComplete();
-                        } catch (Throwable e) {
-                            emitter.onError(e);
-                        }
-                }
-            }, BackpressureStrategy.DROP);
-        }
-        return Flowable.create(new FlowableOnSubscribe<T>() {
+        
+        Flowable<T> flowable = Flowable.create(new FlowableOnSubscribe<T>() {
             @Override
             public void subscribe(FlowableEmitter<T> emitter) throws Exception {
                     try {
@@ -236,26 +206,18 @@ public class FlowableRxInvokerImpl implements FlowableRxInvoker {
                         emitter.onError(e);
                     }
             }
-        }, BackpressureStrategy.DROP).subscribeOn(sc).observeOn(sc);
+        }, BackpressureStrategy.DROP);
+        
+        if (sc == null) {
+            return flowable;
+        }
+        return flowable.subscribeOn(sc).observeOn(sc);
     }
 
     @Override
     public <T> Flowable<T> method(String name, GenericType<T> responseType) {
-        if (sc == null) {
-            return Flowable.create(new FlowableOnSubscribe<T>() {
-                @Override
-                public void subscribe(FlowableEmitter<T> emitter) throws Exception {
-                        try {
-                            T response = syncInvoker.method(name, responseType);
-                            emitter.onNext(response);
-                            emitter.onComplete();
-                        } catch (Exception e) {
-                            emitter.onError(e);
-                        }
-                }
-            }, BackpressureStrategy.DROP);
-        }
-        return Flowable.create(new FlowableOnSubscribe<T>() {
+        
+        Flowable<T> flowable = Flowable.create(new FlowableOnSubscribe<T>() {
             @Override
             public void subscribe(FlowableEmitter<T> emitter) throws Exception {
                     try {
@@ -266,7 +228,12 @@ public class FlowableRxInvokerImpl implements FlowableRxInvoker {
                         emitter.onError(e);
                     }
             }
-        }, BackpressureStrategy.DROP).subscribeOn(sc).observeOn(sc);
+        }, BackpressureStrategy.DROP);
+        
+        if (sc == null) {
+            return flowable;
+        }
+        return flowable.subscribeOn(sc).observeOn(sc);
     }
 
 }
