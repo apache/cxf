@@ -169,5 +169,16 @@ public class Base64UtilityTest extends Assert {
         
     }
 
+    // See https://tools.ietf.org/html/rfc4648#section-10
+    @Test
+    public void testVectors() throws Exception {
+        assertEquals("", Base64Utility.encode("".getBytes()));
+        assertEquals("Zg==", Base64Utility.encode("f".getBytes()));
+        assertEquals("Zm8=", Base64Utility.encode("fo".getBytes()));
+        assertEquals("Zm9v", Base64Utility.encode("foo".getBytes()));
+        assertEquals("Zm9vYg==", Base64Utility.encode("foob".getBytes()));
+        assertEquals("Zm9vYmE=", Base64Utility.encode("fooba".getBytes()));
+        assertEquals("Zm9vYmFy", Base64Utility.encode("foobar".getBytes()));
+    }
 
 }

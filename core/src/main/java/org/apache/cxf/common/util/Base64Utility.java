@@ -264,7 +264,9 @@ public final class Base64Utility {
                                      int o,
                                      int l,
                                      boolean urlSafe) {
-        if (l <= 0) {
+        if (id != null && id.length == 0 && l == 0) {
+            return new char[0];
+        } else if (l <= 0) {
             return null;
         }
 
