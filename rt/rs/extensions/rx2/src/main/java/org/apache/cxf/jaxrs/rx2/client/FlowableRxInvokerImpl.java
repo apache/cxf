@@ -22,21 +22,24 @@ import java.util.concurrent.ExecutorService;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.SyncInvoker;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
-import org.apache.cxf.jaxrs.client.WebClient;
-
+import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
+import io.reactivex.FlowableEmitter;
+import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.Scheduler;
 import io.reactivex.schedulers.Schedulers;
 
 
 public class FlowableRxInvokerImpl implements FlowableRxInvoker {
     private Scheduler sc;
-    private WebClient wc;
-    public FlowableRxInvokerImpl(WebClient wc, ExecutorService ex) {
-        this.wc = wc;
+    private SyncInvoker syncInvoker;
+    
+    public FlowableRxInvokerImpl(SyncInvoker syncInvoker, ExecutorService ex) {
+        this.syncInvoker = syncInvoker;
         this.sc = ex == null ? null : Schedulers.from(ex);
     }
 
@@ -148,33 +151,122 @@ public class FlowableRxInvokerImpl implements FlowableRxInvoker {
     @Override
     public <T> Flowable<T> method(String name, Entity<?> entity, Class<T> responseType) {
         if (sc == null) {
-            return Flowable.fromFuture(wc.async().method(name, entity, responseType));
+            return Flowable.create(new FlowableOnSubscribe<T>() {
+                @Override
+                public void subscribe(FlowableEmitter<T> emitter) throws Exception {
+                        try {
+                            T response = syncInvoker.method(name, entity, responseType);
+                            emitter.onNext(response);
+                            emitter.onComplete();
+                        } catch (Throwable e) {
+                            emitter.onError(e);
+                        }
+                }
+            }, BackpressureStrategy.DROP);
         }
-        return Flowable.fromFuture(wc.async().method(name, entity, responseType), sc);
+        return Flowable.create(new FlowableOnSubscribe<T>() {
+            @Override
+            public void subscribe(FlowableEmitter<T> emitter) throws Exception {
+                    try {
+                        T response = syncInvoker.method(name, entity, responseType);
+                        emitter.onNext(response);
+                        emitter.onComplete();
+                    } catch (Throwable e) {
+                        emitter.onError(e);
+                    }
+            }
+        }, BackpressureStrategy.DROP).subscribeOn(sc).observeOn(sc);        
     }
 
     @Override
     public <T> Flowable<T> method(String name, Entity<?> entity, GenericType<T> responseType) {
         if (sc == null) {
-            return Flowable.fromFuture(wc.async().method(name, entity, responseType));
+            return Flowable.create(new FlowableOnSubscribe<T>() {
+                @Override
+                public void subscribe(FlowableEmitter<T> emitter) throws Exception {
+                        try {
+                            T response = syncInvoker.method(name, entity, responseType);
+                            emitter.onNext(response);
+                            emitter.onComplete();
+                        } catch (Throwable e) {
+                            emitter.onError(e);
+                        }
+                }
+            }, BackpressureStrategy.DROP);            
+
         }
-        return Flowable.fromFuture(wc.async().method(name, entity, responseType), sc);
+        return Flowable.create(new FlowableOnSubscribe<T>() {
+            @Override
+            public void subscribe(FlowableEmitter<T> emitter) throws Exception {
+                    try {
+                        T response = syncInvoker.method(name, entity, responseType);
+                        emitter.onNext(response);
+                        emitter.onComplete();
+                    } catch (Throwable e) {
+                        emitter.onError(e);
+                    }
+            }
+        }, BackpressureStrategy.DROP).subscribeOn(sc).observeOn(sc);
     }
 
     @Override
     public <T> Flowable<T> method(String name, Class<T> responseType) {
         if (sc == null) {
-            return Flowable.fromFuture(wc.async().method(name, responseType));
+            return Flowable.create(new FlowableOnSubscribe<T>() {
+                @Override
+                public void subscribe(FlowableEmitter<T> emitter) throws Exception {
+                        try {
+                            T response = syncInvoker.method(name, responseType);
+                            emitter.onNext(response);
+                            emitter.onComplete();
+                        } catch (Throwable e) {
+                            emitter.onError(e);
+                        }
+                }
+            }, BackpressureStrategy.DROP);
         }
-        return Flowable.fromFuture(wc.async().method(name, responseType), sc);
+        return Flowable.create(new FlowableOnSubscribe<T>() {
+            @Override
+            public void subscribe(FlowableEmitter<T> emitter) throws Exception {
+                    try {
+                        T response = syncInvoker.method(name, responseType);
+                        emitter.onNext(response);
+                        emitter.onComplete();
+                    } catch (Throwable e) {
+                        emitter.onError(e);
+                    }
+            }
+        }, BackpressureStrategy.DROP).subscribeOn(sc).observeOn(sc);
     }
 
     @Override
     public <T> Flowable<T> method(String name, GenericType<T> responseType) {
         if (sc == null) {
-            return Flowable.fromFuture(wc.async().method(name, responseType));
+            return Flowable.create(new FlowableOnSubscribe<T>() {
+                @Override
+                public void subscribe(FlowableEmitter<T> emitter) throws Exception {
+                        try {
+                            T response = syncInvoker.method(name, responseType);
+                            emitter.onNext(response);
+                            emitter.onComplete();
+                        } catch (Exception e) {
+                            emitter.onError(e);
+                        }
+                }
+            }, BackpressureStrategy.DROP);
         }
-        return Flowable.fromFuture(wc.async().method(name, responseType), sc);
+        return Flowable.create(new FlowableOnSubscribe<T>() {
+            @Override
+            public void subscribe(FlowableEmitter<T> emitter) throws Exception {
+                    try {
+                        T response = syncInvoker.method(name, responseType);
+                        emitter.onNext(response);
+                        emitter.onComplete();
+                    } catch (Exception e) {
+                        emitter.onError(e);
+                    }
+            }
+        }, BackpressureStrategy.DROP).subscribeOn(sc).observeOn(sc);
     }
 
 }

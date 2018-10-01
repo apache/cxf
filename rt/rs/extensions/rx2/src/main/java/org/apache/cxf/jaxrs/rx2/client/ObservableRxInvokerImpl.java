@@ -22,21 +22,22 @@ import java.util.concurrent.ExecutorService;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.SyncInvoker;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
-import org.apache.cxf.jaxrs.client.WebClient;
-
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Scheduler;
 import io.reactivex.schedulers.Schedulers;
 
 
 public class ObservableRxInvokerImpl implements ObservableRxInvoker {
     private Scheduler sc;
-    private WebClient wc;
-    public ObservableRxInvokerImpl(WebClient wc, ExecutorService ex) {
-        this.wc = wc;
+    private SyncInvoker syncInvoker;
+    public ObservableRxInvokerImpl(SyncInvoker syncInvoker, ExecutorService ex) {
+        this.syncInvoker = syncInvoker;
         this.sc = ex == null ? null : Schedulers.from(ex);
     }
 
@@ -148,33 +149,122 @@ public class ObservableRxInvokerImpl implements ObservableRxInvoker {
     @Override
     public <T> Observable<T> method(String name, Entity<?> entity, Class<T> responseType) {
         if (sc == null) {
-            return Observable.fromFuture(wc.async().method(name, entity, responseType));
+            return Observable.create(new ObservableOnSubscribe<T>() {
+                @Override
+                public void subscribe(ObservableEmitter<T> emitter) throws Exception {
+                        try {
+                            T response = syncInvoker.method(name, entity, responseType);
+                            emitter.onNext(response);
+                            emitter.onComplete();
+                        } catch (Throwable e) {
+                            emitter.onError(e);
+                        }
+                }
+            });
         }
-        return Observable.fromFuture(wc.async().method(name, entity, responseType), sc);
+        return Observable.create(new ObservableOnSubscribe<T>() {
+            @Override
+            public void subscribe(ObservableEmitter<T> emitter) throws Exception {
+                    try {
+                        T response = syncInvoker.method(name, entity, responseType);
+                        emitter.onNext(response);
+                        emitter.onComplete();
+                    } catch (Throwable e) {
+                        emitter.onError(e);
+                    }
+            }
+        }).subscribeOn(sc).observeOn(sc); 
     }
 
     @Override
     public <T> Observable<T> method(String name, Entity<?> entity, GenericType<T> responseType) {
         if (sc == null) {
-            return Observable.fromFuture(wc.async().method(name, entity, responseType));
+            return Observable.create(new ObservableOnSubscribe<T>() {
+                @Override
+                public void subscribe(ObservableEmitter<T> emitter) throws Exception {
+                        try {
+                            T response = syncInvoker.method(name, entity, responseType);
+                            emitter.onNext(response);
+                            emitter.onComplete();
+                        } catch (Throwable e) {
+                            emitter.onError(e);
+                        }
+                }
+            });            
+
         }
-        return Observable.fromFuture(wc.async().method(name, entity, responseType), sc);
+        return Observable.create(new ObservableOnSubscribe<T>() {
+            @Override
+            public void subscribe(ObservableEmitter<T> emitter) throws Exception {
+                    try {
+                        T response = syncInvoker.method(name, entity, responseType);
+                        emitter.onNext(response);
+                        emitter.onComplete();
+                    } catch (Throwable e) {
+                        emitter.onError(e);
+                    }
+            }
+        }).subscribeOn(sc).observeOn(sc);
     }
 
     @Override
     public <T> Observable<T> method(String name, Class<T> responseType) {
         if (sc == null) {
-            return Observable.fromFuture(wc.async().method(name, responseType));
+            return Observable.create(new ObservableOnSubscribe<T>() {
+                @Override
+                public void subscribe(ObservableEmitter<T> emitter) throws Exception {
+                        try {
+                            T response = syncInvoker.method(name, responseType);
+                            emitter.onNext(response);
+                            emitter.onComplete();
+                        } catch (Throwable e) {
+                            emitter.onError(e);
+                        }
+                }
+            });
         }
-        return Observable.fromFuture(wc.async().method(name, responseType), sc);
+        return Observable.create(new ObservableOnSubscribe<T>() {
+            @Override
+            public void subscribe(ObservableEmitter<T> emitter) throws Exception {
+                    try {
+                        T response = syncInvoker.method(name, responseType);
+                        emitter.onNext(response);
+                        emitter.onComplete();
+                    } catch (Throwable e) {
+                        emitter.onError(e);
+                    }
+            }
+        }).subscribeOn(sc).observeOn(sc);
     }
 
     @Override
     public <T> Observable<T> method(String name, GenericType<T> responseType) {
         if (sc == null) {
-            return Observable.fromFuture(wc.async().method(name, responseType));
+            return Observable.create(new ObservableOnSubscribe<T>() {
+                @Override
+                public void subscribe(ObservableEmitter<T> emitter) throws Exception {
+                        try {
+                            T response = syncInvoker.method(name, responseType);
+                            emitter.onNext(response);
+                            emitter.onComplete();
+                        } catch (Exception e) {
+                            emitter.onError(e);
+                        }
+                }
+            });
         }
-        return Observable.fromFuture(wc.async().method(name, responseType), sc);
+        return Observable.create(new ObservableOnSubscribe<T>() {
+            @Override
+            public void subscribe(ObservableEmitter<T> emitter) throws Exception {
+                    try {
+                        T response = syncInvoker.method(name, responseType);
+                        emitter.onNext(response);
+                        emitter.onComplete();
+                    } catch (Exception e) {
+                        emitter.onError(e);
+                    }
+            }
+        }).subscribeOn(sc).observeOn(sc);
     }
 
 }
