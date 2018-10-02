@@ -24,17 +24,12 @@ import javax.ws.rs.client.RxInvokerProvider;
 import javax.ws.rs.client.SyncInvoker;
 import javax.ws.rs.ext.Provider;
 
-import org.apache.cxf.jaxrs.client.SyncInvokerImpl;
-
 @Provider
 public class ObservableRxInvokerProvider implements RxInvokerProvider<ObservableRxInvoker> {
 
     @Override
     public ObservableRxInvoker getRxInvoker(SyncInvoker syncInvoker, ExecutorService executorService) {
-        // TODO: At the moment we still delegate if possible to the async HTTP conduit.
-        // Investigate if letting the RxJava thread pool deal with the sync invocation
-        // is indeed more effective
-        return new ObservableRxInvokerImpl(((SyncInvokerImpl)syncInvoker).getWebClient(), executorService);
+        return new ObservableRxInvokerImpl(syncInvoker, executorService);
     }
 
     @Override

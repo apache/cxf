@@ -19,6 +19,8 @@
 
 package org.apache.cxf.systest.jaxrs.reactive;
 
+import java.util.Arrays;
+import java.util.List;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -26,10 +28,15 @@ import javax.ws.rs.Produces;
 
 import io.reactivex.Observable;
 
-
 @Path("/rx2/observable")
 public class RxJava2ObservableService {
 
+    @GET
+    @Produces("text/plain")
+    @Path("text")
+    public Observable<String> getText() {
+        return Observable.just("Hello, world!");
+    }
     
     @GET
     @Produces("application/json")
@@ -37,6 +44,15 @@ public class RxJava2ObservableService {
     public Observable<HelloWorldBean> getJson() {
         return Observable.just(new HelloWorldBean());
     }
+    
+    @GET
+    @Produces("application/json")
+    @Path("textJsonList")
+    public Observable<List<HelloWorldBean>> getJsonList() {
+        HelloWorldBean bean1 = new HelloWorldBean();
+        HelloWorldBean bean2 = new HelloWorldBean();
+        bean2.setGreeting("Ciao");
+        return Observable.just(Arrays.asList(bean1, bean2));
+    }
+  
 }
-
-

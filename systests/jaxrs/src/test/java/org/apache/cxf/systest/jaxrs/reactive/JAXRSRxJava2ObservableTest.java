@@ -19,9 +19,11 @@
 
 package org.apache.cxf.systest.jaxrs.reactive;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.ws.rs.core.GenericType;
 import javax.xml.ws.Holder;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
@@ -49,6 +51,14 @@ public class JAXRSRxJava2ObservableTest extends AbstractBusClientServerTestBase 
         createStaticBus();
     }
     @Test
+    public void testGetHelloWorldText() throws Exception {
+        String address = "http://localhost:" + PORT + "/rx2/observable/text";
+        WebClient wc = WebClient.create(address);
+        String text = wc.accept("text/plain").get(String.class);
+        assertEquals("Hello, world!", text);
+    }
+
+    @Test
     public void testGetHelloWorldJson() throws Exception {
         String address = "http://localhost:" + PORT + "/rx2/observable/textJson";
         List<Object> providers = new LinkedList<>();
@@ -69,5 +79,26 @@ public class JAXRSRxJava2ObservableTest extends AbstractBusClientServerTestBase 
         Thread.sleep(2000);
         assertEquals("Hello", holder.value.getGreeting());
         assertEquals("World", holder.value.getAudience());
+    }
+    
+    @Test
+    public void testGetHelloWorldJsonList() throws Exception {
+        String address = "http://localhost:" + PORT + "/rx2/observable/textJsonList";
+        doTestGetHelloWorldJsonList(address);
+    } 
+    
+    private void doTestGetHelloWorldJsonList(String address) throws Exception {
+        WebClient wc = WebClient.create(address,
+                                        Collections.singletonList(new JacksonJsonProvider()));
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000);
+        GenericType<List<HelloWorldBean>> genericResponseType = new GenericType<List<HelloWorldBean>>() {
+        };
+
+        List<HelloWorldBean> beans = wc.accept("application/json").get(genericResponseType);
+        assertEquals(2, beans.size());
+        assertEquals("Hello", beans.get(0).getGreeting());
+        assertEquals("World", beans.get(0).getAudience());
+        assertEquals("Ciao", beans.get(1).getGreeting());
+        assertEquals("World", beans.get(1).getAudience());
     }
 }
