@@ -19,6 +19,7 @@
 package org.apache.cxf.jaxrs.rx2.client;
 
 import java.util.concurrent.ExecutorService;
+import java.util.function.Supplier;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.client.Entity;
@@ -148,89 +149,49 @@ public class ObservableRxInvokerImpl implements ObservableRxInvoker {
 
     @Override
     public <T> Observable<T> method(String name, Entity<?> entity, Class<T> responseType) {
-        
-        Observable<T> observable = Observable.create(new ObservableOnSubscribe<T>() {
-            @Override
-            public void subscribe(ObservableEmitter<T> emitter) throws Exception {
-                    try {
-                        T response = syncInvoker.method(name, entity, responseType);
-                        emitter.onNext(response);
-                        emitter.onComplete();
-                    } catch (Throwable e) {
-                        emitter.onError(e);
-                    }
-            }
-        });
-        
-        if (sc == null) {
-            return observable;
-        }
-        return observable.subscribeOn(sc).observeOn(sc); 
+        return create(() -> syncInvoker.method(name, entity, responseType));
     }
-
+    
     @Override
     public <T> Observable<T> method(String name, Entity<?> entity, GenericType<T> responseType) {
-        
-        Observable<T> observable = Observable.create(new ObservableOnSubscribe<T>() {
-            @Override
-            public void subscribe(ObservableEmitter<T> emitter) throws Exception {
-                    try {
-                        T response = syncInvoker.method(name, entity, responseType);
-                        emitter.onNext(response);
-                        emitter.onComplete();
-                    } catch (Throwable e) {
-                        emitter.onError(e);
-                    }
-            }
-        }); 
-        
-        if (sc == null) {
-            return observable;
-        }
-        return observable.subscribeOn(sc).observeOn(sc);
+        return create(() -> syncInvoker.method(name, entity, responseType));
     }
 
     @Override
     public <T> Observable<T> method(String name, Class<T> responseType) {
-        
-        Observable<T> observable = Observable.create(new ObservableOnSubscribe<T>() {
-            @Override
-            public void subscribe(ObservableEmitter<T> emitter) throws Exception {
-                    try {
-                        T response = syncInvoker.method(name, responseType);
-                        emitter.onNext(response);
-                        emitter.onComplete();
-                    } catch (Throwable e) {
-                        emitter.onError(e);
-                    }
-            }
-        });
-        
-        if (sc == null) {
-            return observable;
-        }
-        return observable.subscribeOn(sc).observeOn(sc);
+        return create(() -> syncInvoker.method(name, responseType));
     }
 
     @Override
     public <T> Observable<T> method(String name, GenericType<T> responseType) {
-        
+        return create(() -> syncInvoker.method(name, responseType));
+    }
+    
+    private <T> Observable<T> create(Supplier<T> supplier) {
         Observable<T> observable = Observable.create(new ObservableOnSubscribe<T>() {
             @Override
             public void subscribe(ObservableEmitter<T> emitter) throws Exception {
-                    try {
-                        T response = syncInvoker.method(name, responseType);
+                try {
+                    T response = supplier.get();
+                    if (!emitter.isDisposed()) {
                         emitter.onNext(response);
+                    }
+                    
+                    if (!emitter.isDisposed()) {
                         emitter.onComplete();
-                    } catch (Exception e) {
+                    }
+                } catch (Throwable e) {
+                    if (!emitter.isDisposed()) {
                         emitter.onError(e);
                     }
+                }
             }
         });
         
         if (sc == null) {
-            return observable;
+            return observable.subscribeOn(Schedulers.io());
         }
+        
         return observable.subscribeOn(sc).observeOn(sc);
     }
 

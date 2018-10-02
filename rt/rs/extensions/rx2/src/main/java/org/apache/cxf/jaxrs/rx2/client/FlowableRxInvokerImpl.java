@@ -19,6 +19,7 @@
 package org.apache.cxf.jaxrs.rx2.client;
 
 import java.util.concurrent.ExecutorService;
+import java.util.function.Supplier;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.client.Entity;
@@ -150,89 +151,49 @@ public class FlowableRxInvokerImpl implements FlowableRxInvoker {
 
     @Override
     public <T> Flowable<T> method(String name, Entity<?> entity, Class<T> responseType) {
-        
-        Flowable<T> flowable = Flowable.create(new FlowableOnSubscribe<T>() {
-            @Override
-            public void subscribe(FlowableEmitter<T> emitter) throws Exception {
-                    try {
-                        T response = syncInvoker.method(name, entity, responseType);
-                        emitter.onNext(response);
-                        emitter.onComplete();
-                    } catch (Throwable e) {
-                        emitter.onError(e);
-                    }
-            }
-        }, BackpressureStrategy.DROP);
-        
-        if (sc == null) {
-            return flowable;
-        }
-        return flowable.subscribeOn(sc).observeOn(sc);        
+        return create(() -> syncInvoker.method(name, entity, responseType));
     }
-
+    
     @Override
     public <T> Flowable<T> method(String name, Entity<?> entity, GenericType<T> responseType) {
-        
-        Flowable<T> flowable = Flowable.create(new FlowableOnSubscribe<T>() {
-            @Override
-            public void subscribe(FlowableEmitter<T> emitter) throws Exception {
-                    try {
-                        T response = syncInvoker.method(name, entity, responseType);
-                        emitter.onNext(response);
-                        emitter.onComplete();
-                    } catch (Throwable e) {
-                        emitter.onError(e);
-                    }
-            }
-        }, BackpressureStrategy.DROP);
-        
-        if (sc == null) {
-            return flowable; 
-        }
-        return flowable.subscribeOn(sc).observeOn(sc);
+        return create(() -> syncInvoker.method(name, entity, responseType));
     }
 
     @Override
     public <T> Flowable<T> method(String name, Class<T> responseType) {
-        
-        Flowable<T> flowable = Flowable.create(new FlowableOnSubscribe<T>() {
-            @Override
-            public void subscribe(FlowableEmitter<T> emitter) throws Exception {
-                    try {
-                        T response = syncInvoker.method(name, responseType);
-                        emitter.onNext(response);
-                        emitter.onComplete();
-                    } catch (Throwable e) {
-                        emitter.onError(e);
-                    }
-            }
-        }, BackpressureStrategy.DROP);
-        
-        if (sc == null) {
-            return flowable;
-        }
-        return flowable.subscribeOn(sc).observeOn(sc);
+        return create(() -> syncInvoker.method(name, responseType));
     }
 
     @Override
     public <T> Flowable<T> method(String name, GenericType<T> responseType) {
-        
+        return create(() -> syncInvoker.method(name, responseType));
+    }
+    
+    private <T> Flowable<T> create(Supplier<T> supplier) {
         Flowable<T> flowable = Flowable.create(new FlowableOnSubscribe<T>() {
             @Override
             public void subscribe(FlowableEmitter<T> emitter) throws Exception {
-                    try {
-                        T response = syncInvoker.method(name, responseType);
+                try {
+                    T response = supplier.get();
+                    if (!emitter.isCancelled()) {
                         emitter.onNext(response);
+                    }
+                    
+                    if (!emitter.isCancelled()) {
                         emitter.onComplete();
-                    } catch (Exception e) {
+                    }
+                } catch (Throwable e) {
+                    if (!emitter.isCancelled()) {
                         emitter.onError(e);
                     }
+                }
             }
         }, BackpressureStrategy.DROP);
         
         if (sc == null) {
-            return flowable;
+            return flowable.subscribeOn(Schedulers.io());
         }
+        
         return flowable.subscribeOn(sc).observeOn(sc);
     }
 
