@@ -130,6 +130,10 @@ public final class Base64Utility {
                                      int l)
         throws Base64Exception {
 
+        if (id != null && id.length == 0 && l == 0) {
+            return new byte[]{};
+        }
+
         // Keep it simple - must be >= 4. Unpadded
         // base64 data contain < 3 octets is invalid.
         //

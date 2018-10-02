@@ -179,6 +179,9 @@ public class Base64UtilityTest extends Assert {
         assertEquals("Zm9vYg==", Base64Utility.encode("foob".getBytes()));
         assertEquals("Zm9vYmE=", Base64Utility.encode("fooba".getBytes()));
         assertEquals("Zm9vYmFy", Base64Utility.encode("foobar".getBytes()));
+
+        //decode
+        assertArrayEquals(new byte[]{}, Base64Utility.decode(""));
     }
 
 }
