@@ -27,10 +27,10 @@
         <httpj:engine port="${testutil.ports.wssec10.server.AuthorizedServer.1}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
-                    <sec:keyStore type="jks" password="password" resource="certs/restricted/bob.jks"/>
+                    <sec:keyStore type="jks" password="password" resource="keys/bob.jks"/>
                 </sec:keyManagers>
                 <sec:trustManagers>
-                    <sec:keyStore type="jks" password="password" resource="certs/restricted/alice.jks"/>
+                    <sec:keyStore type="jks" password="password" resource="keys/alice.jks"/>
                 </sec:trustManagers>
                 <!--
                 <sec:clientAuthentication want="true" required="true"/>
