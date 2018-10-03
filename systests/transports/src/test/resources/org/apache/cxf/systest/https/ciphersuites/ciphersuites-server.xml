@@ -35,6 +35,7 @@
                 <sec:cipherSuitesFilter>
                     <sec:include>.*_AES_.*</sec:include>
                     <sec:exclude>SSL_RSA_WITH_DES_CBC_SHA</sec:exclude>
+                    <sec:exclude>.*_DHE_.*</sec:exclude>
                 </sec:cipherSuitesFilter>
             </httpj:tlsServerParameters>
         </httpj:engine>
@@ -54,7 +55,7 @@
         </jaxws:inInterceptors>
     </jaxws:endpoint>
     
-    <httpj:engine-factory id="rc4-tls-settings">
+    <httpj:engine-factory id="dhe-tls-settings">
         <httpj:engine port="${testutil.ports.CipherSuitesServer.2}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
@@ -62,8 +63,8 @@
                 </sec:keyManagers>
                 <sec:clientAuthentication want="false" required="false"/>
                 <sec:cipherSuitesFilter>
-                    <sec:include>.*_WITH_RC4_.*</sec:include>
-                    <sec:exclude>.*_AES_.*</sec:exclude>
+                    <sec:include>.*_DHE_.*</sec:include>
+                    <sec:exclude>TLS_ECDHE_.*</sec:exclude>
                 </sec:cipherSuitesFilter>
             </httpj:tlsServerParameters>
         </httpj:engine>
@@ -75,7 +76,7 @@
                      implementor="org.apache.cxf.systest.http.GreeterImpl" 
                      address="https://localhost:${testutil.ports.CipherSuitesServer.2}/SoapContext/HttpsPort" 
                      serviceName="s:SOAPService" 
-                     endpointName="e:HttpsPort" depends-on="rc4-tls-settings"/>
+                     endpointName="e:HttpsPort" depends-on="dhe-tls-settings"/>
                      
      <httpj:engine-factory id="null-tls-settings">
         <httpj:engine port="${testutil.ports.CipherSuitesServer.3}">

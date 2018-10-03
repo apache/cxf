@@ -30,7 +30,7 @@
                 <sec:keyStore type="jks" password="password" resource="keys/Truststore.jks"/>
             </sec:trustManagers>
             <sec:cipherSuitesFilter>
-                <sec:include>.*_WITH_AES_.*</sec:include>
+                <sec:include>TLS_ECDHE_.*</sec:include>
             </sec:cipherSuitesFilter>
         </http:tlsClientParameters>
     </http:conduit>
