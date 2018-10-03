@@ -18,8 +18,10 @@
  */
 package org.apache.cxf.microprofile.client;
 
+import java.net.URI;
 import java.net.URL;
 
+import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
@@ -27,6 +29,7 @@ import org.apache.cxf.microprofile.client.mock.EchoClientReqFilter;
 import org.apache.cxf.microprofile.client.mock.ExceptionMappingClient;
 import org.apache.cxf.microprofile.client.mock.HighPriorityClientReqFilter;
 import org.apache.cxf.microprofile.client.mock.HighPriorityMBW;
+import org.apache.cxf.microprofile.client.mock.InvokedMethodClientRequestFilter;
 import org.apache.cxf.microprofile.client.mock.LowPriorityClientReqFilter;
 import org.apache.cxf.microprofile.client.mock.MyClient;
 import org.apache.cxf.microprofile.client.mock.NoSuchEntityException;
@@ -129,6 +132,23 @@ public class CxfTypeSafeClientBuilderTest extends Assert {
 
         Response r = client.getEntity();
         fail(r, "Did not throw expected mapped exception: WebApplicationException");
+    }
+
+    @Test
+    public void testClientRequestFilterCanAccessInvokedMethod() throws Exception {
+        InterfaceWithoutProvidersDefined client = RestClientBuilder.newBuilder()
+            .register(InvokedMethodClientRequestFilter.class)
+            .baseUri(new URI("http://localhost:8080/neverUsed"))
+            .build(InterfaceWithoutProvidersDefined.class);
+
+        Response response = client.executePut("foo", "bar");
+        assertEquals(200, response.getStatus());
+        assertEquals(Response.class.getName(), response.getHeaderString("ReturnType"));
+        assertEquals("PUT", response.getHeaderString("PUT"));
+        assertEquals("/{id}", response.getHeaderString("Path"));
+        assertEquals(String.class.getName(), response.getHeaderString("Parm1"));
+        assertEquals(PathParam.class.getName(), response.getHeaderString("Parm1Annotation"));
+        assertEquals(String.class.getName(), response.getHeaderString("Parm2"));
     }
 
     private void fail(Response r, String failureMessage) {
