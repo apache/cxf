@@ -62,7 +62,6 @@ public final class SSLUtils {
 
     private static final String DEFAULT_KEYSTORE_TYPE = "PKCS12";
     private static final String DEFAULT_TRUST_STORE_TYPE = "JKS";
-    private static final String DEFAULT_SECURE_SOCKET_PROTOCOL = "TLSv1";
 
     private static final String HTTPS_CIPHER_SUITES = "https.cipherSuites";
 
@@ -157,7 +156,7 @@ public final class SSLUtils {
                     is = getResourceAsStream(location);
                 }
             }
-            
+
             if (is != null) {
                 TrustManagerFactory tmf =
                     TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
@@ -567,20 +566,6 @@ public final class SSLUtils {
         }
         LogUtils.log(log, Level.FINE, logMsg, trustStoreProvider);
         return trustStoreProvider;
-    }
-
-    public static String getSecureSocketProtocol(String secureSocketProtocol,
-                                                 Logger log) {
-        if (secureSocketProtocol != null) {
-            LogUtils.log(log,
-                         Level.FINE,
-                         "SECURE_SOCKET_PROTOCOL_SET",
-                         secureSocketProtocol);
-        } else {
-            LogUtils.log(log, Level.FINE, "SECURE_SOCKET_PROTOCOL_NOT_SET");
-            secureSocketProtocol = DEFAULT_SECURE_SOCKET_PROTOCOL;
-        }
-        return secureSocketProtocol;
     }
 
 }
