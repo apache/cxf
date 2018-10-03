@@ -44,6 +44,7 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.hello_world.Greeter;
@@ -52,6 +53,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jsse.provider.BouncyCastleJsseProvider;
 
 import org.junit.AfterClass;
+import org.junit.Assume;
 import org.junit.BeforeClass;
 
 /**
@@ -367,6 +369,8 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
     // See CXF-7782
     @org.junit.Test
     public void testBouncyCastleProvider() throws Exception {
+        // TODO There seems to be a bug with BC 1.60 + JDK 11
+        Assume.assumeFalse(JavaUtils.isJava11Compatible());
         try {
             Security.addProvider(new BouncyCastleProvider());
             Security.addProvider(new BouncyCastleJsseProvider());
