@@ -44,6 +44,7 @@ import org.apache.hello_world.Greeter;
 import org.apache.hello_world.services.SOAPService;
 
 import org.junit.AfterClass;
+import org.junit.Assume;
 import org.junit.BeforeClass;
 
 /**
@@ -241,7 +242,7 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testRC4Included() throws Exception {
         String version = System.getProperty("java.version");
-        if (JavaUtils.isJava9Compatible() 
+        if (JavaUtils.isJava9Compatible()
             || version.length() > 1 && 1.8D <= Double.parseDouble(version.substring(0, 3))
             ) {
             // RC4 not supported since JDK8
@@ -539,6 +540,81 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
 
         tlsParams.setSecureSocketProtocol("TLSv1.2");
         tlsParams.setCipherSuites(Collections.singletonList("TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256"));
+
+        conduit.setTlsClientParameters(tlsParams);
+
+        assertEquals(port.greetMe("Kitty"), "Hello Kitty");
+
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+
+    // Both client + server include AES, client enables a TLS v1.3 CipherSuite
+    @org.junit.Test
+    public void testAESIncludedTLSv13() throws Exception {
+        // Doesn't work with IBM JDK
+        if ("IBM Corporation".equals(System.getProperty("java.vendor"))) {
+            return;
+        }
+        Assume.assumeTrue(JavaUtils.isJava11Compatible());
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = CipherSuitesTest.class.getResource("ciphersuites-client-tlsv13.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL url = SOAPService.WSDL_LOCATION;
+        SOAPService service = new SOAPService(url, SOAPService.SERVICE);
+        assertNotNull("Service is null", service);
+        final Greeter port = service.getHttpsPort();
+        assertNotNull("Port is null", port);
+
+        updateAddressPort(port, PORT);
+
+        assertEquals(port.greetMe("Kitty"), "Hello Kitty");
+
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+
+    // Both client + server include AES, client enables a TLS v1.3 CipherSuite
+    @org.junit.Test
+    public void testAESIncludedTLSv13ViaCode() throws Exception {
+        // Doesn't work with IBM JDK
+        if ("IBM Corporation".equals(System.getProperty("java.vendor"))) {
+            return;
+        }
+        Assume.assumeTrue(JavaUtils.isJava11Compatible());
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = CipherSuitesTest.class.getResource("ciphersuites-client-noconfig.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL url = SOAPService.WSDL_LOCATION;
+        SOAPService service = new SOAPService(url, SOAPService.SERVICE);
+        assertNotNull("Service is null", service);
+        final Greeter port = service.getHttpsPort();
+        assertNotNull("Port is null", port);
+
+        updateAddressPort(port, PORT);
+
+        Client client = ClientProxy.getClient(port);
+        HTTPConduit conduit = (HTTPConduit) client.getConduit();
+
+        TLSClientParameters tlsParams = new TLSClientParameters();
+        X509TrustManager trustManager = new NoOpX509TrustManager();
+        TrustManager[] trustManagers = new TrustManager[1];
+        trustManagers[0] = trustManager;
+        tlsParams.setTrustManagers(trustManagers);
+        tlsParams.setDisableCNCheck(true);
+
+        tlsParams.setSecureSocketProtocol("TLSv1.3");
+        tlsParams.setCipherSuites(Collections.singletonList("TLS_AES_128_GCM_SHA256"));
 
         conduit.setTlsClientParameters(tlsParams);
 

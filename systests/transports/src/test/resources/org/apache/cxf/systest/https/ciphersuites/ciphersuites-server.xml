@@ -33,7 +33,7 @@
                 </sec:keyManagers>
                 <sec:clientAuthentication want="false" required="false"/>
                 <sec:cipherSuitesFilter>
-                    <sec:include>.*_WITH_AES_.*</sec:include>
+                    <sec:include>.*_AES_.*</sec:include>
                     <sec:exclude>SSL_RSA_WITH_DES_CBC_SHA</sec:exclude>
                 </sec:cipherSuitesFilter>
             </httpj:tlsServerParameters>
@@ -63,7 +63,7 @@
                 <sec:clientAuthentication want="false" required="false"/>
                 <sec:cipherSuitesFilter>
                     <sec:include>.*_WITH_RC4_.*</sec:include>
-                    <sec:exclude>.*_WITH_AES_.*</sec:exclude>
+                    <sec:exclude>.*_AES_.*</sec:exclude>
                 </sec:cipherSuitesFilter>
             </httpj:tlsServerParameters>
         </httpj:engine>
@@ -129,7 +129,7 @@
                 </sec:keyManagers>
                 <sec:clientAuthentication want="false" required="false"/>
                 <sec:cipherSuitesFilter>
-                    <sec:include>.*_WITH_AES_.*</sec:include>
+                    <sec:include>.*_AES_.*</sec:include>
                 </sec:cipherSuitesFilter>
             </httpj:tlsServerParameters>
         </httpj:engine>
