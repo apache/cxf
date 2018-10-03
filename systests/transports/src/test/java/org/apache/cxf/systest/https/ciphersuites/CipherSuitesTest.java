@@ -176,11 +176,11 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
 
-    // Client only includes RC4, server only includes AES
+    // Client only includes DHE, server excludes it
     @org.junit.Test
-    public void testClientRC4ServerAESIncluded() throws Exception {
+    public void testClientDHEServerExcludesIncluded() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = CipherSuitesTest.class.getResource("ciphersuites-rc4-client.xml");
+        URL busFile = CipherSuitesTest.class.getResource("ciphersuites-dhe-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -205,11 +205,11 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
 
-    // Client only includes RC4, server only includes AES
+    // Client only includes DHE, server excludes it
     @org.junit.Test
-    public void testClientRC4ServerAESIncludedAsync() throws Exception {
+    public void testClientDHEServerExcludesIncludedAsync() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = CipherSuitesTest.class.getResource("ciphersuites-rc4-client.xml");
+        URL busFile = CipherSuitesTest.class.getResource("ciphersuites-dhe-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -237,18 +237,11 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
 
-    // Both client + server include RC4
+    // Both client + server include DHE
     @org.junit.Test
-    public void testRC4Included() throws Exception {
-        String version = System.getProperty("java.version");
-        if (JavaUtils.isJava9Compatible() 
-            || version.length() > 1 && 1.8D <= Double.parseDouble(version.substring(0, 3))
-            ) {
-            // RC4 not supported since JDK8
-            return;
-        }
+    public void testDHEIncluded() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = CipherSuitesTest.class.getResource("ciphersuites-rc4-client.xml");
+        URL busFile = CipherSuitesTest.class.getResource("ciphersuites-dhe-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -268,18 +261,11 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
 
-    // Both client + server include RC4
+    // Both client + server include DHE
     @org.junit.Test
-    public void testRC4IncludedAsync() throws Exception {
-        String version = System.getProperty("java.version");
-        if (JavaUtils.isJava9Compatible()
-            || version.length() > 1 && 1.8D <= Double.parseDouble(version.substring(0, 3))
-            ) {
-            // RC4 not supported since JDK8
-            return;
-        }
+    public void testDHEIncludedAsync() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = CipherSuitesTest.class.getResource("ciphersuites-rc4-client.xml");
+        URL busFile = CipherSuitesTest.class.getResource("ciphersuites-dhe-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -302,9 +288,9 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
 
-    // Client only includes AES, server only includes RC4
+    // Client only includes ECDHE, server only includes DHE
     @org.junit.Test
-    public void testClientAESServerRC4Included() throws Exception {
+    public void testClientECDHEServerDHEIncluded() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = CipherSuitesTest.class.getResource("ciphersuites-client.xml");
 
@@ -331,9 +317,9 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
 
-    // Client only includes AES, server only includes RC4
+    // Client only includes ECDHE, server only includes DHE
     @org.junit.Test
-    public void testClientAESServerRC4IncludedAsync() throws Exception {
+    public void testClientECDHEServerDHEIncludedAsync() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = CipherSuitesTest.class.getResource("ciphersuites-client.xml");
 
