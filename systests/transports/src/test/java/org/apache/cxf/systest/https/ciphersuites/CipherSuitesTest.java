@@ -349,57 +349,6 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
 
-    // Both client + server include NULL
-    @org.junit.Test
-    public void testNULLIncluded() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = CipherSuitesTest.class.getResource("ciphersuites-null-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
-
-        URL url = SOAPService.WSDL_LOCATION;
-        SOAPService service = new SOAPService(url, SOAPService.SERVICE);
-        assertNotNull("Service is null", service);
-        final Greeter port = service.getHttpsPort();
-        assertNotNull("Port is null", port);
-
-        updateAddressPort(port, PORT3);
-
-        assertEquals(port.greetMe("Kitty"), "Hello Kitty");
-
-        ((java.io.Closeable)port).close();
-        bus.shutdown(true);
-    }
-
-    // Both client + server include NULL
-    @org.junit.Test
-    public void testNULLIncludedAsync() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = CipherSuitesTest.class.getResource("ciphersuites-null-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
-
-        URL url = SOAPService.WSDL_LOCATION;
-        SOAPService service = new SOAPService(url, SOAPService.SERVICE);
-        assertNotNull("Service is null", service);
-        final Greeter port = service.getHttpsPort();
-        assertNotNull("Port is null", port);
-
-        // Enable Async
-        ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
-
-        updateAddressPort(port, PORT3);
-
-        assertEquals(port.greetMe("Kitty"), "Hello Kitty");
-
-        ((java.io.Closeable)port).close();
-        bus.shutdown(true);
-    }
-
     // Client does not allow NULL
     @org.junit.Test
     public void testClientAESServerNULL() throws Exception {

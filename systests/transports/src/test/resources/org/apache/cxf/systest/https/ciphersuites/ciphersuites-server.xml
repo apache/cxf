@@ -108,7 +108,7 @@
                 </sec:keyManagers>
                 <sec:clientAuthentication want="false" required="false"/>
                 <sec:cipherSuites>
-                    <sec:cipherSuite>TLS_RSA_WITH_AES_256_CBC_SHA256</sec:cipherSuite>
+                    <sec:cipherSuite>TLS_DHE_RSA_WITH_AES_128_GCM_SHA256</sec:cipherSuite>
                 </sec:cipherSuites>
             </httpj:tlsServerParameters>
         </httpj:engine>
