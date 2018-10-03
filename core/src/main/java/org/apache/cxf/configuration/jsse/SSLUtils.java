@@ -68,13 +68,17 @@ public final class SSLUtils {
     private static final List<String> DEFAULT_CIPHERSUITE_FILTERS_INCLUDE =
         Arrays.asList(new String[] {".*"});
     /**
-     * By default, exclude NULL, anon, EXPORT, DES ciphersuites
+     * By default, exclude NULL, anon, EXPORT, DES, 3DES, MD5, CBC and RC4 ciphersuites
      */
     private static final List<String> DEFAULT_CIPHERSUITE_FILTERS_EXCLUDE =
         Arrays.asList(new String[] {".*_NULL_.*",
                                     ".*_anon_.*",
                                     ".*_EXPORT_.*",
-                                    ".*_DES_.*"});
+                                    ".*_DES_.*",
+                                    ".*_3DES_.*",
+                                    ".*_MD5",
+                                    ".*_CBC_.*",
+                                    ".*_RC4_.*"});
 
     private static volatile KeyManager[] defaultManagers;
 

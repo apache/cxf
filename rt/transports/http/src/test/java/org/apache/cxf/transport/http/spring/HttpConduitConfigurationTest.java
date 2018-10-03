@@ -105,7 +105,7 @@ public class HttpConduitConfigurationTest extends Assert {
 
         FiltersType csfs = tlscps.getCipherSuitesFilter();
         assertNotNull(csfs);
-        assertEquals(5, csfs.getInclude().size());
+        assertEquals(1, csfs.getInclude().size());
         assertEquals(1, csfs.getExclude().size());
         HTTPClientPolicy clientPolicy = conduit.getClient();
         assertEquals(10240, clientPolicy.getChunkLength());
