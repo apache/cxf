@@ -31,12 +31,12 @@ import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
@@ -68,13 +68,12 @@ public final class SSLUtils {
     private static final String HTTPS_CIPHER_SUITES = "https.cipherSuites";
 
     /**
-     * By default, exclude NULL, anon, EXPORT, DES ciphersuites
+     * By default, exclude NULL, anon and EXPORT ciphersuites
      */
     private static final List<String> DEFAULT_CIPHERSUITE_FILTERS_EXCLUDE =
-        Arrays.asList(new String[] {".*_NULL_.*",
-                                    ".*_anon_.*",
-                                    ".*_EXPORT_.*",
-                                    ".*_DES_.*"});
+        Arrays.asList(new String[] {".*NULL.*",
+                                    ".*anon.*",
+                                    ".*EXPORT.*"});
 
     private static volatile KeyManager[] defaultManagers;
 
@@ -400,16 +399,27 @@ public final class SSLUtils {
                                            String[] supportedCipherSuites,
                                            Logger log, boolean exclude) {
         // We have explicit filters, so use the "include/exclude" cipherSuiteFilter configuration
+        List<Pattern> includes = new ArrayList<>();
+        List<Pattern> excludes = new ArrayList<>();
+
+        if (filters != null) {
+            // We must have an inclusion pattern specified or no ciphersuites are filtered
+            compileRegexPatterns(includes, filters.getInclude(), true, log);
+
+            if (filters.isSetExclude()) {
+                // If we have specified excludes, then the default excludes are ignored
+                compileRegexPatterns(excludes, filters.getExclude(), false, log);
+            } else {
+                // Otherwise use the default excludes, but remove from the default excludes any
+                // ciphersuites explicitly matched by the inclusion filters
+                List<String> filteredExcludes =
+                    filterDefaultExcludes(filters.getInclude(), DEFAULT_CIPHERSUITE_FILTERS_EXCLUDE);
+                compileRegexPatterns(excludes, filteredExcludes, false, log);
+            }
+        }
+
         List<String> filteredCipherSuites = new ArrayList<>();
         List<String> excludedCipherSuites = new ArrayList<>();
-        List<Pattern> includes =
-            filters != null
-                ? compileRegexPatterns(filters.getInclude(), true, log)
-                : Collections.emptyList();
-        List<Pattern> excludes =
-            filters != null
-                ? compileRegexPatterns(filters.getExclude(), false, log)
-                : compileRegexPatterns(DEFAULT_CIPHERSUITE_FILTERS_EXCLUDE, true, log);
         for (int i = 0; i < supportedCipherSuites.length; i++) {
             if (matchesOneOf(supportedCipherSuites[i], includes)
                 && !matchesOneOf(supportedCipherSuites[i], excludes)) {
@@ -440,6 +450,19 @@ public final class SSLUtils {
         return getCiphersFromList(filteredCipherSuites, log, exclude);
     }
 
+    private static List<String> filterDefaultExcludes(List<String> includes, List<String> defaultExcludes) {
+        if (includes != null && !includes.isEmpty()) {
+            // Filter the default exclusion filters to remove any that explicitly match the inclusion filters
+            // e.g. if the user wants the NULL ciphersuite then remove it from the default excludes
+            return defaultExcludes.stream()
+                .filter(ex -> !includes.stream()
+                    .anyMatch(inc -> inc.matches(ex)))
+                .collect(Collectors.toList());
+        }
+
+        return defaultExcludes;
+    }
+
     private static String[] getSystemCiphersuites(Logger log) {
         String jvmCipherSuites = System.getProperty(HTTPS_CIPHER_SUITES);
         if ((jvmCipherSuites != null) && (!jvmCipherSuites.isEmpty())) {
@@ -450,10 +473,8 @@ public final class SSLUtils {
 
     }
 
-    private static List<Pattern> compileRegexPatterns(List<String> regexes,
-                                                      boolean include,
-                                                      Logger log) {
-        List<Pattern> patterns = new ArrayList<>();
+    private static void compileRegexPatterns(List<Pattern> patterns, List<String> regexes,
+                                             boolean include, Logger log) {
         if (regexes != null) {
             String msg = include
                          ? "CIPHERSUITE_INCLUDE_FILTER"
@@ -463,7 +484,6 @@ public final class SSLUtils {
                 patterns.add(Pattern.compile(s));
             }
         }
-        return patterns;
     }
 
     private static boolean matchesOneOf(String s, List<Pattern> patterns) {
