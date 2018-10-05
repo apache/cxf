@@ -31,6 +31,7 @@ import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -65,8 +66,6 @@ public final class SSLUtils {
 
     private static final String HTTPS_CIPHER_SUITES = "https.cipherSuites";
 
-    private static final List<String> DEFAULT_CIPHERSUITE_FILTERS_INCLUDE =
-        Arrays.asList(new String[] {".*"});
     /**
      * By default, exclude NULL, anon, EXPORT, DES, 3DES, MD5, CBC and RC4 ciphersuites
      */
@@ -409,7 +408,7 @@ public final class SSLUtils {
         List<Pattern> includes =
             filters != null
                 ? compileRegexPatterns(filters.getInclude(), true, log)
-                : compileRegexPatterns(DEFAULT_CIPHERSUITE_FILTERS_INCLUDE, true, log);
+                : Collections.emptyList();
         List<Pattern> excludes =
             filters != null
                 ? compileRegexPatterns(filters.getExclude(), false, log)
