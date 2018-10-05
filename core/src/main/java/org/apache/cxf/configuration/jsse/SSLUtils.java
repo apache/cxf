@@ -422,34 +422,27 @@ public final class SSLUtils {
         }
 
         List<String> filteredCipherSuites = new ArrayList<>();
-        List<String> excludedCipherSuites = new ArrayList<>();
-        for (int i = 0; i < supportedCipherSuites.length; i++) {
-            if (matchesOneOf(supportedCipherSuites[i], includes)
-                && !matchesOneOf(supportedCipherSuites[i], excludes)) {
+        for (String supportedCipherSuite : supportedCipherSuites) {
+            if (matchesOneOf(supportedCipherSuite, includes)
+                && !matchesOneOf(supportedCipherSuite, excludes)) {
                 LogUtils.log(log,
                              Level.FINE,
                              "CIPHERSUITE_INCLUDED",
-                             supportedCipherSuites[i]);
-                filteredCipherSuites.add(supportedCipherSuites[i]);
+                             supportedCipherSuite);
+                if (!exclude) {
+                    filteredCipherSuites.add(supportedCipherSuite);
+                }
             } else {
                 LogUtils.log(log,
                              Level.FINE,
                              "CIPHERSUITE_EXCLUDED",
-                             supportedCipherSuites[i]);
-                excludedCipherSuites.add(supportedCipherSuites[i]);
+                             supportedCipherSuite);
+                if (exclude) {
+                    filteredCipherSuites.add(supportedCipherSuite);
+                }
             }
         }
-        LogUtils.log(log,
-                     Level.FINE,
-                     "CIPHERSUITES_FILTERED",
-                     filteredCipherSuites);
-        LogUtils.log(log,
-                     Level.FINE,
-                     "CIPHERSUITES_EXCLUDED",
-                     excludedCipherSuites);
-        if (exclude) {
-            return getCiphersFromList(excludedCipherSuites, log, exclude);
-        }
+
         return getCiphersFromList(filteredCipherSuites, log, exclude);
     }
 
