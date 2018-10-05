@@ -146,8 +146,4 @@ public class AsyncMethodTest extends Assert {
         return URI.create("http://localhost:" + wireMockRule.port() + "/echo");
     }
 
-    private void fail(Response r, String failureMessage) {
-        System.out.println(r.getStatus());
-        fail(failureMessage);
-    }
 }

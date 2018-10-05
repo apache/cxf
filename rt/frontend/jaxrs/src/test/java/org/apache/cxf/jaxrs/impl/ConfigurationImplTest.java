@@ -223,24 +223,28 @@ public class ConfigurationImplTest extends Assert {
     
     @Test
     public void testServerFilterContractsOnClientIsRejected() {
-        Configurable<Client> configurable = new ConfigurableImpl<Client>(createClientProxy(), RuntimeType.CLIENT);
-        Configuration config = configurable.getConfiguration();
-        configurable.register(TestFilter.class);
-        Map<Class<?>, Integer> contracts = config.getContracts(TestFilter.class);
-        assertTrue(contracts.containsKey(ClientRequestFilter.class));
-        assertTrue(contracts.containsKey(ClientResponseFilter.class));
-        assertFalse(contracts.containsKey(ContainerRequestFilter.class));
-        assertFalse(contracts.containsKey(ContainerResponseFilter.class));
+        try (ConfigurableImpl<Client> configurable 
+                = new ConfigurableImpl<Client>(createClientProxy(), RuntimeType.CLIENT)) {
+            Configuration config = configurable.getConfiguration();
+            configurable.register(TestFilter.class);
+            Map<Class<?>, Integer> contracts = config.getContracts(TestFilter.class);
+            assertTrue(contracts.containsKey(ClientRequestFilter.class));
+            assertTrue(contracts.containsKey(ClientResponseFilter.class));
+            assertFalse(contracts.containsKey(ContainerRequestFilter.class));
+            assertFalse(contracts.containsKey(ContainerResponseFilter.class));
+        }
     }
 
     @Test
     public void testClientFilterWithNestedInterfacesIsAccepted() {
-        Configurable<Client> configurable = new ConfigurableImpl<>(createClientProxy(), RuntimeType.CLIENT);
-        Configuration config = configurable.getConfiguration();
-        configurable.register(NestedInterfaceTestFilter.class);
-        Map<Class<?>, Integer> contracts = config.getContracts(NestedInterfaceTestFilter.class);
-        assertTrue(contracts.containsKey(ClientRequestFilter.class));
-        assertTrue(contracts.containsKey(ClientResponseFilter.class));
+        try (ConfigurableImpl<Client> configurable 
+                = new ConfigurableImpl<>(createClientProxy(), RuntimeType.CLIENT)) {
+            Configuration config = configurable.getConfiguration();
+            configurable.register(NestedInterfaceTestFilter.class);
+            Map<Class<?>, Integer> contracts = config.getContracts(NestedInterfaceTestFilter.class);
+            assertTrue(contracts.containsKey(ClientRequestFilter.class));
+            assertTrue(contracts.containsKey(ClientResponseFilter.class));
+        }
     }
 
     @Test
@@ -334,16 +338,18 @@ public class ConfigurationImplTest extends Assert {
         TestHandler handler = new TestHandler();
         LogUtils.getL7dLogger(ConfigurableImpl.class).addHandler(handler);
 
-        Configurable<Client> configurable = new ConfigurableImpl<Client>(createClientProxy(), RuntimeType.CLIENT);
-        Configuration config = configurable.getConfiguration();
-
-        configurable.register(ClientFilterConstrainedToServer.class);
-
-        assertEquals(0, config.getInstances().size());
-
-        for (String message : handler.messages) {
-            if (message.startsWith("WARN") && message.contains("cannot be registered in ")) {
-                return; // success
+        try (ConfigurableImpl<Client> configurable 
+                = new ConfigurableImpl<Client>(createClientProxy(), RuntimeType.CLIENT)) {
+            Configuration config = configurable.getConfiguration();
+    
+            configurable.register(ClientFilterConstrainedToServer.class);
+    
+            assertEquals(0, config.getInstances().size());
+    
+            for (String message : handler.messages) {
+                if (message.startsWith("WARN") && message.contains("cannot be registered in ")) {
+                    return; // success
+                }
             }
         }
         fail("did not log expected message");
@@ -355,16 +361,18 @@ public class ConfigurationImplTest extends Assert {
         TestHandler handler = new TestHandler();
         LogUtils.getL7dLogger(ConfigurableImpl.class).addHandler(handler);
 
-        Configurable<Client> configurable = new ConfigurableImpl<Client>(createClientProxy(), RuntimeType.CLIENT);
-        Configuration config = configurable.getConfiguration();
-
-        configurable.register(ContainerResponseFilterImpl.class);
-
-        assertEquals(0, config.getInstances().size());
-
-        for (String message : handler.messages) {
-            if (message.startsWith("WARN") && message.contains("Null, empty or invalid contracts specified")) {
-                return; // success
+        try (ConfigurableImpl<Client> configurable 
+                = new ConfigurableImpl<Client>(createClientProxy(), RuntimeType.CLIENT)) {
+            Configuration config = configurable.getConfiguration();
+    
+            configurable.register(ContainerResponseFilterImpl.class);
+    
+            assertEquals(0, config.getInstances().size());
+    
+            for (String message : handler.messages) {
+                if (message.startsWith("WARN") && message.contains("Null, empty or invalid contracts specified")) {
+                    return; // success
+                }
             }
         }
         fail("did not log expected message");
