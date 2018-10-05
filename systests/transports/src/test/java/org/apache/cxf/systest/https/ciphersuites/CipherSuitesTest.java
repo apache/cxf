@@ -688,7 +688,7 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
 
         // Check we have no anon/EXPORT/NULL/etc ciphersuites
         assertFalse(Arrays.stream(
-            filteredCipherSuites).anyMatch(c -> c.matches(".*NULL|anon|EXPORT.*")));
+            filteredCipherSuites).anyMatch(c -> c.matches(".*NULL|anon|EXPORT|DES|MD5|CBC|RC4.*")));
     }
 
     @org.junit.Test
