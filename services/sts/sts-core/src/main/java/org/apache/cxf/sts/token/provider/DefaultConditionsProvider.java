@@ -141,8 +141,8 @@ public class DefaultConditionsProvider implements ConditionsProvider {
 
         Lifetime tokenLifetime = providerParameters.getTokenRequirements().getLifetime();
         if (lifetime > 0) {
-            if (acceptClientLifetime && tokenLifetime != null &&
-                    (tokenLifetime.getCreated() != null || tokenLifetime.getExpires() != null)) {
+            if (acceptClientLifetime && tokenLifetime != null
+                    && (tokenLifetime.getCreated() != null || tokenLifetime.getExpires() != null)) {
                 Instant creationTime = parsedInstantOrDefault(tokenLifetime.getCreated(), Instant.now());
                 Instant expirationTime = parsedInstantOrDefault(tokenLifetime.getExpires(),
                         creationTime.plusSeconds(lifetime));
