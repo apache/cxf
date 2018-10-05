@@ -23,6 +23,8 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.Properties;
 
+import org.w3c.dom.Element;
+
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.sts.STSConstants;
@@ -40,7 +42,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.DateUtil;
-import org.w3c.dom.Element;
+
 
 
 /**
