@@ -39,6 +39,7 @@ import org.apache.cxf.jaxrs.model.doc.JavaDocProvider;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
+import io.swagger.v3.jaxrs2.Reader;
 import io.swagger.v3.oas.integration.api.OpenAPIConfiguration;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
@@ -127,6 +128,7 @@ public class OpenApiCustomizer {
                         if (StringUtils.isBlank(subentry.getValue().getSummary())) {
                             subentry.getValue().setSummary(javadocProvider.getMethodDoc(ori));
                         }
+
                         if (subentry.getValue().getParameters() == null) {
                             List<Parameter> parameters = new ArrayList<>();
                             addParameters(parameters);
@@ -141,15 +143,7 @@ public class OpenApiCustomizer {
                             addParameters(subentry.getValue().getParameters());
                         }
 
-                        if (subentry.getValue().getResponses() != null
-                                && !subentry.getValue().getResponses().isEmpty()) {
-
-                            ApiResponse response =
-                                    subentry.getValue().getResponses().entrySet().iterator().next().getValue();
-                            if (StringUtils.isBlank(response.getDescription())) {
-                                response.setDescription(javadocProvider.getMethodResponseDoc(ori));
-                            }
-                        }
+                        customizeResponses(subentry.getValue(), ori);
                     }
                 }
             });
@@ -188,6 +182,25 @@ public class OpenApiCustomizer {
      */
     protected void addParameters(final List<Parameter> parameters) {
         // does nothing by default
+    }
+
+    /**
+     * Allows to customize the responses of the given {@link Operation} instance; the method is invoked
+     * for all instances available.
+     *
+     * @param operation operation instance
+     * @param ori CXF data about the given operation instance
+     */
+    protected void customizeResponses(final Operation operation, final OperationResourceInfo ori) {
+        if (operation.getResponses() != null && !operation.getResponses().isEmpty()) {
+            ApiResponse response = operation.getResponses().entrySet().iterator().next().getValue();
+            if (StringUtils.isBlank(response.getDescription())
+                    || (StringUtils.isNotBlank(javadocProvider.getMethodResponseDoc(ori))
+                    && Reader.DEFAULT_DESCRIPTION.equals(response.getDescription()))) {
+
+                response.setDescription(javadocProvider.getMethodResponseDoc(ori));
+            }
+        }
     }
 
     public void setDynamicBasePath(final boolean dynamicBasePath) {
