@@ -188,6 +188,7 @@ public class VersionTransformer extends org.apache.cxf.ws.addressing.VersionTran
         headers.add(new QName(Names200408.WSA_NAMESPACE_NAME, Names.WSA_FAULTTO_NAME));
         headers.add(new QName(Names200408.WSA_NAMESPACE_NAME, Names.WSA_ACTION_NAME));
         headers.add(new QName(Names200408.WSA_NAMESPACE_NAME, Names.WSA_MESSAGEID_NAME));
+        headers.add(new QName(Names200408.WSA_NAMESPACE_NAME, Names.WSA_RELATESTO_NAME));
 
         headers.add(new QName(Names200403.WSA_NAMESPACE_NAME, Names.WSA_FROM_NAME));
         headers.add(new QName(Names200403.WSA_NAMESPACE_NAME, Names.WSA_TO_NAME));
@@ -195,6 +196,7 @@ public class VersionTransformer extends org.apache.cxf.ws.addressing.VersionTran
         headers.add(new QName(Names200403.WSA_NAMESPACE_NAME, Names.WSA_FAULTTO_NAME));
         headers.add(new QName(Names200403.WSA_NAMESPACE_NAME, Names.WSA_ACTION_NAME));
         headers.add(new QName(Names200403.WSA_NAMESPACE_NAME, Names.WSA_MESSAGEID_NAME));
+        headers.add(new QName(Names200403.WSA_NAMESPACE_NAME, Names.WSA_RELATESTO_NAME));
 
         HEADERS = Collections.unmodifiableSet(headers);
     }
