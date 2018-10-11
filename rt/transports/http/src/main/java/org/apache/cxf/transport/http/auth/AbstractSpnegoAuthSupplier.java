@@ -121,7 +121,7 @@ public abstract class AbstractSpnegoAuthSupplier {
                 subject = lc.getSubject();
             }
         } else if (loginConfig != null && delegatedCred == null) {
-            LoginContext lc = new LoginContext("", new Subject(), null, loginConfig);
+            LoginContext lc = new LoginContext("", null, null, loginConfig);
             lc.login();
             subject = lc.getSubject();
         }
