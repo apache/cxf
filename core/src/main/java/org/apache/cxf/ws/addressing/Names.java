@@ -186,6 +186,7 @@ public final class Names {
         headers.add(WSA_FAULTTO_QNAME);
         headers.add(WSA_ACTION_QNAME);
         headers.add(WSA_MESSAGEID_QNAME);
+        headers.add(WSA_RELATESTO_QNAME);
         HEADERS = Collections.unmodifiableSet(headers);
     }
 
