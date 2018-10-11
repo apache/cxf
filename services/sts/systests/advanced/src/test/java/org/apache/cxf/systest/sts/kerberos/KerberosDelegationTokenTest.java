@@ -19,11 +19,8 @@
 package org.apache.cxf.systest.sts.kerberos;
 
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Map;
 
-import javax.security.auth.login.AppConfigurationEntry;
-import javax.security.auth.login.Configuration;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
@@ -132,48 +129,6 @@ public class KerberosDelegationTokenTest extends AbstractBusClientServerTestBase
         SpnegoAuthSupplier authSupplier = new SpnegoAuthSupplier();
         authSupplier.setServicePrincipalName("bob@service.ws.apache.org");
         authSupplier.setServiceNameType(GSSName.NT_HOSTBASED_SERVICE);
-        WebClient.getConfig(client).getHttpConduit().setAuthSupplier(authSupplier);
-
-        int resp = client.post(numToDouble, Integer.class);
-        org.junit.Assert.assertEquals(2 * numToDouble, resp);
-    }
-
-    @org.junit.Test
-    public void testKerberosTokenJAXRSCustomLogin() throws Exception {
-
-        final String configLocation = "org/apache/cxf/systest/sts/kerberos/cxf-intermediary-jaxrs-client.xml";
-        final String address = "https://localhost:" + INTERMEDIARY_PORT + "/doubleit/services/doubleit-rs";
-        final int numToDouble = 35;
-
-        WebClient client = WebClient.create(address, configLocation);
-        client.type("text/plain").accept("text/plain");
-
-        Map<String, Object> requestContext = WebClient.getConfig(client).getRequestContext();
-        requestContext.put("auth.spnego.useKerberosOid", "true");
-        requestContext.put("auth.spnego.requireCredDelegation", "true");
-
-        SpnegoAuthSupplier authSupplier = new SpnegoAuthSupplier();
-        authSupplier.setServicePrincipalName("bob@service.ws.apache.org");
-        authSupplier.setServiceNameType(GSSName.NT_HOSTBASED_SERVICE);
-        Map<String, String> loginConfig = new HashMap<>();
-
-        loginConfig.put("useKeyTab", "true");
-        loginConfig.put("storeKey", "true");
-        loginConfig.put("refreshKrb5Config", "true");
-        loginConfig.put("keyTab", "/some/fake/keytab.keytab");
-        loginConfig.put("principal", "someuser@service.ws.apache.org");
-        loginConfig.put("useTicketCache", "true");
-        loginConfig.put("debug", String.valueOf(true));
-
-        authSupplier.setLoginConfig(new Configuration() {
-            @Override
-            public AppConfigurationEntry[] getAppConfigurationEntry(String name) {
-                return new AppConfigurationEntry[] {
-                  new AppConfigurationEntry("com.sun.security.auth.module.Krb5LoginModule",
-                    AppConfigurationEntry.LoginModuleControlFlag.REQUIRED,
-                    loginConfig)};
-            }
-        });
         WebClient.getConfig(client).getHttpConduit().setAuthSupplier(authSupplier);
 
         int resp = client.post(numToDouble, Integer.class);
