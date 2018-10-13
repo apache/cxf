@@ -31,7 +31,7 @@ import brave.http.HttpClientHandler;
 import brave.http.HttpTracing;
 import brave.propagation.Propagation.Setter;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.tracing.AbstractTracingProvider;
 import org.apache.cxf.tracing.brave.internal.HttpAdapterFactory;
 import org.apache.cxf.tracing.brave.internal.HttpAdapterFactory.Request;
@@ -81,7 +81,7 @@ public abstract class AbstractBraveClientProvider extends AbstractTracingProvide
     }
 
     private boolean isAsyncInvocation() {
-        return !JAXRSUtils.getCurrentMessage().getExchange().isSynchronous();
+        return !PhaseInterceptorChain.getCurrentMessage().getExchange().isSynchronous();
     }
 
     protected void stopTraceSpan(final TraceScopeHolder<TraceScope> holder, final int responseStatus) {
