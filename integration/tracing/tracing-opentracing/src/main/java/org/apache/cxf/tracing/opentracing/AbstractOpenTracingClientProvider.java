@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.tracing.AbstractTracingProvider;
 import org.apache.cxf.tracing.opentracing.internal.TextMapInjectAdapter;
 
@@ -74,7 +74,7 @@ public abstract class AbstractOpenTracingClientProvider extends AbstractTracingP
     }
 
     private boolean isAsyncInvocation() {
-        return !JAXRSUtils.getCurrentMessage().getExchange().isSynchronous();
+        return !PhaseInterceptorChain.getCurrentMessage().getExchange().isSynchronous();
     }
 
     protected void stopTraceSpan(final TraceScopeHolder<TraceScope> holder, final int responseStatus) {
