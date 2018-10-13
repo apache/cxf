@@ -247,6 +247,12 @@ public class JMSConfiguration {
         this.connectionFactory = connectionFactory;
     }
 
+    public void resetCachedReplyDestination() {
+        synchronized (this) {
+            this.replyDestinationDest = null;
+        }
+    }
+
     public String getTargetDestination() {
         return targetDestination;
     }

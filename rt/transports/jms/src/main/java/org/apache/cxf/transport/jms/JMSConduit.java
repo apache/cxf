@@ -145,14 +145,18 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                 sendAndReceiveMessage(exchange, request, outMessage, closer, session);
             }
         } catch (JMSException e) {
-            // Close connection so it will be refreshed on next try
-            ResourceCloser.close(connection);
-            this.connection = null;
-            this.staticReplyDestination = null;
             if (this.jmsListener != null) {
                 this.jmsListener.shutdown();
             }
             this.jmsListener = null;
+            // Close connection so it will be refreshed on next try
+            if (exchange.get(JMSUtil.JMS_MESSAGE_CONSUMER) != null) {
+                ResourceCloser.close(exchange.get(JMSUtil.JMS_MESSAGE_CONSUMER));
+            }
+            ResourceCloser.close(connection);
+            this.connection = null;
+            jmsConfig.resetCachedReplyDestination();
+            this.staticReplyDestination = null;
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e1) {
@@ -191,6 +195,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
     private void sendAndReceiveMessage(final Exchange exchange, final Object request, final Message outMessage,
                                 ResourceCloser closer,
                                 Session session) throws JMSException {
+
         
         setupReplyDestination(session);
         
@@ -225,7 +230,8 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                     javax.jms.Message replyMessage = JMSUtil.receive(session, replyDestination,
                                                                      correlationId,
                                                                      jmsConfig.getReceiveTimeout(),
-                                                                     jmsConfig.isPubSubNoLocal());
+                                                                     jmsConfig.isPubSubNoLocal(),
+                                                                     exchange);
                     processReplyMessage(exchange, replyMessage);
                 } else {
                     try {
