@@ -152,7 +152,7 @@
         <cxf.servlet-api.group>javax.servlet</cxf.servlet-api.group>
         <cxf.servlet-api.artifact>javax.servlet-api</cxf.servlet-api.artifact>
         <cxf.servlet-api.version>3.1.0</cxf.servlet-api.version>
-        <cxf.snakeyaml.version>1.18</cxf.snakeyaml.version>
+        <cxf.snakeyaml.version>1.23</cxf.snakeyaml.version>
         <cxf.geronimo.servlet25.version>1.2</cxf.geronimo.servlet25.version>
         <cxf.servlet-api-2.5.artifact>geronimo-servlet_2.5_spec</cxf.servlet-api-2.5.artifact>
         <cxf.servlet-api-2.5.version>1.2</cxf.servlet-api-2.5.version>
