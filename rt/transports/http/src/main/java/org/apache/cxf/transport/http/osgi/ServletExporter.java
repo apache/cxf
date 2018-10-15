@@ -61,11 +61,11 @@ class ServletExporter implements ManagedService {
                 } else {
                     LOG.log(Level.SEVERE, e.getMessage(), e);
                 }
-                if (properties == null) {
-                    // we're simply stopping. if we couldn't unregister, that means we had to little time to register
-                    // otherwise, we'll try to register the servlet
-                    return;
-                }
+            }
+            if (properties == null) {
+                // we're simply stopping. if we couldn't unregister, that means we had to little time to register
+                // otherwise, we'll try to register the servlet
+                return;
             }
             alias = null;
         }
