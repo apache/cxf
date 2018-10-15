@@ -28,6 +28,7 @@ import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.transport.AbstractDestination;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 public class FormattedServiceListWriter implements ServiceListWriter {
     private String styleSheetPath;
@@ -172,13 +173,19 @@ public class FormattedServiceListWriter implements ServiceListWriter {
         writer.write("<tr><td>");
         writer.write("<span class=\"field\">Endpoint address:</span> " + "<span class=\"value\">"
                      + absoluteURL + "</span>");
-        if (bus != null && PropertyUtils.isTrue(bus.getProperty("wadl.service.description.available"))) {
+        
+        Bus sb = bus;
+        if (sd instanceof AbstractHTTPDestination) {
+            sb = ((AbstractHTTPDestination)sd).getBus();
+        }        
+        
+        if (sb != null && PropertyUtils.isTrue(sb.getProperty("wadl.service.description.available"))) {
             writer.write("<br/><span class=\"field\">WADL :</span> " + "<a href=\"" + absoluteURL
                      + "?_wadl\">" + absoluteURL + "?_wadl" + "</a>");
         }
-        if (bus != null && PropertyUtils.isTrue(bus.getProperty("swagger.service.description.available"))) {
+        if (sb != null && PropertyUtils.isTrue(sb.getProperty("swagger.service.description.available"))) {
             String swaggerPath = "swagger.json";
-            if (PropertyUtils.isTrue(bus.getProperty("swagger.service.ui.available"))) {
+            if (PropertyUtils.isTrue(sb.getProperty("swagger.service.ui.available"))) {
                 URI uri = URI.create(absoluteURL);
                 String schemePath = uri.getScheme() + "://" + uri.getHost()
                     + (uri.getPort() == -1 ? "" : ":" + uri.getPort());
