@@ -117,7 +117,7 @@
         <cxf.geronimo.jpa.version>1.0</cxf.geronimo.jpa.version>
         <cxf.openjpa.version>2.4.2</cxf.openjpa.version>
         <cxf.geronimo.transaction.version>3.1.4</cxf.geronimo.transaction.version>
-        <cxf.jasypt.bundle.version>1.9.0_1</cxf.jasypt.bundle.version>
+        <cxf.jasypt.bundle.version>1.9.2_1</cxf.jasypt.bundle.version>
         <cxf.javassist.version>3.21.0-GA</cxf.javassist.version>
         <cxf.javax.ws.rs.version>2.1.1</cxf.javax.ws.rs.version>
         <cxf.jaxb.version>2.2.11</cxf.jaxb.version>
