@@ -91,7 +91,7 @@
         <cxf.ehcache3.version>3.0.3</cxf.ehcache3.version>
         <cxf.fastinfoset.bundle.version>1.2.13_1</cxf.fastinfoset.bundle.version>
         <cxf.guava.version>20.0</cxf.guava.version>
-        <cxf.hazelcast.version>3.9.2</cxf.hazelcast.version>
+        <cxf.hazelcast.version>3.10.6</cxf.hazelcast.version>
         <cxf.hibernate.em.version>5.3.3.Final</cxf.hibernate.em.version>
         <cxf.httpcomponents.asyncclient.version>4.1.4</cxf.httpcomponents.asyncclient.version>
         <cxf.httpcomponents.asyncclient.version.range>[4.0,4.2)</cxf.httpcomponents.asyncclient.version.range>
