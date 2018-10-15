@@ -120,6 +120,10 @@ public abstract class AbstractSpnegoAuthSupplier {
                 lc.login();
                 subject = lc.getSubject();
             }
+        } else if (loginConfig != null && delegatedCred == null) {
+            LoginContext lc = new LoginContext("", null, null, loginConfig);
+            lc.login();
+            subject = lc.getSubject();
         }
 
         GSSManager manager = GSSManager.getInstance();
