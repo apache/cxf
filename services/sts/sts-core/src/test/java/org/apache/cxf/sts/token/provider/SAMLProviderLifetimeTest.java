@@ -118,7 +118,7 @@ public class SAMLProviderLifetimeTest extends org.junit.Assert {
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
-        assertEquals(providerResponse.getExpires(), expirationTime);
+        assertEquals(providerResponse.getExpires().toEpochMilli(), expirationTime.toEpochMilli());
     }
 
 
