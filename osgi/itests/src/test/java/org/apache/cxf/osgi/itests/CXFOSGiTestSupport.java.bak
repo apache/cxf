@@ -42,7 +42,6 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.karaf.container.internal.JavaVersionUtil;
 import org.ops4j.pax.exam.options.MavenUrlReference;
 import org.ops4j.pax.exam.options.extra.VMOption;
-
 import static org.ops4j.pax.exam.CoreOptions.composite;
 import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
@@ -68,7 +67,6 @@ public class CXFOSGiTestSupport {
     protected MavenUrlReference cxfUrl;
     protected MavenUrlReference karafUrl;
     protected MavenUrlReference amqUrl;
-    protected MavenUrlReference springLegacyUrl;
 
     private static String getKarafVersion() {
         return MavenUtils.getArtifactVersion("org.apache.karaf", "apache-karaf-minimal");
@@ -86,9 +84,6 @@ public class CXFOSGiTestSupport {
             .type("xml").classifier("features");
         amqUrl = maven().groupId("org.apache.activemq")
         .artifactId("activemq-karaf").type("xml").classifier("features").versionAsInProject();
-        springLegacyUrl = maven().groupId("org.apache.karaf.features").
-            artifactId("spring-legacy").version(getKarafVersion())
-            .type("xml").classifier("features");
         String localRepo = System.getProperty("localRepository");
         Object urp = System.getProperty("cxf.useRandomFirstPort");
         if (JavaVersionUtil.getMajorVersion() >= 9) {
@@ -110,8 +105,7 @@ public class CXFOSGiTestSupport {
                                                                   "org.ops4j.pax.url.mvn.localRepository",
                                                                   localRepo)),
                              new VMOption("--add-reads=java.xml=java.logging"),
-                             new VMOption("--add-exports=java.base/"
-                                 + "org.apache.karaf.specs.locator=java.xml,ALL-UNNAMED"),
+                             new VMOption("--add-exports=java.base/org.apache.karaf.specs.locator=java.xml,ALL-UNNAMED"),
                              new VMOption("--patch-module"),
                              new VMOption("java.base=lib/endorsed/org.apache.karaf.specs.locator-" 
                              + System.getProperty("karaf.version", "4.2.2-SNAPSHOT") + ".jar"),
