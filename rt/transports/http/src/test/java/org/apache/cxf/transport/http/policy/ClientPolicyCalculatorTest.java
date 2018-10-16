@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.transport.http.policy;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 import org.apache.cxf.transport.http.policy.impl.ClientPolicyCalculator;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
@@ -46,6 +48,7 @@ public class ClientPolicyCalculatorTest extends Assert {
 
     @Test
     public void testIntersectClientPolicies() {
+        ThreadLocalRandom random = ThreadLocalRandom.current();
         ClientPolicyCalculator calc = new ClientPolicyCalculator();
         HTTPClientPolicy p1 = new HTTPClientPolicy();
         HTTPClientPolicy p2 = new HTTPClientPolicy();
@@ -55,9 +58,22 @@ public class ClientPolicyCalculatorTest extends Assert {
         p = calc.intersect(p1, p2);
         assertEquals("browser", p.getBrowserType());
         p1.setBrowserType(null);
-        p1.setConnectionTimeout(10000L);
+
+        long connectionRequestTimeout = random.nextLong(0, 10000);
+        p1.setConnectionRequestTimeout(connectionRequestTimeout);
         p = calc.intersect(p1, p2);
-        assertEquals(10000L, p.getConnectionTimeout());
+        assertEquals(connectionRequestTimeout, p.getConnectionRequestTimeout());
+
+        long receiveTimeout = random.nextLong(0, 10000);
+        p1.setReceiveTimeout(receiveTimeout);
+        p = calc.intersect(p1, p2);
+        assertEquals(receiveTimeout, p.getReceiveTimeout());
+
+        long connectionTimeout = random.nextLong(0, 10000);
+        p1.setConnectionTimeout(connectionTimeout);
+        p = calc.intersect(p1, p2);
+        assertEquals(connectionTimeout, p.getConnectionTimeout());
+
         p1.setAllowChunking(false);
         p2.setAllowChunking(false);
         p = calc.intersect(p1, p2);
