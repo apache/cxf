@@ -46,7 +46,7 @@ import org.eclipse.microprofile.rest.client.RestClientBuilder;
 public class MicroProfileClientFactoryBean extends JAXRSClientFactoryBean {
     private final Comparator<ProviderInfo<?>> comparator;
     private final List<Object> registeredProviders;
-    private Configuration configuration;
+    private final Configuration configuration;
     private ClassLoader proxyLoader;
     private boolean inheritHeaders;
     private ExecutorService executorService;
@@ -99,10 +99,10 @@ public class MicroProfileClientFactoryBean extends JAXRSClientFactoryBean {
                                                 ClientState actualState, Object[] varValues) {
         if (actualState == null) {
             return new MicroProfileClientProxyImpl(URI.create(getAddress()), proxyLoader, cri, isRoot,
-                    inheritHeaders, executorService, varValues);
+                    inheritHeaders, executorService, configuration, varValues);
         } else {
             return new MicroProfileClientProxyImpl(actualState, proxyLoader, cri, isRoot,
-                    inheritHeaders, executorService, varValues);
+                    inheritHeaders, executorService, configuration, varValues);
         }
     }
 

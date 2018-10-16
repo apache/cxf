@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.Priority;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.Default;
@@ -51,12 +52,12 @@ import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 public class RestClientBean implements Bean<Object>, PassivationCapable {
-    private static final Logger LOG = LogUtils.getL7dLogger(RestClientBean.class);
     public static final String REST_URL_FORMAT = "%s/mp-rest/url";
     public static final String REST_URI_FORMAT = "%s/mp-rest/uri";
     public static final String REST_SCOPE_FORMAT = "%s/mp-rest/scope";
     public static final String REST_PROVIDERS_FORMAT = "%s/mp-rest/providers";
     public static final String REST_PROVIDERS_PRIORITY_FORMAT = "%s/mp-rest/providers/%s/priority";
+    private static final Logger LOG = LogUtils.getL7dLogger(RestClientBean.class);
     private static final Default DEFAULT_LITERAL = new DefaultLiteral();
     private final Class<?> clientInterface;
     private final Class<? extends Annotation> scope;
@@ -93,8 +94,8 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
         String baseUri = getBaseUri();
         builder = builder.baseUri(URI.create(baseUri));
         List<Class<?>> providers = getConfiguredProviders();
-        Map<Class<?>,Integer> providerPriorities = getConfiguredProviderPriorities(providers);
-        for (Class<?> providerClass : providers){
+        Map<Class<?>, Integer> providerPriorities = getConfiguredProviderPriorities(providers);
+        for (Class<?> providerClass : providers) {
             builder = builder.register(providerClass, 
                                        providerPriorities.getOrDefault(providerClass, Priorities.USER));
         }
@@ -185,12 +186,12 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
         }
     }
 
-    private List<Class<?>> getConfiguredProviders() {
+    List<Class<?>> getConfiguredProviders() {
         String property = String.format(REST_PROVIDERS_FORMAT, clientInterface.getName());
         String providersList = ConfigFacade.getOptionalValue(property, String.class).orElse("");
         String[] providerClassNames = providersList.split(",");
         List<Class<?>> providers = new ArrayList<>();
-        for (int i=0; i<providerClassNames.length; i++) {
+        for (int i = 0; i < providerClassNames.length; i++) {
             try {
                 providers.add(ClassLoaderUtils.loadClass(providerClassNames[i], RestClientBean.class));
             } catch (ClassNotFoundException e) {
@@ -202,16 +203,22 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
         return providers;
     }
 
-    private Map<Class<?>, Integer> getConfiguredProviderPriorities(List<Class<?>> providers) {
+    Map<Class<?>, Integer> getConfiguredProviderPriorities(List<Class<?>> providers) {
         Map<Class<?>, Integer> map = new HashMap<>();
         for (Class<?> providerClass : providers) {
             String property = String.format(REST_PROVIDERS_PRIORITY_FORMAT, 
                                             clientInterface.getName(),
                                             providerClass.getName());
-            Integer priority = ConfigFacade.getOptionalValue(property, Integer.class).orElse(Priorities.USER);
+            Integer priority = ConfigFacade.getOptionalValue(property, Integer.class)
+                                           .orElse(getPriorityFromClass(providerClass, Priorities.USER));
             map.put(providerClass, priority);
         }
         return map;
+    }
+
+    private static int getPriorityFromClass(Class<?> providerClass, int defaultValue) {
+        Priority p = providerClass.getAnnotation(Priority.class);
+        return p != null ? p.value() : defaultValue;
     }
 
     private static final class DefaultLiteral extends AnnotationLiteral<Default> implements Default {

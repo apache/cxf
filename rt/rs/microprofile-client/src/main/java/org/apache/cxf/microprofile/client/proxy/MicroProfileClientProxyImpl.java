@@ -28,6 +28,7 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutorService;
 
 import javax.ws.rs.client.InvocationCallback;
+import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
@@ -56,19 +57,23 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
 
     private final MPAsyncInvocationInterceptorImpl aiiImpl = new MPAsyncInvocationInterceptorImpl();
 
+    //CHECKSTYLE:OFF
     public MicroProfileClientProxyImpl(URI baseURI, ClassLoader loader, ClassResourceInfo cri,
                                        boolean isRoot, boolean inheritHeaders, ExecutorService executorService,
-                                       Object... varValues) {
+                                       Configuration configuration, Object... varValues) {
         super(new LocalClientState(baseURI), loader, cri, isRoot, inheritHeaders, varValues);
         cfg.getRequestContext().put(EXECUTOR_SERVICE_PROPERTY, executorService);
+        cfg.getRequestContext().putAll(configuration.getProperties());
     }
 
     public MicroProfileClientProxyImpl(ClientState initialState, ClassLoader loader, ClassResourceInfo cri,
                                        boolean isRoot, boolean inheritHeaders, ExecutorService executorService,
-                                       Object... varValues) {
+                                       Configuration configuration, Object... varValues) {
         super(initialState, loader, cri, isRoot, inheritHeaders, varValues);
         cfg.getRequestContext().put(EXECUTOR_SERVICE_PROPERTY, executorService);
+        cfg.getRequestContext().putAll(configuration.getProperties());
     }
+    //CHECKSTYLE:ON
 
 
 
@@ -151,11 +156,19 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
                                     Exchange exchange,
                                     Map<String, Object> invocationContext,
                                     boolean proxy) {
+
         Method m = ori.getMethodToInvoke();
-        Map<String, Object> filterProps = new HashMap<>();
-        filterProps.put("org.eclipse.microprofile.rest.client.invokedMethod", m);
+        
         Message msg = super.createMessage(body, ori, headers, currentURI, exchange, invocationContext, proxy);
-        msg.getExchange().put("jaxrs.filter.properties", filterProps);
+        
+        @SuppressWarnings("unchecked")
+        Map<String, Object> filterProps = (Map<String, Object>) msg.getExchange()
+                                                                   .get("jaxrs.filter.properties");
+        if (filterProps == null) {
+            filterProps = new HashMap<>();
+            msg.getExchange().put("jaxrs.filter.properties", filterProps);
+        }
+        filterProps.put("org.eclipse.microprofile.rest.client.invokedMethod", m);
         return msg;
     }
 }
