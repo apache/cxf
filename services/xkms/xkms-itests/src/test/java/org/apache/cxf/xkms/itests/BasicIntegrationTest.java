@@ -65,7 +65,7 @@ public class BasicIntegrationTest {
         System.setProperty("BasicIntegrationTest.PORT", port);
         String xkmsEndpoint = "http://localhost:" + port + "/cxf/XKMS";
 
-        String karafVersion = System.getProperty("karaf.version", "4.2.1");
+        String karafVersion = System.getProperty("karaf.version", "4.2.2-SNAPSHOT");
         String localRepository = System.getProperty("localRepository");
         MavenArtifactUrlReference karafUrl = maven() //
             .groupId("org.apache.karaf") //
@@ -113,6 +113,13 @@ public class BasicIntegrationTest {
                                                           + "cxf-xkms-service,cxf-xkms-client,"
                                                           + "cxf-xkms-ldap,exam,test-dependencies"),
                                  configureConsole().ignoreLocalConsole(), 
+            new VMOption("--add-reads=java.xml=java.logging"),
+            new VMOption("--add-exports=java.base/"
+                + "org.apache.karaf.specs.locator=java.xml,ALL-UNNAMED"),
+            new VMOption("--patch-module"),
+            new VMOption("java.base=lib/endorsed/org.apache.karaf.specs.locator-"
+                + System.getProperty("karaf.version", "4.2.2-SNAPSHOT")
+                + ".jar"),
             new VMOption("--patch-module"),
             new VMOption("java.xml=lib/endorsed/org.apache.karaf.specs.java.xml-"
                 + System.getProperty("karaf.version", "4.2.2-SNAPSHOT")

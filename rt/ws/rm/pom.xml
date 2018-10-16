@@ -36,7 +36,8 @@
         <cxf.osgi.import>
             javax.xml.soap;version="${cxf.osgi.saaj.version}",
             org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
-            org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}"
+            org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}",
+            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}"
         </cxf.osgi.import>
         <!-- keep in sync with services exported in activator -->
         <cxf.export.service>

@@ -37,6 +37,7 @@
             org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}",
             org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
             javax.xml.ws*;version="${cxf.osgi.javax.xml.ws.version}",
+            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}"
         </cxf.osgi.import>
         <!-- keep in sync with services exported in activator -->
         <cxf.export.service>

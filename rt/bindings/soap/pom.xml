@@ -34,8 +34,10 @@
         <cxf.module.name>org.apache.cxf.binding.soap</cxf.module.name>
         <cxf.osgi.import>
             javax.xml.soap;version="${cxf.osgi.saaj.version}",
+            javax.activation;version="${cxf.osgi.javax.annotation.version}",
             org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
-            org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}"
+            org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}",
+            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}"
         </cxf.osgi.import>
         <cxf.bundle.activator>org.apache.cxf.binding.soap.blueprint.Activator</cxf.bundle.activator>
         <!-- keep in sync with services exported in activator -->

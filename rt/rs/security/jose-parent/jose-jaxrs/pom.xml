@@ -32,6 +32,10 @@
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.rs.security.jose.jaxrs</cxf.module.name>
+        <cxf.osgi.import>
+            javax.activation;version="${cxf.osgi.javax.annotation.version}",
+            *
+        </cxf.osgi.import>
     </properties>
     <dependencies>
         <dependency>
