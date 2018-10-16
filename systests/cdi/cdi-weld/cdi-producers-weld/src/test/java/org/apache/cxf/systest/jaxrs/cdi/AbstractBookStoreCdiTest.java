@@ -65,4 +65,16 @@ public abstract class AbstractBookStoreCdiTest extends AbstractCdiSingleAppTest 
         assertEquals(Response.Status.CREATED.getStatusCode(), r.getStatus());
     }
 
+    @Test
+    public void testQueryParameter() {
+        Response r =
+            createWebClient(getBasePath() + "/books/param", "text/plain").query("fieldValue", "queryParam").get();
+        assertEquals("queryParam", r.readEntity(String.class));
+        assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
+
+        r = createWebClient(getBasePath() + "/books/param2", "text/plain").query("fieldValue2", "queryParam").get();
+        assertEquals("queryParam", r.readEntity(String.class));
+        assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
+    }
+
 }
