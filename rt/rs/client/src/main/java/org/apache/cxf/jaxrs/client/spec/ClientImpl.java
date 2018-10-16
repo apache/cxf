@@ -72,8 +72,9 @@ public class ClientImpl implements Client {
     private Configurable<Client> configImpl;
     private TLSConfiguration secConfig;
     private boolean closed;
-    private Set<WebClient> baseClients = 
-        Collections.newSetFromMap(new WeakHashMap<WebClient, Boolean>());
+    private Set<WebClient> baseClients =
+        Collections.synchronizedSet(Collections.newSetFromMap(new WeakHashMap<WebClient, Boolean>()));
+
     public ClientImpl(Configuration config,
                       TLSConfiguration secConfig) {
         configImpl = new ClientConfigurableImpl<Client>(this, config);
@@ -83,8 +84,10 @@ public class ClientImpl implements Client {
     @Override
     public void close() {
         if (!closed) {
-            for (WebClient wc : baseClients) {
-                wc.close();
+            synchronized (baseClients) {
+                for (WebClient wc : baseClients) {
+                    wc.close();
+                }
             }
             baseClients = null;
             closed = true;
@@ -275,7 +278,7 @@ public class ClientImpl implements Client {
                         providers.add(p);
                     } else {
                         final Class<?> providerCls = ClassHelper.getRealClass(pf.getBus(), p);
-                        providers.add(new FilterProviderInfo<Object>(p.getClass(), 
+                        providers.add(new FilterProviderInfo<Object>(p.getClass(),
                             providerCls, p, pf.getBus(), contracts));
                     }
                 }
@@ -547,8 +550,8 @@ public class ClientImpl implements Client {
         }
     }
     private static Long getLongValue(Object o) {
-        return o instanceof Long ? (Long)o 
-            : o instanceof String ? Long.valueOf(o.toString()) 
+        return o instanceof Long ? (Long)o
+            : o instanceof String ? Long.valueOf(o.toString())
             : o instanceof Integer ? ((Integer)o).longValue() : null;
     }
     private static Integer getIntValue(Object o) {
