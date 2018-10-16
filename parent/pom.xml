@@ -91,7 +91,7 @@
         <cxf.ehcache3.version>3.0.3</cxf.ehcache3.version>
         <cxf.fastinfoset.bundle.version>1.2.13_1</cxf.fastinfoset.bundle.version>
         <cxf.guava.version>20.0</cxf.guava.version>
-        <cxf.hazelcast.version>3.9.2</cxf.hazelcast.version>
+        <cxf.hazelcast.version>3.10.6</cxf.hazelcast.version>
         <cxf.hibernate.em.version>5.3.3.Final</cxf.hibernate.em.version>
         <cxf.httpcomponents.asyncclient.version>4.1.4</cxf.httpcomponents.asyncclient.version>
         <cxf.httpcomponents.asyncclient.version.range>[4.0,4.2)</cxf.httpcomponents.asyncclient.version.range>
@@ -99,7 +99,7 @@
         <cxf.httpcomponents.core.version>4.4.10</cxf.httpcomponents.core.version>
         <cxf.httpcomponents.core.version.range>[4.3,4.5.0)</cxf.httpcomponents.core.version.range>
         <cxf.hsqldb.version>2.4.1</cxf.hsqldb.version>
-        <cxf.jackson.version>2.9.6</cxf.jackson.version>
+        <cxf.jackson.version>2.9.7</cxf.jackson.version>
         <cxf.james.mim4j.version>0.7.2</cxf.james.mim4j.version>
         <cxf.kerby.version>1.1.1</cxf.kerby.version>
         <cxf.logback.classic.version>1.2.3</cxf.logback.classic.version>
@@ -117,7 +117,7 @@
         <cxf.geronimo.jpa.version>1.0</cxf.geronimo.jpa.version>
         <cxf.openjpa.version>2.4.2</cxf.openjpa.version>
         <cxf.geronimo.transaction.version>3.1.4</cxf.geronimo.transaction.version>
-        <cxf.jasypt.bundle.version>1.9.0_1</cxf.jasypt.bundle.version>
+        <cxf.jasypt.bundle.version>1.9.2_1</cxf.jasypt.bundle.version>
         <cxf.javassist.version>3.21.0-GA</cxf.javassist.version>
         <cxf.javax.ws.rs.version>2.1.1</cxf.javax.ws.rs.version>
         <cxf.jaxb.version>2.2.11</cxf.jaxb.version>
@@ -152,7 +152,7 @@
         <cxf.servlet-api.group>javax.servlet</cxf.servlet-api.group>
         <cxf.servlet-api.artifact>javax.servlet-api</cxf.servlet-api.artifact>
         <cxf.servlet-api.version>3.1.0</cxf.servlet-api.version>
-        <cxf.snakeyaml.version>1.18</cxf.snakeyaml.version>
+        <cxf.snakeyaml.version>1.23</cxf.snakeyaml.version>
         <cxf.geronimo.servlet25.version>1.2</cxf.geronimo.servlet25.version>
         <cxf.servlet-api-2.5.artifact>geronimo-servlet_2.5_spec</cxf.servlet-api-2.5.artifact>
         <cxf.servlet-api-2.5.version>1.2</cxf.servlet-api-2.5.version>
@@ -225,7 +225,7 @@
         <cxf.dom4j.bundle.version>1.6.1_5</cxf.dom4j.bundle.version>
         <cxf.jdom.bundle.version>1.1_4</cxf.jdom.bundle.version>
         <cxf.olingo.version>2.0.9</cxf.olingo.version>
-        <cxf.tika.version>1.18</cxf.tika.version>
+        <cxf.tika.version>1.19.1</cxf.tika.version>
         <cxf.jexl.version>2.1.1</cxf.jexl.version>
         <cxf.htrace.version>4.2.0-incubating</cxf.htrace.version>
         <cxf.zest.version>2.1</cxf.zest.version>

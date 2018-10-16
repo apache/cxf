@@ -73,6 +73,8 @@ public class RESTLoggingTest {
         await().until(() -> events.size(), is(8));
         server.stop();
         server.destroy();
+
+        Assert.assertEquals(8, events.size());
         
         // First call with binary logging false
         assertContentLogged(events.get(0));
@@ -98,8 +100,12 @@ public class RESTLoggingTest {
         WebClient client = createClient(SERVICE_URI, loggingFeature);
         String result = client.get(String.class);
         Assert.assertEquals("test1", result);
-        server.destroy();
+
         List<LogEvent> events = sender.getEvents();
+        await().until(() -> events.size(), is(4));
+        server.stop();
+        server.destroy();
+
         Assert.assertEquals(4, events.size());
         checkRequestOut(events.get(0));
         checkRequestIn(events.get(1));
