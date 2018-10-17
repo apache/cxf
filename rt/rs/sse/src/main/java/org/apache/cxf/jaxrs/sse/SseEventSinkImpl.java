@@ -19,6 +19,7 @@
 
 package org.apache.cxf.jaxrs.sse;
 
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -26,10 +27,13 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.LockSupport;
 import java.util.logging.Logger;
 
 import javax.servlet.AsyncContext;
+import javax.servlet.AsyncEvent;
+import javax.servlet.AsyncListener;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.sse.OutboundSseEvent;
@@ -47,6 +51,8 @@ public class SseEventSinkImpl implements SseEventSink {
     private final Queue<QueuedEvent> buffer;
     private final AtomicBoolean closed = new AtomicBoolean(false);
     private final AtomicBoolean dispatching = new AtomicBoolean(false);
+    private final AtomicReference<Throwable> throwable = new AtomicReference<>();
+    private final AtomicBoolean completed = new AtomicBoolean(false);
 
     public SseEventSinkImpl(final MessageBodyWriter<OutboundSseEvent> writer, 
             final AsyncResponse async, final AsyncContext ctx) {
@@ -61,15 +67,43 @@ public class SseEventSinkImpl implements SseEventSink {
         }
 
         ctx.getResponse().setContentType(OutboundSseEventBodyWriter.SERVER_SENT_EVENTS);
+        ctx.addListener(new AsyncListener() {
+            @Override
+            public void onComplete(AsyncEvent event) throws IOException {
+                // This callback should be called when dequeue() has encountered an
+                // error during the execution and is forced to complete the context.
+                close();
+            }
+
+            @Override
+            public void onTimeout(AsyncEvent event) throws IOException {
+            }
+
+            @Override
+            public void onError(AsyncEvent event) throws IOException {
+                // In case of Tomcat, the context is closed automatically when client closes
+                // the connection.
+                if (throwable.get() != null || throwable.compareAndSet(null, event.getThrowable())) {
+                    // This callback should be called when dequeue() has encountered an
+                    close();
+                }
+            }
+
+            @Override
+            public void onStartAsync(AsyncEvent event) throws IOException {
+            }
+        });
     }
 
     public AsyncContext getAsyncContext() {
         return ctx;
     }
-
+    
     @Override
     public void close() {
         if (closed.compareAndSet(false, true)) {
+            LOG.fine("Closing SSE sink now");
+            
             // In case we are still dispatching, give the events the chance to be
             // sent over to the consumers. The good example would be sent(event) call,
             // immediately followed by the close() call.
@@ -77,10 +111,30 @@ public class SseEventSinkImpl implements SseEventSink {
                 LOG.warning("There are still SSE events the queue which may not be delivered (closing now)");
             }
             
-            try {
-                ctx.complete();
-            } catch (final IllegalStateException ex) {
-                LOG.warning("Failed to close the AsyncContext cleanly: " + ex.getMessage());
+            if (completed.compareAndSet(false, true)) {
+                try {
+                    // In case of Tomcat, the context may be already closed (f.e. due to error),
+                    // in this case request is set to null.
+                    if (ctx.getRequest() != null) {
+                        LOG.fine("Completing the AsyncContext");
+                        ctx.complete();
+                    }
+                } catch (final IllegalStateException ex) {
+                    LOG.warning("Failed to close the AsyncContext cleanly: " + ex.getMessage());
+                }
+            }
+            
+            // Complete all the accepted but not dispatched send request with the
+            // error (if any) or signal that sink has been closed already.
+            Throwable ex = throwable.get();
+            if (ex == null) {
+                ex = new IllegalStateException("The sink has been already closed");
+            }
+            
+            QueuedEvent queuedEvent = buffer.poll();
+            while (queuedEvent != null) {
+                queuedEvent.completion.completeExceptionally(ex);
+                queuedEvent = buffer.poll();
             }
         }
     }
@@ -106,7 +160,10 @@ public class SseEventSinkImpl implements SseEventSink {
         final CompletableFuture<?> future = new CompletableFuture<>();
 
         if (!closed.get() && writer != null) {
-            if (buffer.offer(new QueuedEvent(event, future))) {
+            final Throwable ex = throwable.get(); 
+            if (ex != null) {
+                future.completeExceptionally(ex);
+            } else if (buffer.offer(new QueuedEvent(event, future))) {
                 if (dispatching.compareAndSet(false, true)) {
                     ctx.start(this::dequeue);
                 }
@@ -122,30 +179,77 @@ public class SseEventSinkImpl implements SseEventSink {
         return future;
     }
 
+    /**
+     * Processes the buffered events and sends the off to the output channel. There  is
+     * a special handling for the IOException, which forces the sink to switch to closed 
+     * state: 
+     *   - when the IOException is detected, the AsyncContext is forcebly closed (unless
+     *     it is already closed like in case of the Tomcat)
+     *   - all unsent events are completed exceptionally
+     *   - all unscheduled events are completed exceptionally (see please close() method)
+     *   
+     */
     private void dequeue() {
+        Throwable error = throwable.get();
+        
         try {
             while (true) {
-                final QueuedEvent qeuedEvent = buffer.poll();
+                final QueuedEvent queuedEvent = buffer.poll();
                 
                 // Nothing queued, release the thread
-                if (qeuedEvent == null) {
+                if (queuedEvent == null) {
                     break;
                 }
                 
-                final OutboundSseEvent event = qeuedEvent.event;
-                final CompletableFuture<?> future = qeuedEvent.completion;
+                final OutboundSseEvent event = queuedEvent.event;
+                final CompletableFuture<?> future = queuedEvent.completion;
     
                 try {
-                    writer.writeTo(event, event.getClass(), event.getGenericType(), EMPTY_ANNOTATIONS,
-                        event.getMediaType(), null, ctx.getResponse().getOutputStream());
-                    ctx.getResponse().flushBuffer();
-                    future.complete(null);
+                    if (error == null) {
+                        LOG.fine("Dispatching SSE event over the wire");
+                        
+                        writer.writeTo(event, event.getClass(), event.getGenericType(), EMPTY_ANNOTATIONS,
+                            event.getMediaType(), null, ctx.getResponse().getOutputStream());
+                        ctx.getResponse().flushBuffer();
+                        
+                        LOG.fine("Completing the future successfully");
+                        future.complete(null);
+                    } else {
+                        LOG.fine("Completing the future unsuccessfully (error enountered previously)");
+                        future.completeExceptionally(error);
+                    }
                 } catch (final Exception ex) {
+                    // Very likely the connection is closed by the client (but we cannot
+                    // detect if for sure, container-specific).
+                    if (ex instanceof IOException) {
+                        error = (IOException)ex;
+                    }
+                    
+                    LOG.fine("Completing the future unsuccessfully (error enountered)");
                     future.completeExceptionally(ex);
                 }
             }
         } finally {
+            final boolean shouldComplete = (error != null) && throwable.compareAndSet(null, error);
             dispatching.set(false);
+            
+            // Ideally, we should be rethrowing the exception here (error) and handle
+            // it inside the onError() callback. However, most of the servlet containers
+            // do not handle this case properly (and onError() is not called). 
+            if (shouldComplete && completed.compareAndSet(false, true)) {
+                LOG.warning("Prematurely completing the AsyncContext due to error encountered: " + error);
+                // In case of Tomcat, the context is closed automatically when client closes
+                // the connection and onError callback will be called (in this case request 
+                // is set to null).
+                if (ctx.getRequest() != null) {
+                    LOG.fine("Completing the AsyncContext");
+                    try {
+                        ctx.complete();
+                    } catch (final IllegalStateException ex) {
+                        LOG.warning("Failed to close the AsyncContext cleanly: " + ex.getMessage());
+                    }
+                }
+            }
         }
     }
 

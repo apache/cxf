@@ -34,7 +34,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.sse.OutboundSseEvent;
 import javax.ws.rs.sse.OutboundSseEvent.Builder;
 import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseBroadcaster;
@@ -44,7 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Path("/api/bookstore")
-public class BookStore2 {
+public class BookStore2 extends BookStoreClientCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(BookStore2.class);
 
     private final CountDownLatch latch = new CountDownLatch(2);
@@ -149,12 +148,9 @@ public class BookStore2 {
             LOG.error("Wait has been interrupted", ex);
         }
     }
-
-    private static OutboundSseEvent createStatsEvent(final OutboundSseEvent.Builder builder, final int eventId) {
-        return builder
-            .id(Integer.toString(eventId))
-            .data(Book.class, new Book("New Book #" + eventId, eventId))
-            .mediaType(MediaType.APPLICATION_JSON_TYPE)
-            .build();
+    
+    @Override
+    protected Sse getSse() {
+        return sse;
     }
 }
