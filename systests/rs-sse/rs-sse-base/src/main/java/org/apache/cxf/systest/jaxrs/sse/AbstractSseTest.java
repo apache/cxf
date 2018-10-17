@@ -40,6 +40,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
 
 public abstract class AbstractSseTest extends AbstractSseBaseTest {
@@ -198,6 +199,71 @@ public abstract class AbstractSseTest extends AbstractSseBaseTest {
                 new Book("New Book #5", 5)
             )
         );
+    }
+
+    @Test
+    public void testClientClosesEventSource() throws InterruptedException {
+        final WebTarget target = createWebTarget("/rest/api/bookstore/client-closes-connection/sse/0");
+        final Collection<Book> books = new ArrayList<>();
+
+        try (SseEventSource eventSource = SseEventSource.target(target).build()) {
+            eventSource.register(collect(books), System.out::println);
+            eventSource.open();
+            
+            // wait for single event, close before server sends other 3
+            awaitEvents(200, books, 1);
+            
+            // Only two out of 4 messages should be delivered, others should be discarded
+            final Response r = 
+                createWebClient("/rest/api/bookstore/client-closes-connection/received", MediaType.APPLICATION_JSON)
+                    .put(null);
+            assertThat(r.getStatus(), equalTo(204));
+            
+            assertThat(eventSource.close(1, TimeUnit.SECONDS), equalTo(true));
+        }
+
+        // Easing the test verification here, it does not work well for Atm + Jetty
+        assertThat(books,
+            hasItems(
+                new Book("New Book #1", 1)
+            )
+        );
+        
+        // Only two out of 4 messages should be delivered, others should be discarded
+        final Response r = 
+            createWebClient("/rest/api/bookstore/client-closes-connection/closed", MediaType.APPLICATION_JSON)
+                .put(null);
+        assertThat(r.getStatus(), equalTo(204));
+
+        // Give server some time to finish up the sink
+        Thread.sleep(2000);
+        
+        // Only two out of 4 messages should be delivered, others should be discarded
+        final BookBroadcasterStats stats = 
+            createWebClient("/rest/api/bookstore/client-closes-connection/stats", MediaType.APPLICATION_JSON)
+                .get()
+                .readEntity(BookBroadcasterStats.class);
+        
+        // Tomcat will feedback through onError callback, others through onComplete
+        assertThat(stats.isErrored(), equalTo(supportsErrorPropagation()));
+        // The sink should be in closed state
+        assertThat(stats.isWasClosed(), equalTo(true));
+        // The onClose callback should be called
+        assertThat(stats.isClosed(), equalTo(true));
+
+        // It is very hard to get the predictable match here, but at most
+        // 2 events could get through before the client's connection drop off
+        assertTrue(stats.getCompleted() == 2 || stats.getCompleted() == 1);
+    }
+    
+    /**
+     * Jetty / Undertow do not propagate errors from the runnable passed to 
+     * AsyncContext::start() up to the AsyncEventListener::onError(). Tomcat however 
+     * does it.
+     * @return
+     */
+    protected boolean supportsErrorPropagation() {
+        return false;
     }
 
     private static Consumer<InboundSseEvent> collect(final Collection< Book > books) {
