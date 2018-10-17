@@ -41,11 +41,22 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
  *
  */
 public class Servlet3ContinuationProvider implements ContinuationProvider {
+    static final boolean IS_31;
+    static {
+        boolean is31 = false;
+        try {
+            ClassLoaderUtils.loadClass("javax.servlet.WriteListener", HttpServletRequest.class);
+            is31 = true;
+        } catch (Throwable t) {
+            is31 = false;
+        }
+        IS_31 = is31;
+    }
+    
     HttpServletRequest req;
     HttpServletResponse resp;
     Message inMessage;
     Servlet3Continuation continuation;
-    boolean is31;
 
     public Servlet3ContinuationProvider(HttpServletRequest req,
                                         HttpServletResponse resp,
@@ -53,14 +64,6 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         this.inMessage = inMessage;
         this.req = req;
         this.resp = resp;
-        
-        
-        try {
-            ClassLoaderUtils.loadClass("javax.servlet.WriteListener", HttpServletRequest.class);
-            is31 = true;
-        } catch (Throwable t) {
-            is31 = false;
-        }
     }
 
     public void complete() {
@@ -78,7 +81,7 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         }
 
         if (continuation == null) {
-            continuation = is31 ? new Servlet31Continuation() : new Servlet3Continuation();
+            continuation = IS_31 ? new Servlet31Continuation() : new Servlet3Continuation();
         } else {
             continuation.startAsyncAgain();
         }
