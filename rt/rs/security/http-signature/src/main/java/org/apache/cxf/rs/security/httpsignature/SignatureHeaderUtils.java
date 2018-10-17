@@ -44,7 +44,7 @@ public final class SignatureHeaderUtils {
     public static  String createDigestHeader(String messageBody, String digestAlgorithmName) throws NoSuchAlgorithmException {
         MessageDigest messageDigest = getDigestAlgorithm(digestAlgorithmName);
         messageDigest.update(messageBody.getBytes());
-        return "SHA-256=" + new String(Base64.getEncoder().encode(messageDigest.digest()));
+        return digestAlgorithmName + "=" + new String(Base64.getEncoder().encode(messageDigest.digest()));
     }
 
     /**
