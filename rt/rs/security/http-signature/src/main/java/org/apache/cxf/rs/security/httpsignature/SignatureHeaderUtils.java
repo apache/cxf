@@ -67,14 +67,14 @@ public final class SignatureHeaderUtils {
 
     public static String getMethod(Map<String, List<String>> responseHeaders) {
         if (responseHeaders.containsKey("(request-target)")) {
-            return getTargetRequestSubString(responseHeaders.get("(request-target)").get(0), 0);
+            return getRequestTargetSubString(responseHeaders.get("(request-target)").get(0), 0);
         }
         return "";
     }
 
     public static String getUri(Map<String, List<String>> responseHeaders) {
         if (responseHeaders.containsKey("(request-target)")) {
-            return getTargetRequestSubString(responseHeaders.get("(request-target)").get(0), 1);
+            return getRequestTargetSubString(responseHeaders.get("(request-target)").get(0), 1);
         }
         return "";
     }
@@ -90,7 +90,7 @@ public final class SignatureHeaderUtils {
         return sb.toString();
     }
 
-    private static String getTargetRequestSubString(String requestTarget, int index) {
+    private static String getRequestTargetSubString(String requestTarget, int index) {
         List<String> subStrings = Arrays.asList(requestTarget.split(" "));
         return subStrings.get(index);
     }
