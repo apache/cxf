@@ -25,6 +25,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.jaxrs.client.WebClientUtil;
 import org.apache.cxf.microprofile.client.mock.EchoClientReqFilter;
 import org.apache.cxf.microprofile.client.mock.ExceptionMappingClient;
 import org.apache.cxf.microprofile.client.mock.HighPriorityClientReqFilter;
@@ -151,8 +152,20 @@ public class CxfTypeSafeClientBuilderTest extends Assert {
         assertEquals(String.class.getName(), response.getHeaderString("Parm2"));
     }
 
+    @Test
+    public void testClientPropertiesAreSet() throws Exception {
+        InterfaceWithoutProvidersDefined client = RestClientBuilder.newBuilder()
+            .register(InvokedMethodClientRequestFilter.class)
+            .property("hello", "world")
+            .baseUri(new URI("http://localhost:8080/neverUsed"))
+            .build(InterfaceWithoutProvidersDefined.class);
+        assertEquals("world",
+            WebClientUtil.getClientConfigFromProxy(client).getRequestContext().get("hello"));
+    }
+
     private void fail(Response r, String failureMessage) {
         System.out.println(r.getStatus());
         fail(failureMessage);
     }
+
 }
