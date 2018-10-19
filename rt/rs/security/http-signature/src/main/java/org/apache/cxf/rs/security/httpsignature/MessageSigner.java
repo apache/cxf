@@ -1,6 +1,5 @@
 package org.apache.cxf.rs.security.httpsignature;
 
-import org.apache.cxf.common.logging.LogUtils;
 import org.tomitribe.auth.signatures.Signature;
 
 import java.io.IOException;
@@ -9,14 +8,10 @@ import java.security.PrivateKey;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 public class MessageSigner {
-
-    protected static final Logger LOG = LogUtils.getL7dLogger(MessageSigner.class);
-
-    private final String signatureAlgorithmName;
     private final String digestAlgorithmName;
+    private final String signatureAlgorithmName;
 
     /**
      * Message signer using standard digest and signing algorithm
@@ -26,8 +21,8 @@ public class MessageSigner {
     }
 
     public MessageSigner(String signatureAlgorithmName, String digestAlgorithmName) {
-        this.signatureAlgorithmName = signatureAlgorithmName;
         this.digestAlgorithmName = digestAlgorithmName;
+        this.signatureAlgorithmName = signatureAlgorithmName;
     }
 
     public void sign(Map<String, List<String>> messageHeaders,
@@ -43,7 +38,6 @@ public class MessageSigner {
         String method = SignatureHeaderUtils.getMethod(messageHeaders);
         String uri = SignatureHeaderUtils.getUri(messageHeaders);
 
-        LOG.info("MessageSigner: method: " + method + " uri: " + uri + " (request-target): " + messageHeaders.get("(request-target)").get(0));
         messageHeaders.put("Signature", Collections.singletonList(createSignature(messageHeaders,
                 privateKey,
                 keyId,

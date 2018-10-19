@@ -1,6 +1,5 @@
 package org.apache.cxf.rs.security.httpsignature;
 
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.rs.security.httpsignature.exception.DifferentAlgorithmsException;
 import org.apache.cxf.rs.security.httpsignature.exception.DifferentDigestsException;
 import org.apache.cxf.rs.security.httpsignature.exception.InvalidDataToVerifySignatureException;
@@ -15,24 +14,21 @@ import java.security.PrivateKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.*;
-import java.util.logging.Logger;
 
 /**
  * @author Fredrik Espedal
  */
 public class MessageVerifierTest {
-    private final static Logger LOG = LogUtils.getL7dLogger(MessageVerifierTest.class);
-
-    private final static String uri = "/test/signature";
-    private final static String method = "Get";
-    private final static String messageBody = "Hello";
     private final static String digestAlgorithm = "SHA-256";
-    private final static String signatureAlgorithm = "rsa-sha256";
     private final static String keyId = "testVerifier";
+    private final static String messageBody = "Hello";
+    private final static String method = "Get";
+    private final static String signatureAlgorithm = "rsa-sha256";
+    private final static String uri = "/test/signature";
     private static PrivateKey privateKey;
 
-    private static MessageVerifier messageVerifier;
     private static MessageSigner messageSigner;
+    private static MessageVerifier messageVerifier;
 
     private static String privateKeyString = "-----BEGIN PRIVATE KEY-----\n" +
             "MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDOq9Krkw8BfXWe\n" +
@@ -90,13 +86,6 @@ public class MessageVerifierTest {
             e.printStackTrace();
         }
         createAndAddSignature(headers);
-
-        String method = SignatureHeaderUtils.getMethod(headers);
-        String uri = SignatureHeaderUtils.getUri(headers);
-
-        LOG.info("MessageVerifierTest: method: " + method + " uri: " + uri + " (request-target): " + headers.get("(request-target)").get(0));
-        LOG.info("signature: " + headers.get("Signature").get(0));
-
         messageVerifier.verifyMessage(headers, messageBody);
     }
 
