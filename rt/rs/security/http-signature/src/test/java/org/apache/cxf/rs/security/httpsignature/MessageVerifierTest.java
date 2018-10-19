@@ -15,9 +15,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.*;
 
-/**
- * @author Fredrik Espedal
- */
 public class MessageVerifierTest {
     private final static String digestAlgorithm = "SHA-256";
     private final static String keyId = "testVerifier";

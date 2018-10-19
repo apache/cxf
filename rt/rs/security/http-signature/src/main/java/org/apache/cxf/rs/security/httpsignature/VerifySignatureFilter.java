@@ -15,7 +15,6 @@ import java.util.logging.Logger;
 /**
  * RS CXF Filter which extracts signature data from the context and sends it to the message verifier
  *
- * @author Fredrik Espedal
  */
 @Provider
 @PreMatching
