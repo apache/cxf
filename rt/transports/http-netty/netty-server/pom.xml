@@ -120,6 +120,13 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-testutils</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+            <classifier>keys</classifier>
+        </dependency>
         <!-- Need to run some integration with jaxws frond end -->
         <dependency>
             <groupId>org.apache.cxf</groupId>

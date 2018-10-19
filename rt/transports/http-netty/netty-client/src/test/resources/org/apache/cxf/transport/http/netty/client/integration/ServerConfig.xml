@@ -28,10 +28,10 @@
         <httpj:engine port="${SSLNettyClientTest.port}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="skpass">
-                    <sec:keyStore file="src/test/resources/org/apache/cxf/transport/http/netty/client/integration/serviceKeystore.jks" password="sspass" type="JKS"/>
+                    <sec:keyStore type="jks" password="sspass" resource="keys/servicestore.jks"/>
                 </sec:keyManagers>
                 <sec:trustManagers>
-                    <sec:keyStore file="src/test/resources/org/apache/cxf/transport/http/netty/client/integration/serviceKeystore.jks" password="sspass" type="JKS"/>
+                    <sec:keyStore type="jks" password="stsspass" resource="keys/stsstore.jks"/>
                 </sec:trustManagers>
                 <sec:clientAuthentication want="true" required="true"/>
             </httpj:tlsServerParameters>

@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.transport.http.netty.server.integration;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
@@ -110,22 +109,23 @@ public class SSLNettyServerTest extends AbstractBusClientServerTestBase {
     private static void setupTLS(Greeter port)
         throws FileNotFoundException, IOException, GeneralSecurityException {
         String keyStoreLoc =
-            "src/test/resources/org/apache/cxf/transport/http/netty/server/integration/clientKeystore.jks";
+            "/keys/clientstore.jks";
         HTTPConduit httpConduit = (HTTPConduit) ClientProxy.getClient(port).getConduit();
 
         TLSClientParameters tlsCP = new TLSClientParameters();
         String keyPassword = "ckpass";
         KeyStore keyStore = KeyStore.getInstance("JKS");
-        keyStore.load(new FileInputStream(keyStoreLoc), "cspass".toCharArray());
+        keyStore.load(SSLNettyServerTest.class.getResourceAsStream(keyStoreLoc), "cspass".toCharArray());
         KeyManager[] myKeyManagers = getKeyManagers(keyStore, keyPassword);
         tlsCP.setKeyManagers(myKeyManagers);
 
 
         KeyStore trustStore = KeyStore.getInstance("JKS");
-        trustStore.load(new FileInputStream(keyStoreLoc), "cspass".toCharArray());
+        trustStore.load(SSLNettyServerTest.class.getResourceAsStream(keyStoreLoc), "cspass".toCharArray());
         TrustManager[] myTrustStoreKeyManagers = getTrustManagers(trustStore);
         tlsCP.setTrustManagers(myTrustStoreKeyManagers);
 
+        tlsCP.setDisableCNCheck(true);
         httpConduit.setTlsClientParameters(tlsCP);
     }
 
