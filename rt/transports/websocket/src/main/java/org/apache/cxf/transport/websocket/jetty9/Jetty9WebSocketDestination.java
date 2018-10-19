@@ -49,6 +49,7 @@ import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory;
 import org.apache.cxf.transport.websocket.InvalidPathException;
 import org.apache.cxf.transport.websocket.WebSocketConstants;
 import org.apache.cxf.transport.websocket.WebSocketDestinationService;
+import org.apache.cxf.transport.websocket.WebSocketUtils;
 import org.apache.cxf.transport.websocket.jetty.WebSocketServletHolder;
 import org.apache.cxf.transport.websocket.jetty.WebSocketVirtualServletRequest;
 import org.apache.cxf.transport.websocket.jetty.WebSocketVirtualServletResponse;
@@ -97,9 +98,9 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
                        final ServletContext context,
                        final HttpServletRequest request,
                        final HttpServletResponse response) throws IOException {
-        
+
         WebSocketServletFactory wsf = getWebSocketFactory(config, context);
-       
+
         if (wsf.isUpgradeRequest(request, response)
             && wsf.acceptWebSocket(request, response)) {
             ((Request)request).setHandled(true);
@@ -119,13 +120,13 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
     protected String getAddress(EndpointInfo endpointInfo) {
         return getNonWSAddress(endpointInfo);
     }
-    
+
     Server getServer(ServletConfig config, ServletContext context) {
         ContextHandler.Context c = (ContextHandler.Context)context;
         ContextHandler h = c.getContextHandler();
         return h.getServer();
     }
-    
+
     private WebSocketServletFactory getWebSocketFactory(ServletConfig config, ServletContext context) {
         if (webSocketFactory == null) {
             Server server = getServer(config, context);
@@ -184,7 +185,11 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
                     request = createServletRequest(data, offset, length, holder, session);
                     String reqid = request.getHeader(REQUEST_ID_KEY);
                     if (reqid != null) {
-                        response.setHeader(RESPONSE_ID_KEY, reqid);
+                        if (WebSocketUtils.isContainingCRLF(reqid)) {
+                            LOG.warning("Invalid characters (CR/LF) in header " + REQUEST_ID_KEY);
+                        } else {
+                            response.setHeader(RESPONSE_ID_KEY, reqid);
+                        }
                     }
                     invoke(null, null, request, response);
                 } catch (InvalidPathException ex) {

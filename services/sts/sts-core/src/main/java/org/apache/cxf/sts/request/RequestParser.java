@@ -111,7 +111,7 @@ public class RequestParser {
             // JAXB types
             if (requestObject instanceof JAXBElement<?>) {
                 JAXBElement<?> jaxbElement = (JAXBElement<?>) requestObject;
-                if (jaxbElement != null && LOG.isLoggable(Level.FINE)) {
+                if (LOG.isLoggable(Level.FINE)) {
                     LOG.fine("Found " + jaxbElement.getName() + ": " + jaxbElement.getValue());
                 }
                 try {

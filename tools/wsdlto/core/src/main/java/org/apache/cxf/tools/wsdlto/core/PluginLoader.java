@@ -188,19 +188,16 @@ public final class PluginLoader {
 
     protected Plugin getPlugin(URL url) throws IOException, JAXBException, FileNotFoundException {
         Plugin plugin = plugins.get(url.toString());
-        InputStream is = null;
         if (plugin == null) {
-            is = url.openStream();
-            plugin = getPlugin(is);
+            try (InputStream is = url.openStream()) {
+                plugin = getPlugin(is);
+            }
             if (plugin == null || StringUtils.isEmpty(plugin.getName())) {
                 Message msg = new Message("PLUGIN_LOAD_FAIL", LOG, url);
                 LOG.log(Level.SEVERE, msg.toString());
                 throw new ToolException(msg);
             }
             plugins.put(url.toString(), plugin);
-        }
-        if (is == null) {
-            return getPlugin(url.toString());
         }
         return plugin;
     }

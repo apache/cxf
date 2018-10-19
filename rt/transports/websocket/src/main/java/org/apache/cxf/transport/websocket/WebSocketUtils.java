@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -37,6 +38,7 @@ public final class WebSocketUtils {
 
     private static final byte[] CRLF = "\r\n".getBytes();
     private static final byte[] COLSP = ": ".getBytes();
+    private static final Pattern CR_OR_LF = Pattern.compile("\\r|\\n");
 
     private WebSocketUtils() {
     }
@@ -221,6 +223,10 @@ public final class WebSocketUtils {
             sb.append(CRLF).append(data, offset, length);
         }
         return sb.toByteArray();
+    }
+
+    public static boolean isContainingCRLF(String value) {
+        return CR_OR_LF.matcher(value).find();
     }
 
     private static class ByteArrayBuilder {

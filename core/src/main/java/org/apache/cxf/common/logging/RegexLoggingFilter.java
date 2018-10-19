@@ -80,15 +80,15 @@ public class RegexLoggingFilter {
     }
 
     public void addCommandOption(String option, String... commands) {
-        String pattern = "(";
+        StringBuilder pattern = new StringBuilder("(");
         for (String command : commands) {
             if (pattern.length() > 1) {
-                pattern += "|";
+                pattern.append("|");
             }
-            pattern += Pattern.quote(command);
+            pattern.append(Pattern.quote(command));
         }
-        pattern += ") +.*?" + Pattern.quote(option) + " +([^ ]+)";
-        regexs.add(new ReplaceRegEx(pattern, 2, DEFAULT_REPLACEMENT));
+        pattern.append(") +.*?").append(Pattern.quote(option)).append(" +([^ ]+)");
+        regexs.add(new ReplaceRegEx(pattern.toString(), 2, DEFAULT_REPLACEMENT));
     }
 
     public String getPattern() {

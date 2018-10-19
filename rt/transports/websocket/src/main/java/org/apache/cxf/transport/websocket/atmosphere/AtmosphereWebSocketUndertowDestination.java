@@ -45,6 +45,7 @@ import org.apache.cxf.transport.http_undertow.UndertowHTTPHandler;
 import org.apache.cxf.transport.http_undertow.UndertowHTTPServerEngineFactory;
 import org.apache.cxf.transport.websocket.WebSocketConstants;
 import org.apache.cxf.transport.websocket.WebSocketDestinationService;
+import org.apache.cxf.transport.websocket.WebSocketUtils;
 import org.apache.cxf.transport.websocket.undertow.WebSocketUndertowServletRequest;
 import org.apache.cxf.transport.websocket.undertow.WebSocketUndertowServletResponse;
 import org.apache.cxf.workqueue.WorkQueueManager;
@@ -186,7 +187,7 @@ public class AtmosphereWebSocketUndertowDestination extends UndertowHTTPDestinat
                     public void handleUpgrade(StreamConnection streamConnection,
                                               HttpServerExchange exchange) {
                         try {
-                            
+
                             WebSocketChannel channel = selected.createChannel(facade, streamConnection,
                                                                               facade.getBufferPool());
                             peerConnections.add(channel);
@@ -226,7 +227,7 @@ public class AtmosphereWebSocketUndertowDestination extends UndertowHTTPDestinat
                 .getDeployment(), request, response, null);
 
             undertowExchange.putAttachment(ServletRequestContext.ATTACHMENT_KEY, servletRequestContext);
-            
+
             try {
                 framework.doCometSupport(AtmosphereRequestImpl.wrap(request),
                                          AtmosphereResponseImpl.wrap(response));
@@ -246,7 +247,7 @@ public class AtmosphereWebSocketUndertowDestination extends UndertowHTTPDestinat
             } catch (ServletException e) {
                 throw new IOException(e);
             }
-            
+
         }
 
         private void handleReceivedMessage(WebSocketChannel channel, Object message, HttpServerExchange exchange) {
@@ -258,18 +259,23 @@ public class AtmosphereWebSocketUndertowDestination extends UndertowHTTPDestinat
                         HttpServletRequest request = new WebSocketUndertowServletRequest(channel, message, exchange);
                         HttpServletResponse response = new WebSocketUndertowServletResponse(channel);
                         if (request.getHeader(WebSocketConstants.DEFAULT_REQUEST_ID_KEY) != null) {
-                            response.setHeader(WebSocketConstants.DEFAULT_RESPONSE_ID_KEY,
-                                               request.getHeader(WebSocketConstants.DEFAULT_REQUEST_ID_KEY));
+                            String headerValue = request.getHeader(WebSocketConstants.DEFAULT_REQUEST_ID_KEY);
+                            if (WebSocketUtils.isContainingCRLF(headerValue)) {
+                                LOG.warning("Invalid characters (CR/LF) in header "
+                                    + WebSocketConstants.DEFAULT_REQUEST_ID_KEY);
+                            } else {
+                                response.setHeader(WebSocketConstants.DEFAULT_RESPONSE_ID_KEY, headerValue);
+                            }
                         }
                         handleNormalRequest(request, response);
                     } catch (Exception ex) {
                         LOG.log(Level.WARNING, "Failed to invoke service", ex);
                     }
-                    
+
                 }
-                
+
             });
-            
+
         }
     }
 
