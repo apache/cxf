@@ -37,6 +37,7 @@ import org.apache.cxf.binding.xml.XMLBindingFactory;
 import org.apache.cxf.binding.xml.wsdl11.XMLWSDLExtensionLoader;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointImpl;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
@@ -86,6 +87,10 @@ public class TestBase extends Assert {
         messageImpl.setInterceptorChain(chain);
         messageImpl.setExchange(exchange);
         xmlMessage = messageImpl;
+        if (JavaUtils.isJava11Compatible()) {
+            //we need this property with JDK11 and easymock4
+            System.setProperty("org.easymock.cglib.experimental_asm7", "true");
+        }
     }
 
     @After
