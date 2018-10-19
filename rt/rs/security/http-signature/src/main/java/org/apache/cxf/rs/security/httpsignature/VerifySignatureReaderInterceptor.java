@@ -18,7 +18,6 @@ import java.util.logging.Logger;
 /**
  * RS CXF Reader Interceptor which extracts signature data from the message and sends it to the message verifier
  *
- * @author Fredrik Espedal
  */
 @Provider
 @Priority(Priorities.AUTHENTICATION)

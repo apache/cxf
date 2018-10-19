@@ -1,6 +1,5 @@
 package org.apache.cxf.rs.security.httpsignature;
 
-
 import org.apache.cxf.rs.security.httpsignature.exception.*;
 
 public class MockExceptionHandler implements ExceptionHandler {
