@@ -1,5 +1,6 @@
 package org.apache.cxf.rs.security.httpsignature;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.rs.security.httpsignature.exception.DifferentAlgorithmsException;
 import org.apache.cxf.rs.security.httpsignature.exception.DifferentDigestsException;
 import org.apache.cxf.rs.security.httpsignature.exception.InvalidDataToVerifySignatureException;
@@ -14,13 +15,15 @@ import java.security.PrivateKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * @author Fredrik Espedal
  */
 public class MessageVerifierTest {
+    private final static Logger LOG = LogUtils.getL7dLogger(MessageVerifierTest.class);
 
-    private final static String path = "/evry/signature";
+    private final static String uri = "/test/signature";
     private final static String method = "Get";
     private final static String messageBody = "Hello";
     private final static String digestAlgorithm = "SHA-256";
@@ -80,14 +83,21 @@ public class MessageVerifierTest {
 
     @Test
     public void validUnalteredRequest() {
+        Map<String, List<String>> headers = createMockHeaders();
         try {
-            Map<String, List<String>> headers = createMockHeaders();
             createDigestHeader(messageBody, headers, digestAlgorithm);
-            createAndAddSignature(headers);
-            messageVerifier.verifyMessage(headers, messageBody);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
+        createAndAddSignature(headers);
+
+        String method = SignatureHeaderUtils.getMethod(headers);
+        String uri = SignatureHeaderUtils.getUri(headers);
+
+        LOG.info("MessageVerifierTest: method: " + method + " uri: " + uri + " (request-target): " + headers.get("(request-target)").get(0));
+        LOG.info("signature: " + headers.get("Signature").get(0));
+
+        messageVerifier.verifyMessage(headers, messageBody);
     }
 
 
@@ -104,46 +114,31 @@ public class MessageVerifierTest {
 
     @Test(expected = InvalidDataToVerifySignatureException.class)
     public void alteredSignatureFails() {
-        try {
-            Map<String, List<String>> headers = createMockHeaders();
-            createDigestHeader(messageBody, headers, digestAlgorithm);
-            createAndAddSignature(headers);
-            String signature = headers.get("Signature").get(0);
-            signature = signature.replaceFirst("signature=\"[\\w][\\w]", "signature=\"AA");
-            headers.replace("Signature", Collections.singletonList(signature));
-            messageVerifier.verifyMessage(headers, messageBody);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
+        Map<String, List<String>> headers = createMockHeaders();
+        createAndAddSignature(headers);
+        String signature = headers.get("Signature").get(0);
+        signature = signature.replaceFirst("signature=\"[\\w][\\w]", "signature=\"AA");
+        headers.replace("Signature", Collections.singletonList(signature));
+        messageVerifier.verifyMessage(headers, messageBody);
     }
 
     @Test(expected = DifferentAlgorithmsException.class)
     public void alteredAlgorithmFails() {
-        try {
-            Map<String, List<String>> headers = createMockHeaders();
-            createDigestHeader(messageBody, headers, digestAlgorithm);
-            createAndAddSignature(headers);
-            String signature = headers.get("Signature").get(0);
-            signature = signature.replaceFirst("algorithm=\"rsa-sha256", "algorithm=\"hmac-sha256");
-            headers.replace("Signature", Collections.singletonList(signature));
-            messageVerifier.verifyMessage(headers, messageBody);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
+        Map<String, List<String>> headers = createMockHeaders();
+        createAndAddSignature(headers);
+        String signature = headers.get("Signature").get(0);
+        signature = signature.replaceFirst("algorithm=\"rsa-sha256", "algorithm=\"hmac-sha256");
+        headers.replace("Signature", Collections.singletonList(signature));
+        messageVerifier.verifyMessage(headers, messageBody);
     }
 
     @Test(expected = DifferentDigestsException.class)
     public void alteredDigestFails() {
-        try {
-            Map<String, List<String>> headers = createMockHeaders();
-            createDigestHeader(messageBody, headers, digestAlgorithm);
-            createAndAddSignature(headers);
-            String digest = "SHA-256=HEYHEYHEYHEY";
-            headers.replace("Digest", Collections.singletonList(digest));
-            messageVerifier.verifyMessage(headers, messageBody);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
+        Map<String, List<String>> headers = createMockHeaders();
+        createAndAddSignature(headers);
+        String digest = "SHA-256=HEYHEYHEYHEY";
+        headers.replace("Digest", Collections.singletonList(digest));
+        messageVerifier.verifyMessage(headers, messageBody);
     }
 
     private static void createAndAddSignature(Map<String, List<String>> headers) {
@@ -156,7 +151,7 @@ public class MessageVerifierTest {
 
     private static Map<String, List<String>> createMockHeaders() {
         Map<String, List<String>> newHeader = new HashMap<>();
-        newHeader.put("(request-target)", Collections.singletonList(method.toLowerCase() + " " + path));
+        newHeader.put("(request-target)", Collections.singletonList(method.toLowerCase() + " " + uri));
         newHeader.put("Host", Collections.singletonList("example.org"));
         newHeader.put("Date", Collections.singletonList("Tue, 07 Jun 2014 20:51:35 GMT"));
         newHeader.put("Accept", Collections.singletonList(""));

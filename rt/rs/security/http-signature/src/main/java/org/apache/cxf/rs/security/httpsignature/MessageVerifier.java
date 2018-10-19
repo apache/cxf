@@ -195,12 +195,15 @@ public class MessageVerifier {
         String method = SignatureHeaderUtils.getMethod(messageHeaders);
         String uri = SignatureHeaderUtils.getUri(messageHeaders);
 
+        LOG.info("MessageVerifier: method: " + method + " uri: " + uri + " (request-target): " + messageHeaders.get("(request-target)").get(0));
+        LOG.info("signature: " + messageHeaders.get("Signature").get(0));
         Verifier verifier = new Verifier(key, signature, provider);
         LOG.info("Starting signature verification");
         try {
             boolean success = verifier.verify(method, uri,
                     SignatureHeaderUtils.mapHeaders(messageHeaders));
             if (!success) {
+                LOG.info("not success");
                 throw exceptionHandler.handle(new SignatureException("signature is not valid"),
                         SignatureExceptionType.FAILED_TO_VERIFY_SIGNATURE);
             }
