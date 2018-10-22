@@ -35,16 +35,16 @@ public class VerifySignatureFilter implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext requestCtx) {
         if (!enabled) {
-            LOG.info("Verify signature filter is disabled");
+            LOG.fine("Verify signature filter is disabled");
             return;
         }
 
-        LOG.info("Starting filter message verification process");
+        LOG.fine("Starting filter message verification process");
 
         MultivaluedMap<String, String> responseHeaders = requestCtx.getHeaders();
 
         messageVerifier.verifyMessage(responseHeaders);
-        LOG.info("Finished filter message verification process");
+        LOG.fine("Finished filter message verification process");
     }
 
     public void setMessageVerifier(MessageVerifier messageVerifier) {

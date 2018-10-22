@@ -18,6 +18,8 @@ public class MockExceptionHandler implements ExceptionHandler {
                 return new DigestFailureException(exception.getMessage());
             case DIFFERENT_DIGESTS:
                 return new DifferentDigestsException(exception.getMessage());
+            case MISSING_DIGEST:
+                return new MissingDigestException(exception.getMessage());
             case MULTIPLE_SIGNATURE_HEADERS:
                 return new MultipleSignatureHeaderException(exception.getMessage());
             case DIFFERENT_ALGORITHMS:
