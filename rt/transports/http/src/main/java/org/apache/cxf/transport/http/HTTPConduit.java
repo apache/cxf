@@ -1242,10 +1242,10 @@ public abstract class HTTPConduit
                         ex.execute(runnable);
                     }
                 } catch (RejectedExecutionException rex) {
-                    if (allowCurrentThread
-                        && policy != null
+                    if (!allowCurrentThread
+                        || (policy != null
                         && policy.isSetAsyncExecuteTimeoutRejection()
-                        && policy.isAsyncExecuteTimeoutRejection()) {
+                        && policy.isAsyncExecuteTimeoutRejection())) {
                         throw rex;
                     }
                     if (!hasLoggedAsyncWarning) {
