@@ -34,7 +34,7 @@ public interface Exchange extends StringMap {
      * Returns the inbound message for the exchange. On the client-side, this
      * is the response. On the server-side, this is the request.
      *
-     * @return the inboubnd message
+     * @return the inbound message
      */
     Message getInMessage();
     void setInMessage(Message m);
