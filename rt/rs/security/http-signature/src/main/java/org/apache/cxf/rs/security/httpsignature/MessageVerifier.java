@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 public class MessageVerifier {
     private ExceptionHandler exceptionHandler;
 
-    protected static final Logger LOG = LogUtils.getL7dLogger(MessageVerifier.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(MessageVerifier.class);
 
     public MessageVerifier(boolean verifyMessageBody) {
         setExceptionHandler(null);
@@ -130,7 +130,7 @@ public class MessageVerifier {
     }
 
     private void inspectDigest(String messageBody, Map<String, List<String>> responseHeaders) {
-        LOG.info("Starting digest verification");
+        LOG.fine("Starting digest verification");
         if (responseHeaders.containsKey("Digest")) {
             String headerDigest = responseHeaders.get("Digest").get(0);
 
@@ -148,7 +148,7 @@ public class MessageVerifier {
             throw exceptionHandler.handle(new SignatureException("failed to validate the digest"),
                     SignatureExceptionType.MISSING_DIGEST);
         }
-        LOG.info("Finished digest verification");
+        LOG.fine("Finished digest verification");
     }
 
     private MessageDigest getDigestAlgorithm(String digestString) {
@@ -196,7 +196,7 @@ public class MessageVerifier {
         String uri = SignatureHeaderUtils.getUri(messageHeaders);
 
         Verifier verifier = new Verifier(key, signature, provider);
-        LOG.info("Starting signature verification");
+        LOG.fine("Starting signature verification");
         try {
             boolean success = verifier.verify(method, uri,
                     SignatureHeaderUtils.mapHeaders(messageHeaders));

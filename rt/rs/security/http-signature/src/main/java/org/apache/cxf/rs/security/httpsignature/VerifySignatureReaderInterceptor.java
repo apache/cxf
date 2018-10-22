@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -22,11 +23,11 @@ import java.util.logging.Logger;
 @Provider
 @Priority(Priorities.AUTHENTICATION)
 public class VerifySignatureReaderInterceptor implements ReaderInterceptor {
+    private static final Logger LOG = LogUtils.getL7dLogger(VerifySignatureReaderInterceptor.class);
+
     private MessageVerifier messageVerifier;
 
     private boolean enabled;
-
-    protected static final Logger LOG = LogUtils.getL7dLogger(VerifySignatureReaderInterceptor.class);
 
     public VerifySignatureReaderInterceptor() {
         setEnabled(true);
@@ -36,10 +37,10 @@ public class VerifySignatureReaderInterceptor implements ReaderInterceptor {
     @Override
     public Object aroundReadFrom(ReaderInterceptorContext context) throws IOException, WebApplicationException {
         if (!enabled) {
-            LOG.info("Verify signature reader interceptor is disabled");
+            LOG.fine("Verify signature reader interceptor is disabled");
             return context.proceed();
         }
-        LOG.info("Starting interceptor message verification process");
+        LOG.fine("Starting interceptor message verification process");
 
         Map<String, List<String>> responseHeaders = context.getHeaders();
 
@@ -48,7 +49,7 @@ public class VerifySignatureReaderInterceptor implements ReaderInterceptor {
         messageVerifier.verifyMessage(responseHeaders, messageBody);
 
         context.setInputStream(new ByteArrayInputStream(messageBody.getBytes()));
-        LOG.info("Finished interceptor message verification process");
+        LOG.fine("Finished interceptor message verification process");
 
         return context.proceed();
     }
