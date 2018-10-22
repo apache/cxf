@@ -36,7 +36,7 @@ public final class EmbeddedBroker {
 
     public static void main(String[] args) throws Exception {
         Configuration config = new ConfigurationImpl();
-        Set<TransportConfiguration> transports = new HashSet<TransportConfiguration>();
+        Set<TransportConfiguration> transports = new HashSet<>();
         transports.add(new TransportConfiguration(NettyAcceptorFactory.class.getName()));
         transports.add(new TransportConfiguration(InVMAcceptorFactory.class.getName()));
         config.setAcceptorConfigurations(transports); 

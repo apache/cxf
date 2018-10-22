@@ -128,7 +128,7 @@ public class ProviderFactoryTest extends Assert {
     @Test
     public void testRegisterMbrMbwProviderAsMbrOnly() {
         ServerProviderFactory pf = ServerProviderFactory.getInstance();
-        JAXBElementProvider<Book> customProvider = new JAXBElementProvider<Book>();
+        JAXBElementProvider<Book> customProvider = new JAXBElementProvider<>();
         pf.registerUserProvider((Feature) context -> {
             context.register(customProvider, MessageBodyReader.class);
             return true;
@@ -146,7 +146,7 @@ public class ProviderFactoryTest extends Assert {
     @Test
     public void testRegisterMbrMbwProviderAsMbwOnly() {
         ServerProviderFactory pf = ServerProviderFactory.getInstance();
-        JAXBElementProvider<Book> customProvider = new JAXBElementProvider<Book>();
+        JAXBElementProvider<Book> customProvider = new JAXBElementProvider<>();
         pf.registerUserProvider((Feature) context -> {
             context.register(customProvider, MessageBodyWriter.class);
             return true;
@@ -407,7 +407,7 @@ public class ProviderFactoryTest extends Assert {
     @Test
     public void testCustomJaxbProvider() {
         ProviderFactory pf = ServerProviderFactory.getInstance();
-        JAXBElementProvider<Book> provider = new JAXBElementProvider<Book>();
+        JAXBElementProvider<Book> provider = new JAXBElementProvider<>();
         pf.registerUserProvider(provider);
         MessageBodyReader<Book> customJaxbReader = pf.createMessageBodyReader(Book.class, null, null,
                                                               MediaType.TEXT_XML_TYPE, new MessageImpl());
@@ -624,7 +624,7 @@ public class ProviderFactoryTest extends Assert {
     public void testMessageBodyWriterNoTypes() throws Exception {
         ProviderFactory pf = ServerProviderFactory.getInstance();
         List<Object> providers = new ArrayList<>();
-        SuperBookReaderWriter2<SuperBook> superBookHandler = new SuperBookReaderWriter2<SuperBook>();
+        SuperBookReaderWriter2<SuperBook> superBookHandler = new SuperBookReaderWriter2<>();
         providers.add(superBookHandler);
         pf.setUserProviders(providers);
         assertSame(superBookHandler,
@@ -955,7 +955,7 @@ public class ProviderFactoryTest extends Assert {
 
     @Test
     public void testSetSchemasFromClasspath() {
-        JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
+        JAXBElementProvider<?> provider = new JAXBElementProvider<>();
         ProviderFactory pf = ServerProviderFactory.getInstance();
         pf.registerUserProvider(provider);
 

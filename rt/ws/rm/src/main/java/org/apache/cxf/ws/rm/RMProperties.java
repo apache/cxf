@@ -69,12 +69,12 @@ public class RMProperties {
 
     public void setAcks(Collection<SequenceAcknowledgement> a) {
         // use threadsafe implementation for working copy, to avoid concurrent modifications
-        acks = new CopyOnWriteArrayList<SequenceAcknowledgement>(a);
+        acks = new CopyOnWriteArrayList<>(a);
     }
 
     public void setAcksRequested(Collection<AckRequestedType> ar) {
         // use threadsafe implementation for working copy, to avoid concurrent modifications
-        acksRequested = new CopyOnWriteArrayList<AckRequestedType>(ar);
+        acksRequested = new CopyOnWriteArrayList<>(ar);
     }
 
     public void setCloseSequence(CloseSequenceType cs) {

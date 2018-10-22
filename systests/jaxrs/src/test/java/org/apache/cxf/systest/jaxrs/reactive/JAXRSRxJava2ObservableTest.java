@@ -69,7 +69,7 @@ public class JAXRSRxJava2ObservableTest extends AbstractBusClientServerTestBase 
             .rx(ObservableRxInvoker.class)
             .get(HelloWorldBean.class);
         
-        Holder<HelloWorldBean> holder = new Holder<HelloWorldBean>();
+        Holder<HelloWorldBean> holder = new Holder<>();
         Disposable d = obs.subscribe(v -> {
             holder.value = v;
         });

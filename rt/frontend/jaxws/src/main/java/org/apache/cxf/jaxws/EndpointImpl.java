@@ -124,7 +124,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     private List<Interceptor<? extends Message>> inFault
         = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
     @SuppressWarnings("rawtypes")
-    private List<Handler> handlers = new ModCountCopyOnWriteArrayList<Handler>();
+    private List<Handler> handlers = new ModCountCopyOnWriteArrayList<>();
     private EndpointContext endpointContext;
 
     /**

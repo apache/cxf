@@ -735,7 +735,7 @@ public final class ResourceUtils {
 
         MessageBodyWriter<?> writer = jaxbWriter;
         if (writer == null) {
-            JAXBElementProvider<Object> defaultWriter = new JAXBElementProvider<Object>();
+            JAXBElementProvider<Object> defaultWriter = new JAXBElementProvider<>();
             defaultWriter.setMarshallAsJaxbElement(true);
             defaultWriter.setXmlTypeAsJaxbElementOnly(true);
             writer = defaultWriter;

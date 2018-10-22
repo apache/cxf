@@ -259,7 +259,7 @@ public class UndertowHTTPServerEngine implements ServerEngine {
         if (tlsServerParameters != null
             && ("SSLv3".equals(tlsServerParameters.getSecureSocketProtocol())
                 || !tlsServerParameters.getIncludeProtocols().isEmpty())) {
-            List<String> protocols = new LinkedList<String>(Arrays.asList("TLSv1", "TLSv1.1", "TLSv1.2", "SSLv3"));
+            List<String> protocols = new LinkedList<>(Arrays.asList("TLSv1", "TLSv1.1", "TLSv1.2", "SSLv3"));
             for (String excludedProtocol : tlsServerParameters.getExcludeProtocols()) {
                 if (protocols.contains(excludedProtocol)) {
                     protocols.remove(excludedProtocol);

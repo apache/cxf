@@ -93,7 +93,7 @@ public class BigQueryService {
 
         JsonMapObject jsonMap = bqClient.post(bigQueryRequest, JsonMapObject.class);
 
-        List<ShakespeareText> texts = new LinkedList<ShakespeareText>();
+        List<ShakespeareText> texts = new LinkedList<>();
         List<Map<String, Object>> rows = CastUtils.cast((List<?>)jsonMap.getProperty("rows"));
         if (rows != null) {
             for (Map<String, Object> row : rows) {

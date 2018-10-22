@@ -101,7 +101,7 @@ public class WSDL2JavaScriptMojo extends AbstractCodegenMoho {
         getLog().debug("Calling wsdl2js with args: " + Arrays.toString(args));
 
         if (!"false".equals(fork)) {
-            Set<URI> artifactsPath = new LinkedHashSet<URI>();
+            Set<URI> artifactsPath = new LinkedHashSet<>();
             for (Artifact a : pluginArtifacts) {
                 File file = a.getFile();
                 if (file == null) {

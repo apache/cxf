@@ -300,7 +300,7 @@ public class ClientServerXMLTest extends AbstractBusClientServerTestBase {
         SOAPHeaderData headerInfo = new SOAPHeaderData();
         headerInfo.setMessage("inoutMessage");
         headerInfo.setOriginator("inoutOriginator");
-        Holder<SOAPHeaderData> holder = new Holder<SOAPHeaderData>();
+        Holder<SOAPHeaderData> holder = new Holder<>();
         holder.value = headerInfo;
         InoutHeaderResponse resp = proxy.inoutHeader(me, holder);
         assertNotNull(resp);
@@ -320,8 +320,8 @@ public class ClientServerXMLTest extends AbstractBusClientServerTestBase {
         OutHeader me = new OutHeader();
         me.setRequestType("OutHeaderRequest");
 
-        Holder<OutHeaderResponse> outHeaderHolder = new Holder<OutHeaderResponse>();
-        Holder<SOAPHeaderData> soapHeaderHolder = new Holder<SOAPHeaderData>();
+        Holder<OutHeaderResponse> outHeaderHolder = new Holder<>();
+        Holder<SOAPHeaderData> soapHeaderHolder = new Holder<>();
         proxy.outHeader(me, outHeaderHolder, soapHeaderHolder);
         assertNotNull(outHeaderHolder.value);
         assertNotNull(soapHeaderHolder.value);

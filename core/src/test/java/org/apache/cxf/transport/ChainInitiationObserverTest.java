@@ -47,7 +47,7 @@ public class ChainInitiationObserverTest extends Assert {
         message = control.createMock(Message.class);
 
         Phase phase1 = new Phase("phase1", 1);
-        SortedSet<Phase> phases = new TreeSet<Phase>();
+        SortedSet<Phase> phases = new TreeSet<>();
         phases.add(phase1);
         chain = new TestChain(phases);
         observer = new ChainInitiationObserver(null, null);

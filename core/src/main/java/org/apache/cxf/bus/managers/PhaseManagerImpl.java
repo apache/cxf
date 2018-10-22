@@ -58,7 +58,7 @@ public class PhaseManagerImpl implements PhaseManager, BusExtension {
     final void createInPhases() {
         int i = 0;
 
-        inPhases = new SortedArraySet<Phase>();
+        inPhases = new SortedArraySet<>();
         inPhases.add(new Phase(Phase.RECEIVE, ++i * 1000));
         inPhases.add(new Phase(Phase.PRE_STREAM, ++i * 1000));
         inPhases.add(new Phase(Phase.USER_STREAM, ++i * 1000));
@@ -82,7 +82,7 @@ public class PhaseManagerImpl implements PhaseManager, BusExtension {
 
     final void createOutPhases() {
 
-        outPhases = new SortedArraySet<Phase>();
+        outPhases = new SortedArraySet<>();
         int i = 0;
 
         outPhases.add(new Phase(Phase.SETUP, ++i * 1000));

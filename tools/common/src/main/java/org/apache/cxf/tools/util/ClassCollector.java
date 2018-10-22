@@ -145,7 +145,7 @@ public class ClassCollector {
     }
 
     public Collection<String> getGeneratedFileInfo() {
-        Set<String> generatedFileList = new TreeSet<String>();
+        Set<String> generatedFileList = new TreeSet<>();
         generatedFileList.addAll(seiClassNames.values());
         generatedFileList.addAll(typesClassNames.values());
         generatedFileList.addAll(exceptionClassNames.values());

@@ -924,7 +924,7 @@ public class WebClient extends AbstractClient {
                                           Class<?> respClass,
                                           Type outType,
                                           InvocationCallback<T> callback) {
-        JaxrsClientCallback<T> cb = new JaxrsClientCallback<T>(callback, respClass, outType);
+        JaxrsClientCallback<T> cb = new JaxrsClientCallback<>(callback, respClass, outType);
         prepareAsyncClient(httpMethod, body, requestClass, inType, respClass, outType, cb);
         return cb.createFuture();
     }

@@ -138,7 +138,7 @@ public class JettyHTTPServerEngine implements ServerEngine {
      */
     private boolean configFinalized;
 
-    private List<String> registedPaths = new CopyOnWriteArrayList<String>();
+    private List<String> registedPaths = new CopyOnWriteArrayList<>();
 
     /**
      * This constructor is called by the JettyHTTPServerEngineFactory.

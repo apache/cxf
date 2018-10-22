@@ -226,7 +226,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @Test
     public void testPostGeneratedBook() throws Exception {
         String baseAddress = "http://localhost:" + PORT + "/the/generated";
-        JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
+        JAXBElementProvider<?> provider = new JAXBElementProvider<>();
         provider.setJaxbElementClassMap(Collections.singletonMap(
                                           "org.apache.cxf.systest.jaxrs.codegen.schema.Book",
                                           "{http://superbooks}thebook"));
@@ -642,7 +642,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @Test
     public void testPostBookXsiType() throws Exception {
         String address = "http://localhost:" + PORT + "/the/thebooksxsi/bookstore/books/xsitype";
-        JAXBElementProvider<Book> provider = new JAXBElementProvider<Book>();
+        JAXBElementProvider<Book> provider = new JAXBElementProvider<>();
         provider.setExtraClass(new Class[]{SuperBook.class});
         provider.setJaxbElementClassNames(Collections.singletonList(Book.class.getName()));
         WebClient wc = WebClient.create(address, Collections.singletonList(provider));
@@ -657,7 +657,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @Test
     public void testPostBookXsiTypeProxy() throws Exception {
         String address = "http://localhost:" + PORT + "/the/thebooksxsi/bookstore";
-        JAXBElementProvider<Book> provider = new JAXBElementProvider<Book>();
+        JAXBElementProvider<Book> provider = new JAXBElementProvider<>();
         provider.setExtraClass(new Class[]{SuperBook.class});
         provider.setJaxbElementClassNames(Collections.singletonList(Book.class.getName()));
         BookStoreSpring bookStore = JAXRSClientFactory.create(address, BookStoreSpring.class,

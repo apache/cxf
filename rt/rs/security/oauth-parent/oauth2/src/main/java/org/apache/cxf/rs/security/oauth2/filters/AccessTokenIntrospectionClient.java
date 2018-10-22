@@ -87,7 +87,7 @@ public class AccessTokenIntrospectionClient implements AccessTokenValidator {
         }
         if (response.getScope() != null) {
             String[] scopes = response.getScope().split(" ");
-            List<OAuthPermission> perms = new LinkedList<OAuthPermission>();
+            List<OAuthPermission> perms = new LinkedList<>();
             for (String s : scopes) {
                 if (!StringUtils.isEmpty(s)) {
                     perms.add(new OAuthPermission(s.trim()));

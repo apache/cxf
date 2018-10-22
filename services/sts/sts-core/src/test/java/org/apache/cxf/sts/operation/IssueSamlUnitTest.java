@@ -1228,7 +1228,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "eve.jks");
 
         useKey = createUseKey(CryptoFactory.getInstance(properties), "eve");
-        useKeyType = new JAXBElement<UseKeyType>(QNameConstants.USE_KEY, UseKeyType.class, useKey);
+        useKeyType = new JAXBElement<>(QNameConstants.USE_KEY, UseKeyType.class, useKey);
         request.getAny().add(useKeyType);
 
         // This should fail as the UseKey certificate is not trusted

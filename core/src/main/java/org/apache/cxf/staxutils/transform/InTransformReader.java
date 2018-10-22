@@ -49,7 +49,7 @@ public class InTransformReader extends DepthXMLStreamReader {
     private Map<QName, ElementProperty> inAppendMap = new HashMap<>(5);
     private Set<QName> inDropSet = new HashSet<>(5);
     private Map<String, String> nsMap = new HashMap<>(5);
-    private List<ParsingEvent> pushedBackEvents = new LinkedList<ParsingEvent>();
+    private List<ParsingEvent> pushedBackEvents = new LinkedList<>();
     private List<List<ParsingEvent>> pushedAheadEvents = new LinkedList<List<ParsingEvent>>();
     private String replaceText;
     private ParsingEvent currentEvent;

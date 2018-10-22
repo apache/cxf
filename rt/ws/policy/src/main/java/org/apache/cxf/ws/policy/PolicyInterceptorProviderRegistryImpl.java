@@ -74,7 +74,7 @@ public class PolicyInterceptorProviderRegistryImpl
         for (QName qn : provider.getAssertionTypes()) {
             Set<PolicyInterceptorProvider> providers = super.get(qn);
             if (providers == null) {
-                providers = new CopyOnWriteArraySet<PolicyInterceptorProvider>();
+                providers = new CopyOnWriteArraySet<>();
             }
             providers.add(provider);
             super.register(qn, providers);

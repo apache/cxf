@@ -88,7 +88,7 @@ public final class JarLoader {
     }
 
     private static List<String> tokenizePathComponents(String path) {
-        List<String> tokens = new LinkedList<String>();
+        List<String> tokens = new LinkedList<>();
         String tmpPath = new String(path);
 
         while (tmpPath.length() > 0) {

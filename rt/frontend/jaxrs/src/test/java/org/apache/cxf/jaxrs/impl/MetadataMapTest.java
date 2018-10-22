@@ -290,7 +290,7 @@ public class MetadataMapTest extends Assert {
     @Test(expected = UnsupportedOperationException.class)
     public void testReadOnlyAdd2() {
         Map<String, List<String>> values = new HashMap<>();
-        List<String> list = new LinkedList<String>();
+        List<String> list = new LinkedList<>();
         list.add("bar");
         values.put("baz", list);
         MultivaluedMap<String, String> map =
@@ -301,7 +301,7 @@ public class MetadataMapTest extends Assert {
     @Test(expected = UnsupportedOperationException.class)
     public void testReadOnlyAddFirst2() {
         Map<String, List<String>> values = new HashMap<>();
-        List<String> list = new LinkedList<String>();
+        List<String> list = new LinkedList<>();
         list.add("bar");
         values.put("baz", list);
         MultivaluedMap<String, String> map =

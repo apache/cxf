@@ -1800,7 +1800,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         private Collection<RMMessage> getMessages(Identifier seq, Map<Identifier, Collection<RMMessage>> map) {
             Collection<RMMessage> cm = map.get(seq);
             if (cm == null) {
-                cm = new LinkedList<RMMessage>();
+                cm = new LinkedList<>();
                 map.put(seq, cm);
             }
             return cm;

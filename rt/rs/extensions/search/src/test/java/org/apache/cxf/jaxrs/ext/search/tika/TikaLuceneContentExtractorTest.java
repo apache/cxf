@@ -61,7 +61,7 @@ public class TikaLuceneContentExtractorTest extends Assert {
         writer = new IndexWriter(directory, config);
         writer.commit();
 
-        parser = new FiqlParser<SearchBean>(SearchBean.class);
+        parser = new FiqlParser<>(SearchBean.class);
         extractor = new TikaLuceneContentExtractor(new PDFParser());
     }
 
@@ -224,7 +224,7 @@ public class TikaLuceneContentExtractorTest extends Assert {
         IndexSearcher searcher = new IndexSearcher(reader);
 
         try {
-            LuceneQueryVisitor<SearchBean> visitor = new LuceneQueryVisitor<SearchBean>("ct", "contents");
+            LuceneQueryVisitor<SearchBean> visitor = new LuceneQueryVisitor<>("ct", "contents");
             visitor.setPrimitiveFieldTypeMap(fieldTypes);
             visitor.visit(parser.parse(expression));
 

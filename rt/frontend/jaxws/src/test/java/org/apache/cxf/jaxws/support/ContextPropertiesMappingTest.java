@@ -99,7 +99,7 @@ public class ContextPropertiesMappingTest extends Assert {
         Exchange exchange = new ExchangeImpl();
         Message inMessage = new MessageImpl();
 
-        Collection<Attachment> attachments = new LinkedList<Attachment>();
+        Collection<Attachment> attachments = new LinkedList<>();
 
         DataSource source = new ByteDataSource(new byte[0], "text/xml");
 

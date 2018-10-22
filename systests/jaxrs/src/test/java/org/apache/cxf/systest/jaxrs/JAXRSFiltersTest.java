@@ -53,7 +53,7 @@ public class JAXRSFiltersTest extends AbstractBusClientServerTestBase {
         protected void run() {
             JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setResourceClasses(ApplicationController.class);
-            List<Object> providers = new ArrayList<Object>();
+            List<Object> providers = new ArrayList<>();
             providers.add(new ApplicationInfoJaxrsFilter());
             sf.setProviders(providers);
             sf.setResourceProvider(ApplicationController.class,

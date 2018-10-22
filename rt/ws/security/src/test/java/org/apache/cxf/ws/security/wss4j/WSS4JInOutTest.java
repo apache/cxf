@@ -74,7 +74,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
     @Test
     public void testOrder() throws Exception {
         //make sure the interceptors get ordered correctly
-        SortedSet<Phase> phases = new TreeSet<Phase>();
+        SortedSet<Phase> phases = new TreeSet<>();
         phases.add(new Phase(Phase.PRE_PROTOCOL, 1));
 
         List<Interceptor<? extends Message>> lst = new ArrayList<Interceptor<? extends Message>>();

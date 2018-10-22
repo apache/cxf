@@ -140,7 +140,7 @@ public class DelegatingNamespaceContext implements NamespaceContext {
     }
 
     public Iterator<String> getPrefixes(String ns) {
-        List<String> pl = new LinkedList<String>();
+        List<String> pl = new LinkedList<>();
         for (Map<String, String> nsp : namespaces) {
             for (Map.Entry<String, String> nse : nsp.entrySet()) {
                 if (ns.equals(nse.getValue()) && ns.equals(getNamespaceURI(nse.getKey()))) {

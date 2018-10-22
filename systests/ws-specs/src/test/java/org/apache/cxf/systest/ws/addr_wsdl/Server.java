@@ -48,7 +48,7 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class Server extends AbstractBusTestServerBase {
     static final String PORT = allocatePort(Server.class);
-    List<Endpoint> eps = new LinkedList<Endpoint>();
+    List<Endpoint> eps = new LinkedList<>();
 
     protected void run() {
         Object implementor = new AddNumberImpl();

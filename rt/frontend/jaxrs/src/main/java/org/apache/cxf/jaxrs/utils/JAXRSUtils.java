@@ -414,7 +414,7 @@ public final class JAXRSUtils {
                         candidateList.put(ori, map);
                         if (finalPath) {
                             if (finalPathSubresources == null) {
-                                finalPathSubresources = new LinkedList<OperationResourceInfo>();
+                                finalPathSubresources = new LinkedList<>();
                             }
                             finalPathSubresources.add(ori);
                         }
@@ -684,7 +684,7 @@ public final class JAXRSUtils {
         if (mts.size() == 1) {
             actualMts = mts;
         } else {
-            actualMts = new LinkedList<MediaType>();
+            actualMts = new LinkedList<>();
             for (MediaType mt : mts) {
                 if (isMediaTypeCompatible(mt, ct)) {
                     actualMts.add(mt);

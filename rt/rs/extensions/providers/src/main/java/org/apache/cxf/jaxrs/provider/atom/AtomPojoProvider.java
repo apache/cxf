@@ -77,7 +77,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
     private static final Abdera ATOM_ENGINE = new Abdera();
     private static final String DEFAULT_ENTRY_CONTENT_METHOD = "getContent";
 
-    private JAXBElementProvider<Object> jaxbProvider = new JAXBElementProvider<Object>();
+    private JAXBElementProvider<Object> jaxbProvider = new JAXBElementProvider<>();
     private Map<String, String> collectionGetters = Collections.emptyMap();
     private Map<String, String> collectionSetters = Collections.emptyMap();
 

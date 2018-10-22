@@ -277,7 +277,7 @@ public class Catalog {
         final Map< String, Class< ? > > fieldTypes = new HashMap<>();
         fieldTypes.put("modified", Date.class);
 
-        LuceneQueryVisitor<SearchBean> newVisitor = new LuceneQueryVisitor<SearchBean>(
+        LuceneQueryVisitor<SearchBean> newVisitor = new LuceneQueryVisitor<>(
             "ct", "contents", analyzer);
         newVisitor.setPrimitiveFieldTypeMap(fieldTypes);
 

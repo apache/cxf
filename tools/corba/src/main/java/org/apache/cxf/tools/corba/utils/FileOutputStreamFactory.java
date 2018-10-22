@@ -36,13 +36,13 @@ public class FileOutputStreamFactory implements OutputStreamFactory {
     FileOutputStreamFactory parent;
 
     public FileOutputStreamFactory() {
-        fileNames = new LinkedList<String>();
+        fileNames = new LinkedList<>();
     }
 
 
     public FileOutputStreamFactory(String dir) {
         this(dir, null);
-        fileNames = new LinkedList<String>();
+        fileNames = new LinkedList<>();
     }
 
 

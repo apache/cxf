@@ -188,7 +188,7 @@ public class DOM4JProviderTest extends Assert {
         DOM4JProvider p = new DOM4JProvider();
 
         ProviderFactory factory = ServerProviderFactory.getInstance();
-        JSONProvider<Object> provider = new JSONProvider<Object>();
+        JSONProvider<Object> provider = new JSONProvider<>();
         provider.setSerializeAsArray(true);
         provider.setDropRootElement(true);
         provider.setDropElementsInXmlStream(false);
@@ -230,7 +230,7 @@ public class DOM4JProviderTest extends Assert {
 
     private Message createMessageWithJSONProvider() {
         ProviderFactory factory = ServerProviderFactory.getInstance();
-        JSONProvider<Object> provider = new JSONProvider<Object>();
+        JSONProvider<Object> provider = new JSONProvider<>();
         provider.setDropRootElement(true);
         provider.setIgnoreNamespaces(true);
         factory.registerUserProvider(provider);

@@ -848,7 +848,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testBookWithMultipleExceptions() throws Exception {
-        List<Object> providers = new LinkedList<Object>();
+        List<Object> providers = new LinkedList<>();
         providers.add(new BookServer.NotReturnedExceptionMapper());
         providers.add(new BookServer.NotFoundExceptionMapper());
         BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT,
@@ -883,7 +883,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testBookWithMultipleExceptions2() throws Exception {
-        List<Object> providers = new LinkedList<Object>();
+        List<Object> providers = new LinkedList<>();
         providers.add(new BookServer.NotReturnedExceptionMapper());
         providers.add(BookServer.NotFoundExceptionMapper.class);
         BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT,
@@ -1182,7 +1182,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testGetJAXBElementBookCollection() throws Exception {
-        JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
+        JAXBElementProvider<?> provider = new JAXBElementProvider<>();
         provider.setMarshallAsJaxbElement(true);
         provider.setUnmarshallAsJaxbElement(true);
         BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT,
@@ -1248,7 +1248,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testWebClientUnwrapBookWithXslt() throws Exception {
-        XSLTJaxbProvider<Book> provider = new XSLTJaxbProvider<Book>();
+        XSLTJaxbProvider<Book> provider = new XSLTJaxbProvider<>();
         provider.setInTemplate("classpath:/org/apache/cxf/systest/jaxrs/resources/unwrapbook.xsl");
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/books/wrapper",
                              Collections.singletonList(provider));
@@ -2130,7 +2130,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testPostGetBookAdapterList() throws Exception {
-        JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
+        JAXBElementProvider<?> provider = new JAXBElementProvider<>();
         Map<String, String> outMap = new HashMap<>();
         outMap.put("Books", "CollectionWrapper");
         outMap.put("books", "Book");
@@ -2145,7 +2145,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testPostGetBookAdapterListJSON() throws Exception {
-        JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
+        JAXBElementProvider<?> provider = new JAXBElementProvider<>();
         Map<String, String> outMap = new HashMap<>();
         outMap.put("Books", "CollectionWrapper");
         outMap.put("books", "Book");

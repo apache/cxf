@@ -257,7 +257,7 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
         executeInTransaction(new EntityManagerOperation<Void>() {
             @Override
             public Void execute(EntityManager em) {
-                List<OAuthPermission> perms = new LinkedList<OAuthPermission>();
+                List<OAuthPermission> perms = new LinkedList<>();
                 for (OAuthPermission perm : serverToken.getScopes()) {
                     OAuthPermission permSaved = em.find(OAuthPermission.class, perm.getPermission());
                     if (permSaved != null) {

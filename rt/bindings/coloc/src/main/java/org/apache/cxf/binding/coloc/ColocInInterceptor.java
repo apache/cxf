@@ -53,7 +53,7 @@ public class ColocInInterceptor extends AbstractPhaseInterceptor<Message> {
         }
 
         Bus bus = ex.getBus();
-        SortedSet<Phase> phases = new TreeSet<Phase>(bus.getExtension(PhaseManager.class).getOutPhases());
+        SortedSet<Phase> phases = new TreeSet<>(bus.getExtension(PhaseManager.class).getOutPhases());
 
         //TODO Set Coloc FaultObserver chain
         ColocUtil.setPhases(phases, Phase.SETUP, Phase.USER_LOGICAL);

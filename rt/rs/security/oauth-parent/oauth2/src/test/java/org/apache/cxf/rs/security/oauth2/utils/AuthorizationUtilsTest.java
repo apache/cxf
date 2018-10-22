@@ -47,7 +47,7 @@ public class AuthorizationUtilsTest extends Assert {
 
     @Test
     public void testThrowAuthorizationFailureManyChallenges() {
-        Set<String> challenges = new LinkedHashSet<String>();
+        Set<String> challenges = new LinkedHashSet<>();
         challenges.add("Basic");
         challenges.add("Bearer");
         try {

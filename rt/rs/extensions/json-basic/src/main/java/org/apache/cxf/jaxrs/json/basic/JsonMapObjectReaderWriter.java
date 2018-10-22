@@ -207,7 +207,7 @@ public class JsonMapObjectReaderWriter {
         }
     }
     protected List<Object> internalFromJsonAsList(String name, String json) {
-        List<Object> values = new LinkedList<Object>();
+        List<Object> values = new LinkedList<>();
         for (int i = 0; i < json.length(); i++) {
             if (Character.isWhitespace(json.charAt(i))) {
                 continue;

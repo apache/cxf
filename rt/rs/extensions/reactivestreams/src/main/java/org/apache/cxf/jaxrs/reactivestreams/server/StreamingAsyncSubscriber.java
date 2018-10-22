@@ -33,7 +33,7 @@ import org.reactivestreams.Subscription;
 
 public class StreamingAsyncSubscriber<T> extends AbstractSubscriber<T> {
 
-    private BlockingQueue<T> queue = new LinkedBlockingQueue<T>();
+    private BlockingQueue<T> queue = new LinkedBlockingQueue<>();
     private String openTag;
     private String closeTag;
     private String separator;

@@ -78,7 +78,7 @@ public class DOCBareClientServerTest extends AbstractBusClientServerTestBase {
         priceData.setTickerPrice(1.0f);
         priceData.setTickerSymbol("CELTIX");
 
-        Holder<TradePriceData> holder = new Holder<TradePriceData>(priceData);
+        Holder<TradePriceData> holder = new Holder<>(priceData);
 
         for (int i = 0; i < 5; i++) {
             putLastTradedPrice.sayHi(holder);
@@ -93,7 +93,7 @@ public class DOCBareClientServerTest extends AbstractBusClientServerTestBase {
     public void testAnnotation() throws Exception {
         Class<PutLastTradedPricePortType> claz = PutLastTradedPricePortType.class;
         TradePriceData priceData = new TradePriceData();
-        Holder<TradePriceData> holder = new Holder<TradePriceData>(priceData);
+        Holder<TradePriceData> holder = new Holder<>(priceData);
         Method method = claz.getMethod("sayHi", holder.getClass());
         assertNotNull("Can not find SayHi method in generated class ", method);
         Annotation ann = method.getAnnotation(WebMethod.class);

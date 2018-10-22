@@ -47,7 +47,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
 
     private Set<QName> dropElements;
     private List<List<ParsingEvent>> pushedAheadEvents = new LinkedList<List<ParsingEvent>>();
-    private List<QName> elementsStack = new LinkedList<QName>();
+    private List<QName> elementsStack = new LinkedList<>();
     private String replaceNamespace;
     private String replaceText;
     private int currentDepth;

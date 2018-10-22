@@ -368,7 +368,7 @@ public class XMLSource {
 
         try {
 
-            JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
+            JAXBElementProvider<?> provider = new JAXBElementProvider<>();
             JAXBContext c = provider.getPackageContext(cls);
             if (c == null) {
                 c = provider.getClassContext(cls);

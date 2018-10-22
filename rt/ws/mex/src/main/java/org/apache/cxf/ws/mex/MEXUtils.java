@@ -50,7 +50,7 @@ public final class MEXUtils {
 
         WSDLGetUtils utils = new WSDLGetUtils();
         EndpointInfo info = server.getEndpoint().getEndpointInfo();
-        List<Element> ret = new LinkedList<Element>();
+        List<Element> ret = new LinkedList<>();
         for (String id : utils.getWSDLIds(message, base, ctxUri, info)) {
             Map<String, String> params = new HashMap<>();
             params.put("wsdl", id);
@@ -85,7 +85,7 @@ public final class MEXUtils {
                                                       base,
                                                       ctxUri,
                                                       info);
-        List<Element> ret = new LinkedList<Element>();
+        List<Element> ret = new LinkedList<>();
         for (Map.Entry<String, String> xsd : locs.entrySet()) {
 
             if (StringUtils.isEmpty(id)

@@ -56,7 +56,7 @@ public class OidcDynamicRegistrationService extends DynamicRegistrationService {
         ClientRegistration resp = super.fromClientToClientRegistration(client);
         String logoutUris = client.getProperties().get(POST_LOGOUT_LOGOUT_URIS);
         if (logoutUris != null) {
-            List<String> list = new LinkedList<String>();
+            List<String> list = new LinkedList<>();
             for (String s : logoutUris.split(" ")) { 
                 list.add(s);
             }

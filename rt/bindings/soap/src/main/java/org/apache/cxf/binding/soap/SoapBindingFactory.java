@@ -808,7 +808,7 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
                 partName = mc.getPart();
 
                 if (attParts == null) {
-                    attParts = new LinkedList<MessagePartInfo>();
+                    attParts = new LinkedList<>();
                 }
 
                 if (StringUtils.isEmpty(partName)) {

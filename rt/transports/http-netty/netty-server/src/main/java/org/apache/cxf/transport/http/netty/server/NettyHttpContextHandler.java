@@ -38,7 +38,7 @@ public class NettyHttpContextHandler {
     private static final Logger LOG =
             LogUtils.getL7dLogger(NettyHttpContextHandler.class);
     private final ServletContext servletContext;
-    private List<NettyHttpHandler> nettyHttpHandlerList = new CopyOnWriteArrayList<NettyHttpHandler>();
+    private List<NettyHttpHandler> nettyHttpHandlerList = new CopyOnWriteArrayList<>();
 
     public NettyHttpContextHandler(String contextPath) {
         servletContext = new NettyServletContext(contextPath);

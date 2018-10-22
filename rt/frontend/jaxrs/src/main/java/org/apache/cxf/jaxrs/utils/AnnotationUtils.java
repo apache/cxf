@@ -89,7 +89,7 @@ public final class AnnotationUtils {
         if (targetAnns.length == 0) {
             return Collections.emptySet();
         }
-        Set<String> names = new LinkedHashSet<String>();
+        Set<String> names = new LinkedHashSet<>();
         for (Annotation a : targetAnns) {
             NameBinding nb = a.annotationType().getAnnotation(NameBinding.class);
             if (nb != null) {

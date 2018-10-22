@@ -40,7 +40,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 public class FiqlParserTest extends Assert {
-    private FiqlParser<Condition> parser = new FiqlParser<Condition>(Condition.class);
+    private FiqlParser<Condition> parser = new FiqlParser<>(Condition.class);
 
     @Test(expected = SearchParseException.class)
     public void testCompareWrongComparator() throws SearchParseException {
@@ -182,7 +182,7 @@ public class FiqlParserTest extends Assert {
         Map<String, String> props = new HashMap<>();
         props.put(SearchUtils.DATE_FORMAT_PROPERTY, "yyyy-MM-dd'T'HH:mm:ss");
         props.put(SearchUtils.TIMEZONE_SUPPORT_PROPERTY, "false");
-        parser = new FiqlParser<Condition>(Condition.class, props);
+        parser = new FiqlParser<>(Condition.class, props);
 
         SearchCondition<Condition> filter = parser.parse("time=le=2010-03-11T18:00:00");
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -305,7 +305,7 @@ public class FiqlParserTest extends Assert {
 
     @Test
     public void testMultipleLists() throws SearchParseException {
-        FiqlParser<Job> jobParser = new FiqlParser<Job>(Job.class,
+        FiqlParser<Job> jobParser = new FiqlParser<>(Job.class,
                                                         Collections.<String, String>emptyMap(),
                                                         Collections.singletonMap("itemName", "tasks.items.itemName"));
         SearchCondition<Job> jobCondition = jobParser.parse("itemName==myitem");

@@ -73,7 +73,7 @@ public class JwsHeaders extends JoseHeaders {
         if (!status) {
             List<String> critical = this.getCritical();
             if (critical == null) {
-                critical = new LinkedList<String>();
+                critical = new LinkedList<>();
                 setCritical(critical);
             } else if (critical.contains(JoseConstants.JWS_HEADER_B64_STATUS_HEADER)) {
                 return;

@@ -280,7 +280,7 @@ public abstract class TestCaseBase<T> {
 	}
         List<Thread> threadList = new ArrayList<>();
         for (int i = 0; i < numberOfThreads; i++) {
-            TestRunner<T> runner = new TestRunner<T>("No." + i + " TestRunner", this);
+            TestRunner<T> runner = new TestRunner<>("No." + i + " TestRunner", this);
             Thread thread = new Thread(runner, "RunnerThread No." + i);
             thread.start();
             threadList.add(thread);

@@ -97,7 +97,7 @@ public class AsyncResource {
     }
 
     private static class AsyncResponseQueue {
-        Queue<AsyncResponse> queue = new ArrayBlockingQueue<AsyncResponse>(1);
+        Queue<AsyncResponse> queue = new ArrayBlockingQueue<>(1);
 
         public void add(AsyncResponse asyncResponse) {
             queue.add(asyncResponse);

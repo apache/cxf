@@ -32,7 +32,7 @@ public final class IdlOperation extends IdlScopeBase {
 
     private IdlOperation(IdlScopeBase parent, String name, boolean isOneway) {
         super(parent, name);
-        exceptions = new Vector<IdlException>();
+        exceptions = new Vector<>();
         oneway = isOneway;
     }
 

@@ -81,7 +81,7 @@ public class JAXRSJweJsonTest extends AbstractBusClientServerTestBase {
         bean.setBus(springBus);
         bean.setServiceClass(BookStore.class);
         bean.setAddress(address);
-        List<Object> providers = new LinkedList<Object>();
+        List<Object> providers = new LinkedList<>();
         JweJsonWriterInterceptor writer = new JweJsonWriterInterceptor();
         providers.add(writer);
         providers.add(new JweJsonClientResponseFilter());

@@ -32,7 +32,7 @@ public class IdlArrayBase extends IdlDefnImplBase implements IdlType {
     protected IdlArrayBase(IdlScopeBase parent, String name, IdlType elem, int length) {
         super(parent, name);
         this.size = length;
-        dims = new Vector<Integer>();
+        dims = new Vector<>();
 
         if (elem instanceof IdlAnonArray) {
             IdlAnonArray arr = (IdlAnonArray)elem;

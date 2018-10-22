@@ -23,7 +23,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public class JavaCommon {
-    private final Set<String> imports = new TreeSet<String>();
+    private final Set<String> imports = new TreeSet<>();
 
     public void addImport(String i) {
         imports.add(i);

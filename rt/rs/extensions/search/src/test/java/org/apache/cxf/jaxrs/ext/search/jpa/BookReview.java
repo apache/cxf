@@ -30,7 +30,7 @@ import javax.persistence.OneToOne;
 public class BookReview {
     private int id;
     private Review review;
-    private List<String> authors = new LinkedList<String>();
+    private List<String> authors = new LinkedList<>();
     private Book book;
 
     public Review getReview() {

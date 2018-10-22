@@ -45,8 +45,8 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
     private long issuedAt;
     private long expiresIn;
     private Client client;
-    private List<String> approvedScopes = new LinkedList<String>();
-    private List<String> requestedScopes = new LinkedList<String>();
+    private List<String> approvedScopes = new LinkedList<>();
+    private List<String> requestedScopes = new LinkedList<>();
     private UserSubject subject;
     private String audience;
     private String responseType;

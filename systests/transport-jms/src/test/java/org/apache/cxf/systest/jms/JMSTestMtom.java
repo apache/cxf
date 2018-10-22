@@ -79,9 +79,9 @@ public class JMSTestMtom {
         Binding binding = ((BindingProvider)mtom).getBinding();
         ((SOAPBinding)binding).setMTOMEnabled(true);
 
-        Holder<String> name = new Holder<String>("Sam");
+        Holder<String> name = new Holder<>("Sam");
         URL fileURL = this.getClass().getResource("/org/apache/cxf/systest/jms/JMSClientServerTest.class");
-        Holder<DataHandler> handler1 = new Holder<DataHandler>();
+        Holder<DataHandler> handler1 = new Holder<>();
         handler1.value = new DataHandler(fileURL);
         int size = handler1.value.getInputStream().available();
         mtom.testDataHandler(name, handler1);

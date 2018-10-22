@@ -89,12 +89,12 @@ public final class AnyClientServerTest extends AbstractBusClientServerTestBase {
         List<Port> any = new ArrayList<>();
         Port anyPort = new Port();
         Port anyPort1 = new Port();
-        JAXBElement<String> ele1 = new JAXBElement<String>(
+        JAXBElement<String> ele1 = new JAXBElement<>(
             new QName("http://apache.org/hello_world_soap_http/other", "port"),
             String.class, "hello");
 
         anyPort.setAny(ele1);
-        JAXBElement<String> ele2 = new JAXBElement<String>(
+        JAXBElement<String> ele2 = new JAXBElement<>(
             new QName("http://apache.org/hello_world_soap_http/other", "port"),
             String.class, "Bon");
         anyPort1.setAny(ele2);

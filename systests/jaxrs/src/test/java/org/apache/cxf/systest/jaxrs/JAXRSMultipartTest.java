@@ -525,7 +525,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     private void doTestNullPart(String address) throws Exception {
         WebClient client = WebClient.create(address);
         client.type("multipart/form-data").accept("text/plain");
-        List<Attachment> atts = new LinkedList<Attachment>();
+        List<Attachment> atts = new LinkedList<>();
         atts.add(new Attachment("somepart", "text/plain", "hello there"));
         Response r = client.postCollection(atts, Attachment.class);
         assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
@@ -537,7 +537,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         String address = "http://localhost:" + PORT + "/bookstore/books/testnullpartprimitive";
         WebClient client = WebClient.create(address);
         client.type("multipart/form-data").accept("text/plain");
-        List<Attachment> atts = new LinkedList<Attachment>();
+        List<Attachment> atts = new LinkedList<>();
         atts.add(new Attachment("somepart", "text/plain", "hello there"));
         Response r = client.postCollection(atts, Attachment.class);
         assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
@@ -1073,7 +1073,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     }
 
     private Book readJSONBookFromInputStream(InputStream is) throws Exception {
-        JSONProvider<Book> provider = new JSONProvider<Book>();
+        JSONProvider<Book> provider = new JSONProvider<>();
         return provider.readFrom(Book.class, Book.class, new Annotation[]{},
                                  MediaType.APPLICATION_JSON_TYPE, null, is);
 

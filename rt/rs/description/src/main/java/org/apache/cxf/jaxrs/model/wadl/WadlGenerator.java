@@ -196,7 +196,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     private String stylesheetReference;
     private boolean applyStylesheetLocally;
     private Bus bus;
-    private final List<DocumentationProvider> docProviders = new LinkedList<DocumentationProvider>();
+    private final List<DocumentationProvider> docProviders = new LinkedList<>();
     private ResourceIdGenerator idGenerator;
     private Map<String, Object> jaxbContextProperties;
 

@@ -202,11 +202,11 @@ public class NotificationTest extends SimpleEventingIntegrationTest {
         EndpointReferenceType eventSinkERT = new EndpointReferenceType();
 
         JAXBElement<String> idqn
-            = new JAXBElement<String>(new QName("http://www.example.org", "MyReferenceParameter"),
+            = new JAXBElement<>(new QName("http://www.example.org", "MyReferenceParameter"),
                 String.class,
                 "380");
         JAXBElement<String> idqn2
-            = new JAXBElement<String>(new QName("http://www.example.org", "MyReferenceParameter2"),
+            = new JAXBElement<>(new QName("http://www.example.org", "MyReferenceParameter2"),
                 String.class,
                 "381");
         eventSinkERT.setReferenceParameters(new ReferenceParametersType());

@@ -65,7 +65,7 @@ public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestB
             sf.setResourceClasses(BookStore.class);
             sf.setResourceProvider(BookStore.class,
                                    new SingletonResourceProvider(new BookStore()));
-            JAXBElementProvider<?> p1 = new JAXBElementProvider<Object>();
+            JAXBElementProvider<?> p1 = new JAXBElementProvider<>();
             p1.setEnableBuffering(true);
             p1.setEnableStreaming(true);
 

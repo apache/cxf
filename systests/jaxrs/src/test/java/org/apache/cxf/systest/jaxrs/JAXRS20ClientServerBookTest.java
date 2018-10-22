@@ -339,7 +339,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         wc.accept("application/xml").type("application/xml");
 
         GenericEntity<List<Book>> collectionEntity = createGenericEntity();
-        final Holder<Book> holder = new Holder<Book>();
+        final Holder<Book> holder = new Holder<>();
         InvocationCallback<Book> callback = createCallback(holder);
 
         Future<Book> future = wc.post(collectionEntity, callback);
@@ -358,7 +358,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         wc.accept("application/xml").type("application/xml");
 
         GenericEntity<List<Book>> collectionEntity = createGenericEntity();
-        final Holder<Book> holder = new Holder<Book>();
+        final Holder<Book> holder = new Holder<>();
         InvocationCallback<Book> callback =
             new GenericInvocationCallback<Book>(holder) { };
 
@@ -380,7 +380,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
 
         GenericEntity<List<Book>> collectionEntity = createGenericEntity();
 
-        final Holder<Book> holder = new Holder<Book>();
+        final Holder<Book> holder = new Holder<>();
         InvocationCallback<Book> callback = createCallback(holder);
 
         Future<Book> future = wc.async().post(Entity.entity(collectionEntity, "application/xml"),
@@ -626,7 +626,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
 
         WebClient wc = createWebClient(address);
 
-        final Holder<Book> holder = new Holder<Book>();
+        final Holder<Book> holder = new Holder<>();
         InvocationCallback<Book> callback = createCallback(holder);
 
         Future<Book> future = asyncInvoker ? wc.async().get(callback) : wc.get(callback);
@@ -641,7 +641,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
 
         WebClient wc = createWebClientPost(address);
 
-        final Holder<Book> holder = new Holder<Book>();
+        final Holder<Book> holder = new Holder<>();
         final InvocationCallback<Book> callback = new InvocationCallback<Book>() {
             public void completed(Book response) {
                 holder.value = response;
@@ -663,7 +663,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         WebClient wc = createWebClient(address);
         wc.accept(MediaType.APPLICATION_XML_TYPE);
 
-        final Holder<Response> holder = new Holder<Response>();
+        final Holder<Response> holder = new Holder<>();
         final InvocationCallback<Response> callback = new InvocationCallback<Response>() {
             public void completed(Response response) {
                 holder.value = response;

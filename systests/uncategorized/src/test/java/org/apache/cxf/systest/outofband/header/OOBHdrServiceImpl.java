@@ -75,7 +75,7 @@ public class OOBHdrServiceImpl implements PutLastTradedPricePortType {
                     ob.setHdrAttribute("testReturnHdrAttribute");
                     // Add Out-of-band header object to HeaderHolder.
 
-                    JAXBElement<OutofBandHeader> job = new JAXBElement<OutofBandHeader>(
+                    JAXBElement<OutofBandHeader> job = new JAXBElement<>(
                             new QName(OOBHeaderTest.TEST_HDR_NS, OOBHeaderTest.TEST_HDR_RESPONSE_ELEM),
                             OutofBandHeader.class, null, ob);
                     Header hdr = new Header(

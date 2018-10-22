@@ -67,7 +67,7 @@ public final class JAXBContextCache {
         private CachedContextAndSchemas(JAXBContext context, Set<Class<?>> classes, CachedContextAndSchemasInternal i) {
             this.context = context;
             this.classes = classes;
-            ccas = new WeakReference<CachedContextAndSchemasInternal>(i);
+            ccas = new WeakReference<>(i);
         }
         public JAXBContext getContext() {
             return context;
@@ -97,7 +97,7 @@ public final class JAXBContextCache {
         private Collection<DOMSource> schemas;
 
         CachedContextAndSchemasInternal(JAXBContext context, Set<Class<?>> classes) {
-            this.context = new WeakReference<JAXBContext>(context);
+            this.context = new WeakReference<>(context);
             this.classes = new WeakReference<Set<Class<?>>>(classes);
         }
 

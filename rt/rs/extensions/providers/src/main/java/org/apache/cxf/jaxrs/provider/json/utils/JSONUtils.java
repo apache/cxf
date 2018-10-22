@@ -278,7 +278,7 @@ public final class JSONUtils {
     private static class IgnoreMixedContentWriter extends DelegatingXMLStreamWriter {
         String lastText;
         boolean isMixed;
-        List<Boolean> mixed = new LinkedList<Boolean>();
+        List<Boolean> mixed = new LinkedList<>();
 
         IgnoreMixedContentWriter(XMLStreamWriter writer) {
             super(writer);

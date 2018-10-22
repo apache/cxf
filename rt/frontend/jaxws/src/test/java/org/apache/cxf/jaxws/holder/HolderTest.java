@@ -57,7 +57,7 @@ public class HolderTest extends AbstractJaxWsTest {
         factory.getClientFactoryBean().setAddress(address);
 
         HolderService h = (HolderService)factory.create();
-        Holder<String> holder = new Holder<String>();
+        Holder<String> holder = new Holder<>();
         assertEquals("one", h.echo("one", "two", holder));
         assertEquals("two", holder.value);
     }

@@ -56,8 +56,8 @@ public class AccessTokenValidation {
     private long tokenNotBefore;
     private String tokenIssuer;
     private UserSubject tokenSubject;
-    private List<OAuthPermission> tokenScopes = new LinkedList<OAuthPermission>();
-    private List<String> audiences = new LinkedList<String>();
+    private List<OAuthPermission> tokenScopes = new LinkedList<>();
+    private List<String> audiences = new LinkedList<>();
     private String clientCodeVerifier;
     private Map<String, String> extraProps = new HashMap<>();
 

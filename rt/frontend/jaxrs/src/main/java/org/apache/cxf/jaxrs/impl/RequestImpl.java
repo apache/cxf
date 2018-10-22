@@ -69,7 +69,7 @@ public class RequestImpl implements Request {
         List<String> acceptEncs = parseAcceptEnc(
             headers.getRequestHeaders().getFirst(HttpHeaders.ACCEPT_ENCODING));
         List<Variant> requestVariants = sortAllCombinations(acceptMediaTypes, acceptLangs, acceptEncs);
-        List<Object> varyValues = new LinkedList<Object>();
+        List<Object> varyValues = new LinkedList<>();
         for (Variant requestVar : requestVariants) {
             for (Variant var : vars) {
                 MediaType mt = var.getMediaType();
@@ -165,7 +165,7 @@ public class RequestImpl implements Request {
         if (StringUtils.isEmpty(acceptEnc)) {
             return Collections.emptyList();
         }
-        List<String> list = new LinkedList<String>();
+        List<String> list = new LinkedList<>();
         String[] values = StringUtils.split(acceptEnc, ",");
         for (String value : values) {
             String[] pair = StringUtils.split(value.trim(), ";");

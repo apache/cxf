@@ -35,8 +35,8 @@ public class ServiceInfo extends AbstractDescriptionElement implements NamedItem
     QName name;
     String targetNamespace;
     InterfaceInfo intf;
-    List<BindingInfo> bindings = new CopyOnWriteArrayList<BindingInfo>();
-    List<EndpointInfo> endpoints = new CopyOnWriteArrayList<EndpointInfo>();
+    List<BindingInfo> bindings = new CopyOnWriteArrayList<>();
+    List<EndpointInfo> endpoints = new CopyOnWriteArrayList<>();
     Map<QName, MessageInfo> messages;
     List<SchemaInfo> schemas = new ArrayList<>(4);
     private SchemaCollection xmlSchemaCollection;

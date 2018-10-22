@@ -1063,7 +1063,7 @@ public final class InjectionUtils {
         } else if (SecurityContext.class.isAssignableFrom(type)) {
             proxy = new ThreadLocalSecurityContext();
         } else if (ContextResolver.class.isAssignableFrom(type)) {
-            proxy = new ThreadLocalContextResolver<Object>();
+            proxy = new ThreadLocalContextResolver<>();
         } else if (Request.class.isAssignableFrom(type)) {
             proxy = new ThreadLocalRequest();
         }  else if (Providers.class.isAssignableFrom(type)) {

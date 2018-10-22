@@ -37,7 +37,7 @@ import org.apache.cxf.message.Message;
  * in use, check the sourcecode of org.apache.cxf.endpoint.ClientImpl.
  */
 public final class PhaseChainCache {
-    AtomicReference<ChainHolder> lastData = new AtomicReference<ChainHolder>();
+    AtomicReference<ChainHolder> lastData = new AtomicReference<>();
 
     public PhaseInterceptorChain get(SortedSet<Phase> phaseList,
                                      List<Interceptor<? extends Message>> p1) {

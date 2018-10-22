@@ -123,7 +123,7 @@ public class DestinationRegistryImpl implements DestinationRegistry, ServletConf
 
 
     public AbstractDestination[] getSortedDestinations() {
-        List<AbstractHTTPDestination> dest2 = new LinkedList<AbstractHTTPDestination>(
+        List<AbstractHTTPDestination> dest2 = new LinkedList<>(
                 getDestinations());
         Collections.sort(dest2, new Comparator<AbstractHTTPDestination>() {
             public int compare(AbstractHTTPDestination o1, AbstractHTTPDestination o2) {

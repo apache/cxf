@@ -718,7 +718,7 @@ public class SourceGenerator {
         List<Element> requestEls = getWadlElements(methodEl, "request");
         Element firstRequestEl = requestEls.size() >= 1 ? requestEls.get(0) : null;
         List<Element> allRequestReps = getWadlElements(firstRequestEl, "representation");
-        List<Element> requestRepsWithElements = new LinkedList<Element>();
+        List<Element> requestRepsWithElements = new LinkedList<>();
         boolean duplicatesAvailable =
             getRepsWithElements(allRequestReps, requestRepsWithElements, info.getGrammarInfo());
 
@@ -1049,7 +1049,7 @@ public class SourceGenerator {
 
     private List<Element> getParameters(Element resourceEl, List<Element> inheritedParams,
                                         boolean isSubresourceMethod) {
-        List<Element> inParamElements = new LinkedList<Element>();
+        List<Element> inParamElements = new LinkedList<>();
         List<Element> allParamElements = getWadlElements(resourceEl, "param");
         List<Element> newInheritedParams = inheritResourceParams ? new LinkedList<Element>()
             : Collections.<Element>emptyList();
@@ -1175,7 +1175,7 @@ public class SourceGenerator {
         }
         String elementType = null;
         if (!responseRequired) {
-            List<Element> responseRepWithElements = new LinkedList<Element>();
+            List<Element> responseRepWithElements = new LinkedList<>();
             getRepsWithElements(repElements, responseRepWithElements, info.getGrammarInfo());
 
             Element responseRepWithElement = null;
@@ -2198,7 +2198,7 @@ public class SourceGenerator {
         private Set<String> resourceClassNames = new HashSet<>();
         private Application rootApp;
         private File srcDir;
-        private List<Element> inheritedParams = new LinkedList<Element>();
+        private List<Element> inheritedParams = new LinkedList<>();
 
         ContextInfo(Application rootApp,
                     File srcDir,

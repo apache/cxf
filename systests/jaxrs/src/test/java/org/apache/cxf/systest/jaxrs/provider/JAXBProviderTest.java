@@ -79,7 +79,7 @@ public class JAXBProviderTest extends AbstractBusClientServerTestBase {
         List<String> values = new ArrayList<>();
         values.add(MediaType.APPLICATION_XML);
         client.getHeaders().put("content-type", values);
-        JAXBElement<String> test = new JAXBElement<String>(new QName("org.apache.cxf", "jaxbelement"),
+        JAXBElement<String> test = new JAXBElement<>(new QName("org.apache.cxf", "jaxbelement"),
                                                            String.class, "test");
         Response response = client.post(test);
         String result = response.readEntity(String.class);

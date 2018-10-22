@@ -205,7 +205,7 @@ public class LuceneQueryVisitorFiqlTest extends AbstractLuceneQueryVisitorTest {
     public void testThatMultipleQueriesForTheSameFieldAreHandledProperly() {
         final SearchCondition<SearchBean> filter1 = getParser().parse("name==text");
         final SearchCondition<SearchBean> filter2 = getParser().parse("name==word");
-        final LuceneQueryVisitor<SearchBean> visitor = new LuceneQueryVisitor<SearchBean>();
+        final LuceneQueryVisitor<SearchBean> visitor = new LuceneQueryVisitor<>();
 
         visitor.visit(filter1);
         assertThat(visitor.getQuery().toString(), equalTo("name:text"));
@@ -217,7 +217,7 @@ public class LuceneQueryVisitorFiqlTest extends AbstractLuceneQueryVisitorTest {
 
     @Test
     public void testThatMultipleQueriesForTheSameFieldAreThreadSafe() throws InterruptedException, ExecutionException {
-        final LuceneQueryVisitor<SearchBean> visitor = new LuceneQueryVisitor<SearchBean>();
+        final LuceneQueryVisitor<SearchBean> visitor = new LuceneQueryVisitor<>();
         final ExecutorService executorService = Executors.newFixedThreadPool(5);
 
         final Collection< Future< ? > > futures = new ArrayList< Future< ? > >();

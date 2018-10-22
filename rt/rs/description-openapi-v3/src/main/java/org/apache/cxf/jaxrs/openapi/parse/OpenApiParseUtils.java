@@ -169,7 +169,7 @@ public final class OpenApiParseUtils {
                     ));
                 }
 
-                List<Parameter> userOpParams = new LinkedList<Parameter>();
+                List<Parameter> userOpParams = new LinkedList<>();
                 List<Map<String, Object>> params = CastUtils.cast((List<?>)oper.get("parameters"));
                 if (params != null) {
                     for (Map<String, Object> param : params) {
@@ -210,7 +210,7 @@ public final class OpenApiParseUtils {
             }
         }
 
-        List<UserResource> resources = new LinkedList<UserResource>();
+        List<UserResource> resources = new LinkedList<>();
 
         for (Map.Entry<String, List<UserOperation>> entry : userOpsMap.entrySet()) {
             if (!entry.getValue().isEmpty()) {

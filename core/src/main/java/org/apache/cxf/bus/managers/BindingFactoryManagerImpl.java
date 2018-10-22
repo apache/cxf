@@ -47,8 +47,8 @@ public final class BindingFactoryManagerImpl implements BindingFactoryManager {
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(BindingFactoryManagerImpl.class);
 
     Map<String, BindingFactory> bindingFactories;
-    Set<String> failed = new CopyOnWriteArraySet<String>();
-    Set<String> loaded = new CopyOnWriteArraySet<String>();
+    Set<String> failed = new CopyOnWriteArraySet<>();
+    Set<String> loaded = new CopyOnWriteArraySet<>();
     Bus bus;
 
     public BindingFactoryManagerImpl() {

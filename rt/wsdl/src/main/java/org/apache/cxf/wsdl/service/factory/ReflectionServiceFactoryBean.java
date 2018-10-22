@@ -1664,7 +1664,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
 
     private void setParameterOrder(Method method, Class<?>[] paramClasses, OperationInfo op) {
         if (isRPC(method) || !isWrapped(method)) {
-            List<String> paramOrdering = new LinkedList<String>();
+            List<String> paramOrdering = new LinkedList<>();
             boolean hasOut = false;
             for (int j = 0; j < paramClasses.length; j++) {
                 if (Exchange.class.equals(paramClasses[j])) {

@@ -52,13 +52,13 @@ public class Client implements Serializable {
     private String applicationWebUri;
     private String applicationLogoUri;
     private String applicationLogoutUri;
-    private List<String> applicationCertificates = new LinkedList<String>();
-    private List<String> redirectUris = new LinkedList<String>();
+    private List<String> applicationCertificates = new LinkedList<>();
+    private List<String> redirectUris = new LinkedList<>();
 
     private boolean isConfidential;
-    private List<String> allowedGrantTypes = new LinkedList<String>();
-    private List<String> registeredScopes = new LinkedList<String>();
-    private List<String> registeredAudiences = new LinkedList<String>();
+    private List<String> allowedGrantTypes = new LinkedList<>();
+    private List<String> registeredScopes = new LinkedList<>();
+    private List<String> registeredAudiences = new LinkedList<>();
 
     private Map<String, String> properties = new HashMap<>();
     private UserSubject subject;

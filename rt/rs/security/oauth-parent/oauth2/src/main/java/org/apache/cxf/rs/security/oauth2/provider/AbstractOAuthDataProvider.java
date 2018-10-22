@@ -366,13 +366,13 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     protected RefreshToken doCreateNewRefreshToken(ServerAccessToken at) {
         RefreshToken rt = new RefreshToken(at.getClient(), refreshTokenLifetime);
         if (at.getAudiences() != null) {
-            List<String> audiences = new LinkedList<String>();
+            List<String> audiences = new LinkedList<>();
             audiences.addAll(at.getAudiences());
             rt.setAudiences(audiences);
         }
         rt.setGrantType(at.getGrantType());
         if (at.getScopes() != null) {
-            List<OAuthPermission> scopes = new LinkedList<OAuthPermission>();
+            List<OAuthPermission> scopes = new LinkedList<>();
             scopes.addAll(at.getScopes());
             rt.setScopes(scopes);
         }

@@ -73,7 +73,7 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
     private Bus bus;
     private PolicyRegistry registry;
     private Collection<PolicyProvider> policyProviders;
-    private Collection<PolicyProvider> preSetPolicyProviders = new LinkedList<PolicyProvider>();
+    private Collection<PolicyProvider> preSetPolicyProviders = new LinkedList<>();
     private Policy busPolicy;
     private boolean enabled = true;
     private Boolean ignoreUnknownAssertions;
@@ -132,7 +132,7 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
 
     
     public void setPolicyProviders(Collection<PolicyProvider> p) {
-        policyProviders = new CopyOnWriteArrayList<PolicyProvider>(p);
+        policyProviders = new CopyOnWriteArrayList<>(p);
     }
 
     public synchronized void addPolicyProvider(PolicyProvider p) {
@@ -144,7 +144,7 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
     }
     public synchronized Collection<PolicyProvider> getPolicyProviders() {
         if (policyProviders == null) {
-            policyProviders = new CopyOnWriteArrayList<PolicyProvider>();
+            policyProviders = new CopyOnWriteArrayList<>();
             if (bus != null) {
                 ConfiguredBeanLocator loc = bus.getExtension(ConfiguredBeanLocator.class);
                 if (loc != null) {

@@ -140,7 +140,7 @@ public class IdTokenResponseFilter extends OAuthServerJoseJwtProducer implements
     @Override
     public String processJwt(JwtToken jwt, Client client) {
         if (keyServiceClient != null) {
-            List<String> opers = new LinkedList<String>();
+            List<String> opers = new LinkedList<>();
             if (super.isJwsRequired()) {
                 opers.add(JsonWebKey.KEY_OPER_SIGN);
             }

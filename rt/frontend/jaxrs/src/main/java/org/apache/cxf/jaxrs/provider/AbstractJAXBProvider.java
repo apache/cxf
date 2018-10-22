@@ -209,7 +209,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
             }
         }
         if (cris != null) {
-            List<String> schemaLocs = new LinkedList<String>();
+            List<String> schemaLocs = new LinkedList<>();
             SchemaValidation sv = null;
             for (ClassResourceInfo cri : cris) {
                 sv = cri.getServiceClass().getAnnotation(SchemaValidation.class);

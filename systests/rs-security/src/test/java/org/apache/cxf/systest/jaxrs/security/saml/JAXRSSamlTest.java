@@ -160,7 +160,7 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetBookSAMLTokenInForm() throws Exception {
         String address = "https://localhost:" + PORT + "/samlform/bookstore/books";
-        FormEncodingProvider<Form> formProvider = new FormEncodingProvider<Form>();
+        FormEncodingProvider<Form> formProvider = new FormEncodingProvider<>();
         formProvider.setExpectedEncoded(true);
         WebClient wc = createWebClient(address, new SamlFormOutInterceptor(), formProvider);
 
@@ -226,7 +226,7 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetBookPreviousSAMLTokenInForm() throws Exception {
         String address = "https://localhost:" + PORT + "/samlform/bookstore/books";
-        FormEncodingProvider<Form> formProvider = new FormEncodingProvider<Form>();
+        FormEncodingProvider<Form> formProvider = new FormEncodingProvider<>();
         formProvider.setExpectedEncoded(true);
         WebClient wc = createWebClientForExistingToken(address, new SamlFormOutInterceptor(),
                                        formProvider);

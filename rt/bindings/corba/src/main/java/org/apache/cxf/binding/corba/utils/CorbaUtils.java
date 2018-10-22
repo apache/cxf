@@ -101,7 +101,7 @@ public final class CorbaUtils {
     }
 
     public static TypeCode getTypeCode(ORB orb, QName type, CorbaTypeMap typeMap) {
-        Stack<QName> seenTypes = new Stack<QName>();
+        Stack<QName> seenTypes = new Stack<>();
         return getTypeCode(orb, type, null, typeMap, seenTypes);
     }
 
@@ -116,7 +116,7 @@ public final class CorbaUtils {
                                        QName type,
                                        CorbaType obj,
                                        CorbaTypeMap typeMap) {
-        Stack<QName> seenTypes = new Stack<QName>();
+        Stack<QName> seenTypes = new Stack<>();
         return getTypeCode(orb, type, obj, typeMap, seenTypes);
     }
 

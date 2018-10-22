@@ -62,7 +62,7 @@ public class ProviderFactoryAllTest extends Assert {
     @Test
     public void testCustomJsonProvider() {
         ProviderFactory pf = ServerProviderFactory.getInstance();
-        JSONProvider<Book> provider = new JSONProvider<Book>();
+        JSONProvider<Book> provider = new JSONProvider<>();
         pf.registerUserProvider(provider);
         MessageBodyReader<?> customJsonReader = pf.createMessageBodyReader(Book.class, null, null,
                                                MediaType.APPLICATION_JSON_TYPE, new MessageImpl());

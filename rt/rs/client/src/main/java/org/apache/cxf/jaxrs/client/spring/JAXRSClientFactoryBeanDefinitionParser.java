@@ -170,7 +170,7 @@ public class JAXRSClientFactoryBeanDefinitionParser extends AbstractFactoryBeanD
         return rootClasses.iterator().next();
     }
     static List<Object> getProviders(ApplicationContext context, Collection<Class<?>> providerClasses) {
-        List<Object> providers = new LinkedList<Object>();
+        List<Object> providers = new LinkedList<>();
         AutowireCapableBeanFactory beanFactory = context.getAutowireCapableBeanFactory();
         for (final Class< ? > providerClass: providerClasses) {
             Object bean = null;

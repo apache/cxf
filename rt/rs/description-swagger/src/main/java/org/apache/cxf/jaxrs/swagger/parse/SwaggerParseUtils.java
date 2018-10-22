@@ -141,7 +141,7 @@ public final class SwaggerParseUtils {
                 List<String> opConsumes = CastUtils.cast((List<?>)oper.get("consumes"));
                 userOp.setConsumes(listToString(opConsumes));
 
-                List<Parameter> userOpParams = new LinkedList<Parameter>();
+                List<Parameter> userOpParams = new LinkedList<>();
                 List<Map<String, Object>> params = CastUtils.cast((List<?>)oper.get("parameters"));
                 for (Map<String, Object> param : params) {
                     String name = (String)param.get("name");
@@ -169,7 +169,7 @@ public final class SwaggerParseUtils {
             }
         }
 
-        List<UserResource> resources = new LinkedList<UserResource>();
+        List<UserResource> resources = new LinkedList<>();
 
         for (Map.Entry<String, List<UserOperation>> entry : userOpsMap.entrySet()) {
             UserResource ur = new UserResource();

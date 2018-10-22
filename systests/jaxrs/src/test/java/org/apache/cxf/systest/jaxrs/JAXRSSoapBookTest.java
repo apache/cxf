@@ -239,7 +239,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress("http://localhost:" + PORT + "/test/services/rest3/bookstore/fastinfoset2");
         bean.getInInterceptors().add(new FIStaxInInterceptor());
-        JAXBElementProvider<?> p = new JAXBElementProvider<Object>();
+        JAXBElementProvider<?> p = new JAXBElementProvider<>();
         p.setConsumeMediaTypes(Collections.singletonList("application/fastinfoset"));
         bean.setProvider(p);
 
@@ -260,7 +260,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         bean.setAddress("http://localhost:" + PORT + "/test/services/rest3/bookstore/fastinfoset");
         bean.getOutInterceptors().add(new FIStaxOutInterceptor());
         bean.getInInterceptors().add(new FIStaxInInterceptor());
-        JAXBElementProvider<?> p = new JAXBElementProvider<Object>();
+        JAXBElementProvider<?> p = new JAXBElementProvider<>();
         p.setConsumeMediaTypes(Collections.singletonList("application/fastinfoset"));
         p.setProduceMediaTypes(Collections.singletonList("application/fastinfoset"));
         bean.setProvider(p);
@@ -280,7 +280,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testPostGetBookFastinfosetProxy() throws Exception {
 
-        JAXBElementProvider<Object> p = new JAXBElementProvider<Object>();
+        JAXBElementProvider<Object> p = new JAXBElementProvider<>();
         p.setConsumeMediaTypes(Collections.singletonList("application/fastinfoset"));
         p.setProduceMediaTypes(Collections.singletonList("application/fastinfoset"));
 
@@ -302,7 +302,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testPostGetBookFastinfosetProxyInterceptors() throws Exception {
 
-        JAXBElementProvider<Object> p = new JAXBElementProvider<Object>();
+        JAXBElementProvider<Object> p = new JAXBElementProvider<>();
         p.setConsumeMediaTypes(Collections.singletonList("application/fastinfoset"));
         p.setProduceMediaTypes(Collections.singletonList("application/fastinfoset"));
 

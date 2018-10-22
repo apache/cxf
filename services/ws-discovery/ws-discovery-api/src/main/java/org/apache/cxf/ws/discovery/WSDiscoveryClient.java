@@ -402,7 +402,7 @@ public class WSDiscoveryClient implements Closeable {
         rt.setEndpointReference(ref);
         if (adHoc) {
             disp.getRequestContext().put("udp.multi.response.timeout", timeout);
-            final Holder<ResolveMatchesType> response = new Holder<ResolveMatchesType>();
+            final Holder<ResolveMatchesType> response = new Holder<>();
             AsyncHandler<Object> handler = new AsyncHandler<Object>() {
                 public void handleResponse(Response<Object> res) {
                     try {

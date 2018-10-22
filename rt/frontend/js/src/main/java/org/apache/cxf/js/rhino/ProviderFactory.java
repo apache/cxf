@@ -45,7 +45,7 @@ public class ProviderFactory {
 
     private String epAddress;
     private boolean isBaseAddr;
-    private List<AbstractDOMProvider> providers = new CopyOnWriteArrayList<AbstractDOMProvider>();
+    private List<AbstractDOMProvider> providers = new CopyOnWriteArrayList<>();
 
     static {
         ContextFactory.initGlobal(new RhinoContextFactory());

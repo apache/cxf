@@ -64,7 +64,7 @@ public class DemoEdmProvider extends CsdlAbstractEdmProvider {
         schema.setNamespace(NAMESPACE);
 
         // add EntityTypes
-        List<CsdlEntityType> entityTypes = new ArrayList<CsdlEntityType>();
+        List<CsdlEntityType> entityTypes = new ArrayList<>();
         entityTypes.add(getEntityType(ET_PRODUCT_FQN));
         schema.setEntityTypes(entityTypes);
 
@@ -72,7 +72,7 @@ public class DemoEdmProvider extends CsdlAbstractEdmProvider {
         schema.setEntityContainer(getEntityContainer());
 
         // finally
-        List<CsdlSchema> schemas = new ArrayList<CsdlSchema>();
+        List<CsdlSchema> schemas = new ArrayList<>();
         schemas.add(schema);
 
         return schemas;
@@ -132,7 +132,7 @@ public class DemoEdmProvider extends CsdlAbstractEdmProvider {
     public CsdlEntityContainer getEntityContainer() {
 
         // create EntitySets
-        List<CsdlEntitySet> entitySets = new ArrayList<CsdlEntitySet>();
+        List<CsdlEntitySet> entitySets = new ArrayList<>();
         entitySets.add(getEntitySet(CONTAINER, ES_PRODUCTS_NAME));
 
         // create EntityContainer

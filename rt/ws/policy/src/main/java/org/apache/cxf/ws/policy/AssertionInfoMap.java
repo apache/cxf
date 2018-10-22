@@ -152,7 +152,7 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
             return validated;
         }
 
-        Set<String> msgs = new LinkedHashSet<String>();
+        Set<String> msgs = new LinkedHashSet<>();
 
         for (QName name : errors) {
             Collection<AssertionInfo> ais = getAssertionInfo(name);

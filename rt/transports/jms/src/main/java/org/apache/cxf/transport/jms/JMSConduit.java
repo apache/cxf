@@ -375,7 +375,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
         final WeakReference<JMSConduit> ref;
         BusLifeCycleManager blcm;
         JMSBusLifeCycleListener(JMSConduit c, BusLifeCycleManager b) {
-            ref = new WeakReference<JMSConduit>(c);
+            ref = new WeakReference<>(c);
             blcm = b;
             blcm.registerLifeCycleListener(this);
         }

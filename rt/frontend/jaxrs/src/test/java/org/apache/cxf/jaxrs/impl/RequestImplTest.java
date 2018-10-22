@@ -151,7 +151,7 @@ public class RequestImplTest extends Assert {
         metadata.putSingle(HttpHeaders.ACCEPT_LANGUAGE, "en-us");
         metadata.putSingle(HttpHeaders.ACCEPT_ENCODING, "gzip;q=1.0, compress");
 
-        List<Variant> list = new ArrayList<Variant>();
+        List<Variant> list = new ArrayList<>();
         Variant var1 = new Variant(MediaType.valueOf("a/b"), new Locale("en"), "gzip");
         Variant var2 = new Variant(MediaType.valueOf("x/z"), new Locale("en"), "gzip");
         Variant var3 = new Variant(MediaType.valueOf("e/f+json"), new Locale("en"), "gzip");

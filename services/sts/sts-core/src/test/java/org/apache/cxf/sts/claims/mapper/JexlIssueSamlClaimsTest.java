@@ -206,7 +206,7 @@ public class JexlIssueSamlClaimsTest extends org.junit.Assert {
     private RequestSecurityTokenType createRequest(Map<String, RealmProperties> realms, Crypto crypto)
         throws WSSecurityException {
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = new JAXBElement<String>(QNameConstants.TOKEN_TYPE, String.class,
+        JAXBElement<String> tokenType = new JAXBElement<>(QNameConstants.TOKEN_TYPE, String.class,
                                                                 WSS4JConstants.WSS_SAML2_TOKEN_TYPE);
         request.getAny().add(tokenType);
 
@@ -221,7 +221,7 @@ public class JexlIssueSamlClaimsTest extends org.junit.Assert {
         claimType = createClaimsType(doc, ROLE_CLAIM);
         claimsType.getAny().add(claimType);
 
-        JAXBElement<ClaimsType> claimsTypeJaxb = new JAXBElement<ClaimsType>(QNameConstants.CLAIMS, ClaimsType.class,
+        JAXBElement<ClaimsType> claimsTypeJaxb = new JAXBElement<>(QNameConstants.CLAIMS, ClaimsType.class,
                                                                              claimsType);
         request.getAny().add(claimsTypeJaxb);
 
@@ -248,7 +248,7 @@ public class JexlIssueSamlClaimsTest extends org.junit.Assert {
         // add SAML token as On-Behalf-Of element
         OnBehalfOfType onbehalfof = new OnBehalfOfType();
         onbehalfof.setAny(samlToken);
-        JAXBElement<OnBehalfOfType> onbehalfofType = new JAXBElement<OnBehalfOfType>(QNameConstants.ON_BEHALF_OF,
+        JAXBElement<OnBehalfOfType> onbehalfofType = new JAXBElement<>(QNameConstants.ON_BEHALF_OF,
                                                                                      OnBehalfOfType.class, onbehalfof);
         request.getAny().add(onbehalfofType);
         return request;

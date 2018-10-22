@@ -55,7 +55,7 @@ public class CorbaStreamWriter implements XMLStreamWriter {
     private List<ArgType> params;
     private int paramCounter;
 
-    private Stack<QName> elements = new Stack<QName>();
+    private Stack<QName> elements = new Stack<>();
     private QName paramElement;
     private QName wrapElementName;
 

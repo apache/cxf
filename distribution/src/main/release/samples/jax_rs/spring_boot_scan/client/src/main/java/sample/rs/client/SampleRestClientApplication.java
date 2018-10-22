@@ -72,7 +72,7 @@ public class SampleRestClientApplication {
     static class EurekaFailoverFeature extends CircuitBreakerFailoverFeature {
         @Autowired
         DiscoveryClient discoveryClient;
-        List<String> addresses = new LinkedList<String>();
+        List<String> addresses = new LinkedList<>();
 
         EurekaFailoverFeature() {
             super("eureka://registry");

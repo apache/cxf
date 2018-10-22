@@ -25,8 +25,8 @@ import org.apache.cxf.common.i18n.Message;
 
 public final class ValidationResult {
 
-    private Stack<String> errors = new Stack<String>();
-    private Stack<String> warnings = new Stack<String>();
+    private Stack<String> errors = new Stack<>();
+    private Stack<String> warnings = new Stack<>();
 
     public Stack<String> getErrors() {
         return this.errors;

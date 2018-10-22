@@ -45,7 +45,7 @@ public class JavaInterface implements JavaAnnotatable {
 
     private final List<JavaMethod> methods = new ArrayList<>();
     private final List<JAnnotation> annotations = new ArrayList<>();
-    private final Set<String> imports = new TreeSet<String>();
+    private final Set<String> imports = new TreeSet<>();
     private final List<String> supers = new ArrayList<>();
 
     private String webserviceName;

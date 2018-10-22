@@ -75,7 +75,7 @@ public final class Client {
         System.out.println("Filesize of me.bmp image is: " + fileSize);
 
         System.out.println("\nStarting MTOM Test using basic byte array:");
-        Holder<String> name = new Holder<String>("Sam");
+        Holder<String> name = new Holder<>("Sam");
         Holder<byte[]> param = new Holder<byte[]>();
         param.value = new byte[(int) fileSize];
         InputStream in = fileURL.openStream();
@@ -99,7 +99,7 @@ public final class Client {
 
         System.out.println("\nStarting MTOM test with DataHandler:");
         name.value = "Bob";
-        Holder<DataHandler> handler = new Holder<DataHandler>();
+        Holder<DataHandler> handler = new Holder<>();
 
         handler.value = new DataHandler(fileURL);
 

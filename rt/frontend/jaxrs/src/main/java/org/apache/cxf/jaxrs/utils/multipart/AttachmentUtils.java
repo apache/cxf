@@ -62,7 +62,7 @@ public final class AttachmentUtils {
         Message m = JAXRSUtils.getCurrentMessage();
         List<MultipartOutputFilter> outFilters = CastUtils.cast((List<?>)m.get(OUT_FILTERS));
         if (outFilters == null) {
-            outFilters = new ArrayList<MultipartOutputFilter>();
+            outFilters = new ArrayList<>();
             m.put(OUT_FILTERS, outFilters);
         }
         outFilters.add(filter);
@@ -72,7 +72,7 @@ public final class AttachmentUtils {
         Message m = JAXRSUtils.getCurrentMessage();
         List<MultipartInputFilter> inFilters = CastUtils.cast((List<?>)m.get(IN_FILTERS));
         if (inFilters == null) {
-            inFilters = new ArrayList<MultipartInputFilter>();
+            inFilters = new ArrayList<>();
             m.put(IN_FILTERS, inFilters);
         }
         inFilters.add(filter);
@@ -199,7 +199,7 @@ public final class AttachmentUtils {
                                                          String mediaType,
                                                          List<Attachment> infos) {
 
-        List<Attachment> all = new LinkedList<Attachment>();
+        List<Attachment> all = new LinkedList<>();
         for (Attachment a : infos) {
             if (matchAttachmentId(a, id)) {
                 if (mediaType != null) {

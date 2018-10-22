@@ -44,7 +44,7 @@ import org.apache.cxf.security.SecurityContext;
 public class WebServiceContextImpl implements WebServiceContext {
     private static final Logger LOG = LogUtils.getL7dLogger(WebServiceContextImpl.class);
 
-    private static ThreadLocal<MessageContext> context = new ThreadLocal<MessageContext>();
+    private static ThreadLocal<MessageContext> context = new ThreadLocal<>();
 
     private final MessageContext localCtx;
 

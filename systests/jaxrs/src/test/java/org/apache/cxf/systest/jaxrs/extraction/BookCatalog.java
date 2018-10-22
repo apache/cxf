@@ -131,7 +131,7 @@ public class BookCatalog {
         final Map< String, Class< ? > > fieldTypes = new HashMap<>();
         fieldTypes.put("modified", Date.class);
 
-        LuceneQueryVisitor<SearchBean> visitor = new LuceneQueryVisitor<SearchBean>("ct", "contents");
+        LuceneQueryVisitor<SearchBean> visitor = new LuceneQueryVisitor<>("ct", "contents");
         visitor.setPrimitiveFieldTypeMap(fieldTypes);
         return visitor;
     }

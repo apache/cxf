@@ -42,7 +42,7 @@ public class ClientBuilderImpl extends ClientBuilder {
     private TLSConfiguration secConfig = new TLSConfiguration();
 
     public ClientBuilderImpl() {
-        configImpl = new ClientConfigurableImpl<ClientBuilder>(this);
+        configImpl = new ClientConfigurableImpl<>(this);
     }
 
     @Override
@@ -154,7 +154,7 @@ public class ClientBuilderImpl extends ClientBuilder {
         if (cfg.getRuntimeType() != RuntimeType.CLIENT) {
             throw new IllegalArgumentException();
         }
-        configImpl = new ClientConfigurableImpl<ClientBuilder>(this, cfg);
+        configImpl = new ClientConfigurableImpl<>(this, cfg);
         return this;
     }
 

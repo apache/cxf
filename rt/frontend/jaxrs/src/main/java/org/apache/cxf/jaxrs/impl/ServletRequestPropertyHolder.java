@@ -56,7 +56,7 @@ public class ServletRequestPropertyHolder implements PropertyHolder {
 
     @Override
     public Collection<String> getPropertyNames() {
-        List<String> list = new LinkedList<String>();
+        List<String> list = new LinkedList<>();
         Enumeration<String> attrNames = request.getAttributeNames();
         while (attrNames.hasMoreElements()) {
             String name = attrNames.nextElement();

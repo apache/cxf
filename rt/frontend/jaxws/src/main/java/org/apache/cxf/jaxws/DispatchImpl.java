@@ -316,7 +316,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
                     addInvokeOperation(opName, isOneWay);
                 }
             }
-            Holder<T> holder = new Holder<T>(obj);
+            Holder<T> holder = new Holder<>(obj);
             opName = calculateOpName(holder, opName, hasOpName);
 
             Object ret[] = client.invokeWrapped(opName, holder.value);
@@ -434,7 +434,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
             }
         };            
 
-        Response<T> ret = new JaxwsResponseCallback<T>(callback);
+        Response<T> ret = new JaxwsResponseCallback<>(callback);
         try {
             boolean hasOpName;
 
@@ -451,7 +451,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
                 }
             }
 
-            Holder<T> holder = new Holder<T>(obj);
+            Holder<T> holder = new Holder<>(obj);
             opName = calculateOpName(holder, opName, hasOpName);
 
             client.invokeWrapped(callback,

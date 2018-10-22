@@ -323,7 +323,7 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
             }
         };
 
-        Response<Object> ret = new JaxwsResponseCallback<Object>(callback);
+        Response<Object> ret = new JaxwsResponseCallback<>(callback);
         client.invoke(callback, oi, params);
         return ret;
     }

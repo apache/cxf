@@ -468,7 +468,7 @@ public final class DOMUtils {
     public static Set<QName> convertStringsToQNames(List<String> expandedQNames) {
         Set<QName> dropElements = Collections.emptySet();
         if (expandedQNames != null) {
-            dropElements = new LinkedHashSet<QName>(expandedQNames.size());
+            dropElements = new LinkedHashSet<>(expandedQNames.size());
             for (String val : expandedQNames) {
                 dropElements.add(convertStringToQName(val));
             }
@@ -738,7 +738,7 @@ public final class DOMUtils {
 
     public static List<Element> findAllElementsByTagNameNS(Element elem, String nameSpaceURI,
                                                            String localName) {
-        List<Element> ret = new LinkedList<Element>();
+        List<Element> ret = new LinkedList<>();
         findAllElementsByTagNameNS(elem, nameSpaceURI, localName, ret);
         return ret;
     }
@@ -799,7 +799,7 @@ public final class DOMUtils {
     }
 
     public static List<Element> findAllElementsByTagName(Element elem, String tagName) {
-        List<Element> ret = new LinkedList<Element>();
+        List<Element> ret = new LinkedList<>();
         findAllElementsByTagName(elem, tagName, ret);
         return ret;
     }

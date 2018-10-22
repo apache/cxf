@@ -105,8 +105,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         }
         EmptyStruct x = new EmptyStruct();
         EmptyStruct yOrig = new EmptyStruct();
-        Holder<EmptyStruct> y = new Holder<EmptyStruct>(yOrig);
-        Holder<EmptyStruct> z = new Holder<EmptyStruct>();
+        Holder<EmptyStruct> y = new Holder<>(yOrig);
+        Holder<EmptyStruct> z = new Holder<>();
         EmptyStruct ret;
         if (testDocLiteral) {
             ret = docClient.testEmptyStruct(x, y, z);
@@ -133,8 +133,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         derivedY.setVarStringExt("DerivedStruct-y");
         derivedY.setAttrString("DerivedAttr-y");
 
-        y = new Holder<EmptyStruct>(derivedY);
-        z = new Holder<EmptyStruct>();
+        y = new Holder<>(derivedY);
+        z = new Holder<>();
         if (testDocLiteral) {
             ret = docClient.testEmptyStruct(derivedX, y, z);
         } else if (testXMLBinding) {
@@ -174,8 +174,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         yOrig.setVarInt(new BigInteger("13"));
         yOrig.setVarString("Cheerio");
 
-        Holder<SimpleStruct> y = new Holder<SimpleStruct>(yOrig);
-        Holder<SimpleStruct> z = new Holder<SimpleStruct>();
+        Holder<SimpleStruct> y = new Holder<>(yOrig);
+        Holder<SimpleStruct> z = new Holder<>();
         SimpleStruct ret;
         if (testDocLiteral) {
             ret = docClient.testSimpleStruct(x, y, z);
@@ -212,8 +212,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         yOrig.setVarInt(Integer.valueOf(13));
         yOrig.setVarString("Cheerio");
 
-        Holder<StructWithNillables> y = new Holder<StructWithNillables>(yOrig);
-        Holder<StructWithNillables> z = new Holder<StructWithNillables>();
+        Holder<StructWithNillables> y = new Holder<>(yOrig);
+        Holder<StructWithNillables> z = new Holder<>();
         StructWithNillables ret;
         if (testDocLiteral) {
             ret = docClient.testStructWithNillables(x, y, z);
@@ -253,8 +253,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         yOrig.setVarString("world");
         yOrig.setVarFloat(10.1f);
 
-        Holder<AnonymousStruct> y = new Holder<AnonymousStruct>(yOrig);
-        Holder<AnonymousStruct> z = new Holder<AnonymousStruct>();
+        Holder<AnonymousStruct> y = new Holder<>(yOrig);
+        Holder<AnonymousStruct> z = new Holder<>();
         AnonymousStruct ret;
         if (testDocLiteral) {
             ret = docClient.testAnonymousStruct(x, y, z);
@@ -326,8 +326,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         yOrig.setVarEmptyStruct(new EmptyStruct());
         yOrig.setVarStruct(ys);
 
-        Holder<NestedStruct> y = new Holder<NestedStruct>(yOrig);
-        Holder<NestedStruct> z = new Holder<NestedStruct>();
+        Holder<NestedStruct> y = new Holder<>(yOrig);
+        Holder<NestedStruct> z = new Holder<>();
         NestedStruct ret;
         if (testDocLiteral) {
             ret = docClient.testNestedStruct(x, y, z);
@@ -357,8 +357,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         FixedArray yOrig = new FixedArray();
         yOrig.getItem().addAll(Arrays.asList(-1, 0, 1));
 
-        Holder<FixedArray> y = new Holder<FixedArray>(yOrig);
-        Holder<FixedArray> z = new Holder<FixedArray>();
+        Holder<FixedArray> y = new Holder<>(yOrig);
+        Holder<FixedArray> z = new Holder<>();
         FixedArray ret;
         if (testDocLiteral) {
             ret = docClient.testFixedArray(x, y, z);
@@ -390,8 +390,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         BoundedArray yOrig = new BoundedArray();
         yOrig.getItem().addAll(Arrays.asList(-1f, 0f, 1f));
 
-        Holder<BoundedArray> y = new Holder<BoundedArray>(yOrig);
-        Holder<BoundedArray> z = new Holder<BoundedArray>();
+        Holder<BoundedArray> y = new Holder<>(yOrig);
+        Holder<BoundedArray> z = new Holder<>();
         BoundedArray ret;
         if (testDocLiteral) {
             ret = docClient.testBoundedArray(x, y, z);
@@ -445,8 +445,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         UnboundedArray yOrig = new UnboundedArray();
         yOrig.getItem().addAll(Arrays.asList("XXX", "YYY", "ZZZ"));
 
-        Holder<UnboundedArray> y = new Holder<UnboundedArray>(yOrig);
-        Holder<UnboundedArray> z = new Holder<UnboundedArray>();
+        Holder<UnboundedArray> y = new Holder<>(yOrig);
+        Holder<UnboundedArray> z = new Holder<>();
         UnboundedArray ret;
         if (testDocLiteral) {
             ret = docClient.testUnboundedArray(x, y, z);
@@ -483,8 +483,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         yOrig.getArray1().addAll(Arrays.asList("XXX", "YYY", "ZZZ"));
         yOrig.getArray2().addAll(Arrays.asList("xxx", "yyy", "zzz"));
 
-        Holder<CompoundArray> y = new Holder<CompoundArray>(yOrig);
-        Holder<CompoundArray> z = new Holder<CompoundArray>();
+        Holder<CompoundArray> y = new Holder<>(yOrig);
+        Holder<CompoundArray> z = new Holder<>();
         CompoundArray ret;
         if (testDocLiteral) {
             ret = docClient.testCompoundArray(x, y, z);
@@ -526,8 +526,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
             yList.add(yy);
         }
 
-        Holder<NestedArray> y = new Holder<NestedArray>(yOrig);
-        Holder<NestedArray> z = new Holder<NestedArray>();
+        Holder<NestedArray> y = new Holder<>(yOrig);
+        Holder<NestedArray> z = new Holder<>();
         NestedArray ret;
         if (testDocLiteral) {
             ret = docClient.testNestedArray(x, y, z);
@@ -591,8 +591,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         yOrig.getVarList().add("StructWithList");
         yOrig.getVarList().add("work");
 
-        Holder<StructWithList> y = new Holder<StructWithList>(yOrig);
-        Holder<StructWithList> z = new Holder<StructWithList>();
+        Holder<StructWithList> y = new Holder<>(yOrig);
+        Holder<StructWithList> z = new Holder<>();
         StructWithList ret;
         if (testDocLiteral) {
             ret = docClient.testStructWithList(x, y, z);
@@ -660,8 +660,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         StructWithUnion yOrig = new StructWithUnion();
         yOrig.setVarUnion("-999");
 
-        Holder<StructWithUnion> y = new Holder<StructWithUnion>(yOrig);
-        Holder<StructWithUnion> z = new Holder<StructWithUnion>();
+        Holder<StructWithUnion> y = new Holder<>(yOrig);
+        Holder<StructWithUnion> z = new Holder<>();
         StructWithUnion ret;
         if (testDocLiteral) {
             ret = docClient.testStructWithUnion(x, y, z);
@@ -715,8 +715,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         }
         EmptyChoice x = new EmptyChoice();
         EmptyChoice yOrig = new EmptyChoice();
-        Holder<EmptyChoice> y = new Holder<EmptyChoice>(yOrig);
-        Holder<EmptyChoice> z = new Holder<EmptyChoice>();
+        Holder<EmptyChoice> y = new Holder<>(yOrig);
+        Holder<EmptyChoice> z = new Holder<>();
         EmptyChoice ret;
         if (testDocLiteral) {
             ret = docClient.testEmptyChoice(x, y, z);
@@ -757,8 +757,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         SimpleChoice yOrig = new SimpleChoice();
         yOrig.setVarString("Cheerio");
 
-        Holder<SimpleChoice> y = new Holder<SimpleChoice>(yOrig);
-        Holder<SimpleChoice> z = new Holder<SimpleChoice>();
+        Holder<SimpleChoice> y = new Holder<>(yOrig);
+        Holder<SimpleChoice> z = new Holder<>();
 
         SimpleChoice ret;
         if (testDocLiteral) {
@@ -785,8 +785,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         }
         EmptyAll x = new EmptyAll();
         EmptyAll yOrig = new EmptyAll();
-        Holder<EmptyAll> y = new Holder<EmptyAll>(yOrig);
-        Holder<EmptyAll> z = new Holder<EmptyAll>();
+        Holder<EmptyAll> y = new Holder<>(yOrig);
+        Holder<EmptyAll> z = new Holder<>();
         EmptyAll ret;
         if (testDocLiteral) {
             ret = docClient.testEmptyAll(x, y, z);
@@ -829,8 +829,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         yOrig.setVarString("Cheerio");
         yOrig.setVarAttrString("Attr-y");
 
-        Holder<SimpleAll> y = new Holder<SimpleAll>(yOrig);
-        Holder<SimpleAll> z = new Holder<SimpleAll>();
+        Holder<SimpleAll> y = new Holder<>(yOrig);
+        Holder<SimpleAll> z = new Holder<>();
 
         SimpleAll ret;
         if (testDocLiteral) {
@@ -868,8 +868,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         yOrig.setVarInt(Integer.valueOf(13));
         yOrig.setVarString("Cheerio");
 
-        Holder<StructWithOptionals> y = new Holder<StructWithOptionals>(yOrig);
-        Holder<StructWithOptionals> z = new Holder<StructWithOptionals>();
+        Holder<StructWithOptionals> y = new Holder<>(yOrig);
+        Holder<StructWithOptionals> z = new Holder<>();
 
         StructWithOptionals ret;
         if (testDocLiteral) {
@@ -929,8 +929,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         yOrig.setVarString("RecStruct-y");
         yOrig.setVarStructArray(arr);
 
-        Holder<RecursiveStruct> y = new Holder<RecursiveStruct>(yOrig);
-        Holder<RecursiveStruct> z = new Holder<RecursiveStruct>();
+        Holder<RecursiveStruct> y = new Holder<>(yOrig);
+        Holder<RecursiveStruct> z = new Holder<>();
         RecursiveStruct ret;
         if (testDocLiteral) {
             ret = docClient.testRecursiveStruct(x, y, z);
@@ -990,8 +990,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         yOrig.getItem().add(ytmp);
         yOrig.getItem().add(xtmp);
 
-        Holder<RecursiveStructArray> y = new Holder<RecursiveStructArray>(yOrig);
-        Holder<RecursiveStructArray> z = new Holder<RecursiveStructArray>();
+        Holder<RecursiveStructArray> y = new Holder<>(yOrig);
+        Holder<RecursiveStructArray> z = new Holder<>();
         RecursiveStructArray ret;
         if (testDocLiteral) {
             ret = docClient.testRecursiveStructArray(x, y, z);
@@ -1050,8 +1050,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         RecursiveUnion yOrig = new RecursiveUnion();
         yOrig.setVarChoice(yData);
 
-        Holder<RecursiveUnion> y = new Holder<RecursiveUnion>(yOrig);
-        Holder<RecursiveUnion> z = new Holder<RecursiveUnion>();
+        Holder<RecursiveUnion> y = new Holder<>(yOrig);
+        Holder<RecursiveUnion> z = new Holder<>();
         RecursiveUnion ret;
         if (testDocLiteral) {
             ret = docClient.testRecursiveUnion(x, y, z);
@@ -1099,8 +1099,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         yOrig.setVarInt(-5);
         yOrig.setVarChoiceArray(yOrigchoice);
 
-        Holder<RecursiveUnionData> y = new Holder<RecursiveUnionData>(yOrig);
-        Holder<RecursiveUnionData> z = new Holder<RecursiveUnionData>();
+        Holder<RecursiveUnionData> y = new Holder<>(yOrig);
+        Holder<RecursiveUnionData> z = new Holder<>();
         RecursiveUnionData ret;
         if (testDocLiteral) {
             ret = docClient.testRecursiveUnionData(x, y, z);
@@ -1153,8 +1153,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         yOrig.getItem().add(tmp2);
         yOrig.getItem().add(tmp1);
 
-        Holder<ChoiceArray> y = new Holder<ChoiceArray>(yOrig);
-        Holder<ChoiceArray> z = new Holder<ChoiceArray>();
+        Holder<ChoiceArray> y = new Holder<>(yOrig);
+        Holder<ChoiceArray> z = new Holder<>();
         ChoiceArray ret;
         if (testDocLiteral) {
             ret = docClient.testChoiceArray(x, y, z);
@@ -1183,8 +1183,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         x.setValue("foo");
         ExtendsSimpleType yOriginal = new ExtendsSimpleType();
         yOriginal.setValue("bar");
-        Holder<ExtendsSimpleType> y = new Holder<ExtendsSimpleType>(yOriginal);
-        Holder<ExtendsSimpleType> z = new Holder<ExtendsSimpleType>();
+        Holder<ExtendsSimpleType> y = new Holder<>(yOriginal);
+        Holder<ExtendsSimpleType> z = new Holder<>();
         ExtendsSimpleType ret;
         if (testDocLiteral) {
             ret = docClient.testExtendsSimpleType(x, y, z);
@@ -1211,8 +1211,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
 
         ExtendsSimpleContent yOriginal = new ExtendsSimpleContent();
         yOriginal.setValue("bar");
-        Holder<ExtendsSimpleContent> y = new Holder<ExtendsSimpleContent>(yOriginal);
-        Holder<ExtendsSimpleContent> z = new Holder<ExtendsSimpleContent>();
+        Holder<ExtendsSimpleContent> y = new Holder<>(yOriginal);
+        Holder<ExtendsSimpleContent> z = new Holder<>();
         ExtendsSimpleContent ret;
         if (testDocLiteral) {
             ret = docClient.testExtendsSimpleContent(x, y, z);
@@ -1246,8 +1246,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         yOrig.setID("Cheerio");
         yOrig.setValue("content-y");
 
-        Holder<Document> y = new Holder<Document>(yOrig);
-        Holder<Document> z = new Holder<Document>();
+        Holder<Document> y = new Holder<>(yOrig);
+        Holder<Document> z = new Holder<>();
 
         Document ret;
         if (testDocLiteral) {
@@ -1269,8 +1269,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         yOrig.setValue("content-y");
         x.setID(null);
         yOrig.setID(null);
-        y = new Holder<Document>(yOrig);
-        z = new Holder<Document>();
+        y = new Holder<>(yOrig);
+        z = new Holder<>();
 
         if (testDocLiteral) {
             ret = docClient.testDocument(x, y, z);
@@ -1310,8 +1310,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         yOrig.setAttrib2("Ay");
         yOrig.setValue(ColourEnum.fromValue("GREEN"));
 
-        Holder<ExtColourEnum> y = new Holder<ExtColourEnum>(yOrig);
-        Holder<ExtColourEnum> z = new Holder<ExtColourEnum>();
+        Holder<ExtColourEnum> y = new Holder<>(yOrig);
+        Holder<ExtColourEnum> z = new Holder<>();
         ExtColourEnum ret;
         if (testDocLiteral) {
             ret = docClient.testExtColourEnum(x, y, z);
@@ -1345,8 +1345,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         y1.setValue("base64b".getBytes());
         y1.setId(2);
 
-        Holder<ExtBase64Binary> y1Holder = new Holder<ExtBase64Binary>(y1);
-        Holder<ExtBase64Binary> z1 = new Holder<ExtBase64Binary>();
+        Holder<ExtBase64Binary> y1Holder = new Holder<>(y1);
+        Holder<ExtBase64Binary> z1 = new Holder<>();
         ExtBase64Binary ret;
         if (testDocLiteral) {
             ret = docClient.testExtBase64Binary(x1, y1Holder, z1);
@@ -1397,8 +1397,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         JAXBElement<? extends SgBaseTypeA> elementB = objectFactory.createSg01DerivedElementB(derivedB);
         yOrig.setSg01BaseElementA(elementB);
 
-        Holder<StructWithSubstitutionGroup> y = new Holder<StructWithSubstitutionGroup>(yOrig);
-        Holder<StructWithSubstitutionGroup> z = new Holder<StructWithSubstitutionGroup>();
+        Holder<StructWithSubstitutionGroup> y = new Holder<>(yOrig);
+        Holder<StructWithSubstitutionGroup> z = new Holder<>();
         StructWithSubstitutionGroup ret;
         if (testDocLiteral) {
             ret = docClient.testStructWithSubstitutionGroup(x, y, z);
@@ -1452,7 +1452,7 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
 
         Holder<StructWithSubstitutionGroupAbstract> y =
             new Holder<StructWithSubstitutionGroupAbstract>(yOrig);
-        Holder<StructWithSubstitutionGroupAbstract> z = new Holder<StructWithSubstitutionGroupAbstract>();
+        Holder<StructWithSubstitutionGroupAbstract> z = new Holder<>();
         StructWithSubstitutionGroupAbstract ret;
         if (testDocLiteral) {
             ret = docClient.testStructWithSubstitutionGroupAbstract(x, y, z);
@@ -1496,8 +1496,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         element = objectFactory.createSg04NillableBaseElementA(null);
         yOrig.setSg04NillableBaseElementA(element);
 
-        Holder<StructWithSubstitutionGroupNil> y = new Holder<StructWithSubstitutionGroupNil>(yOrig);
-        Holder<StructWithSubstitutionGroupNil> z = new Holder<StructWithSubstitutionGroupNil>();
+        Holder<StructWithSubstitutionGroupNil> y = new Holder<>(yOrig);
+        Holder<StructWithSubstitutionGroupNil> z = new Holder<>();
         StructWithSubstitutionGroupNil ret;
         if (testDocLiteral) {
             ret = docClient.testStructWithSubstitutionGroupNil(x, y, z);
@@ -1718,8 +1718,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
             objectFactory.createSg04NillableBaseElementA(null);
         yOrig.setSg04NillableBaseElementA(elementA);
 
-        Holder<ChoiceWithSubstitutionGroupNil> y = new Holder<ChoiceWithSubstitutionGroupNil>(yOrig);
-        Holder<ChoiceWithSubstitutionGroupNil> z = new Holder<ChoiceWithSubstitutionGroupNil>();
+        Holder<ChoiceWithSubstitutionGroupNil> y = new Holder<>(yOrig);
+        Holder<ChoiceWithSubstitutionGroupNil> z = new Holder<>();
         ChoiceWithSubstitutionGroupNil ret;
         if (testDocLiteral) {
             ret = docClient.testChoiceWithSubstitutionGroupNil(x, y, z);
@@ -1869,8 +1869,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         x.setVarInt(456);
         x.setRecElNext(xn);
 
-        Holder<RecElType> yh = new Holder<RecElType>(y);
-        Holder<RecElType> zh = new Holder<RecElType>();
+        Holder<RecElType> yh = new Holder<>(y);
+        Holder<RecElType> zh = new Holder<>();
         RecElType ret;
         if (testDocLiteral) {
             ret = docClient.testRecElType(x, yh, zh);
@@ -2025,8 +2025,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         otx.getRecInner().add(itx);
         otx.getRecMostInner().add(mitx);
 
-        Holder<RecOuterType> yh = new Holder<RecOuterType>(oty);
-        Holder<RecOuterType> zh = new Holder<RecOuterType>();
+        Holder<RecOuterType> yh = new Holder<>(oty);
+        Holder<RecOuterType> zh = new Holder<>();
         RecOuterType ret;
         if (testDocLiteral) {
             ret = docClient.testRecOuterType(otx, yh, zh);
@@ -2065,8 +2065,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         y1.setAttrib1A(Byte.valueOf((byte)3));
         y1.setAttrib1B(Short.valueOf((short)4));
 
-        Holder<SimpleContent1> y1Holder = new Holder<SimpleContent1>(y1);
-        Holder<SimpleContent1> z1 = new Holder<SimpleContent1>();
+        Holder<SimpleContent1> y1Holder = new Holder<>(y1);
+        Holder<SimpleContent1> z1 = new Holder<>();
         SimpleContent1 ret;
         if (testDocLiteral) {
             ret = docClient.testSimpleContent1(x1, y1Holder, z1);
@@ -2106,8 +2106,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         y2.setAttrib2A(Integer.valueOf(7));
         y2.setAttrib2B(Long.valueOf(8));
 
-        Holder<SimpleContent2> y2Holder = new Holder<SimpleContent2>(y2);
-        Holder<SimpleContent2> z2 = new Holder<SimpleContent2>();
+        Holder<SimpleContent2> y2Holder = new Holder<>(y2);
+        Holder<SimpleContent2> z2 = new Holder<>();
         SimpleContent2 ret;
         if (testDocLiteral) {
             ret = docClient.testSimpleContent2(x2, y2Holder, z2);
@@ -2151,8 +2151,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         y3.setAttrib3A("yyy");
         y3.setAttrib3B(Boolean.FALSE);
 
-        Holder<SimpleContent3> y3Holder = new Holder<SimpleContent3>(y3);
-        Holder<SimpleContent3> z3 = new Holder<SimpleContent3>();
+        Holder<SimpleContent3> y3Holder = new Holder<>(y3);
+        Holder<SimpleContent3> z3 = new Holder<>();
         SimpleContent3 ret;
         if (testDocLiteral) {
             ret = docClient.testSimpleContent3(x3, y3Holder, z3);
@@ -2183,8 +2183,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         UnionSimpleContent yOrig = new UnionSimpleContent();
         yOrig.setValue("-7");
 
-        Holder<UnionSimpleContent> y = new Holder<UnionSimpleContent>(yOrig);
-        Holder<UnionSimpleContent> z = new Holder<UnionSimpleContent>();
+        Holder<UnionSimpleContent> y = new Holder<>(yOrig);
+        Holder<UnionSimpleContent> z = new Holder<>();
         UnionSimpleContent ret;
         if (testDocLiteral) {
             ret = docClient.testUnionSimpleContent(x, y, z);

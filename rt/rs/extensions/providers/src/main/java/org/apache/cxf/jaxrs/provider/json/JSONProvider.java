@@ -566,9 +566,9 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
 
         if (ignoreNamespaces && rootIsArray && (theArrayKeys == null || dropRootInJsonStream)) {
             if (theArrayKeys == null) {
-                theArrayKeys = new LinkedList<String>();
+                theArrayKeys = new LinkedList<>();
             } else if (dropRootInJsonStream) {
-                theArrayKeys = new LinkedList<String>(theArrayKeys);
+                theArrayKeys = new LinkedList<>(theArrayKeys);
             }
             if (qname != null) {
                 theArrayKeys.add(qname.getLocalPart());

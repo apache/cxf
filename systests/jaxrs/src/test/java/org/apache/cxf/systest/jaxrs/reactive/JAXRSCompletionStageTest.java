@@ -65,7 +65,7 @@ public class JAXRSCompletionStageTest extends AbstractBusClientServerTestBase {
         String address = "http://localhost:" + PORT + "/completable/books";
         WebClient wc = createWebClient(address);
         CompletionStage<Book> stage = wc.path("123").rx().get(Book.class);
-        Holder<Book> holder = new Holder<Book>();
+        Holder<Book> holder = new Holder<>();
         stage.thenApply(v -> {
             v.setId(v.getId() * 2);
             return v;

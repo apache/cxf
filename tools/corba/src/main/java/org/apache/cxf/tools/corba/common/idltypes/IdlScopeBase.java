@@ -34,9 +34,9 @@ public abstract class IdlScopeBase extends IdlDefnImplBase {
 
     protected IdlScopeBase(IdlScopeBase parent, String name) {
         super(parent, name);
-        defns = new Vector<IdlDefn>();
-        hold = new Stack<IdlDefn>();
-        park = new Vector<IdlDefn>();
+        defns = new Vector<>();
+        hold = new Stack<>();
+        park = new Vector<>();
     }
 
     public IdlDefn addToScope(IdlDefn def) {

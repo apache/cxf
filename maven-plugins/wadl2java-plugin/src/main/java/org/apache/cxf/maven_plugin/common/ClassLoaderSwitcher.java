@@ -64,7 +64,7 @@ public class ClassLoaderSwitcher {
                                          File classesDir) {
         List<URL> urlList = new ArrayList<>();
         StringBuilder buf = new StringBuilder();
-        Set<URI> ret = new LinkedHashSet<URI>();
+        Set<URI> ret = new LinkedHashSet<>();
 
         try {
             urlList.add(classesDir.toURI().toURL());

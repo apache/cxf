@@ -30,7 +30,7 @@ public class ExtendedURIResolver {
 
     protected org.apache.cxf.resource.URIResolver currentResolver;
     protected String lastestImportUri;
-    protected Stack<InputStream> resourceOpened = new Stack<InputStream>();
+    protected Stack<InputStream> resourceOpened = new Stack<>();
 
     public ExtendedURIResolver() {
         currentResolver = new org.apache.cxf.resource.URIResolver();

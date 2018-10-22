@@ -383,7 +383,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
                 }
                 List<String> list = map.get(key);
                 if (list == null) {
-                    list = new LinkedList<String>();
+                    list = new LinkedList<>();
                     map.put(key, list);
                 }
                 list.add(value);
@@ -433,7 +433,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
                 if (isApplication) {
                     provider = new ApplicationInfo((Application)c.newInstance(), getBus());
                 } else {
-                    provider = new ProviderInfo<Object>(c.newInstance(), getBus(), false, true);
+                    provider = new ProviderInfo<>(c.newInstance(), getBus(), false, true);
                 }
             } else {
                 Map<Class<?>, Object> values = new HashMap<>();

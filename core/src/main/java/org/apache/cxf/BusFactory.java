@@ -75,7 +75,7 @@ public abstract class BusFactory {
     }
 
     protected static final Map<Thread, BusHolder> THREAD_BUSSES = new WeakHashMap<Thread, BusHolder>();
-    protected static final ThreadLocal<BusHolder> THREAD_BUS = new ThreadLocal<BusHolder>();
+    protected static final ThreadLocal<BusHolder> THREAD_BUS = new ThreadLocal<>();
 
     private static final Logger LOG = LogUtils.getL7dLogger(BusFactory.class);
 

@@ -35,7 +35,7 @@ import org.jdom.EntityRef;
 import org.jdom.Namespace;
 
 public class JDOMStreamWriter implements XMLStreamWriter {
-    private Stack<Element> stack = new Stack<Element>();
+    private Stack<Element> stack = new Stack<>();
 
     private Document document;
 

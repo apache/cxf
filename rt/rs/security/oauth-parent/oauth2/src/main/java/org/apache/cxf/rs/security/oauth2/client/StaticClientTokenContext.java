@@ -19,7 +19,7 @@
 package org.apache.cxf.rs.security.oauth2.client;
 
 public final class StaticClientTokenContext {
-    private static final ThreadLocal<ClientTokenContext> STATIC_CONTEXT = new ThreadLocal<ClientTokenContext>();
+    private static final ThreadLocal<ClientTokenContext> STATIC_CONTEXT = new ThreadLocal<>();
 
     private StaticClientTokenContext() {
 

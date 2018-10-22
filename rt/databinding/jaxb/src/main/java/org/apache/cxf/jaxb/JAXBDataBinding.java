@@ -281,19 +281,19 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
         Integer mtomThresholdInt = Integer.valueOf(getMtomThreshold());
         if (c == XMLStreamWriter.class) {
             DataWriterImpl<XMLStreamWriter> r
-                = new DataWriterImpl<XMLStreamWriter>(this, true);
+                = new DataWriterImpl<>(this, true);
             r.setMtomThreshold(mtomThresholdInt);
             return (DataWriter<T>)r;
         } else if (c == OutputStream.class) {
-            DataWriterImpl<OutputStream> r = new DataWriterImpl<OutputStream>(this, false);
+            DataWriterImpl<OutputStream> r = new DataWriterImpl<>(this, false);
             r.setMtomThreshold(mtomThresholdInt);
             return (DataWriter<T>)r;
         } else if (c == XMLEventWriter.class) {
-            DataWriterImpl<XMLEventWriter> r = new DataWriterImpl<XMLEventWriter>(this, true);
+            DataWriterImpl<XMLEventWriter> r = new DataWriterImpl<>(this, true);
             r.setMtomThreshold(mtomThresholdInt);
             return (DataWriter<T>)r;
         } else if (c == Node.class) {
-            DataWriterImpl<Node> r = new DataWriterImpl<Node>(this, false);
+            DataWriterImpl<Node> r = new DataWriterImpl<>(this, false);
             r.setMtomThreshold(mtomThresholdInt);
             return (DataWriter<T>)r;
         }
@@ -379,9 +379,9 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
             } else {
                 schemasFromCache = true;
             }
-            Set<DOMSource> bi = new LinkedHashSet<DOMSource>();
+            Set<DOMSource> bi = new LinkedHashSet<>();
             if (schemas == null) {
-                schemas = new LinkedHashSet<DOMSource>();
+                schemas = new LinkedHashSet<>();
                 try {
                     for (DOMResult r : generateJaxbSchemas()) {
                         DOMSource src = new DOMSource(r.getNode(), r.getSystemId());

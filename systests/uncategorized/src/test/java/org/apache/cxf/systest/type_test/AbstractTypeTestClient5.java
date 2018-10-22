@@ -54,8 +54,8 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
         x.setValue("str_x");
         ComplexRestriction yOrig = new ComplexRestriction();
         yOrig.setValue("string_yyy");
-        Holder<ComplexRestriction> y = new Holder<ComplexRestriction>(yOrig);
-        Holder<ComplexRestriction> z = new Holder<ComplexRestriction>();
+        Holder<ComplexRestriction> y = new Holder<>(yOrig);
+        Holder<ComplexRestriction> z = new Holder<>();
 
         ComplexRestriction ret;
         if (testDocLiteral) {
@@ -81,8 +81,8 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
                 x.setValue("string_x");
                 yOrig = new ComplexRestriction();
                 yOrig.setValue("string_yyyyyy");
-                y = new Holder<ComplexRestriction>(yOrig);
-                z = new Holder<ComplexRestriction>();
+                y = new Holder<>(yOrig);
+                z = new Holder<>();
 
                 ret = testDocLiteral ? docClient.testComplexRestriction(x, y, z)
                         : xmlClient.testComplexRestriction(x, y, z);
@@ -105,8 +105,8 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
         x.setValue("string_xxx");
         ComplexRestriction2 yOrig = new ComplexRestriction2();
         yOrig.setValue("string_yyy");
-        Holder<ComplexRestriction2> y = new Holder<ComplexRestriction2>(yOrig);
-        Holder<ComplexRestriction2> z = new Holder<ComplexRestriction2>();
+        Holder<ComplexRestriction2> y = new Holder<>(yOrig);
+        Holder<ComplexRestriction2> z = new Holder<>();
 
         ComplexRestriction2 ret;
         if (testDocLiteral) {
@@ -132,8 +132,8 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
                 x.setValue("str_x");
                 yOrig = new ComplexRestriction2();
                 yOrig.setValue("string_yyy");
-                y = new Holder<ComplexRestriction2>(yOrig);
-                z = new Holder<ComplexRestriction2>();
+                y = new Holder<>(yOrig);
+                z = new Holder<>();
 
                 ret = testDocLiteral ? docClient.testComplexRestriction2(x, y, z)
                         : xmlClient.testComplexRestriction2(x, y, z);
@@ -157,8 +157,8 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
         x.setValue("str_x");
         ComplexRestriction3 yOrig = new ComplexRestriction3();
         yOrig.setValue("string_yyy");
-        Holder<ComplexRestriction3> y = new Holder<ComplexRestriction3>(yOrig);
-        Holder<ComplexRestriction3> z = new Holder<ComplexRestriction3>();
+        Holder<ComplexRestriction3> y = new Holder<>(yOrig);
+        Holder<ComplexRestriction3> z = new Holder<>();
 
         ComplexRestriction3 ret;
         if (testDocLiteral) {
@@ -182,8 +182,8 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
             try {
                 x = new ComplexRestriction3();
                 x.setValue("str");
-                y = new Holder<ComplexRestriction3>(yOrig);
-                z = new Holder<ComplexRestriction3>();
+                y = new Holder<>(yOrig);
+                z = new Holder<>();
                 ret = testDocLiteral ? docClient.testComplexRestriction3(x, y, z)
                         : xmlClient.testComplexRestriction3(x, y, z);
                 fail("maxLength=10 && minLength=5 restriction is violated.");
@@ -195,8 +195,8 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
                 x.setValue("string_x");
                 yOrig = new ComplexRestriction3();
                 yOrig.setValue("string_yyyyyy");
-                y = new Holder<ComplexRestriction3>(yOrig);
-                z = new Holder<ComplexRestriction3>();
+                y = new Holder<>(yOrig);
+                z = new Holder<>();
                 ret = testDocLiteral ? docClient.testComplexRestriction3(x, y, z)
                         : xmlClient.testComplexRestriction3(x, y, z);
                 fail("maxLength=10 && minLength=5 restriction is violated.");
@@ -219,8 +219,8 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
         x.setValue("str_x");
         ComplexRestriction4 yOrig = new ComplexRestriction4();
         yOrig.setValue("y");
-        Holder<ComplexRestriction4> y = new Holder<ComplexRestriction4>(yOrig);
-        Holder<ComplexRestriction4> z = new Holder<ComplexRestriction4>();
+        Holder<ComplexRestriction4> y = new Holder<>(yOrig);
+        Holder<ComplexRestriction4> z = new Holder<>();
 
         ComplexRestriction4 ret;
         if (testDocLiteral) {
@@ -244,8 +244,8 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
             try {
                 x = new ComplexRestriction4();
                 x.setValue("str_xxx");
-                y = new Holder<ComplexRestriction4>(yOrig);
-                z = new Holder<ComplexRestriction4>();
+                y = new Holder<>(yOrig);
+                z = new Holder<>();
                 ret = testDocLiteral ? docClient.testComplexRestriction4(x, y, z)
                         : xmlClient.testComplexRestriction4(x, y, z);
                 fail("maxLength=5 restriction is violated.");
@@ -266,8 +266,8 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
         x.setValue("http://www.iona.com");
         ComplexRestriction5 yOrig = new ComplexRestriction5();
         yOrig.setValue("http://www.iona.com/info/services/oss/");
-        Holder<ComplexRestriction5> y = new Holder<ComplexRestriction5>(yOrig);
-        Holder<ComplexRestriction5> z = new Holder<ComplexRestriction5>();
+        Holder<ComplexRestriction5> y = new Holder<>(yOrig);
+        Holder<ComplexRestriction5> z = new Holder<>();
 
         ComplexRestriction5 ret;
         if (testDocLiteral) {
@@ -291,8 +291,8 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
             try {
                 x = new ComplexRestriction5();
                 x.setValue("uri");
-                y = new Holder<ComplexRestriction5>(yOrig);
-                z = new Holder<ComplexRestriction5>();
+                y = new Holder<>(yOrig);
+                z = new Holder<>();
                 ret = docClient.testComplexRestriction5(x, y, z);
                 fail("maxLength=50 && minLength=5 restriction is violated.");
             } catch (Exception ex) {
@@ -304,8 +304,8 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
                 x.setValue("http://www.iona.com");
                 yOrig = new ComplexRestriction5();
                 yOrig.setValue("http://www.iona.com/info/services/oss/info_services_oss_train.html");
-                y = new Holder<ComplexRestriction5>(yOrig);
-                z = new Holder<ComplexRestriction5>();
+                y = new Holder<>(yOrig);
+                z = new Holder<>();
                 ret = testDocLiteral ? docClient.testComplexRestriction5(x, y, z)
                         : xmlClient.testComplexRestriction5(x, y, z);
                 fail("maxLength=50 && minLength=5 restriction is violated.");
@@ -451,8 +451,8 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
         yOrig.getArray10().addAll(Arrays.asList(array101, array102, array103));
         yOrig.getArray11().addAll(Arrays.asList("XXX", "YYY", "ZZZ"));
 
-        Holder<MixedArray> y = new Holder<MixedArray>(yOrig);
-        Holder<MixedArray> z = new Holder<MixedArray>();
+        Holder<MixedArray> y = new Holder<>(yOrig);
+        Holder<MixedArray> z = new Holder<>();
         MixedArray ret;
         if (testDocLiteral) {
             ret = docClient.testMixedArray(x, y, z);
@@ -498,8 +498,8 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
         yOrig.getArray9().clear();
         yOrig.getArray11().clear();
 
-        y = new Holder<MixedArray>(yOrig);
-        z = new Holder<MixedArray>();
+        y = new Holder<>(yOrig);
+        z = new Holder<>();
         if (testDocLiteral) {
             ret = docClient.testMixedArray(x, y, z);
         } else if (testXMLBinding) {
@@ -562,8 +562,8 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
         yOrig.setAddress("Some Address y");
         yOrig.setAny(elem);
 
-        Holder<StructWithAnyStrict> y = new Holder<StructWithAnyStrict>(yOrig);
-        Holder<StructWithAnyStrict> z = new Holder<StructWithAnyStrict>();
+        Holder<StructWithAnyStrict> y = new Holder<>(yOrig);
+        Holder<StructWithAnyStrict> z = new Holder<>();
         StructWithAnyStrict ret;
         if (testDocLiteral) {
             ret = docClient.testStructWithAnyStrict(x, y, z);
@@ -606,8 +606,8 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
         yOrig.setAddress("Some Other Address y");
         yOrig.getAny().add(elem);
 
-        Holder<StructWithAnyArrayLax> y = new Holder<StructWithAnyArrayLax>(yOrig);
-        Holder<StructWithAnyArrayLax> z = new Holder<StructWithAnyArrayLax>();
+        Holder<StructWithAnyArrayLax> y = new Holder<>(yOrig);
+        Holder<StructWithAnyArrayLax> z = new Holder<>();
         StructWithAnyArrayLax ret;
         if (testDocLiteral) {
             ret = docClient.testStructWithAnyArrayLax(x, y, z);
@@ -670,8 +670,8 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
         yOrig.setAddress("Some Address y");
         yOrig.setAny(elem);
 
-        Holder<StructWithAnyStrict> y = new Holder<StructWithAnyStrict>(yOrig);
-        Holder<StructWithAnyStrict> z = new Holder<StructWithAnyStrict>();
+        Holder<StructWithAnyStrict> y = new Holder<>(yOrig);
+        Holder<StructWithAnyStrict> z = new Holder<>();
         StructWithAnyStrict ret;
         if (testDocLiteral) {
             ret = docClient.testStructWithAnyStrict(x, y, z);
@@ -719,8 +719,8 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
         yOrig.setAddress("Some Other Address y");
         yOrig.getAny().add(elem);
 
-        Holder<StructWithAnyArrayLax> y = new Holder<StructWithAnyArrayLax>(yOrig);
-        Holder<StructWithAnyArrayLax> z = new Holder<StructWithAnyArrayLax>();
+        Holder<StructWithAnyArrayLax> y = new Holder<>(yOrig);
+        Holder<StructWithAnyArrayLax> z = new Holder<>();
         StructWithAnyArrayLax ret;
         if (testDocLiteral) {
             ret = docClient.testStructWithAnyArrayLax(x, y, z);

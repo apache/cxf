@@ -175,7 +175,7 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
         if (!caseInsensitive) {
             return m.keySet();
         }
-        Set<K> set = new TreeSet<K>(new KeyComparator<K>());
+        Set<K> set = new TreeSet<>(new KeyComparator<K>());
         set.addAll(m.keySet());
         return set;
     }

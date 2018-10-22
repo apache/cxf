@@ -86,7 +86,7 @@ public final class ServerProviderFactory extends ProviderFactory {
         new NameKeyMap<ProviderInfo<ContainerResponseFilter>>(false);
     private RequestPreprocessor requestPreprocessor;
     private ApplicationInfo application;
-    private Set<DynamicFeature> dynamicFeatures = new LinkedHashSet<DynamicFeature>();
+    private Set<DynamicFeature> dynamicFeatures = new LinkedHashSet<>();
 
     private Map<Class<?>, BeanParamInfo> beanParams = new ConcurrentHashMap<Class<?>, BeanParamInfo>();
     private ProviderInfo<ContainerRequestFilter> wadlGenerator;
@@ -201,7 +201,7 @@ public final class ServerProviderFactory extends ProviderFactory {
     @SuppressWarnings("unchecked")
     @Override
     protected void setProviders(boolean custom, boolean busGlobal, Object... providers) {
-        List<Object> allProviders = new LinkedList<Object>();
+        List<Object> allProviders = new LinkedList<>();
         for (Object p : providers) {
             if (p instanceof Feature) {
                 FeatureContext featureContext = createServerFeatureContext();

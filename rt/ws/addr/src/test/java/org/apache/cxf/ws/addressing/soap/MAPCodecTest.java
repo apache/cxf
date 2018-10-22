@@ -388,7 +388,7 @@ public class MAPCodecTest extends Assert {
         EasyMock.expectLastCall().andReturn(name);
         Object v = expectedValues[index];
         @SuppressWarnings("unchecked")
-        JAXBElement<?> jaxbElement = new JAXBElement<Object>(new QName(uri, name), (Class<Object>)clz, clz.cast(v));
+        JAXBElement<?> jaxbElement = new JAXBElement<>(new QName(uri, name), (Class<Object>)clz, clz.cast(v));
         unmarshaller.unmarshal(headerElement, clz);
         EasyMock.expectLastCall().andReturn(jaxbElement);
     }

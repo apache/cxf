@@ -59,7 +59,7 @@ public class PhaseInterceptorChainTest extends Assert {
         Phase phase1 = new Phase("phase1", 1);
         Phase phase2 = new Phase("phase2", 2);
         Phase phase3 = new Phase("phase3", 3);
-        SortedSet<Phase> phases = new TreeSet<Phase>();
+        SortedSet<Phase> phases = new TreeSet<>();
         phases.add(phase1);
         phases.add(phase2);
         phases.add(phase3);
@@ -406,10 +406,10 @@ public class PhaseInterceptorChainTest extends Assert {
             .createMock(AbstractPhaseInterceptor.class);
 
         if (a == null) {
-            a = new SortedArraySet<String>();
+            a = new SortedArraySet<>();
         }
         if (b == null) {
-            b = new SortedArraySet<String>();
+            b = new SortedArraySet<>();
         }
         Field f = AbstractPhaseInterceptor.class.getDeclaredField("before");
         ReflectionUtil.setAccessible(f);

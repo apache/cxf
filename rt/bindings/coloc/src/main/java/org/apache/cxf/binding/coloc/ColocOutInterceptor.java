@@ -157,7 +157,7 @@ public class ColocOutInterceptor extends AbstractPhaseInterceptor<Message> {
             //Handle Response
             ex.setInMessage(inMsg);
             PhaseManager pm = bus.getExtension(PhaseManager.class);
-            SortedSet<Phase> phases = new TreeSet<Phase>(pm.getInPhases());
+            SortedSet<Phase> phases = new TreeSet<>(pm.getInPhases());
             ColocUtil.setPhases(phases, Phase.USER_LOGICAL, Phase.PRE_INVOKE);
 
             InterceptorChain chain = ColocUtil.getInInterceptorChain(ex, phases);

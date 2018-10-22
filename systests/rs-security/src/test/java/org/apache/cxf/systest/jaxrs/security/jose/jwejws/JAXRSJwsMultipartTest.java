@@ -100,7 +100,7 @@ public class JAXRSJwsMultipartTest extends AbstractBusClientServerTestBase {
     public void testJwsJwkBooksHMacMultipart() throws Exception {
         String address = "https://localhost:" + PORT + "/jwsjwkhmac";
         BookStore bs = createJwsBookStoreHMac(address, false, false);
-        List<Book> books = new LinkedList<Book>();
+        List<Book> books = new LinkedList<>();
         books.add(new Book("book", 123L));
         books.add(new Book("book2", 124L));
         List<Book> returnBooks = bs.echoBooksMultipart(books);
@@ -155,7 +155,7 @@ public class JAXRSJwsMultipartTest extends AbstractBusClientServerTestBase {
         bean.setBus(springBus);
         bean.setServiceClass(BookStore.class);
         bean.setAddress(address);
-        List<Object> providers = new LinkedList<Object>();
+        List<Object> providers = new LinkedList<>();
         JwsMultipartClientRequestFilter outFilter = new JwsMultipartClientRequestFilter();
         outFilter.setUseJwsJsonSignatureFormat(useJwsJsonSignatureFormat);
         providers.add(outFilter);

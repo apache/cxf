@@ -45,8 +45,8 @@ public class CachingXmlEventWriter implements XMLStreamWriter {
     protected XMLEventFactory factory;
 
     List<XMLEvent> events = new ArrayList<>(1000);
-    Stack<NSContext> contexts = new Stack<NSContext>();
-    Stack<QName> elNames = new Stack<QName>();
+    Stack<NSContext> contexts = new Stack<>();
+    Stack<QName> elNames = new Stack<>();
     QName lastStart;
     NSContext curContext = new NSContext(null);
 

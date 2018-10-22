@@ -70,7 +70,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
 
     protected List<String> schemaLocations;
     protected JAXRSServiceFactoryBean serviceFactory;
-    protected List<Object> entityProviders = new LinkedList<Object>();
+    protected List<Object> entityProviders = new LinkedList<>();
     private Comparator<?> providerComparator;
 
     protected AbstractJAXRSFactoryBean(JAXRSServiceFactoryBean serviceFactory) {

@@ -46,7 +46,7 @@ public class FormEncodingProviderTest extends Assert {
     public void testReadFrom() throws Exception {
         @SuppressWarnings("rawtypes")
         FormEncodingProvider<MultivaluedMap> ferp
-            = new FormEncodingProvider<MultivaluedMap>();
+            = new FormEncodingProvider<>();
         InputStream is = getClass().getResourceAsStream("singleValPostBody.txt");
         @SuppressWarnings("unchecked")
         MultivaluedMap<String, String> mvMap =
@@ -59,7 +59,7 @@ public class FormEncodingProviderTest extends Assert {
 
     @Test
     public void testReadFromForm() throws Exception {
-        FormEncodingProvider<Form> ferp = new FormEncodingProvider<Form>();
+        FormEncodingProvider<Form> ferp = new FormEncodingProvider<>();
         InputStream is = getClass().getResourceAsStream("singleValPostBody.txt");
         Form form = ferp.readFrom(Form.class, null,
                 new Annotation[]{}, MediaType.APPLICATION_FORM_URLENCODED_TYPE, null, is);
@@ -76,7 +76,7 @@ public class FormEncodingProviderTest extends Assert {
 
         @SuppressWarnings("rawtypes")
         FormEncodingProvider<MultivaluedMap> ferp
-            = new FormEncodingProvider<MultivaluedMap>();
+            = new FormEncodingProvider<>();
         MultivaluedMap<String, String> mvMap =
             ferp.readFrom(MultivaluedMap.class, null,
             new Annotation[]{}, MediaType.APPLICATION_FORM_URLENCODED_TYPE, null,
@@ -92,7 +92,7 @@ public class FormEncodingProviderTest extends Assert {
         String values = "foo=1+2&bar=1+3";
         @SuppressWarnings("rawtypes")
         FormEncodingProvider<MultivaluedMap> ferp
-            = new FormEncodingProvider<MultivaluedMap>();
+            = new FormEncodingProvider<>();
         MultivaluedMap<String, String> mvMap =
             ferp.readFrom(MultivaluedMap.class, null,
             new Annotation[]{CustomMap.class.getAnnotations()[0]},
@@ -106,7 +106,7 @@ public class FormEncodingProviderTest extends Assert {
     @Test
     public void testCustomMapImpl() throws Exception {
         String values = "foo=1+2&bar=1+3&baz=4";
-        FormEncodingProvider<CustomMap> ferp = new FormEncodingProvider<CustomMap>();
+        FormEncodingProvider<CustomMap> ferp = new FormEncodingProvider<>();
 
         MultivaluedMap<String, String> mvMap = ferp.readFrom(CustomMap.class, null,
                           new Annotation[]{}, MediaType.APPLICATION_FORM_URLENCODED_TYPE, null,
@@ -124,7 +124,7 @@ public class FormEncodingProviderTest extends Assert {
     @Test
     public void testMultiLines() throws Exception {
         String values = "foo=1+2&bar=line1%0D%0Aline+2&baz=4";
-        FormEncodingProvider<CustomMap> ferp = new FormEncodingProvider<CustomMap>();
+        FormEncodingProvider<CustomMap> ferp = new FormEncodingProvider<>();
 
         MultivaluedMap<String, String> mvMap = ferp.readFrom(CustomMap.class, null,
                           new Annotation[]{}, MediaType.APPLICATION_FORM_URLENCODED_TYPE, null,
@@ -193,7 +193,7 @@ public class FormEncodingProviderTest extends Assert {
         Form form = new Form(new MetadataMap<String, String>());
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         FormEncodingProvider<Form> ferp
-            = new FormEncodingProvider<Form>();
+            = new FormEncodingProvider<>();
         ferp.writeTo(form.param("a", "a1").param("b", "b1"), Form.class, Form.class,
                      new Annotation[0], MediaType.APPLICATION_FORM_URLENCODED_TYPE,
                      new MetadataMap<String, Object>(), bos);
@@ -204,7 +204,7 @@ public class FormEncodingProviderTest extends Assert {
     @Test
     public void testValidation() throws Exception {
         FormEncodingProvider<CustomMap> ferp
-            = new FormEncodingProvider<CustomMap>();
+            = new FormEncodingProvider<>();
         ferp.setValidator(new CustomFormValidator());
         String values = "foo=1+2&bar=1+3";
 
@@ -227,7 +227,7 @@ public class FormEncodingProviderTest extends Assert {
 
         @SuppressWarnings("rawtypes")
         FormEncodingProvider<MultivaluedMap> ferp
-            = new FormEncodingProvider<MultivaluedMap>();
+            = new FormEncodingProvider<>();
 
         MultivaluedMap<String, String> mvMap =
             ferp.readFrom(MultivaluedMap.class, null,
@@ -254,7 +254,7 @@ public class FormEncodingProviderTest extends Assert {
         String helloStringISO88591 = new String(iso88591bytes, "ISO-8859-1");
         @SuppressWarnings("rawtypes")
         FormEncodingProvider<MultivaluedMap> ferp
-            = new FormEncodingProvider<MultivaluedMap>();
+            = new FormEncodingProvider<>();
 
         MultivaluedMap<String, String> mvMap =
             ferp.readFrom(MultivaluedMap.class, null,
@@ -273,7 +273,7 @@ public class FormEncodingProviderTest extends Assert {
 
         @SuppressWarnings("rawtypes")
         FormEncodingProvider<MultivaluedMap> ferp
-            = new FormEncodingProvider<MultivaluedMap>();
+            = new FormEncodingProvider<>();
 
         MultivaluedMap<String, String> mvMap =
             ferp.readFrom(MultivaluedMap.class, null,
@@ -294,14 +294,14 @@ public class FormEncodingProviderTest extends Assert {
     @Test
     public void testReadableForm() {
         FormEncodingProvider<Form> ferp
-            = new FormEncodingProvider<Form>();
+            = new FormEncodingProvider<>();
         assertTrue(ferp.isReadable(Form.class, null, null, null));
     }
 
     @Test
     public void testAnnotations() {
         FormEncodingProvider<Form> ferp
-            = new FormEncodingProvider<Form>();
+            = new FormEncodingProvider<>();
         assertEquals("application/x-www-form-urlencoded", ferp.getClass().getAnnotation(Consumes.class)
                      .value()[0]);
     }

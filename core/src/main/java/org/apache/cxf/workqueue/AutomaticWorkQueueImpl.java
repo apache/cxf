@@ -475,7 +475,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
 
     public synchronized void schedule(final Runnable work, final long delay) {
         if (delayQueue == null) {
-            delayQueue = new DelayQueue<DelayedTaskWrapper>();
+            delayQueue = new DelayQueue<>();
             watchDog = new WatchDog(delayQueue);
             watchDog.setDaemon(true);
             watchDog.start();

@@ -35,7 +35,7 @@ public class ServerXMLBinding extends AbstractBusTestServerBase {
     static final String WRAP_PORT = allocatePort(ServerXMLBinding.class, 1);
     static final String MIX_PORT = allocatePort(ServerXMLBinding.class, 2);
 
-    List<Endpoint> eps = new LinkedList<Endpoint>();
+    List<Endpoint> eps = new LinkedList<>();
 
     protected void run() {
         Object implementor = new GreeterImpl();

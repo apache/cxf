@@ -59,8 +59,8 @@ public class HBaseVisitorTest extends Assert {
     public void testScanWithFilterVisitor() throws Exception {
         Scan scan = new Scan();
 
-        SearchCondition<SearchBean> sc = new FiqlParser<SearchBean>(SearchBean.class).parse("name==CXF");
-        HBaseQueryVisitor<SearchBean> visitor = new HBaseQueryVisitor<SearchBean>("book");
+        SearchCondition<SearchBean> sc = new FiqlParser<>(SearchBean.class).parse("name==CXF");
+        HBaseQueryVisitor<SearchBean> visitor = new HBaseQueryVisitor<>("book");
         sc.accept(visitor);
         Filter filter = visitor.getQuery();
         scan.setFilter(filter);

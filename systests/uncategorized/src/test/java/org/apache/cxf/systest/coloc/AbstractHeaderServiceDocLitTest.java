@@ -116,7 +116,7 @@ public abstract class AbstractHeaderServiceDocLitTest extends AbstractColocTest 
         headerInfo.setMessage(HeaderTesterUtil.INOUT_MESSAGE_IN);
         headerInfo.setOriginator(HeaderTesterUtil.INOUT_ORIGINATOR_IN);
 
-        Holder<HeaderInfo> holder = new Holder<HeaderInfo>();
+        Holder<HeaderInfo> holder = new Holder<>();
         holder.value = headerInfo;
         InoutHeaderResponseT inoutHeaderResponse = ht.inoutHeader(inoutHeader, holder);
 
@@ -135,10 +135,10 @@ public abstract class AbstractHeaderServiceDocLitTest extends AbstractColocTest 
 
         OutHeaderResponseT theResponse = new OutHeaderResponseT();
         theResponse.setResponseType("bogus");
-        Holder<OutHeaderResponseT> respHolder = new Holder<OutHeaderResponseT>();
+        Holder<OutHeaderResponseT> respHolder = new Holder<>();
         respHolder.value = theResponse;
 
-        Holder<HeaderInfo> holder = new Holder<HeaderInfo>();
+        Holder<HeaderInfo> holder = new Holder<>();
         HeaderInfo headerInfo = new HeaderInfo();
         headerInfo.setMessage(HeaderTesterUtil.OUT_MESSAGE_IN);
         headerInfo.setOriginator(HeaderTesterUtil.OUT_ORIGINATOR_IN);

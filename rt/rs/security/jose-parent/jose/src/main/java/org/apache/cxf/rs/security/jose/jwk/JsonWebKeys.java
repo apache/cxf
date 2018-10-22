@@ -47,7 +47,7 @@ public class JsonWebKeys extends JsonMapObject {
             if (first instanceof JsonWebKey) {
                 return CastUtils.cast(list);
             }
-            List<JsonWebKey> keys = new LinkedList<JsonWebKey>();
+            List<JsonWebKey> keys = new LinkedList<>();
             List<Map<String, Object>> listOfMaps =
                 CastUtils.cast((List<?>)super.getProperty(KEYS_PROPERTY));
             for (Map<String, Object> map : listOfMaps) {
@@ -92,7 +92,7 @@ public class JsonWebKeys extends JsonMapObject {
             if (type != null) {
                 List<JsonWebKey> list = map.get(type);
                 if (list == null) {
-                    list = new LinkedList<JsonWebKey>();
+                    list = new LinkedList<>();
                     map.put(type, list);
                 }
                 list.add(key);
@@ -113,7 +113,7 @@ public class JsonWebKeys extends JsonMapObject {
                 for (KeyOperation op : ops) {
                     List<JsonWebKey> list = map.get(op);
                     if (list == null) {
-                        list = new LinkedList<JsonWebKey>();
+                        list = new LinkedList<>();
                         map.put(op, list);
                     }
                     list.add(key);

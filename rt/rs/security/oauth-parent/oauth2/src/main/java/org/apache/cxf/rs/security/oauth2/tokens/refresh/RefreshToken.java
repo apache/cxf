@@ -38,7 +38,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 public class RefreshToken extends ServerAccessToken {
 
     private static final long serialVersionUID = 2837120382251693874L;
-    private List<String> accessTokens = new LinkedList<String>();
+    private List<String> accessTokens = new LinkedList<>();
 
     public RefreshToken(Client client,
                         long lifetime) {

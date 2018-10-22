@@ -77,7 +77,7 @@ public class RMInInterceptorTest extends Assert {
     public void testOrdering() {
         control.replay();
         Phase p = new Phase(Phase.PRE_LOGICAL, 1);
-        SortedSet<Phase> phases = new TreeSet<Phase>();
+        SortedSet<Phase> phases = new TreeSet<>();
         phases.add(p);
         PhaseInterceptorChain chain =
             new PhaseInterceptorChain(phases);

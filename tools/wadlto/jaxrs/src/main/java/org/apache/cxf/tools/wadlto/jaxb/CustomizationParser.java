@@ -94,7 +94,7 @@ public final class CustomizationParser {
 
             String[] jaxbArgs = jaxbCompilerArgs instanceof String
                     ? new String[]{(String)jaxbCompilerArgs} : (String[])jaxbCompilerArgs;
-            List<String> jaxbArgsList = new LinkedList<String>();
+            List<String> jaxbArgsList = new LinkedList<>();
             for (String jaxbArg : jaxbArgs) {
                 String[] allArgs = jaxbArg.split(" ");
                 for (String arg : allArgs) {

@@ -93,7 +93,7 @@ public class CXFExtensionBundleListener implements SynchronousBundleListener {
                  + " (" + bundle.getBundleId() + ") " + names);
         List<OSGiExtension> list = extensions.get(bundle.getBundleId());
         if (list == null) {
-            list = new CopyOnWriteArrayList<OSGiExtension>();
+            list = new CopyOnWriteArrayList<>();
             List<OSGiExtension> preList = extensions.putIfAbsent(bundle.getBundleId(), list);
             if (preList != null) {
                 list = preList;

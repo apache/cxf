@@ -85,7 +85,7 @@ public class CollectionTestsWithService extends AbstractAegisTest {
 
     @Test
     public void testListTypes() throws Exception {
-        SortedSet<String> strings = new TreeSet<String>();
+        SortedSet<String> strings = new TreeSet<>();
         strings.add("Able");
         strings.add("Baker");
         String first = csi.takeSortedStrings(strings);

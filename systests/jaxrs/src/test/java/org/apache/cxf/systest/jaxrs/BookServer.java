@@ -101,7 +101,7 @@ public class BookServer extends AbstractBusTestServerBase {
         List<Object> providers = new ArrayList<>();
 
         //default lifecycle is per-request, change it to singleton
-        BinaryDataProvider<Object> p = new BinaryDataProvider<Object>();
+        BinaryDataProvider<Object> p = new BinaryDataProvider<>();
         p.setProduceMediaTypes(Collections.singletonList("application/bar"));
         p.setEnableBuffering(true);
         p.setReportByteArraySize(true);
@@ -112,7 +112,7 @@ public class BookServer extends AbstractBusTestServerBase {
         providers.add(new BookStore.StringListBodyReaderWriter());
         providers.add(new StreamingResponseProvider<Object>());
         providers.add(new ContentTypeModifyingMBW());
-        JAXBElementProvider<?> jaxbProvider = new JAXBElementProvider<Object>();
+        JAXBElementProvider<?> jaxbProvider = new JAXBElementProvider<>();
         Map<String, String> jaxbElementClassMap = new HashMap<>();
         jaxbElementClassMap.put(BookNoXmlRootElement.class.getName(), "BookNoXmlRootElement");
         jaxbProvider.setJaxbElementClassMap(jaxbElementClassMap);

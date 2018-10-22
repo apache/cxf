@@ -34,7 +34,7 @@ public class DefaultResourceManager implements ResourceManager {
     private static final Logger LOG = LogUtils.getL7dLogger(DefaultResourceManager.class);
 
     protected final List<ResourceResolver> registeredResolvers
-        = new CopyOnWriteArrayList<ResourceResolver>();
+        = new CopyOnWriteArrayList<>();
     protected boolean firstCalled;
 
     public DefaultResourceManager() {

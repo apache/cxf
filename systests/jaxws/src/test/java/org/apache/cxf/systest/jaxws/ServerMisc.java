@@ -70,7 +70,7 @@ public class ServerMisc extends AbstractBusTestServerBase {
 
 
     List<org.apache.cxf.endpoint.Server> servers = new LinkedList<org.apache.cxf.endpoint.Server>();
-    List<Endpoint> endpoints = new LinkedList<Endpoint>();
+    List<Endpoint> endpoints = new LinkedList<>();
     public void tearDown() throws Exception {
         for (org.apache.cxf.endpoint.Server s : servers) {
             s.stop();

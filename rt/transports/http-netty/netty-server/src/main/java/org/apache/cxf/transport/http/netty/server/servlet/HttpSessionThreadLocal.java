@@ -22,7 +22,7 @@ package org.apache.cxf.transport.http.netty.server.servlet;
 import org.apache.cxf.transport.http.netty.server.session.HttpSessionStore;
 
 public final class HttpSessionThreadLocal {
-    public static final ThreadLocal<NettyHttpSession> SESSION_THREAD_LOCAL = new ThreadLocal<NettyHttpSession>();
+    public static final ThreadLocal<NettyHttpSession> SESSION_THREAD_LOCAL = new ThreadLocal<>();
 
     private static HttpSessionStore sessionStore;
 

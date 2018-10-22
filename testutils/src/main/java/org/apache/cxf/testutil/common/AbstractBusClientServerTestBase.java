@@ -108,7 +108,7 @@ public abstract class AbstractBusClientServerTestBase extends AbstractClientServ
 
     protected boolean runClient(Runnable clientImpl, long timeOut, TimeUnit timeUnit)
         throws InterruptedException {
-        FutureTask<?> client = new FutureTask<Object>(clientImpl, null);
+        FutureTask<?> client = new FutureTask<>(clientImpl, null);
         ThreadPoolExecutor tpe = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<Runnable>());
         tpe.execute(client);

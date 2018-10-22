@@ -45,7 +45,7 @@ public class BinaryDataProviderTest extends Assert {
 
     @Test
     public void testIsWriteable() {
-        MessageBodyWriter<Object> p = new BinaryDataProvider<Object>();
+        MessageBodyWriter<Object> p = new BinaryDataProvider<>();
         assertTrue(p.isWriteable(byte[].class, null, null, null)
                    && p.isWriteable(InputStream.class, null, null, null)
                    && p.isWriteable(File.class, null, null, null)
@@ -54,7 +54,7 @@ public class BinaryDataProviderTest extends Assert {
 
     @Test
     public void testIsReadable() {
-        MessageBodyReader<Object> p = new BinaryDataProvider<Object>();
+        MessageBodyReader<Object> p = new BinaryDataProvider<>();
         assertTrue(p.isReadable(byte[].class, null, null, null)
                    && p.isReadable(InputStream.class, null, null, null)
                    && p.isReadable(File.class, null, null, null)

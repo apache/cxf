@@ -78,7 +78,7 @@ public class ClientImpl implements Client {
 
     public ClientImpl(Configuration config,
                       TLSConfiguration secConfig) {
-        configImpl = new ClientConfigurableImpl<Client>(this, config);
+        configImpl = new ClientConfigurableImpl<>(this, config);
         this.secConfig = secConfig;
     }
 
@@ -248,7 +248,7 @@ public class ClientImpl implements Client {
         public WebTargetImpl(UriBuilder uriBuilder,
                              Configuration config,
                              WebClient targetClient) {
-            this.configImpl = new ClientConfigurableImpl<WebTarget>(this, config);
+            this.configImpl = new ClientConfigurableImpl<>(this, config);
             this.uriBuilder = uriBuilder.clone();
             this.targetClient = targetClient;
         }
@@ -266,7 +266,7 @@ public class ClientImpl implements Client {
 
             ClientProviderFactory pf =
                 ClientProviderFactory.getInstance(WebClient.getConfig(targetClient).getEndpoint());
-            List<Object> providers = new LinkedList<Object>();
+            List<Object> providers = new LinkedList<>();
             List<org.apache.cxf.feature.Feature> cxfFeatures =
                 new LinkedList<org.apache.cxf.feature.Feature>();
             Configuration cfg = configImpl.getConfiguration();

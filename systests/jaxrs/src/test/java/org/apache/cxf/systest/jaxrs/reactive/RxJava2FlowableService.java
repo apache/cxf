@@ -144,7 +144,7 @@ public class RxJava2FlowableService {
     
     private static class ListAsyncSubscriber<T> extends AbstractSubscriber<T> {
 
-        private List<T> beans = new LinkedList<T>();
+        private List<T> beans = new LinkedList<>();
         ListAsyncSubscriber(AsyncResponse ar) {
             super(ar);
         }

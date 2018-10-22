@@ -47,7 +47,7 @@ public class OAuthAuthorizationData extends OAuthRedirectionState implements Ser
     private String applicationWebUri;
     private String applicationDescription;
     private String applicationLogoUri;
-    private List<String> applicationCertificates = new LinkedList<String>();
+    private List<String> applicationCertificates = new LinkedList<>();
     private Map<String, String> extraApplicationProperties = new HashMap<>();
     private boolean implicitFlow;
 
@@ -243,7 +243,7 @@ public class OAuthAuthorizationData extends OAuthRedirectionState implements Ser
             : Collections.emptyList();
     }
     public List<OAuthPermission> getAllPermissions() {
-        List<OAuthPermission> allPerms = new LinkedList<OAuthPermission>();
+        List<OAuthPermission> allPerms = new LinkedList<>();
         if (alreadyAuthorizedPermissions != null) {
             allPerms.addAll(alreadyAuthorizedPermissions);
             if (permissions != null) {

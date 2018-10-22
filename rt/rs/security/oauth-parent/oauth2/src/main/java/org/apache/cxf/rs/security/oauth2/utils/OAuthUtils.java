@@ -240,7 +240,7 @@ public final class OAuthUtils {
     }
 
     public static List<String> convertPermissionsToScopeList(List<OAuthPermission> perms) {
-        List<String> list = new LinkedList<String>();
+        List<String> list = new LinkedList<>();
         for (OAuthPermission perm : perms) {
             list.add(perm.getPermission());
         }
@@ -258,7 +258,7 @@ public final class OAuthUtils {
     }
 
     public static List<String> parseScope(String requestedScope) {
-        List<String> list = new LinkedList<String>();
+        List<String> list = new LinkedList<>();
         if (requestedScope != null) {
             String[] scopeValues = requestedScope.split(" ");
             for (String scope : scopeValues) {

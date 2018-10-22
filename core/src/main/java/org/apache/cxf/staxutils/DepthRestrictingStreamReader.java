@@ -36,7 +36,7 @@ public class DepthRestrictingStreamReader extends DepthXMLStreamReader {
 
     private DocumentDepthProperties props;
     private int totalElementCount;
-    private Stack<Integer> stack = new Stack<Integer>();
+    private Stack<Integer> stack = new Stack<>();
 
     public DepthRestrictingStreamReader(XMLStreamReader reader,
                                         int elementCountThreshold,

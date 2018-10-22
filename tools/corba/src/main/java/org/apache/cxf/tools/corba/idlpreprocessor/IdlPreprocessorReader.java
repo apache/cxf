@@ -64,7 +64,7 @@ public final class IdlPreprocessorReader extends Reader {
 
     private final IncludeResolver includeResolver;
 
-    private final Stack<IncludeStackEntry> includeStack = new Stack<IncludeStackEntry>();
+    private final Stack<IncludeStackEntry> includeStack = new Stack<>();
 
     /**
      * Stack of Booleans, corresponding to nested 'if' preprocessor directives.
@@ -72,7 +72,7 @@ public final class IdlPreprocessorReader extends Reader {
      *
      * @see #skips()
      */
-    private final Stack<Boolean> ifStack = new Stack<Boolean>();
+    private final Stack<Boolean> ifStack = new Stack<>();
 
     private final DefineState defineState;
 

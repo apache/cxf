@@ -36,7 +36,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 public class AccessTokenValidatorClient implements AccessTokenValidator {
 
     private WebClient tokenValidatorClient;
-    private List<String> supportedSchemes = new LinkedList<String>();
+    private List<String> supportedSchemes = new LinkedList<>();
     public List<String> getSupportedAuthorizationSchemes() {
         return supportedSchemes.isEmpty()
             ? Collections.singletonList(OAuthConstants.ALL_AUTH_SCHEMES)

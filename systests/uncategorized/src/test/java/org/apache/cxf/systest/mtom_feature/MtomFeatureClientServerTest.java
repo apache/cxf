@@ -60,7 +60,7 @@ public class MtomFeatureClientServerTest extends AbstractBusClientServerTestBase
     @Test
     public void testDetail() throws Exception {
         Holder<byte[]> photo = new Holder<byte[]>("CXF".getBytes());
-        Holder<Image> image = new Holder<Image>(getImage("/java.jpg"));
+        Holder<Image> image = new Holder<>(getImage("/java.jpg"));
         port.detail(photo, image);
         assertEquals("CXF", new String(photo.value));
         assertNotNull(image.value);
@@ -98,7 +98,7 @@ public class MtomFeatureClientServerTest extends AbstractBusClientServerTestBase
         ((BindingProvider)port).getRequestContext()
             .put(LocalConduit.DIRECT_DISPATCH, Boolean.TRUE);
         Holder<byte[]> photo = new Holder<byte[]>("CXF".getBytes());
-        Holder<Image> image = new Holder<Image>(getImage("/java.jpg"));
+        Holder<Image> image = new Holder<>(getImage("/java.jpg"));
         port.detail(photo, image);
         assertEquals("CXF", new String(photo.value));
         assertNotNull(image.value);
@@ -107,7 +107,7 @@ public class MtomFeatureClientServerTest extends AbstractBusClientServerTestBase
         ((BindingProvider)port).getRequestContext()
             .put(LocalConduit.DIRECT_DISPATCH, Boolean.FALSE);
         photo = new Holder<byte[]>("CXF".getBytes());
-        image = new Holder<Image>(getImage("/java.jpg"));
+        image = new Holder<>(getImage("/java.jpg"));
         port.detail(photo, image);
         assertEquals("CXF", new String(photo.value));
         assertNotNull(image.value);

@@ -38,7 +38,7 @@ import org.apache.cxf.helpers.MapNamespaceContext;
 
 public class W3CDOMStreamWriter implements XMLStreamWriter {
     static final String XML_NS = "http://www.w3.org/2000/xmlns/";
-    private Stack<Node> stack = new Stack<Node>();
+    private Stack<Node> stack = new Stack<>();
     private Document document;
     private Node currentNode;
     private NamespaceContext context = new W3CNamespaceContext();

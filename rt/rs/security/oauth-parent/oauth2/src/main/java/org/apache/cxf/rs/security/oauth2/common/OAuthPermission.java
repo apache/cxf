@@ -44,8 +44,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Cacheable
 public class OAuthPermission implements Serializable {
     private static final long serialVersionUID = -6486616235830491290L;
-    private List<String> httpVerbs = new LinkedList<String>();
-    private List<String> uris = new LinkedList<String>();
+    private List<String> httpVerbs = new LinkedList<>();
+    private List<String> uris = new LinkedList<>();
     private String permission;
     private String description;
     private boolean isDefaultPermission;

@@ -58,8 +58,8 @@ public class SOAPDocLitClientTypeTest extends AbstractTypeTestClient5 {
         x.getItem().addAll(Arrays.asList(24, 42, 2008));
         yOrig.getItem().addAll(Arrays.asList(24, 0, 1));
 
-        Holder<FixedArray> y = new Holder<FixedArray>(yOrig);
-        Holder<FixedArray> z = new Holder<FixedArray>();
+        Holder<FixedArray> y = new Holder<>(yOrig);
+        Holder<FixedArray> z = new Holder<>();
         try {
             docClient.testFixedArray(x, y, z);
             fail("should have thrown exception");

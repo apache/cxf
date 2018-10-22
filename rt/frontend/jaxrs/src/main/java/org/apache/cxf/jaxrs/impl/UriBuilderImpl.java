@@ -279,7 +279,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         Map<String, String> varValueMap = new HashMap<>();
 
         // vars in set are properly ordered due to linking in hash set
-        Set<String> uniqueVars = new LinkedHashSet<String>(templ.getVariables());
+        Set<String> uniqueVars = new LinkedHashSet<>(templ.getVariables());
         if (!allowUnresolved && values.length + alreadyResolvedTs.size() + alreadyResolvedTsEnc.size()
             + alreadyResolvedTsPathEnc.size() < uniqueVars.size()) {
             throw new IllegalArgumentException("Unresolved variables; only " + values.length

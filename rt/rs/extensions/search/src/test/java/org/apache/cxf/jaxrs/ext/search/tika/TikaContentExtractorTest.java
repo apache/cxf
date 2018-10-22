@@ -36,7 +36,7 @@ public class TikaContentExtractorTest extends Assert {
 
     @Before
     public void setUp() throws Exception {
-        parser = new FiqlParser<SearchBean>(SearchBean.class);
+        parser = new FiqlParser<>(SearchBean.class);
         extractor = new TikaContentExtractor(new PDFParser());
     }
 

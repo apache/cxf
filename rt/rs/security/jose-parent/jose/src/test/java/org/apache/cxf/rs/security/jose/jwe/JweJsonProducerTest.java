@@ -279,7 +279,7 @@ public class JweJsonProducerTest extends Assert {
         sharedUnprotectedHeaders.setJsonWebKeysUrl("https://server.example.com/keys.jwks");
         sharedUnprotectedHeaders.setKeyEncryptionAlgorithm(KeyAlgorithm.A128KW);
 
-        List<JweEncryptionProvider> jweProviders = new LinkedList<JweEncryptionProvider>();
+        List<JweEncryptionProvider> jweProviders = new LinkedList<>();
 
         KeyEncryptionProvider keyEncryption1 =
             JweUtils.getSecretKeyEncryptionAlgorithm(wrapperKey1, KeyAlgorithm.A128KW);
@@ -294,7 +294,7 @@ public class JweJsonProducerTest extends Assert {
         jweProviders.add(jwe1);
         jweProviders.add(jwe2);
 
-        List<JweHeaders> perRecipientHeades = new LinkedList<JweHeaders>();
+        List<JweHeaders> perRecipientHeades = new LinkedList<>();
         perRecipientHeades.add(new JweHeaders("key1"));
         perRecipientHeades.add(new JweHeaders("key2"));
 

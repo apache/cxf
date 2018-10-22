@@ -52,7 +52,7 @@ public final class ToolsStaxUtils {
             int count = 0;
             QName checkingPoint = null;
 
-            Stack<Tag> stack = new Stack<Tag>();
+            Stack<Tag> stack = new Stack<>();
 
             while (reader.hasNext()) {
                 int event = reader.next();

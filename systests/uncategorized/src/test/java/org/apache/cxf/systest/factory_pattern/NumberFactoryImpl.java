@@ -52,7 +52,7 @@ public class NumberFactoryImpl implements NumberFactory {
     protected NumberImpl servant;
     protected Bus bus;
     protected String port;
-    protected List<AutoCloseable> endpoints = new LinkedList<AutoCloseable>();
+    protected List<AutoCloseable> endpoints = new LinkedList<>();
 
     public NumberFactoryImpl(Bus b, String p) {
         bus = b;

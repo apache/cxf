@@ -25,7 +25,7 @@ package org.apache.cxf.jaxrs.ext.search.visitor;
  * visit calls when a given visitor is not created on per-request basis.
  */
 public class ThreadLocalVisitorState<T> implements VisitorState<T> {
-    private ThreadLocal<T> state = new ThreadLocal<T>();
+    private ThreadLocal<T> state = new ThreadLocal<>();
 
     public T get() {
         return state.get();

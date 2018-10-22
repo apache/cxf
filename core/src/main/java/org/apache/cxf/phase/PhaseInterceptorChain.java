@@ -68,7 +68,7 @@ public class PhaseInterceptorChain implements InterceptorChain {
 
     private static final Logger LOG = LogUtils.getL7dLogger(PhaseInterceptorChain.class);
 
-    private static final ThreadLocal<Message> CURRENT_MESSAGE = new ThreadLocal<Message>();
+    private static final ThreadLocal<Message> CURRENT_MESSAGE = new ThreadLocal<>();
 
     private final Map<String, Integer> nameMap;
     private final Phase phases[];

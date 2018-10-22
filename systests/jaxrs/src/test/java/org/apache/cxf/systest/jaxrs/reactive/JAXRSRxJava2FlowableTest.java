@@ -73,7 +73,7 @@ public class JAXRSRxJava2FlowableTest extends AbstractBusClientServerTestBase {
             .rx(FlowableRxInvoker.class)
             .get(HelloWorldBean.class);
         
-        Holder<HelloWorldBean> holder = new Holder<HelloWorldBean>();
+        Holder<HelloWorldBean> holder = new Holder<>();
         Disposable d = obs.subscribe(v -> {
             holder.value = v;
         });

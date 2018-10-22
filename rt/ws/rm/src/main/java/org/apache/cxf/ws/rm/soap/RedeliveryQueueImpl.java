@@ -354,7 +354,7 @@ public class RedeliveryQueueImpl implements RedeliveryQueue {
         Bus bus = exchange.getBus();
 
         PhaseManager pm = bus.getExtension(PhaseManager.class);
-        SortedSet<Phase> phases = new TreeSet<Phase>(pm.getInPhases());
+        SortedSet<Phase> phases = new TreeSet<>(pm.getInPhases());
         for (Iterator<Phase> it = phases.iterator(); it.hasNext();) {
             Phase p = it.next();
             if (phase.equals(p.getName())) {

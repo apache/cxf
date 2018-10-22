@@ -63,20 +63,20 @@ public class AegisElementProviderTest extends Assert {
 
     @Test
     public void testIsWriteable() {
-        MessageBodyWriter<Object> p = new AegisElementProvider<Object>();
+        MessageBodyWriter<Object> p = new AegisElementProvider<>();
         assertTrue(p.isWriteable(AegisTestBean.class, null, null, null));
     }
 
     @Test
     public void testIsReadable() {
-        MessageBodyReader<Object> p = new AegisElementProvider<Object>();
+        MessageBodyReader<Object> p = new AegisElementProvider<>();
         assertTrue(p.isReadable(AegisTestBean.class, null, null, null));
     }
 
 
     @Test
     public void testReadFrom() throws Exception {
-        MessageBodyReader<AegisTestBean> p = new AegisElementProvider<AegisTestBean>();
+        MessageBodyReader<AegisTestBean> p = new AegisElementProvider<>();
         byte[] simpleBytes = simpleBeanXml.getBytes("utf-8");
         AegisTestBean bean = p.readFrom(AegisTestBean.class, null, null,
                                           null, null, new ByteArrayInputStream(simpleBytes));
@@ -87,7 +87,7 @@ public class AegisElementProviderTest extends Assert {
 
     @Test
     public void testNoNamespaceReadFrom() throws Exception {
-        MessageBodyReader<AegisTestBean> p = new NoNamespaceAegisElementProvider<AegisTestBean>();
+        MessageBodyReader<AegisTestBean> p = new NoNamespaceAegisElementProvider<>();
         byte[] bytes = noNamespaceXml.getBytes("utf-8");
         AegisTestBean bean = p.readFrom(AegisTestBean.class, null, null,
                                           null, null, new ByteArrayInputStream(bytes));
@@ -97,7 +97,7 @@ public class AegisElementProviderTest extends Assert {
 
     @Test
     public void testWriteTo() throws Exception {
-        MessageBodyWriter<Object> p = new AegisElementProvider<Object>();
+        MessageBodyWriter<Object> p = new AegisElementProvider<>();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         AegisTestBean bean = new AegisTestBean();
         bean.setBoolValue(Boolean.TRUE);
@@ -112,7 +112,7 @@ public class AegisElementProviderTest extends Assert {
 
     @Test
     public void testNoNamespaceWriteTo() throws Exception {
-        MessageBodyWriter<Object> p = new NoNamespaceAegisElementProvider<Object>();
+        MessageBodyWriter<Object> p = new NoNamespaceAegisElementProvider<>();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         AegisTestBean bean = new AegisTestBean();
         bean.setBoolValue(Boolean.TRUE);

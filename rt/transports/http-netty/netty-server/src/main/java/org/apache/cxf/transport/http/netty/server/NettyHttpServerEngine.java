@@ -80,7 +80,7 @@ public class NettyHttpServerEngine implements ServerEngine {
 
     private ThreadingParameters threadingParameters = new ThreadingParameters();
 
-    private List<String> registedPaths = new CopyOnWriteArrayList<String>();
+    private List<String> registedPaths = new CopyOnWriteArrayList<>();
 
     // TODO need to setup configuration about them
     private int readIdleTime = 60;

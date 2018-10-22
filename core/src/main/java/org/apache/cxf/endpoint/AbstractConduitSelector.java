@@ -52,7 +52,7 @@ public abstract class AbstractConduitSelector implements ConduitSelector, Closea
 
 
     //collection of conduits that were created so we can close them all at the end
-    protected List<Conduit> conduits = new CopyOnWriteArrayList<Conduit>();
+    protected List<Conduit> conduits = new CopyOnWriteArrayList<>();
 
     //protected Conduit selectedConduit;
     protected Endpoint endpoint;

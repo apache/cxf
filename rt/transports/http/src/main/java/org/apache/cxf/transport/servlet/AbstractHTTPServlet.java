@@ -180,7 +180,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
 
     protected static List<Pattern> parseListSequence(String values) {
         if (values != null) {
-            List<Pattern> list = new LinkedList<Pattern>();
+            List<Pattern> list = new LinkedList<>();
             String[] pathValues = StringUtils.split(values, " ");
             for (String value : pathValues) {
                 String theValue = value.trim();

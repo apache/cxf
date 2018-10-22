@@ -37,7 +37,7 @@ public class JweJsonConsumer {
     private String protectedHeaderJson;
     private JweHeaders protectedHeaderJwe;
     private JweHeaders sharedUnprotectedHeader;
-    private List<JweJsonEncryptionEntry> recipients = new LinkedList<JweJsonEncryptionEntry>();
+    private List<JweJsonEncryptionEntry> recipients = new LinkedList<>();
     private Map<JweJsonEncryptionEntry, JweHeaders> recipientsMap =
         new LinkedHashMap<JweJsonEncryptionEntry, JweHeaders>();
     private byte[] aad;

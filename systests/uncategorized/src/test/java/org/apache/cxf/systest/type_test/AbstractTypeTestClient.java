@@ -168,9 +168,9 @@ public abstract class AbstractTypeTestClient
 
         for (int i = 0; i < valueSets.length; i++) {
             byte x = valueSets[i][0];
-            Holder<Byte> yOrig = new Holder<Byte>(valueSets[i][1]);
-            Holder<Byte> y = new Holder<Byte>(valueSets[i][1]);
-            Holder<Byte> z = new Holder<Byte>();
+            Holder<Byte> yOrig = new Holder<>(valueSets[i][1]);
+            Holder<Byte> y = new Holder<>(valueSets[i][1]);
+            Holder<Byte> z = new Holder<>();
 
             byte ret;
             if (testDocLiteral) {
@@ -197,9 +197,9 @@ public abstract class AbstractTypeTestClient
 
         for (int i = 0; i < valueSets.length; i++) {
             short x = valueSets[i][0];
-            Holder<Short> yOrig = new Holder<Short>(valueSets[i][1]);
-            Holder<Short> y = new Holder<Short>(valueSets[i][1]);
-            Holder<Short> z = new Holder<Short>();
+            Holder<Short> yOrig = new Holder<>(valueSets[i][1]);
+            Holder<Short> y = new Holder<>(valueSets[i][1]);
+            Holder<Short> z = new Holder<>();
 
             short ret;
             if (testDocLiteral) {
@@ -226,9 +226,9 @@ public abstract class AbstractTypeTestClient
 
         for (int i = 0; i < valueSets.length; i++) {
             int x = valueSets[i][0];
-            Holder<Integer> yOrig = new Holder<Integer>(valueSets[i][1]);
-            Holder<Integer> y = new Holder<Integer>(valueSets[i][1]);
-            Holder<Integer> z = new Holder<Integer>();
+            Holder<Integer> yOrig = new Holder<>(valueSets[i][1]);
+            Holder<Integer> y = new Holder<>(valueSets[i][1]);
+            Holder<Integer> z = new Holder<>();
 
             int ret;
             if (testDocLiteral) {
@@ -256,9 +256,9 @@ public abstract class AbstractTypeTestClient
 
         for (int i = 0; i < valueSets.length; i++) {
             int x = valueSets[i][0];
-            Holder<Integer> yOrig = new Holder<Integer>(valueSets[i][1]);
-            Holder<Integer> y = new Holder<Integer>(valueSets[i][1]);
-            Holder<Integer> z = new Holder<Integer>();
+            Holder<Integer> yOrig = new Holder<>(valueSets[i][1]);
+            Holder<Integer> y = new Holder<>(valueSets[i][1]);
+            Holder<Integer> z = new Holder<>();
 
             int ret;
             if (testDocLiteral) {
@@ -286,8 +286,8 @@ public abstract class AbstractTypeTestClient
         for (int i = 0; i < valueSets.length; i++) {
             long x = valueSets[i][0];
             long yOrig = valueSets[i][1];
-            Holder<Long> y = new Holder<Long>(valueSets[i][1]);
-            Holder<Long> z = new Holder<Long>();
+            Holder<Long> y = new Holder<>(valueSets[i][1]);
+            Holder<Long> z = new Holder<>();
 
             long ret;
             if (testDocLiteral) {
@@ -316,9 +316,9 @@ public abstract class AbstractTypeTestClient
 
         for (int i = 0; i < valueSets.length; i++) {
             long x = valueSets[i][0];
-            Holder<Long> yOrig = new Holder<Long>(valueSets[i][1]);
-            Holder<Long> y = new Holder<Long>(valueSets[i][1]);
-            Holder<Long> z = new Holder<Long>();
+            Holder<Long> yOrig = new Holder<>(valueSets[i][1]);
+            Holder<Long> y = new Holder<>(valueSets[i][1]);
+            Holder<Long> z = new Holder<>();
 
             long ret;
             if (testDocLiteral) {
@@ -348,9 +348,9 @@ public abstract class AbstractTypeTestClient
 
         for (int i = 0; i < valueSets.length; i++) {
             BigInteger x = valueSets[i][0];
-            Holder<BigInteger> yOrig = new Holder<BigInteger>(valueSets[i][1]);
-            Holder<BigInteger> y = new Holder<BigInteger>(valueSets[i][1]);
-            Holder<BigInteger> z = new Holder<BigInteger>();
+            Holder<BigInteger> yOrig = new Holder<>(valueSets[i][1]);
+            Holder<BigInteger> y = new Holder<>(valueSets[i][1]);
+            Holder<BigInteger> z = new Holder<>();
 
             BigInteger ret;
             if (testDocLiteral) {
@@ -382,9 +382,9 @@ public abstract class AbstractTypeTestClient
 
         for (int i = 0; i < valueSets.length; i++) {
             float x = valueSets[i][0];
-            Holder<Float> yOrig = new Holder<Float>(valueSets[i][1]);
-            Holder<Float> y = new Holder<Float>(valueSets[i][1]);
-            Holder<Float> z = new Holder<Float>();
+            Holder<Float> yOrig = new Holder<>(valueSets[i][1]);
+            Holder<Float> y = new Holder<>(valueSets[i][1]);
+            Holder<Float> z = new Holder<>();
 
             float ret;
             if (testDocLiteral) {
@@ -402,9 +402,9 @@ public abstract class AbstractTypeTestClient
         }
 
         float x = Float.NaN;
-        Holder<Float> yOrig = new Holder<Float>(0.0f);
-        Holder<Float> y = new Holder<Float>(0.0f);
-        Holder<Float> z = new Holder<Float>();
+        Holder<Float> yOrig = new Holder<>(0.0f);
+        Holder<Float> y = new Holder<>(0.0f);
+        Holder<Float> z = new Holder<>();
         float ret;
         if (testDocLiteral) {
             ret = docClient.testFloat(x, y, z);
@@ -433,9 +433,9 @@ public abstract class AbstractTypeTestClient
         double valueSets[][] = getTestDoubleData();
         for (int i = 0; i < valueSets.length; i++) {
             double x = valueSets[i][0];
-            Holder<Double> yOrig = new Holder<Double>(valueSets[i][1]);
-            Holder<Double> y = new Holder<Double>(valueSets[i][1]);
-            Holder<Double> z = new Holder<Double>();
+            Holder<Double> yOrig = new Holder<>(valueSets[i][1]);
+            Holder<Double> y = new Holder<>(valueSets[i][1]);
+            Holder<Double> z = new Holder<>();
 
             double ret;
             if (testDocLiteral) {
@@ -453,9 +453,9 @@ public abstract class AbstractTypeTestClient
         }
 
         double x = Double.NaN;
-        Holder<Double> yOrig = new Holder<Double>(0.0);
-        Holder<Double> y = new Holder<Double>(0.0);
-        Holder<Double> z = new Holder<Double>();
+        Holder<Double> yOrig = new Holder<>(0.0);
+        Holder<Double> y = new Holder<>(0.0);
+        Holder<Double> z = new Holder<>();
         double ret;
         if (testDocLiteral) {
             ret = docClient.testDouble(x, y, z);
@@ -480,9 +480,9 @@ public abstract class AbstractTypeTestClient
 
         for (int i = 0; i < valueSets.length; i++) {
             short x = valueSets[i][0];
-            Holder<Short> yOrig = new Holder<Short>(valueSets[i][1]);
-            Holder<Short> y = new Holder<Short>(valueSets[i][1]);
-            Holder<Short> z = new Holder<Short>();
+            Holder<Short> yOrig = new Holder<>(valueSets[i][1]);
+            Holder<Short> y = new Holder<>(valueSets[i][1]);
+            Holder<Short> z = new Holder<>();
 
             short ret;
             if (testDocLiteral) {
@@ -510,9 +510,9 @@ public abstract class AbstractTypeTestClient
 
         for (int i = 0; i < valueSets.length; i++) {
             boolean x = valueSets[i][0];
-            Holder<Boolean> yOrig = new Holder<Boolean>(valueSets[i][1]);
-            Holder<Boolean> y = new Holder<Boolean>(valueSets[i][1]);
-            Holder<Boolean> z = new Holder<Boolean>();
+            Holder<Boolean> yOrig = new Holder<>(valueSets[i][1]);
+            Holder<Boolean> y = new Holder<>(valueSets[i][1]);
+            Holder<Boolean> z = new Holder<>();
 
             boolean ret;
             if (testDocLiteral) {
@@ -551,9 +551,9 @@ public abstract class AbstractTypeTestClient
 
         for (int i = 0; i < valueSets.length; i++) {
             String x = valueSets[i][0];
-            Holder<String> yOrig = new Holder<String>(valueSets[i][1]);
-            Holder<String> y = new Holder<String>(valueSets[i][1]);
-            Holder<String> z = new Holder<String>();
+            Holder<String> yOrig = new Holder<>(valueSets[i][1]);
+            Holder<String> y = new Holder<>(valueSets[i][1]);
+            Holder<String> z = new Holder<>();
 
             String ret;
             if (testDocLiteral) {
@@ -581,9 +581,9 @@ public abstract class AbstractTypeTestClient
 
         for (int i = 0; i < valueSets.length; i++) {
             String x = valueSets[i][0];
-            Holder<String> yOrig = new Holder<String>(valueSets[i][1]);
-            Holder<String> y = new Holder<String>(valueSets[i][1]);
-            Holder<String> z = new Holder<String>();
+            Holder<String> yOrig = new Holder<>(valueSets[i][1]);
+            Holder<String> y = new Holder<>(valueSets[i][1]);
+            Holder<String> z = new Holder<>();
 
             String ret;
             if (testDocLiteral) {
@@ -613,8 +613,8 @@ public abstract class AbstractTypeTestClient
         for (int i = 0; i < valueSets.length; i++) {
             QName x = new QName(valueSets[i][1], valueSets[i][0]);
             QName yOrig = new QName("http://www.iona.com/inoutqname", "InOutQName");
-            Holder<QName> y = new Holder<QName>(yOrig);
-            Holder<QName> z = new Holder<QName>();
+            Holder<QName> y = new Holder<>(yOrig);
+            Holder<QName> z = new Holder<>();
 
             QName ret;
             if (testDocLiteral) {
@@ -650,8 +650,8 @@ public abstract class AbstractTypeTestClient
         yOrig.setMonth(4);
         yOrig.setDay(1);
 
-        Holder<XMLGregorianCalendar> y = new Holder<XMLGregorianCalendar>(yOrig);
-        Holder<XMLGregorianCalendar> z = new Holder<XMLGregorianCalendar>();
+        Holder<XMLGregorianCalendar> y = new Holder<>(yOrig);
+        Holder<XMLGregorianCalendar> z = new Holder<>();
 
         XMLGregorianCalendar ret;
         if (testDocLiteral) {
@@ -671,8 +671,8 @@ public abstract class AbstractTypeTestClient
         x = datatypeFactory.newXMLGregorianCalendar();
         yOrig = datatypeFactory.newXMLGregorianCalendar();
 
-        y = new Holder<XMLGregorianCalendar>(yOrig);
-        z = new Holder<XMLGregorianCalendar>();
+        y = new Holder<>(yOrig);
+        z = new Holder<>();
 
         try {
             if (testDocLiteral) {
@@ -709,8 +709,8 @@ public abstract class AbstractTypeTestClient
         yOrig.setMinute(59);
         yOrig.setSecond(30);
 
-        Holder<XMLGregorianCalendar> y = new Holder<XMLGregorianCalendar>(yOrig);
-        Holder<XMLGregorianCalendar> z = new Holder<XMLGregorianCalendar>();
+        Holder<XMLGregorianCalendar> y = new Holder<>(yOrig);
+        Holder<XMLGregorianCalendar> z = new Holder<>();
 
         XMLGregorianCalendar ret;
         if (testDocLiteral) {
@@ -744,8 +744,8 @@ public abstract class AbstractTypeTestClient
         yOrig.setSecond(15);
         yOrig.setMillisecond(250);
 
-        Holder<XMLGregorianCalendar> y = new Holder<XMLGregorianCalendar>(yOrig);
-        Holder<XMLGregorianCalendar> z = new Holder<XMLGregorianCalendar>();
+        Holder<XMLGregorianCalendar> y = new Holder<>(yOrig);
+        Holder<XMLGregorianCalendar> z = new Holder<>();
 
         XMLGregorianCalendar ret;
         if (testDocLiteral) {
@@ -772,8 +772,8 @@ public abstract class AbstractTypeTestClient
         XMLGregorianCalendar x = datatypeFactory.newXMLGregorianCalendar("2004");
         XMLGregorianCalendar yOrig = datatypeFactory.newXMLGregorianCalendar("2003+05:00");
 
-        Holder<XMLGregorianCalendar> y = new Holder<XMLGregorianCalendar>(yOrig);
-        Holder<XMLGregorianCalendar> z = new Holder<XMLGregorianCalendar>();
+        Holder<XMLGregorianCalendar> y = new Holder<>(yOrig);
+        Holder<XMLGregorianCalendar> z = new Holder<>();
 
         XMLGregorianCalendar ret;
         if (testDocLiteral) {
@@ -798,8 +798,8 @@ public abstract class AbstractTypeTestClient
         XMLGregorianCalendar x = datatypeFactory.newXMLGregorianCalendar("2004-08");
         XMLGregorianCalendar yOrig = datatypeFactory.newXMLGregorianCalendar("2003-12+05:00");
 
-        Holder<XMLGregorianCalendar> y = new Holder<XMLGregorianCalendar>(yOrig);
-        Holder<XMLGregorianCalendar> z = new Holder<XMLGregorianCalendar>();
+        Holder<XMLGregorianCalendar> y = new Holder<>(yOrig);
+        Holder<XMLGregorianCalendar> z = new Holder<>();
 
         XMLGregorianCalendar ret;
         if (testDocLiteral) {
@@ -833,8 +833,8 @@ public abstract class AbstractTypeTestClient
             yOrig = datatypeFactory.newXMLGregorianCalendar("--12--+05:00");
         }
 
-        Holder<XMLGregorianCalendar> y = new Holder<XMLGregorianCalendar>(yOrig);
-        Holder<XMLGregorianCalendar> z = new Holder<XMLGregorianCalendar>();
+        Holder<XMLGregorianCalendar> y = new Holder<>(yOrig);
+        Holder<XMLGregorianCalendar> z = new Holder<>();
 
         XMLGregorianCalendar ret;
         if (testDocLiteral) {
@@ -859,8 +859,8 @@ public abstract class AbstractTypeTestClient
         XMLGregorianCalendar x = datatypeFactory.newXMLGregorianCalendar("--08-21");
         XMLGregorianCalendar yOrig = datatypeFactory.newXMLGregorianCalendar("--12-05+05:00");
 
-        Holder<XMLGregorianCalendar> y = new Holder<XMLGregorianCalendar>(yOrig);
-        Holder<XMLGregorianCalendar> z = new Holder<XMLGregorianCalendar>();
+        Holder<XMLGregorianCalendar> y = new Holder<>(yOrig);
+        Holder<XMLGregorianCalendar> z = new Holder<>();
 
         XMLGregorianCalendar ret;
         if (testDocLiteral) {
@@ -885,8 +885,8 @@ public abstract class AbstractTypeTestClient
         XMLGregorianCalendar x = datatypeFactory.newXMLGregorianCalendar("---21");
         XMLGregorianCalendar yOrig = datatypeFactory.newXMLGregorianCalendar("---05+05:00");
 
-        Holder<XMLGregorianCalendar> y = new Holder<XMLGregorianCalendar>(yOrig);
-        Holder<XMLGregorianCalendar> z = new Holder<XMLGregorianCalendar>();
+        Holder<XMLGregorianCalendar> y = new Holder<>(yOrig);
+        Holder<XMLGregorianCalendar> z = new Holder<>();
 
         XMLGregorianCalendar ret;
         if (testDocLiteral) {
@@ -911,8 +911,8 @@ public abstract class AbstractTypeTestClient
         Duration x = datatypeFactory.newDuration("P1Y35DT60M60.500S");
         Duration yOrig = datatypeFactory.newDuration("-P2MT24H60S");
 
-        Holder<Duration> y = new Holder<Duration>(yOrig);
-        Holder<Duration> z = new Holder<Duration>();
+        Holder<Duration> y = new Holder<>(yOrig);
+        Holder<Duration> z = new Holder<>();
 
         Duration ret;
         if (testDocLiteral) {
@@ -935,8 +935,8 @@ public abstract class AbstractTypeTestClient
         String x = "  normalized string ";
         String yOrig = "  another normalized  string ";
 
-        Holder<String> y = new Holder<String>(yOrig);
-        Holder<String> z = new Holder<String>();
+        Holder<String> y = new Holder<>(yOrig);
+        Holder<String> z = new Holder<>();
 
         String ret;
         if (testDocLiteral) {
@@ -959,8 +959,8 @@ public abstract class AbstractTypeTestClient
         String x = "token";
         String yOrig = "another token";
 
-        Holder<String> y = new Holder<String>(yOrig);
-        Holder<String> z = new Holder<String>();
+        Holder<String> y = new Holder<>(yOrig);
+        Holder<String> z = new Holder<>();
 
         String ret;
         if (testDocLiteral) {
@@ -983,8 +983,8 @@ public abstract class AbstractTypeTestClient
         String x = "abc";
         String yOrig = "abc-def";
 
-        Holder<String> y = new Holder<String>(yOrig);
-        Holder<String> z = new Holder<String>();
+        Holder<String> y = new Holder<>(yOrig);
+        Holder<String> z = new Holder<>();
 
         String ret;
         if (testDocLiteral) {
@@ -1007,8 +1007,8 @@ public abstract class AbstractTypeTestClient
         String x = "123:abc";
         String yOrig = "abc.-_:";
 
-        Holder<String> y = new Holder<String>(yOrig);
-        Holder<String> z = new Holder<String>();
+        Holder<String> y = new Holder<>(yOrig);
+        Holder<String> z = new Holder<>();
 
         String ret;
         if (testDocLiteral) {
@@ -1066,8 +1066,8 @@ public abstract class AbstractTypeTestClient
         String x = "abc:123";
         String yOrig = "abc.-_";
 
-        Holder<String> y = new Holder<String>(yOrig);
-        Holder<String> z = new Holder<String>();
+        Holder<String> y = new Holder<>(yOrig);
+        Holder<String> z = new Holder<>();
 
         String ret;
         if (testDocLiteral) {
@@ -1090,8 +1090,8 @@ public abstract class AbstractTypeTestClient
         String x = "abc-123";
         String yOrig = "abc.-";
 
-        Holder<String> y = new Holder<String>(yOrig);
-        Holder<String> z = new Holder<String>();
+        Holder<String> y = new Holder<>(yOrig);
+        Holder<String> z = new Holder<>();
 
         String ret;
         if (testDocLiteral) {
@@ -1120,9 +1120,9 @@ public abstract class AbstractTypeTestClient
 
         for (int i = 0; i < valueSets.length; i++) {
             BigDecimal x = valueSets[i][0];
-            Holder<BigDecimal> yOrig = new Holder<BigDecimal>(valueSets[i][1]);
-            Holder<BigDecimal> y = new Holder<BigDecimal>(valueSets[i][1]);
-            Holder<BigDecimal> z = new Holder<BigDecimal>();
+            Holder<BigDecimal> yOrig = new Holder<>(valueSets[i][1]);
+            Holder<BigDecimal> y = new Holder<>(valueSets[i][1]);
+            Holder<BigDecimal> z = new Holder<>();
 
             BigDecimal ret;
             if (testDocLiteral) {
@@ -1151,9 +1151,9 @@ public abstract class AbstractTypeTestClient
 
         for (int i = 0; i < valueSets.length; i++) {
             BigInteger x = valueSets[i][0];
-            Holder<BigInteger> yOrig = new Holder<BigInteger>(valueSets[i][1]);
-            Holder<BigInteger> y = new Holder<BigInteger>(valueSets[i][1]);
-            Holder<BigInteger> z = new Holder<BigInteger>();
+            Holder<BigInteger> yOrig = new Holder<>(valueSets[i][1]);
+            Holder<BigInteger> y = new Holder<>(valueSets[i][1]);
+            Holder<BigInteger> z = new Holder<>();
 
             BigInteger ret;
             if (testDocLiteral) {
@@ -1182,9 +1182,9 @@ public abstract class AbstractTypeTestClient
 
         for (int i = 0; i < valueSets.length; i++) {
             BigInteger x = valueSets[i][0];
-            Holder<BigInteger> yOrig = new Holder<BigInteger>(valueSets[i][1]);
-            Holder<BigInteger> y = new Holder<BigInteger>(valueSets[i][1]);
-            Holder<BigInteger> z = new Holder<BigInteger>();
+            Holder<BigInteger> yOrig = new Holder<>(valueSets[i][1]);
+            Holder<BigInteger> y = new Holder<>(valueSets[i][1]);
+            Holder<BigInteger> z = new Holder<>();
 
             BigInteger ret;
             if (testDocLiteral) {
@@ -1214,9 +1214,9 @@ public abstract class AbstractTypeTestClient
 
         for (int i = 0; i < valueSets.length; i++) {
             BigInteger x = valueSets[i][0];
-            Holder<BigInteger> yOrig = new Holder<BigInteger>(valueSets[i][1]);
-            Holder<BigInteger> y = new Holder<BigInteger>(valueSets[i][1]);
-            Holder<BigInteger> z = new Holder<BigInteger>();
+            Holder<BigInteger> yOrig = new Holder<>(valueSets[i][1]);
+            Holder<BigInteger> y = new Holder<>(valueSets[i][1]);
+            Holder<BigInteger> z = new Holder<>();
 
             BigInteger ret;
             if (testDocLiteral) {
@@ -1246,9 +1246,9 @@ public abstract class AbstractTypeTestClient
 
         for (int i = 0; i < valueSets.length; i++) {
             BigInteger x = valueSets[i][0];
-            Holder<BigInteger> yOrig = new Holder<BigInteger>(valueSets[i][1]);
-            Holder<BigInteger> y = new Holder<BigInteger>(valueSets[i][1]);
-            Holder<BigInteger> z = new Holder<BigInteger>();
+            Holder<BigInteger> yOrig = new Holder<>(valueSets[i][1]);
+            Holder<BigInteger> y = new Holder<>(valueSets[i][1]);
+            Holder<BigInteger> z = new Holder<>();
 
             BigInteger ret;
             if (testDocLiteral) {
@@ -1278,9 +1278,9 @@ public abstract class AbstractTypeTestClient
 
         for (int i = 0; i < valueSets.length; i++) {
             BigInteger x = valueSets[i][0];
-            Holder<BigInteger> yOrig = new Holder<BigInteger>(valueSets[i][1]);
-            Holder<BigInteger> y = new Holder<BigInteger>(valueSets[i][1]);
-            Holder<BigInteger> z = new Holder<BigInteger>();
+            Holder<BigInteger> yOrig = new Holder<>(valueSets[i][1]);
+            Holder<BigInteger> y = new Holder<>(valueSets[i][1]);
+            Holder<BigInteger> z = new Holder<>();
 
             BigInteger ret;
             if (testDocLiteral) {
@@ -1378,8 +1378,8 @@ public abstract class AbstractTypeTestClient
         for (int i = 0; i < valueSets.length; i++) {
             String x = new String(valueSets[i][0]);
             String yOrig = new String(valueSets[i][1]);
-            Holder<String> y = new Holder<String>(yOrig);
-            Holder<String> z = new Holder<String>();
+            Holder<String> y = new Holder<>(yOrig);
+            Holder<String> z = new Holder<>();
 
             String ret;
             if (testDocLiteral) {
@@ -1405,12 +1405,12 @@ public abstract class AbstractTypeTestClient
         String[] xx = {"RED", "GREEN", "BLUE"};
         String[] yy = {"GREEN", "BLUE", "RED"};
 
-        Holder<ColourEnum> z = new Holder<ColourEnum>();
+        Holder<ColourEnum> z = new Holder<>();
 
         for (int i = 0; i < 3; i++) {
             ColourEnum x = ColourEnum.fromValue(xx[i]);
             ColourEnum yOrig = ColourEnum.fromValue(yy[i]);
-            Holder<ColourEnum> y = new Holder<ColourEnum>(yOrig);
+            Holder<ColourEnum> y = new Holder<>(yOrig);
 
             ColourEnum ret;
             if (testDocLiteral) {
@@ -1437,12 +1437,12 @@ public abstract class AbstractTypeTestClient
         int[] xx = {1, 2, 3};
         int[] yy = {3, 1, 2};
 
-        Holder<NumberEnum> z = new Holder<NumberEnum>();
+        Holder<NumberEnum> z = new Holder<>();
 
         for (int i = 0; i < 3; i++) {
             NumberEnum x = NumberEnum.fromValue(xx[i]);
             NumberEnum yOrig = NumberEnum.fromValue(yy[i]);
-            Holder<NumberEnum> y = new Holder<NumberEnum>(yOrig);
+            Holder<NumberEnum> y = new Holder<>(yOrig);
 
             NumberEnum ret;
             if (testDocLiteral) {
@@ -1469,11 +1469,11 @@ public abstract class AbstractTypeTestClient
         String[] xx = {"a b c", "d e f", "g h i"};
         String[] yy = {"g h i", "a b c", "d e f"};
 
-        Holder<StringEnum> z = new Holder<StringEnum>();
+        Holder<StringEnum> z = new Holder<>();
         for (int i = 0; i < 3; i++) {
             StringEnum x = StringEnum.fromValue(xx[i]);
             StringEnum yOrig = StringEnum.fromValue(yy[i]);
-            Holder<StringEnum> y = new Holder<StringEnum>(yOrig);
+            Holder<StringEnum> y = new Holder<>(yOrig);
 
             StringEnum ret;
             if (testDocLiteral) {
@@ -1500,12 +1500,12 @@ public abstract class AbstractTypeTestClient
         BigDecimal[] xx = {new BigDecimal("-10.34"), new BigDecimal("11.22"), new BigDecimal("14.55")};
         BigDecimal[] yy = {new BigDecimal("14.55"), new BigDecimal("-10.34"), new BigDecimal("11.22")};
 
-        Holder<DecimalEnum> z = new Holder<DecimalEnum>();
+        Holder<DecimalEnum> z = new Holder<>();
 
         for (int i = 0; i < 3; i++) {
             DecimalEnum x = DecimalEnum.fromValue(xx[i]);
             DecimalEnum yOrig = DecimalEnum.fromValue(yy[i]);
-            Holder<DecimalEnum> y = new Holder<DecimalEnum>(yOrig);
+            Holder<DecimalEnum> y = new Holder<>(yOrig);
 
             DecimalEnum ret;
             if (testDocLiteral) {
@@ -1533,12 +1533,12 @@ public abstract class AbstractTypeTestClient
         String[] xx = {"hello", "there"};
         String[] yy = {"there", "hello"};
 
-        Holder<NMTokenEnum> z = new Holder<NMTokenEnum>();
+        Holder<NMTokenEnum> z = new Holder<>();
 
         for (int i = 0; i < 2; i++) {
             NMTokenEnum x = NMTokenEnum.fromValue(xx[i]);
             NMTokenEnum yOrig = NMTokenEnum.fromValue(yy[i]);
-            Holder<NMTokenEnum> y = new Holder<NMTokenEnum>(yOrig);
+            Holder<NMTokenEnum> y = new Holder<>(yOrig);
 
             NMTokenEnum ret;
             if (testDocLiteral) {
@@ -1566,11 +1566,11 @@ public abstract class AbstractTypeTestClient
         String[] xx = {"http://www.iona.com", "http://www.google.com"};
         String[] yy = {"http://www.google.com", "http://www.iona.com"};
 
-        Holder<AnyURIEnum> z = new Holder<AnyURIEnum>();
+        Holder<AnyURIEnum> z = new Holder<>();
         for (int i = 0; i < 2; i++) {
             AnyURIEnum x = AnyURIEnum.fromValue(xx[i]);
             AnyURIEnum yOrig = AnyURIEnum.fromValue(yy[i]);
-            Holder<AnyURIEnum> y = new Holder<AnyURIEnum>(yOrig);
+            Holder<AnyURIEnum> y = new Holder<>(yOrig);
 
             AnyURIEnum ret;
             if (testDocLiteral) {
@@ -1597,8 +1597,8 @@ public abstract class AbstractTypeTestClient
         // normal case, maxLength=10
         String x = "string_x";
         String yOrig = "string_y";
-        Holder<String> y = new Holder<String>(yOrig);
-        Holder<String> z = new Holder<String>();
+        Holder<String> y = new Holder<>(yOrig);
+        Holder<String> z = new Holder<>();
         String ret;
         if (testDocLiteral) {
             ret = docClient.testSimpleRestriction(x, y, z);
@@ -1617,8 +1617,8 @@ public abstract class AbstractTypeTestClient
         if (testDocLiteral || testXMLBinding) {
             // abnormal case
             x = "string_xxxxx";
-            y = new Holder<String>(yOrig);
-            z = new Holder<String>();
+            y = new Holder<>(yOrig);
+            z = new Holder<>();
             try {
                 ret = docClient.testSimpleRestriction(x, y, z);
                 fail("x parameter maxLength=10 restriction is violated.");
@@ -1629,8 +1629,8 @@ public abstract class AbstractTypeTestClient
             // abnormal case
             x = "string_x";
             yOrig = "string_yyyyyy";
-            y = new Holder<String>(yOrig);
-            z = new Holder<String>();
+            y = new Holder<>(yOrig);
+            z = new Holder<>();
             try {
                 ret = testDocLiteral ? docClient.testSimpleRestriction(x, y, z) : xmlClient
                     .testSimpleRestriction(x, y, z);
@@ -1649,8 +1649,8 @@ public abstract class AbstractTypeTestClient
         // normal case, minLength=5
         String x = "str_x";
         String yOrig = "string_yyy";
-        Holder<String> y = new Holder<String>(yOrig);
-        Holder<String> z = new Holder<String>();
+        Holder<String> y = new Holder<>(yOrig);
+        Holder<String> z = new Holder<>();
 
         String ret;
         if (testDocLiteral) {
@@ -1670,8 +1670,8 @@ public abstract class AbstractTypeTestClient
         if (testDocLiteral || testXMLBinding) {
             // abnormal case
             x = "str";
-            y = new Holder<String>(yOrig);
-            z = new Holder<String>();
+            y = new Holder<>(yOrig);
+            z = new Holder<>();
             try {
                 ret = testDocLiteral ? docClient.testSimpleRestriction2(x, y, z) : xmlClient
                     .testSimpleRestriction2(x, y, z);
@@ -1690,8 +1690,8 @@ public abstract class AbstractTypeTestClient
         // normal case, maxLength=10 && minLength=5
         String x = "str_x";
         String yOrig = "string_yyy";
-        Holder<String> y = new Holder<String>(yOrig);
-        Holder<String> z = new Holder<String>();
+        Holder<String> y = new Holder<>(yOrig);
+        Holder<String> z = new Holder<>();
 
         String ret;
         if (testDocLiteral) {
@@ -1711,8 +1711,8 @@ public abstract class AbstractTypeTestClient
         if (testDocLiteral || testXMLBinding) {
             // abnormal case
             x = "str";
-            y = new Holder<String>(yOrig);
-            z = new Holder<String>();
+            y = new Holder<>(yOrig);
+            z = new Holder<>();
             try {
                 ret = docClient.testSimpleRestriction3(x, y, z);
                 fail("x parameter maxLength=10 && minLength=5 restriction is violated.");
@@ -1723,8 +1723,8 @@ public abstract class AbstractTypeTestClient
             // abnormal case
             x = "string_x";
             yOrig = "string_yyyyyy";
-            y = new Holder<String>(yOrig);
-            z = new Holder<String>();
+            y = new Holder<>(yOrig);
+            z = new Holder<>();
             try {
                 ret = testDocLiteral ? docClient.testSimpleRestriction3(x, y, z) : xmlClient
                     .testSimpleRestriction3(x, y, z);
@@ -1743,8 +1743,8 @@ public abstract class AbstractTypeTestClient
         // normal case, length=1
         String x = "x";
         String yOrig = "y";
-        Holder<String> y = new Holder<String>(yOrig);
-        Holder<String> z = new Holder<String>();
+        Holder<String> y = new Holder<>(yOrig);
+        Holder<String> z = new Holder<>();
 
         String ret;
         if (testDocLiteral) {
@@ -1764,8 +1764,8 @@ public abstract class AbstractTypeTestClient
         if (testDocLiteral || testXMLBinding) {
             // abnormal case
             x = "str";
-            y = new Holder<String>(yOrig);
-            z = new Holder<String>();
+            y = new Holder<>(yOrig);
+            z = new Holder<>();
             try {
                 ret = testDocLiteral ? docClient.testSimpleRestriction4(x, y, z) : xmlClient
                     .testSimpleRestriction4(x, y, z);
@@ -1785,8 +1785,8 @@ public abstract class AbstractTypeTestClient
         // && minLength=5 for SimpleRestriction5
         String x = "str_x";
         String yOrig = "string_yyy";
-        Holder<String> y = new Holder<String>(yOrig);
-        Holder<String> z = new Holder<String>();
+        Holder<String> y = new Holder<>(yOrig);
+        Holder<String> z = new Holder<>();
 
         String ret;
         if (testDocLiteral) {
@@ -1806,8 +1806,8 @@ public abstract class AbstractTypeTestClient
         if (testDocLiteral || testXMLBinding) {
             // abnormal case
             x = "str";
-            y = new Holder<String>(yOrig);
-            z = new Holder<String>();
+            y = new Holder<>(yOrig);
+            z = new Holder<>();
             try {
                 ret = docClient.testSimpleRestriction5(x, y, z);
                 fail("maxLength=10 && minLength=5 restriction is violated.");
@@ -1818,8 +1818,8 @@ public abstract class AbstractTypeTestClient
             // abnormal case
             x = "string_x";
             yOrig = "string_yyyyyy";
-            y = new Holder<String>(yOrig);
-            z = new Holder<String>();
+            y = new Holder<>(yOrig);
+            z = new Holder<>();
             try {
                 ret = testDocLiteral ? docClient.testSimpleRestriction5(x, y, z) : xmlClient
                     .testSimpleRestriction5(x, y, z);
@@ -1837,8 +1837,8 @@ public abstract class AbstractTypeTestClient
         }
         String x = "str_x";
         String yOrig = "y";
-        Holder<String> y = new Holder<String>(yOrig);
-        Holder<String> z = new Holder<String>();
+        Holder<String> y = new Holder<>(yOrig);
+        Holder<String> z = new Holder<>();
 
         String ret;
         if (testDocLiteral) {
@@ -1859,8 +1859,8 @@ public abstract class AbstractTypeTestClient
             // abnormal case
             x = "string_x";
             yOrig = "string_y";
-            y = new Holder<String>(yOrig);
-            z = new Holder<String>();
+            y = new Holder<>(yOrig);
+            z = new Holder<>();
             try {
                 ret = testDocLiteral ? docClient.testSimpleRestriction6(x, y, z) : xmlClient
                     .testSimpleRestriction6(x, y, z);

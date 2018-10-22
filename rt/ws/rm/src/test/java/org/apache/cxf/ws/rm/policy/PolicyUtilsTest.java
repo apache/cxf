@@ -146,7 +146,7 @@ public class PolicyUtilsTest extends Assert {
         BaseRetransmissionInterval bbri = new RMAssertion.BaseRetransmissionInterval();
         bbri.setMilliseconds(Long.valueOf(2000));
         b.setBaseRetransmissionInterval(bbri);
-        JaxbAssertion<RMAssertion> assertion = new JaxbAssertion<RMAssertion>();
+        JaxbAssertion<RMAssertion> assertion = new JaxbAssertion<>();
         assertion.setName(RM10Constants.RMASSERTION_QNAME);
         assertion.setData(b);
         AssertionInfo ai = new AssertionInfo(assertion);

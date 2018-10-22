@@ -247,7 +247,7 @@ public final class Client extends TestCaseBase<DocPortType> {
                 break;
             case 2:
                 int id = ++statId;
-                Holder<Integer> i = new Holder<Integer>();
+                Holder<Integer> i = new Holder<>();
                 port.echoComplexTypeDoc(complexTypeSeq, id, i);
                 if (id != i.value) {
                     System.out.println(id + " != " + i.value);

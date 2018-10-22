@@ -216,7 +216,7 @@ public abstract class AbstractEndpointFactory extends AbstractBasicInterceptorPr
             List<String> addresses =
                 (List<String>)getBus().getProperty(PRIVATE_ENDPOINTS);
             if (addresses == null) {
-                addresses = new LinkedList<String>();
+                addresses = new LinkedList<>();
             }
             addresses.add(getAddress());
             bus.setProperty(PRIVATE_ENDPOINTS, addresses);

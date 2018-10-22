@@ -220,7 +220,7 @@ public class OOBHeaderTest extends AbstractBusClientServerTestBase {
         ((BindingProvider)putLastTradedPrice).getRequestContext()
             .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, address);
 
-        Holder<TradePriceData> holder = new Holder<TradePriceData>(priceData);
+        Holder<TradePriceData> holder = new Holder<>(priceData);
         try {
             addOutOfBoundHeader(putLastTradedPrice, invalid, mu);
             putLastTradedPrice.sayHi(holder);

@@ -36,7 +36,7 @@ public class FactoryBeanListenerManager {
     Bus bus;
 
     CopyOnWriteArrayList<FactoryBeanListener> listeners
-        = new CopyOnWriteArrayList<FactoryBeanListener>();
+        = new CopyOnWriteArrayList<>();
 
     public FactoryBeanListenerManager() {
         listeners.add(new AnnotationsFactoryBeanListener());

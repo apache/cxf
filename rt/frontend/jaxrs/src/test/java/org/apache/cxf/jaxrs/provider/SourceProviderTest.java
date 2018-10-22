@@ -57,7 +57,7 @@ public class SourceProviderTest extends Assert {
 
     @Test
     public void testIsWriteable() {
-        SourceProvider<Source> p = new SourceProvider<Source>();
+        SourceProvider<Source> p = new SourceProvider<>();
         assertTrue(p.isWriteable(StreamSource.class, null, null, null)
                    && p.isWriteable(DOMSource.class, null, null, null)
                    && p.isWriteable(Source.class, null, null, null));
@@ -65,7 +65,7 @@ public class SourceProviderTest extends Assert {
 
     @Test
     public void testIsReadable() {
-        SourceProvider<Source> p = new SourceProvider<Source>();
+        SourceProvider<Source> p = new SourceProvider<>();
         assertTrue(p.isReadable(StreamSource.class, null, null, null)
                    && p.isReadable(DOMSource.class, null, null, null)
                    && p.isReadable(Source.class, null, null, null));
@@ -73,7 +73,7 @@ public class SourceProviderTest extends Assert {
 
     @Test
     public void testReadFrom() throws Exception {
-        SourceProvider<Object> p = new TestSourceProvider<Object>();
+        SourceProvider<Object> p = new TestSourceProvider<>();
         assertSame(StreamSource.class, verifyRead(p, StreamSource.class).getClass());
         assertSame(StaxSource.class, verifyRead(p, Source.class).getClass());
         assertSame(StaxSource.class, verifyRead(p, SAXSource.class).getClass());
@@ -84,7 +84,7 @@ public class SourceProviderTest extends Assert {
 
     @Test
     public void testReadFromStreamReader() throws Exception {
-        TestSourceProvider<Source> p = new TestSourceProvider<Source>();
+        TestSourceProvider<Source> p = new TestSourceProvider<>();
 
         InputStream is = new ByteArrayInputStream("<test xmlns=\"http://bar\"/>".getBytes());
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
@@ -108,7 +108,7 @@ public class SourceProviderTest extends Assert {
 
     @Test
     public void testWriteToDocument() throws Exception {
-        SourceProvider<Document> p = new SourceProvider<Document>();
+        SourceProvider<Document> p = new SourceProvider<>();
 
         Document doc = StaxUtils.read(new StringReader("<test/>"));
 
@@ -124,14 +124,14 @@ public class SourceProviderTest extends Assert {
 
     @Test
     public void testReadFromWithPreferredFormat() throws Exception {
-        TestSourceProvider<Source> p = new TestSourceProvider<Source>();
+        TestSourceProvider<Source> p = new TestSourceProvider<>();
         p.getMessage().put("source-preferred-format", "sax");
         assertSame(StaxSource.class, verifyRead(p, Source.class).getClass());
     }
 
     @Test
     public void testWriteTo() throws Exception {
-        SourceProvider<Source> p = new TestSourceProvider<Source>();
+        SourceProvider<Source> p = new TestSourceProvider<>();
         StreamSource s = new StreamSource(new ByteArrayInputStream("<test/>".getBytes()));
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         p.writeTo(s, null, null, null, MediaType.APPLICATION_XML_TYPE,

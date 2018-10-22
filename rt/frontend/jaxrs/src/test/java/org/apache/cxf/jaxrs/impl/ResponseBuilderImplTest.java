@@ -127,7 +127,7 @@ public class ResponseBuilderImplTest extends Assert {
         m.add("Allow", "HEAD");
         m.add("Allow", "GET");
         // LinkedHashSet so we get a predictable order
-        Set<String> methods = new LinkedHashSet<String>();
+        Set<String> methods = new LinkedHashSet<>();
         methods.add("HEAD");
         methods.add("GET");
         checkBuild(Response.ok().allow(methods).build(), 200, null, m);

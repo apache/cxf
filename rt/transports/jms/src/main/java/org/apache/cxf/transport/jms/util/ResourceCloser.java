@@ -32,7 +32,7 @@ public class ResourceCloser implements Closeable, AutoCloseable {
     private AbstractSequentialList<Object> resources;
 
     public ResourceCloser() {
-        resources = new LinkedList<Object>();
+        resources = new LinkedList<>();
     }
 
     public <E> E register(E resource) {

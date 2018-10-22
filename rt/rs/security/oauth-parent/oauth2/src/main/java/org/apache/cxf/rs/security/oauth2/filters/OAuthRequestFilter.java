@@ -301,7 +301,7 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
         if (type != null && MediaType.APPLICATION_FORM_URLENCODED.startsWith(type)
             && method != null && (method.equals(HttpMethod.POST) || method.equals(HttpMethod.PUT))) {
             try {
-                FormEncodingProvider<Form> provider = new FormEncodingProvider<Form>(true);
+                FormEncodingProvider<Form> provider = new FormEncodingProvider<>(true);
                 Form form = FormUtils.readForm(provider, message);
                 MultivaluedMap<String, String> formData = form.asMap();
                 String token = formData.getFirst(OAuthConstants.ACCESS_TOKEN);

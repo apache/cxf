@@ -25,9 +25,9 @@ import java.util.TreeSet;
 
 public class CorbaUtils {
 
-    protected static final Set<String> IDL_RESERVED_WORDS = new TreeSet<String>();
-    protected static final Set<String> IGNORED_MODULES = new TreeSet<String>();
-    protected static final Set<String> TIMEBASE_IDL_DEFS = new TreeSet<String>();
+    protected static final Set<String> IDL_RESERVED_WORDS = new TreeSet<>();
+    protected static final Set<String> IGNORED_MODULES = new TreeSet<>();
+    protected static final Set<String> TIMEBASE_IDL_DEFS = new TreeSet<>();
 
     static {
         /* IDL Key Words */

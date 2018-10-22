@@ -46,7 +46,7 @@ import org.apache.cxf.rs.security.oauth.utils.OAuthConstants;
 public class OOBResponseProvider implements
     MessageBodyReader<OOBAuthorizationResponse>, MessageBodyWriter<OOBAuthorizationResponse> {
 
-    private FormEncodingProvider<Form> formProvider = new FormEncodingProvider<Form>();
+    private FormEncodingProvider<Form> formProvider = new FormEncodingProvider<>();
 
     public boolean isReadable(Class<?> type, Type genericType,
                               Annotation[] annotations, MediaType mt) {

@@ -51,7 +51,7 @@ public class GenericAegisTest  {
     @Test
     public void testGenerateJavascript() throws Exception {
      // Create our service implementation
-        GenericGenericClass<String> impl = new GenericGenericClass<String>();
+        GenericGenericClass<String> impl = new GenericGenericClass<>();
 
         // Create our Server
         ServerFactoryBean svrFactory = new ServerFactoryBean();

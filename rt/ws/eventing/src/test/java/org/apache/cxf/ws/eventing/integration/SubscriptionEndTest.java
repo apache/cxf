@@ -64,7 +64,7 @@ public class SubscriptionEndTest extends SimpleEventingIntegrationTest {
         subscribe.getDelivery().getContent().add(new ObjectFactory().createNotifyTo(eventSinkERT));
 
         JAXBElement<String> idqn
-            = new JAXBElement<String>(new QName("http://www.example.org", "MyReferenceParameter"),
+            = new JAXBElement<>(new QName("http://www.example.org", "MyReferenceParameter"),
                 String.class,
                 "380");
         ReferenceParametersType myParams = new ReferenceParametersType();

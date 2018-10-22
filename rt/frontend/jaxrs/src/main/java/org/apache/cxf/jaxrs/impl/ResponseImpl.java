@@ -288,7 +288,7 @@ public final class ResponseImpl extends Response {
         if (linkValues == null) {
             return Collections.emptySet();
         }
-        Set<Link> links = new LinkedHashSet<Link>();
+        Set<Link> links = new LinkedHashSet<>();
         for (Object o : linkValues) {
             Link link = o instanceof Link ? (Link)o : Link.valueOf(o.toString());
             if (!link.getUri().isAbsolute()) {

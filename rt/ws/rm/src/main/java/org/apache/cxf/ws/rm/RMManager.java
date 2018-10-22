@@ -118,7 +118,7 @@ public class RMManager {
     private RetransmissionQueue retransmissionQueue;
     private RedeliveryQueue redeliveryQueue;
     private Map<Endpoint, RMEndpoint> reliableEndpoints = new ConcurrentHashMap<Endpoint, RMEndpoint>();
-    private AtomicReference<Timer> timer = new AtomicReference<Timer>();
+    private AtomicReference<Timer> timer = new AtomicReference<>();
     private RMConfiguration configuration;
     private SourcePolicyType sourcePolicy;
     private DestinationPolicyType destinationPolicy;

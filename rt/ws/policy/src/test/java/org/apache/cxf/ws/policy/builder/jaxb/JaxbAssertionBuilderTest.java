@@ -56,7 +56,7 @@ public class JaxbAssertionBuilderTest extends Assert {
     @Test
     public void testGetKnownElements() throws Exception {
         QName qn = new QName("http://cxf.apache.org/test/assertions/foo", "FooType");
-        JaxbAssertionBuilder<FooType> ab = new JaxbAssertionBuilder<FooType>(FooType.class, qn);
+        JaxbAssertionBuilder<FooType> ab = new JaxbAssertionBuilder<>(FooType.class, qn);
         assertNotNull(ab);
         assertEquals(1, ab.getKnownElements().length);
         assertSame(qn, ab.getKnownElements()[0]);
@@ -65,7 +65,7 @@ public class JaxbAssertionBuilderTest extends Assert {
     @Test
     public void testBuild() throws Exception {
         QName qn = new QName("http://cxf.apache.org/test/assertions/foo", "FooType");
-        JaxbAssertionBuilder<FooType> ab = new JaxbAssertionBuilder<FooType>(FooType.class, qn);
+        JaxbAssertionBuilder<FooType> ab = new JaxbAssertionBuilder<>(FooType.class, qn);
         assertNotNull(ab);
         InputStream is = JaxbAssertionBuilderTest.class.getResourceAsStream("foo.xml");
         Document doc = StaxUtils.read(is);

@@ -148,7 +148,7 @@ public class XNode {
     }
 
     private Stack<XNode> getParentNodes() {
-        Stack<XNode> parentNodes = new Stack<XNode>();
+        Stack<XNode> parentNodes = new Stack<>();
 
         XNode pNode = getParentNode();
         while (pNode != null) {
@@ -208,7 +208,7 @@ public class XNode {
     }
 
     public boolean matches(Document doc) {
-        Stack<XNode> nodes = new Stack<XNode>();
+        Stack<XNode> nodes = new Stack<>();
         nodes.push(this);
         XNode pNode = getParentNode();
         while (pNode != null) {

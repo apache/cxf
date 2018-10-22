@@ -44,8 +44,8 @@ public final class ConduitInitiatorManagerImpl implements ConduitInitiatorManage
         = BundleUtils.getBundle(ConduitInitiatorManagerImpl.class);
 
     Map<String, ConduitInitiator> conduitInitiators;
-    Set<String> failed = new CopyOnWriteArraySet<String>();
-    Set<String> loaded = new CopyOnWriteArraySet<String>();
+    Set<String> failed = new CopyOnWriteArraySet<>();
+    Set<String> loaded = new CopyOnWriteArraySet<>();
 
     private Bus bus;
     public ConduitInitiatorManagerImpl() {
@@ -98,7 +98,7 @@ public final class ConduitInitiatorManagerImpl implements ConduitInitiatorManage
     public ConduitInitiator getConduitInitiator(String namespace) throws BusException {
         ConduitInitiator factory = conduitInitiators.get(namespace);
         if (factory == null && !failed.contains(namespace)) {
-            factory = new TransportFinder<ConduitInitiator>(bus,
+            factory = new TransportFinder<>(bus,
                     conduitInitiators,
                     loaded,
                     ConduitInitiator.class)

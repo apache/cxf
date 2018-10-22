@@ -51,7 +51,7 @@ public class SimpleTypeJsonProvider<T> extends AbstractConfigurableProvider
     @Context
     private Providers providers;
     private boolean supportSimpleTypesOnly;
-    private PrimitiveTextProvider<T> primitiveHelper = new PrimitiveTextProvider<T>();
+    private PrimitiveTextProvider<T> primitiveHelper = new PrimitiveTextProvider<>();
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return !supportSimpleTypesOnly || primitiveHelper.isReadable(type, genericType, annotations, mediaType);

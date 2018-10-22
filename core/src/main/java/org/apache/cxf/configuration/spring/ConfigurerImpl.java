@@ -247,7 +247,7 @@ public class ConfigurerImpl extends BeanConfigurerSupport
     }
 
     public final void setApplicationContext(ApplicationContext ac) {
-        appContexts = new CopyOnWriteArraySet<ApplicationContext>();
+        appContexts = new CopyOnWriteArraySet<>();
         addApplicationContext(ac);
         this.beanFactory = ac.getAutowireCapableBeanFactory();
         super.setBeanFactory(this.beanFactory);

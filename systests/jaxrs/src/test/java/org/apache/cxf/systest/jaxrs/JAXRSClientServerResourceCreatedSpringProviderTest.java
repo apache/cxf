@@ -335,7 +335,7 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
 
     @Test
     public void testPostPetStatusType() throws Exception {
-        JAXBElementProvider<Object> p = new JAXBElementProvider<Object>();
+        JAXBElementProvider<Object> p = new JAXBElementProvider<>();
         p.setUnmarshallAsJaxbElement(true);
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/webapp/pets/petstore/jaxb/statusType/",
                                         Collections.singletonList(p));

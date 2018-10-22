@@ -321,14 +321,14 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         updateAddressPort(port, PORT);
 
         try {
-            Holder<ComplexStruct> part3 = new Holder<ComplexStruct>();
+            Holder<ComplexStruct> part3 = new Holder<>();
             part3.value = new ComplexStruct();
             part3.value.setElem1("elem1");
             part3.value.setElem2("elem2");
             part3.value.setElem3(0);
-            Holder<Integer> part2 = new Holder<Integer>();
+            Holder<Integer> part2 = new Holder<>();
             part2.value = 0;
-            Holder<String> part1 = new Holder<String>();
+            Holder<String> part1 = new Holder<>();
             part1.value = "part1";
 
             port.orderedParamHolder(part3, part2, part1);
@@ -407,7 +407,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
 
         Service service = Service.create(new URL(ServerMisc.DOCLIT_CODEFIRST_URL + "?wsdl"), servName);
         DocLitWrappedCodeFirstService port = service.getPort(portName, DocLitWrappedCodeFirstService.class);
-        Holder<Boolean> created = new Holder<Boolean>();
+        Holder<Boolean> created = new Holder<>();
         port.singleInOut(created);
         assertEquals(created.value, Boolean.FALSE);
     }
@@ -570,13 +570,13 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
                                         null, 24);
         assertEquals("string1string2string3string3string2string1<null>24", s);
 
-        Holder<String> a = new Holder<String>();
-        Holder<String> b = new Holder<String>("Hello");
-        Holder<String> c = new Holder<String>();
-        Holder<String> d = new Holder<String>(" ");
-        Holder<String> e = new Holder<String>("world!");
-        Holder<String> f = new Holder<String>();
-        Holder<String> g = new Holder<String>();
+        Holder<String> a = new Holder<>();
+        Holder<String> b = new Holder<>("Hello");
+        Holder<String> c = new Holder<>();
+        Holder<String> d = new Holder<>(" ");
+        Holder<String> e = new Holder<>("world!");
+        Holder<String> f = new Holder<>();
+        Holder<String> g = new Holder<>();
         s = port.multiInOut(a, b, c, d, e, f, g);
         assertEquals("Hello world!", s);
         assertEquals("a", a.value);
@@ -759,13 +759,13 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
             //ignore, expected
         }
 
-        Holder<String> a = new Holder<String>();
-        Holder<String> b = new Holder<String>("Hello");
-        Holder<String> c = new Holder<String>();
-        Holder<String> d = new Holder<String>(" ");
-        Holder<String> e = new Holder<String>("world!");
-        Holder<String> f = new Holder<String>();
-        Holder<String> g = new Holder<String>();
+        Holder<String> a = new Holder<>();
+        Holder<String> b = new Holder<>("Hello");
+        Holder<String> c = new Holder<>();
+        Holder<String> d = new Holder<>(" ");
+        Holder<String> e = new Holder<>("world!");
+        Holder<String> f = new Holder<>();
+        Holder<String> g = new Holder<>();
         s = port.multiInOut(a, b, c, d, e, f, g);
         assertEquals("Hello world!", s);
         assertEquals("a", a.value);
@@ -776,13 +776,13 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         assertEquals("f", f.value);
         assertEquals("g", g.value);
 
-        a = new Holder<String>();
-        b = new Holder<String>("Hello");
-        c = new Holder<String>();
-        d = new Holder<String>(" ");
-        e = new Holder<String>("world!");
-        f = new Holder<String>();
-        g = new Holder<String>();
+        a = new Holder<>();
+        b = new Holder<>("Hello");
+        c = new Holder<>();
+        d = new Holder<>(" ");
+        e = new Holder<>("world!");
+        f = new Holder<>();
+        g = new Holder<>();
         s = port.multiHeaderInOut(a, b, c, d, e, f, g);
         assertEquals("Hello world!", s);
         assertEquals("a", a.value);

@@ -117,7 +117,7 @@ public class ODataParserTest extends Assert {
 
     @Before
     public void setUp() {
-        parser = new ODataParser<Person>(Person.class, Collections.<String, String>emptyMap(),
+        parser = new ODataParser<>(Person.class, Collections.<String, String>emptyMap(),
             Collections.singletonMap("thename", "FirstName"));
     }
 

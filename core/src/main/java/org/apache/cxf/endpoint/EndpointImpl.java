@@ -208,7 +208,7 @@ public class EndpointImpl extends AbstractAttributedInterceptorProvider implemen
 
     public synchronized void addCleanupHook(Closeable c) {
         if (cleanupHooks == null) {
-            cleanupHooks = new CopyOnWriteArrayList<Closeable>();
+            cleanupHooks = new CopyOnWriteArrayList<>();
         }
         cleanupHooks.add(c);
     }

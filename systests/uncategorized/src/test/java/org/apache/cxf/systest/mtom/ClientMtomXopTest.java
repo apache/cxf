@@ -110,7 +110,7 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
     public void testMtomXop() throws Exception {
         TestMtom mtomPort = createPort(MTOM_SERVICE, MTOM_PORT, TestMtom.class, true, true);
         try {
-            Holder<DataHandler> param = new Holder<DataHandler>();
+            Holder<DataHandler> param = new Holder<>();
             Holder<String> name;
             byte bytes[];
             InputStream in;
@@ -136,7 +136,7 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
                                                                     validationType);
 
                 param.value = new DataHandler(new ByteArrayDataSource(data, "application/octet-stream"));
-                name = new Holder<String>("call detail");
+                name = new Holder<>("call detail");
                 mtomPort.testXop(name, param);
                 assertEquals("name unchanged", "return detail + call detail", name.value);
                 assertNotNull(param.value);
@@ -147,7 +147,7 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
                 in.close();
 
                 param.value = new DataHandler(new ByteArrayDataSource(data, "application/octet-stream"));
-                name = new Holder<String>("call detail");
+                name = new Holder<>("call detail");
                 mtomPort.testXop(name, param);
                 assertEquals("name unchanged", "return detail + call detail", name.value);
                 assertNotNull(param.value);
@@ -166,7 +166,7 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
                 SAAJInInterceptor saajIn = new SAAJInInterceptor();
 
                 param.value = new DataHandler(new ByteArrayDataSource(data, "application/octet-stream"));
-                name = new Holder<String>("call detail");
+                name = new Holder<>("call detail");
                 mtomPort.testXop(name, param);
                 assertEquals("name unchanged", "return detail + call detail", name.value);
                 assertNotNull(param.value);
@@ -179,7 +179,7 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
                 ClientProxy.getClient(mtomPort).getInInterceptors().add(saajIn);
                 ClientProxy.getClient(mtomPort).getInInterceptors().add(saajOut);
                 param.value = new DataHandler(new ByteArrayDataSource(data, "application/octet-stream"));
-                name = new Holder<String>("call detail");
+                name = new Holder<>("call detail");
                 mtomPort.testXop(name, param);
                 assertEquals("name unchanged", "return detail + call detail", name.value);
                 assertNotNull(param.value);
@@ -213,7 +213,7 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
     public void testMtomXopProvider() throws Exception {
         TestMtom mtomPort = createPort(MTOM_SERVICE, MTOM_PORT_PROVIDER, TestMtom.class, true, true);
         try {
-            Holder<DataHandler> param = new Holder<DataHandler>();
+            Holder<DataHandler> param = new Holder<>();
             Holder<String> name;
             byte bytes[];
             InputStream in;
@@ -239,7 +239,7 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
                                                                     validationType);
 
                 param.value = new DataHandler(new ByteArrayDataSource(data, "application/octet-stream"));
-                name = new Holder<String>("call detail");
+                name = new Holder<>("call detail");
                 mtomPort.testXop(name, param);
                 assertEquals("name unchanged", "return detail + call detail", name.value);
                 assertNotNull(param.value);
@@ -250,7 +250,7 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
                 in.close();
 
                 param.value = new DataHandler(new ByteArrayDataSource(data, "application/octet-stream"));
-                name = new Holder<String>("call detail");
+                name = new Holder<>("call detail");
                 mtomPort.testXop(name, param);
                 assertEquals("name unchanged", "return detail + call detail", name.value);
                 assertNotNull(param.value);
@@ -269,7 +269,7 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
                 SAAJInInterceptor saajIn = new SAAJInInterceptor();
 
                 param.value = new DataHandler(new ByteArrayDataSource(data, "application/octet-stream"));
-                name = new Holder<String>("call detail");
+                name = new Holder<>("call detail");
                 mtomPort.testXop(name, param);
                 assertEquals("name unchanged", "return detail + call detail", name.value);
                 assertNotNull(param.value);
@@ -282,7 +282,7 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
                 ClientProxy.getClient(mtomPort).getInInterceptors().add(saajIn);
                 ClientProxy.getClient(mtomPort).getInInterceptors().add(saajOut);
                 param.value = new DataHandler(new ByteArrayDataSource(data, "application/octet-stream"));
-                name = new Holder<String>("call detail");
+                name = new Holder<>("call detail");
                 mtomPort.testXop(name, param);
                 assertEquals("name unchanged", "return detail + call detail", name.value);
                 assertNotNull(param.value);
@@ -315,7 +315,7 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
     public void testMtomWithFileName() throws Exception {
         TestMtom mtomPort = createPort(MTOM_SERVICE, MTOM_PORT, TestMtom.class, true, true);
         try {
-            Holder<DataHandler> param = new Holder<DataHandler>();
+            Holder<DataHandler> param = new Holder<>();
             Holder<String> name;
 
             URL fileURL = getClass().getClassLoader().getResource("me.bmp");
@@ -325,7 +325,7 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
                 ((BindingProvider)mtomPort).getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED,
                                                                     validationType);
                 param.value = new DataHandler(fileURL);
-                name = new Holder<String>("have name");
+                name = new Holder<>("have name");
                 mtomPort.testXop(name, param);
                 assertEquals("can't get file name", "return detail + me.bmp", name.value);
                 assertNotNull(param.value);

@@ -39,7 +39,7 @@ public class StudentServiceImpl implements StudentService {
     }
 
     public List<Student> getStudents(Map<String, String> filters) {
-        List<Student> returnValue = new LinkedList<Student>();
+        List<Student> returnValue = new LinkedList<>();
         for (Map.Entry<Long, Student> e : studentMap.entrySet()) {
             if (filters.containsKey((Object)e.getValue())) {
                 returnValue.add(e.getValue());
@@ -50,7 +50,7 @@ public class StudentServiceImpl implements StudentService {
     }
 
     public List<Student> getStudentsByIds(List<String> ids) {
-        List<Student> returnValue = new LinkedList<Student>();
+        List<Student> returnValue = new LinkedList<>();
         for (String id : ids) {
             Long longId = Long.decode(id);
             Student s = studentMap.get(longId);

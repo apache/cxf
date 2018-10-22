@@ -41,7 +41,7 @@ public class JwsJsonProducer {
     private boolean supportDetached;
     private String plainPayload;
     private String encodedPayload;
-    private List<JwsJsonSignatureEntry> signatures = new LinkedList<JwsJsonSignatureEntry>();
+    private List<JwsJsonSignatureEntry> signatures = new LinkedList<>();
     private JsonMapObjectReaderWriter writer = new JsonMapObjectReaderWriter();
     public JwsJsonProducer(String tbsDocument) {
         this(tbsDocument, false);
@@ -198,7 +198,7 @@ public class JwsJsonProducer {
         }
     }
     static Boolean validateB64Status(List<JwsJsonSignatureEntry> signatures) {
-        Set<Boolean> b64Set = new LinkedHashSet<Boolean>();
+        Set<Boolean> b64Set = new LinkedHashSet<>();
         for (JwsJsonSignatureEntry entry : signatures) {
             JwsHeaders headers = entry.getProtectedHeader();
             Boolean status = headers != null ? headers.getPayloadEncodingStatus() : null;

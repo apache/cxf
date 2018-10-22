@@ -52,7 +52,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
     private final ClassLoader loader;
     private ResourceManager resourceManager;
     private Map<String, Extension> all = new ConcurrentHashMap<String, Extension>();
-    private List<Extension> ordered = new CopyOnWriteArrayList<Extension>();
+    private List<Extension> ordered = new CopyOnWriteArrayList<>();
     private final Map<Class<?>, Object> activated;
     private final Bus bus;
 
@@ -294,7 +294,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
         }
     }
     public List<String> getBeanNamesOfType(Class<?> type) {
-        List<String> ret = new LinkedList<String>();
+        List<String> ret = new LinkedList<>();
         for (Extension ex : ordered) {
             Class<?> cls = ex.getClassObject(loader);
             if (cls != null && type.isAssignableFrom(cls)) {
@@ -319,7 +319,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
         return null;
     }
     public <T> Collection<? extends T> getBeansOfType(Class<T> type) {
-        List<T> ret = new LinkedList<T>();
+        List<T> ret = new LinkedList<>();
         Extension ext = all.get(type.getName());
         if (ext != null) {
             Class<?> cls = ext.getClassObject(loader);

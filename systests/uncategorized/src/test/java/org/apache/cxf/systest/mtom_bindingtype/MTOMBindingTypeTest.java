@@ -82,7 +82,7 @@ public class MTOMBindingTypeTest extends AbstractBusClientServerTestBase {
         ByteArrayOutputStream output = setupOutLogging();
 
         Holder<byte[]> photo = new Holder<byte[]>("CXF".getBytes());
-        Holder<Image> image = new Holder<Image>(getImage("/java.jpg"));
+        Holder<Image> image = new Holder<>(getImage("/java.jpg"));
 
         Hello port = getPort();
 

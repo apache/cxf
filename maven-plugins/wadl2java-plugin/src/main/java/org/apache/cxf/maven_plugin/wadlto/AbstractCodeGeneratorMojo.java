@@ -262,7 +262,7 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
 
     protected void forkOnce(Set<URI> classPath, List<WadlOption> effectiveOptions)
         throws MojoExecutionException {
-        List<WadlOption> toDo = new LinkedList<WadlOption>();
+        List<WadlOption> toDo = new LinkedList<>();
         List<List<String>> wargs = new LinkedList<List<String>>();
         for (WadlOption option : effectiveOptions) {
             File outputDirFile = option.getOutputDir();
@@ -286,7 +286,7 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
             return;
         }
 
-        Set<URI> artifactsPath = new LinkedHashSet<URI>();
+        Set<URI> artifactsPath = new LinkedHashSet<>();
         for (Artifact a : pluginArtifacts) {
             File file = a.getFile();
             if (file == null) {
@@ -390,7 +390,7 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
             getLog().debug("Calling wadl2java with args: " + Arrays.toString(args));
 
             if (!"false".equals(fork)) {
-                Set<URI> artifactsPath = new LinkedHashSet<URI>();
+                Set<URI> artifactsPath = new LinkedHashSet<>();
                 for (Artifact a : pluginArtifacts) {
                     File file = a.getFile();
                     if (file == null) {

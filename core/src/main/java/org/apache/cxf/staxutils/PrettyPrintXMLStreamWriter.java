@@ -34,7 +34,7 @@ public class PrettyPrintXMLStreamWriter implements XMLStreamWriter {
 
     int curIndent;
     int indentAmount = DEFAULT_INDENT_LEVEL;
-    Stack<CurrentElement> elems = new Stack<CurrentElement>();
+    Stack<CurrentElement> elems = new Stack<>();
 
     public PrettyPrintXMLStreamWriter(XMLStreamWriter writer,
                                       int indentAmount) {

@@ -91,7 +91,7 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
     Bus bus;
     Endpoint udpEndpoint;
     WSDiscoveryClient client;
-    List<HelloType> registered = new CopyOnWriteArrayList<HelloType>();
+    List<HelloType> registered = new CopyOnWriteArrayList<>();
     ObjectFactory factory = new ObjectFactory();
     boolean started;
 
@@ -275,7 +275,7 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
 
 
     public ProbeMatchesType handleProbe(ProbeType pt) {
-        List<HelloType> consider = new LinkedList<HelloType>(registered);
+        List<HelloType> consider = new LinkedList<>(registered);
         //step one, consider the "types"
         //ALL types in the probe must be in the registered type
         if (pt.getTypes() != null && !pt.getTypes().isEmpty()) {

@@ -40,10 +40,10 @@ public class CXFBusLifeCycleManager implements BusLifeCycleManager {
     private boolean postShutdownCalled;
 
     public CXFBusLifeCycleManager() {
-        listeners = new CopyOnWriteArrayList<BusLifeCycleListener>();
+        listeners = new CopyOnWriteArrayList<>();
     }
     public CXFBusLifeCycleManager(Bus b) {
-        listeners = new CopyOnWriteArrayList<BusLifeCycleListener>();
+        listeners = new CopyOnWriteArrayList<>();
         setBus(b);
     }
 

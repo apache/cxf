@@ -58,7 +58,7 @@ public final class EncoderDecoder10AImpl extends EncoderDecoder {
 
     public static final EncoderDecoder10AImpl INSTANCE = new EncoderDecoder10AImpl();
 
-    private static AtomicReference<JAXBContext> jaxbContextReference = new AtomicReference<JAXBContext>();
+    private static AtomicReference<JAXBContext> jaxbContextReference = new AtomicReference<>();
 
     private static final Logger LOG = LogUtils.getL7dLogger(EncoderDecoder10AImpl.class);
 

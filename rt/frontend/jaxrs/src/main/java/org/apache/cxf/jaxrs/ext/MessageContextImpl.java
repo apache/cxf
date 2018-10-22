@@ -283,7 +283,7 @@ public class MessageContextImpl implements MessageContext {
 
         new AttachmentInputInterceptor().handleMessage(inMessage);
 
-        List<Attachment> newAttachments = new LinkedList<Attachment>();
+        List<Attachment> newAttachments = new LinkedList<>();
         try {
             Map<String, List<String>> headers
                 = CastUtils.cast((Map<?, ?>)inMessage.get(AttachmentDeserializer.ATTACHMENT_PART_HEADERS));

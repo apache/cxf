@@ -111,7 +111,7 @@ public class JavascriptUtils {
         floatTypes.add("float");
         floatTypes.add("double");
 
-        prefixStack = new Stack<String>();
+        prefixStack = new Stack<>();
         prefixStack.push("    ");
     }
 

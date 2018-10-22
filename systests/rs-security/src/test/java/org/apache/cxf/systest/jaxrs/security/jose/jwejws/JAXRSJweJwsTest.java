@@ -105,7 +105,7 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         bean.setBus(springBus);
         bean.setServiceClass(BookStore.class);
         bean.setAddress(address);
-        List<Object> providers = new LinkedList<Object>();
+        List<Object> providers = new LinkedList<>();
         JweWriterInterceptor jweWriter = new JweWriterInterceptor();
         jweWriter.setUseJweOutputStream(true);
         providers.add(jweWriter);
@@ -131,7 +131,7 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         bean.setBus(springBus);
         bean.setServiceClass(BookStore.class);
         bean.setAddress(address);
-        List<Object> providers = new LinkedList<Object>();
+        List<Object> providers = new LinkedList<>();
         JweWriterInterceptor jweWriter = new JweWriterInterceptor();
         jweWriter.setUseJweOutputStream(true);
         providers.add(jweWriter);
@@ -161,7 +161,7 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         bean.setBus(springBus);
         bean.setServiceClass(BookStore.class);
         bean.setAddress(address);
-        List<Object> providers = new LinkedList<Object>();
+        List<Object> providers = new LinkedList<>();
         JweWriterInterceptor jweWriter = new JweWriterInterceptor();
         jweWriter.setUseJweOutputStream(true);
         providers.add(jweWriter);
@@ -193,7 +193,7 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         bean.setBus(springBus);
         bean.setServiceClass(BookStore.class);
         bean.setAddress(address);
-        List<Object> providers = new LinkedList<Object>();
+        List<Object> providers = new LinkedList<>();
         JweWriterInterceptor jweWriter = new JweWriterInterceptor();
         jweWriter.setUseJweOutputStream(true);
         providers.add(jweWriter);
@@ -300,7 +300,7 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         bean.setBus(springBus);
         bean.setServiceClass(BookStore.class);
         bean.setAddress(address);
-        List<Object> providers = new LinkedList<Object>();
+        List<Object> providers = new LinkedList<>();
         JwsWriterInterceptor jwsWriter = new JwsWriterInterceptor();
         jwsWriter.setProtectHttpHeaders(protectHttpHeaders);
         jwsWriter.setEncodePayload(encodePayload);
@@ -325,7 +325,7 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         bean.setBus(springBus);
         bean.setServiceClass(BookStore.class);
         bean.setAddress(address);
-        List<Object> providers = new LinkedList<Object>();
+        List<Object> providers = new LinkedList<>();
         JwsWriterInterceptor jwsWriter = new JwsWriterInterceptor();
         jwsWriter.setUseJwsOutputStream(true);
         providers.add(jwsWriter);
@@ -361,7 +361,7 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         bean.setBus(springBus);
         bean.setServiceClass(BookStore.class);
         bean.setAddress(address);
-        List<Object> providers = new LinkedList<Object>();
+        List<Object> providers = new LinkedList<>();
         JwsWriterInterceptor jwsWriter = new JwsWriterInterceptor();
         jwsWriter.setUseJwsOutputStream(true);
         providers.add(jwsWriter);
@@ -391,7 +391,7 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         bean.setBus(springBus);
         bean.setServiceClass(BookStore.class);
         bean.setAddress(address);
-        List<Object> providers = new LinkedList<Object>();
+        List<Object> providers = new LinkedList<>();
         JweWriterInterceptor jweWriter = new JweWriterInterceptor();
         jweWriter.setUseJweOutputStream(true);
         providers.add(jweWriter);
@@ -427,7 +427,7 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         bean.setBus(springBus);
         bean.setServiceClass(BookStore.class);
         bean.setAddress(address);
-        List<Object> providers = new LinkedList<Object>();
+        List<Object> providers = new LinkedList<>();
         // writer
         JweWriterInterceptor jweWriter = new JweWriterInterceptor();
         jweWriter.setUseJweOutputStream(true);
@@ -456,7 +456,7 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         bean.setBus(springBus);
         bean.setServiceClass(BookStore.class);
         bean.setAddress(address);
-        List<Object> providers = new LinkedList<Object>();
+        List<Object> providers = new LinkedList<>();
         // writer
         JweWriterInterceptor jweWriter = new JweWriterInterceptor();
         jweWriter.setUseJweOutputStream(true);

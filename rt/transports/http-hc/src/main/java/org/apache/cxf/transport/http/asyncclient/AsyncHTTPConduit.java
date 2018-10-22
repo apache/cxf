@@ -567,7 +567,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
                 ctx.setUserToken(sslState);
             }
 
-            connectionFuture = new BasicFuture<Boolean>(callback);
+            connectionFuture = new BasicFuture<>(callback);
             HttpAsyncClient c = getHttpAsyncClient();
             Credentials creds = (Credentials)outMessage.getContextualProperty(Credentials.class.getName());
             if (creds != null) {

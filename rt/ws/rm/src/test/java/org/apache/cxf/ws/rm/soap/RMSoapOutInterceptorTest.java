@@ -257,7 +257,7 @@ public class RMSoapOutInterceptorTest extends Assert {
     }
 
     private void verifyHeaders(SoapMessage message, String... names) {
-        List<Header> headers = new ArrayList<Header>(message.getHeaders());
+        List<Header> headers = new ArrayList<>(message.getHeaders());
 
         // check all expected headers are present
 

@@ -41,7 +41,7 @@ import org.apache.cxf.common.util.StringUtils;
 public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
     protected boolean isOverlaid = true;
 
-    List<Boolean> isOverlaidStack = new LinkedList<Boolean>();
+    List<Boolean> isOverlaidStack = new LinkedList<>();
     Boolean textOverlay;
 
     public OverlayW3CDOMStreamWriter(Document document) {

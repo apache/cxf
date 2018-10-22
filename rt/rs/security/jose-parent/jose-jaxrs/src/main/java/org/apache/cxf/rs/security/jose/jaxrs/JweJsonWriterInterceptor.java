@@ -55,7 +55,7 @@ public class JweJsonWriterInterceptor extends AbstractJweJsonWriterProvider impl
         OutputStream actualOs = ctx.getOutputStream();
         JweHeaders sharedProtectedHeaders = new JweHeaders();
         List<String> propLocs = getPropertyLocations();
-        List<JweHeaders> perRecipientUnprotectedHeaders = new ArrayList<JweHeaders>(propLocs.size());
+        List<JweHeaders> perRecipientUnprotectedHeaders = new ArrayList<>(propLocs.size());
         for (int i = 0; i < propLocs.size(); i++) {
             perRecipientUnprotectedHeaders.add(new JweHeaders());
         }

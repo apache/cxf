@@ -37,7 +37,7 @@ public class SamlFormInHandler extends AbstractSamlBase64InHandler {
     private static final String SAML_ELEMENT = "SAMLToken";
     private static final String SAML_RELAY_STATE = "RelayState";
 
-    private FormEncodingProvider<Form> provider = new FormEncodingProvider<Form>(true);
+    private FormEncodingProvider<Form> provider = new FormEncodingProvider<>(true);
 
     public SamlFormInHandler() {
     }

@@ -434,7 +434,7 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
         } else {
             actualHeaders = allowHeaders;
         }
-        Set<String> actualHeadersSet = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+        Set<String> actualHeadersSet = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
         actualHeadersSet.addAll(actualHeaders);
         return actualHeadersSet.containsAll(aHeaders);
     }

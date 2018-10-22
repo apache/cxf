@@ -235,7 +235,7 @@ public class JAXRSClientServerResourceJacksonSpringProviderTest extends Abstract
 
         String endpointAddress =
             "http://localhost:" + PORT + "/webapp/genericstore2";
-        JAXBElementProvider<Object> jaxbProvider = new JAXBElementProvider<Object>();
+        JAXBElementProvider<Object> jaxbProvider = new JAXBElementProvider<>();
         jaxbProvider.setXmlRootAsJaxbElement(true);
         jaxbProvider.setMarshallAsJaxbElement(true);
         GenericBookStoreSpring2 proxy = JAXRSClientFactory.create(endpointAddress,
@@ -252,7 +252,7 @@ public class JAXRSClientServerResourceJacksonSpringProviderTest extends Abstract
 
         String endpointAddress =
             "http://localhost:" + PORT + "/webapp/genericstore2type";
-        JAXBElementProvider<Object> jaxbProvider = new JAXBElementProvider<Object>();
+        JAXBElementProvider<Object> jaxbProvider = new JAXBElementProvider<>();
         jaxbProvider.setMarshallAsJaxbElement(true);
         jaxbProvider.setUnmarshallAsJaxbElement(true);
         GenericBookStoreSpring2 proxy = JAXRSClientFactory.create(endpointAddress,
@@ -297,7 +297,7 @@ public class JAXRSClientServerResourceJacksonSpringProviderTest extends Abstract
 
         String endpointAddress =
             "http://localhost:" + PORT + "/webapp/genericstore2";
-        JAXBElementProvider<Object> jaxbProvider = new JAXBElementProvider<Object>();
+        JAXBElementProvider<Object> jaxbProvider = new JAXBElementProvider<>();
         jaxbProvider.setMarshallAsJaxbElement(true);
         jaxbProvider.setUnmarshallAsJaxbElement(true);
         GenericBookStoreSpring2 proxy = JAXRSClientFactory.create(endpointAddress,
@@ -315,7 +315,7 @@ public class JAXRSClientServerResourceJacksonSpringProviderTest extends Abstract
 
         String endpointAddress =
             "http://localhost:" + PORT + "/webapp/genericstore2type";
-        JAXBElementProvider<Object> jaxbProvider = new JAXBElementProvider<Object>();
+        JAXBElementProvider<Object> jaxbProvider = new JAXBElementProvider<>();
         jaxbProvider.setMarshallAsJaxbElement(true);
         jaxbProvider.setUnmarshallAsJaxbElement(true);
         GenericBookStoreSpring2 proxy = JAXRSClientFactory.create(endpointAddress,

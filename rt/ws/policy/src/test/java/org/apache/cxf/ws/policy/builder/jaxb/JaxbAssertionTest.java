@@ -45,7 +45,7 @@ public class JaxbAssertionTest extends Assert {
 
     @Test
     public void testBasic() {
-        JaxbAssertion<FooType> assertion = new JaxbAssertion<FooType>();
+        JaxbAssertion<FooType> assertion = new JaxbAssertion<>();
         assertNull(assertion.getName());
         assertNull(assertion.getData());
         assertTrue(!assertion.isOptional());
@@ -65,7 +65,7 @@ public class JaxbAssertionTest extends Assert {
 
     @Test
     public void testEqual() {
-        JaxbAssertion<FooType> assertion = new JaxbAssertion<FooType>();
+        JaxbAssertion<FooType> assertion = new JaxbAssertion<>();
         FooType data = new FooType();
         data.setName("CXF");
         data.setNumber(2);
@@ -93,7 +93,7 @@ public class JaxbAssertionTest extends Assert {
         FooType odata = new FooType();
         odata.setName(data.getName());
         odata.setNumber(data.getNumber());
-        JaxbAssertion<FooType> oassertion = new JaxbAssertion<FooType>();
+        JaxbAssertion<FooType> oassertion = new JaxbAssertion<>();
         oassertion.setData(odata);
         oassertion.setName(qn);
         assertTrue(!assertion.equal(oassertion));
@@ -104,7 +104,7 @@ public class JaxbAssertionTest extends Assert {
 
     @Test
     public void testNormalise() {
-        JaxbAssertion<FooType> assertion = new JaxbAssertion<FooType>();
+        JaxbAssertion<FooType> assertion = new JaxbAssertion<>();
         FooType data = new FooType();
         data.setName("CXF");
         data.setNumber(2);

@@ -98,7 +98,7 @@ public class WadlOption extends Option {
         if (wadlLocation.contains(".") && !wadlLocation.contains("*")) {
             return Collections.singletonList(getWadlURI(baseURI, wadlLocation));
         }
-        List<URI> uris = new LinkedList<URI>();
+        List<URI> uris = new LinkedList<>();
         try {
             for (URL nextLocation : ClasspathScanner.findResources(wadlLocation, wadlFileExtension, resourceLoader)) {
                 uris.add(getWadlURI(baseURI, nextLocation.toURI().getPath()));

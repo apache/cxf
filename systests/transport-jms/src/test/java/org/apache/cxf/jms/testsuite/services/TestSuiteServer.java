@@ -31,7 +31,7 @@ public class TestSuiteServer extends AbstractBusTestServerBase {
 
     private static String jndiUrl;
 
-    List<Endpoint> endpoints = new LinkedList<Endpoint>();
+    List<Endpoint> endpoints = new LinkedList<>();
     protected void run() {
         setBus(BusFactory.getDefaultBus());
         startEndpoint("test0001", new Test0001Impl());

@@ -51,7 +51,7 @@ public abstract class AbstractJwsMultipartSignatureFilter {
         if (rootEntity instanceof MultipartBody) {
             parts = CastUtils.cast(((MultipartBody)rootEntity).getAllAttachments());
         } else {
-            parts = new ArrayList<Object>();
+            parts = new ArrayList<>();
             if (rootEntity instanceof List) {
                 List<Object> entityList = CastUtils.cast((List<?>)rootEntity);
                 parts.addAll(entityList);

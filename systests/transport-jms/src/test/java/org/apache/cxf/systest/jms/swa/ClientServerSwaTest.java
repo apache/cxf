@@ -91,8 +91,8 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         SwAService port = factory.create(SwAService.class);
 
 
-        Holder<String> textHolder = new Holder<String>();
-        Holder<DataHandler> data = new Holder<DataHandler>();
+        Holder<String> textHolder = new Holder<>();
+        Holder<DataHandler> data = new Holder<>();
 
         ByteArrayDataSource source = new ByteArrayDataSource("foobar".getBytes(), "application/octet-stream");
         DataHandler handler = new DataHandler(source);

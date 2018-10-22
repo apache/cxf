@@ -35,8 +35,8 @@ public class Book {
     private OwnerAddress address;
     private OwnerInfo ownerInfo;
     private Library library;
-    private List<BookReview> reviews = new LinkedList<BookReview>();
-    private List<String> authors = new LinkedList<String>();
+    private List<BookReview> reviews = new LinkedList<>();
+    private List<String> authors = new LinkedList<>();
 
     @Id
     public int getId() {

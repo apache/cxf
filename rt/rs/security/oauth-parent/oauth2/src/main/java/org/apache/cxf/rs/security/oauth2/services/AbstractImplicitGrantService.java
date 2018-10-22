@@ -47,7 +47,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 public abstract class AbstractImplicitGrantService extends RedirectionBasedGrantService {
     // For a client to validate that this client is a targeted recipient.
     private boolean reportClientId;
-    private List<AccessTokenResponseFilter> responseHandlers = new LinkedList<AccessTokenResponseFilter>();
+    private List<AccessTokenResponseFilter> responseHandlers = new LinkedList<>();
 
     protected AbstractImplicitGrantService(String supportedResponseType,
                                            String supportedGrantType) {

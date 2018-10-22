@@ -125,7 +125,7 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
         }
         boolean matchAll = scopesMatchAllMap.get(m.getName());
         OAuthContext context = OAuthContextUtils.getContext(mc);
-        List<String> requestScopes = new LinkedList<String>();
+        List<String> requestScopes = new LinkedList<>();
         for (OAuthPermission perm : context.getPermissions()) {
             if (matchAll) {
                 requestScopes.add(perm.getPermission());

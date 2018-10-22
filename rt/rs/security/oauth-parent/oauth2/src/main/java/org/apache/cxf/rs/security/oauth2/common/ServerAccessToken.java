@@ -45,9 +45,9 @@ public abstract class ServerAccessToken extends AccessToken {
 
     private String grantType;
     private Client client;
-    private List<OAuthPermission> scopes = new LinkedList<OAuthPermission>();
+    private List<OAuthPermission> scopes = new LinkedList<>();
     private UserSubject subject;
-    private List<String> audiences = new LinkedList<String>();
+    private List<String> audiences = new LinkedList<>();
     private String clientCodeVerifier;
     private String nonce;
     private String responseType;

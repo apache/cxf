@@ -226,7 +226,7 @@ public class SubscriptionManagerImpl implements SubscriptionManager {
         // generate a ID for this subscription
         UUID uuid = UUID.randomUUID();
         JAXBElement<String> idqn
-            = new JAXBElement<String>(new QName(subscriptionIdNamespace, subscriptionIdElementName),
+            = new JAXBElement<>(new QName(subscriptionIdNamespace, subscriptionIdElementName),
                     String.class,
                     uuid.toString());
         subscriptionManagerReference.setReferenceParameters(new ReferenceParametersType());

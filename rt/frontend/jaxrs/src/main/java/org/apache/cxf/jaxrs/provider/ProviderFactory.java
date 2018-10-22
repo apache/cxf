@@ -530,7 +530,7 @@ public abstract class ProviderFactory {
     }
 
     protected void setBusProviders() {
-        List<Object> extensions = new LinkedList<Object>();
+        List<Object> extensions = new LinkedList<>();
         addBusExtension(extensions,
                         MessageBodyReader.class,
                         MessageBodyWriter.class,
@@ -1384,7 +1384,7 @@ public abstract class ProviderFactory {
             } else if (provider instanceof ProviderInfo) {
                 theProviders.add((ProviderInfo<?>)provider);
             } else {
-                ProviderInfo<Object> theProvider = new ProviderInfo<Object>(provider, getBus(), custom);
+                ProviderInfo<Object> theProvider = new ProviderInfo<>(provider, getBus(), custom);
                 theProvider.setBusGlobal(busGlobal);
                 theProviders.add(theProvider);
             }

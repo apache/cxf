@@ -43,7 +43,7 @@ import org.apache.cxf.security.SecurityContext;
 
 public class JwtBearerAuthHandler extends OAuthServerJoseJwtConsumer implements ContainerRequestFilter {
     private ClientRegistrationProvider clientProvider;
-    private FormEncodingProvider<Form> provider = new FormEncodingProvider<Form>(true);
+    private FormEncodingProvider<Form> provider = new FormEncodingProvider<>(true);
     private boolean validateAudience = true;
 
     public JwtBearerAuthHandler() {

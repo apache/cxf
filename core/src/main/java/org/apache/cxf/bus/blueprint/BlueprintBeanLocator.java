@@ -100,7 +100,7 @@ public class BlueprintBeanLocator implements ConfiguredBeanLocator {
     }
     /** {@inheritDoc}*/
     public List<String> getBeanNamesOfType(Class<?> type) {
-        Set<String> names = new LinkedHashSet<String>();
+        Set<String> names = new LinkedHashSet<>();
         for (String s : container.getComponentIds()) {
             ComponentMetadata cmd = container.getComponentMetadata(s);
             Class<?> cls = getClassForMetaData(cmd);

@@ -71,8 +71,8 @@ public class DoMerges {
     public static String username;
     public static String fromBranch;
 
-    public static Set<String> records = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
-    public static Set<String> patchIds = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+    public static Set<String> records = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+    public static Set<String> patchIds = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
 
     static class ToFrom {
         final String from;
@@ -83,7 +83,7 @@ public class DoMerges {
             from = f;
         }
     }
-    public static List<ToFrom> pathMaps = new LinkedList<ToFrom>();
+    public static List<ToFrom> pathMaps = new LinkedList<>();
 
     static int waitFor(Process p) throws Exception  {
         return waitFor(p, true);
@@ -205,7 +205,7 @@ public class DoMerges {
     }
 
     public static List<String> getAvailableUpdates() throws Exception {
-        List<String> verList = new LinkedList<String>();
+        List<String> verList = new LinkedList<>();
         Process p;
         BufferedReader reader;
         String line;
@@ -393,8 +393,8 @@ public class DoMerges {
 
         doUpdate();
 
-        List<String> args = new LinkedList<String>(Arrays.asList(a));
-        List<String> check = new LinkedList<String>();
+        List<String> args = new LinkedList<>(Arrays.asList(a));
+        List<String> check = new LinkedList<>();
         while (!args.isEmpty()) {
             String get = args.remove(0);
 
@@ -412,7 +412,7 @@ public class DoMerges {
 
         List<String> verList = getAvailableUpdates();
         if (!check.isEmpty()) {
-            List<String> newList = new LinkedList<String>();
+            List<String> newList = new LinkedList<>();
             for (String s : check) {
                 if (verList.contains(s)) {
                     newList.add(s);
@@ -432,7 +432,7 @@ public class DoMerges {
         //and compare with what should be merged and check if things are already merged
         gitLogs = getGitLogs();
 
-        Set<String> jiras = new TreeSet<String>();
+        Set<String> jiras = new TreeSet<>();
 
         for (int cur = 0; cur < verList.size(); cur++) {
             jiras.clear();

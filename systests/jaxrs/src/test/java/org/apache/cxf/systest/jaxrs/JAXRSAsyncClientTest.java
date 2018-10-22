@@ -288,7 +288,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
     @Test
     public void testAsyncProxyPrimitiveResponse() throws Exception {
         String address = "http://localhost:" + PORT;
-        final Holder<Boolean> holder = new Holder<Boolean>();
+        final Holder<Boolean> holder = new Holder<>();
         final InvocationCallback<Boolean> callback = new InvocationCallback<Boolean>() {
             public void completed(Boolean response) {
                 holder.value = response;
@@ -306,7 +306,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
     @Test
     public void testAsyncProxyBookResponse() throws Exception {
         String address = "http://localhost:" + PORT;
-        final Holder<Book> holder = new Holder<Book>();
+        final Holder<Book> holder = new Holder<>();
         final InvocationCallback<Book> callback = new InvocationCallback<Book>() {
             public void completed(Book response) {
                 holder.value = response;
@@ -326,7 +326,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
     @Test
     public void testAsyncProxyMultipleCallbacks() throws Exception {
         String address = "http://localhost:" + PORT;
-        final Holder<Book> bookHolder = new Holder<Book>();
+        final Holder<Book> bookHolder = new Holder<>();
         final InvocationCallback<Book> bookCallback = new InvocationCallback<Book>() {
             public void completed(Book response) {
                 bookHolder.value = response;
@@ -334,7 +334,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
             public void failed(Throwable error) {
             }
         };
-        final Holder<Boolean> booleanHolder = new Holder<Boolean>();
+        final Holder<Boolean> booleanHolder = new Holder<>();
         final InvocationCallback<Boolean> booleanCallback = new InvocationCallback<Boolean>() {
             public void completed(Boolean response) {
                 booleanHolder.value = response;
@@ -373,7 +373,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
     public void testGetBookAsync404Callback() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/404";
         WebClient wc = createWebClient(address);
-        final Holder<Object> holder = new Holder<Object>();
+        final Holder<Object> holder = new Holder<>();
         InvocationCallback<Object> callback = createCallback(holder);
         try {
             wc.async().get(callback).get();

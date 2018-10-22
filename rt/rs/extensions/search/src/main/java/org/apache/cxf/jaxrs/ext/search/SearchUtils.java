@@ -98,7 +98,7 @@ public final class SearchUtils {
     }
 
     public static <T> String toSQL(SearchCondition<T> sc, String table, String... columns) {
-        SQLPrinterVisitor<T> visitor = new SQLPrinterVisitor<T>(table, columns);
+        SQLPrinterVisitor<T> visitor = new SQLPrinterVisitor<>(table, columns);
         sc.accept(visitor);
         return visitor.getQuery();
     }

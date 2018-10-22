@@ -50,7 +50,7 @@ public class Server extends AbstractBusTestServerBase {
     static final String BARE_PORT = allocatePort(Server.class, 1);
     static final String BOGUS_REAL_PORT = allocatePort(Server.class, 2);
 
-    List<Endpoint> eps = new LinkedList<Endpoint>();
+    List<Endpoint> eps = new LinkedList<>();
 
     protected void run() {
         URL url = getClass().getResource("fault-stack-trace.xml");
@@ -135,7 +135,7 @@ public class Server extends AbstractBusTestServerBase {
 
         public Future<?> greetMeAsync(final String requestType,
                                       final AsyncHandler<GreetMeResponse> asyncHandler) {
-            final ServerAsyncResponse<GreetMeResponse> r = new ServerAsyncResponse<GreetMeResponse>();
+            final ServerAsyncResponse<GreetMeResponse> r = new ServerAsyncResponse<>();
             new Thread() {
                 public void run() {
                     try {
@@ -164,7 +164,7 @@ public class Server extends AbstractBusTestServerBase {
         }
 
         public Future<?> invokeAsync(final StreamSource s, final AsyncHandler<Source> asyncHandler) {
-            final ServerAsyncResponse<Source> r = new ServerAsyncResponse<Source>();
+            final ServerAsyncResponse<Source> r = new ServerAsyncResponse<>();
             new Thread() {
                 public void run() {
                     try {

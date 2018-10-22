@@ -194,7 +194,7 @@ public class CorbaUtilsTest extends Assert {
 
         CorbaTypeMap typeMap = new CorbaTypeMap("dud:namespace");
         QName seen = new QName("bla", "Bla");
-        Stack<QName> seenTypes = new Stack<QName>();
+        Stack<QName> seenTypes = new Stack<>();
         seenTypes.add(seen);
         try {
             CorbaUtils.getTypeCode(orb, null, typeMap, seenTypes);

@@ -155,7 +155,7 @@ public class UriInfoImpl implements UriInfo {
 
     public List<Object> getMatchedResources() {
         if (stack != null) {
-            List<Object> resources = new LinkedList<Object>();
+            List<Object> resources = new LinkedList<>();
             for (MethodInvocationInfo invocation : stack) {
                 resources.add(0, invocation.getRealClass());
             }
@@ -172,7 +172,7 @@ public class UriInfoImpl implements UriInfo {
     public List<String> getMatchedURIs(boolean decode) {
         if (stack != null) {
             List<String> objects = new ArrayList<>();
-            List<String> uris = new LinkedList<String>();
+            List<String> uris = new LinkedList<>();
             StringBuilder sumPath = new StringBuilder("");
             for (MethodInvocationInfo invocation : stack) {
                 List<String> templateObjects = invocation.getTemplateValues();

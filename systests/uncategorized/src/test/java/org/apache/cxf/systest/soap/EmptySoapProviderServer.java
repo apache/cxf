@@ -34,7 +34,7 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 public class EmptySoapProviderServer extends AbstractBusTestServerBase {
     public static final String REG_PORT = allocatePort(EmptySoapProviderServer.class);
 
-    List<Endpoint> eps = new LinkedList<Endpoint>();
+    List<Endpoint> eps = new LinkedList<>();
 
     protected void run() {
         String address = "http://localhost:" + REG_PORT + "/helloProvider/helloPort";

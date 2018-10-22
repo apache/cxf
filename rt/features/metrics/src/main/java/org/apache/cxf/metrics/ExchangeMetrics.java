@@ -30,7 +30,7 @@ import org.apache.cxf.metrics.interceptors.CountingOutputStream;
  *
  */
 public class ExchangeMetrics {
-    Deque<MetricsContext> contexts = new LinkedList<MetricsContext>();
+    Deque<MetricsContext> contexts = new LinkedList<>();
     Exchange exchange;
     boolean started;
     long startTime = -1;

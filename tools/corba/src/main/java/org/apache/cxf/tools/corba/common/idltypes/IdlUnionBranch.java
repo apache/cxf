@@ -31,7 +31,7 @@ public final class IdlUnionBranch extends IdlField {
     private IdlUnionBranch(IdlUnion union, String name, IdlType type, boolean hasDefault) {
         super(union, name, type);
         this.isDefault = hasDefault;
-        cases = new Vector<String>();
+        cases = new Vector<>();
     }
 
     public static IdlUnionBranch create(IdlUnion union, String name, IdlType type, boolean isDefault) {

@@ -56,7 +56,7 @@ public class GreeterImpl implements GreeterAsync {
         LOG.info("Executing operation greetMeSometimeAsync asynchronously");
         System.out.println("Executing operation greetMeSometimeAsync asynchronously\n");
         final ServerAsyncResponse<GreetMeSometimeResponse> r
-            = new ServerAsyncResponse<GreetMeSometimeResponse>();
+            = new ServerAsyncResponse<>();
         new Thread() {
             public void run() {
                 GreetMeSometimeResponse resp = new GreetMeSometimeResponse();

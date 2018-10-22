@@ -150,8 +150,8 @@ public final class StaxUtils {
     static {
         int i = getInteger("org.apache.cxf.staxutils.pool-size", 20);
 
-        NS_AWARE_INPUT_FACTORY_POOL = new ArrayBlockingQueue<XMLInputFactory>(i);
-        OUTPUT_FACTORY_POOL = new ArrayBlockingQueue<XMLOutputFactory>(i);
+        NS_AWARE_INPUT_FACTORY_POOL = new ArrayBlockingQueue<>(i);
+        OUTPUT_FACTORY_POOL = new ArrayBlockingQueue<>(i);
 
         //old names
         innerElementCountThreshold = getInteger(INNER_ELEMENT_COUNT_SYSTEM_PROP, innerElementCountThreshold);
@@ -732,7 +732,7 @@ public final class StaxUtils {
         // number of elements read in
         int read = 0;
         int elementCount = 0;
-        Stack<Integer> countStack = new Stack<Integer>();
+        Stack<Integer> countStack = new Stack<>();
         int event = reader.getEventType();
 
         while (reader.hasNext()) {
@@ -1054,7 +1054,7 @@ public final class StaxUtils {
         if (attrs.getLength() == 0) {
             return Collections.<Node> emptyList();
         }
-        List<Node> sortedAttrs = new LinkedList<Node>();
+        List<Node> sortedAttrs = new LinkedList<>();
         for (int i = 0; i < attrs.getLength(); i++) {
             Node attr = attrs.item(i);
             String name = attr.getLocalName();
@@ -1270,7 +1270,7 @@ public final class StaxUtils {
                                        XMLStreamReader reader, boolean repairing, boolean recordLoc,
                                        boolean isThreshold)
         throws XMLStreamException {
-        Stack<Node> stack = new Stack<Node>();
+        Stack<Node> stack = new Stack<>();
         int event = reader.getEventType();
         int elementCount = 0;
         while (reader.hasNext()) {
@@ -1370,7 +1370,7 @@ public final class StaxUtils {
     }
 
     public static class StreamToDOMContext {
-        private Stack<Node> stack = new Stack<Node>();
+        private Stack<Node> stack = new Stack<>();
         private int elementCount;
         private boolean repairing;
         private boolean recordLoc;

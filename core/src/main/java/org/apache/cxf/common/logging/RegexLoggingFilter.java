@@ -55,7 +55,7 @@ public class RegexLoggingFilter {
     private int regGroup = 1;
     private String regReplacement = DEFAULT_REPLACEMENT;
 
-    private List<ReplaceRegEx> regexs = new ArrayList<ReplaceRegEx>();
+    private List<ReplaceRegEx> regexs = new ArrayList<>();
 
     public CharSequence filter(CharSequence command) {
         if (regPattern != null) {

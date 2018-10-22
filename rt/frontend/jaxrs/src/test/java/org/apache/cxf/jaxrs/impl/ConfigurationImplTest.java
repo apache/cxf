@@ -224,7 +224,7 @@ public class ConfigurationImplTest extends Assert {
     @Test
     public void testServerFilterContractsOnClientIsRejected() {
         try (ConfigurableImpl<Client> configurable 
-                = new ConfigurableImpl<Client>(createClientProxy(), RuntimeType.CLIENT)) {
+                = new ConfigurableImpl<>(createClientProxy(), RuntimeType.CLIENT)) {
             Configuration config = configurable.getConfiguration();
             configurable.register(TestFilter.class);
             Map<Class<?>, Integer> contracts = config.getContracts(TestFilter.class);
@@ -339,7 +339,7 @@ public class ConfigurationImplTest extends Assert {
         LogUtils.getL7dLogger(ConfigurableImpl.class).addHandler(handler);
 
         try (ConfigurableImpl<Client> configurable 
-                = new ConfigurableImpl<Client>(createClientProxy(), RuntimeType.CLIENT)) {
+                = new ConfigurableImpl<>(createClientProxy(), RuntimeType.CLIENT)) {
             Configuration config = configurable.getConfiguration();
     
             configurable.register(ClientFilterConstrainedToServer.class);
@@ -362,7 +362,7 @@ public class ConfigurationImplTest extends Assert {
         LogUtils.getL7dLogger(ConfigurableImpl.class).addHandler(handler);
 
         try (ConfigurableImpl<Client> configurable 
-                = new ConfigurableImpl<Client>(createClientProxy(), RuntimeType.CLIENT)) {
+                = new ConfigurableImpl<>(createClientProxy(), RuntimeType.CLIENT)) {
             Configuration config = configurable.getConfiguration();
     
             configurable.register(ContainerResponseFilterImpl.class);

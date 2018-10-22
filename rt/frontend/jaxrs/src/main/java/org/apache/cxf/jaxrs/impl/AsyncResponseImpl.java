@@ -56,8 +56,8 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
     private volatile boolean resumedByApplication;
     private volatile Long pendingTimeout;
 
-    private List<CompletionCallback> completionCallbacks = new LinkedList<CompletionCallback>();
-    private List<ConnectionCallback> connectionCallbacks = new LinkedList<ConnectionCallback>();
+    private List<CompletionCallback> completionCallbacks = new LinkedList<>();
+    private List<ConnectionCallback> connectionCallbacks = new LinkedList<>();
     private Throwable unmappedThrowable;
 
     public AsyncResponseImpl(Message inMessage) {

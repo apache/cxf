@@ -75,7 +75,7 @@ public class JAXRSOverlappingDestinationsTest extends AbstractBusClientServerTes
 
             }
         };
-        FutureTask<String> task = new FutureTask<String>(callable);
+        FutureTask<String> task = new FutureTask<>(callable);
         ExecutorService executor = Executors.newFixedThreadPool(1);
         executor.execute(task);
         Thread.sleep(1000);
@@ -112,7 +112,7 @@ public class JAXRSOverlappingDestinationsTest extends AbstractBusClientServerTes
 
             }
         };
-        FutureTask<String> task = new FutureTask<String>(callable);
+        FutureTask<String> task = new FutureTask<>(callable);
         ExecutorService executor = Executors.newFixedThreadPool(1);
         executor.execute(task);
         Thread.sleep(3000);

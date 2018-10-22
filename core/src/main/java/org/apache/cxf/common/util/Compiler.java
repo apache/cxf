@@ -48,8 +48,8 @@ public class Compiler {
     private String encoding;
     private boolean forceFork = Boolean.getBoolean(Compiler.class.getName() + "-fork");
     private File classpathTmpFile;
-    private List<String> errors = new LinkedList<String>();
-    private List<String> warnings = new LinkedList<String>();
+    private List<String> errors = new LinkedList<>();
+    private List<String> warnings = new LinkedList<>();
 
     public Compiler() {
     }

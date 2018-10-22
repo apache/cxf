@@ -124,7 +124,7 @@ public class AuthorizationRequestHandler {
                         approvedScopesSet.add(perm);
                     }
                 }
-                List<OAuthPermission> approvedScopes = new LinkedList<OAuthPermission>(approvedScopesSet);
+                List<OAuthPermission> approvedScopes = new LinkedList<>(approvedScopesSet);
                 if (approvedScopes.isEmpty()) {
                     approvedScopes = originalScopes;
                 } else if (approvedScopes.size() < originalScopes.size()) {

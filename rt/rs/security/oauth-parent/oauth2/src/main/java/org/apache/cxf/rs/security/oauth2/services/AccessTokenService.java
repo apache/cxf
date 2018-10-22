@@ -50,8 +50,8 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
  */
 @Path("/token")
 public class AccessTokenService extends AbstractTokenService {
-    private List<AccessTokenGrantHandler> grantHandlers = new LinkedList<AccessTokenGrantHandler>();
-    private List<AccessTokenResponseFilter> responseHandlers = new LinkedList<AccessTokenResponseFilter>();
+    private List<AccessTokenGrantHandler> grantHandlers = new LinkedList<>();
+    private List<AccessTokenResponseFilter> responseHandlers = new LinkedList<>();
 
     /**
      * Sets the list of optional grant handlers

@@ -40,80 +40,80 @@ public class PrimitiveTextProviderTest extends Assert {
 
     @Test
     public void testNumberIsWriteable() {
-        MessageBodyWriter<Object> p = new PrimitiveTextProvider<Object>();
+        MessageBodyWriter<Object> p = new PrimitiveTextProvider<>();
         assertTrue(p.isWriteable(Byte.class, null, null, MediaType.TEXT_PLAIN_TYPE));
     }
 
     @Test
     public void testNumberIsNotWriteable() {
-        MessageBodyWriter<Object> p = new PrimitiveTextProvider<Object>();
+        MessageBodyWriter<Object> p = new PrimitiveTextProvider<>();
         assertFalse(p.isWriteable(Byte.class, null, null, MediaType.valueOf("text/custom")));
     }
 
     @Test
     public void testBooleanIsWriteable() {
-        MessageBodyWriter<Object> p = new PrimitiveTextProvider<Object>();
+        MessageBodyWriter<Object> p = new PrimitiveTextProvider<>();
         assertTrue(p.isWriteable(Boolean.class, null, null, MediaType.TEXT_PLAIN_TYPE));
     }
 
     @Test
     public void testBooleanIsNotWriteable() {
-        MessageBodyWriter<Object> p = new PrimitiveTextProvider<Object>();
+        MessageBodyWriter<Object> p = new PrimitiveTextProvider<>();
         assertFalse(p.isWriteable(Boolean.class, null, null, MediaType.valueOf("text/custom")));
     }
 
     @Test
     public void testCharacterIsWriteable() {
-        MessageBodyWriter<Object> p = new PrimitiveTextProvider<Object>();
+        MessageBodyWriter<Object> p = new PrimitiveTextProvider<>();
         assertTrue(p.isWriteable(Character.class, null, null, MediaType.TEXT_PLAIN_TYPE));
     }
 
     @Test
     public void testCharacterIsNotWriteable() {
-        MessageBodyWriter<Object> p = new PrimitiveTextProvider<Object>();
+        MessageBodyWriter<Object> p = new PrimitiveTextProvider<>();
         assertFalse(p.isWriteable(Character.class, null, null, MediaType.valueOf("text/custom")));
     }
 
     @Test
     public void testStringIsWriteable() {
-        MessageBodyWriter<Object> p = new PrimitiveTextProvider<Object>();
+        MessageBodyWriter<Object> p = new PrimitiveTextProvider<>();
         assertFalse(p.isWriteable(String.class, null, null, MediaType.TEXT_PLAIN_TYPE)
                    && p.isWriteable(String.class, null, null, MediaType.valueOf("text/custom")));
     }
 
     @Test
     public void testNumberIsReadable() {
-        MessageBodyReader<Object> p = new PrimitiveTextProvider<Object>();
+        MessageBodyReader<Object> p = new PrimitiveTextProvider<>();
         assertTrue(p.isReadable(Byte.class, null, null, MediaType.TEXT_PLAIN_TYPE));
     }
     @Test
     public void testNumberIsNotReadable() {
-        MessageBodyReader<Object> p = new PrimitiveTextProvider<Object>();
+        MessageBodyReader<Object> p = new PrimitiveTextProvider<>();
         assertFalse(p.isReadable(Byte.class, null, null, MediaType.valueOf("text/custom")));
     }
     @Test
     public void testBooleanIsReadable() {
-        MessageBodyReader<Object> p = new PrimitiveTextProvider<Object>();
+        MessageBodyReader<Object> p = new PrimitiveTextProvider<>();
         assertTrue(p.isReadable(Boolean.class, null, null, MediaType.TEXT_PLAIN_TYPE));
     }
     @Test
     public void testBooleanIsNotReadable() {
-        MessageBodyReader<Object> p = new PrimitiveTextProvider<Object>();
+        MessageBodyReader<Object> p = new PrimitiveTextProvider<>();
         assertFalse(p.isReadable(Boolean.class, null, null, MediaType.valueOf("text/custom")));
     }
     @Test
     public void testCharacterIsReadable() {
-        MessageBodyReader<Object> p = new PrimitiveTextProvider<Object>();
+        MessageBodyReader<Object> p = new PrimitiveTextProvider<>();
         assertTrue(p.isReadable(Character.class, null, null, MediaType.TEXT_PLAIN_TYPE));
     }
     @Test
     public void testCharacterIsNotReadable() {
-        MessageBodyReader<Object> p = new PrimitiveTextProvider<Object>();
+        MessageBodyReader<Object> p = new PrimitiveTextProvider<>();
         assertFalse(p.isReadable(Character.class, null, null, MediaType.valueOf("text/custom")));
     }
     @Test
     public void testStringIsReadable() {
-        MessageBodyReader<Object> p = new PrimitiveTextProvider<Object>();
+        MessageBodyReader<Object> p = new PrimitiveTextProvider<>();
         assertFalse(p.isReadable(String.class, null, null, MediaType.TEXT_PLAIN_TYPE)
                    && p.isReadable(String.class, null, null, MediaType.valueOf("text/custom")));
     }
@@ -121,7 +121,7 @@ public class PrimitiveTextProviderTest extends Assert {
     @SuppressWarnings("unchecked")
     @Test
     public void testReadByte() throws Exception {
-        MessageBodyReader<?> p = new PrimitiveTextProvider<Object>();
+        MessageBodyReader<?> p = new PrimitiveTextProvider<>();
 
         @SuppressWarnings("rawtypes")
         Byte valueRead = (Byte)p.readFrom((Class)Byte.TYPE,
@@ -138,7 +138,7 @@ public class PrimitiveTextProviderTest extends Assert {
     })
     @Test(expected = NoContentException.class)
     public void testReadEmptyByte() throws Exception {
-        MessageBodyReader<?> p = new PrimitiveTextProvider<Object>();
+        MessageBodyReader<?> p = new PrimitiveTextProvider<>();
 
         p.readFrom((Class)Byte.TYPE, null, null,
                                           null,
@@ -181,7 +181,7 @@ public class PrimitiveTextProviderTest extends Assert {
 
     @Test
     public void testWriteStringISO() throws Exception {
-        MessageBodyWriter<String> p = new PrimitiveTextProvider<String>();
+        MessageBodyWriter<String> p = new PrimitiveTextProvider<>();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         MultivaluedMap<String, Object> headers = new MetadataMap<String, Object>();
 
@@ -202,7 +202,7 @@ public class PrimitiveTextProviderTest extends Assert {
     public void testReadChineeseChars() throws Exception {
         String s = "中文";
 
-        MessageBodyReader<String> p = new PrimitiveTextProvider<String>();
+        MessageBodyReader<String> p = new PrimitiveTextProvider<>();
 
         String value = p.readFrom(String.class, null,
                 new Annotation[]{},
@@ -231,7 +231,7 @@ public class PrimitiveTextProviderTest extends Assert {
     }
 
     private void testClass(Object value) throws Exception {
-        final PrimitiveTextProvider<Object> p = new PrimitiveTextProvider<Object>();
+        final PrimitiveTextProvider<Object> p = new PrimitiveTextProvider<>();
 
         assertTrue(p.isWriteable(value.getClass(), null, null, MediaType.TEXT_PLAIN_TYPE));
         ByteArrayOutputStream os = new ByteArrayOutputStream();
