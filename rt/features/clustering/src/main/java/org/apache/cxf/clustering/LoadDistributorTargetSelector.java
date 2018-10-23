@@ -107,7 +107,7 @@ public class LoadDistributorTargetSelector extends FailoverTargetSelector {
         }
         Exchange exchange = message.getExchange();
         InvocationKey key = new InvocationKey(exchange);
-        InvocationContext invocation = inProgress.get(key);
+        InvocationContext invocation = getInvocationContext(key);
         if ((invocation != null) && !invocation.getContext().containsKey(IS_DISTRIBUTED)) {
             Endpoint target = getDistributionTarget(exchange, invocation);
             if (target != null) {

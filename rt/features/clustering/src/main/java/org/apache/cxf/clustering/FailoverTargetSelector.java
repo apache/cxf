@@ -51,8 +51,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
     private static final String COMPLETE_IF_SERVICE_NOT_AVAIL_PROPERTY =
         "org.apache.cxf.transport.complete_if_service_not_available";
 
-    protected ConcurrentHashMap<InvocationKey, InvocationContext> inProgress
-        = new ConcurrentHashMap<InvocationKey, InvocationContext>();
+    protected ConcurrentHashMap<String, InvocationContext> inProgress = new ConcurrentHashMap<>();
     protected FailoverStrategy failoverStrategy;
     private boolean supportNotAvailableErrorsOnly = true;
     private String clientBootstrapAddress;
@@ -112,7 +111,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
                                       bindingOperationInfo,
                                       params,
                                       context);
-            inProgress.putIfAbsent(key, invocation);
+            inProgress.putIfAbsent(String.valueOf(key.hashCode()), invocation);
         }
     }
 
@@ -138,7 +137,10 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
     }
 
     protected InvocationContext getInvocationContext(InvocationKey key) {
-        return inProgress.get(key);
+        if (key != null) {
+            return inProgress.get(String.valueOf(key.hashCode()));
+        }
+        return null;
     }
 
     /**
@@ -175,7 +177,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
         }
 
         if (!failover) {
-            inProgress.remove(key);
+            inProgress.remove(String.valueOf(key.hashCode()));
             doComplete(exchange);
         }
     }
@@ -405,7 +407,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
 
                 Exchange exchange = message.getExchange();
                 InvocationKey key = new InvocationKey(exchange);
-                InvocationContext invocation = inProgress.get(key);
+                InvocationContext invocation = getInvocationContext(key);
                 if (invocation != null) {
                     overrideAddressProperty(invocation.getContext(),
                                             cond.getTarget().getAddress().getValue());
