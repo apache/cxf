@@ -73,11 +73,17 @@ public class StringUtilsTest extends Assert {
     @Test
     public void testSplitWithDot() throws Exception {
         String str = "a.b.c";
-        String[] parts = StringUtils.split(str, "\\.", -1);
+        String[] parts = StringUtils.split(str, "\\.");
         assertEquals(3, parts.length);
         assertEquals("a", parts[0]);
         assertEquals("b", parts[1]);
         assertEquals("c", parts[2]);
+    }
+
+    @Test
+    public void testGetPattern() throws Exception {
+        assertSame(StringUtils.getPattern("\\."), StringUtils.getPattern("\\."));
+        assertNotSame(StringUtils.getPattern("123"), StringUtils.getPattern("123"));
     }
 
     @Test

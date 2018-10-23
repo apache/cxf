@@ -29,13 +29,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 public final class StringUtils {
-    public static final Map<String, Pattern> PATTERN_MAP = new HashMap<>();
+    private static final Map<String, Pattern> PATTERN_MAP = new HashMap<>();
     static {
         String patterns[] = {"/", " ", ":", ",", ";", "=", "\\.", "\\+"};
         for (String p : patterns) {
@@ -51,13 +52,13 @@ public final class StringUtils {
         return split(s, regex, 0);
     }
     public static String[] split(String s, String regex, int limit) {
-        Pattern p = PATTERN_MAP.getOrDefault(regex, Pattern.compile(regex));
-        return p.split(s, limit);
+        return getPattern(regex).split(s, limit);
     }
-    
     public static Stream<String> splitAsStream(String s, String regex) {
-        Pattern p = PATTERN_MAP.getOrDefault(regex, Pattern.compile(regex));
-        return p.splitAsStream(s);
+        return getPattern(regex).splitAsStream(s);
+    }
+    static Pattern getPattern(String regex) {
+        return Optional.ofNullable(PATTERN_MAP.get(regex)).orElseGet(() -> Pattern.compile(regex));
     }
 
     public static boolean isFileExist(String file) {
