@@ -61,7 +61,7 @@ public final class AnnotationUtils {
 
 
     private static Set<Class<?>> initParamAnnotationClasses() {
-        Set<Class<?>> classes = new HashSet<Class<?>>();
+        Set<Class<?>> classes = new HashSet<>();
         classes.add(PathParam.class);
         classes.add(QueryParam.class);
         classes.add(MatrixParam.class);
@@ -73,7 +73,7 @@ public final class AnnotationUtils {
     }
 
     private static Set<Class<?>> initMethodAnnotationClasses() {
-        Set<Class<?>> classes = new HashSet<Class<?>>();
+        Set<Class<?>> classes = new HashSet<>();
         classes.add(HttpMethod.class);
         classes.add(Path.class);
         classes.add(Produces.class);

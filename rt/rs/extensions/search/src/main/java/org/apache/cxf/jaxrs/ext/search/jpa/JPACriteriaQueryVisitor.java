@@ -141,7 +141,7 @@ public class JPACriteriaQueryVisitor<T, E> extends AbstractJPATypedQueryVisitor<
     }
 
     private List<Selection<?>> toSelectionsList(List<SingularAttribute<T, ?>> attributes, boolean setAlias) {
-        List<Selection<?>> selections = new ArrayList<Selection<?>>(attributes.size());
+        List<Selection<?>> selections = new ArrayList<>(attributes.size());
         for (SingularAttribute<T, ?> attr : attributes) {
             Path<?> path = getRoot().get(attr);
             path.alias(attr.getName());

@@ -57,8 +57,7 @@ public final class BadgerFishProvider
     implements MessageBodyReader<Object>, MessageBodyWriter<Object>  {
 
 
-    private static Map<Class<?>, JAXBContext> jaxbContexts
-        = new WeakHashMap<Class<?>, JAXBContext>();
+    private static Map<Class<?>, JAXBContext> jaxbContexts = new WeakHashMap<>();
     @Context
     private HttpHeaders requestHeaders;
 

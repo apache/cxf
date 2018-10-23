@@ -141,7 +141,7 @@ public class MessageImpl extends StringMapImpl implements Message {
 
     public Set<Class<?>> getContentFormats() {
 
-        Set<Class<?>> c = new HashSet<Class<?>>();
+        Set<Class<?>> c = new HashSet<>();
         for (int x = 0; x < index; x += 2) {
             c.add((Class<?>)contents[x]);
         }

@@ -40,7 +40,7 @@ public class InMessageRecorder extends AbstractPhaseInterceptor<Message> {
 
     public InMessageRecorder() {
         super(Phase.RECEIVE);
-        inbound = new CopyOnWriteArrayList<byte[]>();
+        inbound = new CopyOnWriteArrayList<>();
     }
 
     public void handleMessage(Message message) throws Fault {

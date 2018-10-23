@@ -1799,8 +1799,8 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
             List<String> yOrig = Arrays.asList("I", "am", "SimpleList");
 
             // Invoke testUnionWithStringList
-            Holder<List<String>> y = new Holder<List<String>>(yOrig);
-            Holder<List<String>> z = new Holder<List<String>>();
+            Holder<List<String>> y = new Holder<>(yOrig);
+            Holder<List<String>> z = new Holder<>();
             List<String> ret = testDocLiteral ? docClient.testUnionWithStringList(x, y, z)
                     : xmlClient.testUnionWithStringList(x, y, z);
             if (!perfTestOnly) {
@@ -1814,8 +1814,8 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
             String[] x = {"5"};
             String[] yOrig = {"I", "am", "SimpleList"};
 
-            Holder<String[]> y = new Holder<String[]>(yOrig);
-            Holder<String[]> z = new Holder<String[]>();
+            Holder<String[]> y = new Holder<>(yOrig);
+            Holder<String[]> z = new Holder<>();
 
             String[] ret = rpcClient.testUnionWithStringList(x, y, z);
             if (!perfTestOnly) {
@@ -1841,8 +1841,8 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
             List<String> yOrig = Arrays.asList("I", "am", "SimpleList");
 
             // Invoke testUnionWithStringListRestriction
-            Holder<List<String>> y = new Holder<List<String>>(yOrig);
-            Holder<List<String>> z = new Holder<List<String>>();
+            Holder<List<String>> y = new Holder<>(yOrig);
+            Holder<List<String>> z = new Holder<>();
             List<String> ret = testDocLiteral ? docClient.testUnionWithStringListRestriction(x, y, z)
                     : xmlClient.testUnionWithStringListRestriction(x, y, z);
             if (!perfTestOnly) {
@@ -1856,8 +1856,8 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
             String[] x = {"5"};
             String[] yOrig = {"I", "am", "SimpleList"};
 
-            Holder<String[]> y = new Holder<String[]>(yOrig);
-            Holder<String[]> z = new Holder<String[]>();
+            Holder<String[]> y = new Holder<>(yOrig);
+            Holder<String[]> z = new Holder<>();
 
             String[] ret = rpcClient.testUnionWithStringListRestriction(x, y, z);
             if (!perfTestOnly) {
@@ -1888,8 +1888,8 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
                 "12.78e-2", "12", "-0", "INF");
 
             // Invoke testUnionWithAnonList
-            Holder<List<String>> y = new Holder<List<String>>(yOrig);
-            Holder<List<String>> z = new Holder<List<String>>();
+            Holder<List<String>> y = new Holder<>(yOrig);
+            Holder<List<String>> z = new Holder<>();
             List<String> ret = testDocLiteral ? docClient.testUnionWithAnonList(x, y, z)
                     : xmlClient.testUnionWithAnonList(x, y, z);
             if (!perfTestOnly) {
@@ -1903,8 +1903,8 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
             //String[] yOrig = {"0.5f", "1.5f", "2.5f"};
             String[] yOrig = {"-1E4", "1267.43233E12", "12.78e-2", "12", "-0", "INF"};
 
-            Holder<String[]> y = new Holder<String[]>(yOrig);
-            Holder<String[]> z = new Holder<String[]>();
+            Holder<String[]> y = new Holder<>(yOrig);
+            Holder<String[]> z = new Holder<>();
 
             String[] ret = rpcClient.testUnionWithStringListRestriction(x, y, z);
             if (!perfTestOnly) {

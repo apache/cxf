@@ -76,7 +76,7 @@ public final class Client {
 
         System.out.println("\nStarting MTOM Test using basic byte array:");
         Holder<String> name = new Holder<>("Sam");
-        Holder<byte[]> param = new Holder<byte[]>();
+        Holder<byte[]> param = new Holder<>();
         param.value = new byte[(int) fileSize];
         InputStream in = fileURL.openStream();
         int len = in.read(param.value);

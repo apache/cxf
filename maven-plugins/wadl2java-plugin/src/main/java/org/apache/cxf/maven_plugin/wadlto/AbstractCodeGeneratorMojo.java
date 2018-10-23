@@ -263,7 +263,7 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
     protected void forkOnce(Set<URI> classPath, List<WadlOption> effectiveOptions)
         throws MojoExecutionException {
         List<WadlOption> toDo = new LinkedList<>();
-        List<List<String>> wargs = new LinkedList<List<String>>();
+        List<List<String>> wargs = new LinkedList<>();
         for (WadlOption option : effectiveOptions) {
             File outputDirFile = option.getOutputDir();
             outputDirFile.mkdirs();

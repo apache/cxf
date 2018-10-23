@@ -235,7 +235,7 @@ public class DoMerges {
         reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
         line = reader.readLine();
 
-        List<String[]> map = new LinkedList<String[]>();
+        List<String[]> map = new LinkedList<>();
         List<String> list = new ArrayList<>(10);
         while (line != null) {
             if (line.length() > 0 && line.startsWith("commit ")) {
@@ -546,7 +546,7 @@ public class DoMerges {
         if (gitLogs == null) {
             return false;
         }
-        List<List<String>> matchingLogs = new LinkedList<List<String>>();
+        List<List<String>> matchingLogs = new LinkedList<>();
         for (String[] f : gitLogs) {
             List<String> ll = compareLogs(f, logLines);
             if (!ll.isEmpty()) {

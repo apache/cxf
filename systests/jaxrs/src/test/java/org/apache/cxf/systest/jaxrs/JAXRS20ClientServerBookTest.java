@@ -457,7 +457,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
 
         wc.accept(mt).type(mt);
         GenericEntity<List<Book>> collectionEntity = createGenericEntity();
-        final Holder<List<Book>> holder = new Holder<List<Book>>();
+        final Holder<List<Book>> holder = new Holder<>();
         InvocationCallback<List<Book>> callback = new CustomInvocationCallback(holder);
 
         Future<List<Book>> future = wc.async().post(Entity.entity(collectionEntity, mt),

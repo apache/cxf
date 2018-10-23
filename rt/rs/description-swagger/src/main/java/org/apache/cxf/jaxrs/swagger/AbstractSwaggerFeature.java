@@ -87,7 +87,7 @@ public abstract class AbstractSwaggerFeature extends AbstractFeature {
         if (resourceInfos.size() == 1) {
             setResourcePackage(resourceInfos.get(0).getServiceClass().getPackage().getName());
         } else {
-            List<Class<?>> serviceClasses = new ArrayList<Class<?>>(resourceInfos.size());
+            List<Class<?>> serviceClasses = new ArrayList<>(resourceInfos.size());
             for (ClassResourceInfo cri : resourceInfos) {
                 serviceClasses.add(cri.getServiceClass());
             }

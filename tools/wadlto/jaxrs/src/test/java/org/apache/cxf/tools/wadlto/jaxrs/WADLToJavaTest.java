@@ -102,7 +102,7 @@ public class WADLToJavaTest extends ProcessorTestBase {
         URLClassLoader cl = new URLClassLoader(new URL[] {output.toURI().toURL()},
                                             Thread.currentThread().getContextClassLoader());
 
-        List<Class<?>> files = new ArrayList<Class<?>>(4);
+        List<Class<?>> files = new ArrayList<>(4);
         files.add(cl.loadClass("superbooks.EnumType"));
         files.add(cl.loadClass("superbooks.Book"));
         files.add(cl.loadClass("superbooks.TheBook2"));

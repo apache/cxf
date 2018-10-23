@@ -74,7 +74,7 @@ public class LogicalHandlerInterceptorTest extends Assert {
 
     @Test
     public void testInterceptSuccess() {
-        List<LogicalHandler<?>> list = new ArrayList<LogicalHandler<?>>();
+        List<LogicalHandler<?>> list = new ArrayList<>();
         list.add(new LogicalHandler<LogicalMessageContext>() {
             public void close(MessageContext arg0) {
             }

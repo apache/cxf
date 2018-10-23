@@ -55,7 +55,7 @@ public class JavaToWSDLProcessor implements Processor {
     private static final String DEFAULT_ADDRESS = "http://localhost:9090/hello";
     private static final String JAVA_CLASS_PATH = "java.class.path";
     private ToolContext context;
-    private final List<AbstractGenerator<?>> generators = new ArrayList<AbstractGenerator<?>>();
+    private final List<AbstractGenerator<?>> generators = new ArrayList<>();
 
     private void customize(ServiceInfo service) {
         if (context.containsKey(ToolConstants.CFG_TNS)) {

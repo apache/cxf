@@ -96,7 +96,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         new HashSet<Class<?>>(Arrays.asList(InputStream.class,
                                             OutputStream.class,
                                             StreamingOutput.class));
-    protected Set<Class<?>> collectionContextClasses = new HashSet<Class<?>>();
+    protected Set<Class<?>> collectionContextClasses = new HashSet<>();
 
     protected Map<String, String> jaxbElementClassMap = Collections.emptyMap();
     protected boolean unmarshalAsJaxbElement;
@@ -190,11 +190,11 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
             JAXBContext context = null;
             Set<Class<?>> allTypes = null;
             if (cris != null) {
-                allTypes = new HashSet<Class<?>>(ResourceUtils.getAllRequestResponseTypes(cris, true)
+                allTypes = new HashSet<>(ResourceUtils.getAllRequestResponseTypes(cris, true)
                     .getAllTypes().keySet());
                 context = ResourceUtils.createJaxbContext(allTypes, extraClass, cProperties);
             } else if (extraClass != null) {
-                allTypes = new HashSet<Class<?>>(Arrays.asList(extraClass));
+                allTypes = new HashSet<>(Arrays.asList(extraClass));
                 context = ResourceUtils.createJaxbContext(allTypes, null, cProperties);
             }
 

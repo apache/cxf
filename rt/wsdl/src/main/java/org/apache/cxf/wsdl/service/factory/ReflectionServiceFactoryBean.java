@@ -1459,7 +1459,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
     }
 
     private Map<Class<?>, Boolean> getJaxbAnnoMap(MessagePartInfo mpi) {
-        Map<Class<?>, Boolean> map = new ConcurrentHashMap<Class<?>, Boolean>(4, 0.75f, 1);
+        Map<Class<?>, Boolean> map = new ConcurrentHashMap<>(4, 0.75f, 1);
         Annotation[] anns = getMethodParameterAnnotations(mpi);
 
         if (anns != null) {

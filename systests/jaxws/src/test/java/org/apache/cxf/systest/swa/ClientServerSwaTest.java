@@ -68,7 +68,7 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         setAddress(port, "http://localhost:" + serverPort + "/swa-nomime");
 
         Holder<String> textHolder = new Holder<>("Hi");
-        Holder<byte[]> data = new Holder<byte[]>("foobar".getBytes());
+        Holder<byte[]> data = new Holder<>("foobar".getBytes());
 
         port.echoData(textHolder, data);
         String string = IOUtils.newStringFromBytes(data.value);
@@ -84,8 +84,8 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         Holder<String> attach1 = new Holder<>(IOUtils.toString(url1.openStream()));
         Holder<String> attach2 = new Holder<>(IOUtils.toString(url2.openStream()));
         Holder<String> attach3 = new Holder<>(IOUtils.toString(url3.openStream()));
-        Holder<byte[]> attach4 = new Holder<byte[]>(IOUtils.readBytesFromStream(url4.openStream()));
-        Holder<byte[]> attach5 = new Holder<byte[]>(IOUtils.readBytesFromStream(url5.openStream()));
+        Holder<byte[]> attach4 = new Holder<>(IOUtils.readBytesFromStream(url4.openStream()));
+        Holder<byte[]> attach5 = new Holder<>(IOUtils.readBytesFromStream(url5.openStream()));
         org.apache.cxf.swa_nomime.types.VoidRequest request
             = new org.apache.cxf.swa_nomime.types.VoidRequest();
         org.apache.cxf.swa_nomime.types.OutputResponseAll response

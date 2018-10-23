@@ -191,8 +191,7 @@ public class JSONProviderTest extends Assert {
     @Test
     public void testWriteCollectionWithoutXmlRootElement()
         throws Exception {
-        JSONProvider<List<SuperBook>> provider
-            = new JSONProvider<List<SuperBook>>();
+        JSONProvider<List<SuperBook>> provider = new JSONProvider<>();
         provider.setCollectionWrapperName("{http://superbooks}SuperBooks");
         provider.setJaxbElementClassMap(Collections.singletonMap(
                 SuperBook.class.getName(),
@@ -367,8 +366,7 @@ public class JSONProviderTest extends Assert {
 
     private void doTestWriteCollectionParameterDef(boolean asJaxbElement)
         throws Exception {
-        JSONProvider<List<ReportDefinition>> provider
-            = new JSONProvider<List<ReportDefinition>>();
+        JSONProvider<List<ReportDefinition>> provider = new JSONProvider<>();
         provider.setMarshallAsJaxbElement(asJaxbElement);
         provider.setUnmarshallAsJaxbElement(asJaxbElement);
         ReportDefinition r = new ReportDefinition();
@@ -762,7 +760,7 @@ public class JSONProviderTest extends Assert {
     public void doWriteQualifiedCollection(boolean drop, boolean serializeAsArray,
                                            boolean ignoreNamespaces, String data)
         throws Exception {
-        JSONProvider<List<?>> p = new JSONProvider<List<?>>();
+        JSONProvider<List<?>> p = new JSONProvider<>();
         p.setCollectionWrapperName("{http://tags}tag");
         p.setDropCollectionWrapperElement(drop);
         p.setSerializeAsArray(serializeAsArray);
@@ -800,7 +798,7 @@ public class JSONProviderTest extends Assert {
 
     @Test
     public void testWriteUnqualifiedCollection() throws Exception {
-        JSONProvider<List<Book>> p = new JSONProvider<List<Book>>();
+        JSONProvider<List<Book>> p = new JSONProvider<>();
         List<Book> books = new ArrayList<>();
         books.add(new Book("CXF", 123L));
         ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -947,7 +945,7 @@ public class JSONProviderTest extends Assert {
         Unmarshaller um = context.createUnmarshaller();
         JAXBElement<?> jaxbEl = um.unmarshal(new StreamSource(is), Books.class);
 
-        JSONProvider<JAXBElement<?>> p = new JSONProvider<JAXBElement<?>>();
+        JSONProvider<JAXBElement<?>> p = new JSONProvider<>();
         p.setIgnoreMixedContent(ignore);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
 
@@ -1390,7 +1388,7 @@ public class JSONProviderTest extends Assert {
     public void testOutAttributesAsElementsForList() throws Exception {
 
         //Provider
-        JSONProvider<List<?>> provider = new JSONProvider<List<?>>();
+        JSONProvider<List<?>> provider = new JSONProvider<>();
         provider.setCollectionWrapperName("tagholders");
         Map<String, String> map = new HashMap<>();
         map.put("{http://tags}*", "*");

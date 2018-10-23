@@ -43,10 +43,10 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
     private QNamesMap attributesMap;
     private Map<QName, ElementProperty> appendMap = new HashMap<>(5);
     private Map<String, String> nsMap = new HashMap<>(5);
-    private List<Set<String>> writtenUris = new LinkedList<Set<String>>();
+    private List<Set<String>> writtenUris = new LinkedList<>();
 
     private Set<QName> dropElements;
-    private List<List<ParsingEvent>> pushedAheadEvents = new LinkedList<List<ParsingEvent>>();
+    private List<List<ParsingEvent>> pushedAheadEvents = new LinkedList<>();
     private List<QName> elementsStack = new LinkedList<>();
     private String replaceNamespace;
     private String replaceText;

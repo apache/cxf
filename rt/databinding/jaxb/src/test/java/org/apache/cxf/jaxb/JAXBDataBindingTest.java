@@ -193,7 +193,7 @@ public class JAXBDataBindingTest extends Assert {
         Map<String, Object> contextProperties = new HashMap<>();
         contextProperties.put("com.sun.xml.bind.defaultNamespaceRemap", "uri:ultima:thule");
         db.setContextProperties(contextProperties);
-        Set<Class<?>> classes = new HashSet<Class<?>>();
+        Set<Class<?>> classes = new HashSet<>();
         classes.add(UnqualifiedBean.class);
         db.setContext(db.createJAXBContext(classes));
         DataWriter<XMLStreamWriter> writer = db.createWriter(XMLStreamWriter.class);
@@ -215,7 +215,7 @@ public class JAXBDataBindingTest extends Assert {
         db.setNamespaceMap(nsMap);
         Map<String, Object> contextProperties = new HashMap<>();
         db.setContextProperties(contextProperties);
-        Set<Class<?>> classes = new HashSet<Class<?>>();
+        Set<Class<?>> classes = new HashSet<>();
         classes.add(QualifiedBean.class);
 
         //have to fastboot to avoid conflicts of generated accessors
@@ -291,7 +291,7 @@ public class JAXBDataBindingTest extends Assert {
 
     @Test
     public void testResursiveType() throws Exception {
-        Set<Class<?>> classes = new HashSet<Class<?>>();
+        Set<Class<?>> classes = new HashSet<>();
         Collection<Object> typeReferences = new ArrayList<>();
         Map<String, Object> props = new HashMap<>();
         JAXBContextInitializer init = new JAXBContextInitializer(null, classes, typeReferences, props);

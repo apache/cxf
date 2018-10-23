@@ -136,7 +136,7 @@ public class ClassResourceInfoTest extends Assert {
     public void testGetHttpContexts() {
         ClassResourceInfo c = new ClassResourceInfo(TestClass.class, true);
         List<Field> fields = c.getContextFields();
-        Set<Class<?>> clses = new HashSet<Class<?>>();
+        Set<Class<?>> clses = new HashSet<>();
         for (Field f : fields) {
             clses.add(f.getType());
         }
@@ -266,7 +266,7 @@ public class ClassResourceInfoTest extends Assert {
     public class TestApplication extends Application {
         @Override
         public Set<Class<?>> getClasses() {
-            Set<Class<?>> classes = new HashSet<Class<?>>();
+            Set<Class<?>> classes = new HashSet<>();
             classes.add(TestClass.class);
             return classes;
         }

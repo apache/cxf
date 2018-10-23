@@ -42,9 +42,9 @@ public class ASMHelper {
     protected static final Map<Class<?>, Integer> PRIMITIVE_ZERO_MAP = new HashMap<>();
 
     protected static final Map<ClassLoader, WeakReference<TypeHelperClassLoader>> LOADER_MAP
-        = new WeakIdentityHashMap<ClassLoader, WeakReference<TypeHelperClassLoader>>();
+        = new WeakIdentityHashMap<>();
     protected static final Map<Class<?>, WeakReference<TypeHelperClassLoader>> CLASS_MAP
-        = new WeakIdentityHashMap<Class<?>, WeakReference<TypeHelperClassLoader>>();
+        = new WeakIdentityHashMap<>();
 
     protected static boolean badASM;
     private static Class<?> cwClass;

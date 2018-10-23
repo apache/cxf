@@ -84,7 +84,7 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.SAML_TOKEN_UNSIGNED);
         properties.setActions(actions);
         properties.setSamlCallbackHandler(new SAML1CallbackHandler());
@@ -158,7 +158,7 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.SAML_TOKEN_SIGNED);
         properties.setActions(actions);
         properties.setSamlCallbackHandler(new SAML1CallbackHandler());
@@ -240,7 +240,7 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.SAML_TOKEN_UNSIGNED);
         properties.setActions(actions);
         properties.setSamlCallbackHandler(new SAML2CallbackHandler());
@@ -316,7 +316,7 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.SAML_TOKEN_SIGNED);
         properties.setActions(actions);
         properties.setSamlCallbackHandler(new SAML2CallbackHandler());
@@ -400,7 +400,7 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.SAML_TOKEN_SIGNED);
         properties.setActions(actions);
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
@@ -513,7 +513,7 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.SAML_TOKEN_SIGNED);
         properties.setActions(actions);
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();

@@ -45,7 +45,7 @@ public class OutMessageRecorder extends AbstractPhaseInterceptor<Message> {
 
     public OutMessageRecorder() {
         super(Phase.PREPARE_SEND);
-        outbound = new CopyOnWriteArrayList<byte[]>();
+        outbound = new CopyOnWriteArrayList<>();
         addAfter(MessageSenderInterceptor.class.getName());
     }
 

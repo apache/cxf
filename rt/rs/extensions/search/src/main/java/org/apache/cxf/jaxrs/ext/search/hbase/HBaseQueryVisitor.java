@@ -39,7 +39,7 @@ import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 
 public class HBaseQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Filter> {
 
-    private Stack<List<Filter>> queryStack = new Stack<List<Filter>>();
+    private Stack<List<Filter>> queryStack = new Stack<>();
     private String family;
     private Map<String, String> familyMap;
     public HBaseQueryVisitor(String family) {

@@ -45,7 +45,7 @@ public class CertConstraints {
         /**
          * a collection of compiled regular expression patterns
          */
-        private final Collection<Pattern> dnPatterns = new ArrayList<java.util.regex.Pattern>();
+        private final Collection<Pattern> dnPatterns = new ArrayList<>();
 
         /**
          * Creates a DNConstraints from a list of Strings

@@ -54,7 +54,7 @@ public final class WriteZoo {
 
         context = new AegisContext();
         context.setWriteXsiTypes(true);
-        Set<java.lang.reflect.Type> rootClasses = new HashSet<java.lang.reflect.Type>();
+        Set<java.lang.reflect.Type> rootClasses = new HashSet<>();
         rootClasses.add(Zoo.class);
         context.setRootClasses(rootClasses);
         context.initialize();

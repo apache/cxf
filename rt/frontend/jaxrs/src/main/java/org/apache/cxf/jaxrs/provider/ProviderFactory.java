@@ -209,7 +209,7 @@ public abstract class ProviderFactory {
         if (contextCls == null) {
             return null;
         }
-        List<ContextResolver<T>> candidates = new LinkedList<ContextResolver<T>>();
+        List<ContextResolver<T>> candidates = new LinkedList<>();
         for (ProviderInfo<ContextResolver<?>> cr : contextResolvers) {
             Type[] types = cr.getProvider().getClass().getGenericInterfaces();
             for (Type t : types) {
@@ -959,7 +959,7 @@ public abstract class ProviderFactory {
                 map.add(provider, entryName);
             }
         }
-        List<ProviderInfo<T>> list = new LinkedList<ProviderInfo<T>>();
+        List<ProviderInfo<T>> list = new LinkedList<>();
         for (Map.Entry<ProviderInfo<T>, List<String>> entry : map.entrySet()) {
             List<String> values = entry.getValue();
             if (names.containsAll(values)) {

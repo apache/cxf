@@ -181,7 +181,7 @@ public abstract class AbstractResourceInfo {
             property = bus.getProperty(prop);
             if (property == null && create) {
                 Map<Class<?>, Map<T, ThreadLocalProxy<?>>> map
-                    = new ConcurrentHashMap<Class<?>, Map<T, ThreadLocalProxy<?>>>(2);
+                    = new ConcurrentHashMap<>(2);
                 bus.setProperty(prop, map);
                 property = map;
             }
@@ -201,7 +201,7 @@ public abstract class AbstractResourceInfo {
         Object property = bus.getProperty(CONSTRUCTOR_PROXY_MAP);
         if (property == null) {
             Map<Class<?>, Map<Class<?>, ThreadLocalProxy<?>>> map
-                = new ConcurrentHashMap<Class<?>, Map<Class<?>, ThreadLocalProxy<?>>>(2);
+                = new ConcurrentHashMap<>(2);
             bus.setProperty(CONSTRUCTOR_PROXY_MAP, map);
             property = map;
         }

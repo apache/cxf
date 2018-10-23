@@ -2226,8 +2226,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
             List<Short> x = Arrays.asList((short)10, (short)100);
             List<Short> yOrig = Arrays.asList((short)1000, (short)10);
 
-            Holder<List<Short>> y = new Holder<List<Short>>(yOrig);
-            Holder<List<Short>> z = new Holder<List<Short>>();
+            Holder<List<Short>> y = new Holder<>(yOrig);
+            Holder<List<Short>> z = new Holder<>();
 
             List<Short> ret = testDocLiteral ? docClient.testAnonEnumList(x, y, z) : xmlClient
                 .testAnonEnumList(x, y, z);
@@ -2240,8 +2240,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
             Short[] x = {(short)10, (short)100};
             Short[] yOrig = {(short)1000, (short)10};
 
-            Holder<Short[]> y = new Holder<Short[]>(yOrig);
-            Holder<Short[]> z = new Holder<Short[]>();
+            Holder<Short[]> y = new Holder<>(yOrig);
+            Holder<Short[]> z = new Holder<>();
 
             Short[] ret = rpcClient.testAnonEnumList(x, y, z);
 

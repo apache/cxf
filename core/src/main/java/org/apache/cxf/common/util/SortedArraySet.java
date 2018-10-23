@@ -45,7 +45,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * @param <T>
  */
 public final class SortedArraySet<T> implements SortedSet<T> {
-    final AtomicReference<T[]> data = new AtomicReference<T[]>();
+    final AtomicReference<T[]> data = new AtomicReference<>();
 
     public void clear() {
         data.set(null);

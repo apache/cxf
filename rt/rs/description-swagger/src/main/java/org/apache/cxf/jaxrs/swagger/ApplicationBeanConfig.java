@@ -32,7 +32,7 @@ public class ApplicationBeanConfig extends BeanConfig {
     }
     @Override
     public Set<Class<?>> classes() {
-        Set<Class<?>> allClasses = new HashSet<Class<?>>();
+        Set<Class<?>> allClasses = new HashSet<>();
         allClasses.addAll(app.getClasses());
         for (Object singleton : app.getSingletons()) {
             allClasses.add(singleton.getClass());

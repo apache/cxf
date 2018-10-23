@@ -1035,8 +1035,8 @@ public abstract class AbstractTypeTestClient
         if (testDocLiteral || testXMLBinding) {
             List<String> x = Arrays.asList("123:abc");
             List<String> yOrig = Arrays.asList("abc.-_:", "a");
-            Holder<List<String>> y = new Holder<List<String>>(yOrig);
-            Holder<List<String>> z = new Holder<List<String>>();
+            Holder<List<String>> y = new Holder<>(yOrig);
+            Holder<List<String>> z = new Holder<>();
             List<String> ret = testXMLBinding ? xmlClient.testNMTOKENS(x, y, z) : docClient.testNMTOKENS(x, y, z);
             assertTrue("testNMTOKENS(): Incorrect value for inout param", x.equals(y.value));
             assertTrue("testNMTOKENS(): Incorrect value for out param", yOrig.equals(z.value));
@@ -1048,8 +1048,8 @@ public abstract class AbstractTypeTestClient
             yOrig[0] = "abc.-_:";
             yOrig[1] = "a";
 
-            Holder<String[]> y = new Holder<String[]>(yOrig);
-            Holder<String[]> z = new Holder<String[]>();
+            Holder<String[]> y = new Holder<>(yOrig);
+            Holder<String[]> z = new Holder<>();
 
             String[] ret = rpcClient.testNMTOKENS(x, y, z);
             assertTrue("testNMTOKENS(): Incorrect value for inout param", Arrays.equals(x, y.value));
@@ -1304,9 +1304,9 @@ public abstract class AbstractTypeTestClient
             return;
         }
         byte[] x = "hello".getBytes();
-        Holder<byte[]> y = new Holder<byte[]>("goodbye".getBytes());
-        Holder<byte[]> yOriginal = new Holder<byte[]>("goodbye".getBytes());
-        Holder<byte[]> z = new Holder<byte[]>();
+        Holder<byte[]> y = new Holder<>("goodbye".getBytes());
+        Holder<byte[]> yOriginal = new Holder<>("goodbye".getBytes());
+        Holder<byte[]> z = new Holder<>();
         byte[] ret;
         if (testDocLiteral) {
             ret = docClient.testHexBinary(x, y, z);
@@ -1329,9 +1329,9 @@ public abstract class AbstractTypeTestClient
             return;
         }
         byte[] x = "hello".getBytes();
-        Holder<byte[]> y = new Holder<byte[]>("goodbye".getBytes());
-        Holder<byte[]> yOriginal = new Holder<byte[]>("goodbye".getBytes());
-        Holder<byte[]> z = new Holder<byte[]>();
+        Holder<byte[]> y = new Holder<>("goodbye".getBytes());
+        Holder<byte[]> yOriginal = new Holder<>("goodbye".getBytes());
+        Holder<byte[]> z = new Holder<>();
         byte[] ret;
         if (testDocLiteral) {
             ret = docClient.testBase64Binary(x, y, z);
@@ -1349,8 +1349,8 @@ public abstract class AbstractTypeTestClient
 
         // Test uninitialized holder value
         try {
-            y = new Holder<byte[]>();
-            z = new Holder<byte[]>();
+            y = new Holder<>();
+            z = new Holder<>();
             if (testDocLiteral) {
                 docClient.testBase64Binary(x, y, z);
             } else if (testXMLBinding) {
@@ -1879,8 +1879,8 @@ public abstract class AbstractTypeTestClient
         // normal case, maxLength=10 && minLength=1
         byte[] x = "x".getBytes();
         byte[] yOrig = "string_yyy".getBytes();
-        Holder<byte[]> y = new Holder<byte[]>(yOrig);
-        Holder<byte[]> z = new Holder<byte[]>();
+        Holder<byte[]> y = new Holder<>(yOrig);
+        Holder<byte[]> z = new Holder<>();
 
         byte[] ret;
         if (testDocLiteral) {
@@ -1900,8 +1900,8 @@ public abstract class AbstractTypeTestClient
         if (testDocLiteral || testXMLBinding) {
             // abnormal case
             x = "".getBytes();
-            y = new Holder<byte[]>(yOrig);
-            z = new Holder<byte[]>();
+            y = new Holder<>(yOrig);
+            z = new Holder<>();
             try {
                 ret = docClient.testHexBinaryRestriction(x, y, z);
                 fail("maxLength=10 && minLength=1 restriction is violated.");
@@ -1912,8 +1912,8 @@ public abstract class AbstractTypeTestClient
             // abnormal case
             x = "string_x".getBytes();
             yOrig = "string_yyyyyy".getBytes();
-            y = new Holder<byte[]>(yOrig);
-            z = new Holder<byte[]>();
+            y = new Holder<>(yOrig);
+            z = new Holder<>();
             try {
                 ret = testDocLiteral ? docClient.testHexBinaryRestriction(x, y, z) : xmlClient
                     .testHexBinaryRestriction(x, y, z);
@@ -1937,8 +1937,8 @@ public abstract class AbstractTypeTestClient
         }
         byte[] x = "string_xxx".getBytes();
         byte[] yOrig = "string_yyy".getBytes();
-        Holder<byte[]> y = new Holder<byte[]>(yOrig);
-        Holder<byte[]> z = new Holder<byte[]>();
+        Holder<byte[]> y = new Holder<>(yOrig);
+        Holder<byte[]> z = new Holder<>();
 
         byte[] ret;
         if (testDocLiteral) {
@@ -1959,8 +1959,8 @@ public abstract class AbstractTypeTestClient
         if (testDocLiteral) {
             // abnormal case
             x = "string_xxxxx".getBytes();
-            y = new Holder<byte[]>(yOrig);
-            z = new Holder<byte[]>();
+            y = new Holder<>(yOrig);
+            z = new Holder<>();
             try {
                 ret = docClient.testBase64BinaryRestriction(x, y, z);
                 fail("length=10 restriction is violated.");
@@ -1978,8 +1978,8 @@ public abstract class AbstractTypeTestClient
         if (testDocLiteral || testXMLBinding) {
             List<String> x = Arrays.asList("I", "am", "SimpleList");
             List<String> yOrig = Arrays.asList("Does", "SimpleList", "Work");
-            Holder<List<String>> y = new Holder<List<String>>(yOrig);
-            Holder<List<String>> z = new Holder<List<String>>();
+            Holder<List<String>> y = new Holder<>(yOrig);
+            Holder<List<String>> z = new Holder<>();
             List<String> ret = testDocLiteral ? docClient.testSimpleListRestriction2(x, y, z) : xmlClient
                 .testSimpleListRestriction2(x, y, z);
             if (!perfTestOnly) {
@@ -1988,8 +1988,8 @@ public abstract class AbstractTypeTestClient
                 assertTrue("testStringList(): Incorrect return value", x.equals(ret));
             }
             x = new ArrayList<>();
-            y = new Holder<List<String>>(yOrig);
-            z = new Holder<List<String>>();
+            y = new Holder<>(yOrig);
+            z = new Holder<>();
             try {
                 ret = testDocLiteral ? docClient.testSimpleListRestriction2(x, y, z) : xmlClient
                     .testSimpleListRestriction2(x, y, z);
@@ -2000,8 +2000,8 @@ public abstract class AbstractTypeTestClient
         } else {
             String[] x = {"I", "am", "SimpleList"};
             String[] yOrig = {"Does", "SimpleList", "Work"};
-            Holder<String[]> y = new Holder<String[]>(yOrig);
-            Holder<String[]> z = new Holder<String[]>();
+            Holder<String[]> y = new Holder<>(yOrig);
+            Holder<String[]> z = new Holder<>();
 
             // normal case, maxLength=10 && minLength=1
             String[] ret = rpcClient.testSimpleListRestriction2(x, y, z);
@@ -2027,8 +2027,8 @@ public abstract class AbstractTypeTestClient
         if (testDocLiteral || testXMLBinding) {
             List<String> x = Arrays.asList("I", "am", "SimpleList");
             List<String> yOrig = Arrays.asList("Does", "SimpleList", "Work");
-            Holder<List<String>> y = new Holder<List<String>>(yOrig);
-            Holder<List<String>> z = new Holder<List<String>>();
+            Holder<List<String>> y = new Holder<>(yOrig);
+            Holder<List<String>> z = new Holder<>();
 
             List<String> ret = testDocLiteral ? docClient.testStringList(x, y, z) : xmlClient
                 .testStringList(x, y, z);
@@ -2047,8 +2047,8 @@ public abstract class AbstractTypeTestClient
         } else {
             String[] x = {"I", "am", "SimpleList"};
             String[] yOrig = {"Does", "SimpleList", "Work"};
-            Holder<String[]> y = new Holder<String[]>(yOrig);
-            Holder<String[]> z = new Holder<String[]>();
+            Holder<String[]> y = new Holder<>(yOrig);
+            Holder<String[]> z = new Holder<>();
 
             String[] ret = rpcClient.testStringList(x, y, z);
 
@@ -2073,8 +2073,8 @@ public abstract class AbstractTypeTestClient
         if (testDocLiteral || testXMLBinding) {
             List<Integer> x = Arrays.asList(1, 2, 3);
             List<Integer> yOrig = Arrays.asList(10, 100, 1000);
-            Holder<List<Integer>> y = new Holder<List<Integer>>(yOrig);
-            Holder<List<Integer>> z = new Holder<List<Integer>>();
+            Holder<List<Integer>> y = new Holder<>(yOrig);
+            Holder<List<Integer>> z = new Holder<>();
 
             List<Integer> ret = testDocLiteral ? docClient.testNumberList(x, y, z) : xmlClient
                 .testNumberList(x, y, z);
@@ -2086,8 +2086,8 @@ public abstract class AbstractTypeTestClient
         } else {
             Integer[] x = {1, 2, 3};
             Integer[] yOrig = {10, 100, 1000};
-            Holder<Integer[]> y = new Holder<Integer[]>(yOrig);
-            Holder<Integer[]> z = new Holder<Integer[]>();
+            Holder<Integer[]> y = new Holder<>(yOrig);
+            Holder<Integer[]> z = new Holder<>();
 
             Integer[] ret = rpcClient.testNumberList(x, y, z);
 
@@ -2116,8 +2116,8 @@ public abstract class AbstractTypeTestClient
             List<QName> yOrig = Arrays.asList(new QName("http://schemas.iona.com/type_test", "testqname4"),
                                               new QName("http://schemas.iona.com/type_test", "testqname5"),
                                               new QName("http://schemas.iona.com/type_test", "testqname6"));
-            Holder<List<QName>> y = new Holder<List<QName>>(yOrig);
-            Holder<List<QName>> z = new Holder<List<QName>>();
+            Holder<List<QName>> y = new Holder<>(yOrig);
+            Holder<List<QName>> z = new Holder<>();
 
             List<QName> ret = testDocLiteral ? docClient.testQNameList(x, y, z) : xmlClient.testQNameList(x,
                                                                                                           y,
@@ -2134,8 +2134,8 @@ public abstract class AbstractTypeTestClient
             QName[] yOrig = {new QName("http://schemas.iona.com/type_test", "testqname4"),
                              new QName("http://schemas.iona.com/type_test", "testqname5"),
                              new QName("http://schemas.iona.com/type_test", "testqname6")};
-            Holder<QName[]> y = new Holder<QName[]>(yOrig);
-            Holder<QName[]> z = new Holder<QName[]>();
+            Holder<QName[]> y = new Holder<>(yOrig);
+            Holder<QName[]> z = new Holder<>();
 
             QName[] ret = rpcClient.testQNameList(x, y, z);
 
@@ -2161,8 +2161,8 @@ public abstract class AbstractTypeTestClient
             List<String> x = Arrays.asList("5", "-7");
             List<String> yOrig = Arrays.asList("-9", "7");
 
-            Holder<List<String>> y = new Holder<List<String>>(yOrig);
-            Holder<List<String>> z = new Holder<List<String>>();
+            Holder<List<String>> y = new Holder<>(yOrig);
+            Holder<List<String>> z = new Holder<>();
 
             List<String> ret = testDocLiteral ? docClient.testSimpleUnionList(x, y, z) : xmlClient
                 .testSimpleUnionList(x, y, z);
@@ -2175,8 +2175,8 @@ public abstract class AbstractTypeTestClient
             String[] x = {"5", "-7"};
             String[] yOrig = {"-9", "7"};
 
-            Holder<String[]> y = new Holder<String[]>(yOrig);
-            Holder<String[]> z = new Holder<String[]>();
+            Holder<String[]> y = new Holder<>(yOrig);
+            Holder<String[]> z = new Holder<>();
 
             String[] ret = rpcClient.testSimpleUnionList(x, y, z);
 

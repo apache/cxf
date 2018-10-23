@@ -71,7 +71,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
     private static final Logger LOG = LogUtils.getL7dLogger(JAXBContextInitializer.class);
     private Set<Class<?>> classes;
     private Collection<Object> typeReferences;
-    private Set<Class<?>> globalAdapters = new HashSet<Class<?>>();
+    private Set<Class<?>> globalAdapters = new HashSet<>();
     private Map<String, Object> unmarshallerProperties;
 
     JAXBContextInitializer(ServiceInfo serviceInfo,

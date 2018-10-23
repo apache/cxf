@@ -264,7 +264,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
             // Find the Async method whic has a Future & AsyncResultHandler
             List<Class<?>> asyncHandlerParams = Arrays.asList(method.getParameterTypes());
             //copy it to may it non-readonly
-            asyncHandlerParams = new ArrayList<Class<?>>(asyncHandlerParams);
+            asyncHandlerParams = new ArrayList<>(asyncHandlerParams);
             asyncHandlerParams.add(AsyncHandler.class);
             Method futureMethod = ReflectionUtil
                 .getDeclaredMethod(method.getDeclaringClass(), method.getName() + "Async",
@@ -640,7 +640,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
 
     @Override
     protected Set<Class<?>> getExtraClass() {
-        Set<Class<?>> classes = new HashSet<Class<?>>();
+        Set<Class<?>> classes = new HashSet<>();
         wrapperClasses = generatedWrapperBeanClass();
         if (wrapperClasses != null) {
             classes.addAll(wrapperClasses);

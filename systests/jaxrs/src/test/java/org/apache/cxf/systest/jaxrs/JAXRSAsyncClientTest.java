@@ -342,7 +342,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
             public void failed(Throwable error) {
             }
         };
-        List<InvocationCallback<?>> callbacks = new ArrayList<InvocationCallback<?>>();
+        List<InvocationCallback<?>> callbacks = new ArrayList<>();
         callbacks.add(bookCallback);
         callbacks.add(booleanCallback);
 

@@ -98,7 +98,7 @@ public final class JAXBContextCache {
 
         CachedContextAndSchemasInternal(JAXBContext context, Set<Class<?>> classes) {
             this.context = new WeakReference<>(context);
-            this.classes = new WeakReference<Set<Class<?>>>(classes);
+            this.classes = new WeakReference<>(classes);
         }
 
         public JAXBContext getContext() {
@@ -118,10 +118,10 @@ public final class JAXBContextCache {
     }
 
     private static final Map<Set<Class<?>>, Map<String, CachedContextAndSchemasInternal>> JAXBCONTEXT_CACHE
-        = new CacheMap<Set<Class<?>>, Map<String, CachedContextAndSchemasInternal>>();
+        = new CacheMap<>();
 
     private static final Map<Package, CachedClass> OBJECT_FACTORY_CACHE
-        = new CacheMap<Package, CachedClass>();
+        = new CacheMap<>();
 
     private static final boolean HAS_MOXY;
 
@@ -157,7 +157,7 @@ public final class JAXBContextCache {
     }
 
     public static CachedContextAndSchemas getCachedContextAndSchemas(Class<?> ... cls) throws JAXBException {
-        Set<Class<?>> classes = new HashSet<Class<?>>();
+        Set<Class<?>> classes = new HashSet<>();
         for (Class<?> c : cls) {
             classes.add(c);
         }
@@ -169,7 +169,7 @@ public final class JAXBContextCache {
                                                                      Map<String, Object> props,
                                                                      ClassLoader loader)
         throws JAXBException {
-        Set<Class<?>> classes = new HashSet<Class<?>>();
+        Set<Class<?>> classes = new HashSet<>();
         addPackage(classes, pkg, loader);
         return getCachedContextAndSchemas(classes, null, props, null, true);
     }

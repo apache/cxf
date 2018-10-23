@@ -264,7 +264,7 @@ public class Java2SwaggerMojo extends AbstractMojo {
     }
 
     private Set<Class<?>> loadResourceClasses(Class<? extends Annotation> clazz) throws MojoExecutionException {
-        resourceClasses = new LinkedHashSet<Class<?>>(this.resourcePackages.size());
+        resourceClasses = new LinkedHashSet<>(this.resourcePackages.size());
         Thread.currentThread().setContextClassLoader(getClassLoader());
         for (String resourcePackage : resourcePackages) {
             Set<Class<?>> c = new Reflections(resourcePackage).getTypesAnnotatedWith(clazz, true);

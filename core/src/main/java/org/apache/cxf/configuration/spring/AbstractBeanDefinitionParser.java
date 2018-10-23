@@ -304,7 +304,7 @@ public abstract class AbstractBeanDefinitionParser
     private synchronized JAXBContext getContext(Class<?> cls) {
         if (context == null || classes == null || !classes.contains(cls)) {
             try {
-                Set<Class<?>> tmp = new HashSet<Class<?>>();
+                Set<Class<?>> tmp = new HashSet<>();
                 if (classes != null) {
                     tmp.addAll(classes);
                 }

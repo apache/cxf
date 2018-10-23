@@ -164,7 +164,7 @@ public final class JAXRSUtils {
     private static final String NO_CONTENT_EXCEPTION = "javax.ws.rs.core.NoContentException";
     private static final String HTTP_CHARSET_PARAM = "charset";
     private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0];
-    private static final Set<Class<?>> STREAMING_OUT_TYPES = new HashSet<Class<?>>(
+    private static final Set<Class<?>> STREAMING_OUT_TYPES = new HashSet<>(
         Arrays.asList(InputStream.class, Reader.class, StreamingOutput.class));
 
     private JAXRSUtils() {

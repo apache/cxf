@@ -69,7 +69,7 @@ public class StaxToDOMSignatureIdentifierTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(XMLSecurityConstants.SIGNATURE);
         properties.setActions(actions);
         properties.setSignatureKeyIdentifier(
@@ -107,7 +107,7 @@ public class StaxToDOMSignatureIdentifierTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(XMLSecurityConstants.SIGNATURE);
         properties.setActions(actions);
         properties.setSignatureKeyIdentifier(
@@ -145,7 +145,7 @@ public class StaxToDOMSignatureIdentifierTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(XMLSecurityConstants.SIGNATURE);
         properties.setActions(actions);
         properties.setSignatureKeyIdentifier(
@@ -184,7 +184,7 @@ public class StaxToDOMSignatureIdentifierTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(XMLSecurityConstants.SIGNATURE);
         properties.setActions(actions);
         properties.setSignatureKeyIdentifier(
@@ -223,7 +223,7 @@ public class StaxToDOMSignatureIdentifierTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(XMLSecurityConstants.SIGNATURE);
         properties.setActions(actions);
         properties.setSignatureKeyIdentifier(

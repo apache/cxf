@@ -68,7 +68,7 @@ public class StandaloneReadTest {
     @Test
     public void testCollectionReadNoXsiType() throws Exception {
         context = new AegisContext();
-        Set<java.lang.reflect.Type> roots = new HashSet<java.lang.reflect.Type>();
+        Set<java.lang.reflect.Type> roots = new HashSet<>();
         java.lang.reflect.Type listStringType
             = ListStringInterface.class.getMethods()[0].getGenericReturnType();
         roots.add(listStringType);
@@ -93,7 +93,7 @@ public class StandaloneReadTest {
     @Test
     public void testCollectionReadXsiType() throws Exception {
         context = new AegisContext();
-        Set<java.lang.reflect.Type> roots = new HashSet<java.lang.reflect.Type>();
+        Set<java.lang.reflect.Type> roots = new HashSet<>();
         java.lang.reflect.Type listStringType
             = ListStringInterface.class.getMethods()[0].getGenericReturnType();
         roots.add(listStringType);
@@ -116,7 +116,7 @@ public class StandaloneReadTest {
     @Test
     public void testSimpleBeanRead() throws Exception {
         context = new AegisContext();
-        Set<java.lang.reflect.Type> rootClasses = new HashSet<java.lang.reflect.Type>();
+        Set<java.lang.reflect.Type> rootClasses = new HashSet<>();
         rootClasses.add(SimpleBean.class);
         context.setRootClasses(rootClasses);
         context.initialize();

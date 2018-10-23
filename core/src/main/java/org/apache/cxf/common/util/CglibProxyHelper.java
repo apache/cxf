@@ -43,7 +43,7 @@ class CglibProxyHelper extends ProxyHelper {
                                       final java.lang.reflect.InvocationHandler h) {
 
         Class<?> superClass = null;
-        List<Class<?>> theInterfaces = new ArrayList<Class<?>>();
+        List<Class<?>> theInterfaces = new ArrayList<>();
 
         for (Class<?> c : interfaces) {
             if (!c.isInterface()) {

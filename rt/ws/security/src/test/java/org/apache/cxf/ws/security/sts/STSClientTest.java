@@ -58,7 +58,7 @@ public class STSClientTest extends Assert {
     @Test
     public void testConfigureViaEPR() throws Exception {
 
-        final Set<Class<?>> addressingClasses = new HashSet<Class<?>>();
+        final Set<Class<?>> addressingClasses = new HashSet<>();
         addressingClasses.add(org.apache.cxf.ws.addressing.wsdl.ObjectFactory.class);
         addressingClasses.add(org.apache.cxf.ws.addressing.ObjectFactory.class);
 

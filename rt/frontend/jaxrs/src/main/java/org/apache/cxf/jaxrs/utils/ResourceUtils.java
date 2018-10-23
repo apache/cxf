@@ -410,7 +410,7 @@ public final class ResourceUtils {
     }
 
     public static Constructor<?> findResourceConstructor(Class<?> resourceClass, boolean perRequest) {
-        List<Constructor<?>> cs = new LinkedList<Constructor<?>>();
+        List<Constructor<?>> cs = new LinkedList<>();
         for (Constructor<?> c : resourceClass.getConstructors()) {
             Class<?>[] params = c.getParameterTypes();
             Annotation[][] anns = c.getParameterAnnotations();
@@ -870,7 +870,7 @@ public final class ResourceUtils {
         Set<Object> singletons = app.getSingletons();
         verifySingletons(singletons);
 
-        List<Class<?>> resourceClasses = new ArrayList<Class<?>>();
+        List<Class<?>> resourceClasses = new ArrayList<>();
         List<Object> providers = new ArrayList<>();
         List<Feature> features = new ArrayList<>();
         Map<Class<?>, ResourceProvider> map = new HashMap<>();

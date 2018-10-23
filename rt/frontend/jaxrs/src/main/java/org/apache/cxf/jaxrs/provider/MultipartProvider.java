@@ -85,7 +85,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
     private static final Set<Class<?>> WELL_KNOWN_MULTIPART_CLASSES;
     private static final Set<String> MULTIPART_SUBTYPES;
     static {
-        WELL_KNOWN_MULTIPART_CLASSES = new HashSet<Class<?>>();
+        WELL_KNOWN_MULTIPART_CLASSES = new HashSet<>();
         WELL_KNOWN_MULTIPART_CLASSES.add(MultipartBody.class);
         WELL_KNOWN_MULTIPART_CLASSES.add(Attachment.class);
 

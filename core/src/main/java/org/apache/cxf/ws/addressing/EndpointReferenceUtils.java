@@ -252,7 +252,7 @@ public final class EndpointReferenceUtils {
         new org.apache.cxf.ws.addressing.wsdl.ObjectFactory();
 
 
-    private static final Set<Class<?>> ADDRESSING_CLASSES = new HashSet<Class<?>>();
+    private static final Set<Class<?>> ADDRESSING_CLASSES = new HashSet<>();
     private static final AtomicReference<Reference<JAXBContext>> ADDRESSING_CONTEXT
         = new AtomicReference<Reference<JAXBContext>>(new SoftReference<JAXBContext>(null));
     static {

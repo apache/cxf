@@ -69,7 +69,7 @@ public class StaxToDOMEncryptionIdentifierTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(XMLSecurityConstants.ENCRYPT);
         properties.setActions(actions);
         properties.setEncryptionUser("myalias");
@@ -108,7 +108,7 @@ public class StaxToDOMEncryptionIdentifierTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(XMLSecurityConstants.ENCRYPT);
         properties.setActions(actions);
         properties.setEncryptionUser("myalias");
@@ -147,7 +147,7 @@ public class StaxToDOMEncryptionIdentifierTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(XMLSecurityConstants.ENCRYPT);
         properties.setActions(actions);
         properties.setEncryptionUser("myalias");
@@ -187,7 +187,7 @@ public class StaxToDOMEncryptionIdentifierTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(XMLSecurityConstants.ENCRYPT);
         properties.setActions(actions);
         properties.setEncryptionUser("myalias");
@@ -226,7 +226,7 @@ public class StaxToDOMEncryptionIdentifierTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(XMLSecurityConstants.ENCRYPT);
         properties.setActions(actions);
         properties.setEncryptionUser("myalias");

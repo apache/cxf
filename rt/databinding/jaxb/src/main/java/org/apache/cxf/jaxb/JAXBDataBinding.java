@@ -221,7 +221,7 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
     }
 
     public JAXBDataBinding(Class<?>... classes) throws JAXBException {
-        contextClasses = new LinkedHashSet<Class<?>>();
+        contextClasses = new LinkedHashSet<>();
         contextClasses.addAll(Arrays.asList(classes));
         setContext(createJAXBContext(contextClasses)); //NOPMD - specifically allow this
     }
@@ -333,7 +333,7 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
             return;
         }
 
-        contextClasses = new LinkedHashSet<Class<?>>();
+        contextClasses = new LinkedHashSet<>();
 
         for (ServiceInfo serviceInfo : service.getServiceInfos()) {
             JAXBContextInitializer initializer

@@ -81,7 +81,7 @@ public class MTOMBindingTypeTest extends AbstractBusClientServerTestBase {
         ByteArrayOutputStream input = setupInLogging();
         ByteArrayOutputStream output = setupOutLogging();
 
-        Holder<byte[]> photo = new Holder<byte[]>("CXF".getBytes());
+        Holder<byte[]> photo = new Holder<>("CXF".getBytes());
         Holder<Image> image = new Holder<>(getImage("/java.jpg"));
 
         Hello port = getPort();
@@ -104,7 +104,7 @@ public class MTOMBindingTypeTest extends AbstractBusClientServerTestBase {
     @org.junit.Ignore
     public void testEcho() throws Exception {
         byte[] bytes = ImageHelper.getImageBytes(getImage("/java.jpg"), "image/jpeg");
-        Holder<byte[]> image = new Holder<byte[]>(bytes);
+        Holder<byte[]> image = new Holder<>(bytes);
 
         Hello port = getPort();
         SOAPBinding binding = (SOAPBinding) ((BindingProvider)port).getBinding();

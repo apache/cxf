@@ -57,7 +57,7 @@ public final class TLSClientParametersConfig {
 
     private static synchronized JAXBContext getContext() throws JAXBException {
         if (context == null || classes == null) {
-            Set<Class<?>> c2 = new HashSet<Class<?>>();
+            Set<Class<?>> c2 = new HashSet<>();
             JAXBContextCache.addPackage(c2,
                                         PackageUtils.getPackageName(TLSClientParametersType.class),
                                         TLSClientParametersConfig.class.getClassLoader());

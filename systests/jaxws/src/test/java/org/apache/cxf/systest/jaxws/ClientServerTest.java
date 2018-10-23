@@ -578,7 +578,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         assertEquals(((TestExecutor)executor).getCount(), 0);
         Greeter greeter = service.getPort(portName, Greeter.class);
         updateAddressPort(greeter, PORT);
-        List<Response<GreetMeResponse>> responses = new ArrayList<Response<GreetMeResponse>>();
+        List<Response<GreetMeResponse>> responses = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
             responses.add(greeter.greetMeAsync("asyn call" + i));
         }

@@ -139,7 +139,7 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
     }
 
     public List<List<Assertion>> checkEffectivePolicy(Policy policy) {
-        List<List<Assertion>> validated = new ArrayList<List<Assertion>>(4);
+        List<List<Assertion>> validated = new ArrayList<>(4);
         List<QName> errors = new ArrayList<>();
         Iterator<List<Assertion>> alternatives = policy.getAlternatives();
         while (alternatives.hasNext()) {

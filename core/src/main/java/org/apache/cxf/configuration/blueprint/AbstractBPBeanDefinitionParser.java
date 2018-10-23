@@ -406,7 +406,7 @@ public abstract class AbstractBPBeanDefinitionParser {
     protected synchronized JAXBContext getContext(Class<?> cls) {
         if (jaxbContext == null || jaxbClasses == null || !jaxbClasses.contains(cls)) {
             try {
-                Set<Class<?>> tmp = new HashSet<Class<?>>();
+                Set<Class<?>> tmp = new HashSet<>();
                 if (jaxbClasses != null) {
                     tmp.addAll(jaxbClasses);
                 }

@@ -92,7 +92,7 @@ public abstract class AbstractAegisProvider<T>
                 context = new AegisContext();
                 context.setWriteXsiTypes(writeXsiType);
                 context.setReadXsiTypes(readXsiType);
-                Set<java.lang.reflect.Type> rootClasses = new HashSet<java.lang.reflect.Type>();
+                Set<java.lang.reflect.Type> rootClasses = new HashSet<>();
                 rootClasses.add(reflectionType);
                 context.setRootClasses(rootClasses);
                 context.initialize();

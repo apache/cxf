@@ -897,7 +897,7 @@ public class RMTxStore implements RMStore {
             DatabaseMetaData metadata = con.getMetaData();
             ResultSet rs = metadata.getColumns(null, null, tableName, "%");
             Set<String> dbCols = new HashSet<>();
-            List<String[]> newCols = new ArrayList<String[]>();
+            List<String[]> newCols = new ArrayList<>();
             while (rs.next()) {
                 dbCols.add(rs.getString(4));
             }

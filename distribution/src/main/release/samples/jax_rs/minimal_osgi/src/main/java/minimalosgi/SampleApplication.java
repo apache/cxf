@@ -28,7 +28,7 @@ import javax.ws.rs.core.Application;
 public class SampleApplication extends Application {
     @Override
     public Set<Class<?>> getClasses() {
-        Set<Class<?>> s = new HashSet<Class<?>>();
+        Set<Class<?>> s = new HashSet<>();
         s.add(SampleResource.class);
         return s;
     }

@@ -520,7 +520,7 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         service.getInInterceptors().add(inhandler);
 
         WSSSecurityProperties outProperties = new WSSSecurityProperties();
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(XMLSecurityConstants.SIGNATURE);
         actions.add(WSSConstants.SIGNATURE_CONFIRMATION);
         outProperties.setActions(actions);

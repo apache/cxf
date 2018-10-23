@@ -376,7 +376,7 @@ public class Java2WADLMojo extends AbstractMojo {
             throw new MojoExecutionException(
                 "either classResourceNames or basePackages should be specified");
         }
-        List<Class<?>> resourceClasses = new ArrayList<Class<?>>(
+        List<Class<?>> resourceClasses = new ArrayList<>(
             classResourceNames == null ? 0 : classResourceNames.size());
         if (classResourceNames != null) {
             for (String className : classResourceNames) {

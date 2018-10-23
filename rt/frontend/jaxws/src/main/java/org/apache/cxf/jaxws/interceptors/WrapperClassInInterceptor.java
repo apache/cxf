@@ -178,7 +178,7 @@ public class WrapperClassInInterceptor extends AbstractPhaseInterceptor<Message>
                                               Class<?> wrapperClass) {
         List<String> partNames = new ArrayList<>();
         List<String> elTypeNames = new ArrayList<>();
-        List<Class<?>> partClasses = new ArrayList<Class<?>>();
+        List<Class<?>> partClasses = new ArrayList<>();
         QName wrapperName = null;
         for (MessagePartInfo p : wrappedMessageInfo.getMessageParts()) {
             if (wrapperClass == p.getTypeClass()) {

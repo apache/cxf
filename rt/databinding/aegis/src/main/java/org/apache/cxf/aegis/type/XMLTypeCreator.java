@@ -101,7 +101,7 @@ import org.apache.cxf.helpers.XPathUtils;
  */
 public class XMLTypeCreator extends AbstractTypeCreator {
     private static final Logger LOG = LogUtils.getL7dLogger(XMLTypeCreator.class);
-    private static List<Class<?>> stopClasses = new ArrayList<Class<?>>();
+    private static List<Class<?>> stopClasses = new ArrayList<>();
     static {
         stopClasses.add(Object.class);
         stopClasses.add(Exception.class);

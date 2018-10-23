@@ -668,7 +668,7 @@ public final class JAXBUtils {
                                                  anns.getClass()).newInstance(qname, refcls, anns);
             List<Object> typeRefs = new ArrayList<>();
             typeRefs.add(ref);
-            List<Class<?>> clses = new ArrayList<Class<?>>(ctxClasses);
+            List<Class<?>> clses = new ArrayList<>(ctxClasses);
             clses.add(refClass.getField("type").get(ref).getClass());
             if (!refcls.isInterface()) {
                 clses.add(refcls);
@@ -874,7 +874,7 @@ public final class JAXBUtils {
         // that are in the same package. Also check for ObjectFactory classes
         Map<String, InputStream> packages = new HashMap<>();
         Map<String, ClassLoader> packageLoaders = new HashMap<>();
-        Set<Class<?>> objectFactories = new HashSet<Class<?>>();
+        Set<Class<?>> objectFactories = new HashSet<>();
         for (Class<?> jcls : classes) {
             String pkgName = PackageUtils.getPackageName(jcls);
             if (!packages.containsKey(pkgName)) {

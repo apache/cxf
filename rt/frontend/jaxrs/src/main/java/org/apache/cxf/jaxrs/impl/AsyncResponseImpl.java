@@ -220,7 +220,7 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
             Class<?> callbackCls = allCallbacks[i].getClass();
             Collection<Class<?>> knownCallbacks = map.get(callbackCls);
             if (knownCallbacks == null) {
-                knownCallbacks = new HashSet<Class<?>>();
+                knownCallbacks = new HashSet<>();
                 map.put(callbackCls, knownCallbacks);
             }
 

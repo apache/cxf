@@ -516,7 +516,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
     protected void forkOnce(Set<URI> classPath, List<GenericWsdlOption> effectiveWsdlOptions)
         throws MojoExecutionException {
         List<GenericWsdlOption> toDo = new LinkedList<>();
-        List<List<String>> wargs = new LinkedList<List<String>>();
+        List<List<String>> wargs = new LinkedList<>();
         for (GenericWsdlOption wsdlOption : effectiveWsdlOptions) {
             File outputDirFile = wsdlOption.getOutputDir();
             outputDirFile.mkdirs();

@@ -73,12 +73,12 @@ public class ExtensionManagerBus extends AbstractBasicInterceptorProvider implem
     public ExtensionManagerBus(Map<Class<?>, Object> extensions, Map<String, Object> props,
           ClassLoader extensionClassLoader) {
         if (extensions == null) {
-            extensions = new ConcurrentHashMap<Class<?>, Object>(16, 0.75f, 4);
+            extensions = new ConcurrentHashMap<>(16, 0.75f, 4);
         } else {
-            extensions = new ConcurrentHashMap<Class<?>, Object>(extensions);
+            extensions = new ConcurrentHashMap<>(extensions);
         }
         this.extensions = extensions;
-        this.missingExtensions = new CopyOnWriteArraySet<Class<?>>();
+        this.missingExtensions = new CopyOnWriteArraySet<>();
 
 
         state = BusState.INITIAL;

@@ -60,7 +60,7 @@ public final class WrapperClassGenerator extends ASMHelper {
     public static final String DEFAULT_PACKAGE_NAME = "defaultnamespace";
 
     private static final Logger LOG = LogUtils.getL7dLogger(WrapperClassGenerator.class);
-    private Set<Class<?>> wrapperBeans = new LinkedHashSet<Class<?>>();
+    private Set<Class<?>> wrapperBeans = new LinkedHashSet<>();
     private InterfaceInfo interfaceInfo;
     private boolean qualified;
     private JaxWsServiceFactoryBean factory;

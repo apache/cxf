@@ -54,7 +54,7 @@ public abstract class AbstractJPATypedQueryVisitor<T, T1, E>
     private Root<T> root;
     private CriteriaBuilder builder;
     private CriteriaQuery<T1> cq;
-    private Stack<List<Predicate>> predStack = new Stack<List<Predicate>>();
+    private Stack<List<Predicate>> predStack = new Stack<>();
     private boolean criteriaFinalized;
     private Set<String> joinProperties;
 

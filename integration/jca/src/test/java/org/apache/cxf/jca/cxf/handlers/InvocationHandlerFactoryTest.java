@@ -63,7 +63,7 @@ public class InvocationHandlerFactoryTest extends HandlerTestBase {
 
         assertNotNull("handler must not be null", handler);
         int count = 0;
-        Set<Class<?>> allHandlerTypes = new HashSet<Class<?>>();
+        Set<Class<?>> allHandlerTypes = new HashSet<>();
 
         while (handler != null) {
 

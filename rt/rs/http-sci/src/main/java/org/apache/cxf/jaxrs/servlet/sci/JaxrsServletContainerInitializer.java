@@ -108,7 +108,7 @@ public class JaxrsServletContainerInitializer implements ServletContainerInitial
                 app = new Application() {
                     @Override
                     public Set<Class<?>> getClasses() {
-                        Set<Class<?>> set = new HashSet<Class<?>>();
+                        Set<Class<?>> set = new HashSet<>();
                         set.addAll(providersAndResources.get(Path.class));
                         set.addAll(providersAndResources.get(Provider.class));
                         return set;

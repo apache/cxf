@@ -524,7 +524,7 @@ public final class ContextUtils {
     public static JAXBContext getJAXBContext() throws JAXBException {
         synchronized (ContextUtils.class) {
             if (jaxbContext == null || jaxbContextClasses == null) {
-                Set<Class<?>> tmp = new HashSet<Class<?>>();
+                Set<Class<?>> tmp = new HashSet<>();
                 JAXBContextCache.addPackage(tmp, WSA_OBJECT_FACTORY.getClass().getPackage().getName(),
                                             WSA_OBJECT_FACTORY.getClass().getClassLoader());
                 JAXBContextCache.scanPackages(tmp);
@@ -545,7 +545,7 @@ public final class ContextUtils {
     public static void setJAXBContext(JAXBContext ctx) throws JAXBException {
         synchronized (ContextUtils.class) {
             jaxbContext = ctx;
-            jaxbContextClasses = new HashSet<Class<?>>();
+            jaxbContextClasses = new HashSet<>();
         }
     }
 
