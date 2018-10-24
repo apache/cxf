@@ -317,7 +317,7 @@ public class JettyHTTPDestination extends ServletDestination {
             written = true;
             out.write(b);
         }
-        public void write(byte b[], int off, int len) throws IOException {
+        public void write(byte[] b, int off, int len) throws IOException {
             written = true;
             out.write(b, off, len);
         }

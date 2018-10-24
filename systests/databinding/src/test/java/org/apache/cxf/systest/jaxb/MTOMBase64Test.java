@@ -92,7 +92,7 @@ public class MTOMBase64Test extends AbstractBusClientServerTestBase {
         }
 
         private byte[] generateByteData(int x) {
-            byte bytes[] = new byte[x];
+            byte[] bytes = new byte[x];
             for (int y = 0; y < x; y++) {
                 int z = 'A' + y;
                 if (z > 'z') {
@@ -139,7 +139,7 @@ public class MTOMBase64Test extends AbstractBusClientServerTestBase {
         final int count = 99;
         ObjectWithHashMapData data = port.getHashMapData(count);
         for (int y = 1;  y < count; y++) {
-            byte bytes[] = data.getKeyData().get(Integer.toHexString(y));
+            byte[] bytes = data.getKeyData().get(Integer.toHexString(y));
             assertEquals(y, bytes.length);
         }
     }

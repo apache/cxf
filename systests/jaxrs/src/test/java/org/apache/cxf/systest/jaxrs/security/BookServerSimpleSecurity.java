@@ -43,7 +43,7 @@ public class BookServerSimpleSecurity extends AbstractSpringServer {
         server.addBean(realm);
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         try {
             BookServerSimpleSecurity s = new BookServerSimpleSecurity();
             s.start();

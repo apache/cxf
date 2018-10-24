@@ -35,7 +35,7 @@ public class BenchmarkServer{
         Endpoint.publish(address, implementor);
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         new BenchmarkServer();
         System.out.println("Server ready...");
         Thread.sleep(Integer.MAX_VALUE);

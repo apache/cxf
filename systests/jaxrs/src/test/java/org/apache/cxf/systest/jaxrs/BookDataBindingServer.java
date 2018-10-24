@@ -67,7 +67,7 @@ public class BookDataBindingServer extends AbstractBusTestServerBase {
         }
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         try {
             BookDataBindingServer s = new BookDataBindingServer();
             s.start();

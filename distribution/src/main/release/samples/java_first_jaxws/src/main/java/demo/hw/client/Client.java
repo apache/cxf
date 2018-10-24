@@ -40,7 +40,7 @@ public final class Client {
     private Client() {
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         Service service = Service.create(SERVICE_NAME);
         // Endpoint Address
         String endpointAddress = "http://localhost:9000/helloWorld";

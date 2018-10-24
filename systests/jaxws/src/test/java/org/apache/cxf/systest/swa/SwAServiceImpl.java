@@ -46,7 +46,7 @@ public class SwAServiceImpl implements SwAServiceInterface {
         try {
             InputStream bis = null;
             bis = data.value.getDataRef().getDataSource().getInputStream();
-            byte b[] = new byte[6];
+            byte[] b = new byte[6];
             bis.read(b, 0, 6);
             String string = IOUtils.newStringFromBytes(b);
 
@@ -63,7 +63,7 @@ public class SwAServiceImpl implements SwAServiceInterface {
         try {
             InputStream bis = null;
             bis = data.value.getDataSource().getInputStream();
-            byte b[] = new byte[6];
+            byte[] b = new byte[6];
             bis.read(b, 0, 6);
             String string = IOUtils.newStringFromBytes(b);
 
@@ -81,7 +81,7 @@ public class SwAServiceImpl implements SwAServiceInterface {
         try {
             InputStream bis = null;
             bis = data.value.getDataSource().getInputStream();
-            byte b[] = new byte[6];
+            byte[] b = new byte[6];
             bis.read(b, 0, 6);
             String string = IOUtils.newStringFromBytes(b);
 

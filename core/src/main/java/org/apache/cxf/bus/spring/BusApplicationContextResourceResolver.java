@@ -68,7 +68,7 @@ public class BusApplicationContextResourceResolver
         try {
             T resource = null;
             if (resourceName == null) {
-                String names[] = context.getBeanNamesForType(resourceType);
+                String[] names = context.getBeanNamesForType(resourceType);
                 if (names != null && names.length > 0) {
                     resource = resourceType.cast(context.getBean(names[0], resourceType));
                 }

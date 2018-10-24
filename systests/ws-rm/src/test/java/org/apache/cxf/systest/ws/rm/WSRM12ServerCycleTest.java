@@ -64,7 +64,7 @@ public class WSRM12ServerCycleTest extends AbstractBusClientServerTestBase {
         String port;
         String pfx;
         Endpoint ep;
-        public Server(String args[]) {
+        public Server(String[] args) {
             port = args[0];
             pfx = args[1];
         }
@@ -89,7 +89,7 @@ public class WSRM12ServerCycleTest extends AbstractBusClientServerTestBase {
             ep.stop();
             ep = null;
         }
-        public static void main(String args[]) {
+        public static void main(String[] args) {
             new Server(args).start();
         }
     }

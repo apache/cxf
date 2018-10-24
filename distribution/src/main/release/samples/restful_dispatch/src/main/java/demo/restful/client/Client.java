@@ -42,7 +42,7 @@ public final class Client {
     private Client() {
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         QName serviceName = new QName("http://apache.org/hello_world_xml_http/wrapped",
                                                 "cutomerservice");
         QName portName = new QName("http://apache.org/hello_world_xml_http/wrapped",

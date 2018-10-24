@@ -28,7 +28,7 @@ public final class Client {
     private Client() {
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
 
         HelloWorldCORBAService ss = new HelloWorldCORBAService();
         HelloWorld port = ss.getHelloWorldCORBAPort();

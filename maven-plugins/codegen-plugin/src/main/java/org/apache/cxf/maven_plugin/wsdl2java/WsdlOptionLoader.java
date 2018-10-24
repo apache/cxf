@@ -75,8 +75,8 @@ public final class WsdlOptionLoader {
      * @throws MojoExecutionException
      */
     public static List<GenericWsdlOption> loadWsdlOptionsFromFiles(File wsdlBasedir,
-                                                                   String includes[],
-                                                                   String excludes[],
+                                                                   String[] includes,
+                                                                   String[] excludes,
                                                                    File defaultOutputDir)
         throws MojoExecutionException {
 

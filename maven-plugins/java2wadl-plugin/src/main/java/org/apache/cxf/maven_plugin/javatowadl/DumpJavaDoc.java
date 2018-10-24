@@ -88,7 +88,7 @@ public final class DumpJavaDoc {
         return 0;
     }
 
-    public static boolean validOptions(String options[][], DocErrorReporter reporter) {
+    public static boolean validOptions(String[] options[], DocErrorReporter reporter) {
         boolean foundTagOption = false;
         for (int i = 0; i < options.length; i++) {
             String[] opt = options[i];

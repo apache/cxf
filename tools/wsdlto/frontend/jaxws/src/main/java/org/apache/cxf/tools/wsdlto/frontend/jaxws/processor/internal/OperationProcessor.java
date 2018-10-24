@@ -178,7 +178,7 @@ public class OperationProcessor  extends AbstractProcessor {
     }
 
     private boolean checkEnableMime(boolean enableMime, JavaMethod method) {
-        String o[] = context.getArray(ToolConstants.CFG_MIMEMETHODS);
+        String[] o = context.getArray(ToolConstants.CFG_MIMEMETHODS);
         if (checkArray(o, method.getName())) {
             return true;
         }
@@ -186,7 +186,7 @@ public class OperationProcessor  extends AbstractProcessor {
     }
 
     private boolean checkEnableAsync(boolean enableAsync, JavaMethod method) {
-        String o[] = context.getArray(ToolConstants.CFG_ASYNCMETHODS);
+        String[] o = context.getArray(ToolConstants.CFG_ASYNCMETHODS);
         if (checkArray(o, method.getName())) {
             return true;
         }
@@ -194,7 +194,7 @@ public class OperationProcessor  extends AbstractProcessor {
     }
 
     private boolean checkEnableWrapper(boolean enableWrapper, JavaMethod method) {
-        String o[] = context.getArray(ToolConstants.CFG_BAREMETHODS);
+        String[] o = context.getArray(ToolConstants.CFG_BAREMETHODS);
         if (checkArray(o, method.getName())) {
             return false;
         }

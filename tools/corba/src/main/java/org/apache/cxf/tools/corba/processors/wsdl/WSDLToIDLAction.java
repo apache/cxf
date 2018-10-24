@@ -161,7 +161,7 @@ public class WSDLToIDLAction {
                                        + "please pass a corba binding/porttype to use");
         }
 
-        String nm[] = unscopeName(binding.getPortType().getQName().getLocalPart());
+        String[] nm = unscopeName(binding.getPortType().getQName().getLocalPart());
         int pos = nm[nm.length - 1].lastIndexOf("Binding");
 
         if (pos != -1) {
@@ -352,7 +352,7 @@ public class WSDLToIDLAction {
                 root.addInclude("<omg/TimeBase.idl>");
             }
 
-            String name[] = unscopeName(local);
+            String[] name = unscopeName(local);
             IdlDefn defn = root.lookup(name);
 
             if (defn != null) {
@@ -394,7 +394,7 @@ public class WSDLToIDLAction {
         return (IdlType)result;
     }
 
-    protected IdlType createType(QName idlType, String name[], CorbaType corbaType) throws Exception {
+    protected IdlType createType(QName idlType, String[] name, CorbaType corbaType) throws Exception {
         if (idlType.getLocalPart().equals("CORBA.Object")) {
             return IdlInterface.create(null, "Object");
         }
@@ -590,7 +590,7 @@ public class WSDLToIDLAction {
 
             if (!undefinedCircular && !(bt instanceof IdlSequence)) {
                 String mlocal = qname.getLocalPart();
-                String mname[] = unscopeName(mlocal);
+                String[] mname = unscopeName(mlocal);
                 undefinedCircular = null != root.lookup(mname, true);
             }
 
@@ -625,7 +625,7 @@ public class WSDLToIDLAction {
 
             if (!undefinedCircular && !(type instanceof IdlSequence)) {
                 String mlocal = qname.getLocalPart();
-                String mname[] = unscopeName(mlocal);
+                String[] mname = unscopeName(mlocal);
                 undefinedCircular = null != root.lookup(mname, true);
             }
 
@@ -778,7 +778,7 @@ public class WSDLToIDLAction {
 
     private String[] unscopeName(String nm) {
         StringTokenizer strtok = new StringTokenizer(nm, ".");
-        String result[] = new String[strtok.countTokens()];
+        String[] result = new String[strtok.countTokens()];
 
         for (int i = 0; strtok.hasMoreTokens(); ++i) {
             result[i] = strtok.nextToken();

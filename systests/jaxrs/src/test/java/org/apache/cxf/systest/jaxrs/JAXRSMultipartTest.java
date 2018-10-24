@@ -172,7 +172,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         PushbackInputStream buf = new PushbackInputStream(is, 1024 * 20) {
             int bcount = -1;
             @Override
-            public int read(byte b[], int offset, int len) throws IOException {
+            public int read(byte[] b, int offset, int len) throws IOException {
                 if (bcount >= 0 && bcount < 1024 * 50) {
                     for (int x = 0; x < len; x++) {
                         b[offset + x] = (byte)x;

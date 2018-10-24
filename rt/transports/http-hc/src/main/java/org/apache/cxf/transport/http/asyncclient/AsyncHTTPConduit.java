@@ -429,7 +429,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         protected void setupWrappedStream() throws IOException {
             connect(true);
             wrappedStream = new OutputStream() {
-                public void write(byte b[], int off, int len) throws IOException {
+                public void write(byte[] b, int off, int len) throws IOException {
                     if (exception instanceof IOException) {
                         throw (IOException) exception;
                     }
@@ -658,7 +658,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         }
 
         protected void closeInputStream() throws IOException {
-            byte bytes[] = new byte[1024];
+            byte[] bytes = new byte[1024];
             while (inbuf.read(bytes) > 0) {
                 //nothing
             }

@@ -53,7 +53,7 @@ public class JweOutputStream extends FilterOutputStream {
     }
 
     @Override
-    public void write(byte b[], int off, int len) throws IOException {
+    public void write(byte[] b, int off, int len) throws IOException {
         if (lastRawDataChunk != null) {
             int remaining = blockSize - lastRawDataChunk.length;
             int lenToCopy = remaining < len ? remaining : len;

@@ -89,7 +89,7 @@ public class Option {
      * A set of dependent files used to detect that the generator must process WSDL, even
      * if generator marker files are up to date.
      */
-    String dependencies[];
+    String[] dependencies;
 
     /**
      * Redundant directories to be deleted after code generation
@@ -252,7 +252,7 @@ public class Option {
     public void setNamespaceExcludes(List<String> namespaceExcludes) {
         this.namespaceExcludes = namespaceExcludes;
     }
-    public void setDependencies(String dependencies[]) {
+    public void setDependencies(String[] dependencies) {
         this.dependencies = dependencies;
     }
 

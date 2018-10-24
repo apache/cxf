@@ -72,7 +72,7 @@ class ClassReader extends ByteArrayInputStream {
 
     private Map<String, Method> attrMethods;
 
-    protected ClassReader(byte buf[], Map<String, Method> attrMethods) {
+    protected ClassReader(byte[] buf, Map<String, Method> attrMethods) {
         super(buf);
 
         this.attrMethods = attrMethods;

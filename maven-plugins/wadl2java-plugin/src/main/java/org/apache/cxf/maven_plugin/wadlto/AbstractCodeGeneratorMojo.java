@@ -123,13 +123,13 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
      * *.wadl
      */
     @Parameter
-    String includes[];
+    String[] includes;
 
     /**
      * A list of wadl files to exclude. Can contain ant-style wildcards and double wildcards.
      */
     @Parameter
-    String excludes[];
+    String[] excludes;
 
     /**
      * Allows running the JavaToWs in a separate process.
@@ -299,7 +299,7 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
         addPluginArtifact(artifactsPath);
         artifactsPath.addAll(classPath);
 
-        String args[] = createForkOnceArgs(wargs);
+        String[] args = createForkOnceArgs(wargs);
         runForked(artifactsPath, ForkOnceCodeGenerator.class, args);
 
         for (WadlOption option : toDo) {

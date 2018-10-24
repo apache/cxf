@@ -83,7 +83,7 @@ public class UDPDestination extends AbstractDestination {
                     return;
                 }
                 try {
-                    byte bytes[] = new byte[64 * 1024];
+                    byte[] bytes = new byte[64 * 1024];
                     final DatagramPacket p = new DatagramPacket(bytes, bytes.length);
                     mcast.receive(p);
 
@@ -341,7 +341,7 @@ public class UDPDestination extends AbstractDestination {
         public void write(int b) throws IOException {
             buffer.put(new byte[] {(byte)b}, 0, 1);
         }
-        public void write(byte b[], int off, int len) throws IOException {
+        public void write(byte[] b, int off, int len) throws IOException {
             while (len > buffer.remaining()) {
                 int nlen = buffer.remaining();
                 buffer.put(b, off, nlen);

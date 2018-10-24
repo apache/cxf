@@ -363,7 +363,7 @@ public final class IOUtils {
         if (i > 65536) {
             i = 65536;
         }
-        byte bytes[] = new byte[i];
+        byte[] bytes = new byte[i];
         while (in.read(bytes) != -1) {
             //nothing - just discarding
         }

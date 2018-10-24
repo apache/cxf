@@ -129,7 +129,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
      * *.wsdl
      */
     @Parameter
-    protected String includes[];
+    protected String[] includes;
     /**
      * Directory in which the "DONE" markers are saved that
      */
@@ -156,7 +156,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
      * A list of wsdl files to exclude. Can contain ant-style wildcards and double wildcards.
      */
     @Parameter
-    protected String excludes[];
+    protected String[] excludes;
 
     @Parameter(property = "cxf.testWsdlRoot", defaultValue = "${basedir}/src/test/resources/wsdl")
     protected File testWsdlRoot;
@@ -549,7 +549,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         addPluginArtifact(artifactsPath);
         artifactsPath.addAll(classPath);
 
-        String args[] = createForkOnceArgs(wargs);
+        String[] args = createForkOnceArgs(wargs);
         runForked(artifactsPath, getForkClass().getName(), args);
 
         for (GenericWsdlOption wsdlOption : toDo) {

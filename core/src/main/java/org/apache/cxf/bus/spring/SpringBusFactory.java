@@ -94,7 +94,7 @@ public class SpringBusFactory extends BusFactory {
         return createBus(cfgFile, defaultBusNotExists());
     }
 
-    public Bus createBus(String cfgFiles[]) {
+    public Bus createBus(String[] cfgFiles) {
         return createBus(cfgFiles, defaultBusNotExists());
     }
 
@@ -124,7 +124,7 @@ public class SpringBusFactory extends BusFactory {
         return createBus(new String[] {cfgFile}, includeDefaults);
     }
 
-    public Bus createBus(String cfgFiles[], boolean includeDefaults) {
+    public Bus createBus(String[] cfgFiles, boolean includeDefaults) {
         try {
             String userCfgFile
                 = SystemPropertyAction.getPropertyOrNull(Configurer.USER_CFG_FILE_PROPERTY_NAME);
@@ -152,7 +152,7 @@ public class SpringBusFactory extends BusFactory {
         }
     }
 
-    protected ConfigurableApplicationContext createApplicationContext(String cfgFiles[], boolean includeDefaults) {
+    protected ConfigurableApplicationContext createApplicationContext(String[] cfgFiles, boolean includeDefaults) {
         try {
             return new BusApplicationContext(cfgFiles, includeDefaults, context, resolver);
         } catch (BeansException ex) {

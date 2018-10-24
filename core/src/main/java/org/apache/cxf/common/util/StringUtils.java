@@ -37,7 +37,7 @@ import java.util.stream.Stream;
 public final class StringUtils {
     public static final Map<String, Pattern> PATTERN_MAP = new HashMap<>();
     static {
-        String patterns[] = {"/", " ", ":", ",", ";", "=", "\\.", "\\+"};
+        String[] patterns = {"/", " ", ":", ",", ";", "=", "\\.", "\\+"};
         for (String p : patterns) {
             PATTERN_MAP.put(p, Pattern.compile(p));
         }
@@ -187,7 +187,7 @@ public final class StringUtils {
         if (name == null || name.length() == 0) {
             return name;
         }
-        char chars[] = name.toCharArray();
+        char[] chars = name.toCharArray();
         chars[0] = Character.toUpperCase(chars[0]);
         return new String(chars);
     }

@@ -79,7 +79,7 @@ public class CXFAuthenticator extends Authenticator {
 
                 InputStream ins = ReferencingAuthenticator.class
                         .getResourceAsStream("ReferencingAuthenticator.class");
-                byte b[] = IOUtils.readBytesFromStream(ins);
+                byte[] b = IOUtils.readBytesFromStream(ins);
 
                 ReflectionUtil.setAccessible(m).invoke(loader, ReferencingAuthenticator.class.getName(),
                                                        b, 0, b.length);

@@ -76,7 +76,7 @@ public abstract class AbstractClientPersistenceTest extends AbstractBusClientSer
         String port;
         String pfx;
 
-        public Server(String args[]) {
+        public Server(String[] args) {
             port = args[0];
             pfx = args[1];
         }
@@ -112,7 +112,7 @@ public abstract class AbstractClientPersistenceTest extends AbstractBusClientSer
             ep = null;
         }
 
-        public static void main(String args[]) {
+        public static void main(String[] args) {
             new Server(args).start();
         }
 

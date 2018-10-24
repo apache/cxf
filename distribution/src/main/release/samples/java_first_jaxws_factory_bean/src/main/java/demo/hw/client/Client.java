@@ -30,7 +30,7 @@ public final class Client {
     private Client() {
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.getFeatures().add(new LoggingFeature());
         factory.setAddress("http://localhost:9000/helloWorld");

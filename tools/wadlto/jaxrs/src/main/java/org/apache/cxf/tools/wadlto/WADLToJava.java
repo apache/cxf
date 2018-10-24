@@ -40,7 +40,7 @@ public class WADLToJava {
     public WADLToJava() {
         args = new String[0];
     }
-    public WADLToJava(String pargs[]) {
+    public WADLToJava(String[] pargs) {
         args = pargs;
     }
 

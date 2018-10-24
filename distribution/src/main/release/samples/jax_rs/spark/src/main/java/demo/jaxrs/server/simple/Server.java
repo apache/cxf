@@ -25,7 +25,7 @@ import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 
 public class Server {
 
-    protected Server(String args[]) throws Exception {
+    protected Server(String[] args) throws Exception {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(StreamingService.class);
 
@@ -38,7 +38,7 @@ public class Server {
         sf.create();
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         new Server(args);
         System.out.println("Server ready...");
         Thread.sleep(60 * 60 * 1000);

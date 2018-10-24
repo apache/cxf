@@ -47,7 +47,7 @@ public final class Client {
     private Client() {
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         String keyStoreLoc = "src/main/config/clientKeystore.jks";
 
         KeyStore keyStore = KeyStore.getInstance("JKS");

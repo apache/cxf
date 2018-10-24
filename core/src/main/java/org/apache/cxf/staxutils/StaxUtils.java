@@ -130,7 +130,7 @@ public final class StaxUtils {
     private static final XMLOutputFactory SAFE_OUTPUT_FACTORY;
 
     private static final String XML_NS = "http://www.w3.org/2000/xmlns/";
-    private static final String DEF_PREFIXES[] = new String[] {
+    private static final String[] DEF_PREFIXES = new String[] {
         "ns1".intern(), "ns2".intern(), "ns3".intern(),
         "ns4".intern(), "ns5".intern(), "ns6".intern(),
         "ns7".intern(), "ns8".intern(), "ns9".intern()

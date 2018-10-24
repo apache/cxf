@@ -119,7 +119,7 @@ public class FaultToEndpointServer extends AbstractBusTestServerBase {
 
             //System.out.println("In handler: " + request.getContentLength());
 
-            byte bytes[] = new byte[1024];
+            byte[] bytes = new byte[1024];
             InputStream in = request.getInputStream();
             while (in.read(bytes) > -1) {
                 //nothing

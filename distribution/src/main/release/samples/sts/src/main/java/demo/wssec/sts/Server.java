@@ -36,7 +36,7 @@ public class Server {
         BusFactory.setDefaultBus(bus);
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
 
         if (args.length == 0) {
             System.out.println("please specify configuration file");

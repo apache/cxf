@@ -846,7 +846,7 @@ public class ClientImpl
                     setResponseContext(resCtx);
                 }
                 try {
-                    Object obj[] = processResult(message, message.getExchange(),
+                    Object[] obj = processResult(message, message.getExchange(),
                                                  null, resCtx);
 
                     callback.handleResponse(resCtx, obj);

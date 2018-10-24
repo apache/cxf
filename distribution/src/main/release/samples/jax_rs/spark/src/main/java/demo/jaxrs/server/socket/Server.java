@@ -44,7 +44,7 @@ import demo.jaxrs.server.simple.SparkStreamingOutput;
 
 public class Server {
 
-    protected Server(String args[]) throws Exception {
+    protected Server(String[] args) throws Exception {
 
         ServerSocket sparkServerSocket = new ServerSocket(9999);
         ServerSocket jaxrsResponseServerSocket = new ServerSocket(10000);
@@ -90,7 +90,7 @@ public class Server {
 
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         new Server(args);
         System.out.println("Server ready...");
         Thread.sleep(60 * 60 * 1000);

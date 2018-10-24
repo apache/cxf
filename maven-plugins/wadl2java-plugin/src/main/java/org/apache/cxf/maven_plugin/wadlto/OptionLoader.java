@@ -85,8 +85,8 @@ public final class OptionLoader {
      * @throws MojoExecutionException
      */
     public static List<WadlOption> loadWadlOptionsFromFile(File wadlBasedir,
-                                                           String includes[],
-                                                            String excludes[],
+                                                           String[] includes,
+                                                            String[] excludes,
                                                             Option defaultOptions,
                                                             File defaultOutputDir)
         throws MojoExecutionException {
@@ -117,7 +117,7 @@ public final class OptionLoader {
         return String.join(",", arr);
     }
 
-    private static List<File> getWadlFiles(File dir, String includes[], String excludes[])
+    private static List<File> getWadlFiles(File dir, String[] includes, String excludes[])
         throws MojoExecutionException {
 
         List<String> exList = new ArrayList<>();

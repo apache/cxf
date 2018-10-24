@@ -320,7 +320,7 @@ public class CachedWriter extends Writer {
         // read the file
         try (Reader fin = createInputStreamReader(tempFile)) {
             CharArrayWriter out = new CharArrayWriter((int)tempFile.length());
-            char bytes[] = new char[1024];
+            char[] bytes = new char[1024];
             int x = fin.read(bytes);
             while (x != -1) {
                 out.write(bytes, 0, x);
@@ -341,7 +341,7 @@ public class CachedWriter extends Writer {
         } else {
             // read the file
             try (Reader fin = createInputStreamReader(tempFile)) {
-                char bytes[] = new char[1024];
+                char[] bytes = new char[1024];
                 int x = fin.read(bytes);
                 while (x != -1) {
                     out.write(bytes, 0, x);
@@ -370,7 +370,7 @@ public class CachedWriter extends Writer {
         } else {
             // read the file
             try (Reader fin = createInputStreamReader(tempFile)) {
-                char bytes[] = new char[1024];
+                char[] bytes = new char[1024];
                 long x = fin.read(bytes);
                 while (x != -1) {
                     if ((count + x) > limit) {
@@ -401,7 +401,7 @@ public class CachedWriter extends Writer {
         } else {
             // read the file
             try (Reader r = createInputStreamReader(tempFile)) {
-                char chars[] = new char[1024];
+                char[] chars = new char[1024];
                 int x = r.read(chars);
                 while (x != -1) {
                     out.append(chars, 0, x);

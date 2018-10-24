@@ -44,7 +44,7 @@ public class AsymmetricServer extends AbstractBusTestServerBase {
         }
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         new AsymmetricServer().run();
     }
 }

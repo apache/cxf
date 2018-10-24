@@ -38,7 +38,7 @@ public final class Client {
     private Client() {
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
 
         URL wsdlURL = Client.class.getResource("/wsdl/hello_world.wsdl");
         SOAPService ss = new SOAPService(wsdlURL, SERVICE_NAME);

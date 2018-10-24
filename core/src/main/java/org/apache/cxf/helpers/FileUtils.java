@@ -105,7 +105,7 @@ public final class FileUtils {
     public static synchronized void maybeDeleteDefaultTempDir() {
         if (defaultTempDir != null) {
             Runtime.getRuntime().gc(); // attempt a garbage collect to close any files
-            String files[] = defaultTempDir.list();
+            String[] files = defaultTempDir.list();
             if (files != null && files.length > 0) {
                 //there are files in there, we need to attempt some more cleanup
 

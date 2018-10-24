@@ -110,7 +110,7 @@ public class PortTypeProcessor extends AbstractProcessor {
             interfaceInfo.setProperty("JavaInterface", intf);
 
             if (context.containsKey(ToolConstants.CFG_SEI_SUPER)) {
-                String supers[] = context.getArray(ToolConstants.CFG_SEI_SUPER);
+                String[] supers = context.getArray(ToolConstants.CFG_SEI_SUPER);
                 for (String s : supers) {
                     intf.addSuperInterface(s);
                 }

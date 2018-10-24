@@ -103,7 +103,7 @@ public class SwANoMimeServiceImpl implements SwAServiceInterface {
         try {
             InputStream bis = null;
             bis = data.value.getDataRef().getDataSource().getInputStream();
-            byte b[] = new byte[6];
+            byte[] b = new byte[6];
             bis.read(b, 0, 6);
             String string = IOUtils.newStringFromBytes(b);
 

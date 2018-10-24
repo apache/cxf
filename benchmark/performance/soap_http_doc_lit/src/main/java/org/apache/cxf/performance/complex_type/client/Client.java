@@ -96,7 +96,7 @@ public final class Client extends TestCaseBase<DocPortType> {
         }
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         //workaround issue of xmlsec logging too much
         Logger.getLogger("org.apache.xml.security.signature.Reference").setLevel(Level.WARNING);
 
@@ -111,7 +111,7 @@ public final class Client extends TestCaseBase<DocPortType> {
             }
         }
         if (servIdx != -1) {
-            String tmp[] = new String[args.length - servIdx];
+            String[] tmp = new String[args.length - servIdx];
             System.arraycopy(args, servIdx, tmp, 0, args.length - servIdx);
             Server.main(tmp);
 
@@ -121,7 +121,7 @@ public final class Client extends TestCaseBase<DocPortType> {
         }
         List<String> threadList = new ArrayList<>();
         if (threadIdx != -1) {
-            String threads[] = args[threadIdx].split(",");
+            String[] threads = args[threadIdx].split(",");
             for (String s : threads) {
                 if (s.indexOf("-") != -1) {
                     String s1 = s.substring(0, s.indexOf("-"));

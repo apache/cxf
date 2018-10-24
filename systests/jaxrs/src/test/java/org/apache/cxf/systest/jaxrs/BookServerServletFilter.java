@@ -68,7 +68,7 @@ public class BookServerServletFilter extends AbstractBusTestServerBase {
         }
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         try {
             BookServerServletFilter s = new BookServerServletFilter();
             s.start();

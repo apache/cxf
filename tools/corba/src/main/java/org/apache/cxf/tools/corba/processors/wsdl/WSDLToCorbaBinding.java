@@ -856,7 +856,7 @@ public class WSDLToCorbaBinding {
         }
     }
 
-    public void main(String args[]) {
+    public void main(String[] args) {
         if (args.length != 6) {
             System.err.println("usage: WSDLToCORBABinding "
                                + "-w <wsdl file> -i <interfaceName> -o <output wsdl file>");

@@ -26,7 +26,7 @@ import org.osgi.framework.FrameworkUtil;
 
 public class OsgiSwaggerUiResolver extends SwaggerUiResolver {
     private static final String DEFAULT_COORDINATES = "org.webjars/swagger-ui";
-    private static final String DEFAULT_LOCATIONS[] = {
+    private static final String[] DEFAULT_LOCATIONS = {
         "mvn:" + DEFAULT_COORDINATES + "/",
         "wrap:mvn:" + DEFAULT_COORDINATES + "/"
     };

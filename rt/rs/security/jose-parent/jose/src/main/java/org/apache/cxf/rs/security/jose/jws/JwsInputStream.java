@@ -49,7 +49,7 @@ public class JwsInputStream extends FilterInputStream {
         return value;
     }
  
-    public int read(byte b[], int off, int len) throws IOException {
+    public int read(byte[] b, int off, int len) throws IOException {
         int num = in.read(b, off, len);
         if (num != -1) {
             signature.update(b, off, num);

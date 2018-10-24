@@ -36,7 +36,7 @@ public class Server {
         sf.create();
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         new Server();
         System.out.println("Server ready...");
 

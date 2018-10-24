@@ -68,7 +68,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
                                 Bus b) {
         this(new String[] {resource}, cl, initialExtensions, rm, b);
     }
-    public ExtensionManagerImpl(String resources[],
+    public ExtensionManagerImpl(String[] resources,
                                 ClassLoader cl,
                                 Map<Class<?>, Object> initialExtensions,
                                 ResourceManager rm,
@@ -93,7 +93,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
         }
     }
 
-    final void load(String resources[]) {
+    final void load(String[] resources) {
         if (resources == null) {
             return;
         }

@@ -164,7 +164,7 @@ public abstract class AbstractTypeTestClient
         if (!shouldRunTest("Byte")) {
             return;
         }
-        byte valueSets[][] = {{0, 1}, {-1, 0}, {Byte.MIN_VALUE, Byte.MAX_VALUE}};
+        byte[] valueSets[] = {{0, 1}, {-1, 0}, {Byte.MIN_VALUE, Byte.MAX_VALUE}};
 
         for (int i = 0; i < valueSets.length; i++) {
             byte x = valueSets[i][0];
@@ -222,7 +222,7 @@ public abstract class AbstractTypeTestClient
         if (!shouldRunTest("UnsignedShort")) {
             return;
         }
-        int valueSets[][] = {{0, 1}, {1, 0}, {0, Short.MAX_VALUE * 2 + 1}};
+        int[] valueSets[] = {{0, 1}, {1, 0}, {0, Short.MAX_VALUE * 2 + 1}};
 
         for (int i = 0; i < valueSets.length; i++) {
             int x = valueSets[i][0];
@@ -252,7 +252,7 @@ public abstract class AbstractTypeTestClient
         if (!shouldRunTest("Int")) {
             return;
         }
-        int valueSets[][] = {{5, 10}, {-10, 50}, {Integer.MIN_VALUE, Integer.MAX_VALUE}};
+        int[] valueSets[] = {{5, 10}, {-10, 50}, {Integer.MIN_VALUE, Integer.MAX_VALUE}};
 
         for (int i = 0; i < valueSets.length; i++) {
             int x = valueSets[i][0];
@@ -281,7 +281,7 @@ public abstract class AbstractTypeTestClient
         if (!shouldRunTest("UnsignedInt")) {
             return;
         }
-        long valueSets[][] = {{0, ((long)Integer.MAX_VALUE) * 2 + 1}, {11, 20}, {1, 0}};
+        long[] valueSets[] = {{0, ((long)Integer.MAX_VALUE) * 2 + 1}, {11, 20}, {1, 0}};
 
         for (int i = 0; i < valueSets.length; i++) {
             long x = valueSets[i][0];
@@ -312,7 +312,7 @@ public abstract class AbstractTypeTestClient
         if (!shouldRunTest("Long")) {
             return;
         }
-        long valueSets[][] = {{0, 1}, {-1, 0}, {Long.MIN_VALUE, Long.MAX_VALUE}};
+        long[] valueSets[] = {{0, 1}, {-1, 0}, {Long.MIN_VALUE, Long.MAX_VALUE}};
 
         for (int i = 0; i < valueSets.length; i++) {
             long x = valueSets[i][0];
@@ -341,7 +341,7 @@ public abstract class AbstractTypeTestClient
         if (!shouldRunTest("UnsignedLong")) {
             return;
         }
-        BigInteger valueSets[][] = {{new BigInteger("0"), new BigInteger("1")},
+        BigInteger[] valueSets[] = {{new BigInteger("0"), new BigInteger("1")},
                                     {new BigInteger("1"), new BigInteger("0")},
                                     {new BigInteger("0"),
                                      new BigInteger(String.valueOf(Long.MAX_VALUE))}};
@@ -543,7 +543,7 @@ public abstract class AbstractTypeTestClient
             buffer2.append((char)('A' + (x % 26)));
         }
 
-        String valueSets[][] = {{"hello", "world"},
+        String[] valueSets[] = {{"hello", "world"},
                                 {"is pi > 3 ?", " is pi < 4\\\""},
                                 {"<illegal_tag/>", ""},
                                 {buffer.toString(), buffer2.toString()},
@@ -576,7 +576,7 @@ public abstract class AbstractTypeTestClient
         if (!shouldRunTest("StringI18N")) {
             return;
         }
-        String valueSets[][] = {{"hello", I18NStrings.CHINESE_COMPLEX_STRING},
+        String[] valueSets[] = {{"hello", I18NStrings.CHINESE_COMPLEX_STRING},
                                 {"hello", I18NStrings.JAP_SIMPLE_STRING}, };
 
         for (int i = 0; i < valueSets.length; i++) {
@@ -606,7 +606,7 @@ public abstract class AbstractTypeTestClient
         if (!shouldRunTest("QName")) {
             return;
         }
-        String valueSets[][] = {{"NoNamespaceService", ""},
+        String[] valueSets[] = {{"NoNamespaceService", ""},
                                 {"HelloWorldService", "http://www.iona.com/services"},
                                 {I18NStrings.JAP_SIMPLE_STRING, "http://www.iona.com/iona"},
                                 {"MyService", "http://www.iona.com/iona"}};
@@ -1145,7 +1145,7 @@ public abstract class AbstractTypeTestClient
         if (!shouldRunTest("Integer")) {
             return;
         }
-        BigInteger valueSets[][] = {{new BigInteger("-1234567890"), new BigInteger("1234567890")},
+        BigInteger[] valueSets[] = {{new BigInteger("-1234567890"), new BigInteger("1234567890")},
                                     {new BigInteger("-" + String.valueOf(Long.MAX_VALUE)),
                                      new BigInteger(String.valueOf(Long.MAX_VALUE))}};
 
@@ -1176,7 +1176,7 @@ public abstract class AbstractTypeTestClient
         if (!shouldRunTest("PositiveInteger")) {
             return;
         }
-        BigInteger valueSets[][] = {{new BigInteger("1"), new BigInteger("1234567890")},
+        BigInteger[] valueSets[] = {{new BigInteger("1"), new BigInteger("1234567890")},
                                     {new BigInteger(String.valueOf(Integer.MAX_VALUE)),
                                      new BigInteger(String.valueOf(Long.MAX_VALUE))}};
 
@@ -1207,7 +1207,7 @@ public abstract class AbstractTypeTestClient
         if (!shouldRunTest("NonPositiveInteger")) {
             return;
         }
-        BigInteger valueSets[][] = {{new BigInteger("0"), new BigInteger("-1234567890")},
+        BigInteger[] valueSets[] = {{new BigInteger("0"), new BigInteger("-1234567890")},
                                     {new BigInteger("-"
                                                     + String.valueOf(Integer.MAX_VALUE * Integer.MAX_VALUE)),
                                      new BigInteger("-" + String.valueOf(Long.MAX_VALUE * Long.MAX_VALUE))}};
@@ -1239,7 +1239,7 @@ public abstract class AbstractTypeTestClient
         if (!shouldRunTest("NegativeInteger")) {
             return;
         }
-        BigInteger valueSets[][] = {{new BigInteger("-1"), new BigInteger("-1234567890")},
+        BigInteger[] valueSets[] = {{new BigInteger("-1"), new BigInteger("-1234567890")},
                                     {new BigInteger("-"
                                                     + String.valueOf(Integer.MAX_VALUE * Integer.MAX_VALUE)),
                                      new BigInteger("-" + String.valueOf(Long.MAX_VALUE * Long.MAX_VALUE))}};
@@ -1271,7 +1271,7 @@ public abstract class AbstractTypeTestClient
         if (!shouldRunTest("NonNegativeInteger")) {
             return;
         }
-        BigInteger valueSets[][] = {{new BigInteger("0"),
+        BigInteger[] valueSets[] = {{new BigInteger("0"),
                                         new BigInteger("1234567890")},
                                     {new BigInteger(String.valueOf(Integer.MAX_VALUE)),
                                      new BigInteger(String.valueOf(Long.MAX_VALUE))}};
@@ -1369,7 +1369,7 @@ public abstract class AbstractTypeTestClient
         if (!shouldRunTest("AnyURI")) {
             return;
         }
-        String valueSets[][] = {{"file:///root%20%20/-;?&+",
+        String[] valueSets[] = {{"file:///root%20%20/-;?&+",
                                     "file:///w:/test!artix~java*"},
                                 {"http://iona.com/",
                                     "file:///z:/mail_iona=com,\'xmlbus\'"},

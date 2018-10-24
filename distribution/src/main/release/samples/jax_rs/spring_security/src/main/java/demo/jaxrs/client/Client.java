@@ -39,7 +39,7 @@ public final class Client {
     private Client() {
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
 
         System.out.println("\n");
         Client c = new Client();

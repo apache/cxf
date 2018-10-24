@@ -99,7 +99,7 @@ public class WSDLToIDLTest extends ToolTestBase {
         return 0;
     }
 
-    private void checkStrings(byte orig[], byte generated[]) throws Exception {
+    private void checkStrings(byte[] orig, byte generated[]) throws Exception {
         BufferedReader origReader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(orig)));
         BufferedReader genReader =
             new BufferedReader(new InputStreamReader(

@@ -304,7 +304,7 @@ public class UDPConduit extends AbstractConduit {
                 }
 
                 if (!message.getExchange().isOneWay()) {
-                    byte bytes[] = new byte[64 * 1024];
+                    byte[] bytes = new byte[64 * 1024];
                     DatagramPacket p = new DatagramPacket(bytes, bytes.length);
                     Object to = message.getContextualProperty(MULTI_RESPONSE_TIMEOUT);
                     Integer i = null;
@@ -358,7 +358,7 @@ public class UDPConduit extends AbstractConduit {
         public void write(int b) throws IOException {
             buffer.put(new byte[] {(byte)b}, 0, 1);
         }
-        public void write(byte b[], int off, int len) throws IOException {
+        public void write(byte[] b, int off, int len) throws IOException {
             while (len > buffer.remaining()) {
                 int nlen = buffer.remaining();
                 buffer.put(b, off, nlen);

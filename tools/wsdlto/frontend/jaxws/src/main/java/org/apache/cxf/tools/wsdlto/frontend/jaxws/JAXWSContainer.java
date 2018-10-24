@@ -90,7 +90,7 @@ public class JAXWSContainer extends WSDLToJavaContainer {
     }
 
     private void cleanArrays(ToolContext env, String key) {
-        String s[] = env.getArray(key);
+        String[] s = env.getArray(key);
         if (s != null) {
             List<String> n = new ArrayList<>();
             for (String s2 : s) {

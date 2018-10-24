@@ -44,7 +44,7 @@ public class STSServer extends AbstractBusTestServerBase {
         }
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         new STSServer().run();
     }
 }

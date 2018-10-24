@@ -871,7 +871,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
 
         writer.writeEndElement();
 
-        Object obj[] = client.invoke(boi, new DOMSource(writer.getDocument().getDocumentElement()));
+        Object[] obj = client.invoke(boi, new DOMSource(writer.getDocument().getDocumentElement()));
 
         return new STSResponse((DOMSource)obj[0], requestorEntropy, cert, crypto);
     }
@@ -1091,7 +1091,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
 
         writer.writeEndElement();
 
-        Object obj[] = client.invoke(boi, new DOMSource(writer.getDocument().getDocumentElement()));
+        Object[] obj = client.invoke(boi, new DOMSource(writer.getDocument().getDocumentElement()));
 
         return new STSResponse((DOMSource)obj[0], null);
     }
@@ -1164,7 +1164,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
             writer.writeEndElement();
             writer.writeEndElement();
 
-            Object o[] = client.invoke(boi, new DOMSource(writer.getDocument().getDocumentElement()));
+            Object[] o = client.invoke(boi, new DOMSource(writer.getDocument().getDocumentElement()));
 
             return new STSResponse((DOMSource)o[0], null);
         }
@@ -1211,7 +1211,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
         writer.writeEndElement();
         writer.writeEndElement();
 
-        Object o[] = client.invoke(boi, new DOMSource(writer.getDocument().getDocumentElement()));
+        Object[] o = client.invoke(boi, new DOMSource(writer.getDocument().getDocumentElement()));
 
         return new STSResponse((DOMSource)o[0], requestorEntropy, cert, crypto);
     }

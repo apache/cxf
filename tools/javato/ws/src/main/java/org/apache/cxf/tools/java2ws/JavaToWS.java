@@ -35,7 +35,7 @@ public class JavaToWS {
         args = new String[0];
     }
 
-    public JavaToWS(String pargs[]) {
+    public JavaToWS(String[] pargs) {
         args = pargs;
     }
 

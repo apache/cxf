@@ -43,7 +43,7 @@ public class PlugInClassLoader extends SecureClassLoader {
     private static final String JARS_PROPS_FILE = "jars.properties";
     private static final String FILTERS_PROPS_FILE = "filters.properties";
     private static final String NEFILTERS_PROPS_FILE = "negativefilters.properties";
-    private String jarUrls[] = new String[0];
+    private String[] jarUrls = new String[0];
     private final ProtectionDomain protectionDomain;
 
     private final ClassLoader ploader;
@@ -58,7 +58,7 @@ public class PlugInClassLoader extends SecureClassLoader {
         processJarUrls(jarUrls);
     }
 
-    private void processJarUrls(String urls[]) {
+    private void processJarUrls(String[] urls) {
         for (int i = 0; i < urls.length; i++) {
             if (urls[i].startsWith(ZIP_COLON)) {
                 urls[i] = FILE_COLON + urls[i].substring(ZIP_COLON.length());
@@ -124,7 +124,7 @@ public class PlugInClassLoader extends SecureClassLoader {
     protected Class<?> findClass(String name) throws ClassNotFoundException {
         String path = name.replace('.', '/').concat(".class");
         LOG.fine("findClass " + path);
-        byte bytes[] = null;
+        byte[] bytes = null;
 
         for (int i = 0; i < jarUrls.length; i++) {
             String fullpath = jarUrls[i] + "!/" + path;

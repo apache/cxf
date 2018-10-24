@@ -252,7 +252,7 @@ public class CorbaObjectReaderTest extends Assert {
     @Test
     public void testReadArray() {
 
-        int data[] = {1, 1, 2, 3, 5, 8, 13, 21};
+        int[] data = {1, 1, 2, 3, 5, 8, 13, 21};
 
         OutputStream oStream = orb.create_output_stream();
         oStream.write_long_array(data, 0, data.length);
@@ -288,7 +288,7 @@ public class CorbaObjectReaderTest extends Assert {
 
     @Test
     public void testReadSequence() {
-        String data[] = {"one", "one", "two", "three", "five", "eight", "thirteen", "twenty-one"};
+        String[] data = {"one", "one", "two", "three", "five", "eight", "thirteen", "twenty-one"};
 
         OutputStream oStream = orb.create_output_stream();
         oStream.write_long(data.length);

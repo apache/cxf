@@ -82,7 +82,7 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
                 if (reader == null) {
                     reader = new InputStreamReader(is, (String)message.get(Message.ENCODING));
                 }
-                char s[] = new char[1024];
+                char[] s = new char[1024];
                 int i = reader.read(s);
                 while (htmlMessage.length() < 64536 && i > 0) {
                     htmlMessage.append(s, 0, i);

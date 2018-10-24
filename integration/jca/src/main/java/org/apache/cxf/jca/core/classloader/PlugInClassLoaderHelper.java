@@ -74,7 +74,7 @@ public final class PlugInClassLoaderHelper {
         Map<?, ?> jarMap = JarLoader.getJarContents(enclosingJar);
 
         if (null != jarMap && jarMap.containsKey(resourceName)) {
-            byte bytes[] = (byte[])jarMap.get(resourceName);
+            byte[] bytes = (byte[])jarMap.get(resourceName);
 
             // this class will not be looked for again
             // once it is loaded so to save memory we

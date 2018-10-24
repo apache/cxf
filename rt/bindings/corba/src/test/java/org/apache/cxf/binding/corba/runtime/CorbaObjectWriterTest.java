@@ -245,7 +245,7 @@ public class CorbaObjectWriterTest extends Assert {
 
     @Test
     public void testWriteArray() {
-        int data[] = {1, 1, 2, 3, 5, 8, 13, 21};
+        int[] data = {1, 1, 2, 3, 5, 8, 13, 21};
 
         // create an array of longs
         QName longIdlType = new QName(CorbaConstants.NU_WSDL_CORBA, "long", CorbaConstants.NP_WSDL_CORBA);
@@ -279,7 +279,7 @@ public class CorbaObjectWriterTest extends Assert {
 
     @Test
     public void testWriteSequence() {
-        String data[] = {"one", "one", "two", "three", "five", "eight", "thirteen", "twenty-one"};
+        String[] data = {"one", "one", "two", "three", "five", "eight", "thirteen", "twenty-one"};
 
         // create an sequence of strings
         QName stringIdlType = new QName(CorbaConstants.NU_WSDL_CORBA, "string", CorbaConstants.NP_WSDL_CORBA);

@@ -330,7 +330,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             }
             writer.writeStartElement(prefix, "RequestSecurityTokenResponse", namespace);
 
-            byte clientEntropy[] = null;
+            byte[] clientEntropy = null;
             int keySize = 256;
             long ttl = WSS4JUtils.getSecurityTokenLifetime(exchange.getOutMessage());
             String tokenType = null;

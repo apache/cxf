@@ -40,7 +40,7 @@ public class XMLServerImpl extends AbstractBusTestServerBase {
         Endpoint.publish(address, implementor);
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         try {
             XMLServerImpl s = new XMLServerImpl();
             s.start();

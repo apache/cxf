@@ -44,7 +44,7 @@ public class SOAPDocLitServerImpl extends AbstractBusTestServerBase {
         Endpoint.publish(address, implementor);
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         try {
             SOAPDocLitServerImpl s = new SOAPDocLitServerImpl();
             s.start();

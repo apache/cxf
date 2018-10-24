@@ -102,7 +102,7 @@ public class Server {
 
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = Server.class.getResource("wssec.xml");

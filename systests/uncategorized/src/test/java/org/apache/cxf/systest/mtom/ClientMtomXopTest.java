@@ -112,7 +112,7 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
         try {
             Holder<DataHandler> param = new Holder<>();
             Holder<String> name;
-            byte bytes[];
+            byte[] bytes;
             InputStream in;
 
             InputStream pre = this.getClass().getResourceAsStream("/wsdl/mtom_xop.wsdl");
@@ -215,7 +215,7 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
         try {
             Holder<DataHandler> param = new Holder<>();
             Holder<String> name;
-            byte bytes[];
+            byte[] bytes;
             InputStream in;
 
             InputStream pre = this.getClass().getResourceAsStream("/wsdl/mtom_xop.wsdl");

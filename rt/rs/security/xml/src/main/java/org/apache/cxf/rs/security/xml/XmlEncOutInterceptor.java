@@ -266,7 +266,7 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
 
         Node keyIdentifierNode = null;
         if (keyIdType.equals(RSSecurityUtils.X509_CERT)) {
-            byte data[] = null;
+            byte[] data = null;
             try {
                 data = remoteCert.getEncoded();
             } catch (CertificateEncodingException e) {

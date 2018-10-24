@@ -256,7 +256,7 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
         assertEquals(0, part.getIndex());
 
         d.setMessageObserver(new MessageReplayObserver("sayHiResponse.xml"));
-        Object ret[] = client.invoke(bop, new Object[] {"hi"}, null);
+        Object[] ret = client.invoke(bop, new Object[] {"hi"}, null);
         assertNotNull(ret);
         assertEquals("Wrong number of return objects", 1, ret.length);
 

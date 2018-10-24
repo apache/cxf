@@ -52,7 +52,7 @@ public class Option {
     /**
      * Specifies JAXB binding files. Use spaces to separate multiple entries.
      */
-    String bindingFiles[] = new String[0];
+    String[] bindingFiles = new String[0];
 
     /**
      * Specifies catalog file to map the imported wadl/schema
@@ -118,14 +118,14 @@ public class Option {
         outputDir = f;
     }
 
-    public void setBindingFiles(String files[]) {
+    public void setBindingFiles(String[] files) {
         bindingFiles = files;
     }
     public String[] getBindingFiles() {
         return bindingFiles;
     }
     public void addBindingFile(File file) {
-        String tmp[] = new String[bindingFiles.length + 1];
+        String[] tmp = new String[bindingFiles.length + 1];
         System.arraycopy(bindingFiles, 0, tmp, 0, bindingFiles.length);
         bindingFiles = tmp;
         bindingFiles[bindingFiles.length - 1] = file.getAbsolutePath();

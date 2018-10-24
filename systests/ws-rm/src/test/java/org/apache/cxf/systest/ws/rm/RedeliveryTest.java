@@ -57,7 +57,7 @@ public class RedeliveryTest extends AbstractBusClientServerTestBase {
         String pfx;
         Endpoint ep;
 
-        public Server(String args[]) {
+        public Server(String[] args) {
             port = args[0];
             pfx = args[1];
         }

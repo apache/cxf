@@ -478,7 +478,7 @@ public class AttachmentDeserializerTest extends Assert {
 
     private String getString(InputStream ins) throws Exception {
         try (ByteArrayOutputStream bout = new ByteArrayOutputStream(100)) {
-            byte b[] = new byte[100];
+            byte[] b = new byte[100];
             int i = ins.read(b);
             while (i > 0) {
                 bout.write(b, 0, i);
@@ -516,7 +516,7 @@ public class AttachmentDeserializerTest extends Assert {
         for (int x = 1; x < 50; x++) {
             String cid = "1882f79d-e20a-4b36-a222-7a75518cf395-" + x + "@cxf.apache.org";
             DataSource ds = AttachmentUtil.getAttachmentDataSource(cid, message.getAttachments());
-            byte bts[] = new byte[1024];
+            byte[] bts = new byte[1024];
 
             InputStream ins = ds.getInputStream();
             int count = 0;
@@ -557,7 +557,7 @@ public class AttachmentDeserializerTest extends Assert {
 
         String cid = "1a66bb35-67fc-4e89-9f33-48af417bf9fe-1@apache.org";
         DataSource ds = AttachmentUtil.getAttachmentDataSource(cid, message.getAttachments());
-        byte bts[] = new byte[1024];
+        byte[] bts = new byte[1024];
         InputStream ins = ds.getInputStream();
         int count = ins.read(bts, 0, bts.length);
         assertEquals(500, count);
@@ -599,7 +599,7 @@ public class AttachmentDeserializerTest extends Assert {
 
         String cid = "1a66bb35-67fc-4e89-9f33-48af417bf9fe-1@apache.org";
         DataSource ds = AttachmentUtil.getAttachmentDataSource(cid, message.getAttachments());
-        byte bts[] = new byte[1024];
+        byte[] bts = new byte[1024];
         InputStream ins = ds.getInputStream();
         int count = 0;
         int x = ins.read(bts, 500, 200);
@@ -650,7 +650,7 @@ public class AttachmentDeserializerTest extends Assert {
 
         String cid = "1a66bb35-67fc-4e89-9f33-48af417bf9fe-1@apache.org";
         DataSource ds = AttachmentUtil.getAttachmentDataSource(cid, message.getAttachments());
-        byte bts[] = new byte[1024];
+        byte[] bts = new byte[1024];
         InputStream ins = ds.getInputStream();
         int count = 0;
         int x = ins.read(bts, 100, 600);

@@ -61,7 +61,7 @@ public class OSGIBusListener implements BusLifeCycleListener {
     public OSGIBusListener(Bus b) {
         this(b, null);
     }
-    public OSGIBusListener(Bus b, Object args[]) {
+    public OSGIBusListener(Bus b, Object[] args) {
         bus = b;
         if (args != null && args.length > 0
             && args[0] instanceof BundleContext) {

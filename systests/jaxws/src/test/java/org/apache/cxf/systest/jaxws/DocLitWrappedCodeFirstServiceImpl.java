@@ -44,7 +44,7 @@ import org.apache.cxf.systest.jaxws.types.BarImpl;
 @GZIP(threshold = 10)
 @FastInfoset(force = true)
 public class DocLitWrappedCodeFirstServiceImpl implements DocLitWrappedCodeFirstService {
-    public static final String DATA[] = new String[] {"string1", "string2", "string3"};
+    public static final String[] DATA = new String[] {"string1", "string2", "string3"};
 
     @Resource
     WebServiceContext context;

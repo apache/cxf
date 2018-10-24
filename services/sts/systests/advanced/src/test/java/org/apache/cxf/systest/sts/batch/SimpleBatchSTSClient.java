@@ -559,7 +559,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
         }
         writer.writeEndElement();
 
-        Object obj[] = client.invoke(boi, new DOMSource(writer.getDocument().getDocumentElement()));
+        Object[] obj = client.invoke(boi, new DOMSource(writer.getDocument().getDocumentElement()));
 
         Element responseCollection = getDocumentElement((DOMSource)obj[0]);
         Node child = responseCollection.getFirstChild();
@@ -609,7 +609,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
         }
         writer.writeEndElement();
 
-        Object obj[] = client.invoke(boi, new DOMSource(writer.getDocument().getDocumentElement()));
+        Object[] obj = client.invoke(boi, new DOMSource(writer.getDocument().getDocumentElement()));
 
         Element responseCollection = getDocumentElement((DOMSource)obj[0]);
         Node child = responseCollection.getFirstChild();

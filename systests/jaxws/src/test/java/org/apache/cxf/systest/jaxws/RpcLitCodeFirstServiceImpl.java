@@ -30,7 +30,7 @@ import javax.xml.ws.Holder;
             portName = "RpcLitCodeFirstServicePort",
             targetNamespace = "http://cxf.apache.org/systest/jaxws/RpcLitCodeFirstService")
 public class RpcLitCodeFirstServiceImpl implements RpcLitCodeFirstService {
-    public static final String DATA[] = new String[] {"string1", "string2", "string3"};
+    public static final String[] DATA = new String[] {"string1", "string2", "string3"};
 
     public int thisShouldNotBeInTheWSDL(int i) {
         return i;
@@ -127,7 +127,7 @@ public class RpcLitCodeFirstServiceImpl implements RpcLitCodeFirstService {
     }
 
     public String[] convertToString(int[] numbers) {
-        String ret[] = new String[numbers.length];
+        String[] ret = new String[numbers.length];
         for (int x = 0; x < numbers.length; x++) {
             ret[x] = Integer.toString(numbers[x]);
         }

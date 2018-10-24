@@ -31,7 +31,7 @@ public class Server extends AbstractBusTestServerBase {
         Endpoint.publish(address, implementor);
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         try {
             Server s = new Server();
             s.start();

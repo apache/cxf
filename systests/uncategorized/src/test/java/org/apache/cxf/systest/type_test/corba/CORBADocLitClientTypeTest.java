@@ -46,7 +46,7 @@ public class CORBADocLitClientTypeTest extends AbstractTypeTestClient5 {
     private static final Set<String> RUN_TESTS = new HashSet<>();
     static {
 
-        String notWorking[] = new String[] {
+        String[] notWorking = new String[] {
             "AnonEnumList",
             "AnonymousType",
             "AnyURIRestriction",
@@ -175,7 +175,7 @@ public class CORBADocLitClientTypeTest extends AbstractTypeTestClient5 {
         };
         NOT_WORKING_TESTS.addAll(Arrays.asList(notWorking));
 
-        String notWorkingIBM[] = new String[] {
+        String[] notWorkingIBM = new String[] {
             "AnyURIEnum",
             "NMTokenEnum",
             "DecimalEnum",

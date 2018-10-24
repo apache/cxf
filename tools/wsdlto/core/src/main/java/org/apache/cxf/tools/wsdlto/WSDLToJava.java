@@ -50,7 +50,7 @@ public class WSDLToJava {
     public WSDLToJava() {
         args = new String[0];
     }
-    public WSDLToJava(String pargs[]) {
+    public WSDLToJava(String[] pargs) {
         args = pargs;
     }
 

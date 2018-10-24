@@ -138,7 +138,7 @@ public abstract class AbstractPropertiesHolder implements Extensible {
             return delegate.containsExtensor(el);
         }
 
-        Object exts[] = extensors.get();
+        Object[] exts = extensors.get();
         if (exts != null) {
             for (Object o : exts) {
                 if (o == el) {
@@ -153,8 +153,8 @@ public abstract class AbstractPropertiesHolder implements Extensible {
             delegate.addExtensor(el);
             return;
         }
-        Object exts[] = extensors.get();
-        Object exts2[];
+        Object[] exts = extensors.get();
+        Object[] exts2;
         if (exts == null) {
             exts2 = new Object[1];
         } else {
@@ -174,7 +174,7 @@ public abstract class AbstractPropertiesHolder implements Extensible {
         if (delegate != null) {
             return delegate.getExtensor(cls);
         }
-        Object exts[] = extensors.get();
+        Object[] exts = extensors.get();
         if (exts == null) {
             return null;
         }
@@ -190,7 +190,7 @@ public abstract class AbstractPropertiesHolder implements Extensible {
             return delegate.getExtensors(cls);
         }
 
-        Object exts[] = extensors.get();
+        Object[] exts = extensors.get();
         if (exts == null) {
             return null;
         }

@@ -38,7 +38,7 @@ public class Handler extends URLStreamHandler {
         }
 
         public InputStream getInputStream() throws java.io.IOException {
-            byte bytes[] = PlugInClassLoaderHelper.getResourceAsBytes(url.getPath());
+            byte[] bytes = PlugInClassLoaderHelper.getResourceAsBytes(url.getPath());
 
             if (bytes != null) {
                 return new java.io.ByteArrayInputStream(bytes);

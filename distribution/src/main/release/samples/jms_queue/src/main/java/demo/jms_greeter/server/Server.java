@@ -62,7 +62,7 @@ public class Server {
         }
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         Server s = new Server();
         System.out.println("Server ready...");
         try {

@@ -78,7 +78,7 @@ public class RMPolicyTest extends AbstractBusClientServerTestBase {
         public Server(String dir) {
             tmpDir = dir;
         }
-        public Server(String args[]) {
+        public Server(String[] args) {
             tmpDir = args[0];
         }
         protected void run()  {

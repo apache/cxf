@@ -67,7 +67,7 @@ public class BookServerSpring extends AbstractBusTestServerBase {
         }
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         try {
             BookServerSpring s = new BookServerSpring();
             s.start();

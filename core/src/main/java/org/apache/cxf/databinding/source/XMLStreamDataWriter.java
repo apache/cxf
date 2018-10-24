@@ -233,7 +233,7 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
         
         private String getAttachmentElementName(SAXParseException exception) {
             String msg = exception.getMessage();
-            String str[] = msg.split("'");
+            String[] str = msg.split("'");
             return str[1];
         }
         

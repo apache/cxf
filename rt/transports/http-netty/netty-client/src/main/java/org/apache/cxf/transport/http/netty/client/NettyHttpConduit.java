@@ -289,7 +289,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
         protected void setupWrappedStream() throws IOException {
             connect(true);
             wrappedStream = new OutputStream() {
-                public void write(byte b[], int off, int len) throws IOException {
+                public void write(byte[] b, int off, int len) throws IOException {
                     outputStream.write(b, off, len);
                 }
                 public void write(int b) throws IOException {

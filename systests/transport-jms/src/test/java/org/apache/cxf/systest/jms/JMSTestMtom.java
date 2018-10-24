@@ -86,7 +86,7 @@ public class JMSTestMtom {
         int size = handler1.value.getInputStream().available();
         mtom.testDataHandler(name, handler1);
 
-        byte bytes[] = IOUtils.readBytesFromStream(handler1.value.getInputStream());
+        byte[] bytes = IOUtils.readBytesFromStream(handler1.value.getInputStream());
         Assert.assertEquals("The response file is not same with the sent file.", size, bytes.length);
         ((Closeable)mtom).close();
     }
@@ -106,7 +106,7 @@ public class JMSTestMtom {
         int size = handler1.getInputStream().available();
         DataHandler ret = mtom.testOutMtom();
 
-        byte bytes[] = IOUtils.readBytesFromStream(ret.getInputStream());
+        byte[] bytes = IOUtils.readBytesFromStream(ret.getInputStream());
         Assert.assertEquals("The response file is not same with the original file.", size, bytes.length);
         ((Closeable)mtom).close();
     }

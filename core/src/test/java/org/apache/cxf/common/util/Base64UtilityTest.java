@@ -34,7 +34,7 @@ public class Base64UtilityTest extends Assert {
         super();
     }
 
-    void assertEquals(byte b1[], byte b2[]) {
+    void assertEquals(byte[] b1, byte b2[]) {
         assertEquals(b1.length, b2.length);
         for (int x = 0; x < b1.length; x++) {
             assertEquals(b1[x], b2[x]);
@@ -73,16 +73,16 @@ public class Base64UtilityTest extends Assert {
 
     @Test
     public void testEncodeDecodeChunk() throws Exception {
-        byte bytes[] = new byte[100];
+        byte[] bytes = new byte[100];
         for (int x = 0; x < bytes.length; x++) {
             bytes[x] = (byte)x;
         }
 
-        char encodedChars[] = Base64Utility.encodeChunk(bytes, 0, -2);
+        char[] encodedChars = Base64Utility.encodeChunk(bytes, 0, -2);
         assertNull(encodedChars);
         encodedChars = Base64Utility.encodeChunk(bytes, 0, bytes.length);
         assertNotNull(encodedChars);
-        byte bytesDecoded[] = Base64Utility.decodeChunk(encodedChars, 0, encodedChars.length);
+        byte[] bytesDecoded = Base64Utility.decodeChunk(encodedChars, 0, encodedChars.length);
         assertEquals(bytes, bytesDecoded);
 
         //require padding
@@ -123,7 +123,7 @@ public class Base64UtilityTest extends Assert {
     @Test
     public void testEncodeDecodeString() throws Exception {
         String in = "QWxhZGRpbjpvcGVuIHNlc2FtZQ==";
-        byte bytes[] = Base64Utility.decode(in);
+        byte[] bytes = Base64Utility.decode(in);
         assertEquals("Aladdin:open sesame", IOUtils.newStringFromBytes(bytes));
         String encoded = Base64Utility.encode(bytes);
         assertEquals(in, encoded);
@@ -142,7 +142,7 @@ public class Base64UtilityTest extends Assert {
 
     @Test
     public void testEncodeDecodeStreams() throws Exception {
-        byte bytes[] = new byte[100];
+        byte[] bytes = new byte[100];
         for (int x = 0; x < bytes.length; x++) {
             bytes[x] = (byte)x;
         }

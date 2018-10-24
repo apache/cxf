@@ -983,7 +983,7 @@ public final class JAXBEncoderDecoder {
                 }
                 Field f = ReflectionUtil.getDeclaredField(c.getClass(), "mNamespaces");
                 ReflectionUtil.setAccessible(f);
-                String ns[] = (String[])f.get(c);
+                String[] ns = (String[])f.get(c);
                 for (int x = 0; x < ns.length; x += 2) {
                     if (ns[x] == null) {
                         nsMap.put("", ns[x + 1]);

@@ -37,7 +37,7 @@ public final class Get {
     private Get() {
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         // Sent HTTP GET request to invoke sayHi
         String target = "http://localhost:9000/SoapContext/SoapPort/sayHi";
         URL url = new URL(target);

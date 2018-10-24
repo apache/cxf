@@ -129,7 +129,7 @@ public final class WSDiscoveryClientTest {
                         String msg = IOUtils.readStringFromStream(ins);
                         msg = msg.replace("urn:uuid:883d0d53-92aa-4066-9b6f-9eadb1832366",
                                           incoming);
-                        byte out[] = msg.getBytes(StandardCharsets.UTF_8);
+                        byte[] out = msg.getBytes(StandardCharsets.UTF_8);
                         DatagramPacket outp = new DatagramPacket(out, 0, out.length, sa);
                         s.send(outp);
                     }

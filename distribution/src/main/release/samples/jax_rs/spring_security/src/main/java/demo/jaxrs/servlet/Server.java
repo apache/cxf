@@ -51,7 +51,7 @@ public class Server {
         server.join();
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         new Server();
     }
 

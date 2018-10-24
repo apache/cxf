@@ -84,7 +84,7 @@ public class JAXBEncoderDecoderTest extends Assert {
     JAXBContext context;
     Schema schema;
     Map<String, String> mapField;
-    String arrayField[];
+    String[] arrayField;
     List<String> listField;
 
     @Before

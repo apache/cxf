@@ -43,8 +43,8 @@ public class MimeBodyPartInputStream extends InputStream {
         this.pbAmount = pbsize;
     }
 
-    public int read(byte buf[], int origOff, int origLen) throws IOException {
-        byte b[] = buf;
+    public int read(byte[] buf, int origOff, int origLen) throws IOException {
+        byte[] b = buf;
         int off = origOff;
         int len = origLen;
         if (boundaryFound || closed) {

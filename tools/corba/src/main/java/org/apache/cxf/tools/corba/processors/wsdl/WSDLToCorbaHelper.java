@@ -93,7 +93,7 @@ public class WSDLToCorbaHelper {
     public static final String IDL_VERSION = ":1.0";
 
     protected static final Logger LOG = LogUtils.getL7dLogger(WSDLToCorbaHelper.class);
-    protected static final String DISCRIMINATORTYPES[]
+    protected static final String[] DISCRIMINATORTYPES
         = new String[] {"long", "short", "boolean", "char"};
     protected static final Set<String> SUPPORTEDDISTYPES =
         new TreeSet<String>(Arrays.asList(DISCRIMINATORTYPES));

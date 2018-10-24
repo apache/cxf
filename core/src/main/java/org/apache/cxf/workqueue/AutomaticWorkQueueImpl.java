@@ -67,7 +67,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
 
     ThreadPoolExecutor executor;
     Method addWorkerMethod;
-    Object addWorkerArgs[];
+    Object[] addWorkerArgs;
 
     AWQThreadFactory threadFactory;
     ReentrantLock mainLock;

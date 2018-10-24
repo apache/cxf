@@ -67,7 +67,7 @@ public class Swagger2Server extends AbstractBusTestServerBase {
         }
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         try {
             Swagger2Server s = new Swagger2Server();
             s.start();

@@ -69,7 +69,7 @@ public class AegisServer extends AbstractBusTestServerBase {
         }
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         try {
             AegisServer s = new AegisServer();
             s.start();

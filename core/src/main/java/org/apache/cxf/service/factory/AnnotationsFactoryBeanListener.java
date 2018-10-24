@@ -225,7 +225,7 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
             String ref = prop.ref();
             Class<?> cls = prop.beanClass();
             Object obj = null;
-            String s[] = prop.value();
+            String[] s = prop.value();
             if (!StringUtils.isEmpty(ref)) {
                 obj = bus.getExtension(ConfiguredBeanLocator.class).getBeanOfType(ref, cls);
             } else if (s.length == 0 && cls != Object.class) {

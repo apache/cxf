@@ -28,7 +28,7 @@ public class CustomerServiceClient {
     protected CustomerServiceClient() {
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         CustomerServiceService customerServiceService;
         if (args.length != 0 && args[0].length() != 0) {
             File wsdlFile = new File(args[0]);

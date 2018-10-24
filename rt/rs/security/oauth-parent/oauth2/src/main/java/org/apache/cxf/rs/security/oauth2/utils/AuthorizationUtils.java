@@ -52,7 +52,7 @@ public final class AuthorizationUtils {
         } catch (Exception ex) {
             throw ExceptionUtils.toNotAuthorizedException(ex, null);
         }
-        String authInfo[] = authDecoded.split(":");
+        String[] authInfo = authDecoded.split(":");
         if (authInfo.length == 2) {
             return authInfo;
         }

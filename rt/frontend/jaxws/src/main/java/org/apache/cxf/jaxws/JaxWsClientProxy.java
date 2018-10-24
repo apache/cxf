@@ -281,7 +281,7 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
 
     private static Locale stringToLocale(String locale) {
         // use the IETF BCP 47 delimiter but accept the toString delimiter for cxf 2.7.x
-        String parts[] = locale.split("-", 0);
+        String[] parts = locale.split("-", 0);
         if (parts.length == 1) {
             return new Locale(parts[0]);
         } else if (parts.length == 2) {

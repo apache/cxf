@@ -184,7 +184,7 @@ public abstract class AbstractJMSTester extends Assert {
         ByteArrayInputStream bis = (ByteArrayInputStream)message.getContent(InputStream.class);
         String response = "<not found>";
         if (bis != null) {
-            byte bytes[] = new byte[bis.available()];
+            byte[] bytes = new byte[bis.available()];
             try {
                 bis.read(bytes);
             } catch (IOException ex) {
@@ -194,7 +194,7 @@ public abstract class AbstractJMSTester extends Assert {
             response = IOUtils.newStringFromBytes(bytes);
         } else {
             StringReader reader = (StringReader)message.getContent(Reader.class);
-            char buffer[] = new char[5000];
+            char[] buffer = new char[5000];
             try {
                 int i = reader.read(buffer);
                 response = new String(buffer, 0, i);

@@ -118,7 +118,7 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         port.echoData(textHolder, data);
         InputStream bis = null;
         bis = data.value.getDataSource().getInputStream();
-        byte b[] = new byte[10];
+        byte[] b = new byte[10];
         bis.read(b, 0, 10);
         String string = IOUtils.newStringFromBytes(b);
         assertEquals("testfoobar", string);
@@ -147,7 +147,7 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         port.echoDataWithHeader(textHolder, data, headerHolder);
         InputStream bis = null;
         bis = data.value.getDataSource().getInputStream();
-        byte b[] = new byte[10];
+        byte[] b = new byte[10];
         bis.read(b, 0, 10);
         String string = IOUtils.newStringFromBytes(b);
         assertEquals("testfoobar", string);
@@ -175,7 +175,7 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
 
         handler = structHolder.value.getDataRef();
         InputStream bis = handler.getDataSource().getInputStream();
-        byte b[] = new byte[10];
+        byte[] b = new byte[10];
         bis.read(b, 0, 10);
         String string = IOUtils.newStringFromBytes(b);
         assertEquals("testfoobar", string);

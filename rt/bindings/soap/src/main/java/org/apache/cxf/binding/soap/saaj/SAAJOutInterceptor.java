@@ -148,7 +148,7 @@ public class SAAJOutInterceptor extends AbstractSoapInterceptor {
             XMLStreamWriter dummyWriter = StaxUtils.createXMLStreamWriter(new OutputStream() {
                     public void write(int b) throws IOException {
                     }
-                    public void write(byte b[], int off, int len) throws IOException {
+                    public void write(byte[] b, int off, int len) throws IOException {
                     }
                 });
             message.setContent(XMLStreamWriter.class, dummyWriter);

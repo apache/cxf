@@ -659,7 +659,7 @@ public abstract class HTTPConduit
         try {
             if (in != null) {
                 int count = 0;
-                byte buffer[] = new byte[1024];
+                byte[] buffer = new byte[1024];
                 while (in.read(buffer) != -1
                     && count < 25) {
                     //don't do anything, we just need to pull off the unread data (like

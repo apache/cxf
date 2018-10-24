@@ -78,7 +78,7 @@ public class CorbaSequenceHandlerTest extends Assert {
         obj = new CorbaSequenceHandler(objName, objIdlType, objTypeCode, sequenceType);
         assertNotNull(obj);
 
-        int sequenceData[] = {2, 4, 6, 8, 10};
+        int[] sequenceData = {2, 4, 6, 8, 10};
         for (int i = 0; i < sequenceData.length; ++i) {
             QName elName = new QName("item");
             QName elIdlType = CorbaConstants.NT_CORBA_LONG;

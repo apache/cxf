@@ -42,7 +42,7 @@ public class Extension {
     protected String interfaceName;
     protected boolean deferred;
     protected Collection<String> namespaces = new ArrayList<>();
-    protected Object args[];
+    protected Object[] args;
     protected volatile Object obj;
     protected boolean optional;
     protected boolean notFound;
@@ -153,7 +153,7 @@ public class Extension {
         return namespaces;
     }
 
-    public void setArgs(Object a[]) {
+    public void setArgs(Object[] a) {
         args = a;
     }
 

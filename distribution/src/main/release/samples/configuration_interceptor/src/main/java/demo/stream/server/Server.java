@@ -38,7 +38,7 @@ public class Server {
         ep.getOutInterceptors().add(new StreamInterceptor());
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         new Server();
         System.out.println("Server ready...");
 

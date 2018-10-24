@@ -172,7 +172,7 @@ public class AttachmentDeserializer {
         InputStream is = message.getContent(InputStream.class);
         //boundary should definitely be in the first 2K;
         PushbackInputStream in = new PushbackInputStream(is, 4096);
-        byte buf[] = new byte[2048];
+        byte[] buf = new byte[2048];
         int i = in.read(buf);
         int len = i;
         while (i > 0 && len < buf.length) {

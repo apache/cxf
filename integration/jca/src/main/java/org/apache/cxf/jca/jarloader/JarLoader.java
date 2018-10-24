@@ -137,7 +137,7 @@ public final class JarLoader {
         } else {
             Map<?, ?> parentMap
                 = (Map<?, ?>)archives.get(buildPartialName(nameComponents, nameComponents.size() - 1));
-            byte bytes[] = (byte[])(parentMap.get(nameComponents.get(nameComponents.size() - 1)));
+            byte[] bytes = (byte[])(parentMap.get(nameComponents.get(nameComponents.size() - 1)));
 
             if (null == bytes) {
                 // unexpected, classpath entry in error, referenced jar is not in the archive
@@ -161,7 +161,7 @@ public final class JarLoader {
             if (ze.isDirectory()) {
                 map.put(ze.getName(), ze.getName());
             } else {
-                byte bytes[] = getBytesFromInputStream(zis, ze.getSize());
+                byte[] bytes = getBytesFromInputStream(zis, ze.getSize());
                 map.put(ze.getName(), bytes);
             }
         }
@@ -171,7 +171,7 @@ public final class JarLoader {
 
     private static byte[] getBytesFromInputStream(InputStream is, long size) throws IOException {
 
-        byte chunk[] = new byte[((size > CHUNK_SIZE) && (size < MAX_CHUNK_SIZE)) ? (int)size : CHUNK_SIZE];
+        byte[] chunk = new byte[((size > CHUNK_SIZE) && (size < MAX_CHUNK_SIZE)) ? (int)size : CHUNK_SIZE];
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 

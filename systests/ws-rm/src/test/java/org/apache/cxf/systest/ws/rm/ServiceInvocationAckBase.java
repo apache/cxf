@@ -53,7 +53,7 @@ public abstract class ServiceInvocationAckBase extends AbstractBusClientServerTe
         String port;
         String pfx;
         Endpoint ep;
-        public Server(String args[]) {
+        public Server(String[] args) {
             port = args[0];
             pfx = args[1];
         }

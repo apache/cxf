@@ -170,7 +170,7 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
             wrappedStream = new OutputStream() {
 
                 @Override
-                public void write(byte b[], int off, int len) throws IOException {
+                public void write(byte[] b, int off, int len) throws IOException {
                     //REVISIT support multiple writes and flush() to write the entire block data?
                     // or provides the fragment mode?
                     Map<String, String> headers = new HashMap<>();

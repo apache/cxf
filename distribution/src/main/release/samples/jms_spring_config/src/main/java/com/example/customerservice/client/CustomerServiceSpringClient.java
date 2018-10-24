@@ -27,7 +27,7 @@ public final class CustomerServiceSpringClient {
     private CustomerServiceSpringClient() {
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         ClassPathXmlApplicationContext context
             = new ClassPathXmlApplicationContext(new String[] {"classpath:client-applicationContext.xml"});
         CustomerServiceTester client = (CustomerServiceTester)context.getBean("tester");

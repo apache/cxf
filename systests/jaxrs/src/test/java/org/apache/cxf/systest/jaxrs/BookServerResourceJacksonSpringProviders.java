@@ -68,7 +68,7 @@ public class BookServerResourceJacksonSpringProviders extends AbstractBusTestSer
         }
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         try {
             BookServerResourceJacksonSpringProviders s = new BookServerResourceJacksonSpringProviders();
             s.start();

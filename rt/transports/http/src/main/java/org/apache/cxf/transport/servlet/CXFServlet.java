@@ -136,7 +136,7 @@ public class CXFServlet extends CXFNonSpringServlet
         }
         if (ctx != null) {
             ctx2.setParent(ctx);
-            String names[] = ctx.getBeanNamesForType(Bus.class);
+            String[] names = ctx.getBeanNamesForType(Bus.class);
             if (names == null || names.length == 0) {
                 ctx2.setConfigLocations(new String[] {"classpath:/META-INF/cxf/cxf.xml",
                                                       location});

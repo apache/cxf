@@ -282,7 +282,7 @@ public abstract class AbstractCXFToolContainer extends AbstractToolContainer {
 
     protected ClassCollector createClassCollector() {
         ClassCollector collector = new ClassCollector();
-        String reserved[] = (String[])context.get(ToolConstants.CFG_RESERVE_NAME);
+        String[] reserved = (String[])context.get(ToolConstants.CFG_RESERVE_NAME);
         if (reserved != null) {
             for (String r : reserved) {
                 collector.reserveClass(r);

@@ -32,7 +32,7 @@ public final class Client {
     private Client() {
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
 
         // Create a websocket client and connect to the target service
         WebSocketTestClient client = new WebSocketTestClient(Server.HOST_URL + Server.CONTEXT_PATH);

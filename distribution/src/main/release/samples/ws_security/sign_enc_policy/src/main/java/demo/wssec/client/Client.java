@@ -40,7 +40,7 @@ public final class Client {
     private Client() {
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
 
         if (args.length < 2) {
             System.out.println("please specify wsdl and configuration file");

@@ -116,7 +116,7 @@ public abstract class IdlScopeBase extends IdlDefnImplBase {
 
     public IdlDefn lookup(IdlScopedName name, boolean undefined) {
         IdlScopeBase scope = this;
-        String parents[] = name.parentNames();
+        String[] parents = name.parentNames();
 
         if (parents != null) {
             IdlDefn defn = lookup(parents, undefined);
@@ -133,11 +133,11 @@ public abstract class IdlScopeBase extends IdlDefnImplBase {
     }
 
 
-    public IdlDefn lookup(String scopedName[]) {
+    public IdlDefn lookup(String[] scopedName) {
         return lookup(scopedName, false);
     }
 
-    public IdlDefn lookup(String scopedName[], boolean undefined) {
+    public IdlDefn lookup(String[] scopedName, boolean undefined) {
         IdlScopeBase scope = this;
 
         for (;;) {

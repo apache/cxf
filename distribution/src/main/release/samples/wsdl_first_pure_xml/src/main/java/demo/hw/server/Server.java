@@ -33,7 +33,7 @@ public class Server {
         Endpoint.publish(address, implementor, new LoggingFeature());
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         new Server();
         System.out.println("Server ready...");
 

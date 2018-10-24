@@ -126,7 +126,7 @@ final class WrapperHelperCompiler extends ASMHelper {
         try {
             if (b) {
                 cw.visitEnd();
-                byte bt[] = cw.toByteArray();
+                byte[] bt = cw.toByteArray();
                 Class<?> cl = loadClass(newClassName.replace('/', '.'), wrapperType, bt);
                 Object o = cl.newInstance();
                 return WrapperHelper.class.cast(o);

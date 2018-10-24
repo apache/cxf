@@ -72,7 +72,7 @@ public class CorbaEnumHandlerTest extends Assert {
         QName enumName = new QName("EnumType");
         QName enumIdlType =
             new QName(CorbaConstants.NU_WSDL_CORBA, "EnumType", CorbaConstants.NP_WSDL_CORBA);
-        String members[] = new String[3];
+        String[] members = new String[3];
         members[0] = enumerator0.getValue();
         members[1] = enumerator1.getValue();
         members[2] = enumerator2.getValue();

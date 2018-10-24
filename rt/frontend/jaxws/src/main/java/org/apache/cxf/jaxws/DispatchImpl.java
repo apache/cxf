@@ -319,7 +319,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
             Holder<T> holder = new Holder<>(obj);
             opName = calculateOpName(holder, opName, hasOpName);
 
-            Object ret[] = client.invokeWrapped(opName, holder.value);
+            Object[] ret = client.invokeWrapped(opName, holder.value);
             if (isOneWay || ret == null || ret.length == 0) {
                 return null;
             }

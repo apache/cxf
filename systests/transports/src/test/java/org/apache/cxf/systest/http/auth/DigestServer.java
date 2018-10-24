@@ -85,7 +85,7 @@ public class DigestServer extends AbstractBusTestServerBase {
             server = null;
         }
     }
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         try {
             DigestServer s = new DigestServer();
             s.start();

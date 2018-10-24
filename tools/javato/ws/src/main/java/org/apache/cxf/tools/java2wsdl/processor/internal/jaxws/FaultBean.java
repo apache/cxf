@@ -95,7 +95,7 @@ public final class FaultBean {
 
     private String getFieldName(final Method method) {
         String name = method.getName().substring(3);
-        char chars[] = name.toCharArray();
+        char[] chars = name.toCharArray();
         chars[0] = Character.toLowerCase(chars[0]);
         return new String(chars);
     }

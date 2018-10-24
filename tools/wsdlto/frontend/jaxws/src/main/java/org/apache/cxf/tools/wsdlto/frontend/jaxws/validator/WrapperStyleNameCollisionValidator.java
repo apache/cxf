@@ -81,7 +81,7 @@ public class WrapperStyleNameCollisionValidator extends ServiceValidator {
         return false;
     }
     private boolean checkBare(ToolContext context, String opName) {
-        String o[] = context.getArray(ToolConstants.CFG_BAREMETHODS);
+        String[] o = context.getArray(ToolConstants.CFG_BAREMETHODS);
         return checkArray(o, opName);
     }
     private boolean isValidOperation(OperationInfo operation) {

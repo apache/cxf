@@ -104,7 +104,7 @@ class SSLSocketFactoryWrapper extends SSLSocketFactory {
         }
 
         if (protocol != null) {
-            String p[] = findProtocols(protocol, socket.getSupportedProtocols());
+            String[] p = findProtocols(protocol, socket.getSupportedProtocols());
             if (p != null) {
                 socket.setEnabledProtocols(p);
             }

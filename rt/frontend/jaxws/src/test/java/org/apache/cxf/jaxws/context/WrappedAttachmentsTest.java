@@ -71,7 +71,7 @@ public class WrappedAttachmentsTest extends Assert {
         assertEquals(1, atts.length);
         assertEquals("att-1".equals(attx.getId()) ? "att-2" : "att-1", atts[0].getId());
         
-        Object o[] = attachments.toArray(); //NOPMD - explicitly test this
+        Object[] o = attachments.toArray(); //NOPMD - explicitly test this
         assertEquals(1, o.length);
         Attachment a = (Attachment)o[0];
         assertEquals("att-1".equals(attx.getId()) ? "att-2" : "att-1", a.getId());

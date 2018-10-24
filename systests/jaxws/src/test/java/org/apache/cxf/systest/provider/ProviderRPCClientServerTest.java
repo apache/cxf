@@ -178,7 +178,7 @@ public class ProviderRPCClientServerTest extends AbstractBusClientServerTestBase
         SOAPServiceRPCLit service = new SOAPServiceRPCLit(wsdl, serviceName);
         assertNotNull(service);
 
-        String addresses[] = {
+        String[] addresses = {
             "http://localhost:" + PORT
                 + "/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit8",
             "http://localhost:" + PORT

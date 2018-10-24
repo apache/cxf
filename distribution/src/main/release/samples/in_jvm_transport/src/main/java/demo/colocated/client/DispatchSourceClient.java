@@ -64,7 +64,7 @@ public final class DispatchSourceClient {
     private DispatchSourceClient() {
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
 
         Server.main(new String[]{"inProcess"});
 

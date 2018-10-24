@@ -76,7 +76,7 @@ public class CorbaArrayHandlerTest extends Assert {
         obj = new CorbaArrayHandler(objName, objIdlType, objTypeCode, arrayType);
         assertNotNull(obj);
 
-        int arrayData[] = {2, 4, 6, 8, 10};
+        int[] arrayData = {2, 4, 6, 8, 10};
         for (int i = 0; i < arrayData.length; ++i) {
             QName elName = new QName("item");
             QName elIdlType = CorbaConstants.NT_CORBA_LONG;

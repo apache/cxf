@@ -54,7 +54,7 @@ public class JaxWsDynamicClientTest extends AbstractBusClientServerTestBase {
         }
         algorithm.reset();
         algorithm.update(bytes);
-        byte messageDigest[] = algorithm.digest();
+        byte[] messageDigest = algorithm.digest();
 
         StringBuilder hexString = new StringBuilder();
         for (int i = 0; i < messageDigest.length; i++) {

@@ -247,7 +247,7 @@ public class Compiler {
 
     public boolean internalCompile(String[] args, int sourceFileIndex) {
         Process p = null;
-        String cmdArray[] = null;
+        String[] cmdArray = null;
         File tmpFile = null;
         try {
             if (isLongCommandLines(args) && sourceFileIndex >= 0) {
@@ -324,7 +324,7 @@ public class Compiler {
         return false;
     }
 
-    private boolean isLongCommandLines(String args[]) {
+    private boolean isLongCommandLines(String[] args) {
         StringBuilder strBuffer = new StringBuilder();
         for (int i = 0; i < args.length; i++) {
             strBuffer.append(args[i]);

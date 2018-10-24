@@ -204,7 +204,7 @@ abstract class STSInvoker implements Invoker {
         byte[] clientEntropy,
         int keySize
     ) throws NoSuchAlgorithmException, WSSecurityException, XMLStreamException {
-        byte secret[] = null;
+        byte[] secret = null;
         writer.writeStartElement(prefix, "RequestedProofToken", namespace);
         if (clientEntropy == null) {
             secret = WSSecurityUtil.generateNonce(keySize / 8);
@@ -214,7 +214,7 @@ abstract class STSInvoker implements Invoker {
             writer.writeCharacters(XMLUtils.encodeToString(secret));
             writer.writeEndElement();
         } else {
-            byte entropy[] = WSSecurityUtil.generateNonce(keySize / 8);
+            byte[] entropy = WSSecurityUtil.generateNonce(keySize / 8);
             P_SHA1 psha1 = new P_SHA1();
             secret = psha1.createKey(clientEntropy, entropy, 0, keySize / 8);
 

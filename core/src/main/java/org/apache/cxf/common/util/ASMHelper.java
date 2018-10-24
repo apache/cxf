@@ -197,7 +197,7 @@ public class ASMHelper {
     }
 
     public static String periodToSlashes(String s) {
-        char ch[] = s.toCharArray();
+        char[] ch = s.toCharArray();
         for (int x = 0; x < ch.length; x++) {
             if (ch[x] == '.') {
                 ch[x] = '/';
@@ -382,7 +382,7 @@ public class ASMHelper {
             return super.findClass(name);
         }
 
-        public Class<?> defineClass(String name, byte bytes[]) {
+        public Class<?> defineClass(String name, byte[] bytes) {
             Class<?> ret = defined.get(name.replace('/', '.'));
             if (ret != null) {
                 return ret;

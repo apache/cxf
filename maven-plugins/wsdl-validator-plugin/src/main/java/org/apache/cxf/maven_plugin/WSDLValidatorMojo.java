@@ -71,13 +71,13 @@ public class WSDLValidatorMojo extends AbstractMojo {
      *
      * @parameter
      */
-    private String includes[];
+    private String[] includes;
     /**
      * A list of wsdl files to exclude. Can contain ant-style wildcards and double wildcards.
      *
      * @parameter
      */
-    private String excludes[];
+    private String[] excludes;
 
     private String getIncludeExcludeString(String[] arr) {
         if (arr == null || arr.length == 0) {

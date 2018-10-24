@@ -75,7 +75,7 @@ public final class Server {
         return 0;
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         Properties props = System.getProperties();
         props.put("org.omg.CORBA.ORBInitialHost", "localhost");
         props.put("org.omg.CORBA.ORBInitialPort", "1050");

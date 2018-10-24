@@ -1147,13 +1147,13 @@ public final class JAXBUtils {
     public static class MapNamespacePrefixMapper2
         extends org.eclipse.persistence.internal.oxm.record.namespaces.MapNamespacePrefixMapper {
 
-        String nsctxt[];
+        String[] nsctxt;
 
         public MapNamespacePrefixMapper2(Map<String, String> foo) {
             super(foo);
         }
         public String[] getPreDeclaredNamespaceUris() {
-            String sup[] = super.getPreDeclaredNamespaceUris();
+            String[] sup = super.getPreDeclaredNamespaceUris();
             if (nsctxt == null) {
                 return sup;
             }
@@ -1163,7 +1163,7 @@ public final class JAXBUtils {
             }
             return s.toArray(new String[s.size()]);
         }
-        public void setContextualNamespaceDecls(String f[]) {
+        public void setContextualNamespaceDecls(String[] f) {
             nsctxt = f;
         }
         public String[] getContextualNamespaceDecls() {
@@ -1341,7 +1341,7 @@ public final class JAXBUtils {
 
             cw.visitEnd();
 
-            byte bts[] = cw.toByteArray();
+            byte[] bts = cw.toByteArray();
             cls = helper.loadClass(className,
                                    mcls, bts);
         }
@@ -1506,7 +1506,7 @@ public final class JAXBUtils {
 
         cw.visitEnd();
 
-        byte bts[] = cw.toByteArray();
+        byte[] bts = cw.toByteArray();
         return helper.loadClass(className,
                                 ref, bts);
     }

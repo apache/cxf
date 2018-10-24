@@ -40,7 +40,7 @@ public class Server {
         svrFactory.create();
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         new Server(args[0]);
         System.out.println("Server ready...");
 

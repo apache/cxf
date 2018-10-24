@@ -74,7 +74,7 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
         assertEquals("Joe", list.get(0));
         assertEquals("Joe-1", list.get(1));
         assertEquals("Joe-2", list.get(2));
-        String roles[] = service.getRolesAsArray("Joe");
+        String[] roles = service.getRolesAsArray("Joe");
         assertEquals(2, roles.length);
         assertEquals("Joe", roles[0]);
         assertEquals("Joe-1", roles[1]);
@@ -104,7 +104,7 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
         assertEquals("Joe", list.get(0));
         assertEquals("Joe-1", list.get(1));
         assertEquals("Joe-2", list.get(2));
-        String roles[] = service.getRolesAsArray("Joe");
+        String[] roles = service.getRolesAsArray("Joe");
         assertEquals(2, roles.length);
         assertEquals("Joe", roles[0]);
         assertEquals("Joe-1", roles[1]);

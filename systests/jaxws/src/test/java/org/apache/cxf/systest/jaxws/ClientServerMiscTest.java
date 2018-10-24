@@ -197,7 +197,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         DocLitBareCodeFirstService.GreetMeRequest req =
             new DocLitBareCodeFirstService.GreetMeRequest();
         DocLitBareCodeFirstService.GreetMeResponse resp;
-        BigInteger i[];
+        BigInteger[] i;
 
         req.setName("Foo");
         resp = port.greetMe(req);
@@ -534,7 +534,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
 
         String s;
 
-        String arrayOut[] = port.arrayOutput();
+        String[] arrayOut = port.arrayOutput();
         assertNotNull(arrayOut);
         assertEquals(3, arrayOut.length);
         for (int x = 0; x < 3; x++) {
@@ -598,7 +598,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         assertEquals(2, foos2.get(0).length);
         assertEquals(2, foos2.get(1).length);
 
-        int ints[] = port.echoIntArray(new int[] {1, 2, 3}, null);
+        int[] ints = port.echoIntArray(new int[] {1, 2, 3}, null);
         assertEquals(3, ints.length);
         assertEquals(1, ints[0]);
 
@@ -707,7 +707,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
 
     private void runRpcLitTest(RpcLitCodeFirstService port) throws Exception {
 
-        String ret[] = port.convertToString(new int[] {1, 2, 3});
+        String[] ret = port.convertToString(new int[] {1, 2, 3});
         assertEquals(3, ret.length);
 
         List<String> rev = new ArrayList<>(Arrays.asList(RpcLitCodeFirstServiceImpl.DATA));
@@ -715,7 +715,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
 
         String s;
 
-        String arrayOut[] = port.arrayOutput();
+        String[] arrayOut = port.arrayOutput();
         assertNotNull(arrayOut);
         assertEquals(3, arrayOut.length);
         for (int x = 0; x < 3; x++) {

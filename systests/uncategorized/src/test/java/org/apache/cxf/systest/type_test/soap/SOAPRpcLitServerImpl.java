@@ -34,7 +34,7 @@ public class SOAPRpcLitServerImpl extends AbstractBusTestServerBase {
         Endpoint.publish(address, implementor);
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         try {
             SOAPRpcLitServerImpl s = new SOAPRpcLitServerImpl();
             s.start();

@@ -64,7 +64,7 @@ public class StaxServer {
         impl.getInInterceptors().add(new WSS4JStaxInInterceptor(inProperties));
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = StaxServer.class.getResource("/wssec.xml");

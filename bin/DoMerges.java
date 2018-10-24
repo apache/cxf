@@ -347,14 +347,14 @@ public class DoMerges {
     }
     private static String getPatchId(String id) throws Exception {
 
-        String commands[] = new String[] { "git", "show", id};
+        String[] commands = new String[] { "git", "show", id};
         Process p = Runtime.getRuntime().exec(commands);
         InputStream in = p.getInputStream();
 
         commands = new String[] { "git", "patch-id"};
         Process p2 = Runtime.getRuntime().exec(commands);
         OutputStream out = p2.getOutputStream();
-        byte bytes[] = new byte[1024];
+        byte[] bytes = new byte[1024];
         int len = in.read(bytes);
         BufferedReader r2 = new BufferedReader(new InputStreamReader(p2.getInputStream()));
         while (len > 0) {
@@ -382,7 +382,7 @@ public class DoMerges {
         return line;
     }
 
-    public static void main(String a[]) throws Exception {
+    public static void main(String[] a) throws Exception {
         File file = new File(".git-commit-message.txt");
         if (file.exists()) {
             //make sure we delete this to not cause confusion

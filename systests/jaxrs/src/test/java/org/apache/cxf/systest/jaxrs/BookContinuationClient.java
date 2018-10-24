@@ -33,7 +33,7 @@ public class BookContinuationClient extends AbstractTestServerBase {
 
     }
 
-    public static void main(String args[]) throws InterruptedException, ExecutionException {
+    public static void main(String[] args) throws InterruptedException, ExecutionException {
         final String url = "http://localhost:" + PORT + "/async/bookstore/disconnect";
         WebClient wc = WebClient.create(url);
         try {

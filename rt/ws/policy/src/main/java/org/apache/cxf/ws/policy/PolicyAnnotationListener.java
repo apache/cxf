@@ -419,7 +419,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
     private String getPolicyRefURI(Element element) {
         return element.getAttributeNS(null, "URI");
     }
-    private boolean isExistsPolicy(Object exts[], String uri) {
+    private boolean isExistsPolicy(Object[] exts, String uri) {
         exts = exts == null ? new Object[0] : exts;
         for (Object o : exts) {
             if (o instanceof UnknownExtensibilityElement) {
@@ -433,7 +433,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
         return false;
     }
 
-    private boolean isExistsPolicyReference(Object exts[], String uri) {
+    private boolean isExistsPolicyReference(Object[] exts, String uri) {
         exts = exts == null ? new Object[0] : exts;
         for (Object o : exts) {
             if (o instanceof UnknownExtensibilityElement) {

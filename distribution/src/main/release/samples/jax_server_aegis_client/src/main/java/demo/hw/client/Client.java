@@ -29,7 +29,7 @@ public final class Client {
     private Client() {
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         ClientProxyFactoryBean factory = new ClientProxyFactoryBean();
         String serviceURL;
         if (args != null && args.length > 0 && !"".equals(args[0])) {

@@ -37,7 +37,7 @@ public class Server {
         Endpoint.publish(address, implementor);
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = Server.class.getResource("/server.xml");
