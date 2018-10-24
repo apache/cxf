@@ -375,11 +375,9 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
         client = httpAsyncClientBuilder.build();
         // Start the client thread
         client.start();
-        if (this.connectionTTL == 0) {
-            //if the connection does not have an expiry deadline
-            //use the ConnectionMaxIdle to close the idle connection
-            new CloseIdleConnectionThread(connectionManager, client).start();
-        }
+        //Always start the idle checker thread to validate pending requests and
+        //use the ConnectionMaxIdle to close the idle connection
+        new CloseIdleConnectionThread(connectionManager, client).start();
     }
 
     //provide a hook to customize the builder
@@ -401,20 +399,28 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
 
         public CloseIdleConnectionThread(PoolingNHttpClientConnectionManager connMgr,
                                      CloseableHttpAsyncClient client) {
-            super();
+            super("CXFCloseIdleConnectionThread");
             this.connMgr = connMgr;
             this.client = client;
         }
 
         @Override
         public void run() {
+            long nextIdleCheck = System.currentTimeMillis() + connectionMaxIdle;
             try {
                 while (client.isRunning()) {
                     synchronized (this) {
-                        sleep(connectionMaxIdle);
-                        // close connections
-                        // that have been idle longer than specified connectionMaxIdle
-                        connMgr.closeIdleConnections(connectionMaxIdle, TimeUnit.MILLISECONDS);
+                        sleep(selectInterval);
+                        // make sure pending leases fail in a timely manner,
+                        // not just when a connection becomes available
+                        connMgr.validatePendingRequests();
+
+                        if (connectionMaxIdle > 0 && System.currentTimeMillis() >= nextIdleCheck) {
+                            nextIdleCheck += connectionMaxIdle;
+                            // close connections
+                            // that have been idle longer than specified connectionMaxIdle
+                            connMgr.closeIdleConnections(connectionMaxIdle, TimeUnit.MILLISECONDS);
+                        }
                     }
                 }
             } catch (InterruptedException ex) {
