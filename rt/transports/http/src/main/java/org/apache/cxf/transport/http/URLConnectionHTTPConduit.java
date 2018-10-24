@@ -25,7 +25,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.Proxy;
-import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -278,8 +277,9 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
                     Boolean b = (Boolean)outMessage.get(HTTPURL_CONNECTION_METHOD_REFLECTION);
                     cout = connectAndGetOutputStream(b);
                 }
-            } catch (SocketException e) {
-                if ("Socket Closed".equals(e.getMessage())) {
+            } catch (Exception e) {
+                if ("Socket Closed".equals(e.getMessage())
+                    || "HostnameVerifier, socket reset for TTL".equals(e.getMessage())) {
                     connection.connect();
                     cout = connectAndGetOutputStream((Boolean)outMessage.get(HTTPURL_CONNECTION_METHOD_REFLECTION));
                 } else {
