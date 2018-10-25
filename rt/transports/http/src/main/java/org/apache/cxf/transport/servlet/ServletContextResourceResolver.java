@@ -36,7 +36,7 @@ import org.apache.cxf.resource.ResourceResolver;
 
 public class ServletContextResourceResolver implements ResourceResolver {
     ServletContext servletContext;
-    Map<String, URL> urlMap = new ConcurrentHashMap<String, URL>();
+    Map<String, URL> urlMap = new ConcurrentHashMap<>();
 
     public ServletContextResourceResolver(ServletContext sc) {
         servletContext = sc;

@@ -72,7 +72,7 @@ public class NettyHttpServletRequest implements HttpServletRequest {
 
     private QueryStringDecoder queryStringDecoder;
 
-    private Map<String, Object> attributes = new ConcurrentHashMap<String, Object>();
+    private Map<String, Object> attributes = new ConcurrentHashMap<>();
 
     private String characterEncoding;
 

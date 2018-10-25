@@ -389,7 +389,7 @@ public class Java2WADLMojo extends AbstractMojo {
         }
         if (resourceClasses.isEmpty() && basePackages != null) {
             try {
-                List<Class<? extends Annotation>> anns = new ArrayList<Class<? extends Annotation>>();
+                List<Class<? extends Annotation>> anns = new ArrayList<>();
                 anns.add(Path.class);
                 final Map< Class< ? extends Annotation >, Collection< Class< ? > > > discoveredClasses =
                     ClasspathScanner.findClasses(ClasspathScanner.parsePackages(basePackages),

@@ -49,7 +49,7 @@ public class Destination extends AbstractEndpoint {
 
     Destination(RMEndpoint reliableEndpoint) {
         super(reliableEndpoint);
-        map = new ConcurrentHashMap<String, DestinationSequence>();
+        map = new ConcurrentHashMap<>();
     }
 
     public DestinationSequence getSequence(Identifier id) {

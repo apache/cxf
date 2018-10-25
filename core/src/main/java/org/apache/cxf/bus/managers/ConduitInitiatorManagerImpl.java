@@ -49,10 +49,10 @@ public final class ConduitInitiatorManagerImpl implements ConduitInitiatorManage
 
     private Bus bus;
     public ConduitInitiatorManagerImpl() {
-        conduitInitiators = new ConcurrentHashMap<String, ConduitInitiator>(8, 0.75f, 4);
+        conduitInitiators = new ConcurrentHashMap<>(8, 0.75f, 4);
     }
     public ConduitInitiatorManagerImpl(Bus b) {
-        conduitInitiators = new ConcurrentHashMap<String, ConduitInitiator>(8, 0.75f, 4);
+        conduitInitiators = new ConcurrentHashMap<>(8, 0.75f, 4);
         setBus(b);
     }
 

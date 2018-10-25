@@ -52,7 +52,7 @@ public class ThrottlingResponseInterceptor extends AbstractPhaseInterceptor<Mess
             Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
 
             if (headers == null) {
-                headers = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+                headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
                 message.put(Message.PROTOCOL_HEADERS, headers);
             }
             for (Map.Entry<String, String> e : rsp.getResponseHeaders().entrySet()) {

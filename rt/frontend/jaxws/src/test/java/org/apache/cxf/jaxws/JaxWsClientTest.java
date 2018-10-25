@@ -355,7 +355,7 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
                 if (outbound) {
                     headers = CastUtils.cast((Map<?, ?>) context.get(MessageContext.HTTP_REQUEST_HEADERS));
                     if (headers == null) {
-                        headers = new HashMap<String, List<String>>();
+                        headers = new HashMap<>();
                         context.put(MessageContext.HTTP_REQUEST_HEADERS, headers);
                     }
                     headers.put("My-Custom-Header", Collections.singletonList("value"));
@@ -389,7 +389,7 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
                     if (outbound) {
                         headers = CastUtils.cast((Map<?, ?>) context.get(MessageContext.HTTP_REQUEST_HEADERS));
                         if (headers == null) {
-                            headers = new HashMap<String, List<String>>();
+                            headers = new HashMap<>();
                             context.put(MessageContext.HTTP_REQUEST_HEADERS, headers);
                         }
                         headers.put("My-Custom-Header", Collections.singletonList("value"));

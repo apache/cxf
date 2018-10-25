@@ -48,7 +48,7 @@ public class ResponseBuilderImpl extends ResponseBuilder implements Cloneable {
     private String reasonPhrase;
     private boolean statusSet;
     private Object entity;
-    private MultivaluedMap<String, Object> metadata = new MetadataMap<String, Object>();
+    private MultivaluedMap<String, Object> metadata = new MetadataMap<>();
     private Annotation[] annotations;
 
     public ResponseBuilderImpl() {

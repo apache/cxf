@@ -59,11 +59,11 @@ public class JAXRSLocalTransportTest extends AbstractBusClientServerTestBase {
         sf.setResourceProvider(BookStoreSpring.class,
                                new SingletonResourceProvider(new BookStoreSpring(), true));
         sf.setProvider(new JacksonJsonProvider());
-        List<Interceptor<? extends Message>> outInts = new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> outInts = new ArrayList<>();
         outInts.add(new CustomOutInterceptor());
         sf.setOutInterceptors(outInts);
 
-        List<Interceptor<? extends Message>> inInts = new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> inInts = new ArrayList<>();
         inInts.add(new CustomInFaultyInterceptor());
         sf.setInInterceptors(inInts);
 

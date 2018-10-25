@@ -120,8 +120,8 @@ public class WSDLManagerImpl implements WSDLManager {
         } catch (WSDLException e) {
             throw new BusException(e);
         }
-        definitionsMap = new CacheMap<Object, Definition>();
-        schemaCacheMap = new CacheMap<Object, ServiceSchemaInfo>();
+        definitionsMap = new CacheMap<>();
+        schemaCacheMap = new CacheMap<>();
 
         setBus(b);
     }

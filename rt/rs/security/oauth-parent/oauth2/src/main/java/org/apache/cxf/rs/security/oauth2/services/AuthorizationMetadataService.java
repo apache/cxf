@@ -54,7 +54,7 @@ public class AuthorizationMetadataService {
     @GET
     @Produces("application/json")
     public String getConfiguration(@Context UriInfo ui) {
-        Map<String, Object> cfg = new LinkedHashMap<String, Object>();
+        Map<String, Object> cfg = new LinkedHashMap<>();
         String baseUri = getBaseUri(ui);
         prepareConfigurationData(cfg, baseUri);
 

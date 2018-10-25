@@ -550,7 +550,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
     }
 
     private Map<String, QName> createPayloadEleOpNameMap(BindingInfo bindingInfo, boolean reverseMapping) {
-        Map<String, QName> payloadElementMap = new java.util.HashMap<String, QName>();
+        Map<String, QName> payloadElementMap = new java.util.HashMap<>();
         // assume a document binding style, which is default according to W3C spec on WSDL
         String bindingStyle = "document";
         // if the bindingInfo is a SOAPBindingInfo instance then we can see if it has a style

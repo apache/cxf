@@ -39,7 +39,7 @@ public class DigestAuthSupplier implements HttpAuthSupplier {
     };
 
     final MessageDigest md5Helper;
-    Map<URI, DigestInfo> authInfo = new ConcurrentHashMap<URI, DigestInfo>();
+    Map<URI, DigestInfo> authInfo = new ConcurrentHashMap<>();
 
     public DigestAuthSupplier() {
         MessageDigest md = null;

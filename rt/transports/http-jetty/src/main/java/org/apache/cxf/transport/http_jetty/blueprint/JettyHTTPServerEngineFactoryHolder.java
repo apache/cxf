@@ -83,7 +83,7 @@ public class JettyHTTPServerEngineFactoryHolder {
             factory = new JettyHTTPServerEngineFactory(defaultBus);
 
             Map<String, ThreadingParameters> threadingParametersMap
-                = new TreeMap<String, ThreadingParameters>();
+                = new TreeMap<>();
 
             if (config.getIdentifiedThreadingParameters() != null) {
                 for (ThreadingParametersIdentifiedType threads : config.getIdentifiedThreadingParameters()) {
@@ -99,7 +99,7 @@ public class JettyHTTPServerEngineFactoryHolder {
             }
 
             //SSL
-            Map<String, TLSServerParameters> sslMap = new TreeMap<String, TLSServerParameters>();
+            Map<String, TLSServerParameters> sslMap = new TreeMap<>();
             if (config.getIdentifiedTLSServerParameters() != null) {
 
                 for (TLSServerParametersIdentifiedType t : config.getIdentifiedTLSServerParameters()) {

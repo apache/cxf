@@ -30,7 +30,7 @@ import java.util.TreeSet;
 public class ClassCollector {
 
     private Map<String, String> seiClassNames
-        = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
+        = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     private Map<String, String> typesClassNames = new HashMap<>();
     private Map<String, String> exceptionClassNames = new HashMap<>();
     private Map<String, String> serviceClassNames = new HashMap<>();

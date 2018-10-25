@@ -42,10 +42,10 @@ public class ProviderCache {
             } }).intValue();
 
     private final Map<String, List<ProviderInfo<MessageBodyReader<?>>>>
-        readerProviderCache = new ConcurrentHashMap<String, List<ProviderInfo<MessageBodyReader<?>>>>();
+        readerProviderCache = new ConcurrentHashMap<>();
 
     private final Map<String, List<ProviderInfo<MessageBodyWriter<?>>>>
-        writerProviderCache = new ConcurrentHashMap<String, List<ProviderInfo<MessageBodyWriter<?>>>>();
+        writerProviderCache = new ConcurrentHashMap<>();
 
     private boolean checkAllCandidates;
     public ProviderCache(boolean checkAllCandidates) {

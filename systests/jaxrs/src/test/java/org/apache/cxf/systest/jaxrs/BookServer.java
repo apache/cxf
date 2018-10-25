@@ -127,15 +127,15 @@ public class BookServer extends AbstractBusTestServerBase {
         providers.add(new BlockedExceptionMapper());
         providers.add(new ParamConverterImpl());
         sf.setProviders(providers);
-        List<Interceptor<? extends Message>> inInts = new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> inInts = new ArrayList<>();
         inInts.add(new CustomInFaultyInterceptor());
         inInts.add(new LoggingInInterceptor());
         sf.setInInterceptors(inInts);
-        List<Interceptor<? extends Message>> outInts = new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> outInts = new ArrayList<>();
         outInts.add(new CustomOutInterceptor());
         outInts.add(new LoggingOutInterceptor());
         sf.setOutInterceptors(outInts);
-        List<Interceptor<? extends Message>> outFaultInts = new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> outFaultInts = new ArrayList<>();
         outFaultInts.add(new CustomOutFaultInterceptor());
         sf.setOutFaultInterceptors(outFaultInts);
         sf.setResourceProvider(BookStore.class,

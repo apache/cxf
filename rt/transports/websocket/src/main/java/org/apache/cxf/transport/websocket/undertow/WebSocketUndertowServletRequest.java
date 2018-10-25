@@ -89,7 +89,7 @@ public class WebSocketUndertowServletRequest implements HttpServletRequest {
         if (!path.startsWith(origin)) {
             throw new InvalidPathException();
         }*/
-        this.attributes = new TreeMap<String, Object>(String.CASE_INSENSITIVE_ORDER);
+        this.attributes = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         Object v = channel.getAttribute("org.apache.cxf.transport.endpoint.address");
         if (v != null) {
             attributes.put("org.apache.cxf.transport.endpoint.address", v);

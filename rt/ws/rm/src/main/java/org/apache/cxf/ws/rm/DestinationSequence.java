@@ -69,7 +69,7 @@ public class DestinationSequence extends AbstractSequence {
     private volatile long highNumberCompleted;
     private long nextInOrder;
     //be careful, must be used in sync block
-    private Map<Long, Continuation> continuations = new TreeMap<Long, Continuation>();
+    private Map<Long, Continuation> continuations = new TreeMap<>();
     // this map is used for robust and redelivery tracking. for redelivery it holds the beingDeliverd messages
     private Set<Long> deliveringMessageNumbers = new HashSet<>();
 

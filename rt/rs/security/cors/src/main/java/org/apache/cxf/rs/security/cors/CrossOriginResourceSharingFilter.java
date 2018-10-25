@@ -279,7 +279,7 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
         if (matchedResources == null) {
             return null;
         }
-        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> values = new MetadataMap<>();
         OperationResourceInfo ori = findPreflightMethod(matchedResources, requestUri, httpMethod, values, m);
         return ori == null ? null : ori.getAnnotatedMethod();
     }
@@ -308,7 +308,7 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
             if (subcri == null) {
                 return null;
             }
-            MultivaluedMap<String, String> newValues = new MetadataMap<String, String>();
+            MultivaluedMap<String, String> newValues = new MetadataMap<>();
             newValues.putAll(values);
             return findPreflightMethod(Collections.singletonMap(subcri, newValues),
                                        values.getFirst(URITemplate.FINAL_MATCH_GROUP),

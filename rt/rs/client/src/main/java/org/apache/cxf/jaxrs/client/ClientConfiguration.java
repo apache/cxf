@@ -49,13 +49,13 @@ public class ClientConfiguration implements InterceptorProvider, ConduitSelector
     private static final Logger LOG = LogUtils.getL7dLogger(ClientConfiguration.class);
 
     private List<Interceptor<? extends Message>> inInterceptors
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+        = new ModCountCopyOnWriteArrayList<>();
     private List<Interceptor<? extends Message>> outInterceptors
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+        = new ModCountCopyOnWriteArrayList<>();
     private List<Interceptor<? extends Message>> outFault
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+        = new ModCountCopyOnWriteArrayList<>();
     private List<Interceptor<? extends Message>> inFault
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+        = new ModCountCopyOnWriteArrayList<>();
     private ConduitSelector conduitSelector;
     private Bus bus;
     private Map<String, Object> requestContext = new HashMap<>();

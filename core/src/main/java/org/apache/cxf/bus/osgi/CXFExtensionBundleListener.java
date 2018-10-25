@@ -45,7 +45,7 @@ public class CXFExtensionBundleListener implements SynchronousBundleListener {
     private static final Logger LOG = LogUtils.getL7dLogger(CXFActivator.class);
     private long id;
     private ConcurrentMap<Long, List<OSGiExtension>> extensions
-        = new ConcurrentHashMap<Long, List<OSGiExtension>>(16, 0.75f, 4);
+        = new ConcurrentHashMap<>(16, 0.75f, 4);
 
     public CXFExtensionBundleListener(long bundleId) {
         this.id = bundleId;

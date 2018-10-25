@@ -41,7 +41,7 @@ public class MemoryClientCodeStateManager implements ClientCodeStateManager {
     public MultivaluedMap<String, String> toRedirectState(MessageContext mc,
                                                           MultivaluedMap<String, String> requestState) {
         String stateParam = OAuthUtils.generateRandomTokenKey();
-        MultivaluedMap<String, String> redirectMap = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> redirectMap = new MetadataMap<>();
 
         if (generateNonce) {
             String nonceParam = MessageDigestUtils.generate(CryptoUtils.generateSecureRandomBytes(16));

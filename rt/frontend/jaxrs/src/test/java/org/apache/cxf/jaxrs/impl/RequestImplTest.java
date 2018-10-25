@@ -50,7 +50,7 @@ public class RequestImplTest extends Assert {
     @Before
     public void setUp() {
         m = new MessageImpl();
-        metadata = new MetadataMap<String, String>();
+        metadata = new MetadataMap<>();
         m.put(Message.PROTOCOL_HEADERS, metadata);
         m.put(Message.HTTP_REQUEST_METHOD, "GET");
     }

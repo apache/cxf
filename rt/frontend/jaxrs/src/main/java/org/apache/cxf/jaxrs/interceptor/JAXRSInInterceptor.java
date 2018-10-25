@@ -173,7 +173,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             throw ExceptionUtils.toNotFoundException(null, resp);
         }
 
-        MultivaluedMap<String, String> matchedValues = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> matchedValues = new MetadataMap<>();
 
         OperationResourceInfo ori = null;
 

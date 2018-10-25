@@ -614,7 +614,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
         }
     }
     public Dictionary<String, String> getProperties() {
-        Dictionary<String, String> properties = new Hashtable<String, String>();
+        Dictionary<String, String> properties = new Hashtable<>();
         NumberFormat nf = NumberFormat.getIntegerInstance();
         properties.put("name", nf.format(getName()));
         properties.put("highWaterMark", nf.format(getHighWaterMark()));

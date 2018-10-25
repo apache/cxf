@@ -77,7 +77,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         SortedSet<Phase> phases = new TreeSet<>();
         phases.add(new Phase(Phase.PRE_PROTOCOL, 1));
 
-        List<Interceptor<? extends Message>> lst = new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> lst = new ArrayList<>();
         lst.add(new MustUnderstandInterceptor());
         lst.add(new WSS4JInInterceptor());
         lst.add(new SAAJInInterceptor());

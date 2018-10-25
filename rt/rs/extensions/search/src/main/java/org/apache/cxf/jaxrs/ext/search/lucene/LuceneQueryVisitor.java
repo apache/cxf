@@ -59,7 +59,7 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
     private String contentsFieldName;
     private Map<String, String> contentsFieldMap;
     private boolean caseInsensitiveMatch;
-    private VisitorState< Stack< List< Query > > > state = new ThreadLocalVisitorState< Stack< List< Query > > >();
+    private VisitorState< Stack< List< Query > > > state = new ThreadLocalVisitorState<>();
     private QueryBuilder queryBuilder;
 
     public LuceneQueryVisitor() {

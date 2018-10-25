@@ -41,7 +41,7 @@ public class ConfigurationImpl implements Configuration {
     private RuntimeType runtimeType;
     private Map<Object, Map<Class<?>, Integer>> providers =
         new LinkedHashMap<Object, Map<Class<?>, Integer>>();
-    private Map<Feature, Boolean> features = new LinkedHashMap<Feature, Boolean>();
+    private Map<Feature, Boolean> features = new LinkedHashMap<>();
 
     public ConfigurationImpl(RuntimeType rt) {
         this.runtimeType = rt;

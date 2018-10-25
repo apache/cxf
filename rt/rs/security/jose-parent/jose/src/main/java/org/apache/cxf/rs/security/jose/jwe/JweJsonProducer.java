@@ -98,7 +98,7 @@ public class JweJsonProducer {
         }
 
         List<JweJsonEncryptionEntry> entries = new ArrayList<>(encryptors.size());
-        Map<String, Object> jweJsonMap = new LinkedHashMap<String, Object>();
+        Map<String, Object> jweJsonMap = new LinkedHashMap<>();
         byte[] cipherText = null;
         byte[] authTag = null;
         byte[] iv = null;

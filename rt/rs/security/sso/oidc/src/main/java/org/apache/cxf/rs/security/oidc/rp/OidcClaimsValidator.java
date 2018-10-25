@@ -42,7 +42,7 @@ public class OidcClaimsValidator extends OAuthJoseJwtConsumer {
     private WebClient jwkSetClient;
     private boolean supportSelfIssuedProvider;
     private boolean strictTimeValidation;
-    private ConcurrentHashMap<String, JsonWebKey> keyMap = new ConcurrentHashMap<String, JsonWebKey>();
+    private ConcurrentHashMap<String, JsonWebKey> keyMap = new ConcurrentHashMap<>();
 
     /**
      * Validate core JWT claims

@@ -1805,7 +1805,7 @@ public class BookStore {
                 throw new RuntimeException();
             }
             BookStore.this.messageContext.put(Message.RESPONSE_CODE, 503);
-            MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
+            MultivaluedMap<String, String> headers = new MetadataMap<>();
             headers.putSingle("Content-Type", "text/custom+plain");
             headers.putSingle("CustomHeader", "CustomValue");
             BookStore.this.messageContext.put(Message.PROTOCOL_HEADERS, headers);

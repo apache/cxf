@@ -301,7 +301,7 @@ public final class JAXRSUtils {
                                                         BUNDLE,
                                                         path).toString());
         if (resources.size() == 1) {
-            MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+            MultivaluedMap<String, String> values = new MetadataMap<>();
             return resources.get(0).getURITemplate().match(path, values)
                    ? Collections.singletonMap(resources.get(0), values) : null;
         }
@@ -311,7 +311,7 @@ public final class JAXRSUtils {
                 new ClassResourceInfoComparator(message));
 
         for (ClassResourceInfo cri : resources) {
-            MultivaluedMap<String, String> map = new MetadataMap<String, String>();
+            MultivaluedMap<String, String> map = new MetadataMap<>();
             if (cri.getURITemplate().match(path, map)) {
                 candidateList.put(cri, map);
                 LOG.fine(() -> new org.apache.cxf.common.i18n.Message("CRI_SELECTED_POSSIBLY",
@@ -405,7 +405,7 @@ public final class JAXRSUtils {
                 boolean added = false;
 
                 URITemplate uriTemplate = ori.getURITemplate();
-                MultivaluedMap<String, String> map = new MetadataMap<String, String>(values);
+                MultivaluedMap<String, String> map = new MetadataMap<>(values);
                 if (uriTemplate != null && uriTemplate.match(path, map)) {
                     String finalGroup = map.getFirst(URITemplate.FINAL_MATCH_GROUP);
                     boolean finalPath = StringUtils.isEmpty(finalGroup) || PATH_SEGMENT_SEP.equals(finalGroup);
@@ -941,7 +941,7 @@ public final class JAXRSUtils {
         List<PathSegment> segments = JAXRSUtils.getPathSegments(
                                       (String)m.get(Message.REQUEST_URI), decode);
         if (!segments.isEmpty()) {
-            MultivaluedMap<String, String> params = new MetadataMap<String, String>();
+            MultivaluedMap<String, String> params = new MetadataMap<>();
             for (PathSegment ps : segments) {
                 MultivaluedMap<String, String> matrix = ps.getMatrixParameters();
                 for (Map.Entry<String, List<String>> entry : matrix.entrySet()) {
@@ -982,7 +982,7 @@ public final class JAXRSUtils {
             (MultivaluedMap<String, String>)m.get(FormUtils.FORM_PARAM_MAP);
 
         if (params == null) {
-            params = new MetadataMap<String, String>();
+            params = new MetadataMap<>();
             m.put(FormUtils.FORM_PARAM_MAP, params);
 
             if (mt == null || mt.isCompatible(MediaType.APPLICATION_FORM_URLENCODED_TYPE)) {

@@ -106,7 +106,7 @@ public final class FaultBean {
     }
 
     private void buildBeanFields(final Class<?> exceptionClass, final JavaClass jClass) {
-        Map<String, JavaField> fields = new TreeMap<String, JavaField>();
+        Map<String, JavaField> fields = new TreeMap<>();
 
         for (Method method : exceptionClass.getMethods()) {
             if (isIncludedGetter(method)) {

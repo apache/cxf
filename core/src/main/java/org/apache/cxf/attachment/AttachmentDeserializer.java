@@ -344,7 +344,7 @@ public class AttachmentDeserializer {
     private Map<String, List<String>> loadPartHeaders(InputStream in) throws IOException {
         StringBuilder buffer = new StringBuilder(128);
         StringBuilder b = new StringBuilder(128);
-        Map<String, List<String>> heads = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+        Map<String, List<String>> heads = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
         // loop until we hit the end or a null line
         while (readLine(in, b)) {

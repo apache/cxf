@@ -61,11 +61,11 @@ public final class PluginLoader {
     private static PluginLoader pluginLoader;
     private static final String PLUGIN_FILE_NAME = "META-INF/tools-plugin.xml";
 
-    private Map<String, Plugin> plugins = new LinkedHashMap<String, Plugin>();
+    private Map<String, Plugin> plugins = new LinkedHashMap<>();
 
-    private Map<String, FrontEnd> frontends = new LinkedHashMap<String, FrontEnd>();
+    private Map<String, FrontEnd> frontends = new LinkedHashMap<>();
 
-    private Map<String, DataBinding> databindings = new TreeMap<String, DataBinding>();
+    private Map<String, DataBinding> databindings = new TreeMap<>();
 
     private JAXBContext jaxbContext;
 

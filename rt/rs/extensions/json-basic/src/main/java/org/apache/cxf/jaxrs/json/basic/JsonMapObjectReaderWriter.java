@@ -295,7 +295,7 @@ public class JsonMapObjectReaderWriter {
         void put(String key, Object value);
     }
     private static class MapSettable implements Settable {
-        private Map<String, Object> map = new LinkedHashMap<String, Object>();
+        private Map<String, Object> map = new LinkedHashMap<>();
         public void put(String key, Object value) {
             map.put(key, value);
         }

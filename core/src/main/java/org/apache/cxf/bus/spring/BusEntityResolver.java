@@ -58,7 +58,7 @@ public class BusEntityResolver extends DelegatingEntityResolver  {
         try {
             Properties mappings = PropertiesLoaderUtils.loadAllProperties("META-INF/spring.schemas",
                                                                           classLoader);
-            schemaMappings = new ConcurrentHashMap<String, String>(mappings.size());
+            schemaMappings = new ConcurrentHashMap<>(mappings.size());
             CollectionUtils.mergePropertiesIntoMap(mappings, schemaMappings);
         } catch (IOException e) {
             //ignore

@@ -47,7 +47,7 @@ public abstract class AccessToken implements Serializable {
     private String encodedToken;
 
 
-    private Map<String, String> parameters = new LinkedHashMap<String, String>();
+    private Map<String, String> parameters = new LinkedHashMap<>();
 
     protected AccessToken() {
 

@@ -41,7 +41,7 @@ public class AuthorizationCodeRegistration {
     private String responseType;
     private String clientCodeChallenge;
     private boolean preauthorizedTokenAvailable;
-    private Map<String, String> extraProperties = new LinkedHashMap<String, String>();
+    private Map<String, String> extraProperties = new LinkedHashMap<>();
     /**
      * Sets the {@link Client} reference
      * @param client the client

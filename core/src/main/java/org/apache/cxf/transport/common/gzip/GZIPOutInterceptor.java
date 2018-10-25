@@ -326,7 +326,7 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
         Map<String, List<String>> protocolHeaders = CastUtils.cast((Map<?, ?>)message
             .get(Message.PROTOCOL_HEADERS));
         if (protocolHeaders == null) {
-            protocolHeaders = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+            protocolHeaders = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
             message.put(Message.PROTOCOL_HEADERS, protocolHeaders);
         }
         List<String> header = CastUtils.cast((List<?>)protocolHeaders.get(name));

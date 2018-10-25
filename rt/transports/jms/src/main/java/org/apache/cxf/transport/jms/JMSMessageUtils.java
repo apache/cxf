@@ -106,7 +106,7 @@ final class JMSMessageUtils {
         if (responseCode != null) {
             inMessage.put(org.apache.cxf.message.Message.RESPONSE_CODE, Integer.valueOf(responseCode));
         }
-        Map<String, List<String>> protHeaders = new TreeMap<String, List<String>>();
+        Map<String, List<String>> protHeaders = new TreeMap<>();
         for (String name : messageHeaders.getPropertyKeys()) {
             String val = (String)messageHeaders.getProperty(name);
             protHeaders.put(name, Collections.singletonList(val));
@@ -172,7 +172,7 @@ final class JMSMessageUtils {
         Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)message
             .get(org.apache.cxf.message.Message.PROTOCOL_HEADERS));
         if (null == headers) {
-            headers = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+            headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
             message.put(org.apache.cxf.message.Message.PROTOCOL_HEADERS, headers);
         }
         return contentType;

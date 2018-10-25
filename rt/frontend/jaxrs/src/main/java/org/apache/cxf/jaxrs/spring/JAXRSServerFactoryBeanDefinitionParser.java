@@ -266,7 +266,7 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
                                                          Collection<Class<?>> classes,
                                                          Class<? extends Annotation> serviceClassAnnotation) {
         AutowireCapableBeanFactory beanFactory = context.getAutowireCapableBeanFactory();
-        final List< Object > providers = new ArrayList< Object >();
+        final List< Object > providers = new ArrayList<>();
         for (final Class< ? > clazz: classes) {
             if (serviceClassAnnotation != null && clazz.getAnnotation(serviceClassAnnotation) == null) {
                 continue;

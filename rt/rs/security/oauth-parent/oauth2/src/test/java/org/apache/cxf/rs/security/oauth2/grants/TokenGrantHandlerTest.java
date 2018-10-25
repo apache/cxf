@@ -74,7 +74,7 @@ public class TokenGrantHandlerTest extends Assert {
     }
 
     private MultivaluedMap<String, String> createMap(String grant) {
-        MultivaluedMap<String, String> map = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> map = new MetadataMap<>();
         map.putSingle(OAuthConstants.GRANT_TYPE, grant);
         return map;
     }

@@ -200,7 +200,7 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
     Class<?> cls;
 
     private Map<String, Object> contextProperties = new HashMap<>();
-    private List<XmlAdapter<?, ?>> adapters = new ArrayList<XmlAdapter<?, ?>>();
+    private List<XmlAdapter<?, ?>> adapters = new ArrayList<>();
     private Map<String, Object> marshallerProperties = new HashMap<>();
     private Map<String, Object> unmarshallerProperties = new HashMap<>();
     private Unmarshaller.Listener unmarshallerListener;

@@ -576,21 +576,21 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         Book json = new Book("json", 2L);
         InputStream is1 =
             getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg");
-        Map<String, Object> objects = new LinkedHashMap<String, Object>();
+        Map<String, Object> objects = new LinkedHashMap<>();
 
-        MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> headers = new MetadataMap<>();
         headers.putSingle("Content-Type", "application/xml");
         headers.putSingle("Content-ID", "theroot");
         headers.putSingle("Content-Transfer-Encoding", "customxml");
         Attachment attJaxb = new Attachment(headers, jaxb);
 
-        headers = new MetadataMap<String, String>();
+        headers = new MetadataMap<>();
         headers.putSingle("Content-Type", "application/json");
         headers.putSingle("Content-ID", "thejson");
         headers.putSingle("Content-Transfer-Encoding", "customjson");
         Attachment attJson = new Attachment(headers, json);
 
-        headers = new MetadataMap<String, String>();
+        headers = new MetadataMap<>();
         headers.putSingle("Content-Type", "application/octet-stream");
         headers.putSingle("Content-ID", "theimage");
         headers.putSingle("Content-Transfer-Encoding", "customstream");
@@ -626,17 +626,17 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         Book json = new Book("json", 1L);
         InputStream is1 =
             getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg");
-        Map<String, Object> objects = new LinkedHashMap<String, Object>();
+        Map<String, Object> objects = new LinkedHashMap<>();
 
-        MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> headers = new MetadataMap<>();
 
-        headers = new MetadataMap<String, String>();
+        headers = new MetadataMap<>();
         headers.putSingle("Content-Type", "application/json");
         headers.putSingle("Content-ID", "thejson");
         headers.putSingle("Content-Transfer-Encoding", "customjson");
         Attachment attJson = new Attachment(headers, json);
 
-        headers = new MetadataMap<String, String>();
+        headers = new MetadataMap<>();
         headers.putSingle("Content-Type", "application/octet-stream");
         headers.putSingle("Content-ID", "theimage");
         headers.putSingle("Content-Transfer-Encoding", "customstream");
@@ -668,7 +668,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         Book json = new Book("json", 2L);
         InputStream is1 =
             getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg");
-        Map<String, Object> objects = new LinkedHashMap<String, Object>();
+        Map<String, Object> objects = new LinkedHashMap<>();
         objects.put(MediaType.APPLICATION_XML, jaxb);
         objects.put(MediaType.APPLICATION_JSON, json);
         objects.put(MediaType.APPLICATION_OCTET_STREAM, is1);
@@ -824,7 +824,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         client.type("multipart/form-data").accept("multipart/form-data");
 
         ContentDisposition cd = new ContentDisposition("attachment;filename=java.jpg");
-        MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> headers = new MetadataMap<>();
         headers.putSingle("Content-ID", "image");
         headers.putSingle("Content-Disposition", cd.toString());
         headers.putSingle("Content-Location", "http://host/bar");
@@ -851,7 +851,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         client.type("multipart/form-data").accept("text/plain");
 
         ContentDisposition cd = new ContentDisposition("attachment;name=\"a\";filename=\"a;txt\"");
-        MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> headers = new MetadataMap<>();
         headers.putSingle("Content-Disposition", cd.toString());
         Attachment att = new Attachment(new ByteArrayInputStream("file name with semicolon".getBytes()),
                                         headers);

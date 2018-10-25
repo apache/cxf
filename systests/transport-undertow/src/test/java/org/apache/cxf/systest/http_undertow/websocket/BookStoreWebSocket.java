@@ -47,7 +47,7 @@ import org.apache.cxf.transport.websocket.WebSocketConstants;
 @Path("/web/bookstore")
 public class BookStoreWebSocket {
     private static ExecutorService executor = Executors.newSingleThreadExecutor();
-    private Map<String, OutputStream> eventsStreams = new HashMap<String, OutputStream>();
+    private Map<String, OutputStream> eventsStreams = new HashMap<>();
 
     @GET
     @Path("/booknames")

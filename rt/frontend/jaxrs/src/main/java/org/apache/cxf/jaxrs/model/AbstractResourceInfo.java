@@ -350,7 +350,7 @@ public abstract class AbstractResourceInfo {
                                  V proxy) {
         Map<T, V> proxies = proxyMap.get(serviceClass);
         if (proxies == null) {
-            proxies = new ConcurrentHashMap<T, V>();
+            proxies = new ConcurrentHashMap<>();
             proxyMap.put(serviceClass, proxies);
         }
         if (!proxies.containsKey(f)) {

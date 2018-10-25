@@ -38,7 +38,7 @@ public class IntegerUserMapAdapter extends XmlAdapter<IntegerUserMap, Map<Intege
     }
 
     public Map<Integer, User> unmarshal(IntegerUserMap v) throws Exception {
-        Map<Integer, User> map = new LinkedHashMap<Integer, User>();
+        Map<Integer, User> map = new LinkedHashMap<>();
         for (IntegerUserMap.IntegerUserEntry e : v.getEntries()) {
             map.put(e.getId(), e.getUser());
         }

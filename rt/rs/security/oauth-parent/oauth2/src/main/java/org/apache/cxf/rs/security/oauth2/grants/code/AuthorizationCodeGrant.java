@@ -97,7 +97,7 @@ public class AuthorizationCodeGrant implements AccessTokenGrant {
      * {@inheritDoc}
      */
     public MultivaluedMap<String, String> toMap() {
-        MultivaluedMap<String, String> map = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> map = new MetadataMap<>();
         map.putSingle(OAuthConstants.GRANT_TYPE, OAuthConstants.AUTHORIZATION_CODE_GRANT);
         map.putSingle(OAuthConstants.AUTHORIZATION_CODE_VALUE, getCode());
         if (getRedirectUri() != null) {

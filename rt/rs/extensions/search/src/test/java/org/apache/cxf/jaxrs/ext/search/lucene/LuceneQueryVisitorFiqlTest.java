@@ -220,7 +220,7 @@ public class LuceneQueryVisitorFiqlTest extends AbstractLuceneQueryVisitorTest {
         final LuceneQueryVisitor<SearchBean> visitor = new LuceneQueryVisitor<>();
         final ExecutorService executorService = Executors.newFixedThreadPool(5);
 
-        final Collection< Future< ? > > futures = new ArrayList< Future< ? > >();
+        final Collection< Future< ? > > futures = new ArrayList<>();
         for (int i = 0; i < 5; ++i) {
             final int index = i;
 

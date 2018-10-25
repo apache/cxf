@@ -153,7 +153,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
             }
         }
         if (!at.getExtraProperties().isEmpty()) {
-            Map<String, String> actualExtraProps = new HashMap<String, String>();
+            Map<String, String> actualExtraProps = new HashMap<>();
             for (Map.Entry<String, String> entry : at.getExtraProperties().entrySet()) {
                 if (JoseConstants.HEADER_X509_THUMBPRINT_SHA256.equals(entry.getKey())) {
                     claims.setClaim(JwtConstants.CLAIM_CONFIRMATION,

@@ -183,7 +183,7 @@ public class PrimitiveTextProviderTest extends Assert {
     public void testWriteStringISO() throws Exception {
         MessageBodyWriter<String> p = new PrimitiveTextProvider<>();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        MultivaluedMap<String, Object> headers = new MetadataMap<String, Object>();
+        MultivaluedMap<String, Object> headers = new MetadataMap<>();
 
         String eWithAcute = "\u00E9";
         String helloStringUTF16 = "Hello, my name is F" + eWithAcute + "lix Agn" + eWithAcute + "s";

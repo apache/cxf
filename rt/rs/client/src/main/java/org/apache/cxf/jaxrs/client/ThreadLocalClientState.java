@@ -140,7 +140,7 @@ public class ThreadLocalClientState implements ClientState {
 
     private void prepareCheckpointMap() {
         if (checkpointMap == null) {
-            checkpointMap = new ConcurrentHashMap<Thread, Long>();
+            checkpointMap = new ConcurrentHashMap<>();
         }
     }
 

@@ -201,7 +201,7 @@ public class MediaTypeHeaderProviderTest extends Assert {
         MediaTypeHeaderProvider provider =
             new MediaTypeHeaderProvider();
 
-        Map<String, String> params = new LinkedHashMap<String, String>();
+        Map<String, String> params = new LinkedHashMap<>();
         params.put("foo", "bar");
         params.put("q", "0.2");
 

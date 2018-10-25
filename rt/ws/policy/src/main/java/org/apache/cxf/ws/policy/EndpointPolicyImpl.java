@@ -295,7 +295,7 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         PolicyInterceptorProviderRegistry reg
             = engine.getBus().getExtension(PolicyInterceptorProviderRegistry.class);
 
-        Set<Interceptor<? extends Message>> out = new LinkedHashSet<Interceptor<? extends Message>>();
+        Set<Interceptor<? extends Message>> out = new LinkedHashSet<>();
         if (getChosenAlternative() != null) {
             for (Assertion a : getChosenAlternative()) {
                 initializeInterceptors(reg, out, a, false, m);
@@ -304,12 +304,12 @@ public class EndpointPolicyImpl implements EndpointPolicy {
 
         List<Interceptor<? extends Message>> tmp = null;
         if (requestor) {
-            tmp = new ArrayList<Interceptor<? extends Message>>(out);
+            tmp = new ArrayList<>(out);
             out.clear();
             for (Assertion a : getChosenAlternative()) {
                 initializeInterceptors(reg, out, a, true, m);
             }
-            faultInterceptors = new ArrayList<Interceptor<? extends Message>>(out);
+            faultInterceptors = new ArrayList<>(out);
         } else if (ei != null && ei.getBinding() != null) {
             for (BindingOperationInfo boi : ei.getBinding().getOperations()) {
                 EffectivePolicy p = engine.getEffectiveServerRequestPolicy(ei, boi, m);
@@ -324,9 +324,9 @@ public class EndpointPolicyImpl implements EndpointPolicy {
                     }
                 }
             }
-            tmp = new ArrayList<Interceptor<? extends Message>>(out);
+            tmp = new ArrayList<>(out);
         } else {
-            tmp = new ArrayList<Interceptor<? extends Message>>(out);
+            tmp = new ArrayList<>(out);
         }
         interceptors = tmp;
     }

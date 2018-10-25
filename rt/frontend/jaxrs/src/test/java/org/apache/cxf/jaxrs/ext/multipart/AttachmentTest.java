@@ -37,7 +37,7 @@ public class AttachmentTest extends Assert {
     }
 
     private Attachment createAttachment(String id) {
-        MetadataMap<String, String> map = new MetadataMap<String, String>();
+        MetadataMap<String, String> map = new MetadataMap<>();
         map.add("foo", "bar");
         return new Attachment(id,
                        new DataHandler(new ByteArrayDataSource(new byte[]{1}, "application/octet-stream")),

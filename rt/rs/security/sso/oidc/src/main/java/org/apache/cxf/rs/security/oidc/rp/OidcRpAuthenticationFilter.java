@@ -107,7 +107,7 @@ public class OidcRpAuthenticationFilter implements ContainerRequestFilter {
         return true;
     }
     private MultivaluedMap<String, String> toRequestState(ContainerRequestContext rc) {
-        MultivaluedMap<String, String> requestState = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> requestState = new MetadataMap<>();
         requestState.putAll(rc.getUriInfo().getQueryParameters(true));
         if (MediaType.APPLICATION_FORM_URLENCODED_TYPE.isCompatible(rc.getMediaType())) {
             String body = FormUtils.readBody(rc.getEntityStream(), StandardCharsets.UTF_8.name());

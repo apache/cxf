@@ -259,7 +259,7 @@ public class JAXRSOAuth2TlsTest extends AbstractBusClientServerTestBase {
 
         @Override
         public MultivaluedMap<String, String> toMap() {
-            MultivaluedMap<String, String> map = new MetadataMap<String, String>();
+            MultivaluedMap<String, String> map = new MetadataMap<>();
             map.putSingle(OAuthConstants.GRANT_TYPE, "custom_grant");
             return map;
         }

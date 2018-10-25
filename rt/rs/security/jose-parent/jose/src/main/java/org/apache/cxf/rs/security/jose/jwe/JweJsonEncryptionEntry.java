@@ -46,7 +46,7 @@ public class JweJsonEncryptionEntry implements JsonObject {
     }
     public String toJson() {
         JsonMapObjectReaderWriter jsonWriter = new JsonMapObjectReaderWriter();
-        Map<String, Object> recipientsEntry = new LinkedHashMap<String, Object>();
+        Map<String, Object> recipientsEntry = new LinkedHashMap<>();
         if (unprotectedHeader != null && !unprotectedHeader.asMap().isEmpty()) {
             recipientsEntry.put("header", this.unprotectedHeader);
         }

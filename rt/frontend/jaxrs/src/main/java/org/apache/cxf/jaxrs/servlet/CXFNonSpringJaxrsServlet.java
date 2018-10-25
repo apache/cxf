@@ -230,7 +230,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
             return;
         }
         String[] values = StringUtils.split(value, splitChar);
-        List<Interceptor<? extends Message>> list = new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> list = new ArrayList<>();
         for (String interceptorVal : values) {
             Map<String, List<String>> props = new HashMap<>();
             String theValue = getClassNameAndProperties(interceptorVal, props);
@@ -319,7 +319,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
             return Collections.< Feature >emptyList();
         }
         String[] classNames = StringUtils.split(featuresList, splitChar);
-        List< Feature > features = new ArrayList< Feature >();
+        List< Feature > features = new ArrayList<>();
         for (String cName : classNames) {
             Map<String, List<String>> props = new HashMap<>();
             String theName = getClassNameAndProperties(cName, props);

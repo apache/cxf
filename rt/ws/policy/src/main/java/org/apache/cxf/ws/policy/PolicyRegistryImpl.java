@@ -30,7 +30,7 @@ import org.apache.neethi.PolicyRegistry;
  */
 public class PolicyRegistryImpl implements PolicyRegistry {
 
-    private Map<String, Policy> reg = new ConcurrentHashMap<String, Policy>(16, 0.75f, 4);
+    private Map<String, Policy> reg = new ConcurrentHashMap<>(16, 0.75f, 4);
 
     public Policy lookup(String key) {
         return reg.get(key);

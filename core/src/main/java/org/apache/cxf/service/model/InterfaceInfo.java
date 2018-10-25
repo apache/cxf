@@ -36,7 +36,7 @@ public class InterfaceInfo extends AbstractDescriptionElement implements NamedIt
     QName name;
     ServiceInfo service;
 
-    Map<QName, OperationInfo> operations = new ConcurrentHashMap<QName, OperationInfo>(4, 0.75f, 2);
+    Map<QName, OperationInfo> operations = new ConcurrentHashMap<>(4, 0.75f, 2);
 
     public InterfaceInfo(ServiceInfo info, QName q) {
         name = q;

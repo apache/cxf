@@ -254,7 +254,7 @@ public final class EndpointReferenceUtils {
 
     private static final Set<Class<?>> ADDRESSING_CLASSES = new HashSet<>();
     private static final AtomicReference<Reference<JAXBContext>> ADDRESSING_CONTEXT
-        = new AtomicReference<Reference<JAXBContext>>(new SoftReference<JAXBContext>(null));
+        = new AtomicReference<>(new SoftReference<JAXBContext>(null));
     static {
         ADDRESSING_CLASSES.add(WSA_WSDL_OBJECT_FACTORY.getClass());
         ADDRESSING_CLASSES.add(org.apache.cxf.ws.addressing.ObjectFactory.class);
@@ -560,8 +560,8 @@ public final class EndpointReferenceUtils {
         Schema schema = serviceInfo.getProperty(Schema.class.getName(), Schema.class);
         if (schema == null) {
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            Map<String, byte[]> schemaSourcesMap = new LinkedHashMap<String, byte[]>();
-            Map<String, Source> schemaSourcesMap2 = new LinkedHashMap<String, Source>();
+            Map<String, byte[]> schemaSourcesMap = new LinkedHashMap<>();
+            Map<String, Source> schemaSourcesMap2 = new LinkedHashMap<>();
 
             XMLStreamWriter writer = null;
             try {

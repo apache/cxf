@@ -214,7 +214,7 @@ public class EffectivePolicyImpl implements EffectivePolicy {
             PolicyInterceptorProviderRegistry reg
                 = ((PolicyEngineImpl)engine).getBus().getExtension(PolicyInterceptorProviderRegistry.class);
             Set<Interceptor<? extends org.apache.cxf.message.Message>> out
-                = new LinkedHashSet<Interceptor<? extends org.apache.cxf.message.Message>>();
+                = new LinkedHashSet<>();
             for (Assertion a : getChosenAlternative()) {
                 initialiseInterceptors(reg, engine, out, a, useIn, fault, m);
             }

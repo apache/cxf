@@ -53,7 +53,7 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
     private String clientCodeChallenge;
     private String nonce;
     private boolean preauthorizedTokenAvailable;
-    private Map<String, String> extraProperties = new LinkedHashMap<String, String>();
+    private Map<String, String> extraProperties = new LinkedHashMap<>();
 
     public ServerAuthorizationCodeGrant() {
 

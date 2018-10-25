@@ -39,7 +39,7 @@ import org.apache.cxf.common.util.StringUtils;
 public class StreamWriterContentHandler implements ContentHandler, LexicalHandler {
 
     XMLStreamWriter writer;
-    Map<String, String> mapping = new LinkedHashMap<String, String>();
+    Map<String, String> mapping = new LinkedHashMap<>();
     boolean inCDATA;
 
     public StreamWriterContentHandler(XMLStreamWriter w) {

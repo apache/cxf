@@ -140,7 +140,7 @@ public class JAXRSUtilsTest extends Assert {
         Message messageImpl = createMessage();
         String body = "p1=" + URLEncoder.encode("\u00E4\u00F6\u00FC", enc) + "&p2=2&p2=3";
         messageImpl.put(Message.REQUEST_URI, "/foo");
-        MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> headers = new MetadataMap<>();
         String ct = MediaType.APPLICATION_FORM_URLENCODED;
         if (setEnc) {
             ct += ";charset=" + enc;
@@ -402,7 +402,7 @@ public class JAXRSUtilsTest extends Assert {
 
         //If acceptContentTypes does not specify a specific Mime type, the
         //method is declared with a most specific ProduceMime type is selected.
-        MetadataMap<String, String> values = new MetadataMap<String, String>();
+        MetadataMap<String, String> values = new MetadataMap<>();
         OperationResourceInfo ori = findTargetResourceClass(resources, createMessage2(), "/1/2/",
              "GET", values, contentTypes, getTypes("*/*"));
         assertNotNull(ori);
@@ -414,7 +414,7 @@ public class JAXRSUtilsTest extends Assert {
         assertEquals("First {id} is 1", "1", values.getFirst("id"));
         assertEquals("Second id is 2", "2", values.get("id").get(1));
 
-        values = new MetadataMap<String, String>();
+        values = new MetadataMap<>();
         ori = findTargetResourceClass(resources, createMessage2(), "/2",
              "POST", values, contentTypes, getTypes("*/*"));
         assertNotNull(ori);
@@ -425,7 +425,7 @@ public class JAXRSUtilsTest extends Assert {
                      values.get(URITemplate.FINAL_MATCH_GROUP).size());
         assertEquals("Only the first {id} should've been picked up", "2", values.getFirst("id"));
 
-        values = new MetadataMap<String, String>();
+        values = new MetadataMap<>();
         ori = findTargetResourceClass(resources, createMessage2(), "/3/4",
              "PUT", values, contentTypes, getTypes("*/*"));
         assertNotNull(ori);
@@ -963,7 +963,7 @@ public class JAXRSUtilsTest extends Assert {
         Class<?>[] argType = {String.class, Set.class, String.class, Set.class};
         Method m = Customer.class.getMethod("testCookieParam", argType);
         Message messageImpl = createMessage();
-        MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> headers = new MetadataMap<>();
         headers.add("Cookie", "c1=c1Value");
         messageImpl.put(Message.PROTOCOL_HEADERS, headers);
         List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m,
@@ -987,7 +987,7 @@ public class JAXRSUtilsTest extends Assert {
         Class<?>[] argType = {String.class, String.class, Cookie.class};
         Method m = Customer.class.getMethod("testMultipleCookieParam", argType);
         Message messageImpl = createMessage();
-        MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> headers = new MetadataMap<>();
         headers.add("Cookie", "c1=c1Value; c2=c2Value");
         headers.add("Cookie", "c3=c3Value");
         messageImpl.put(Message.PROTOCOL_HEADERS, headers);
@@ -1253,11 +1253,11 @@ public class JAXRSUtilsTest extends Assert {
         Class<?>[] argType = {Customer.CustomerBean.class};
         Method m = Customer.class.getMethod("testPathBean", argType);
 
-        MultivaluedMap<String, String> pathTemplates = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> pathTemplates = new MetadataMap<>();
         pathTemplates.add("a", "aValue");
         pathTemplates.add("b", "123");
 
-        MultivaluedMap<String, String> complexPathTemplates = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> complexPathTemplates = new MetadataMap<>();
         complexPathTemplates.add("c", "1");
         complexPathTemplates.add("a", "A");
         complexPathTemplates.add("b", "123");
@@ -1328,7 +1328,7 @@ public class JAXRSUtilsTest extends Assert {
         Method m = Customer.class.getMethod("testFormBean", argType);
         Message messageImpl = createMessage();
         messageImpl.put(Message.REQUEST_URI, "/bar");
-        MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> headers = new MetadataMap<>();
         headers.putSingle("Content-Type", MediaType.APPLICATION_FORM_URLENCODED);
         messageImpl.put(Message.PROTOCOL_HEADERS, headers);
         String body = "a=aValue&b=123&cb=true";
@@ -1353,7 +1353,7 @@ public class JAXRSUtilsTest extends Assert {
         Method m = Customer.class.getMethod("testFormBean", argType);
         Message messageImpl = createMessage();
         messageImpl.put(Message.REQUEST_URI, "/bar");
-        MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> headers = new MetadataMap<>();
         headers.putSingle("Content-Type", MediaType.APPLICATION_FORM_URLENCODED);
         messageImpl.put(Message.PROTOCOL_HEADERS, headers);
         String body = "a=aValue&b=123&cb=true";
@@ -1380,7 +1380,7 @@ public class JAXRSUtilsTest extends Assert {
         Method m = Customer.class.getMethod("testFormBean", argType);
         Message messageImpl = createMessage();
         messageImpl.put(Message.REQUEST_URI, "/bar");
-        MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> headers = new MetadataMap<>();
         headers.putSingle("Content-Type", MediaType.APPLICATION_FORM_URLENCODED);
         messageImpl.put(Message.PROTOCOL_HEADERS, headers);
         String body = "g.b=1&g.b=2";
@@ -1556,7 +1556,7 @@ public class JAXRSUtilsTest extends Assert {
         Method m = Customer.class.getMethod("testPathSegment", argType);
         Message messageImpl = createMessage();
         messageImpl.put(Message.REQUEST_URI, "/bar%20foo;p4=0%201");
-        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> values = new MetadataMap<>();
         values.add("ps", "bar%20foo;p4=0%201");
         List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m,
                                                                new ClassResourceInfo(Customer.class)),
@@ -1588,7 +1588,7 @@ public class JAXRSUtilsTest extends Assert {
         Message messageImpl = createMessage();
         String body = "p1=1&p2=2&p2=3";
         messageImpl.put(Message.REQUEST_URI, "/foo");
-        MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> headers = new MetadataMap<>();
         if (useMediaType) {
             headers.putSingle("Content-Type", MediaType.APPLICATION_FORM_URLENCODED);
         }
@@ -1711,7 +1711,7 @@ public class JAXRSUtilsTest extends Assert {
                                                      List.class}),
                 cri);
         ori.setHttpMethod("GET");
-        MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> headers = new MetadataMap<>();
         headers.add("Foo", "bar, baz");
 
         Message m = createMessage();
@@ -1924,7 +1924,7 @@ public class JAXRSUtilsTest extends Assert {
         OperationResourceInfo ori = new OperationResourceInfo(Customer.class.getMethods()[0],
                                                               cri);
         Message m = createMessage();
-        MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> headers = new MetadataMap<>();
         headers.add("AHeader2", "theAHeader2");
         m.put(Message.PROTOCOL_HEADERS, headers);
         m.put(Message.QUERY_STRING, "a_value=aValue&query2=b");
@@ -1942,7 +1942,7 @@ public class JAXRSUtilsTest extends Assert {
                                                               cri);
         Message m = createMessage();
 
-        MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> headers = new MetadataMap<>();
         headers.add("AHeader", "theAHeader");
         m.put(Message.PROTOCOL_HEADERS, headers);
         m.put(Message.QUERY_STRING, "b=bValue");
@@ -2061,7 +2061,7 @@ public class JAXRSUtilsTest extends Assert {
                 cri);
         ori.setHttpMethod("GET");
         ori.setURITemplate(new URITemplate("{id1}/{id2}"));
-        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> values = new MetadataMap<>();
         values.putSingle("id1", "1");
         values.putSingle("id2", "2");
 

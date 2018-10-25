@@ -44,8 +44,8 @@ import java.util.WeakHashMap;
  * </b>
  */
 public class CacheMap<K, V> implements Map<K, V> {
-    Map<K, V> mainDataMap = new WeakHashMap<K, V>();
-    Map<K, V> extraKeyMap = new WeakIdentityHashMap<K, V>();
+    Map<K, V> mainDataMap = new WeakHashMap<>();
+    Map<K, V> extraKeyMap = new WeakIdentityHashMap<>();
 
     public CacheMap() {
 

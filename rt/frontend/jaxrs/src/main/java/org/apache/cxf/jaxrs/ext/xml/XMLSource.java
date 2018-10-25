@@ -217,7 +217,7 @@ public class XMLSource {
      * @return the xml:base value
      */
     public URI getBaseURI() {
-        Map<String, String> map = new LinkedHashMap<String, String>();
+        Map<String, String> map = new LinkedHashMap<>();
         map.put("xml", XML_NAMESPACE);
         return getLink("/*/@xml:base", map);
     }

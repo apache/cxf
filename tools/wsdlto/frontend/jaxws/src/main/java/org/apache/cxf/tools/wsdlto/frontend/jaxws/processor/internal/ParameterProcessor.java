@@ -675,7 +675,7 @@ public class ParameterProcessor extends AbstractProcessor {
             outputPartsMap = outputMessage.getMessagePartsMap();
             outputParts = outputPartsMap.values();
         } else {
-            outputPartsMap = new LinkedHashMap<QName, MessagePartInfo>();
+            outputPartsMap = new LinkedHashMap<>();
             outputParts = new ArrayList<>();
         }
 

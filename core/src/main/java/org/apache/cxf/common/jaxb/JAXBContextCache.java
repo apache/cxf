@@ -267,7 +267,7 @@ public final class JAXBContextCache {
             if (typeRefs == null || typeRefs.isEmpty()) {
                 if (cachedContextAndSchemasInternalMap == null) {
                     cachedContextAndSchemasInternalMap
-                        = new CacheMap<String, CachedContextAndSchemasInternal>();
+                        = new CacheMap<>();
                 }
                 cachedContextAndSchemasInternalMap.put((defaultNs != null) ? defaultNs : "",
                     cachedContextAndSchemasInternal);

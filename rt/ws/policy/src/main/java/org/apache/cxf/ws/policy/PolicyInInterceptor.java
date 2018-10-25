@@ -67,7 +67,7 @@ public class PolicyInInterceptor extends AbstractPolicyInterceptor {
             return;
         }
 
-        List<Interceptor<? extends Message>> interceptors = new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> interceptors = new ArrayList<>();
         Collection<Assertion> assertions = new ArrayList<>();
 
         // 1. Check overridden policy

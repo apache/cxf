@@ -48,9 +48,9 @@ public class MultipleEndpointObserver implements MessageObserver {
 
     protected Bus bus;
     protected List<Interceptor<? extends Message>> bindingInterceptors
-        = new CopyOnWriteArrayList<Interceptor<? extends Message>>();
+        = new CopyOnWriteArrayList<>();
     protected List<Interceptor<? extends Message>> routingInterceptors
-        = new CopyOnWriteArrayList<Interceptor<? extends Message>>();
+        = new CopyOnWriteArrayList<>();
     private Set<Endpoint> endpoints = new CopyOnWriteArraySet<>();
     private ClassLoader loader;
 

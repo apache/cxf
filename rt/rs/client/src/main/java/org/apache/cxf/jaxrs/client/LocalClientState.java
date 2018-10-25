@@ -36,7 +36,7 @@ public class LocalClientState implements ClientState {
     private static final String HTTP_SCHEME = "http";
     private static final String WS_SCHEME = "ws";
 
-    private MultivaluedMap<String, String> requestHeaders = new MetadataMap<String, String>(false, true);
+    private MultivaluedMap<String, String> requestHeaders = new MetadataMap<>(false, true);
     private MultivaluedMap<String, String> templates;
     private Response response;
     private URI baseURI;
@@ -57,7 +57,7 @@ public class LocalClientState implements ClientState {
     }
 
     public LocalClientState(LocalClientState cs) {
-        this.requestHeaders = new MetadataMap<String, String>(cs.requestHeaders);
+        this.requestHeaders = new MetadataMap<>(cs.requestHeaders);
         this.templates = cs.templates == null ? null : new MetadataMap<String, String>(cs.templates);
         this.response = cs.response;
 

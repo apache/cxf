@@ -261,7 +261,7 @@ public class AttachmentSerializer {
                 Map<String, List<String>> headers = null;
                 Iterator<String> it = a.getHeaderNames();
                 if (it.hasNext()) {
-                    headers = new LinkedHashMap<String, List<String>>();
+                    headers = new LinkedHashMap<>();
                     while (it.hasNext()) {
                         String key = it.next();
                         headers.put(key, Collections.singletonList(a.getHeader(key)));

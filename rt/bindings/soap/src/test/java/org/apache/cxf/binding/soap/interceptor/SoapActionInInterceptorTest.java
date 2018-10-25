@@ -173,8 +173,8 @@ public class SoapActionInInterceptorTest extends Assert {
 
     private SoapMessage setUpMessage(String contentType, SoapVersion version, String prop) {
         SoapMessage message = control.createMock(SoapMessage.class);
-        Map<String, List<String>> headers = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
-        Map<String, List<String>> partHeaders = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+        Map<String, List<String>> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        Map<String, List<String>> partHeaders = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         if (version instanceof Soap11 && prop != null) {
             headers.put("SOAPAction", Collections.singletonList(prop));
         } else if (version instanceof Soap12 && prop != null) {

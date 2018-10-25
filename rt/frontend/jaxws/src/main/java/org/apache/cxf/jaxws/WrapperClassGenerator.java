@@ -92,7 +92,7 @@ public final class WrapperClassGenerator extends ASMHelper {
     }
 
     private List<Annotation> getJaxbAnnos(MessagePartInfo mpi) {
-        List<Annotation> list = new java.util.concurrent.CopyOnWriteArrayList<Annotation>();
+        List<Annotation> list = new java.util.concurrent.CopyOnWriteArrayList<>();
         Annotation[] anns = getMethodParameterAnnotations(mpi);
         if (anns != null) {
             for (Annotation anno : anns) {

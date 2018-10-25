@@ -33,7 +33,7 @@ public class JsonMapObjectReaderWriterTest extends Assert {
 
     @Test
     public void testWriteMap() throws Exception {
-        Map<String, Object> map = new LinkedHashMap<String, Object>();
+        Map<String, Object> map = new LinkedHashMap<>();
         map.put("a", "aValue");
         map.put("b", 123);
         map.put("c", Collections.singletonList("cValue"));

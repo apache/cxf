@@ -155,7 +155,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
             return getAttachmentCollection(t, infos, anns);
         }
         if (c.isAssignableFrom(Map.class)) {
-            Map<String, Object> map = new LinkedHashMap<String, Object>(infos.size());
+            Map<String, Object> map = new LinkedHashMap<>(infos.size());
             Class<?> actual = getActualType(t, 1);
             for (Attachment a : infos) {
                 map.put(a.getContentType().toString(), fromAttachment(a, actual, actual, anns));
@@ -365,7 +365,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
             dh = getHandlerForObject(obj, cls, genericType, anns, mimeType, id);
         }
         String contentId = getContentId(anns, id);
-        MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> headers = new MetadataMap<>();
         headers.putSingle("Content-Type", mimeType);
         
         return new Attachment(contentId, dh, headers);

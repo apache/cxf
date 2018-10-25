@@ -32,7 +32,7 @@ public abstract class AbstractPropertiesHolder implements Extensible {
     private AbstractPropertiesHolder delegate;
     private boolean delegateProperties;
 
-    private AtomicReference<Map<String, Object>> propertyMap = new AtomicReference<Map<String, Object>>();
+    private AtomicReference<Map<String, Object>> propertyMap = new AtomicReference<>();
     private AtomicReference<Object[]> extensors = new AtomicReference<>();
     private Map<QName, Object> extensionAttributes;
     private String documentation;

@@ -495,7 +495,7 @@ public class HttpHeadersImplTest extends Assert {
 
 
     private MetadataMap<String, String> createHeaders() {
-        MetadataMap<String, String> hs = new MetadataMap<String, String>();
+        MetadataMap<String, String> hs = new MetadataMap<>();
         hs.add("Accept", "text/bar;q=0.6");
         hs.add("Accept", "text/*;q=1,application/xml");
         hs.putSingle("Content-Type", "*/*");
@@ -509,7 +509,7 @@ public class HttpHeadersImplTest extends Assert {
     }
 
     private MetadataMap<String, String> createHeader(String name, String... values) {
-        MetadataMap<String, String> hs = new MetadataMap<String, String>();
+        MetadataMap<String, String> hs = new MetadataMap<>();
         List<String> list = new ArrayList<>();
         list.addAll(Arrays.asList(values));
         hs.put(name, list);

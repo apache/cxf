@@ -398,7 +398,7 @@ public class WrappedMessageContext implements MessageContext {
         return Collections.unmodifiableSet(set);
     }
     public final Set<Entry<String, Object>> entrySet() {
-        Set<Entry<String, Object>> set = new HashSet<Entry<String, Object>>();
+        Set<Entry<String, Object>> set = new HashSet<>();
         for (Map.Entry<String, Object> s : message.entrySet()) {
             set.add(s);
 

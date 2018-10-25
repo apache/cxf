@@ -44,7 +44,7 @@ public class Source extends AbstractEndpoint {
 
     Source(RMEndpoint reliableEndpoint) {
         super(reliableEndpoint);
-        map = new ConcurrentHashMap<String, SourceSequence>();
+        map = new ConcurrentHashMap<>();
         current = new HashMap<>();
 
         sequenceCreationLock = new ReentrantLock();

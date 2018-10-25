@@ -305,7 +305,7 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
         if (!str.startsWith("{") || !str.endsWith("}")) {
             throw new IOException("JSON Sequence is broken");
         }
-        Map<String, String> map = new LinkedHashMap<String, String>();
+        Map<String, String> map = new LinkedHashMap<>();
 
         str = str.substring(1, str.length() - 1).trim();
         String[] jsonPairs = str.split(",");

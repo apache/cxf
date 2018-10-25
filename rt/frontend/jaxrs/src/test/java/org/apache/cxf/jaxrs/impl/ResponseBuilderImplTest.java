@@ -65,7 +65,7 @@ public class ResponseBuilderImplTest extends Assert {
 
     @Test
     public void testAllow() throws Exception {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         m.add("Allow", "HEAD");
         m.add("Allow", "GET");
         checkBuild(Response.ok().allow("HEAD").allow("GET").build(), 200, null, m);
@@ -73,20 +73,20 @@ public class ResponseBuilderImplTest extends Assert {
 
     @Test
     public void testEncoding() throws Exception {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         m.add("Content-Encoding", "gzip");
         checkBuild(Response.ok().encoding("gzip").build(), 200, null, m);
     }
 
     @Test
     public void testEntity() throws Exception {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         checkBuild(Response.ok().entity("Hello").build(), 200, "Hello", m);
     }
 
     @Test
     public void testEntityAnnotations() throws Exception {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         Annotation[] annotations = new Annotation[1];
         Annotation produces = new Produces() {
             @Override
@@ -108,7 +108,7 @@ public class ResponseBuilderImplTest extends Assert {
 
     @Test
     public void testReplaceAll() throws Exception {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         m.add("Content-Type", "text/plain");
         checkBuild(Response.ok().type("image/png").tag("removeme").replaceAll(m).build(), 200, null, m);
 
@@ -116,14 +116,14 @@ public class ResponseBuilderImplTest extends Assert {
 
     @Test
     public void testAllowReset() throws Exception {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         m.add("Allow", "POST");
         checkBuild(Response.ok().allow("HEAD").allow("GET").allow().allow("POST").build(), 200, null, m);
     }
 
     @Test
     public void testAllowSet() throws Exception {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         m.add("Allow", "HEAD");
         m.add("Allow", "GET");
         // LinkedHashSet so we get a predictable order
@@ -160,21 +160,21 @@ public class ResponseBuilderImplTest extends Assert {
 
     @Test
     public void testAbsoluteLocation() {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         m.putSingle("Location", URI.create("http://localhost/rest"));
         checkBuild(Response.ok().location(URI.create("http://localhost/rest")).build(), 200, null, m);
     }
 
     @Test
     public void testLanguage() {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         m.putSingle("Content-Language", "de");
         checkBuild(Response.ok().language("de").build(), 200, null, m);
     }
 
     @Test
     public void testLanguageReplace() {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         m.putSingle("Content-Language", "en");
         checkBuild(Response.ok().language("de").language((Locale)null)
                    .language("en").build(), 200, null, m);
@@ -182,14 +182,14 @@ public class ResponseBuilderImplTest extends Assert {
 
     @Test
     public void testLinkStr() {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         m.putSingle("Link", Link.valueOf("<http://example.com/page3>;rel=\"next\""));
         checkBuild(Response.ok().link("http://example.com/page3", "next").build(), 200, null, m);
     }
 
     @Test
     public void testLinkStrMultiple() {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         m.add("Link", Link.valueOf("<http://example.com/page1>;rel=\"previous\""));
         m.add("Link", Link.valueOf("<http://example.com/page3>;rel=\"next\""));
         checkBuild(Response.ok().link("http://example.com/page1", "previous")
@@ -198,7 +198,7 @@ public class ResponseBuilderImplTest extends Assert {
 
     @Test
     public void testLinkStrMultipleSameRel() {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         m.add("Link", Link.valueOf("<http://example.com/page2.pdf>;rel=\"alternate\""));
         m.add("Link", Link.valueOf("<http://example.com/page2.txt>;rel=\"alternate\""));
         checkBuild(Response.ok().link("http://example.com/page2.pdf", "alternate")
@@ -207,7 +207,7 @@ public class ResponseBuilderImplTest extends Assert {
 
     @Test
     public void testLinkURI() {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         URI uri = URI.create("http://example.com/page3");
         m.putSingle("Link", Link.valueOf("<http://example.com/page3>;rel=\"next\""));
         checkBuild(Response.ok().link(uri, "next").build(), 200, null, m);
@@ -215,7 +215,7 @@ public class ResponseBuilderImplTest extends Assert {
 
     @Test
     public void testLinks() {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         m.add("Link", Link.valueOf("<http://example.com/page1>;rel=\"previous\""));
         m.add("Link", Link.valueOf("<http://example.com/page3>;rel=\"next\""));
         RuntimeDelegateImpl delegate = new RuntimeDelegateImpl();
@@ -229,7 +229,7 @@ public class ResponseBuilderImplTest extends Assert {
 
     @Test
     public void testLinks2() {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         m.add("Link", Link.valueOf("<http://example.com/page1>;rel=\"previous\""));
         m.add("Link", Link.valueOf("<http://example.com/page3>;rel=\"next\""));
         RuntimeDelegateImpl delegate = new RuntimeDelegateImpl();
@@ -246,7 +246,7 @@ public class ResponseBuilderImplTest extends Assert {
 
     @Test
     public void testLinksNoReset() {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         m.add("Link", Link.valueOf("<http://example.com/page1>;rel=\"previous\""));
         m.add("Link", Link.valueOf("<http://example.com/page3>;rel=\"next\""));
         RuntimeDelegateImpl delegate = new RuntimeDelegateImpl();
@@ -259,7 +259,7 @@ public class ResponseBuilderImplTest extends Assert {
 
     @Test
     public void testLinksWithReset() {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         m.add("Link", Link.valueOf("<http://example.com/page3>;rel=\"next\""));
         RuntimeDelegateImpl delegate = new RuntimeDelegateImpl();
         Link.Builder linkBuilder = delegate.createLinkBuilder();
@@ -274,7 +274,7 @@ public class ResponseBuilderImplTest extends Assert {
 
     @Test
     public void testAddHeader() {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         m.putSingle("Content-Language", "en");
         checkBuild(Response.ok().header(HttpHeaders.CONTENT_LANGUAGE, "de")
                                 .header(HttpHeaders.CONTENT_LANGUAGE, null)
@@ -284,7 +284,7 @@ public class ResponseBuilderImplTest extends Assert {
 
     @Test
     public void testAddCookie() {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         m.add("Set-Cookie", new NewCookie("a", "b"));
         m.add("Set-Cookie", new NewCookie("c", "d"));
         checkBuild(Response.ok().cookie(new NewCookie("a", "b"))
@@ -325,7 +325,7 @@ public class ResponseBuilderImplTest extends Assert {
         SimpleDateFormat format = HttpUtils.getHttpDateFormat();
         Date date = format.parse("Tue, 21 Oct 2008 17:00:00 GMT");
 
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         m.putSingle("Expires", date);
         checkBuild(Response.ok()
                    .expires(format.parse("Tue, 21 Oct 2008 17:00:00 GMT"))
@@ -347,7 +347,7 @@ public class ResponseBuilderImplTest extends Assert {
     @Test
     public void testVariant() throws Exception {
 
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         m.putSingle("Content-Type", MediaType.TEXT_XML_TYPE);
         m.putSingle("Content-Language", new Locale("en"));
         m.putSingle("Content-Encoding", "gzip");
@@ -383,7 +383,7 @@ public class ResponseBuilderImplTest extends Assert {
     @Test
     public void testCreatedNoEntity() throws Exception {
 
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         m.putSingle("Location", URI.create("http://foo"));
 
         checkBuild(Response.created(new URI("http://foo")).build(),
@@ -404,7 +404,7 @@ public class ResponseBuilderImplTest extends Assert {
     @Test
     public void testVariantsArray() throws Exception {
 
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         m.add("Content-Type", MediaType.APPLICATION_JSON_TYPE);
         m.add("Content-Language", new Locale("en_uk"));
         m.add("Content-Language", new Locale("en_gb"));
@@ -419,7 +419,7 @@ public class ResponseBuilderImplTest extends Assert {
 
     @Test
     public void testVariantsList() throws Exception {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         m.add("Content-Type", MediaType.TEXT_XML_TYPE);
         m.add("Content-Language", new Locale("en", "UK"));
         m.add("Content-Language", new Locale("en", "GB"));

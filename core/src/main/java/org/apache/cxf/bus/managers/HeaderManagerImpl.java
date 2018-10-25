@@ -30,7 +30,7 @@ import org.apache.cxf.headers.HeaderProcessor;
 
 @NoJSR250Annotations(unlessNull = "bus")
 public class HeaderManagerImpl implements HeaderManager {
-    Map<String, HeaderProcessor> processors = new ConcurrentHashMap<String, HeaderProcessor>(4, 0.75f, 2);
+    Map<String, HeaderProcessor> processors = new ConcurrentHashMap<>(4, 0.75f, 2);
     Bus bus;
 
     public HeaderManagerImpl() {

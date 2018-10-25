@@ -116,13 +116,13 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     private List<String> schemaLocations;
     private List<Feature> features;
     private List<Interceptor<? extends Message>> in
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+        = new ModCountCopyOnWriteArrayList<>();
     private List<Interceptor<? extends Message>> out
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+        = new ModCountCopyOnWriteArrayList<>();
     private List<Interceptor<? extends Message>> outFault
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+        = new ModCountCopyOnWriteArrayList<>();
     private List<Interceptor<? extends Message>> inFault
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+        = new ModCountCopyOnWriteArrayList<>();
     @SuppressWarnings("rawtypes")
     private List<Handler> handlers = new ModCountCopyOnWriteArrayList<>();
     private EndpointContext endpointContext;

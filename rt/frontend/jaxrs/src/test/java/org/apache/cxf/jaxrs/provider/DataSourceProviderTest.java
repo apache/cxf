@@ -76,7 +76,7 @@ public class DataSourceProviderTest extends Assert {
         DataSourceProvider<DataSource> p = new DataSourceProvider<>();
         DataSource ds = new InputStreamDataSource(new ByteArrayInputStream("image".getBytes()),
                                                   "image/png");
-        MultivaluedMap<String, Object> outHeaders = new MetadataMap<String, Object>();
+        MultivaluedMap<String, Object> outHeaders = new MetadataMap<>();
 
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             p.writeTo(ds, DataSource.class, DataSource.class, new Annotation[]{},
@@ -92,7 +92,7 @@ public class DataSourceProviderTest extends Assert {
         p.setUseDataSourceContentType(true);
         DataSource ds = new InputStreamDataSource(new ByteArrayInputStream("image".getBytes()),
                                                   "image/png");
-        MultivaluedMap<String, Object> outHeaders = new MetadataMap<String, Object>();
+        MultivaluedMap<String, Object> outHeaders = new MetadataMap<>();
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             p.writeTo(ds, DataSource.class, DataSource.class, new Annotation[]{},
                     MediaType.valueOf("image/jpeg"), outHeaders, os);

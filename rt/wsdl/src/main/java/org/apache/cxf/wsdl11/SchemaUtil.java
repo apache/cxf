@@ -75,7 +75,7 @@ public final class SchemaUtil {
         // added
         getSchemaList(def);
 
-        Map<Definition, Definition> done = new IdentityHashMap<Definition, Definition>();
+        Map<Definition, Definition> done = new IdentityHashMap<>();
         done.put(def, def);
         for (Definition def2 : defList) {
             if (!done.containsKey(def2)) {

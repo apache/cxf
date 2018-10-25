@@ -42,7 +42,7 @@ public class AnnotationProcessorTest extends Assert {
 
     AnnotatedGreeterImpl greeterImpl = new AnnotatedGreeterImpl();
     AnnotationProcessor processor = new AnnotationProcessor(greeterImpl);
-    List<Class<? extends Annotation>> expectedAnnotations = new ArrayList<Class<? extends Annotation>>();
+    List<Class<? extends Annotation>> expectedAnnotations = new ArrayList<>();
 
     AnnotationVisitor visitor = EasyMock.createMock(AnnotationVisitor.class);
 

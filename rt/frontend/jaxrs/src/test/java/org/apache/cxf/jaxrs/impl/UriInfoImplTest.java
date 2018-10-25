@@ -344,7 +344,7 @@ public class UriInfoImplTest extends Assert {
     @Test
     public void testGetTemplateParameters() {
 
-        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> values = new MetadataMap<>();
         new URITemplate("/bar").match("/baz", values);
 
         UriInfoImpl u = new UriInfoImpl(mockMessage("http://localhost:8080/baz", "/bar"),

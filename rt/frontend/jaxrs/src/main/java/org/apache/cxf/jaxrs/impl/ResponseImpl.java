@@ -151,7 +151,7 @@ public final class ResponseImpl extends Response {
     }
 
     public MultivaluedMap<String, String> getStringHeaders() {
-        MetadataMap<String, String> headers = new MetadataMap<String, String>(metadata.size());
+        MetadataMap<String, String> headers = new MetadataMap<>(metadata.size());
         for (Map.Entry<String, List<Object>> entry : metadata.entrySet()) {
             String headerName = entry.getKey();
             headers.put(headerName, toListOfStrings(headerName, entry.getValue()));

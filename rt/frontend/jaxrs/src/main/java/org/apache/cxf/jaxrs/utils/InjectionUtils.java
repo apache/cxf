@@ -643,7 +643,7 @@ public final class InjectionUtils {
 
             MultivaluedMap<String, String> value = parsedValues.get(beanKey);
             if (value == null) {
-                value = new MetadataMap<String, String>();
+                value = new MetadataMap<>();
                 parsedValues.put(beanKey, value);
             }
             value.put(memberKey, entry.getValue());
@@ -760,7 +760,7 @@ public final class InjectionUtils {
         Type secondType = InjectionUtils.getType(paramType.getActualTypeArguments(), 1);
 
         if (secondType instanceof ParameterizedType) {
-            MultivaluedMap<Object, Object> theValues = new MetadataMap<Object, Object>();
+            MultivaluedMap<Object, Object> theValues = new MetadataMap<>();
             ParameterizedType valueParamType = (ParameterizedType) secondType;
             Class<?> valueType = (Class<?>) InjectionUtils.getType(valueParamType
                                .getActualTypeArguments(), 0);
@@ -868,7 +868,7 @@ public final class InjectionUtils {
                     MultivaluedMap<String, String> splitValues =
                         (idx < valuesList.size()) ? valuesList.get(idx) : null;
                     if (splitValues == null) {
-                        splitValues = new MetadataMap<String, String>();
+                        splitValues = new MetadataMap<>();
                         valuesList.add(splitValues);
                     }
                     splitValues.add(memberKey, value);
@@ -1031,7 +1031,7 @@ public final class InjectionUtils {
 
         Object value = null;
         if (InjectionUtils.isSupportedCollectionOrArray(paramType)) {
-            MultivaluedMap<String, String> paramValuesMap = new MetadataMap<String, String>();
+            MultivaluedMap<String, String> paramValuesMap = new MetadataMap<>();
             paramValuesMap.put("", paramValues);
             value = InjectionUtils.injectIntoCollectionOrArray(paramType, genericType, paramAnns,
                                                 paramValuesMap, false, decoded, pathParam, message);
@@ -1261,7 +1261,7 @@ public final class InjectionUtils {
     }
 
     public static MultivaluedMap<String, Object> extractValuesFromBean(Object bean, String baseName) {
-        MultivaluedMap<String, Object> values = new MetadataMap<String, Object>();
+        MultivaluedMap<String, Object> values = new MetadataMap<>();
         fillInValuesFromBean(bean, baseName, values);
         return values;
     }
@@ -1336,7 +1336,7 @@ public final class InjectionUtils {
     public static Map<Parameter, Class<?>> getParametersFromBeanClass(Class<?> beanClass,
                                                                       ParameterType type,
                                                                       boolean checkIgnorable) {
-        Map<Parameter, Class<?>> params = new LinkedHashMap<Parameter, Class<?>>();
+        Map<Parameter, Class<?>> params = new LinkedHashMap<>();
         for (Method m : beanClass.getMethods()) {
             String methodName = m.getName();
             boolean startsFromGet = methodName.startsWith("get");

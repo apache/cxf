@@ -32,7 +32,7 @@ public class CacheMapTest {
 
     @Test
     public void testRemove() {
-        Map<Object, Object> definitions = new CacheMap<Object, Object>();
+        Map<Object, Object> definitions = new CacheMap<>();
         
         Object putValue = new Object();
         

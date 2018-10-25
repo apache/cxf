@@ -119,7 +119,7 @@ public class SelectMethodCandidatesTest extends Assert {
         EasyMock.replay(e);
         ex.put(Endpoint.class, e);
 
-        MetadataMap<String, String> values = new MetadataMap<String, String>();
+        MetadataMap<String, String> values = new MetadataMap<>();
         OperationResourceInfo ori = findTargetResourceClass(resources, m,
                                                             "/books",
                                                             "POST",
@@ -149,7 +149,7 @@ public class SelectMethodCandidatesTest extends Assert {
         Message m = createMessage();
         m.put(Message.CONTENT_TYPE, "text/xml");
 
-        MetadataMap<String, String> values = new MetadataMap<String, String>();
+        MetadataMap<String, String> values = new MetadataMap<>();
         OperationResourceInfo ori = findTargetResourceClass(resources, m,
                                                             "/",
                                                             "POST",
@@ -196,7 +196,7 @@ public class SelectMethodCandidatesTest extends Assert {
         EasyMock.replay(e);
         ex.put(Endpoint.class, e);
 
-        MetadataMap<String, String> values = new MetadataMap<String, String>();
+        MetadataMap<String, String> values = new MetadataMap<>();
         OperationResourceInfo ori = findTargetResourceClass(resources, m,
                                                             "/books",
                                                             "PUT",
@@ -244,7 +244,7 @@ public class SelectMethodCandidatesTest extends Assert {
         EasyMock.replay(e);
         ex.put(Endpoint.class, e);
 
-        MetadataMap<String, String> values = new MetadataMap<String, String>();
+        MetadataMap<String, String> values = new MetadataMap<>();
         OperationResourceInfo ori = findTargetResourceClass(resources, m,
                                                             "/service/all",
                                                             "PUT",
@@ -328,7 +328,7 @@ public class SelectMethodCandidatesTest extends Assert {
         EasyMock.replay(e);
         ex.put(Endpoint.class, e);
 
-        MetadataMap<String, String> values = new MetadataMap<String, String>();
+        MetadataMap<String, String> values = new MetadataMap<>();
         OperationResourceInfo ori = findTargetResourceClass(resources,
                                                             m,
                                                             "/",
@@ -493,7 +493,7 @@ public class SelectMethodCandidatesTest extends Assert {
         EasyMock.replay(e);
         ex.put(Endpoint.class, e);
 
-        MetadataMap<String, String> values = new MetadataMap<String, String>();
+        MetadataMap<String, String> values = new MetadataMap<>();
         Map<ClassResourceInfo, MultivaluedMap<String, String>> mResources
             = JAXRSUtils.selectResourceClass(resources, path, m);
 
@@ -531,7 +531,7 @@ public class SelectMethodCandidatesTest extends Assert {
 
         Message m = prepareMessage();
 
-        MetadataMap<String, String> values = new MetadataMap<String, String>();
+        MetadataMap<String, String> values = new MetadataMap<>();
         OperationResourceInfo ori = findTargetResourceClass(resources, m,
                                                             path,
                                                             "PUT",
@@ -593,7 +593,7 @@ public class SelectMethodCandidatesTest extends Assert {
         EasyMock.replay(e);
         ex.put(Endpoint.class, e);
 
-        MetadataMap<String, String> values = new MetadataMap<String, String>();
+        MetadataMap<String, String> values = new MetadataMap<>();
         OperationResourceInfo ori = findTargetResourceClass(resources, m,
                                                             "/books",
                                                             methodName,
@@ -650,7 +650,7 @@ public class SelectMethodCandidatesTest extends Assert {
         String contentTypes = "*/*";
         String acceptContentTypes = "text/xml,*/*";
 
-        MetadataMap<String, String> values = new MetadataMap<String, String>();
+        MetadataMap<String, String> values = new MetadataMap<>();
         OperationResourceInfo ori = findTargetResourceClass(resources,
                                                             createMessage(),
                                                             path,
@@ -672,7 +672,7 @@ public class SelectMethodCandidatesTest extends Assert {
         String contentTypes = "*/*";
         String acceptContentTypes = "application/xml;q=0.5,application/json";
 
-        MetadataMap<String, String> values = new MetadataMap<String, String>();
+        MetadataMap<String, String> values = new MetadataMap<>();
         OperationResourceInfo ori = findTargetResourceClass(resources, createMessage(),
                                                             "/1/2/3/d/resource1",
                                                             "GET",
@@ -697,7 +697,7 @@ public class SelectMethodCandidatesTest extends Assert {
 
         //If acceptContentTypes does not specify a specific Mime type, the
         //method is declared with a most specific ProduceMime type is selected.
-        MetadataMap<String, String> values = new MetadataMap<String, String>();
+        MetadataMap<String, String> values = new MetadataMap<>();
         OperationResourceInfo ori = findTargetResourceClass(resources, createMessage(),
                                                             "/1/2/3/d",
                                                             "GET",
@@ -774,7 +774,7 @@ public class SelectMethodCandidatesTest extends Assert {
         String contentTypes = "*/*";
         String acceptContentTypes = "application/bar,application/foo;q=0.8";
 
-        MetadataMap<String, String> values = new MetadataMap<String, String>();
+        MetadataMap<String, String> values = new MetadataMap<>();
         OperationResourceInfo ori = findTargetResourceClass(resources, null,
                                       "/1/2/3/d/custom",
                                       "GET",

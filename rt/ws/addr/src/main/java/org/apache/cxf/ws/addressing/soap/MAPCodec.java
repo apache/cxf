@@ -90,7 +90,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
      * is used in all chains.
      */
     protected final Map<String, Exchange> uncorrelatedExchanges
-        = new ConcurrentHashMap<String, Exchange>();
+        = new ConcurrentHashMap<>();
 
     private VersionTransformer transformer;
     private HeaderFactory headerFactory;

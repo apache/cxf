@@ -57,7 +57,7 @@ public final class WebSocketUtils {
      * @throws IOException
      */
     public static Map<String, String> readHeaders(InputStream in, boolean req) throws IOException {
-        Map<String, String> headers = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
+        Map<String, String> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         String line;
         int del;
         if (req) {

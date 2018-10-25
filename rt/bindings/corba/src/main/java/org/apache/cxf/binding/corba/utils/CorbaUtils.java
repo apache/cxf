@@ -305,7 +305,7 @@ public final class CorbaUtils {
         seenTypes.push(new QName(unionType.getName()));
 
         TypeCode discTC = getTypeCode(orb, unionType.getDiscriminator(), typeMap, seenTypes);
-        Map<String, UnionMember> members = new LinkedHashMap<String, UnionMember>();
+        Map<String, UnionMember> members = new LinkedHashMap<>();
         List<Unionbranch> branches = unionType.getUnionbranch();
         for (Iterator<Unionbranch> branchIter = branches.iterator(); branchIter.hasNext();) {
             Unionbranch branch = branchIter.next();

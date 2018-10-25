@@ -52,7 +52,7 @@ public abstract class AbstractCreatePullPoint extends AbstractEndpoint
     public AbstractCreatePullPoint(String name) {
         super(name);
         idGenerator = new IdGenerator();
-        pullPoints = new ConcurrentHashMap<String, AbstractPullPoint>();
+        pullPoints = new ConcurrentHashMap<>();
     }
     @Override
     public ObjectName getMBeanName() {

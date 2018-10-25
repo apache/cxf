@@ -35,7 +35,7 @@ public class SecurityContextImplTest extends Assert {
     public void testAuthenticationScheme() {
         Message m = new MessageImpl();
         Map<String, List<String>> requestHeaders
-            = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+            = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         List<String> values = new ArrayList<>();
         values.add("Digest realm=\"custom\"");
         requestHeaders.put("Authorization", values);

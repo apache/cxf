@@ -65,7 +65,7 @@ public class ExtensionManagerBus extends AbstractBasicInterceptorProvider implem
     protected String id;
     private BusState state;
     private final Collection<Feature> features = new CopyOnWriteArrayList<>();
-    private final Map<String, Object> properties = new ConcurrentHashMap<String, Object>(16, 0.75f, 4);
+    private final Map<String, Object> properties = new ConcurrentHashMap<>(16, 0.75f, 4);
 
 
     private final ExtensionManagerImpl extensionManager;

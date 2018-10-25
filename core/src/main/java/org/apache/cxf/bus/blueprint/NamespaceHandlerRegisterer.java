@@ -38,7 +38,7 @@ public final class NamespaceHandlerRegisterer {
         try {
             Object handler = factory.createNamespaceHandler();
             for (String namespace : namespaces) {
-                Dictionary<String, String> properties = new Hashtable<String, String>();
+                Dictionary<String, String> properties = new Hashtable<>();
                 properties.put("osgi.service.blueprint.namespace", namespace);
                 bc.registerService(NamespaceHandler.class.getName(), handler, properties);
                 LOG.fine("Registered blueprint namespace handler for " + namespace);

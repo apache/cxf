@@ -36,7 +36,7 @@ import javax.ws.rs.core.Response;
 public class BookStorePerRequest {
 
     private HttpHeaders httpHeaders;
-    private Map<Long, Book> books = new HashMap<Long, Book>();
+    private Map<Long, Book> books = new HashMap<>();
     private List<String> bookIds;
     private List<String> setterBookIds;
 

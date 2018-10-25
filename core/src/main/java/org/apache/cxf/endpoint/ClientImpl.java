@@ -96,7 +96,7 @@ public class ClientImpl
     protected PhaseChainCache outboundChainCache = new PhaseChainCache();
     protected PhaseChainCache inboundChainCache = new PhaseChainCache();
 
-    protected Map<String, Object> currentRequestContext = new ConcurrentHashMap<String, Object>(8, 0.75f, 4);
+    protected Map<String, Object> currentRequestContext = new ConcurrentHashMap<>(8, 0.75f, 4);
     protected Thread latestContextThread;
     protected Map<Thread, EchoContext> requestContext
         = Collections.synchronizedMap(new WeakHashMap<Thread, EchoContext>());

@@ -72,8 +72,8 @@ public final class JoseJaxrsUtils {
         if (protectedHttpHeaders == null) {
             protectedHttpHeaders = DEFAULT_PROTECTED_HTTP_HEADERS;
         }
-        Map<String, String> joseHttpHeaders = new HashMap<String, String>();
-        Map<String, String> updatedHttpHeaders = new HashMap<String, String>();
+        Map<String, String> joseHttpHeaders = new HashMap<>();
+        Map<String, String> updatedHttpHeaders = new HashMap<>();
         for (String headerName : protectedHttpHeaders) {
             List<String> headerValues = httpHeaders.get(headerName);
             if (headerValues != null) {

@@ -38,7 +38,7 @@ public class MetadataMapTest extends Assert {
 
     @Test
     public void testPutSingle() {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         List<Object> value1 = new ArrayList<>();
         value1.add("bar");
         value1.add("foo");
@@ -53,7 +53,7 @@ public class MetadataMapTest extends Assert {
 
     @Test
     public void testPutSingleNullKey() {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         m.putSingle(null, "null");
         m.putSingle(null, "null2");
         assertEquals(1, m.get(null).size());
@@ -62,7 +62,7 @@ public class MetadataMapTest extends Assert {
 
     @Test
     public void testPutSingleNullKeyCaseSensitive() {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>(false, true);
+        MetadataMap<String, Object> m = new MetadataMap<>(false, true);
         m.putSingle(null, "null");
         m.putSingle(null, "null2");
         assertEquals(1, m.get(null).size());
@@ -71,7 +71,7 @@ public class MetadataMapTest extends Assert {
 
     @Test
     public void testPutSingleNullKeyCaseSensitive2() {
-        MetadataMap<String, Object> map = new MetadataMap<String, Object>(false, true);
+        MetadataMap<String, Object> map = new MetadataMap<>(false, true);
         Object obj1 = new Object();
         Object obj2 = new Object();
         map.putSingle("key", obj1);
@@ -86,7 +86,7 @@ public class MetadataMapTest extends Assert {
 
     @Test
     public void testAddFirst() {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         m.addFirst("baz", "foo");
         List<Object> values = m.get("baz");
         assertEquals(1, values.size());
@@ -101,7 +101,7 @@ public class MetadataMapTest extends Assert {
 
     @Test
     public void testAddFirstUnmodifiableListFirst() {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         m.put("baz", Arrays.<Object>asList("foo"));
         List<Object> values = m.get("baz");
         assertEquals(1, values.size());
@@ -116,7 +116,7 @@ public class MetadataMapTest extends Assert {
 
     @Test
     public void testAddAll() {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         List<Object> values = new ArrayList<>();
         values.add("foo");
         m.addAll("baz", values);
@@ -133,7 +133,7 @@ public class MetadataMapTest extends Assert {
 
     @Test
     public void testPutSingleCaseInsensitive() {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>(false, true);
+        MetadataMap<String, Object> m = new MetadataMap<>(false, true);
         List<Object> value1 = new ArrayList<>();
         value1.add("bar");
         value1.add("foo");
@@ -158,7 +158,7 @@ public class MetadataMapTest extends Assert {
 
     @Test
     public void testContainsKeyCaseInsensitive() {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>(false, true);
+        MetadataMap<String, Object> m = new MetadataMap<>(false, true);
         m.putSingle("a", "b");
         assertTrue(m.containsKey("a"));
         assertTrue(m.containsKey("A"));
@@ -166,7 +166,7 @@ public class MetadataMapTest extends Assert {
 
     @Test
     public void testContainsKeyCaseSensitive() {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         m.putSingle("a", "b");
         assertTrue(m.containsKey("a"));
         assertFalse(m.containsKey("A"));
@@ -175,7 +175,7 @@ public class MetadataMapTest extends Assert {
 
     @Test
     public void testKeySetCaseInsensitive() {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>(false, true);
+        MetadataMap<String, Object> m = new MetadataMap<>(false, true);
         m.putSingle("a", "b");
         assertTrue(m.keySet().contains("a"));
         assertTrue(m.keySet().contains("A"));
@@ -183,7 +183,7 @@ public class MetadataMapTest extends Assert {
 
     @Test
     public void testKeySetCaseSensitive() {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         m.putSingle("a", "b");
         assertTrue(m.keySet().contains("a"));
         assertFalse(m.keySet().contains("A"));
@@ -191,7 +191,7 @@ public class MetadataMapTest extends Assert {
 
     @Test
     public void testPutAllCaseInsensitive() {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>(false, true);
+        MetadataMap<String, Object> m = new MetadataMap<>(false, true);
         List<Object> value1 = new ArrayList<>();
         value1.add("bar");
         value1.add("foo");
@@ -202,7 +202,7 @@ public class MetadataMapTest extends Assert {
         assertEquals("bar", values.get(0));
         assertEquals("foo", values.get(1));
 
-        MetadataMap<String, Object> m2 = new MetadataMap<String, Object>(false, true);
+        MetadataMap<String, Object> m2 = new MetadataMap<>(false, true);
         List<Object> value2 = new ArrayList<>();
         value2.add("bar2");
         value2.add("foo2");
@@ -219,7 +219,7 @@ public class MetadataMapTest extends Assert {
 
     @Test
     public void testRemoveCaseInsensitive() {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>(false, true);
+        MetadataMap<String, Object> m = new MetadataMap<>(false, true);
         List<Object> value1 = new ArrayList<>();
         value1.add("bar");
         value1.add("foo");
@@ -234,7 +234,7 @@ public class MetadataMapTest extends Assert {
 
     @Test
     public void testAddAndGetFirst() {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         m.add("baz", "bar");
 
         List<Object> value = m.get("baz");
@@ -253,9 +253,9 @@ public class MetadataMapTest extends Assert {
 
     @Test
     public void testCopyAndUpdate() {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         m.add("baz", "bar");
-        MetadataMap<String, Object> m2 = new MetadataMap<String, Object>(m);
+        MetadataMap<String, Object> m2 = new MetadataMap<>(m);
         m.remove("baz");
         m.add("baz", "foo");
         assertEquals("bar", m2.getFirst("baz"));
@@ -265,25 +265,25 @@ public class MetadataMapTest extends Assert {
 
     @Test(expected = UnsupportedOperationException.class)
     public void testReadOnlyRemove() {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         m.add("baz", "bar");
-        MetadataMap<String, Object> m2 = new MetadataMap<String, Object>(m, true, false);
+        MetadataMap<String, Object> m2 = new MetadataMap<>(m, true, false);
         m2.remove("baz");
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void testReadOnlyAdd() {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         m.add("baz", "bar");
-        MetadataMap<String, Object> m2 = new MetadataMap<String, Object>(m, true, false);
+        MetadataMap<String, Object> m2 = new MetadataMap<>(m, true, false);
         m2.add("bar", "foo");
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void testReadOnlyAddFirst() {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         m.add("baz", "bar");
-        MetadataMap<String, Object> m2 = new MetadataMap<String, Object>(m, true, false);
+        MetadataMap<String, Object> m2 = new MetadataMap<>(m, true, false);
         m2.addFirst("baz", "bar2");
     }
 
@@ -319,9 +319,9 @@ public class MetadataMapTest extends Assert {
 
     @Test
     public void testGetCaseInsensitive() {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         m.add("Baz", "bar");
-        MetadataMap<String, Object> m2 = new MetadataMap<String, Object>(m, true, true);
+        MetadataMap<String, Object> m2 = new MetadataMap<>(m, true, true);
         assertEquals("bar", m2.getFirst("baZ"));
         assertEquals("bar", m2.getFirst("Baz"));
         assertTrue(m2.containsKey("BaZ"));
@@ -333,7 +333,7 @@ public class MetadataMapTest extends Assert {
 
     @Test
     public void testGetFirstEmptyMap() {
-        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> m = new MetadataMap<>();
         assertNull(m.getFirst("key"));
         m.add("key", "1");
         m.get("key").clear();
@@ -342,14 +342,14 @@ public class MetadataMapTest extends Assert {
 
     @Test
     public void testCompareIgnoreValueOrder() {
-        MetadataMap<String, String> m = new MetadataMap<String, String>();
+        MetadataMap<String, String> m = new MetadataMap<>();
         m.add("baz", "bar1");
         m.add("baz", "bar2");
         List<String> values = m.get("baz");
         assertEquals("bar1", values.get(0));
         assertEquals("bar2", values.get(1));
 
-        MetadataMap<String, String> m2 = new MetadataMap<String, String>();
+        MetadataMap<String, String> m2 = new MetadataMap<>();
         m2.add("baz", "bar2");
         m2.add("baz", "bar1");
         values = m2.get("baz");
@@ -360,7 +360,7 @@ public class MetadataMapTest extends Assert {
         assertTrue(m.equalsIgnoreValueOrder(m));
         assertTrue(m2.equalsIgnoreValueOrder(m));
 
-        MetadataMap<String, String> m3 = new MetadataMap<String, String>();
+        MetadataMap<String, String> m3 = new MetadataMap<>();
         m3.add("baz", "bar1");
         assertFalse(m.equalsIgnoreValueOrder(m3));
         assertFalse(m2.equalsIgnoreValueOrder(m3));

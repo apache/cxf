@@ -365,7 +365,7 @@ public class ASMHelper {
     }
 
     public static class TypeHelperClassLoader extends ClassLoader {
-        ConcurrentHashMap<String, Class<?>> defined = new ConcurrentHashMap<String, Class<?>>();
+        ConcurrentHashMap<String, Class<?>> defined = new ConcurrentHashMap<>();
 
         TypeHelperClassLoader(ClassLoader parent) {
             super(parent);

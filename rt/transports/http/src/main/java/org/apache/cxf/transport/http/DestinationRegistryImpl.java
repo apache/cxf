@@ -40,7 +40,7 @@ import org.apache.cxf.transport.servlet.ServletConfigAware;
 public class DestinationRegistryImpl implements DestinationRegistry, ServletConfigAware {
     private static final String SLASH = "/";
     private ConcurrentMap<String, AbstractHTTPDestination> destinations
-        = new ConcurrentHashMap<String, AbstractHTTPDestination>();
+        = new ConcurrentHashMap<>();
     private Map<String, AbstractHTTPDestination> decodedDestinations =
         new ConcurrentHashMap<String, AbstractHTTPDestination>();
 

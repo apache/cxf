@@ -49,7 +49,7 @@ public class AccessTokenValidatorClient implements AccessTokenValidator {
                                                      MultivaluedMap<String, String> extraProps)
         throws OAuthServiceException {
         WebClient client = WebClient.fromClient(tokenValidatorClient, true);
-        MultivaluedMap<String, String> props = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> props = new MetadataMap<>();
         props.putSingle(OAuthConstants.AUTHORIZATION_SCHEME_TYPE, authScheme);
         props.putSingle(OAuthConstants.AUTHORIZATION_SCHEME_DATA, authSchemeData);
         if (extraProps != null) {

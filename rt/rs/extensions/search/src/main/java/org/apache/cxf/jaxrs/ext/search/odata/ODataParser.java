@@ -104,7 +104,7 @@ public class ODataParser<T> extends AbstractSearchConditionParser<T> {
             // AND / OR operate on search conditions
             if (operator == BinaryOperator.AND || operator == BinaryOperator.OR) {
                 if (leftSide instanceof SearchCondition && rightSide instanceof SearchCondition) {
-                    final List< SearchCondition< T > > conditions = new ArrayList< SearchCondition< T > >(2);
+                    final List< SearchCondition< T > > conditions = new ArrayList<>(2);
                     conditions.add((SearchCondition< T >)leftSide);
                     conditions.add((SearchCondition< T >)rightSide);
 

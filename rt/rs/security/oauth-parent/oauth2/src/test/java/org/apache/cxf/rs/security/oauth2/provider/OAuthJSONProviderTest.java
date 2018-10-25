@@ -186,7 +186,7 @@ public class OAuthJSONProviderTest extends Assert {
         token.setExpiresIn(12345);
         token.setRefreshToken("5678");
         token.setApprovedScope("read");
-        Map<String, String> params = new LinkedHashMap<String, String>();
+        Map<String, String> params = new LinkedHashMap<>();
         params.put(OAuthConstants.HAWK_TOKEN_KEY, "test_mac_secret");
         params.put(OAuthConstants.HAWK_TOKEN_ALGORITHM, OAuthConstants.HMAC_ALGO_SHA_1);
         params.put("my_parameter", "http://abc");

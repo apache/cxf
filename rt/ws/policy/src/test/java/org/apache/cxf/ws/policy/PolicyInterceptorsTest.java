@@ -76,7 +76,7 @@ public class PolicyInterceptorsTest extends Assert {
     private List<Interceptor<? extends Message>> createMockInterceptorList() {
         Interceptor<? extends Message> i = control.createMock(Interceptor.class);
         Interceptor<? extends Message> m = i;
-        List<Interceptor<? extends Message>> a = new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> a = new ArrayList<>();
         a.add(m);
         return a;
     }
@@ -120,7 +120,7 @@ public class PolicyInterceptorsTest extends Assert {
         EasyMock.expect(pe.getEffectiveClientResponsePolicy(ei, boi, message)).andReturn(effectivePolicy);
         EasyMock.expect(effectivePolicy.getPolicy()).andReturn(new Policy()).times(2);
         Interceptor<? extends Message> i = control.createMock(Interceptor.class);
-        List<Interceptor<? extends Message>> lst = new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> lst = new ArrayList<>();
         lst.add(i);
         EasyMock.expect(effectivePolicy.getInterceptors()).andReturn(lst);
         InterceptorChain ic = control.createMock(InterceptorChain.class);

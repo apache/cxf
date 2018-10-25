@@ -39,7 +39,7 @@ public class BindingInfo extends AbstractDescriptionElement implements NamedItem
     final String bindingId;
 
     Map<QName, BindingOperationInfo> operations
-        = new ConcurrentHashMap<QName, BindingOperationInfo>(4, 0.75f, 2);
+        = new ConcurrentHashMap<>(4, 0.75f, 2);
 
     public BindingInfo(ServiceInfo service, String bindingId) {
         this.service = service;

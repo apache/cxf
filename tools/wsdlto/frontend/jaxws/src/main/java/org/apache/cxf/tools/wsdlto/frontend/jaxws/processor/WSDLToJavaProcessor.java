@@ -65,7 +65,7 @@ public class WSDLToJavaProcessor extends WSDLToProcessor implements ClassNamePro
         JavaModel javaModel = null;
         Map<QName, JavaModel> map = CastUtils.cast((Map<?, ?>)context.get(MODEL_MAP));
         if (map == null) {
-            map = new LinkedHashMap<QName, JavaModel>();
+            map = new LinkedHashMap<>();
             context.put(MODEL_MAP, map);
         }
         if (map.containsKey(serviceInfo.getName())) {

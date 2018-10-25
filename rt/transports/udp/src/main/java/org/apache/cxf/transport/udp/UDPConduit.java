@@ -76,7 +76,7 @@ public class UDPConduit extends AbstractConduit {
     Bus bus;
     NioDatagramConnector connector = new NioDatagramConnector();
     ConcurrentHashMap<String, Queue<ConnectFuture>> connections
-        = new ConcurrentHashMap<String, Queue<ConnectFuture>>();
+        = new ConcurrentHashMap<>();
 
     public UDPConduit(EndpointReferenceType t,
                       final Bus bus) {

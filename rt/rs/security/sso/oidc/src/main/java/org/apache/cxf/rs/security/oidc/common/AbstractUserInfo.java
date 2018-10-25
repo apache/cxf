@@ -182,7 +182,7 @@ public abstract class AbstractUserInfo extends JwtClaims {
 
     public void setAggregatedClaims(AggregatedClaims claims) {
         setAddClaimNames(claims.getClaimNames());
-        Map<String, Map<String, String>> sources = new LinkedHashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> sources = new LinkedHashMap<>();
         for (Map.Entry<String, String> entry : claims.getClaimNames().entrySet()) {
             String source = entry.getValue();
             String jwt = claims.getClaimSources().get(source);
@@ -219,8 +219,8 @@ public abstract class AbstractUserInfo extends JwtClaims {
 
         AggregatedClaims claims = new AggregatedClaims();
 
-        Map<String, String> namesMap = new LinkedHashMap<String, String>();
-        Map<String, String> sourcesMap = new LinkedHashMap<String, String>();
+        Map<String, String> namesMap = new LinkedHashMap<>();
+        Map<String, String> sourcesMap = new LinkedHashMap<>();
         for (Map.Entry<String, String> entry : names.entrySet()) {
             String source = entry.getValue();
             Map<String, String> sourceValue = sources.get(source);
@@ -236,11 +236,11 @@ public abstract class AbstractUserInfo extends JwtClaims {
     }
     public void setDistributedClaims(DistributedClaims claims) {
         setAddClaimNames(claims.getClaimNames());
-        Map<String, Map<String, String>> sources = new LinkedHashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> sources = new LinkedHashMap<>();
         for (Map.Entry<String, String> entry : claims.getClaimNames().entrySet()) {
             String source = entry.getValue();
             DistributedClaimSource distSource = claims.getClaimSources().get(source);
-            Map<String, String> mapSource = new LinkedHashMap<String, String>();
+            Map<String, String> mapSource = new LinkedHashMap<>();
             mapSource.put(OidcUtils.ENDPOINT_CLAIM_SOURCE_PROPERTY, distSource.getEndpoint());
             if (distSource.getAccessToken() != null) {
                 mapSource.put(OidcUtils.TOKEN_CLAIM_SOURCE_PROPERTY, distSource.getAccessToken());
@@ -257,8 +257,8 @@ public abstract class AbstractUserInfo extends JwtClaims {
             return null;
         }
         DistributedClaims claims = new DistributedClaims();
-        Map<String, String> namesMap = new LinkedHashMap<String, String>();
-        Map<String, DistributedClaimSource> sourcesMap = new LinkedHashMap<String, DistributedClaimSource>();
+        Map<String, String> namesMap = new LinkedHashMap<>();
+        Map<String, DistributedClaimSource> sourcesMap = new LinkedHashMap<>();
         for (Map.Entry<String, String> entry : names.entrySet()) {
             String source = entry.getValue();
             Map<String, String> sourceValue = sources.get(source);

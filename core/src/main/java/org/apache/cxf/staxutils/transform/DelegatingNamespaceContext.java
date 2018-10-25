@@ -37,8 +37,8 @@ public class DelegatingNamespaceContext implements NamespaceContext {
     public DelegatingNamespaceContext(NamespaceContext nc, Map<String, String> nsMap) {
         this.nc = nc;
         this.nsMap = nsMap;
-        namespaces = new LinkedList<Map<String, String>>();
-        prefixes = new LinkedList<Map<String, String>>();
+        namespaces = new LinkedList<>();
+        prefixes = new LinkedList<>();
     }
 
     public void down() {

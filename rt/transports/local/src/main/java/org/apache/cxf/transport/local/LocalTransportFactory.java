@@ -71,7 +71,7 @@ public class LocalTransportFactory extends AbstractTransportFactory
     }
 
     private ConcurrentMap<String, Destination> destinations
-        = new ConcurrentHashMap<String, Destination>();
+        = new ConcurrentHashMap<>();
 
     private Set<String> messageFilterProperties;
     private Set<String> messageIncludeProperties;

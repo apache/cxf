@@ -27,7 +27,7 @@ import javax.jws.WebService;
 @WebService(endpointInterface = "org.apache.cxf.systest.jaxrs.jaxws.HelloWorld",
             serviceName = "HelloWorld")
 public class HelloWorldImpl implements HelloWorld {
-    Map<Integer, User> users = new LinkedHashMap<Integer, User>();
+    Map<Integer, User> users = new LinkedHashMap<>();
 
     public int clearUsers() {
         int i = users.size();

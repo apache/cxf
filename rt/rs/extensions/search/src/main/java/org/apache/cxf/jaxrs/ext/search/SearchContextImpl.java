@@ -186,7 +186,7 @@ public class SearchContextImpl implements SearchContext {
 
         Map<String, String> props = null;
         if (parserProperties == null) {
-            props = new LinkedHashMap<String, String>(4);
+            props = new LinkedHashMap<>(4);
             props.put(SearchUtils.DATE_FORMAT_PROPERTY,
                       (String)message.getContextualProperty(SearchUtils.DATE_FORMAT_PROPERTY));
             props.put(SearchUtils.TIMEZONE_SUPPORT_PROPERTY,

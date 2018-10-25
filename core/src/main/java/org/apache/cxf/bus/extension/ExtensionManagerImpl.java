@@ -51,7 +51,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
 
     private final ClassLoader loader;
     private ResourceManager resourceManager;
-    private Map<String, Extension> all = new ConcurrentHashMap<String, Extension>();
+    private Map<String, Extension> all = new ConcurrentHashMap<>();
     private List<Extension> ordered = new CopyOnWriteArrayList<>();
     private final Map<Class<?>, Object> activated;
     private final Bus bus;

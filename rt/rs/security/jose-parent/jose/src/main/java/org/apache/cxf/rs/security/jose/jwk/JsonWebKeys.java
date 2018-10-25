@@ -69,7 +69,7 @@ public class JsonWebKeys extends JsonMapObject {
         if (keys == null) {
             return Collections.emptyMap();
         }
-        Map<String, JsonWebKey> map = new LinkedHashMap<String, JsonWebKey>();
+        Map<String, JsonWebKey> map = new LinkedHashMap<>();
         for (JsonWebKey key : keys) {
             String kid = key.getKeyId();
             if (kid != null) {
@@ -86,7 +86,7 @@ public class JsonWebKeys extends JsonMapObject {
         if (keys == null) {
             return Collections.emptyMap();
         }
-        Map<KeyType, List<JsonWebKey>> map = new LinkedHashMap<KeyType, List<JsonWebKey>>();
+        Map<KeyType, List<JsonWebKey>> map = new LinkedHashMap<>();
         for (JsonWebKey key : keys) {
             KeyType type = key.getKeyType();
             if (type != null) {
@@ -106,7 +106,7 @@ public class JsonWebKeys extends JsonMapObject {
         if (keys == null) {
             return Collections.emptyMap();
         }
-        Map<KeyOperation, List<JsonWebKey>> map = new LinkedHashMap<KeyOperation, List<JsonWebKey>>();
+        Map<KeyOperation, List<JsonWebKey>> map = new LinkedHashMap<>();
         for (JsonWebKey key : keys) {
             List<KeyOperation> ops = key.getKeyOperation();
             if (ops != null) {

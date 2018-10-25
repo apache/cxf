@@ -383,10 +383,10 @@ public class PolicyEngineTest extends Assert {
         engine = new PolicyEngineImpl(enabled);
 
         Bus bus = control.createMock(Bus.class);
-        List<Interceptor<? extends Message>> out = new ArrayList<Interceptor<? extends Message>>();
-        List<Interceptor<? extends Message>> in = new ArrayList<Interceptor<? extends Message>>();
-        List<Interceptor<? extends Message>> inFault = new ArrayList<Interceptor<? extends Message>>();
-        List<Interceptor<? extends Message>> outFault = new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> out = new ArrayList<>();
+        List<Interceptor<? extends Message>> in = new ArrayList<>();
+        List<Interceptor<? extends Message>> inFault = new ArrayList<>();
+        List<Interceptor<? extends Message>> outFault = new ArrayList<>();
         if (enabled) {
             EasyMock.expect(bus.getOutInterceptors()).andReturn(out).times(1);
             EasyMock.expect(bus.getInInterceptors()).andReturn(in).times(1);

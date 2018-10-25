@@ -181,7 +181,7 @@ public class JwsCompactReaderWriterTest extends Assert {
 
     @Test
     public void testWriteJwsWithJwkAsMapSignedByMac() throws Exception {
-        Map<String, Object> map = new LinkedHashMap<String, Object>();
+        Map<String, Object> map = new LinkedHashMap<>();
         map.put(JsonWebKey.KEY_TYPE, JsonWebKey.KEY_TYPE_OCTET);
         map.put(JsonWebKey.KEY_OPERATIONS,
                 new KeyOperation[]{KeyOperation.SIGN, KeyOperation.VERIFY});

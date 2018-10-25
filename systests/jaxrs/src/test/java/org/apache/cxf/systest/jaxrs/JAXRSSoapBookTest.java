@@ -676,7 +676,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         String baseAddress = "http://localhost:" + PORT
             + "/test/services/rest/bookstore/books/679/subresource3";
         WebClient wc = WebClient.create(baseAddress);
-        MultivaluedMap<String, Object> map = new MetadataMap<String, Object>();
+        MultivaluedMap<String, Object> map = new MetadataMap<>();
         map.putSingle("id", "679");
         map.add("name", "CXF in Action - ");
         map.add("name", "679");

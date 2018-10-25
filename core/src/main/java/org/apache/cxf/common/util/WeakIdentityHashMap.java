@@ -70,7 +70,7 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
 
     public Set<Map.Entry<K, V>> entrySet() {
         reap();
-        Set<Map.Entry<K, V>> ret = new HashSet<Map.Entry<K, V>>();
+        Set<Map.Entry<K, V>> ret = new HashSet<>();
         for (Map.Entry<IdentityWeakReference, V> ref : backingStore.entrySet()) {
             final K key = ref.getKey().get();
             if (key != null) {

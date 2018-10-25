@@ -809,7 +809,7 @@ public class ProviderFactoryTest extends Assert {
 
     private Message prepareMessage(String contentType, String acceptType) {
         Message message = new MessageImpl();
-        Map<String, List<String>> headers = new MetadataMap<String, String>();
+        Map<String, List<String>> headers = new MetadataMap<>();
         message.put(Message.PROTOCOL_HEADERS, headers);
         Exchange exchange = new ExchangeImpl();
         exchange.setInMessage(message);

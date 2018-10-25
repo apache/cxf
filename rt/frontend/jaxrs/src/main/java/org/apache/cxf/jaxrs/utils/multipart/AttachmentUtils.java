@@ -228,7 +228,7 @@ public final class AttachmentUtils {
 
     public static MultivaluedMap<String, String> populateFormMap(MessageContext mc,
                                                                 boolean errorIfMissing) {
-        MultivaluedMap<String, String> data = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> data = new MetadataMap<>();
         FormUtils.populateMapFromMultipart(data,
                                            AttachmentUtils.getMultipartBody(mc),
                                            PhaseInterceptorChain.getCurrentMessage(),
@@ -242,7 +242,7 @@ public final class AttachmentUtils {
 
     private static Map<String, Attachment> fromListToMap(List<Attachment> atts,
                                                          boolean preferContentDisposition) {
-        Map<String, Attachment> map = new LinkedHashMap<String, Attachment>();
+        Map<String, Attachment> map = new LinkedHashMap<>();
         for (Attachment a : atts) {
             String contentId = null;
             if (preferContentDisposition) {

@@ -36,9 +36,9 @@ import org.junit.Test;
 public class CounterRepositoryTest extends Assert {
     private Bus bus;
     private CounterRepository cr;
-    private List<Interceptor<? extends Message>> inlist = new ArrayList<Interceptor<? extends Message>>();
-    private List<Interceptor<? extends Message>> outlist = new ArrayList<Interceptor<? extends Message>>();
-    private List<Interceptor<? extends Message>> faultlist = new ArrayList<Interceptor<? extends Message>>();
+    private List<Interceptor<? extends Message>> inlist = new ArrayList<>();
+    private List<Interceptor<? extends Message>> outlist = new ArrayList<>();
+    private List<Interceptor<? extends Message>> faultlist = new ArrayList<>();
     //private InstrumentationManager im;
     private ObjectName serviceCounter;
     private ObjectName operationCounter;

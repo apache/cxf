@@ -167,7 +167,7 @@ public class ColocMessageObserver extends ChainInitiationObserver {
     }
 
     protected List<Interceptor<? extends Message>> addColocInterceptors() {
-        List<Interceptor<? extends Message>> list = new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> list = new ArrayList<>();
         list.add(new ColocInInterceptor());
         return list;
     }

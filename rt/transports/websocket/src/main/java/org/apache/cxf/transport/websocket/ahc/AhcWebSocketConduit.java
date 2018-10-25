@@ -70,7 +70,7 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
     private String requestIdKey = WebSocketConstants.DEFAULT_REQUEST_ID_KEY;
     private String responseIdKey = WebSocketConstants.DEFAULT_RESPONSE_ID_KEY;
 
-    private Map<String, RequestResponse> uncorrelatedRequests = new ConcurrentHashMap<String, RequestResponse>();
+    private Map<String, RequestResponse> uncorrelatedRequests = new ConcurrentHashMap<>();
 
     public AhcWebSocketConduit(Bus b, EndpointInfo ei, EndpointReferenceType t) throws IOException {
         super(b, ei, t);

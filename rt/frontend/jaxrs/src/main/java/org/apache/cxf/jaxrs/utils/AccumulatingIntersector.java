@@ -47,7 +47,7 @@ public class AccumulatingIntersector implements MimeTypesIntersector {
 
         Map<String, String> parameters = userType.getParameters();
         if (addRequiredParamsIfPossible) {
-            parameters = new LinkedHashMap<String, String>(parameters);
+            parameters = new LinkedHashMap<>(parameters);
             for (Map.Entry<String, String> entry : requiredType.getParameters().entrySet()) {
                 if (!parameters.containsKey(entry.getKey())) {
                     parameters.put(entry.getKey(), entry.getValue());

@@ -70,7 +70,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
     private static final String CORRELATED = JMSConduit.class.getName() + ".correlated";
 
     private JMSConfiguration jmsConfig;
-    private Map<String, Exchange> correlationMap = new ConcurrentHashMap<String, Exchange>();
+    private Map<String, Exchange> correlationMap = new ConcurrentHashMap<>();
     private JMSListenerContainer jmsListener;
     private String conduitId;
     private final AtomicLong messageCount = new AtomicLong(0);

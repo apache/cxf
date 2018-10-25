@@ -73,7 +73,7 @@ public final class OAuthUtils {
         String theURI = wildcard ? uri.substring(0, uri.length() - 1) : uri;
         try {
             URITemplate template = new URITemplate(theURI);
-            MultivaluedMap<String, String> map = new MetadataMap<String, String>();
+            MultivaluedMap<String, String> map = new MetadataMap<>();
             if (template.match(servletPath, map)) {
                 String finalGroup = map.getFirst(URITemplate.FINAL_MATCH_GROUP);
                 if (wildcard || StringUtils.isEmpty(finalGroup) || "/".equals(finalGroup)) {
@@ -138,7 +138,7 @@ public final class OAuthUtils {
             InputStream stream = mc != null
                 ? mc.getContent(InputStream.class) : oAuthMessage.getBodyAsStream();
             String body = FormUtils.readBody(stream, enc);
-            MultivaluedMap<String, String> map = new MetadataMap<String, String>();
+            MultivaluedMap<String, String> map = new MetadataMap<>();
             FormUtils.populateMapFromString(map, PhaseInterceptorChain.getCurrentMessage(), body, enc, true,
                                             request);
             for (String key : map.keySet()) {

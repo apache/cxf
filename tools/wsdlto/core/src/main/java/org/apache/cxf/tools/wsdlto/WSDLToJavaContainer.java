@@ -236,7 +236,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
         }
         context.put(ToolConstants.SERVICE_LIST, serviceList);
 
-        Map<String, InterfaceInfo> interfaces = new LinkedHashMap<String, InterfaceInfo>();
+        Map<String, InterfaceInfo> interfaces = new LinkedHashMap<>();
 
         ServiceInfo service0 = serviceList.get(0);
         SchemaCollection schemaCollection = service0.getXmlSchemaCollection();

@@ -53,7 +53,7 @@ public class JAXRSServiceFactoryBeanTest extends Assert {
         ClassResourceInfo rootCri = resources.get(0);
         assertNotNull(rootCri.getURITemplate());
         URITemplate template = rootCri.getURITemplate();
-        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> values = new MetadataMap<>();
         assertTrue(template.match("/bookstore/books/123", values));
         assertFalse(rootCri.hasSubResources());
         MethodDispatcher md = rootCri.getMethodDispatcher();
@@ -93,7 +93,7 @@ public class JAXRSServiceFactoryBeanTest extends Assert {
         ClassResourceInfo rootCri = resources.get(0);
         assertNotNull(rootCri.getURITemplate());
         URITemplate template = rootCri.getURITemplate();
-        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> values = new MetadataMap<>();
         assertTrue(template.match("/bookstore/books/123", values));
         assertTrue(rootCri.hasSubResources());
         MethodDispatcher md = rootCri.getMethodDispatcher();

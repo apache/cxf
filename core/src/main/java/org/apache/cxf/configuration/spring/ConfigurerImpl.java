@@ -59,7 +59,7 @@ public class ConfigurerImpl extends BeanConfigurerSupport
 
     private Set<ApplicationContext> appContexts;
     private final Map<String, List<MatcherHolder>> wildCardBeanDefinitions
-        = new TreeMap<String, List<MatcherHolder>>();
+        = new TreeMap<>();
     private BeanFactory beanFactory;
 
     static class MatcherHolder implements Comparable<MatcherHolder> {

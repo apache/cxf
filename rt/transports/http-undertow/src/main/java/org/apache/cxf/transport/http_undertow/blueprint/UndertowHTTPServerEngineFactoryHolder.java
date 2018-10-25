@@ -79,7 +79,7 @@ public class UndertowHTTPServerEngineFactoryHolder {
             factory = new UndertowHTTPServerEngineFactory();
 
             Map<String, ThreadingParameters> threadingParametersMap
-                = new TreeMap<String, ThreadingParameters>();
+                = new TreeMap<>();
 
             if (config.getIdentifiedThreadingParameters() != null) {
                 for (ThreadingParametersIdentifiedType threads : config.getIdentifiedThreadingParameters()) {
@@ -95,7 +95,7 @@ public class UndertowHTTPServerEngineFactoryHolder {
             }
 
             //SSL
-            Map<String, TLSServerParameters> sslMap = new TreeMap<String, TLSServerParameters>();
+            Map<String, TLSServerParameters> sslMap = new TreeMap<>();
             if (config.getIdentifiedTLSServerParameters() != null) {
 
                 for (TLSServerParametersIdentifiedType t : config.getIdentifiedTLSServerParameters()) {

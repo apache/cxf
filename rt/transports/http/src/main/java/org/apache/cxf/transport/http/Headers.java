@@ -83,7 +83,7 @@ public class Headers {
         this.headers = getSetProtocolHeaders(message);
     }
     public Headers() {
-        this.headers = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+        this.headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         this.message = null;
     }
 
@@ -109,7 +109,7 @@ public class Headers {
      * enabled.
      */
     static String toString(Map<String, List<Object>> headers, boolean logSensitiveHeaders) {
-        Map<String, List<Object>> filteredHeaders = new TreeMap<String, List<Object>>(String.CASE_INSENSITIVE_ORDER);
+        Map<String, List<Object>> filteredHeaders = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         filteredHeaders.putAll(headers);
         if (!logSensitiveHeaders) {
             for (String filteredKey : SENSITIVE_HEADERS) {
@@ -266,10 +266,10 @@ public class Headers {
         Map<String, List<String>> headers =
             CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
         if (null == headers) {
-            headers = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+            headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         } else if (headers instanceof HashMap) {
             Map<String, List<String>> headers2
-                = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+                = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
             headers2.putAll(headers);
             headers = headers2;
         }

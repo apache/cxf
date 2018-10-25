@@ -846,7 +846,7 @@ public class JAXBElementProviderTest extends Assert {
         String data = "<?xml version='1.0' encoding='UTF-8'?>"
             + "<tagholder><thetag><group>B</group><name>A</name></thetag></tagholder>";
         JAXBElementProvider<TagVO2Holder> provider = new JAXBElementProvider<>();
-        Map<String, String> map = new LinkedHashMap<String, String>();
+        Map<String, String> map = new LinkedHashMap<>();
         map.put("group", "group");
         map.put("name", "name");
         map.put("*", "{http://tags}*");
@@ -866,7 +866,7 @@ public class JAXBElementProviderTest extends Assert {
             + "<ns2:tagholder xmlns:ns2=\"http://tags2\" attr=\"attribute\"><ns2:thetag><group>B</group>"
             + "<name>A</name></ns2:thetag></ns2:tagholder>";
         JAXBElementProvider<TagVO2Holder> provider = new JAXBElementProvider<>();
-        Map<String, String> map = new LinkedHashMap<String, String>();
+        Map<String, String> map = new LinkedHashMap<>();
         map.put("group", "group");
         map.put("name", "name");
         map.put("{http://tags2}*", "{http://tags}*");

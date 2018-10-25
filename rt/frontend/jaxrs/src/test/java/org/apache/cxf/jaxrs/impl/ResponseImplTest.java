@@ -107,7 +107,7 @@ public class ResponseImplTest extends Assert {
             + " Value=\"urn:oasis:names:tc:xacml:1.0:status:ok\"/></Status></Result></Response>";
 
 
-        MultivaluedMap<String, Object> headers = new MetadataMap<String, Object>();
+        MultivaluedMap<String, Object> headers = new MetadataMap<>();
         headers.putSingle("Content-Type", "text/xml");
         r.addMetadata(headers);
         r.setEntity(new ByteArrayInputStream(content.getBytes()), null);
@@ -147,7 +147,7 @@ public class ResponseImplTest extends Assert {
         assertEquals("Wrong status", ri.getStatus(), 200);
         assertSame("Wrong entity", entity, ri.getEntity());
 
-        MetadataMap<String, Object> meta = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> meta = new MetadataMap<>();
         ri.addMetadata(meta);
         ri.getMetadata();
         assertSame("Wrong metadata", meta, ri.getMetadata());
@@ -255,7 +255,7 @@ public class ResponseImplTest extends Assert {
     @Test
     public void testGetHeaderString() {
         ResponseImpl ri = new ResponseImpl(200);
-        MetadataMap<String, Object> meta = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> meta = new MetadataMap<>();
         ri.addMetadata(meta);
         assertNull(ri.getHeaderString("a"));
         meta.putSingle("a", "aValue");
@@ -267,7 +267,7 @@ public class ResponseImplTest extends Assert {
     @Test
     public void testGetHeaderStrings() {
         ResponseImpl ri = new ResponseImpl(200);
-        MetadataMap<String, Object> meta = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> meta = new MetadataMap<>();
         meta.add("Set-Cookie", NewCookie.valueOf("a=b"));
         ri.addMetadata(meta);
         MultivaluedMap<String, String> headers = ri.getStringHeaders();
@@ -278,7 +278,7 @@ public class ResponseImplTest extends Assert {
     @Test
     public void testGetCookies() {
         ResponseImpl ri = new ResponseImpl(200);
-        MetadataMap<String, Object> meta = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> meta = new MetadataMap<>();
         meta.add("Set-Cookie", NewCookie.valueOf("a=b"));
         meta.add("Set-Cookie", NewCookie.valueOf("c=d"));
         ri.addMetadata(meta);
@@ -291,7 +291,7 @@ public class ResponseImplTest extends Assert {
     @Test
     public void testGetContentLength() {
         ResponseImpl ri = new ResponseImpl(200);
-        MetadataMap<String, Object> meta = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> meta = new MetadataMap<>();
         ri.addMetadata(meta);
         assertEquals(-1, ri.getLength());
         meta.add("Content-Length", "10");
@@ -311,7 +311,7 @@ public class ResponseImplTest extends Assert {
     public void doTestDate(String dateHeader) {
         boolean date = HttpHeaders.DATE.equals(dateHeader);
         ResponseImpl ri = new ResponseImpl(200);
-        MetadataMap<String, Object> meta = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> meta = new MetadataMap<>();
         meta.add(dateHeader, "Tue, 21 Oct 2008 17:00:00 GMT");
         ri.addMetadata(meta);
         assertEquals(HttpUtils.getHttpDate("Tue, 21 Oct 2008 17:00:00 GMT"),
@@ -321,7 +321,7 @@ public class ResponseImplTest extends Assert {
     @Test
     public void testEntityTag() {
         ResponseImpl ri = new ResponseImpl(200);
-        MetadataMap<String, Object> meta = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> meta = new MetadataMap<>();
         meta.add(HttpHeaders.ETAG, "1234");
         ri.addMetadata(meta);
         assertEquals("\"1234\"", ri.getEntityTag().toString());
@@ -330,7 +330,7 @@ public class ResponseImplTest extends Assert {
     @Test
     public void testLocation() {
         ResponseImpl ri = new ResponseImpl(200);
-        MetadataMap<String, Object> meta = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> meta = new MetadataMap<>();
         meta.add(HttpHeaders.LOCATION, "http://localhost:8080");
         ri.addMetadata(meta);
         assertEquals("http://localhost:8080", ri.getLocation().toString());
@@ -339,7 +339,7 @@ public class ResponseImplTest extends Assert {
     @Test
     public void testGetLanguage() {
         ResponseImpl ri = new ResponseImpl(200);
-        MetadataMap<String, Object> meta = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> meta = new MetadataMap<>();
         meta.add(HttpHeaders.CONTENT_LANGUAGE, "en-US");
         ri.addMetadata(meta);
         assertEquals("en_US", ri.getLanguage().toString());
@@ -348,7 +348,7 @@ public class ResponseImplTest extends Assert {
     @Test
     public void testGetMediaType() {
         ResponseImpl ri = new ResponseImpl(200);
-        MetadataMap<String, Object> meta = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> meta = new MetadataMap<>();
         meta.add(HttpHeaders.CONTENT_TYPE, "text/xml");
         ri.addMetadata(meta);
         assertEquals("text/xml", ri.getMediaType().toString());
@@ -374,7 +374,7 @@ public class ResponseImplTest extends Assert {
     @Test
     public void testGetLinks() {
         ResponseImpl ri = new ResponseImpl(200);
-        MetadataMap<String, Object> meta = new MetadataMap<String, Object>();
+        MetadataMap<String, Object> meta = new MetadataMap<>();
         ri.addMetadata(meta);
         assertFalse(ri.hasLink("next"));
         assertNull(ri.getLink("next"));
@@ -404,7 +404,7 @@ public class ResponseImplTest extends Assert {
     @Test
     public void testGetLinksNoRel() {
         try (ResponseImpl ri = new ResponseImpl(200)) {
-            MetadataMap<String, Object> meta = new MetadataMap<String, Object>();
+            MetadataMap<String, Object> meta = new MetadataMap<>();
             ri.addMetadata(meta);
     
             Set<Link> links = ri.getLinks();

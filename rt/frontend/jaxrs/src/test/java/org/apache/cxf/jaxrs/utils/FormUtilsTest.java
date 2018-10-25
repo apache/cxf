@@ -54,7 +54,7 @@ public class FormUtilsTest extends Assert {
         mockObjects(null);
         EasyMock.replay(mockMessage, mockRequest);
 
-        MultivaluedMap<String, String> params = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> params = new MetadataMap<>();
         FormUtils.populateMapFromString(params, mockMessage, null, StandardCharsets.UTF_8.name(),
                                         false, mockRequest);
 
@@ -68,7 +68,7 @@ public class FormUtilsTest extends Assert {
         mockObjects("false");
         EasyMock.replay(mockMessage, mockRequest);
 
-        MultivaluedMap<String, String> params = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> params = new MetadataMap<>();
         FormUtils.populateMapFromString(params, mockMessage, null, StandardCharsets.UTF_8.name(),
                                         false, mockRequest);
 
@@ -80,7 +80,7 @@ public class FormUtilsTest extends Assert {
         mockObjects(null);
         EasyMock.replay(mockMessage, mockRequest);
 
-        MultivaluedMap<String, String> params = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> params = new MetadataMap<>();
         String postBody = FORM_PARAM1 + "=" + FORM_PARAM_VALUE1 + "&" + FORM_PARAM2 + "=" + FORM_PARAM_VALUE2;
         FormUtils.populateMapFromString(params, mockMessage, postBody, StandardCharsets.UTF_8.name(),
                                         false, mockRequest);

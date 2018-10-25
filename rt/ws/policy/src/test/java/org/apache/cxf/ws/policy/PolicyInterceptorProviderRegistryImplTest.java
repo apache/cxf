@@ -66,14 +66,14 @@ public class PolicyInterceptorProviderRegistryImplTest extends Assert {
         Interceptor<Message> pif = control.createMock(Interceptor.class);
         Interceptor<Message> po = control.createMock(Interceptor.class);
         Interceptor<Message> pof = control.createMock(Interceptor.class);
-        List<Interceptor<? extends Message>> pil = new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> pil = new ArrayList<>();
         pil.add(pi1);
         pil.add(pi2);
-        List<Interceptor<? extends Message>> pifl = new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> pifl = new ArrayList<>();
         pifl.add(pif);
-        List<Interceptor<? extends Message>> pol = new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> pol = new ArrayList<>();
         pol.add(po);
-        List<Interceptor<? extends Message>> pofl = new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> pofl = new ArrayList<>();
         pofl.add(pof);
         EasyMock.expect(pp.getInInterceptors()).andReturn(pil);
         EasyMock.expect(pp.getInFaultInterceptors()).andReturn(pifl);

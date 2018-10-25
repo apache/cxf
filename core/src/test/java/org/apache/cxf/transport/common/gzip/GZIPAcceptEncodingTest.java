@@ -131,7 +131,7 @@ public class GZIPAcceptEncodingTest extends Assert {
 
     private void setAcceptEncoding(String enc) {
         Map<String, List<String>> protocolHeaders
-            = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+            = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         protocolHeaders.put(HttpHeaderHelper.getHeaderKey(HttpHeaderHelper.ACCEPT_ENCODING), Collections
             .singletonList(enc));
         inMessage.put(Message.PROTOCOL_HEADERS, protocolHeaders);

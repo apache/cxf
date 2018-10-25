@@ -958,7 +958,7 @@ public final class JAXBEncoderDecoder {
         //anyway.
 
         NamespaceContext c = source.getNamespaceContext();
-        final Map<String, String> nsMap = new TreeMap<String, String>();
+        final Map<String, String> nsMap = new TreeMap<>();
         try {
             if (c instanceof W3CNamespaceContext) {
                 Element element = ((W3CNamespaceContext)c).getElement();

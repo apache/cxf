@@ -52,7 +52,7 @@ public class ClassResourceInfo extends BeanResourceInfo {
     private MethodDispatcher methodDispatcher;
     private ResourceProvider resourceProvider;
     private ConcurrentHashMap<SubresourceKey, ClassResourceInfo> subResources
-        = new ConcurrentHashMap<SubresourceKey, ClassResourceInfo>();
+        = new ConcurrentHashMap<>();
 
     private boolean enableStatic;
     private boolean createdFromModel;

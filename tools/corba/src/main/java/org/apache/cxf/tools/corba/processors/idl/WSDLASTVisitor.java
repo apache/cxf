@@ -85,7 +85,7 @@ public final class WSDLASTVisitor implements ASTVisitor {
 
         definition = manager.createWSDLDefinition(tns);
 
-        inheritScopeMap = new TreeMap<Scope, List<Scope>>();
+        inheritScopeMap = new TreeMap<>();
 
         targetNamespace = tns;
         schemas = new XmlSchemaCollection();

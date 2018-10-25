@@ -114,7 +114,7 @@ public class SoapPreProtocolOutInterceptor extends AbstractSoapInterceptor {
         String action = getSoapAction(message, boi);
 
         if (message.getVersion() instanceof Soap11) {
-            Map<String, List<String>> tempReqHeaders = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+            Map<String, List<String>> tempReqHeaders = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
             Map<String, List<String>> reqHeaders
                     = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
             if (reqHeaders != null) {

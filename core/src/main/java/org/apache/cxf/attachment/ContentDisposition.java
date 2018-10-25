@@ -40,7 +40,7 @@ public class ContentDisposition {
 
     private String value;
     private String type;
-    private Map<String, String> params = new LinkedHashMap<String, String>();
+    private Map<String, String> params = new LinkedHashMap<>();
 
     public ContentDisposition(String value) {
         this.value = value;

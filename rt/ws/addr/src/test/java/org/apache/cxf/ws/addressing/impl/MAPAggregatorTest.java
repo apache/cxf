@@ -1029,7 +1029,7 @@ public class MAPAggregatorTest extends Assert {
 
             Collection<FaultInfo> of = opInfo.getFaults();
             if (of != null && !of.isEmpty()) {
-                faults = new ConcurrentHashMap<QName, BindingFaultInfo>(of.size());
+                faults = new ConcurrentHashMap<>(of.size());
                 for (FaultInfo fault : of) {
                     faults.put(fault.getFaultName(), new BindingFaultInfo(fault, this));
                 }

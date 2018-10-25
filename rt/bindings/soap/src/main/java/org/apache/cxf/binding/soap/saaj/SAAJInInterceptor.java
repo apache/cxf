@@ -86,8 +86,7 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
     private static final String BODY_FILLED_IN = SAAJInInterceptor.class.getName() + ".BODY_DONE";
 
     private SAAJPreInInterceptor preInterceptor = SAAJPreInInterceptor.INSTANCE;
-    private List<PhaseInterceptor<? extends Message>> extras
-        = new ArrayList<PhaseInterceptor<? extends Message>>(1);
+    private List<PhaseInterceptor<? extends Message>> extras = new ArrayList<>(1);
     public SAAJInInterceptor() {
         super(Phase.PRE_PROTOCOL);
         extras.add(preInterceptor);

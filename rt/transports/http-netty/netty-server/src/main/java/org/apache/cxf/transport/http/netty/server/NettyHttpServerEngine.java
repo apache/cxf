@@ -69,7 +69,7 @@ public class NettyHttpServerEngine implements ServerEngine {
 
     private NettyHttpServletPipelineFactory servletPipeline;
 
-    private Map<String, NettyHttpContextHandler> handlerMap = new ConcurrentHashMap<String, NettyHttpContextHandler>();
+    private Map<String, NettyHttpContextHandler> handlerMap = new ConcurrentHashMap<>();
 
     /**
      * This field holds the TLS ServerParameters that are programatically

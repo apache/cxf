@@ -104,7 +104,7 @@ public final class SwaggerParseUtils {
         app.setBasePath(StringUtils.isEmpty(relativePath) ? "/" : relativePath);
 
 
-        Map<String, List<UserOperation>> userOpsMap = new LinkedHashMap<String, List<UserOperation>>();
+        Map<String, List<UserOperation>> userOpsMap = new LinkedHashMap<>();
         Set<String> tags = new HashSet<>();
         List<Map<String, Object>> tagsProp = CastUtils.cast((List<?>)map.get("tags"));
         if (tagsProp != null) {

@@ -46,7 +46,7 @@ public class ConfigurerImpl implements Configurer {
     BlueprintContainer container;
 
     private final Map<String, List<MatcherHolder>> wildCardBeanDefinitions
-        = new TreeMap<String, List<MatcherHolder>>();
+        = new TreeMap<>();
 
     static class MatcherHolder implements Comparable<MatcherHolder> {
         Matcher matcher;

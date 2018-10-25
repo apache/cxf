@@ -46,7 +46,7 @@ public class MTOMTest extends AbstractBusClientServerTestBase {
 
     public static class ObjectWithHashMapData {
         private String name;
-        private Map<String, byte[]> keyData = new LinkedHashMap<String, byte[]>();
+        private Map<String, byte[]> keyData = new LinkedHashMap<>();
 
         public ObjectWithHashMapData() {
         }

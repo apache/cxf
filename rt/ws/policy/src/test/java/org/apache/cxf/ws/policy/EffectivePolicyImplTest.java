@@ -64,7 +64,7 @@ public class EffectivePolicyImplTest extends Assert {
     private List<Interceptor<? extends Message>> createMockInterceptorList() {
         Interceptor<? extends Message> i = control.createMock(Interceptor.class);
         Interceptor<? extends Message> m = i;
-        List<Interceptor<? extends Message>> a = new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> a = new ArrayList<>();
         a.add(m);
         return a;
     }
@@ -314,7 +314,7 @@ public class EffectivePolicyImplTest extends Assert {
 
         control.reset();
         setupPolicyInterceptorProviderRegistry(engine, reg);
-        List<Interceptor<? extends Message>> il = new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> il = new ArrayList<>();
         setupRegistryInterceptors(useIn, fault, reg, null, il);
         PolicyAssertion a = control.createMock(PolicyAssertion.class);
         alternative.add(a);
@@ -327,7 +327,7 @@ public class EffectivePolicyImplTest extends Assert {
         setupPolicyInterceptorProviderRegistry(engine, reg);
         QName qn = new QName("http://x.y.z", "a");
         EasyMock.expect(a.getName()).andReturn(qn);
-        il = new ArrayList<Interceptor<? extends Message>>();
+        il = new ArrayList<>();
         setupRegistryInterceptors(useIn, fault, reg, qn, il);
         control.replay();
         epi.initialiseInterceptors(engine, useIn, fault, msg);
@@ -338,7 +338,7 @@ public class EffectivePolicyImplTest extends Assert {
         setupPolicyInterceptorProviderRegistry(engine, reg);
         EasyMock.expect(a.getName()).andReturn(qn);
         Interceptor<Message> pi = control.createMock(Interceptor.class);
-        il = new ArrayList<Interceptor<? extends Message>>();
+        il = new ArrayList<>();
         il.add(pi);
         setupRegistryInterceptors(useIn, fault, reg, qn, il);
         control.replay();

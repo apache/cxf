@@ -51,7 +51,7 @@ public class AccessTokenIntrospectionClient implements AccessTokenValidator {
                                                      MultivaluedMap<String, String> extraProps)
         throws OAuthServiceException {
         WebClient client = WebClient.fromClient(tokenValidatorClient, true);
-        MultivaluedMap<String, String> props = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> props = new MetadataMap<>();
         props.putSingle(OAuthConstants.TOKEN_ID, authSchemeData);
         try {
             TokenIntrospection response = client.post(props, TokenIntrospection.class);

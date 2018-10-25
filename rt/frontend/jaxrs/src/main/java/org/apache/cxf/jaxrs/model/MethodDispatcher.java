@@ -30,7 +30,7 @@ public class MethodDispatcher {
         new LinkedHashMap<OperationResourceInfo, Method>();
     private Map<Method, OperationResourceInfo> methodToOri =
         new LinkedHashMap<Method, OperationResourceInfo>();
-    private ConcurrentHashMap<Method, Method> proxyMethodMap = new ConcurrentHashMap<Method, Method>();
+    private ConcurrentHashMap<Method, Method> proxyMethodMap = new ConcurrentHashMap<>();
 
     public MethodDispatcher() {
 

@@ -71,7 +71,7 @@ public class Attachment implements Transferable {
 
     public Attachment(String id, DataHandler dh, MultivaluedMap<String, String> headers) {
         handler = dh;
-        this.headers = new MetadataMap<String, String>(headers, false, true);
+        this.headers = new MetadataMap<>(headers, false, true);
         this.headers.putSingle("Content-ID", id);
     }
 

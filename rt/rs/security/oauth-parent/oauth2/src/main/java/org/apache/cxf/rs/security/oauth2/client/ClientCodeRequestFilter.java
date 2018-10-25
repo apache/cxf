@@ -303,13 +303,13 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
     protected MultivaluedMap<String, String> toCodeRequestState(ContainerRequestContext rc, UriInfo ui) {
         MultivaluedMap<String, String> state = toRequestState(rc, ui);
         if (state == null) {
-            state = new MetadataMap<String, String>();
+            state = new MetadataMap<>();
         }
         return state;
     }
 
     protected MultivaluedMap<String, String> toRequestState(ContainerRequestContext rc, UriInfo ui) {
-        MultivaluedMap<String, String> requestState = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> requestState = new MetadataMap<>();
         requestState.putAll(ui.getQueryParameters(decodeRequestParameters));
         if (MediaType.APPLICATION_FORM_URLENCODED_TYPE.isCompatible(rc.getMediaType())) {
             String body = FormUtils.readBody(rc.getEntityStream(), StandardCharsets.UTF_8.name());

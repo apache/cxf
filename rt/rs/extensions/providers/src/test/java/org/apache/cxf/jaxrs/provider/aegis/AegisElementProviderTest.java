@@ -144,7 +144,7 @@ public class AegisElementProviderTest extends Assert {
         testMap.put(bean, bean2);
 
         MessageBodyWriter<Map<AegisTestBean, AegisSuperBean>> writer
-            = new AegisElementProvider<Map<AegisTestBean, AegisSuperBean>>();
+            = new AegisElementProvider<>();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
 
         writer.writeTo(testMap, testMap.getClass(), mapType, new Annotation[]{},
@@ -153,7 +153,7 @@ public class AegisElementProviderTest extends Assert {
         byte[] bytes = os.toByteArray();
         String xml = new String(bytes, "utf-8");
         MessageBodyReader<Map<AegisTestBean, AegisSuperBean>> reader
-            = new AegisElementProvider<Map<AegisTestBean, AegisSuperBean>>();
+            = new AegisElementProvider<>();
         byte[] simpleBytes = xml.getBytes("utf-8");
 
         Map<AegisTestBean, AegisSuperBean> map2 = reader.readFrom(null, mapType, new Annotation[]{},

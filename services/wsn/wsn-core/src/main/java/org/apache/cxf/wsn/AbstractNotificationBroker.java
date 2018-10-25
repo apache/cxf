@@ -101,8 +101,8 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint
     public AbstractNotificationBroker(String name) {
         super(name);
         idGenerator = new IdGenerator();
-        subscriptions = new ConcurrentHashMap<String, AbstractSubscription>();
-        publishers = new ConcurrentHashMap<String, AbstractPublisher>();
+        subscriptions = new ConcurrentHashMap<>();
+        publishers = new ConcurrentHashMap<>();
         nonContactPublishers = new CopyOnWriteArrayList<>();
     }
 

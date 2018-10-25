@@ -52,7 +52,7 @@ public abstract class ServerAccessToken extends AccessToken {
     private String nonce;
     private String responseType;
     private String grantCode;
-    private Map<String, String> extraProperties = new LinkedHashMap<String, String>();
+    private Map<String, String> extraProperties = new LinkedHashMap<>();
 
     protected ServerAccessToken() {
 

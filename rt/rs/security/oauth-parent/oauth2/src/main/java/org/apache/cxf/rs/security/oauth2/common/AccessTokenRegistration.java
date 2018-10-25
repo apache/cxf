@@ -37,7 +37,7 @@ public class AccessTokenRegistration {
     private String clientCodeVerifier;
     private String responseType;
     private String grantCode;
-    private Map<String, String> extraProperties = new LinkedHashMap<String, String>();
+    private Map<String, String> extraProperties = new LinkedHashMap<>();
 
     /**
      * Sets the {@link Client} instance

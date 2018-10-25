@@ -55,8 +55,8 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
     private boolean leadingSlash;
     private String fragment;
     private String schemeSpecificPart;
-    private MultivaluedMap<String, String> query = new MetadataMap<String, String>();
-    private MultivaluedMap<String, String> matrix = new MetadataMap<String, String>();
+    private MultivaluedMap<String, String> query = new MetadataMap<>();
+    private MultivaluedMap<String, String> matrix = new MetadataMap<>();
 
     private Map<String, Object> resolvedTemplates;
     private Map<String, Object> resolvedTemplatesPathEnc;
@@ -351,7 +351,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         Set<String> pathEncodeVars = alreadyResolvedTsPathEnc.isEmpty() && !encodePathSlash
             ? Collections.<String>emptySet() : new HashSet<>();
 
-        Map<String, Object> theMap = new LinkedHashMap<String, Object>();
+        Map<String, Object> theMap = new LinkedHashMap<>();
         for (String var : uniqueVars) {
             boolean isPathEncVar = !isQuery && alreadyResolvedTsPathEnc.containsKey(var);
 
@@ -420,8 +420,8 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         builder.host = host;
         builder.paths = new ArrayList<>(paths);
         builder.fragment = fragment;
-        builder.query = new MetadataMap<String, String>(query);
-        builder.matrix = new MetadataMap<String, String>(matrix);
+        builder.query = new MetadataMap<>(query);
+        builder.matrix = new MetadataMap<>(matrix);
         builder.schemeSpecificPart = schemeSpecificPart;
         builder.leadingSlash = leadingSlash;
         builder.originalPathEmpty = originalPathEmpty;
@@ -1009,7 +1009,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
             throw new IllegalArgumentException();
         }
         if (map == null) {
-            map = new LinkedHashMap<String, Object>();
+            map = new LinkedHashMap<>();
         }
 
         for (Map.Entry<String, Object> entry : values.entrySet()) {

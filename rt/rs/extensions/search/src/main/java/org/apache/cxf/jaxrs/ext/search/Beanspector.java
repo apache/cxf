@@ -39,8 +39,8 @@ public class Beanspector<T> {
 
     private Class<T> tclass;
     private T tobj;
-    private Map<String, Method> getters = new LinkedHashMap<String, Method>();
-    private Map<String, Method> setters = new LinkedHashMap<String, Method>();
+    private Map<String, Method> getters = new LinkedHashMap<>();
+    private Map<String, Method> setters = new LinkedHashMap<>();
 
     public Beanspector(Class<T> tclass) {
         if (tclass == null) {

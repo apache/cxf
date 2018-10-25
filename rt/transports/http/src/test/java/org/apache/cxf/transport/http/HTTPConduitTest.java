@@ -68,7 +68,7 @@ public class HTTPConduitTest extends Assert {
      */
     private Message getNewMessage() throws Exception {
         Message message = new MessageImpl();
-        Map<String, List<String>> headers = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+        Map<String, List<String>> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         List<String> contentTypes = new ArrayList<>();
         contentTypes.add("text/xml");
         contentTypes.add("charset=utf8");

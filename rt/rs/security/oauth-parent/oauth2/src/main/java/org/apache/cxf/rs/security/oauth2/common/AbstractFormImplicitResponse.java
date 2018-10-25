@@ -25,7 +25,7 @@ public abstract class AbstractFormImplicitResponse {
     private String responseType;
     private String redirectUri;
     private String state;
-    private Map<String, String> parameters = new LinkedHashMap<String, String>();
+    private Map<String, String> parameters = new LinkedHashMap<>();
     public String getRedirectUri() {
         return redirectUri;
     }

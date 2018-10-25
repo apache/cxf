@@ -38,7 +38,7 @@ public class WebSocketUtilsTest extends Assert {
 
 
     static {
-        TEST_HEADERS_MAP = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
+        TEST_HEADERS_MAP = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         TEST_HEADERS_MAP.put(WebSocketUtils.SC_KEY, "200");
         TEST_HEADERS_MAP.put("Content-Type", "text/xml;charset=utf-8");
         TEST_HEADERS_MAP.put(WebSocketConstants.DEFAULT_RESPONSE_ID_KEY, "31415926-5358-9793-2384-626433832795");

@@ -50,7 +50,7 @@ public class ClaimsRequest extends JsonMapObject {
                 if (claimsMap.values().iterator().next() instanceof ClaimRequirement) {
                     return CastUtils.cast((Map<?, ?>)claimsMap);
                 }
-                Map<String, ClaimRequirement> claims = new LinkedHashMap<String, ClaimRequirement>();
+                Map<String, ClaimRequirement> claims = new LinkedHashMap<>();
                 Map<String, Map<String, ?>> parsedMap = CastUtils.cast((Map<?, ?>)claimsProp);
                 for (Map.Entry<String, Map<String, ?>> entry : parsedMap.entrySet()) {
 

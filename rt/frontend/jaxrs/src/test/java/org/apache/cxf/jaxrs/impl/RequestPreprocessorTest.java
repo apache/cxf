@@ -111,7 +111,7 @@ public class RequestPreprocessorTest extends Assert {
         m.put(Message.REQUEST_URI, pathInfo);
         m.put(Message.QUERY_STRING, query);
         m.put(Message.HTTP_REQUEST_METHOD, method);
-        Map<String, List<String>> headers = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+        Map<String, List<String>> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         if (methodHeader != null) {
             headers.put("X-HTTP-Method-Override", Collections.singletonList(methodHeader));
         }
