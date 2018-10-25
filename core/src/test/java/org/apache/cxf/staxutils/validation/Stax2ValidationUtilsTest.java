@@ -122,11 +122,13 @@ public class Stax2ValidationUtilsTest {
     @Before
     public void setUp() throws Exception {
         XmlSchemaCollection schemaCol = new XmlSchemaCollection();
+        
         InputStream io = getClass().getClassLoader().getResourceAsStream(schemaPath);
+        String sysId = getClass().getClassLoader().getResource(schemaPath).toString();
         schemaCol.setBaseUri(getTestBaseURI());
-        schemaCol.read(new StreamSource(io));
+        schemaCol.read(new StreamSource(io, sysId));
         serviceInfo.addSchema(schemaInfo);
-        schemaInfo.setSchema(schemaCol.getXmlSchemas()[0]);
+        schemaInfo.setSchema(schemaCol.getXmlSchema(sysId)[0]);
         expect(endpoint.get(anyObject())).andReturn(null);
         expect(endpoint.containsKey(anyObject())).andReturn(false);
         expect(endpoint.put(anyString(), anyObject())).andReturn(null);
