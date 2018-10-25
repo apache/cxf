@@ -48,6 +48,7 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.microprofile.client.CxfTypeSafeClientBuilder;
 import org.apache.cxf.microprofile.client.config.ConfigFacade;
+import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 public class RestClientBean implements Bean<Object>, PassivationCapable {
@@ -141,17 +142,29 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
         String property = String.format(REST_URI_FORMAT, interfaceName);
         String baseURI = null;
         try {
-            baseURI = ConfigFacade.getValue(property, String.class);
+            baseURI = ConfigFacade.getOptionalValue(property, String.class).orElse(null);
         } catch (NoSuchElementException ex) {
             // no-op - will revert to baseURL config value (as opposed to baseURI)
         }
         if (baseURI == null) {
             // revert to baseUrl
             property = String.format(REST_URL_FORMAT, interfaceName);
-            baseURI = ConfigFacade.getValue(property, String.class);
-            if (baseURI == null) {
-                throw new IllegalStateException("Unable to determine base URI from configuration");
+            baseURI = ConfigFacade.getOptionalValue(property, String.class).orElse(null);
+        }
+        if (baseURI == null) {
+            // last, if baseUrl/Uri is not specified via MP Config, check the @RegisterRestClient annotation
+            RegisterRestClient anno = clientInterface.getAnnotation(RegisterRestClient.class);
+            if (anno != null) {
+                String annoUri = anno.baseUri();
+                if (annoUri != null && !"".equals(anno.baseUri())) {
+                    baseURI = annoUri;
+                }
             }
+        }
+
+        if (baseURI == null) {
+            throw new IllegalStateException("Unable to determine base URI from configuration for "
+                                            + interfaceName);
         }
         return baseURI;
     }

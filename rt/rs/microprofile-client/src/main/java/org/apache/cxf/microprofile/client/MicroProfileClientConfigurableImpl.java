@@ -28,6 +28,7 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.WriterInterceptor;
 
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.jaxrs.impl.ConfigurableImpl;
 import org.apache.cxf.jaxrs.impl.ConfigurationImpl;
 import org.apache.cxf.microprofile.client.config.ConfigFacade;
@@ -52,8 +53,8 @@ public class MicroProfileClientConfigurableImpl<C extends Configurable<C>>
 
     boolean isDefaultExceptionMapperDisabled() {
         Object prop = getConfiguration().getProperty(CONFIG_KEY_DISABLE_MAPPER);
-        if (prop instanceof Boolean) {
-            return (Boolean)prop;
+        if (prop != null) {
+            return PropertyUtils.isTrue(prop);
         }
         return ConfigFacade.getOptionalValue(CONFIG_KEY_DISABLE_MAPPER,
                                              Boolean.class).orElse(false);

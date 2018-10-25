@@ -20,21 +20,55 @@ package org.apache.cxf.microprofile.client;
 
 import java.net.URI;
 import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.ServiceLoader;
+import java.util.WeakHashMap;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.Configuration;
 
+import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.jaxrs.client.spec.ClientImpl;
+import org.apache.cxf.microprofile.client.config.ConfigFacade;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
+import org.eclipse.microprofile.rest.client.spi.RestClientListener;
 
 public class CxfTypeSafeClientBuilder implements RestClientBuilder, Configurable<RestClientBuilder> {
+    private static final Logger LOG = LogUtils.getL7dLogger(CxfTypeSafeClientBuilder.class);
+    private static final String REST_CONN_TIMEOUT_FORMAT = "%s/mp-rest/connectTimeout";
+    private static final String REST_READ_TIMEOUT_FORMAT = "%s/mp-rest/readTimeout";
+    private static final Map<ClassLoader, Collection<RestClientListener>> REST_CLIENT_LISTENERS = 
+        new WeakHashMap<>();
+
     private String baseUri;
     private ExecutorService executorService;
     private final MicroProfileClientConfigurableImpl<RestClientBuilder> configImpl =
             new MicroProfileClientConfigurableImpl<>(this);
+
+    private static Collection<RestClientListener> listeners() {
+        ClassLoader threadContextClassLoader = AccessController.doPrivileged(
+            (PrivilegedAction<ClassLoader>)() -> Thread.currentThread().getContextClassLoader());
+        synchronized (REST_CLIENT_LISTENERS) {
+            return REST_CLIENT_LISTENERS.computeIfAbsent(threadContextClassLoader, key -> {
+                Collection<RestClientListener> listeners = new ArrayList<>();
+                for (RestClientListener listener : ServiceLoader.load(RestClientListener.class)) {
+                    listeners.add(listener);
+                }
+                return listeners;
+            });
+        }
+    }
 
     @Override
     public RestClientBuilder baseUrl(URL url) {
@@ -58,6 +92,28 @@ public class CxfTypeSafeClientBuilder implements RestClientBuilder, Configurable
     }
 
     @Override
+    public RestClientBuilder connectTimeout(long timeout, TimeUnit unit) {
+        if (null == unit) {
+            throw new IllegalArgumentException("time unit must not be null");
+        }
+        if (timeout < 0) {
+            throw new IllegalArgumentException("timeout must be non-negative");
+        }
+        return property(ClientImpl.HTTP_CONNECTION_TIMEOUT_PROP, unit.toMillis(timeout));
+    }
+
+    @Override
+    public RestClientBuilder readTimeout(long timeout, TimeUnit unit) {
+        if (null == unit) {
+            throw new IllegalArgumentException("time unit must not be null");
+        }
+        if (timeout < 0) {
+            throw new IllegalArgumentException("timeout must be non-negative");
+        }
+        return property(ClientImpl.HTTP_RECEIVE_TIMEOUT_PROP, unit.toMillis(timeout));
+    }
+
+    @Override
     public <T> T build(Class<T> aClass) {
         if (baseUri == null) {
             throw new IllegalStateException("baseUrl not set");
@@ -76,8 +132,32 @@ public class CxfTypeSafeClientBuilder implements RestClientBuilder, Configurable
                 }
             }
         }
+
+        final String interfaceName = aClass.getName();
+        Optional<Long> timeout = ConfigFacade.getOptionalValue(
+            String.format(REST_CONN_TIMEOUT_FORMAT, interfaceName), Long.class).map(
+                timeoutValue -> {
+                    connectTimeout(timeoutValue, TimeUnit.MILLISECONDS);
+                    return timeoutValue;
+                });
+        if (!timeout.isPresent() && LOG.isLoggable(Level.FINEST)) {
+            LOG.finest("connectionTimeout set by MP Config: " + timeout.get());
+        }
+        timeout = ConfigFacade.getOptionalValue(
+            String.format(REST_READ_TIMEOUT_FORMAT, interfaceName), Long.class).map(
+                timeoutValue -> {
+                    readTimeout(timeoutValue, TimeUnit.MILLISECONDS);
+                    return timeoutValue;
+                });
+        if (!timeout.isPresent() && LOG.isLoggable(Level.FINEST)) {
+            LOG.finest("readTimeout set by MP Config: " + timeout.get());
+        }
+
+        for (RestClientListener listener : listeners()) {
+            listener.onNewClient(aClass, this);
+        }
         MicroProfileClientFactoryBean bean = new MicroProfileClientFactoryBean(configImpl,
-                baseUri, aClass, executorService);
+                                                                               baseUri, aClass, executorService);
         return bean.create(aClass);
     }
 

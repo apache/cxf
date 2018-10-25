@@ -51,6 +51,14 @@ public class AsyncInvocationInterceptorFactoryTestImpl implements AsyncInvocatio
             list.add(Thread.currentThread().getName());
             list.add(AsyncInvocationInterceptorFactoryTestImpl.class.getSimpleName());
         }
+
+        /** {@inheritDoc}*/
+        @Override
+        public void removeContext() {
+            List<String> list = INBOUND.get();
+            list.add("REMOVE-" + Thread.currentThread().getName());
+            list.add("REMOVE-" + AsyncInvocationInterceptorFactoryTestImpl.class.getSimpleName());
+        }
     }
 
     /** {@inheritDoc}*/
