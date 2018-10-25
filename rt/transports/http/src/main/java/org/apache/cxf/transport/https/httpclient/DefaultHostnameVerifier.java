@@ -86,7 +86,7 @@ public final class DefaultHostnameVerifier implements HostnameVerifier {
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.log(Level.FINE, ex.getMessage(), ex);
             }
-            return false;
+            throw new RuntimeException("HostnameVerifier, socket reset for TTL");
         }
     }
 
