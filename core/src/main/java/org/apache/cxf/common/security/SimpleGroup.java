@@ -19,7 +19,6 @@
 package org.apache.cxf.common.security;
 
 import java.security.Principal;
-import java.security.acl.Group;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -29,7 +28,7 @@ import java.util.Set;
  * Simple Group implementation
  *
  */
-public class SimpleGroup extends SimplePrincipal implements Group {
+public class SimpleGroup extends SimplePrincipal implements GroupPrincipal {
 
     private static final long serialVersionUID = 1L;
     private Set<Principal> members = new HashSet<>();

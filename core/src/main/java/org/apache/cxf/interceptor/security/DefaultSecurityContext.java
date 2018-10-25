@@ -19,13 +19,13 @@
 package org.apache.cxf.interceptor.security;
 
 import java.security.Principal;
-import java.security.acl.Group;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.security.auth.Subject;
 
+import org.apache.cxf.common.security.GroupPrincipal;
 import org.apache.cxf.security.LoginSecurityContext;
 
 /**
@@ -62,7 +62,7 @@ public class DefaultSecurityContext implements LoginSecurityContext {
         }
 
         for (Principal principal : subject.getPrincipals()) {
-            if (!(principal instanceof Group)
+            if (!(principal instanceof GroupPrincipal)
                 && (principalName == null || principal.getName().equals(principalName))) {
                 return principal;
             }
@@ -71,7 +71,7 @@ public class DefaultSecurityContext implements LoginSecurityContext {
         // No match for the principalName. Just return first non-Group Principal
         if (principalName != null) {
             for (Principal principal : subject.getPrincipals()) {
-                if (!(principal instanceof Group)) {
+                if (!(principal instanceof GroupPrincipal)) {
                     return principal;
                 }
             }
@@ -87,7 +87,7 @@ public class DefaultSecurityContext implements LoginSecurityContext {
     public boolean isUserInRole(String role) {
         if (subject != null) {
             for (Principal principal : subject.getPrincipals()) {
-                if (principal instanceof Group && checkGroup((Group)principal, role)) {
+                if (principal instanceof GroupPrincipal && checkGroup((GroupPrincipal)principal, role)) {
                     return true;
                 } else if (p != principal
                            && role.equals(principal.getName())) {
@@ -98,7 +98,7 @@ public class DefaultSecurityContext implements LoginSecurityContext {
         return false;
     }
 
-    protected boolean checkGroup(Group group, String role) {
+    protected boolean checkGroup(GroupPrincipal group, String role) {
         if (group.getName().equals(role)) {
             return true;
         }
@@ -107,7 +107,7 @@ public class DefaultSecurityContext implements LoginSecurityContext {
             // this might be a plain role but could represent a group consisting of other groups/roles
             Principal member = members.nextElement();
             if (member.getName().equals(role)
-                || member instanceof Group && checkGroup((Group)member, role)) {
+                || member instanceof GroupPrincipal && checkGroup((GroupPrincipal)member, role)) {
                 return true;
             }
         }
