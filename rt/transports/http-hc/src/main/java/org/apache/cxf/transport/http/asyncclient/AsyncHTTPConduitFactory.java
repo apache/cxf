@@ -415,7 +415,8 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
                         // not just when a connection becomes available
                         connMgr.validatePendingRequests();
 
-                        if (connectionMaxIdle > 0 && System.currentTimeMillis() >= nextIdleCheck) {
+                        if (connectionTTL == 0 
+                            && connectionMaxIdle > 0 && System.currentTimeMillis() >= nextIdleCheck) {
                             nextIdleCheck += connectionMaxIdle;
                             // close connections
                             // that have been idle longer than specified connectionMaxIdle
