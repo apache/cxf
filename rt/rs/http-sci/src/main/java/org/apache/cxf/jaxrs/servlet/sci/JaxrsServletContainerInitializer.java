@@ -164,7 +164,7 @@ public class JaxrsServletContainerInitializer implements ServletContainerInitial
         final Set< Class< ? > > classes) {
 
         final Map< Class< ? extends Annotation >, Collection< Class< ? > > > grouped =
-            new HashMap< Class< ? extends Annotation >, Collection< Class< ? > > >();
+            new HashMap<>();
 
         grouped.put(Provider.class, new ArrayList< Class< ? > >());
         grouped.put(Path.class, new ArrayList< Class< ? > >());

@@ -101,7 +101,7 @@ public class PolicyUtilsTest extends Assert {
 
     public AssertionInfo getClientPolicyAssertionInfo(HTTPClientPolicy policy) {
         JaxbAssertion<HTTPClientPolicy> assertion =
-            new JaxbAssertion<HTTPClientPolicy>(new ClientPolicyCalculator().getDataClassName(), false);
+            new JaxbAssertion<>(new ClientPolicyCalculator().getDataClassName(), false);
         assertion.setData(policy);
         return new AssertionInfo(assertion);
     }
@@ -155,7 +155,7 @@ public class PolicyUtilsTest extends Assert {
 
     public AssertionInfo getServerPolicyAssertionInfo(HTTPServerPolicy policy) {
         JaxbAssertion<HTTPServerPolicy> assertion =
-            new JaxbAssertion<HTTPServerPolicy>(new ServerPolicyCalculator().getDataClassName(), false);
+            new JaxbAssertion<>(new ServerPolicyCalculator().getDataClassName(), false);
         assertion.setData(policy);
         return new AssertionInfo(assertion);
     }

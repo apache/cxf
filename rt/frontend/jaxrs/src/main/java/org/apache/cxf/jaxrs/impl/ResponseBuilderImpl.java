@@ -68,7 +68,7 @@ public class ResponseBuilderImpl extends ResponseBuilder implements Cloneable {
         }
         ResponseImpl r = new ResponseImpl(status, null, reasonPhrase);
         MetadataMap<String, Object> m =
-            new MetadataMap<String, Object>(metadata, false, true);
+            new MetadataMap<>(metadata, false, true);
         r.addMetadata(m);
         r.setEntity(entity, annotations);
         reset();

@@ -127,8 +127,7 @@ public class AegisElementProviderTest extends Assert {
 
     @Test
     public void testReadWriteComplexMap() throws Exception {
-        Map<AegisTestBean, AegisSuperBean> testMap =
-            new HashMap<AegisTestBean, AegisSuperBean>();
+        Map<AegisTestBean, AegisSuperBean> testMap = new HashMap<>();
 
         Class<InterfaceWithMap> iwithMapClass = InterfaceWithMap.class;
         Method method = iwithMapClass.getMethod("mapFunction");

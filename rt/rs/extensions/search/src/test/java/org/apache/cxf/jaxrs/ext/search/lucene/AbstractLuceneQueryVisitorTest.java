@@ -140,7 +140,7 @@ public abstract class AbstractLuceneQueryVisitorTest extends Assert {
     protected Query createTermQuery(String expression, boolean useAnalyzer) throws Exception {
         SearchCondition<SearchBean> filter = getParser().parse(expression);
         SearchConditionVisitor<SearchBean, Query> lucene =
-            new LuceneQueryVisitor<SearchBean>(useAnalyzer ? analyzer : null);
+            new LuceneQueryVisitor<>(useAnalyzer ? analyzer : null);
         lucene.visit(filter);
         return lucene.getQuery();
     }
@@ -157,7 +157,7 @@ public abstract class AbstractLuceneQueryVisitorTest extends Assert {
             boolean useAnalyzer) throws Exception {
         SearchCondition<SearchBean> filter = getParser().parse(expression);
         LuceneQueryVisitor<SearchBean> lucene =
-            new LuceneQueryVisitor<SearchBean>(useAnalyzer ? analyzer : null);
+            new LuceneQueryVisitor<>(useAnalyzer ? analyzer : null);
         lucene.setPrimitiveFieldTypeMap(Collections.<String, Class<?>>singletonMap("intfield", cls));
         lucene.visit(filter);
         return lucene.getQuery();
@@ -170,7 +170,7 @@ public abstract class AbstractLuceneQueryVisitorTest extends Assert {
     protected Query createTermQuery(String fieldName, String expression, boolean useAnalyzer) throws Exception {
         SearchCondition<SearchBean> filter = getParser().parse(expression);
         LuceneQueryVisitor<SearchBean> lucene =
-            new LuceneQueryVisitor<SearchBean>("ct", fieldName, useAnalyzer ? analyzer : null);
+            new LuceneQueryVisitor<>("ct", fieldName, useAnalyzer ? analyzer : null);
         lucene.visit(filter);
         return lucene.getQuery();
     }
@@ -179,7 +179,7 @@ public abstract class AbstractLuceneQueryVisitorTest extends Assert {
         throws Exception {
         SearchCondition<SearchBean> filter = getParser().parse(expression);
         LuceneQueryVisitor<SearchBean> lucene =
-            new LuceneQueryVisitor<SearchBean>("ct", fieldName);
+            new LuceneQueryVisitor<>("ct", fieldName);
         lucene.setPrimitiveFieldTypeMap(Collections.<String, Class<?>>singletonMap(fieldName, cls));
         lucene.visit(filter);
         return lucene.getQuery();
@@ -196,7 +196,7 @@ public abstract class AbstractLuceneQueryVisitorTest extends Assert {
     protected Query createPhraseQuery(String fieldName, String expression, boolean useAnalyzer) throws Exception {
         SearchCondition<SearchBean> filter = getParser().parse(expression);
         LuceneQueryVisitor<SearchBean> lucene =
-            new LuceneQueryVisitor<SearchBean>(fieldName, useAnalyzer ? analyzer : null);
+            new LuceneQueryVisitor<>(fieldName, useAnalyzer ? analyzer : null);
         lucene.visit(filter);
         return lucene.getQuery();
     }

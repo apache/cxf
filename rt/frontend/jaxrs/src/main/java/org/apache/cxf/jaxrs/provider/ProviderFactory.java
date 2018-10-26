@@ -95,25 +95,25 @@ public abstract class ProviderFactory {
     private static final String PROVIDER_CACHE_CHECK_ALL = "org.apache.cxf.jaxrs.provider.cache.checkAllCandidates";
 
     protected Map<NameKey, ProviderInfo<ReaderInterceptor>> readerInterceptors =
-        new NameKeyMap<ProviderInfo<ReaderInterceptor>>(true);
+        new NameKeyMap<>(true);
     protected Map<NameKey, ProviderInfo<WriterInterceptor>> writerInterceptors =
-        new NameKeyMap<ProviderInfo<WriterInterceptor>>(true);
+        new NameKeyMap<>(true);
 
     private List<ProviderInfo<MessageBodyReader<?>>> messageReaders =
-        new ArrayList<ProviderInfo<MessageBodyReader<?>>>();
+        new ArrayList<>();
     private List<ProviderInfo<MessageBodyWriter<?>>> messageWriters =
-        new ArrayList<ProviderInfo<MessageBodyWriter<?>>>();
+        new ArrayList<>();
     private List<ProviderInfo<ContextResolver<?>>> contextResolvers =
-        new ArrayList<ProviderInfo<ContextResolver<?>>>(1);
+        new ArrayList<>();
     private List<ProviderInfo<ContextProvider<?>>> contextProviders =
-        new ArrayList<ProviderInfo<ContextProvider<?>>>(1);
+        new ArrayList<>();
 
     private List<ProviderInfo<ParamConverterProvider>> paramConverters =
-        new ArrayList<ProviderInfo<ParamConverterProvider>>(1);
+        new ArrayList<>(1);
     private boolean paramConverterContextsAvailable;
     // List of injected providers
     private Collection<ProviderInfo<?>> injectedProviders =
-        new HashSet<ProviderInfo<?>>();
+        new HashSet<>();
 
     private Bus bus;
 
@@ -561,9 +561,9 @@ public abstract class ProviderFactory {
     @SuppressWarnings("unchecked")
     protected void setCommonProviders(List<ProviderInfo<? extends Object>> theProviders) {
         List<ProviderInfo<ReaderInterceptor>> readInts =
-            new LinkedList<ProviderInfo<ReaderInterceptor>>();
+            new LinkedList<>();
         List<ProviderInfo<WriterInterceptor>> writeInts =
-            new LinkedList<ProviderInfo<WriterInterceptor>>();
+            new LinkedList<>();
         for (ProviderInfo<? extends Object> provider : theProviders) {
             Class<?> providerCls = ClassHelper.getRealClass(bus, provider.getProvider());
 
@@ -943,7 +943,7 @@ public abstract class ProviderFactory {
         names = names == null ? Collections.<String>emptySet() : names;
 
         MultivaluedMap<ProviderInfo<T>, String> map =
-            new MetadataMap<ProviderInfo<T>, String>();
+            new MetadataMap<>();
         for (Map.Entry<NameKey, ProviderInfo<T>> entry : boundFilters.entrySet()) {
             String entryName = entry.getKey().getName();
             ProviderInfo<T> provider = entry.getValue();
@@ -1186,7 +1186,7 @@ public abstract class ProviderFactory {
                                        + " can not be instantiated", ex);
         }
         Map<Class<?>, ThreadLocalProxy<?>> proxies =
-            new LinkedHashMap<Class<?>, ThreadLocalProxy<?>>();
+            new LinkedHashMap<>();
         for (int i = 0; i < paramTypes.length; i++) {
             if (cArgs[i] instanceof ThreadLocalProxy) {
                 @SuppressWarnings("unchecked")
@@ -1367,7 +1367,7 @@ public abstract class ProviderFactory {
                                                                     Object[] providers,
                                                                     ProviderInfo<Application> application) {
         List<ProviderInfo<? extends Object>> theProviders =
-            new ArrayList<ProviderInfo<? extends Object>>(providers.length);
+            new ArrayList<>(providers.length);
         for (Object o : providers) {
             if (o == null) {
                 continue;

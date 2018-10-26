@@ -216,16 +216,14 @@ public class JAXBElementProviderTest extends Assert {
         provider.setSingleJaxbContext(true);
         provider.init(Collections.singletonList(cri));
 
-        List<org.apache.cxf.jaxrs.fortest.jaxb.SuperBook> list =
-            new ArrayList<org.apache.cxf.jaxrs.fortest.jaxb.SuperBook>();
+        List<org.apache.cxf.jaxrs.fortest.jaxb.SuperBook> list = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             org.apache.cxf.jaxrs.fortest.jaxb.SuperBook o =
                 new org.apache.cxf.jaxrs.fortest.jaxb.SuperBook();
             o.setName("name #" + i);
             list.add(o);
         }
-        XmlList<org.apache.cxf.jaxrs.fortest.jaxb.SuperBook> xmlList =
-            new XmlList<org.apache.cxf.jaxrs.fortest.jaxb.SuperBook>(list);
+        XmlList<org.apache.cxf.jaxrs.fortest.jaxb.SuperBook> xmlList = new XmlList<>(list);
 
         Method m = XmlListResource.class.getMethod("testJaxb2", new Class[]{});
         JAXBContext context = provider.getJAXBContext(m.getReturnType(), m.getGenericReturnType());

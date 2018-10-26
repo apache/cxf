@@ -37,7 +37,7 @@ public class HelloImplWithWrapppedContinuation implements HelloContinuation {
 
 
     private Map<String, Continuation> suspended =
-        new HashMap<String, Continuation>();
+        new HashMap<>();
 
 
     @Resource

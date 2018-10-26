@@ -382,7 +382,7 @@ public class IssueUnitTest extends org.junit.Assert {
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
         LifetimeType lifetime = createLifetime(300L * 5L);
         JAXBElement<LifetimeType> lifetimeJaxb =
-            new JAXBElement<LifetimeType>(QNameConstants.LIFETIME, LifetimeType.class, lifetime);
+            new JAXBElement<>(QNameConstants.LIFETIME, LifetimeType.class, lifetime);
         request.getAny().add(lifetimeJaxb);
 
         // Mock up message context

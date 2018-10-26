@@ -37,11 +37,11 @@ import org.apache.cxf.message.Message;
 
 public final class ClientProviderFactory extends ProviderFactory {
     private List<ProviderInfo<ClientRequestFilter>> clientRequestFilters =
-        new ArrayList<ProviderInfo<ClientRequestFilter>>(1);
+        new ArrayList<>(1);
     private List<ProviderInfo<ClientResponseFilter>> clientResponseFilters =
-        new ArrayList<ProviderInfo<ClientResponseFilter>>(1);
+        new ArrayList<>(1);
     private List<ProviderInfo<ResponseExceptionMapper<?>>> responseExceptionMappers =
-        new ArrayList<ProviderInfo<ResponseExceptionMapper<?>>>(1);
+        new ArrayList<>(1);
     private RxInvokerProvider<?> rxInvokerProvider;
     private ClientProviderFactory(Bus bus) {
         super(bus);

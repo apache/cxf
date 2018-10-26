@@ -628,7 +628,7 @@ public final class InjectionUtils {
         }
 
         Map<String, MultivaluedMap<String, String>> parsedValues =
-            new HashMap<String, MultivaluedMap<String, String>>();
+            new HashMap<>();
         for (Map.Entry<String, List<String>> entry : values.entrySet()) {
             String memberKey = entry.getKey();
             String beanKey = null;
@@ -823,7 +823,7 @@ public final class InjectionUtils {
                                         MultivaluedMap<String, String> values,
                                         boolean isbean) {
         List<MultivaluedMap<String, String>> valuesList =
-            new ArrayList<MultivaluedMap<String, String>>();
+            new ArrayList<>();
 
         if (isbean && InjectionUtils.isSupportedCollectionOrArray(type)) {
             Class<?> realType = InjectionUtils.getActualType(genericType);

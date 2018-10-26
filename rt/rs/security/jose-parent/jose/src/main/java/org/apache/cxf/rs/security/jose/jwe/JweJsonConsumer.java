@@ -39,7 +39,7 @@ public class JweJsonConsumer {
     private JweHeaders sharedUnprotectedHeader;
     private List<JweJsonEncryptionEntry> recipients = new LinkedList<>();
     private Map<JweJsonEncryptionEntry, JweHeaders> recipientsMap =
-        new LinkedHashMap<JweJsonEncryptionEntry, JweHeaders>();
+        new LinkedHashMap<>();
     private byte[] aad;
     private byte[] iv;
     private byte[] cipherBytes;

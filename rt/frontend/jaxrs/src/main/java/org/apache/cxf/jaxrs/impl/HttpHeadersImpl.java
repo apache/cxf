@@ -170,7 +170,7 @@ public class HttpHeadersImpl implements HttpHeaders {
             = MessageUtils.getContextualBoolean(message, HEADER_SPLIT_PROPERTY, false);
         if (splitIndividualValue) {
             Map<String, List<String>> newHeaders =
-                new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+                new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
             for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
                 newHeaders.put(entry.getKey(), getRequestHeader(entry.getKey()));
             }

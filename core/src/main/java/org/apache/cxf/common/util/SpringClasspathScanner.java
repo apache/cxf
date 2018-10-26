@@ -68,9 +68,9 @@ class SpringClasspathScanner extends ClasspathScanner {
         MetadataReaderFactory factory = new CachingMetadataReaderFactory(resolver);
 
         final Map< Class< ? extends Annotation >, Collection< Class< ? > > > classes =
-            new HashMap< Class< ? extends Annotation >, Collection< Class< ? > > >();
+            new HashMap<>();
         final Map< Class< ? extends Annotation >, Collection< String > > matchingInterfaces =
-            new HashMap< Class< ? extends Annotation >, Collection< String > >();
+            new HashMap<>();
         final Map<String, String[]> nonMatchingClasses = new HashMap<>();
 
         for (Class< ? extends Annotation > annotation: annotations) {

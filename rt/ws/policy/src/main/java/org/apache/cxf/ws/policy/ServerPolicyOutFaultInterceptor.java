@@ -84,8 +84,7 @@ public class ServerPolicyOutFaultInterceptor extends AbstractPolicyInterceptor {
 
         Exception ex = exchange.get(Exception.class);
 
-        List<Interceptor<? extends Message>> faultInterceptors =
-            new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> faultInterceptors = new ArrayList<>();
         Collection<Assertion> assertions = new ArrayList<>();
 
         // 1. Check overridden policy

@@ -31,11 +31,11 @@ public class SimpleMethodDispatcher
     implements org.apache.cxf.service.invoker.MethodDispatcher  {
 
     private Map<Method, Map<BindingInfo, BindingOperationInfo>> infoMap =
-        new ConcurrentHashMap<Method, Map<BindingInfo, BindingOperationInfo>>(16, 0.75f, 2);
+        new ConcurrentHashMap<>(16, 0.75f, 2);
     private Map<OperationInfo, Method> opToMethod =
-        new ConcurrentHashMap<OperationInfo, Method>(16, 0.75f, 2);
+        new ConcurrentHashMap<>(16, 0.75f, 2);
     private Map<Method, OperationInfo> methodToOp =
-        new ConcurrentHashMap<Method, OperationInfo>(16, 0.75f, 2);
+        new ConcurrentHashMap<>(16, 0.75f, 2);
 
     public SimpleMethodDispatcher() {
         //complete

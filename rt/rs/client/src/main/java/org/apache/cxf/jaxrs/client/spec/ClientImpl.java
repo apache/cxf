@@ -268,7 +268,7 @@ public class ClientImpl implements Client {
                 ClientProviderFactory.getInstance(WebClient.getConfig(targetClient).getEndpoint());
             List<Object> providers = new LinkedList<>();
             List<org.apache.cxf.feature.Feature> cxfFeatures =
-                new LinkedList<org.apache.cxf.feature.Feature>();
+                new LinkedList<>();
             Configuration cfg = configImpl.getConfiguration();
             for (Object p : cfg.getInstances()) {
                 if (p instanceof org.apache.cxf.feature.Feature) {

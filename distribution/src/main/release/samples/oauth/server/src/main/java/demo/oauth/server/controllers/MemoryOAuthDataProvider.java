@@ -51,7 +51,7 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
     public static final String CLIENT_SECRET = "secret";
 
     private static final ConcurrentHashMap<String, OAuthPermission> AVAILABLE_PERMISSIONS =
-        new ConcurrentHashMap<String, OAuthPermission>();
+        new ConcurrentHashMap<>();
 
     static {
         AVAILABLE_PERMISSIONS

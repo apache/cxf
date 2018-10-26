@@ -40,7 +40,7 @@ public class ConfigurationImpl implements Configuration {
     private Map<String, Object> props = new HashMap<>();
     private RuntimeType runtimeType;
     private Map<Object, Map<Class<?>, Integer>> providers =
-        new LinkedHashMap<Object, Map<Class<?>, Integer>>();
+        new LinkedHashMap<>();
     private Map<Feature, Boolean> features = new LinkedHashMap<>();
 
     public ConfigurationImpl(RuntimeType rt) {

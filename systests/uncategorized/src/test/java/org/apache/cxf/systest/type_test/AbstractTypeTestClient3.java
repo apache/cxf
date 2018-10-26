@@ -1330,9 +1330,9 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         yOriginal.getValue().add(new BigInteger("3200"));
 
         Holder<MultipleOccursSequenceInSequence> y =
-            new Holder<MultipleOccursSequenceInSequence>(yOriginal);
+            new Holder<>(yOriginal);
         Holder<MultipleOccursSequenceInSequence> z =
-            new Holder<MultipleOccursSequenceInSequence>();
+            new Holder<>();
 
         MultipleOccursSequenceInSequence ret;
         if (testDocLiteral) {

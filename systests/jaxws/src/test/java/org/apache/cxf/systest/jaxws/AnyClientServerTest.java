@@ -115,7 +115,7 @@ public final class AnyClientServerTest extends AbstractBusClientServerTestBase {
         updateAddressPort(port, PORT);
 
         List<org.apache.hello_world_soap_http.any_types.SayHi1.Port> list =
-                new ArrayList<org.apache.hello_world_soap_http.any_types.SayHi1.Port>();
+                new ArrayList<>();
         org.apache.hello_world_soap_http.any_types.SayHi1.Port port1 =
             new org.apache.hello_world_soap_http.any_types.SayHi1.Port();
         port1.setRequestType("hello");

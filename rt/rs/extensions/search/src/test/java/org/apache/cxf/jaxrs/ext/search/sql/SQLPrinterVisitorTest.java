@@ -144,7 +144,7 @@ public class SQLPrinterVisitorTest extends Assert {
     public void testSQL5WithColumns() throws SearchParseException {
         SearchCondition<Condition> filter = parser.parse("name==test");
         SQLPrinterVisitor<Condition> visitor =
-            new SQLPrinterVisitor<Condition>("table", "NAMES");
+            new SQLPrinterVisitor<>("table", "NAMES");
         filter.accept(visitor);
         String sql = visitor.getQuery();
         assertTrue("SELECT NAMES FROM table WHERE name = 'test'".equals(sql));

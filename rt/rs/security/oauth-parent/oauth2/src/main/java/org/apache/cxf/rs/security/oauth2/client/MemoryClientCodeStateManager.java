@@ -33,7 +33,7 @@ import org.apache.cxf.rt.security.crypto.MessageDigestUtils;
 
 public class MemoryClientCodeStateManager implements ClientCodeStateManager {
     private Map<String, MultivaluedMap<String, String>> map =
-            new ConcurrentHashMap<String, MultivaluedMap<String, String>>();
+            new ConcurrentHashMap<>();
 
     private boolean generateNonce;
 

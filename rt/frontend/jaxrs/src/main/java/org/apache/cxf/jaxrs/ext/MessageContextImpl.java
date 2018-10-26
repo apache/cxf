@@ -201,7 +201,7 @@ public class MessageContextImpl implements MessageContext {
     private void convertToAttachments(Object value) {
         List<?> handlers = (List<?>)value;
         List<org.apache.cxf.message.Attachment> atts =
-            new ArrayList<org.apache.cxf.message.Attachment>();
+            new ArrayList<>();
 
         for (int i = 1; i < handlers.size(); i++) {
             Attachment handler = (Attachment)handlers.get(i);

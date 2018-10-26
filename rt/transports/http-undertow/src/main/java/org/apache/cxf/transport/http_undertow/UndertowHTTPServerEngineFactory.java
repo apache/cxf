@@ -59,7 +59,7 @@ public class UndertowHTTPServerEngineFactory {
     // Still use the static map to hold the port information
     // in the same JVM
     private static ConcurrentHashMap<Integer, UndertowHTTPServerEngine> portMap =
-        new ConcurrentHashMap<Integer, UndertowHTTPServerEngine>();
+        new ConcurrentHashMap<>();
 
 
 
@@ -69,7 +69,7 @@ public class UndertowHTTPServerEngineFactory {
      * to new Engines when bound to the reference id.
      */
     private Map<String, ThreadingParameters> threadingParametersMap =
-        new TreeMap<String, ThreadingParameters>();
+        new TreeMap<>();
 
     private ThreadingParameters fallbackThreadingParameters;
 
@@ -78,7 +78,7 @@ public class UndertowHTTPServerEngineFactory {
      * configure a subsequently created UndertowHTTPServerEngine.
      */
     private Map<String, TLSServerParameters> tlsParametersMap =
-        new TreeMap<String, TLSServerParameters>();
+        new TreeMap<>();
 
 
     /**

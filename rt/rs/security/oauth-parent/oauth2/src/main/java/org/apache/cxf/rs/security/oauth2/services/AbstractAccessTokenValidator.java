@@ -57,7 +57,7 @@ public abstract class AbstractAccessTokenValidator {
 
     private int maxValidationDataCacheSize;
     private ConcurrentHashMap<String, AccessTokenValidation> accessTokenValidations =
-        new ConcurrentHashMap<String, AccessTokenValidation>();
+        new ConcurrentHashMap<>();
     private JoseJwtConsumer jwtTokenConsumer;
     private boolean persistJwtEncoding = true;
 

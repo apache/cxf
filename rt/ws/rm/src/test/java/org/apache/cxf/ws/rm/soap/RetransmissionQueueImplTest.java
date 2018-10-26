@@ -226,7 +226,7 @@ public class RetransmissionQueueImplTest extends Assert {
                                           messageNumbers,
                                           new boolean[] {true, false});
         List<RetransmissionQueueImpl.ResendCandidate> sequenceList =
-            new ArrayList<RetransmissionQueueImpl.ResendCandidate>();
+            new ArrayList<>();
         queue.getUnacknowledged().put("sequence1", sequenceList);
         SoapMessage message1 = setUpMessage("sequence1", messageNumbers[0]);
         setupMessagePolicies(message1);
@@ -256,7 +256,7 @@ public class RetransmissionQueueImplTest extends Assert {
                                            messageNumbers,
                                            new boolean[] {false, false});
         List<RetransmissionQueueImpl.ResendCandidate> sequenceList =
-            new ArrayList<RetransmissionQueueImpl.ResendCandidate>();
+            new ArrayList<>();
         queue.getUnacknowledged().put("sequence1", sequenceList);
         SoapMessage message1 = setUpMessage("sequence1", messageNumbers[0]);
         setupMessagePolicies(message1);
@@ -283,7 +283,7 @@ public class RetransmissionQueueImplTest extends Assert {
                                           messageNumbers,
                                           new boolean[] {true, true});
         List<RetransmissionQueueImpl.ResendCandidate> sequenceList =
-            new ArrayList<RetransmissionQueueImpl.ResendCandidate>();
+            new ArrayList<>();
         queue.getUnacknowledged().put("sequence1", sequenceList);
         SoapMessage message1 = setUpMessage("sequence1", messageNumbers[0]);
         setupMessagePolicies(message1);
@@ -320,7 +320,7 @@ public class RetransmissionQueueImplTest extends Assert {
                                           messageNumbers,
                                           null);
         List<RetransmissionQueueImpl.ResendCandidate> sequenceList =
-            new ArrayList<RetransmissionQueueImpl.ResendCandidate>();
+            new ArrayList<>();
 
         queue.getUnacknowledged().put("sequence1", sequenceList);
         SoapMessage message1 = setUpMessage("sequence1", messageNumbers[0], false);

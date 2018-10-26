@@ -62,7 +62,7 @@ public class PolicyDataEngineImplTest extends Assert {
 
     public AssertionInfo getTestPolicyAssertionInfo(TestPolicy policy) {
         JaxbAssertion<TestPolicy> assertion =
-            new JaxbAssertion<TestPolicy>(TEST_POLICY_NAME, false);
+            new JaxbAssertion<>(TEST_POLICY_NAME, false);
         assertion.setData(policy);
         return new AssertionInfo(assertion);
     }

@@ -213,7 +213,7 @@ public class HttpHeadersImplTest extends Assert {
         Message m = new MessageImpl();
         // this is what happens at runtime and is tested in the system tests
         Map<String, List<String>> headers =
-            new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+            new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         headers.put("content-type", Collections.singletonList("text/plain"));
         m.put(Message.PROTOCOL_HEADERS, headers);
         HttpHeaders h = new HttpHeadersImpl(m);
@@ -226,7 +226,7 @@ public class HttpHeadersImplTest extends Assert {
         Message m = new MessageImpl();
         // this is what happens at runtime and is tested in the system tests
         Map<String, List<String>> headers =
-            new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+            new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         headers.put("A", Collections.<String>emptyList());
         m.put(Message.PROTOCOL_HEADERS, headers);
         HttpHeaders h = new HttpHeadersImpl(m);

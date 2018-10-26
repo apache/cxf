@@ -31,7 +31,7 @@ import org.apache.cxf.service.model.OperationInfo;
  */
 public class DefaultSchemaValidationTypeProvider implements SchemaValidationTypeProvider {
     private final Map<String, SchemaValidationType> operationMap =
-        new HashMap<String, SchemaValidationType>();
+        new HashMap<>();
 
     public DefaultSchemaValidationTypeProvider(Map<String, SchemaValidationType> operationMap) {
         this.operationMap.putAll(operationMap);

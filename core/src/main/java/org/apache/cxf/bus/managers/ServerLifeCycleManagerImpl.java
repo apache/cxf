@@ -35,7 +35,7 @@ import org.apache.cxf.extension.BusExtension;
 public class ServerLifeCycleManagerImpl implements ServerLifeCycleManager, BusExtension {
 
     private CopyOnWriteArrayList<ServerLifeCycleListener> listeners =
-            new CopyOnWriteArrayList<ServerLifeCycleListener>();
+            new CopyOnWriteArrayList<>();
 
     public ServerLifeCycleManagerImpl() {
 

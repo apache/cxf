@@ -96,7 +96,7 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
     private Map<String, Templates> inMediaTemplates;
     private Map<String, Templates> outMediaTemplates;
     private ConcurrentHashMap<String, Templates> annotationTemplates =
-        new ConcurrentHashMap<String, Templates>();
+        new ConcurrentHashMap<>();
 
     private List<String> inClassesToHandle;
     private List<String> outClassesToHandle;

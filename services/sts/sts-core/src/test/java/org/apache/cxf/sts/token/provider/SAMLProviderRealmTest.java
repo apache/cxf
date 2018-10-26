@@ -117,7 +117,7 @@ public class SAMLProviderRealmTest extends org.junit.Assert {
 
         // Create Realms
         Map<String, org.apache.cxf.sts.token.realm.SAMLRealm> samlRealms =
-            new HashMap<String, org.apache.cxf.sts.token.realm.SAMLRealm>();
+            new HashMap<>();
         org.apache.cxf.sts.token.realm.SAMLRealm samlRealm = new org.apache.cxf.sts.token.realm.SAMLRealm();
         samlRealm.setIssuer("A-Issuer");
         samlRealms.put("A", samlRealm);

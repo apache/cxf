@@ -76,9 +76,9 @@ public class RedeliveryQueueImpl implements RedeliveryQueue {
     private static final Logger LOG = LogUtils.getL7dLogger(RedeliveryQueueImpl.class);
 
     private Map<String, List<RedeliverCandidate>> candidates =
-        new HashMap<String, List<RedeliverCandidate>>();
+        new HashMap<>();
     private Map<String, List<RedeliverCandidate>> suspendedCandidates =
-        new HashMap<String, List<RedeliverCandidate>>();
+        new HashMap<>();
 
     private RMManager manager;
 

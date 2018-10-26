@@ -98,7 +98,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
     }
 
     private ConcurrentHashMap<String, String> namespaceMap =
-        new ConcurrentHashMap<String, String>();
+        new ConcurrentHashMap<>();
     private boolean serializeAsArray;
     private List<String> arrayKeys;
     private List<String> primitiveArrayKeys;

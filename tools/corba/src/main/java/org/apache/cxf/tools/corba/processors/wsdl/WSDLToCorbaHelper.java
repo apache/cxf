@@ -96,7 +96,7 @@ public class WSDLToCorbaHelper {
     protected static final String[] DISCRIMINATORTYPES
         = new String[] {"long", "short", "boolean", "char"};
     protected static final Set<String> SUPPORTEDDISTYPES =
-        new TreeSet<String>(Arrays.asList(DISCRIMINATORTYPES));
+        new TreeSet<>(Arrays.asList(DISCRIMINATORTYPES));
 
     protected static final CorbaPrimitiveMap CORBAPRIMITIVEMAP = new CorbaPrimitiveMap();
 

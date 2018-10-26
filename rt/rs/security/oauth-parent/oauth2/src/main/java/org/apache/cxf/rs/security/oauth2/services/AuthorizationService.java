@@ -42,7 +42,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 public class AuthorizationService {
 
     private Map<String, RedirectionBasedGrantService> servicesMap =
-        new HashMap<String, RedirectionBasedGrantService>();
+        new HashMap<>();
 
     @Context
     public void setMessageContext(MessageContext context) {
