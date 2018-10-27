@@ -206,8 +206,7 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
     @Override
     public Map<Class<?>, Collection<Class<?>>> register(Object callback, Object... callbacks)
         throws NullPointerException {
-        Map<Class<?>, Collection<Class<?>>> map =
-            new HashMap<Class<?>, Collection<Class<?>>>();
+        Map<Class<?>, Collection<Class<?>>> map = new HashMap<>();
 
         Object[] allCallbacks = new Object[1 + callbacks.length];
         allCallbacks[0] = callback;

@@ -42,7 +42,7 @@ public class DestinationRegistryImpl implements DestinationRegistry, ServletConf
     private ConcurrentMap<String, AbstractHTTPDestination> destinations
         = new ConcurrentHashMap<>();
     private Map<String, AbstractHTTPDestination> decodedDestinations =
-        new ConcurrentHashMap<String, AbstractHTTPDestination>();
+        new ConcurrentHashMap<>();
 
     public DestinationRegistryImpl() {
     }

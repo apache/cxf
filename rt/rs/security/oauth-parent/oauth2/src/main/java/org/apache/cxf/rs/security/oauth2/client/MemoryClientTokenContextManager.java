@@ -25,7 +25,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
 public class MemoryClientTokenContextManager implements ClientTokenContextManager {
     private ConcurrentHashMap<String, ClientTokenContext> map =
-            new ConcurrentHashMap<String, ClientTokenContext>();
+            new ConcurrentHashMap<>();
 
     @Override
     public void setClientTokenContext(MessageContext mc, ClientTokenContext request) {

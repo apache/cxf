@@ -43,7 +43,7 @@ import org.apache.cxf.rs.security.oauth.provider.OAuthServiceException;
 public class MemoryOAuthDataProvider implements OAuthDataProvider {
 
     private static final ConcurrentHashMap<String, OAuthPermission> AVAILABLE_PERMISSIONS =
-        new ConcurrentHashMap<String, OAuthPermission>();
+        new ConcurrentHashMap<>();
 
     static {
         AVAILABLE_PERMISSIONS

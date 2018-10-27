@@ -34,7 +34,7 @@ import org.apache.ws.security.WSPasswordCallback;
 public class KeystorePasswordCallback implements CallbackHandler {
 
     private Map<String, String> passwords =
-        new HashMap<String, String>();
+        new HashMap<>();
 
     public KeystorePasswordCallback() {
         passwords.put("myclientkey", "ckpass");

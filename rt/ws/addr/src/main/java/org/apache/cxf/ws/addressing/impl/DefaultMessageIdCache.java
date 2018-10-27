@@ -35,7 +35,7 @@ public class DefaultMessageIdCache implements MessageIdCache {
      * The set of message IDs.
      */
     private final Map<String, Boolean> messageIdSet =
-        new ConcurrentHashMap<String, Boolean>();
+        new ConcurrentHashMap<>();
 
     public boolean checkUniquenessAndCacheId(String messageId) {
         return this.messageIdSet.put(messageId, Boolean.TRUE) == null;

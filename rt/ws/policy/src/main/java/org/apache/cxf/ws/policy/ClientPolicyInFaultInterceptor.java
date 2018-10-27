@@ -75,8 +75,7 @@ public class ClientPolicyInFaultInterceptor extends AbstractPolicyInterceptor {
         Conduit conduit = exchange.getConduit(msg);
         LOG.fine("conduit: " + conduit);
 
-        List<Interceptor<? extends Message>> faultInterceptors =
-            new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> faultInterceptors = new ArrayList<>();
         Collection<Assertion> assertions = new ArrayList<>();
 
         // 1. Check overridden policy

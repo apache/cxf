@@ -33,7 +33,7 @@ import org.apache.wss4j.common.ext.WSPasswordCallback;
 public class CommonPasswordCallback implements CallbackHandler {
 
     private Map<String, String> passwords =
-        new HashMap<String, String>();
+        new HashMap<>();
 
     public CommonPasswordCallback() {
         passwords.put("Alice", "ecilA");

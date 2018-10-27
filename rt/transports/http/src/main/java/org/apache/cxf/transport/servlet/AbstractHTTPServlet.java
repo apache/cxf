@@ -107,7 +107,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
     private String dispatcherServletName;
     private Map<String, String> redirectAttributes;
     private Map<String, String> staticContentTypes =
-        new HashMap<String, String>(DEFAULT_STATIC_CONTENT_TYPES);
+        new HashMap<>(DEFAULT_STATIC_CONTENT_TYPES);
     private boolean redirectQueryCheck;
     private boolean useXForwardedHeaders;
 

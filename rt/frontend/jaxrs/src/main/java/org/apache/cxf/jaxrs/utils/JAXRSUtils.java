@@ -329,7 +329,7 @@ public final class JAXRSUtils {
 
         if (!candidateList.isEmpty()) {
             Map<ClassResourceInfo, MultivaluedMap<String, String>> cris =
-                new LinkedHashMap<ClassResourceInfo, MultivaluedMap<String, String>>(candidateList.size());
+                new LinkedHashMap<>(candidateList.size());
             ClassResourceInfo firstCri = null;
             for (Map.Entry<ClassResourceInfo, MultivaluedMap<String, String>> entry : candidateList.entrySet()) {
                 ClassResourceInfo cri = entry.getKey();
@@ -1249,7 +1249,7 @@ public final class JAXRSUtils {
                                                                     boolean decode,
                                                                     boolean decodePlus) {
         MultivaluedMap<String, String> map =
-            new MetadataMap<String, String>(new LinkedHashMap<String, List<String>>());
+            new MetadataMap<>(new LinkedHashMap<String, List<String>>());
 
         getStructuredParams(map, query, sep, decode, decodePlus);
 

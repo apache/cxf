@@ -110,9 +110,9 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
     private static final Logger LOG = LogUtils.getL7dLogger(RetransmissionQueueImpl.class);
 
     private Map<String, List<ResendCandidate>> candidates =
-        new HashMap<String, List<ResendCandidate>>();
+        new HashMap<>();
     private Map<String, List<ResendCandidate>> suspendedCandidates =
-        new HashMap<String, List<ResendCandidate>>();
+        new HashMap<>();
     private Resender resender;
     private RMManager manager;
 

@@ -1451,7 +1451,7 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         yOrig.setSg03AbstractBaseElementA(elementB);
 
         Holder<StructWithSubstitutionGroupAbstract> y =
-            new Holder<StructWithSubstitutionGroupAbstract>(yOrig);
+            new Holder<>(yOrig);
         Holder<StructWithSubstitutionGroupAbstract> z = new Holder<>();
         StructWithSubstitutionGroupAbstract ret;
         if (testDocLiteral) {
@@ -1589,9 +1589,9 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         yOrig.setSg02BaseElementA(y2);
 
         Holder<StructWithMultipleSubstitutionGroups> y =
-            new Holder<StructWithMultipleSubstitutionGroups>(yOrig);
+            new Holder<>(yOrig);
         Holder<StructWithMultipleSubstitutionGroups> z =
-            new Holder<StructWithMultipleSubstitutionGroups>();
+            new Holder<>();
         StructWithMultipleSubstitutionGroups ret;
         if (testDocLiteral) {
             ret = docClient.testStructWithMultipleSubstitutionGroups(x, y, z);
@@ -1647,9 +1647,9 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         yOrig.setSg03AbstractBaseElementA(elementB);
 
         Holder<ChoiceWithSubstitutionGroupAbstract> y =
-            new Holder<ChoiceWithSubstitutionGroupAbstract>(yOrig);
+            new Holder<>(yOrig);
         Holder<ChoiceWithSubstitutionGroupAbstract> z =
-            new Holder<ChoiceWithSubstitutionGroupAbstract>();
+            new Holder<>();
         ChoiceWithSubstitutionGroupAbstract ret;
         if (testDocLiteral) {
             ret = docClient.testChoiceWithSubstitutionGroupAbstract(x, y, z);
@@ -1809,9 +1809,9 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         yOrig.setSg01BaseElementA(elementB);
 
         Holder<ChoiceWithSubstitutionGroup> y =
-            new Holder<ChoiceWithSubstitutionGroup>(yOrig);
+            new Holder<>(yOrig);
         Holder<ChoiceWithSubstitutionGroup> z =
-            new Holder<ChoiceWithSubstitutionGroup>();
+            new Holder<>();
         assertTrue("yoo: ", equals(y.value, y.value));
         ChoiceWithSubstitutionGroup ret;
         if (testDocLiteral) {

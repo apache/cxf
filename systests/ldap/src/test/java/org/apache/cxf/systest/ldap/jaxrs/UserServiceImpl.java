@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
         }
 
         LdapQueryVisitor<User> visitor =
-            new LdapQueryVisitor<User>(Collections.singletonMap("name", "cn"));
+            new LdapQueryVisitor<>(Collections.singletonMap("name", "cn"));
         visitor.setEncodeQueryValues(encodeQueryValues);
         sc.accept(visitor.visitor());
         String parsedQuery = visitor.getQuery();

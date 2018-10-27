@@ -1216,7 +1216,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
     @Test
     public void testMustUnderstandSoapFaultOneWay() {
         TestMustUnderstandHandler<SOAPMessageContext> handler =
-            new TestMustUnderstandHandler<SOAPMessageContext>();
+            new TestMustUnderstandHandler<>();
         addHandlersToChain((BindingProvider)handlerTest, handler);
         try {
             handlerTest.pingOneWay();

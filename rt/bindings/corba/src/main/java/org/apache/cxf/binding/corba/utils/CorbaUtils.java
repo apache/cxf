@@ -89,7 +89,7 @@ public final class CorbaUtils {
         }
     }
     private static final ThreadLocal<LastExport> LAST_EXPORT_CACHE =
-        new ThreadLocal<LastExport>();
+        new ThreadLocal<>();
 
     private CorbaUtils() {
         //utility class

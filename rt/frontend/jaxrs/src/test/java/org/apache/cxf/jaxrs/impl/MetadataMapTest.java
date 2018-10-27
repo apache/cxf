@@ -294,7 +294,7 @@ public class MetadataMapTest extends Assert {
         list.add("bar");
         values.put("baz", list);
         MultivaluedMap<String, String> map =
-            new MetadataMap<String, String>(values, false, true, true);
+            new MetadataMap<>(values, false, true, true);
         map.add("baz", "baz");
     }
 
@@ -305,7 +305,7 @@ public class MetadataMapTest extends Assert {
         list.add("bar");
         values.put("baz", list);
         MultivaluedMap<String, String> map =
-            new MetadataMap<String, String>(values, false, true, true);
+            new MetadataMap<>(values, false, true, true);
         map.addFirst("baz", "bar2");
     }
 
@@ -313,7 +313,7 @@ public class MetadataMapTest extends Assert {
     public void testReadOnlyPutSingle() {
         Map<String, List<String>> values = new HashMap<>();
         MultivaluedMap<String, String> map =
-            new MetadataMap<String, String>(values, false, true, true);
+            new MetadataMap<>(values, false, true, true);
         map.putSingle("baz", "baz");
     }
 

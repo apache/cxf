@@ -107,7 +107,7 @@ public class UndertowHTTPServerEngine implements ServerEngine {
     private boolean configFinalized;
 
     private ConcurrentMap<String, UndertowHTTPHandler> registedPaths =
-        new CopyOnWriteMap<String, UndertowHTTPHandler>();
+        new CopyOnWriteMap<>();
 
     private boolean continuationsEnabled = true;
 

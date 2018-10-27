@@ -295,8 +295,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
             throw new ServletException("At least one resource class should be specified");
         }
         String[] classNames = StringUtils.split(serviceBeans, splitChar);
-        Map<Class<?>, Map<String, List<String>>> map =
-            new HashMap<Class<?>, Map<String, List<String>>>();
+        Map<Class<?>, Map<String, List<String>>> map = new HashMap<>();
         for (String cName : classNames) {
             Map<String, List<String>> props = new HashMap<>();
             String theName = getClassNameAndProperties(cName, props);

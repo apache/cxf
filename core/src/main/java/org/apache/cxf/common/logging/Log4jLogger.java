@@ -43,7 +43,7 @@ import org.apache.log4j.spi.LoggingEvent;
  */
 public class Log4jLogger extends AbstractDelegatingLogger {
     private static final Map<Level, org.apache.log4j.Level> TO_LOG4J =
-                                                new HashMap<Level, org.apache.log4j.Level>();
+                                                new HashMap<>();
     private static final org.apache.log4j.Level TRACE;
 
 

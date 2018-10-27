@@ -34,7 +34,7 @@ import org.apache.cxf.rs.security.jose.common.JoseHeaders;
 public final class JoseJaxrsUtils {
     private static final String HTTP_PREFIX = "http.";
     private static final Set<String> DEFAULT_PROTECTED_HTTP_HEADERS = 
-        new HashSet<String>(Arrays.asList(HttpHeaders.CONTENT_TYPE, HttpHeaders.ACCEPT));
+        new HashSet<>(Arrays.asList(HttpHeaders.CONTENT_TYPE, HttpHeaders.ACCEPT));
     
     private JoseJaxrsUtils() {
 

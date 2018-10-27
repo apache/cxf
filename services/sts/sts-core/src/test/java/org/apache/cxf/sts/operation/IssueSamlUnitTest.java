@@ -556,7 +556,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         // Now add UseKey
         UseKeyType useKey = createUseKey(crypto, "myclientkey");
         JAXBElement<UseKeyType> useKeyType =
-            new JAXBElement<UseKeyType>(QNameConstants.USE_KEY, UseKeyType.class, useKey);
+            new JAXBElement<>(QNameConstants.USE_KEY, UseKeyType.class, useKey);
         request.getAny().add(useKeyType);
 
         RequestSecurityTokenResponseCollectionType response =
@@ -653,7 +653,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         EntropyType entropyType = new EntropyType();
         entropyType.getAny().add(binarySecretTypeJaxb);
         JAXBElement<EntropyType> entropyJaxbType =
-            new JAXBElement<EntropyType>(QNameConstants.ENTROPY, EntropyType.class, entropyType);
+            new JAXBElement<>(QNameConstants.ENTROPY, EntropyType.class, entropyType);
         request.getAny().add(entropyJaxbType);
 
         RequestSecurityTokenResponseCollectionType response =
@@ -746,7 +746,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         EntropyType entropyType = new EntropyType();
         entropyType.getAny().add(binarySecretTypeJaxb);
         JAXBElement<EntropyType> entropyJaxbType =
-            new JAXBElement<EntropyType>(QNameConstants.ENTROPY, EntropyType.class, entropyType);
+            new JAXBElement<>(QNameConstants.ENTROPY, EntropyType.class, entropyType);
         request.getAny().add(entropyJaxbType);
 
         RequestSecurityTokenResponseCollectionType response =
@@ -840,7 +840,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         EntropyType entropyType = new EntropyType();
         entropyType.getAny().add(encryptedKeyElement);
         JAXBElement<EntropyType> entropyJaxbType =
-            new JAXBElement<EntropyType>(QNameConstants.ENTROPY, EntropyType.class, entropyType);
+            new JAXBElement<>(QNameConstants.ENTROPY, EntropyType.class, entropyType);
         request.getAny().add(entropyJaxbType);
 
         RequestSecurityTokenResponseCollectionType response =
@@ -1180,7 +1180,7 @@ public class IssueSamlUnitTest extends org.junit.Assert {
 
         UseKeyType useKey = createUseKey(crypto, "myclientkey");
         JAXBElement<UseKeyType> useKeyType =
-            new JAXBElement<UseKeyType>(QNameConstants.USE_KEY, UseKeyType.class, useKey);
+            new JAXBElement<>(QNameConstants.USE_KEY, UseKeyType.class, useKey);
         request.getAny().add(useKeyType);
 
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));

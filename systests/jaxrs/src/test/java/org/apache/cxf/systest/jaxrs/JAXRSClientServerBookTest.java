@@ -1141,8 +1141,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                                                     BookStore.class);
         Book b1 = new Book("CXF in Action", 123L);
         Book b2 = new Book("CXF Rocks", 124L);
-        List<JAXBElement<Book>> books =
-            new ArrayList<JAXBElement<Book>>();
+        List<JAXBElement<Book>> books = new ArrayList<>();
         books.add(new JAXBElement<Book>(new QName("bookRootElement"),
             Book.class, b1));
         books.add(new JAXBElement<Book>(new QName("bookRootElement"),
@@ -1190,8 +1189,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                                                     Collections.singletonList(provider));
         BookNoXmlRootElement b1 = new BookNoXmlRootElement("CXF in Action", 123L);
         BookNoXmlRootElement b2 = new BookNoXmlRootElement("CXF Rocks", 124L);
-        List<JAXBElement<BookNoXmlRootElement>> books =
-            new ArrayList<JAXBElement<BookNoXmlRootElement>>();
+        List<JAXBElement<BookNoXmlRootElement>> books = new ArrayList<>();
         books.add(new JAXBElement<BookNoXmlRootElement>(new QName("bookNoXmlRootElement"),
             BookNoXmlRootElement.class, b1));
         books.add(new JAXBElement<BookNoXmlRootElement>(new QName("bookNoXmlRootElement"),

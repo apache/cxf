@@ -60,7 +60,7 @@ public class JettyHTTPServerEngineFactory {
     // Still use the static map to hold the port information
     // in the same JVM
     private static ConcurrentHashMap<Integer, JettyHTTPServerEngine> portMap =
-        new ConcurrentHashMap<Integer, JettyHTTPServerEngine>();
+        new ConcurrentHashMap<>();
 
 
 
@@ -70,7 +70,7 @@ public class JettyHTTPServerEngineFactory {
      * to new Engines when bound to the reference id.
      */
     private Map<String, ThreadingParameters> threadingParametersMap =
-        new TreeMap<String, ThreadingParameters>();
+        new TreeMap<>();
 
     private ThreadingParameters fallbackThreadingParameters;
 
@@ -79,7 +79,7 @@ public class JettyHTTPServerEngineFactory {
      * configure a subsequently created JettyHTTPServerEngine.
      */
     private Map<String, TLSServerParameters> tlsParametersMap =
-        new TreeMap<String, TLSServerParameters>();
+        new TreeMap<>();
 
 
     /**

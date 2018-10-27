@@ -818,8 +818,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
 
         Book b1 = new Book("CXF in Action", 123L);
         Book b2 = new Book("CXF Rocks", 124L);
-        List<JAXBElement<Book>> books =
-            new ArrayList<JAXBElement<Book>>();
+        List<JAXBElement<Book>> books = new ArrayList<>();
         books.add(new JAXBElement<Book>(new QName("bookRootElement"),
             Book.class, b1));
         books.add(new JAXBElement<Book>(new QName("bookRootElement"),

@@ -51,7 +51,7 @@ public class Attachment implements Transferable {
 
     private DataHandler handler;
     private MultivaluedMap<String, String> headers =
-        new MetadataMap<String, String>(false, true);
+        new MetadataMap<>(false, true);
     private Object object;
     private Providers providers;
 

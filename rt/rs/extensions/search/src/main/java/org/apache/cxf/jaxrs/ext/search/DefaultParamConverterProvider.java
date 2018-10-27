@@ -36,7 +36,7 @@ import org.apache.lucene.document.DateTools.Resolution;
  */
 public class DefaultParamConverterProvider implements ParamConverterProvider {
     private final Map< Class< ? >, ParamConverter< ? > > converters =
-            new HashMap< Class< ? >, ParamConverter< ? > >();
+            new HashMap<>();
 
     /**
      * Date type converter.

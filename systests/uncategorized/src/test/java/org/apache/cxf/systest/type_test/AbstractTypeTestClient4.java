@@ -757,7 +757,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
         yOriginal.setVarInteger(200);
 
         Holder<StructWithNillableStruct> y =
-            new Holder<StructWithNillableStruct>(yOriginal);
+            new Holder<>(yOriginal);
         Holder<StructWithNillableStruct> z = new Holder<>();
         StructWithNillableStruct ret;
         if (testDocLiteral) {

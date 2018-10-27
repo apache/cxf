@@ -83,7 +83,7 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
         new QName("http://apache.org/hello_world_soap_http", "SOAPServiceAddressing");
 
     private static Map<Object, Map<String, String>> messageIDs =
-        new HashMap<Object, Map<String, String>>();
+        new HashMap<>();
     protected Greeter greeter;
     private String verified;
 
@@ -140,7 +140,7 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
         ReferenceParametersType params =
             ContextUtils.WSA_OBJECT_FACTORY.createReferenceParametersType();
         JAXBElement<String> param =
-             new JAXBElement<String>(CUSTOMER_NAME, String.class, CUSTOMER_KEY);
+             new JAXBElement<>(CUSTOMER_NAME, String.class, CUSTOMER_KEY);
         params.getAny().add(param);
         target.setReferenceParameters(params);
         greeter = createGreeter(target);

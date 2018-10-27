@@ -84,7 +84,7 @@ public class JAXRSCdiResourceExtension implements Extension {
     private final List< Bean< ? > > providerBeans = new ArrayList< Bean< ? > >();
     private final List< Bean< ? extends Feature > > featureBeans = new ArrayList< Bean< ? extends Feature > >();
     private final List< CreationalContext< ? > > disposableCreationalContexts =
-        new ArrayList< CreationalContext< ? > >();
+        new ArrayList<>();
     private final List< Lifecycle > disposableLifecycles =
         new ArrayList<>();
     private final Set< Type > contextTypes = new LinkedHashSet<>();

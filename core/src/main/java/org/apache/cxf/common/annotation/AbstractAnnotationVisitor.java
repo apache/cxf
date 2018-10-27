@@ -31,7 +31,7 @@ public abstract class AbstractAnnotationVisitor implements AnnotationVisitor {
 
 
     private final List<Class<? extends Annotation>> targetAnnotations =
-                                 new ArrayList<Class<? extends Annotation>>();
+                                 new ArrayList<>();
 
 
     protected AbstractAnnotationVisitor(Class<? extends Annotation> ann) {

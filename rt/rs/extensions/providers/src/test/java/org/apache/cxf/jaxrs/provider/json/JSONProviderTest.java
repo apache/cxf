@@ -1485,7 +1485,7 @@ public class JSONProviderTest extends Assert {
     @Test
     public void testWriteWithXmlRootElementAndPackageInfo() throws Exception {
         JSONProvider<org.apache.cxf.jaxrs.resources.jaxb.Book2> provider =
-            new JSONProvider<org.apache.cxf.jaxrs.resources.jaxb.Book2>();
+            new JSONProvider<>();
         org.apache.cxf.jaxrs.resources.jaxb.Book2 book =
             new org.apache.cxf.jaxrs.resources.jaxb.Book2(333);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();

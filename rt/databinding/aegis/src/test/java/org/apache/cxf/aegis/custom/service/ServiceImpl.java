@@ -58,7 +58,7 @@ public class ServiceImpl implements Service {
         }
 
         Map<NoDefaultConstructorBeanKey, Collection<NoDefaultConstructorBean>> map =
-                new HashMap<NoDefaultConstructorBeanKey, Collection<NoDefaultConstructorBean>>();
+                new HashMap<>();
 
         Collection<NoDefaultConstructorBean> collection = new ArrayList<>();
 
