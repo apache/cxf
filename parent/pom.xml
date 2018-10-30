@@ -48,7 +48,7 @@
         <!-- stuff related to ASM -->
         <cxf.asm.groupId>org.ow2.asm</cxf.asm.groupId>
         <cxf.asm.artifactId>asm</cxf.asm.artifactId>
-        <cxf.asm.version>6.2</cxf.asm.version>
+        <cxf.asm.version>6.2.1</cxf.asm.version>
         <cxf.osgi.asm.version>[3.0,7)</cxf.osgi.asm.version>
         <cxf.easymock.version>3.6</cxf.easymock.version>
         <!-- OSGi related properties -->
@@ -2877,11 +2877,8 @@
         <profile>
 	    <id>java9-plus</id>
 	    <properties>
-                <cxf.xjc-utils.version>3.2.3-SNAPSHOT</cxf.xjc-utils.version>
+                <cxf.xjc-utils.version>3.2.3</cxf.xjc-utils.version>
                 <cxf.jaxb.version>2.3.0</cxf.jaxb.version>
-                <cxf.asm.version>6.2</cxf.asm.version>
-                <cxf.easymock.version>3.6</cxf.easymock.version>
-                <cxf.karaf.version>4.2.2-SNAPSHOT</cxf.karaf.version>
                 <cxf.pax.exam.version>4.13.0-SNAPSHOT</cxf.pax.exam.version>
                 <cxf.server.launcher.vmargs>-ea --add-exports=java.naming/com.sun.jndi.ldap=ALL-UNNAMED --add-exports=java.base/java.io=ALL-UNNAMED --add-opens java.rmi/sun.rmi.transport=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED --add-opens java.base/java.security=ALL-UNNAMED --add-opens java.base/java.net=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.util.concurrent=ALL-UNNAMED --add-exports=java.base/sun.security.util=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xerces.internal.impl.xs=ALL-UNNAMED --add-exports=java.base/sun.reflect=ALL-UNNAMED --add-exports=java.base/sun.reflect.generics.reflectiveObjects=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xerces.internal.impl.xs.util=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xerces.internal.jaxp=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xerces.internal.dom=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xml.internal.resolver=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xml.internal.resolver.tools=ALL-UNNAMED</cxf.server.launcher.vmargs>
                 <cxf.surefire.fork.vmargs>-ea --add-exports=java.naming/com.sun.jndi.ldap=ALL-UNNAMED --add-exports=java.base/java.io=ALL-UNNAMED --add-opens java.rmi/sun.rmi.transport=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED --add-opens java.base/java.security=ALL-UNNAMED --add-opens java.base/java.net=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.util.concurrent=ALL-UNNAMED --add-exports=java.base/sun.security.util=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xerces.internal.impl.xs=ALL-UNNAMED --add-exports=java.base/sun.reflect=ALL-UNNAMED --add-exports=java.base/sun.reflect.generics.reflectiveObjects=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xerces.internal.impl.xs.util=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xerces.internal.jaxp=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xerces.internal.dom=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xml.internal.resolver=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xml.internal.resolver.tools=ALL-UNNAMED</cxf.surefire.fork.vmargs>
