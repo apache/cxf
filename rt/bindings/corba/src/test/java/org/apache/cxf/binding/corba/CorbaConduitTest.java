@@ -35,7 +35,6 @@ import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
 import org.apache.cxf.binding.corba.wsdl.OperationType;
 import org.apache.cxf.binding.corba.wsdl.RaisesType;
 import org.apache.cxf.binding.corba.wsdl.TypeMappingType;
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
@@ -207,7 +206,7 @@ public class CorbaConduitTest extends Assert {
         OperationType opType = control.createMock(OperationType.class);
         CorbaTypeMap typeMap = control.createMock(CorbaTypeMap.class);
 
-        List<RaisesType> exlist = CastUtils.cast(control.createMock(ArrayList.class));
+        List<RaisesType> exlist = control.createMock(ArrayList.class);
         opType.getRaises();
         EasyMock.expectLastCall().andReturn(exlist);
         int i = 0;
@@ -229,7 +228,7 @@ public class CorbaConduitTest extends Assert {
         EasyMock.expectLastCall().andReturn(exchange);
         ServiceInfo service = control.createMock(ServiceInfo.class);
         EasyMock.expect(exchange.get(ServiceInfo.class)).andReturn(service);
-        List<CorbaTypeMap> list = CastUtils.cast(control.createMock(List.class));
+        List<CorbaTypeMap> list = control.createMock(List.class);
         CorbaTypeMap typeMap = control.createMock(CorbaTypeMap.class);
         EasyMock.expect(service.getExtensors(CorbaTypeMap.class)).andReturn(list);
 
