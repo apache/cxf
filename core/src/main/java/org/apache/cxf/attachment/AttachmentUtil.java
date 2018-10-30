@@ -382,7 +382,7 @@ public final class AttachmentUtil {
 
         for (Map.Entry<String, List<String>> e : headers.entrySet()) {
             String name = e.getKey();
-            if (name.equalsIgnoreCase("Content-Transfer-Encoding")) {
+            if ("Content-Transfer-Encoding".equalsIgnoreCase(name)) {
                 encoding = getHeader(headers, name);
                 if ("binary".equalsIgnoreCase(encoding)) {
                     att.setXOP(true);

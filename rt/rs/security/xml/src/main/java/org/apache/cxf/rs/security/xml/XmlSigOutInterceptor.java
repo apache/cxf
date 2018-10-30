@@ -125,7 +125,7 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
             ? SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA1 : sigProps.getSignatureAlgo();
 
         String pubKeyAlgo = issuerCerts[0].getPublicKey().getAlgorithm();
-        if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
+        if ("DSA".equalsIgnoreCase(pubKeyAlgo)) {
             sigAlgo = XMLSignature.ALGO_ID_SIGNATURE_DSA;
         }
         PrivateKey privateKey = null;

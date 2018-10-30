@@ -54,15 +54,15 @@ public class RestSourcePayloadProvider implements Provider<DOMSource> {
         System.out.println("--query--- " + query);
         System.out.println("--httpMethod--- " + httpMethod);
 
-        if (httpMethod.equalsIgnoreCase("POST")) {
+        if ("POST".equalsIgnoreCase(httpMethod)) {
             // TBD: parse query info from DOMSource
             System.out.println("---Invoking updateCustomer---");
             return updateCustomer(request);
-        } else if (httpMethod.equalsIgnoreCase("GET")) {
-            if (path.equals("/customerservice/customer") && query == null) {
+        } else if ("GET".equalsIgnoreCase(httpMethod)) {
+            if ("/customerservice/customer".equals(path) && query == null) {
                 System.out.println("---Invoking getAllCustomers---");
                 return getAllCustomers();
-            } else if (path.equals("/customerservice/customer") && query != null) {
+            } else if ("/customerservice/customer".equals(path) && query != null) {
                 System.out.println("---Invoking getCustomer---");
                 return getCustomer(query);
             }

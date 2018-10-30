@@ -484,11 +484,11 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
                                 if (elem2 instanceof SOAPElement) {
                                     String value = ((SOAPElement)elem2).getValue();
                                     String name = ((SOAPElement)elem2).getLocalName();
-                                    if (name.indexOf("arg0") >= 0 && value.equalsIgnoreCase("11")) {
+                                    if (name.indexOf("arg0") >= 0 && "11".equalsIgnoreCase(value)) {
                                         value = "12";
                                         ((SOAPElement)elem2).setValue(value);
                                     }
-                                    if (name.indexOf("arg1") >= 0 && value.equalsIgnoreCase("21")) {
+                                    if (name.indexOf("arg1") >= 0 && "21".equalsIgnoreCase(value)) {
                                         value = "22";
                                         ((SOAPElement)elem2).setValue(value);
                                     }
@@ -519,7 +519,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
                                 if (elem2 instanceof SOAPElement) {
                                     String value = ((SOAPElement)elem2).getValue();
                                     String name = ((SOAPElement)elem2).getLocalName();
-                                    if (name.indexOf("return") >= 0 && value.equalsIgnoreCase("264")) {
+                                    if (name.indexOf("return") >= 0 && "264".equalsIgnoreCase(value)) {
                                         value = "333";
                                         ((SOAPElement)elem2).setValue(value);
                                     }

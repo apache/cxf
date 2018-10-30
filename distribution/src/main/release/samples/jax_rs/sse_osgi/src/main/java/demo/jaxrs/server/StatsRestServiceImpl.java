@@ -62,7 +62,7 @@ public class StatsRestServiceImpl {
             int ind = resourcePath.lastIndexOf('.');
             if (ind != -1 && ind < resourcePath.length()) {
                 String ext = resourcePath.substring(ind + 1);
-                if (ext.equalsIgnoreCase("js")) {
+                if ("js".equalsIgnoreCase(ext)) {
                     rb.type("application/javascript");
                 } else {
                     rb.type(MediaType.TEXT_HTML);
