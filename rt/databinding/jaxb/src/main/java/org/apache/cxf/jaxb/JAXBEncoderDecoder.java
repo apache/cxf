@@ -676,7 +676,7 @@ public final class JAXBEncoderDecoder {
     public static void marshallNullElement(Marshaller marshaller,
                                            Object source,
                                            MessagePartInfo part) {
-        Class<?> clazz = part != null ? (Class<?>)part.getTypeClass() : null;
+        Class<?> clazz = part != null ? part.getTypeClass() : null;
         try {
             writeObject(marshaller, source, newJAXBElement(part.getElementQName(), clazz, null));
         } catch (JAXBException e) {
@@ -689,7 +689,7 @@ public final class JAXBEncoderDecoder {
                                     Object source,
                                     MessagePartInfo part,
                                     boolean unwrap) {
-        Class<?> clazz = part != null ? (Class<?>)part.getTypeClass() : null;
+        Class<?> clazz = part != null ? part.getTypeClass() : null;
         if (clazz != null && Exception.class.isAssignableFrom(clazz) && part != null
             && Boolean.TRUE.equals(part.getProperty(JAXBDataBinding.class.getName() + ".CUSTOM_EXCEPTION"))) {
             return unmarshallException(u, source, part);

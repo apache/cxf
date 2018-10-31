@@ -196,7 +196,7 @@ public class AbstractAuthFilter {
 
     protected AuthorizationPolicy getAuthorizationPolicy(String authorizationHeader) {
         Message m = PhaseInterceptorChain.getCurrentMessage();
-        return m != null ? (AuthorizationPolicy)m.get(AuthorizationPolicy.class) : null;
+        return m != null ? m.get(AuthorizationPolicy.class) : null;
     }
 
     protected boolean checkHttpVerb(HttpServletRequest req, List<String> verbs) {
