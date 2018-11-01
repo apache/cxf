@@ -194,7 +194,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
             applyFeatures();
 
             updateClassResourceProviders(ep);
-            injectContexts(factory);
+            injectContexts(factory, (ApplicationInfo)ep.get(Application.class.getName()));
             factory.applyDynamicFeatures(getServiceFactory().getClassResourceInfo());
             
             
@@ -403,8 +403,14 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
         this.start = start;
     }
 
-    protected void injectContexts(ServerProviderFactory factory) {
-        Application application = appProvider == null ? null : appProvider.getProvider();
+    protected void injectContexts(ServerProviderFactory factory, ApplicationInfo fallback) {
+        // Sometimes the application provider (ApplicationInfo) is injected through
+        // the endpoint, not JAXRSServerFactoryBean (like for example OpenApiFeature
+        // or Swagger2Feature do). As such, without consulting the endpoint, the injection
+        // may not work properly.
+        final ApplicationInfo appInfoProvider = (appProvider == null) ? fallback : appProvider;
+        final Application application = appInfoProvider == null ? null : appInfoProvider.getProvider();
+
         for (ClassResourceInfo cri : serviceFactory.getClassResourceInfo()) {
             if (cri.isSingleton()) {
                 InjectionUtils.injectContextProxiesAndApplication(cri,
@@ -414,7 +420,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
             }
         }
         if (application != null) {
-            InjectionUtils.injectContextProxiesAndApplication(appProvider,
+            InjectionUtils.injectContextProxiesAndApplication(appInfoProvider,
                                                               application, null, null);
         }
     }

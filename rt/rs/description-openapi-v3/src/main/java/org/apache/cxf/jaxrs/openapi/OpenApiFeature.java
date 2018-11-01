@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Application;
@@ -104,6 +105,11 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
     private boolean scanKnownConfigLocations = true;
     // Swagger UI configuration parameters (to be passed as query string).
     private SwaggerUiConfig swaggerUiConfig;
+    // Generates the Swagger Context ID (instead of using the default one). It is
+    // necessary when more than one JAXRS Server Factory Bean or OpenApiFeature instance
+    // are co-located in the same application.
+    private boolean useContextBasedConfig;
+    private String ctxId;
 
     protected static class DefaultApplication extends Application {
 
@@ -134,6 +140,11 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
         final Set<String> packages = new HashSet<>();
         if (resourcePackages != null) {
             packages.addAll(resourcePackages);
+        }
+        
+        // Generate random Context ID for Swagger
+        if (useContextBasedConfig) {
+            ctxId = UUID.randomUUID().toString();
         }
 
         Properties swaggerProps = null;
@@ -166,11 +177,13 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
 
             openApiConfiguration = new JaxrsOpenApiContextBuilder<>()
                 .application(application)
-                .openApiConfiguration(config);
+                .openApiConfiguration(config)
+                .ctxId(ctxId); /* will be null if not used */
         } else {
             openApiConfiguration = new JaxrsOpenApiContextBuilder<>()
                 .application(application)
-                .configLocation(defaultConfigLocation);
+                .configLocation(defaultConfigLocation)
+                .ctxId(ctxId); /* will be null if not used */
         }
 
         try {
@@ -181,6 +194,10 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
                     .getUserDefinedOptions());
             registerOpenApiResources(sfb, packages, context.getOpenApiConfiguration());
             registerSwaggerUiResources(sfb, combine(swaggerProps, userProperties), factory, bus);
+            
+            if (useContextBasedConfig) {
+                registerServletConfigProvider(factory);
+            }
             
             if (customizer != null) {
                 customizer.setApplicationInfo(factory.getApplicationProvider());
@@ -405,6 +422,14 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
         this.swaggerUiConfig = swaggerUiConfig;
     }
     
+    public void setUseContextBasedConfig(final boolean useContextBasedConfig) {
+        this.useContextBasedConfig = useContextBasedConfig;
+    }
+    
+    public boolean isUseContextBasedConfig() {
+        return useContextBasedConfig;
+    }
+    
     @Override
     public SwaggerUiConfig getSwaggerUiConfig() {
         return swaggerUiConfig;
@@ -443,6 +468,10 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
                 .openApiConfiguration(config)
                 .configLocation(configLocation)
                 .resourcePackages(packages)));
+    }
+
+    protected void registerServletConfigProvider(ServerProviderFactory factory) {
+        factory.setUserProviders(Arrays.asList(new ServletConfigProvider(ctxId)));
     }
 
     protected void registerSwaggerUiResources(JAXRSServiceFactoryBean sfb, Properties properties, 
