@@ -70,7 +70,10 @@ public abstract class AbstractSecurityContextInInterceptor extends AbstractPhase
 
     protected Principal getPrincipal(Principal originalPrincipal, Subject subject) {
         Principal[] ps = subject.getPrincipals().toArray(new Principal[subject.getPrincipals().size()]);
-        if (ps != null && ps.length > 0 && !(ps[0] instanceof GroupPrincipal)) {
+        if (ps != null && ps.length > 0 
+            && !(ps[0] instanceof GroupPrincipal
+            || DefaultSecurityContext.instanceOf(ps[0], "java.security.acl.Group")
+            || DefaultSecurityContext.instanceOf(ps[0], "org.apache.karaf.jaas.boot.principal.Group"))) {
             return ps[0];
         }
         return originalPrincipal;

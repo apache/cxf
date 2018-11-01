@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.interceptor.security;
 
+
+import java.lang.reflect.Method;
 import java.security.Principal;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -26,6 +28,7 @@ import java.util.Set;
 import javax.security.auth.Subject;
 
 import org.apache.cxf.common.security.GroupPrincipal;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.security.LoginSecurityContext;
 
 /**
@@ -62,7 +65,9 @@ public class DefaultSecurityContext implements LoginSecurityContext {
         }
 
         for (Principal principal : subject.getPrincipals()) {
-            if (!(principal instanceof GroupPrincipal)
+            if (!(principal instanceof GroupPrincipal
+                || instanceOf(principal, "java.security.acl.Group")
+                || instanceOf(principal, "org.apache.karaf.jaas.boot.principal.Group"))
                 && (principalName == null || principal.getName().equals(principalName))) {
                 return principal;
             }
@@ -71,7 +76,9 @@ public class DefaultSecurityContext implements LoginSecurityContext {
         // No match for the principalName. Just return first non-Group Principal
         if (principalName != null) {
             for (Principal principal : subject.getPrincipals()) {
-                if (!(principal instanceof GroupPrincipal)) {
+                if (!(principal instanceof GroupPrincipal
+                    || instanceOf(principal, "java.security.acl.Group")
+                    || instanceOf(principal, "org.apache.karaf.jaas.boot.principal.Group"))) {
                     return principal;
                 }
             }
@@ -87,7 +94,10 @@ public class DefaultSecurityContext implements LoginSecurityContext {
     public boolean isUserInRole(String role) {
         if (subject != null) {
             for (Principal principal : subject.getPrincipals()) {
-                if (principal instanceof GroupPrincipal && checkGroup((GroupPrincipal)principal, role)) {
+                if ((principal instanceof GroupPrincipal
+                    || instanceOf(principal, "java.security.acl.Group")
+                    || instanceOf(principal, "org.apache.karaf.jaas.boot.principal.Group")) 
+                    && checkGroup((Principal)principal, role)) {
                     return true;
                 } else if (p != principal
                            && role.equals(principal.getName())) {
@@ -98,16 +108,28 @@ public class DefaultSecurityContext implements LoginSecurityContext {
         return false;
     }
 
-    protected boolean checkGroup(GroupPrincipal group, String role) {
-        if (group.getName().equals(role)) {
+    protected boolean checkGroup(Principal principal, String role) {
+        if (principal.getName().equals(role)) {
             return true;
         }
 
-        for (Enumeration<? extends Principal> members = group.members(); members.hasMoreElements();) {
+        Enumeration<? extends Principal> members = null;
+        
+        try {
+            Method m = ReflectionUtil.getMethod(principal.getClass(), "members");
+            members = (Enumeration<? extends Principal>)m.invoke(principal);
+        } catch (Exception e) {
+            return false;
+        }
+        
+        while (members.hasMoreElements()) {
             // this might be a plain role but could represent a group consisting of other groups/roles
             Principal member = members.nextElement();
             if (member.getName().equals(role)
-                || member instanceof GroupPrincipal && checkGroup((GroupPrincipal)member, role)) {
+                || (member instanceof GroupPrincipal
+                    || instanceOf(member, "java.security.acl.Group")
+                    || instanceOf(member, "org.apache.karaf.jaas.boot.principal.Group")) 
+                && checkGroup((GroupPrincipal)member, role)) {
                 return true;
             }
         }
@@ -130,4 +152,12 @@ public class DefaultSecurityContext implements LoginSecurityContext {
         }
         return roles;
     }
+    
+    public static boolean instanceOf(Object obj, String className) { 
+        try {
+            return Class.forName(className).isInstance(obj);
+        } catch (ClassNotFoundException ex) {
+            return false;
+        }
+    } 
 }
