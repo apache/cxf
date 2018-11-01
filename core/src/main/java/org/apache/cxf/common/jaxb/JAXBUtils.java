@@ -1536,11 +1536,13 @@ public final class JAXBUtils {
     }
 
     private static String getPostfix(Class<?> cls) {
-        if (cls.getName().contains("com.sun.xml.internal")
-            || cls.getName().contains("eclipse")) {
+        String className = cls.getName();
+        if (className.contains("com.sun.xml.internal")
+            || className.contains("eclipse")) {
             //eclipse moxy accepts sun package CharacterEscapeHandler 
             return ".internal";
-        } else if (cls.getName().contains("com.sun.xml.bind")) {
+        } else if (className.contains("com.sun.xml.bind")
+            || className.startsWith("com.ibm.xml")) {
             return "";
         }
         return null;
