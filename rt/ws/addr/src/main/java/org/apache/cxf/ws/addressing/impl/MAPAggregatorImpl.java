@@ -69,7 +69,6 @@ import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.MessageObserver;
-import org.apache.cxf.transport.Observable;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.ContextUtils;
@@ -434,7 +433,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
             }
             AddressingProperties theMaps =
                 ContextUtils.retrieveMAPs(message, false, ContextUtils.isOutbound(message));
-            
+
             if (isAddressingRequired() && ContextUtils.isRequestor(message)) {
                 theMaps.setRequired(true);
             }
@@ -582,7 +581,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
             passed = true;
         } else if (WSAddressingFeature.AddressingResponses.NON_ANONYMOUS == addressingResponses
                    && (!anonReply && (!anonFault && faultTo.getAddress() != null)
-                       || !anonReply && faultTo == null)) {        
+                       || !anonReply && faultTo == null)) {
             passed = true;
         }
         if (!passed) {
@@ -987,7 +986,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
             destination = factory.getDestination(ei, bus);
             Conduit conduit = ContextUtils.getConduit(null, message);
             if (conduit != null) {
-                MessageObserver ob = ((Observable)conduit).getMessageObserver();
+                MessageObserver ob = conduit.getMessageObserver();
                 ob = new InterposedMessageObserver(bus, ob);
                 destination.setMessageObserver(ob);
             }

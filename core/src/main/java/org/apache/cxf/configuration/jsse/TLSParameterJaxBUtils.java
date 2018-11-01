@@ -307,7 +307,7 @@ public final class TLSParameterJaxBUtils {
 
         return fac.getKeyManagers();
     }
-    
+
     /**
      * This method converts the JAXB KeyManagersType into a list of
      * JSSE KeyManagers.
@@ -328,8 +328,8 @@ public final class TLSParameterJaxBUtils {
                      kmc.isSetProvider()
                      ? KeyManagerFactory.getInstance(alg, kmc.getProvider())
                      : KeyManagerFactory.getInstance(alg);
-                     
-        try {             
+
+        try {
             fac.init(keyStore, keyPass);
 
             return fac.getKeyManagers();
@@ -396,7 +396,7 @@ public final class TLSParameterJaxBUtils {
                 ? getKeyStore(tmc.getKeyStore(), true)
                 : (tmc.isSetCertStore()
                     ? getKeyStore(tmc.getCertStore())
-                    : (KeyStore) null);
+                    : null);
 
         String alg = tmc.isSetFactoryAlgorithm()
                      ? tmc.getFactoryAlgorithm()
