@@ -24,7 +24,7 @@ under the License.
     <!-- -->
     <http:conduit name="https://localhost:.*/customerservice/.*">
         <http:client ConnectionTimeout="3000000" ReceiveTimeout="3000000"/>
-        <http:tlsClientParameters>
+        <http:tlsClientParameters secureSocketProtocol="TLSv1.2">
             <sec:keyManagers keyPassword="ckpass">
                 <sec:keyStore file="src/main/config/clientKeystore.jks" password="cspass" type="JKS"/>
             </sec:keyManagers>
