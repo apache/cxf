@@ -82,14 +82,6 @@
                         <contextPath>/${project.build.finalName}</contextPath>
                     </webApp>
                     <jettyXml>jetty-http.xml,jetty-ssl.xml,jetty-https.xml</jettyXml>
-                    <connectors>
-                      <connector implementation="org.mortbay.jetty.security.SslSocketConnector">
-                         <port>8080</port>
-                         <keystore>${project.build.directory}/user/WEB-INF/servicestore.jks</keystore>
-                         <password>sspass</password>
-                         <keyPassword>skpass</keyPassword>
-                      </connector>
-                    </connectors>
                 </configuration>
             </plugin>
             <plugin>

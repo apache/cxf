@@ -84,19 +84,14 @@
         <finalName>bigquery</finalName>
         <plugins>
             <plugin>
-                <groupId>org.mortbay.jetty</groupId>
-                <artifactId>maven-jetty-plugin</artifactId>
-                <version>6.1.15</version>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>9.4.12.v20180830</version>
                 <configuration>
-                    <contextPath>/${project.build.finalName}</contextPath>
-                    <connectors>
-                      <connector implementation="org.mortbay.jetty.security.SslSocketConnector">
-                         <port>8080</port>
-                         <keystore>${project.build.directory}/bigquery/WEB-INF/servicestore.jks</keystore>
-                         <password>sspass</password>
-                         <keyPassword>skpass</keyPassword>
-                      </connector>
-                    </connectors>
+                    <webApp>
+                        <contextPath>/${project.build.finalName}</contextPath>
+                    </webApp>
+                    <jettyXml>jetty-http.xml,jetty-ssl.xml,jetty-https.xml</jettyXml>
                 </configuration>
             </plugin>
             <plugin>
