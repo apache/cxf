@@ -145,7 +145,7 @@ public class MtomTest extends AbstractJUnit4SpringContextTests {
         Assert.assertNotNull(accepted);
         InputStream data = accepted.getDataHandler().getInputStream();
         Assert.assertNotNull(data);
-        String dataString = org.apache.commons.io.IOUtils.toString(data, "utf-8");
+        String dataString = IOUtils.toString(data, "utf-8");
         Assert.assertEquals("This is the cereal shot from guns.", dataString);
     }
 
