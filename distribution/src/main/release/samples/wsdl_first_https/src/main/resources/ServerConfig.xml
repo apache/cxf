@@ -30,7 +30,7 @@
                     <sec:keyStore file="src/main/config/serviceKeystore.jks" password="sspass" type="JKS"/>
                 </sec:keyManagers>
                 <sec:trustManagers>
-                    <sec:keyStore file="src/main/config/serviceKeystore.jks" password="sspass" type="JKS"/>
+                    <sec:keyStore file="src/main/config/stsstore.jks" password="stsspass" type="JKS"/>
                 </sec:trustManagers>
                 <sec:clientAuthentication want="true" required="true"/>
             </httpj:tlsServerParameters>

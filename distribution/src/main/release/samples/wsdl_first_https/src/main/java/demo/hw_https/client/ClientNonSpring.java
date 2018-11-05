@@ -111,7 +111,7 @@ public final class ClientNonSpring {
         trustStore.load(new FileInputStream(keyStoreLoc), "cspass".toCharArray());
         TrustManager[] myTrustStoreKeyManagers = getTrustManagers(trustStore);
         tlsCP.setTrustManagers(myTrustStoreKeyManagers);
-
+        tlsCP.setDisableCNCheck(true);
         httpConduit.setTlsClientParameters(tlsCP);
     }
 
