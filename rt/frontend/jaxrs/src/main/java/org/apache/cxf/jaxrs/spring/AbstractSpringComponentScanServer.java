@@ -113,7 +113,7 @@ public abstract class AbstractSpringComponentScanServer extends AbstractSpringCo
                 List<Application> apps = CastUtils.cast(JAXRSServerFactoryBeanDefinitionParser
                     .createBeansFromDiscoveredClasses(super.applicationContext, 
                                                       appClasses.get(ApplicationPath.class), null));
-                if (apps.size() > 0) {
+                if (!apps.isEmpty()) {
                     factoryBean = createFactoryBeanFromApplication(apps.get(0));
                     final Map< Class< ? extends Annotation >, Collection< Class< ? > > > cxfClasses =
                         ClasspathScanner.findClasses(classesScanPackages, org.apache.cxf.annotations.Provider.class);
