@@ -85,7 +85,7 @@
         <cxf.commons-collections.version>3.2.2</cxf.commons-collections.version>
         <cxf.commons-lang3.version>3.8.1</cxf.commons-lang3.version>
         <cxf.commons-text.version>1.2</cxf.commons-text.version>
-        <cxf.derby.version>10.13.1.1</cxf.derby.version>
+        <cxf.derby.version>10.14.2.0</cxf.derby.version>
         <cxf.dropwizard.version>3.2.6</cxf.dropwizard.version>
         <cxf.ehcache.version>2.10.6</cxf.ehcache.version>
         <cxf.ehcache3.version>3.0.3</cxf.ehcache3.version>
