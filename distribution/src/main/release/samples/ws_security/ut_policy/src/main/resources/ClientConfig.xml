@@ -27,12 +27,12 @@
         </cxf:features>
     </cxf:bus>
     <http:conduit name="{http://apache.org/hello_world_soap_http}SoapPort.http-conduit">
-        <http:tlsClientParameters>
+        <http:tlsClientParameters disableCNCheck="true">
             <sec:keyManagers keyPassword="ckpass">
                 <sec:keyStore file="src/main/config/clientKeystore.jks" password="cspass" type="JKS"/>
             </sec:keyManagers>
             <sec:trustManagers>
-                <sec:keyStore file="src/main/config/clientKeystore.jks" password="cspass" type="JKS"/>
+                <sec:keyStore file="src/main/config/stsstore.jks" password="stsspass" type="JKS"/>
             </sec:trustManagers>
         </http:tlsClientParameters>
     </http:conduit>
