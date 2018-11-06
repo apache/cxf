@@ -169,7 +169,7 @@
         <cxf.swagger.ui.version>3.19.0</cxf.swagger.ui.version>
         <cxf.tomcat.version>8.0.53</cxf.tomcat.version>
         <cxf.velocity.version>2.0</cxf.velocity.version>
-        <cxf.woodstox.core.version>5.1.0</cxf.woodstox.core.version>
+        <cxf.woodstox.core.version>5.2.0</cxf.woodstox.core.version>
         <cxf.woodstox.stax2-api.version>4.1</cxf.woodstox.stax2-api.version>
         <cxf.wsdl4j.version>1.6.3</cxf.wsdl4j.version>
         <cxf.wss4j.version>2.2.2</cxf.wss4j.version>
