@@ -22,7 +22,7 @@ import org.apache.cxf.jaxrs.openapi.OpenApiCustomizer;
 import org.apache.cxf.jaxrs.openapi.OpenApiFeature;
 import org.apache.cxf.spring.boot.autoconfigure.CxfAutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,7 +34,7 @@ import org.springframework.context.annotation.Configuration;
  *
  */
 @Configuration
-@ConditionalOnBean(OpenApiFeature.class)
+@ConditionalOnClass(OpenApiFeature.class)
 @AutoConfigureAfter(CxfAutoConfiguration.class)
 public class OpenApiAutoConfiguration {
     @Bean
