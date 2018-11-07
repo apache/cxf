@@ -16,12 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.httpsignature.exception;
+package org.apache.cxf.rs.security.httpsignature;
 
-import org.apache.cxf.rs.security.httpsignature.SignatureException;
+public final class DefaultSignatureConstants {
+    public static final String SIGNING_ALGORITHM = "rsa-sha256";
+    public static final String DIGEST_ALGORITHM = "SHA-256";
+    public static final String SECURITY_PROVIDER = "SunRsaSign";
 
-public class DifferentAlgorithmsException extends SignatureException {
-    public DifferentAlgorithmsException(String message) {
-        super(message);
+    private DefaultSignatureConstants() {
     }
 }

@@ -1,6 +1,25 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.apache.cxf.rs.security.httpsignature;
 
-import org.apache.cxf.common.logging.LogUtils;
+import java.util.Objects;
+import java.util.logging.Logger;
 
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
@@ -9,8 +28,8 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
-import java.util.*;
-import java.util.logging.Logger;
+
+import org.apache.cxf.common.logging.LogUtils;
 
 /**
  * RS CXF Filter which extracts signature data from the context and sends it to the message verifier
@@ -19,13 +38,12 @@ import java.util.logging.Logger;
 @Provider
 @PreMatching
 @Priority(Priorities.AUTHENTICATION)
-public class VerifySignatureFilter implements ContainerRequestFilter {
+public final class VerifySignatureFilter implements ContainerRequestFilter {
+    private static final Logger LOG = LogUtils.getL7dLogger(VerifySignatureFilter.class);
+
     private MessageVerifier messageVerifier;
 
     private boolean enabled;
-
-    protected static final Logger LOG = LogUtils.getL7dLogger(VerifySignatureReaderInterceptor.class);
-
 
     public VerifySignatureFilter() {
         setEnabled(true);

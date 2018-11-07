@@ -35,22 +35,23 @@
     </parent>
 
     <artifactId>http-signature</artifactId>
+    <properties>
+        <cxf.module.name>org.apache.cxf.rs.security.http.signature</cxf.module.name>
+    </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.tomitribe</groupId>
             <artifactId>tomitribe-http-signatures</artifactId>
-            <version>1.1</version>
+            <version>${cxf.tomitribe.http.signature.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-core</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-security</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

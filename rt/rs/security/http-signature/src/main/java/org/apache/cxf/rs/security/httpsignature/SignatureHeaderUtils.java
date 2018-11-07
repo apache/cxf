@@ -1,3 +1,21 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.apache.cxf.rs.security.httpsignature;
 
 import java.security.MessageDigest;
@@ -8,6 +26,8 @@ import java.util.regex.Pattern;
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 
 public final class SignatureHeaderUtils {
+
+    private SignatureHeaderUtils() { }
     /**
      * Maps a multimap to a normal map with comma-separated values in case of duplicate headers
      * @param multivaluedMap the multivalued map
@@ -41,7 +61,8 @@ public final class SignatureHeaderUtils {
      * @return A base64 encoded digest ready to be added as a header to the message
      * @throws NoSuchAlgorithmException If the user gives an unexpected digestAlgorithmName
      */
-    public static  String createDigestHeader(String messageBody, String digestAlgorithmName) throws NoSuchAlgorithmException {
+    public static String createDigestHeader(String messageBody, String digestAlgorithmName)
+            throws NoSuchAlgorithmException {
         MessageDigest messageDigest = getDigestAlgorithm(digestAlgorithmName);
         messageDigest.update(messageBody.getBytes());
         return digestAlgorithmName + "=" + new String(Base64.getEncoder().encode(messageDigest.digest()));
