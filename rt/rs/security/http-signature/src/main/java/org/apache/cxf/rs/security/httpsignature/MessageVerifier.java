@@ -1,8 +1,22 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.apache.cxf.rs.security.httpsignature;
-
-import org.apache.cxf.common.logging.LogUtils;
-import org.tomitribe.auth.signatures.Signature;
-import org.tomitribe.auth.signatures.Verifier;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
@@ -12,15 +26,25 @@ import java.security.Security;
 import java.util.*;
 import java.util.logging.Logger;
 
-public class MessageVerifier {
-    private ExceptionHandler exceptionHandler;
+import org.apache.cxf.common.logging.LogUtils;
+import org.tomitribe.auth.signatures.Signature;
+import org.tomitribe.auth.signatures.Verifier;
 
+
+public class MessageVerifier {
     private static final Logger LOG = LogUtils.getL7dLogger(MessageVerifier.class);
 
+    private AlgorithmProvider algorithmProvider;
+    private ExceptionHandler exceptionHandler;
+    private PublicKeyProvider publicKeyProvider;
+    private SecurityProvider securityProvider;
+
+    private boolean verifyMessageBody;
+
     public MessageVerifier(boolean verifyMessageBody) {
-        setExceptionHandler(null);
-        setSecurityProvider(null);
-        setAlgorithmProvider(null);
+        this.exceptionHandler = (exception, type) -> new SignatureException("exception of type: " + type + " occurred");
+        this.securityProvider = keyId -> Security.getProvider("SunRsaSign");
+        this.algorithmProvider = keyId -> DefaultSignatureConstants.SIGNING_ALGORITHM;
         this.verifyMessageBody = verifyMessageBody;
     }
 
@@ -28,8 +52,10 @@ public class MessageVerifier {
                            ExceptionHandler exceptionHandler,
                            SecurityProvider securityProvider,
                            AlgorithmProvider algorithmProvider,
-                           boolean verifyMessageBody)
-    {
+                           boolean verifyMessageBody) {
+        Objects.requireNonNull(publicKeyProvider, "Public key provider cannot be null");
+        Objects.requireNonNull(publicKeyProvider, "Public key provider cannot be null");
+        Objects.requireNonNull(publicKeyProvider, "Public key provider cannot be null");
         Objects.requireNonNull(publicKeyProvider, "Public key provider cannot be null");
         this.publicKeyProvider = publicKeyProvider;
         this.exceptionHandler = exceptionHandler;
@@ -38,20 +64,31 @@ public class MessageVerifier {
         this.verifyMessageBody = verifyMessageBody;
     }
 
-    private PublicKeyProvider publicKeyProvider;
+    /**
+     * @return a map of the headers included in the signature
+     */
+    private static Map<String, List<String>> extractHeaders(Map<String, List<String>> allHeaders) {
+        assert allHeaders != null && allHeaders.containsKey("Signature") && allHeaders.get("Signature").size() == 1;
 
-    private SecurityProvider securityProvider;
+        final String signature = allHeaders.get("Signature").get(0);
+        String headerList = new Scanner(signature).findWithinHorizon("headers=\"[^,]+\"", 0);
+        headerList = headerList.substring("headers=".length() + 1); // Trim off prefix
+        headerList = headerList.substring(0, headerList.length() - 1); // Trim off trailing quote
 
-    private AlgorithmProvider algorithmProvider;
+        Map<String, List<String>> headers = new HashMap<>();
+        for (String headerName : headerList.split(" ")) {
+            for (String possibleMatch : allHeaders.keySet()) {
+                if (possibleMatch.equalsIgnoreCase(headerName)) {
+                    headers.put(possibleMatch, allHeaders.get(possibleMatch));
+                }
+            }
+        }
 
-    private boolean verifyMessageBody;
+        return headers;
+    }
 
     public void setSecurityProvider(SecurityProvider securityProvider) {
-        if (securityProvider != null) {
-            this.securityProvider = securityProvider;
-        } else {
-            this.securityProvider = (keyId) -> Security.getProvider("SunRsaSign");
-        }
+        this.securityProvider = securityProvider;
     }
 
     public void setPublicKeyProvider(PublicKeyProvider publicKeyProvider) {
@@ -59,11 +96,7 @@ public class MessageVerifier {
     }
 
     public void setAlgorithmProvider(AlgorithmProvider algorithmProvider) {
-        if (algorithmProvider != null) {
-            this.algorithmProvider = algorithmProvider;
-        } else {
-            this.algorithmProvider = (keyId) -> "rsa-sha256";
-        }
+        this.algorithmProvider = algorithmProvider;
     }
 
     public ExceptionHandler getExceptionHandler() {
@@ -71,11 +104,7 @@ public class MessageVerifier {
     }
 
     public void setExceptionHandler(ExceptionHandler exceptionHandler) {
-        if (exceptionHandler != null) {
-            this.exceptionHandler = exceptionHandler;
-        } else {
-            this.exceptionHandler = (exception, type) -> new SignatureException("exception of type: " + type + " occurred");
-        }
+        this.exceptionHandler = exceptionHandler;
     }
 
     public void verifyMessage(Map<String, List<String>> messageHeaders, String messageBody) {
@@ -110,7 +139,7 @@ public class MessageVerifier {
         Key key = publicKeyProvider.getKey(signature.getKeyId());
         Objects.requireNonNull(key, "provided public key is null");
 
-        runVerifier(messageHeaders, key, newSignature);
+        runVerifier(extractHeaders(messageHeaders), key, newSignature);
     }
 
     private String replaceAlgorithm(String signatureString, String oldAlgorithm, String newAlgorithm) {
@@ -141,8 +170,9 @@ public class MessageVerifier {
             headerDigest = new String(Base64.getDecoder().decode(trimAlgorithmName(headerDigest)));
 
             if (!generatedDigest.equals(headerDigest)) {
-                throw exceptionHandler.handle(new SignatureException("the digest does not match the body of the message"),
-                        SignatureExceptionType.DIFFERENT_DIGESTS);
+                throw exceptionHandler
+                        .handle(new SignatureException("the digest does not match the body of the message"),
+                                SignatureExceptionType.DIFFERENT_DIGESTS);
             }
         } else {
             throw exceptionHandler.handle(new SignatureException("failed to validate the digest"),
@@ -155,7 +185,7 @@ public class MessageVerifier {
         try {
             return SignatureHeaderUtils.getDigestAlgorithm(digestString);
         } catch (NoSuchAlgorithmException e) {
-            throw exceptionHandler.handle(new SignatureException("failed to validate the digest"),
+            throw exceptionHandler.handle(new SignatureException("failed to validate the digest", e),
                     SignatureExceptionType.DIGEST_FAILURE);
         }
     }
@@ -183,7 +213,7 @@ public class MessageVerifier {
         try {
             return Signature.fromString(signatureString);
         } catch (Exception e) {
-            throw exceptionHandler.handle(new SignatureException("failed to parse signature from signature header"),
+            throw exceptionHandler.handle(new SignatureException("failed to parse signature from signature header", e),
                     SignatureExceptionType.INVALID_SIGNATURE_HEADER);
         }
     }
@@ -197,16 +227,16 @@ public class MessageVerifier {
 
         Verifier verifier = new Verifier(key, signature, provider);
         LOG.fine("Starting signature verification");
+        boolean success;
         try {
-            boolean success = verifier.verify(method, uri,
-                    SignatureHeaderUtils.mapHeaders(messageHeaders));
-            if (!success) {
-                throw exceptionHandler.handle(new SignatureException("signature is not valid"),
-                        SignatureExceptionType.FAILED_TO_VERIFY_SIGNATURE);
-            }
+            success = verifier.verify(method, uri, SignatureHeaderUtils.mapHeaders(messageHeaders));
         } catch (Exception e) {
-            throw exceptionHandler.handle(new SignatureException(e.getMessage()),
+            throw exceptionHandler.handle(new SignatureException(e.getMessage(), e),
                     SignatureExceptionType.INVALID_DATA_TO_VERIFY_SIGNATURE);
+        }
+        if (!success) {
+            throw exceptionHandler.handle(new SignatureException("signature is not valid"),
+                    SignatureExceptionType.FAILED_TO_VERIFY_SIGNATURE);
         }
     }
 }
