@@ -65,9 +65,7 @@ public class DefaultSecurityContext implements LoginSecurityContext {
         }
 
         for (Principal principal : subject.getPrincipals()) {
-            if (!(principal instanceof GroupPrincipal
-                || instanceOf(principal, "java.security.acl.Group")
-                || instanceOf(principal, "org.apache.karaf.jaas.boot.principal.Group"))
+            if (!isGroupPrincipal(principal)
                 && (principalName == null || principal.getName().equals(principalName))) {
                 return principal;
             }
@@ -76,9 +74,7 @@ public class DefaultSecurityContext implements LoginSecurityContext {
         // No match for the principalName. Just return first non-Group Principal
         if (principalName != null) {
             for (Principal principal : subject.getPrincipals()) {
-                if (!(principal instanceof GroupPrincipal
-                    || instanceOf(principal, "java.security.acl.Group")
-                    || instanceOf(principal, "org.apache.karaf.jaas.boot.principal.Group"))) {
+                if (!isGroupPrincipal(principal)) {
                     return principal;
                 }
             }
@@ -94,9 +90,7 @@ public class DefaultSecurityContext implements LoginSecurityContext {
     public boolean isUserInRole(String role) {
         if (subject != null) {
             for (Principal principal : subject.getPrincipals()) {
-                if ((principal instanceof GroupPrincipal
-                    || instanceOf(principal, "java.security.acl.Group")
-                    || instanceOf(principal, "org.apache.karaf.jaas.boot.principal.Group")) 
+                if (isGroupPrincipal(principal) 
                     && checkGroup((Principal)principal, role)) {
                     return true;
                 } else if (p != principal
@@ -107,6 +101,7 @@ public class DefaultSecurityContext implements LoginSecurityContext {
         }
         return false;
     }
+
 
     protected boolean checkGroup(Principal principal, String role) {
         if (principal.getName().equals(role)) {
@@ -126,9 +121,7 @@ public class DefaultSecurityContext implements LoginSecurityContext {
             // this might be a plain role but could represent a group consisting of other groups/roles
             Principal member = members.nextElement();
             if (member.getName().equals(role)
-                || (member instanceof GroupPrincipal
-                    || instanceOf(member, "java.security.acl.Group")
-                    || instanceOf(member, "org.apache.karaf.jaas.boot.principal.Group")) 
+                || isGroupPrincipal(member) 
                 && checkGroup((GroupPrincipal)member, role)) {
                 return true;
             }
@@ -153,11 +146,19 @@ public class DefaultSecurityContext implements LoginSecurityContext {
         return roles;
     }
     
-    public static boolean instanceOf(Object obj, String className) { 
+    
+    private static boolean instanceOf(Object obj, String className) { 
         try {
             return Class.forName(className).isInstance(obj);
         } catch (ClassNotFoundException ex) {
             return false;
         }
-    } 
+    }
+    
+    public static boolean isGroupPrincipal(Principal principal) {
+        return principal instanceof GroupPrincipal
+            || instanceOf(principal, "java.security.acl.Group")
+            || instanceOf(principal, "org.apache.karaf.jaas.boot.principal.Group");
+    }
+
 }

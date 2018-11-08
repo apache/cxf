@@ -24,7 +24,6 @@ import java.util.logging.Logger;
 import javax.security.auth.Subject;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.security.GroupPrincipal;
 import org.apache.cxf.common.security.SecurityToken;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
@@ -71,9 +70,7 @@ public abstract class AbstractSecurityContextInInterceptor extends AbstractPhase
     protected Principal getPrincipal(Principal originalPrincipal, Subject subject) {
         Principal[] ps = subject.getPrincipals().toArray(new Principal[subject.getPrincipals().size()]);
         if (ps != null && ps.length > 0 
-            && !(ps[0] instanceof GroupPrincipal
-            || DefaultSecurityContext.instanceOf(ps[0], "java.security.acl.Group")
-            || DefaultSecurityContext.instanceOf(ps[0], "org.apache.karaf.jaas.boot.principal.Group"))) {
+            && !DefaultSecurityContext.isGroupPrincipal(ps[0])) {
             return ps[0];
         }
         return originalPrincipal;
