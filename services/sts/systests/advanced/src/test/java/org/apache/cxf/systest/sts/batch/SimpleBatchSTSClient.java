@@ -451,7 +451,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
     protected String findMEXLocation(Element ref) {
         Element el = DOMUtils.getFirstElement(ref);
         while (el != null) {
-            if (el.getLocalName().equals("Address")
+            if ("Address".equals(el.getLocalName())
                 && VersionTransformer.isSupported(el.getNamespaceURI())
                 && "MetadataReference".equals(ref.getLocalName())) {
                 return DOMUtils.getContent(el);

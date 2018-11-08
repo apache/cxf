@@ -318,7 +318,7 @@ public class JWTTokenValidatorTest extends org.junit.Assert {
         assertTrue(principal != null && principal.getName() != null);
         Set<Principal> roles = validatorResponse.getRoles();
         assertTrue(roles != null && !roles.isEmpty());
-        assertTrue(roles.iterator().next().getName().equals("manager"));
+        assertTrue("manager".equals(roles.iterator().next().getName()));
     }
 
     private TokenProviderParameters createProviderParameters() throws WSSecurityException {

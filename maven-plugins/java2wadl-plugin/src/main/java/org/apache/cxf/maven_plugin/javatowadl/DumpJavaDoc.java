@@ -74,7 +74,7 @@ public final class DumpJavaDoc {
         String tagName = null;
         for (int i = 0; i < options.length; i++) {
             String[] opt = options[i];
-            if (opt[0].equals("-dumpJavaDocFile")) {
+            if ("-dumpJavaDocFile".equals(opt[0])) {
                 tagName = opt[1];
             }
         }
@@ -92,7 +92,7 @@ public final class DumpJavaDoc {
         boolean foundTagOption = false;
         for (int i = 0; i < options.length; i++) {
             String[] opt = options[i];
-            if (opt[0].equals("-dumpJavaDocFile")) {
+            if ("-dumpJavaDocFile".equals(opt[0])) {
                 if (foundTagOption) {
                     reporter.printError("Only one -dumpJavaDocFile option allowed.");
                     return false;

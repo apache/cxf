@@ -91,7 +91,7 @@ public class HWDOMSourcePayloadProvider implements Provider<DOMSource> {
         } else if (n.getLocalName().equals(greetMe.getLocalPart())) {
             Element el = DOMUtils.getFirstElement(n);
             String s = DOMUtils.getContent(el);
-            if (s.trim().equals("throwFault")) {
+            if ("throwFault".equals(s.trim())) {
                 try {
                     SOAPFactory f = SOAPFactory.newInstance();
                     SOAPFault soapFault = f.createFault();

@@ -307,7 +307,7 @@ public class ServiceWSDLBuilderTest extends Assert {
     public void testBindingWithDifferentNamespaceImport() throws Exception {
         setupWSDL("wsdl2/person.wsdl");
         assertEquals(newDef.getBindings().size(), 1);
-        assertTrue(newDef.getNamespace("ns3").equals("http://cxf.apache.org/samples/wsdl-first"));
+        assertTrue("http://cxf.apache.org/samples/wsdl-first".equals(newDef.getNamespace("ns3")));
     }
 
     @Test

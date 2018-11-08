@@ -569,13 +569,13 @@ public class ClientImpl
             //Server Fault
             if (faultCode.getNamespaceURI().equals(
                     soap11NS)
-                    && faultCode.getLocalPart().equals("Client")) {
+                    && "Client".equals(faultCode.getLocalPart())) {
                 faultCode = new QName(soap11NS, "Server");
                 fault.setFaultCode(faultCode);
             }
             if (faultCode.getNamespaceURI().equals(
                     soap12NS)
-                    && faultCode.getLocalPart().equals("Sender")) {
+                    && "Sender".equals(faultCode.getLocalPart())) {
                 faultCode = new QName(soap12NS, "Receiver");
                 fault.setFaultCode(faultCode);
             }

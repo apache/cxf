@@ -184,7 +184,7 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
     }
     private Class<?> findContextClass(Class<?> cls) {
         for (Class<?> c : cls.getInterfaces()) {
-            if (c.getName().equals("org.osgi.framework.BundleContext")) {
+            if ("org.osgi.framework.BundleContext".equals(c.getName())) {
                 return c;
             }
         }

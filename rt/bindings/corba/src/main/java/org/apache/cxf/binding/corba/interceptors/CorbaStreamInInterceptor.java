@@ -279,7 +279,7 @@ public class CorbaStreamInInterceptor extends AbstractPhaseInterceptor<Message> 
                 QName paramIdlType = param.getIdltype();
                 QName paramName;
                 ModeType paramMode = param.getMode();
-                if (paramMode.value().equals("in")) {
+                if ("in".equals(paramMode.value())) {
                     if (wrap) {
                         paramName = new QName(inWrapNSUri, param.getName());
                     } else {
@@ -299,10 +299,10 @@ public class CorbaStreamInInterceptor extends AbstractPhaseInterceptor<Message> 
                 streamables[i] = corbaMsg.createStreamableObject(obj, paramName);
 
                 Any value = CorbaAnyHelper.createAny(orb);
-                if (paramMode.value().equals("in")) {
+                if ("in".equals(paramMode.value())) {
                     streamables[i].setMode(org.omg.CORBA.ARG_IN.value);
                     streamables[i].getObject().setIntoAny(value, streamables[i], false);
-                } else if (paramMode.value().equals("out")) {
+                } else if ("out".equals(paramMode.value())) {
                     streamables[i].setMode(org.omg.CORBA.ARG_OUT.value);
                     streamables[i].getObject().setIntoAny(value, streamables[i], true);
                 } else {

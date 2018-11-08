@@ -44,7 +44,7 @@ public class OldLoggingFactoryBeanListener implements FactoryBeanListener {
     public OldLoggingFactoryBeanListener(Bus b) {
         FactoryBeanListenerManager m = b.getExtension(FactoryBeanListenerManager.class);
         for (FactoryBeanListener f : m.getListeners()) {
-            if (f.getClass().getSimpleName().equals("OldLoggingFactoryBeanListener")) {
+            if ("OldLoggingFactoryBeanListener".equals(f.getClass().getSimpleName())) {
                 m.removeListener(f);
             }
         }

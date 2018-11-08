@@ -452,11 +452,11 @@ public final class CustomizationParser {
     private boolean isGlobaleBindings(Element binding) {
 
         boolean globleNode = binding.getNamespaceURI().equals(ToolConstants.NS_JAXWS_BINDINGS)
-                             && binding.getLocalName().equals("package")
-                             || binding.getLocalName().equals("enableAsyncMapping")
-                             || binding.getLocalName().equals("enableAdditionalSOAPHeaderMapping")
-                             || binding.getLocalName().equals("enableWrapperStyle")
-                             || binding.getLocalName().equals("enableMIMEContent");
+                             && "package".equals(binding.getLocalName())
+                             || "enableAsyncMapping".equals(binding.getLocalName())
+                             || "enableAdditionalSOAPHeaderMapping".equals(binding.getLocalName())
+                             || "enableWrapperStyle".equals(binding.getLocalName())
+                             || "enableMIMEContent".equals(binding.getLocalName());
         Node parentNode = binding.getParentNode();
         if (parentNode instanceof Element) {
             Element ele = (Element)parentNode;

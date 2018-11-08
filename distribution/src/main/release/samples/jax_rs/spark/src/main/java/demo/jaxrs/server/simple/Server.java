@@ -29,7 +29,7 @@ public class Server {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(StreamingService.class);
 
-        String receiverType = args.length == 1 && args[0].equals("-receiverType=queue")
+        String receiverType = args.length == 1 && "-receiverType=queue".equals(args[0])
             ? "queue" : "string";
         sf.setResourceProvider(StreamingService.class,
             new SingletonResourceProvider(new StreamingService(receiverType)));

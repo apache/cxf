@@ -90,7 +90,7 @@ public class UDPTransportTest extends AbstractBusClientServerTestBase {
     @Test
     public void testBroadcastUDP() throws Exception {
         // Disable the test on Redhat Enterprise Linux which doesn't enable the UDP broadcast by default
-        if (System.getProperties().getProperty("os.name").equals("Linux")
+        if ("Linux".equals(System.getProperties().getProperty("os.name"))
             && System.getProperties().getProperty("os.version").indexOf("el") > 0) {
             System.out.println("Skipping broadcast test for REL");
             return;

@@ -175,7 +175,7 @@ public final class ServiceModelUtil {
                 if (best == null) {
                     best = ep;
                 }
-                if (ep.getTransportId().equals("http://schemas.xmlsoap.org/wsdl/soap/")) {
+                if ("http://schemas.xmlsoap.org/wsdl/soap/".equals(ep.getTransportId())) {
                     return ep;
                 }
             }

@@ -37,7 +37,7 @@ public class ContentTypeModifyingMBW implements MessageBodyWriter<String> {
 
     @Override
     public boolean isWriteable(Class<?> arg0, Type arg1, Annotation[] arg2, MediaType mt) {
-        return mt.toString().equals("text/custom");
+        return "text/custom".equals(mt.toString());
     }
 
     @Override

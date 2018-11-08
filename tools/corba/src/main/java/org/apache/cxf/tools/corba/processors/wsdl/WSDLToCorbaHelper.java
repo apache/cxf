@@ -1150,7 +1150,7 @@ public class WSDLToCorbaHelper {
         // Add base as a member of this struct
         MemberType memberType = new MemberType();
         memberType.setName(extName.getLocalPart() + "_f");
-        if (extName.getLocalPart().equals("anyType")) {
+        if ("anyType".equals(extName.getLocalPart())) {
             memberType.setIdltype(processPrimitiveType(extName).getQName());
         } else {
             memberType.setIdltype(createQNameCorbaNamespace(extName.getLocalPart()));
@@ -1415,20 +1415,20 @@ public class WSDLToCorbaHelper {
                 caselist.add(enumerator.getValue());
             }
         } else if (SUPPORTEDDISTYPES.contains(disctype.getQName().getLocalPart())) {
-            if (disctype.getQName().getLocalPart().equals("long")
-                || disctype.getQName().getLocalPart().equals("short")) {
+            if ("long".equals(disctype.getQName().getLocalPart())
+                || "short".equals(disctype.getQName().getLocalPart())) {
                 for (int i = 0; i < fields.size(); i++) {
                     caselist.add(Integer.toString(i));
                 }
-            } else if (disctype.getQName().getLocalPart().equals("char")) {
+            } else if ("char".equals(disctype.getQName().getLocalPart())) {
                 for (int i = 0; i < fields.size(); i++) {
                     caselist.add(Integer.toString(i));
                 }
-            } else if (disctype.getQName().getLocalPart().equals("char")) {
+            } else if ("char".equals(disctype.getQName().getLocalPart())) {
                 for (int i = 0; i < fields.size(); i++) {
                     caselist.add(Integer.toString(i));
                 }
-            } else if (disctype.getQName().getLocalPart().equals("boolean")) {
+            } else if ("boolean".equals(disctype.getQName().getLocalPart())) {
                 if (fields.size() == 2) {
                     caselist.add("TRUE");
                     caselist.add("FALSE");

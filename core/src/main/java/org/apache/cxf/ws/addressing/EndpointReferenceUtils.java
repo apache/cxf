@@ -318,7 +318,7 @@ public final class EndpointReferenceUtils {
                 if ((node.getNamespaceURI().equals(JAXWSAConstants.NS_WSAW)
                     || node.getNamespaceURI().equals(NS_WSAW_2005)
                     || node.getNamespaceURI().equals(JAXWSAConstants.NS_WSAM))
-                    && node.getLocalName().equals("ServiceName")) {
+                    && "ServiceName".equals(node.getLocalName())) {
                     String content = node.getTextContent();
                     String namespaceURI = node.getFirstChild().getNamespaceURI();
                     String service = content;

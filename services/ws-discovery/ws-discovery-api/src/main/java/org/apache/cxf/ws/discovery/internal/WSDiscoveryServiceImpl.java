@@ -318,10 +318,10 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
         if (uri.getScheme() == null) {
             return UUID.fromString(scope);
         }
-        if (uri.getScheme().equals("urn")) {
+        if ("urn".equals(uri.getScheme())) {
             uri = URI.create(uri.getSchemeSpecificPart());
         }
-        if (uri.getScheme().equals("uuid")) {
+        if ("uuid".equals(uri.getScheme())) {
             return UUID.fromString(uri.getSchemeSpecificPart());
         }
         return null;

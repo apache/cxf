@@ -690,7 +690,7 @@ public class MultipartStore {
     public Response addBookFromMessageContext() throws Exception {
         Map<String, Attachment> handlers = AttachmentUtils.getAttachmentsMap(context);
         for (Map.Entry<String, Attachment> entry : handlers.entrySet()) {
-            if (entry.getKey().equals("book2")) {
+            if ("book2".equals(entry.getKey())) {
                 return readBookFromInputStream(entry.getValue().getDataHandler().getInputStream());
             }
         }
@@ -703,7 +703,7 @@ public class MultipartStore {
     public Response addBookFromAttachments() throws Exception {
         Collection<Attachment> handlers = AttachmentUtils.getChildAttachments(context);
         for (Attachment a : handlers) {
-            if (a.getContentId().equals("book2")) {
+            if ("book2".equals(a.getContentId())) {
                 return readBookFromInputStream(a.getDataHandler().getInputStream());
             }
         }

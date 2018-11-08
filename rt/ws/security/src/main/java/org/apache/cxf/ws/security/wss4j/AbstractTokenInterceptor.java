@@ -154,7 +154,7 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
     protected Header findSecurityHeader(SoapMessage message, boolean create) {
         for (Header h : message.getHeaders()) {
             QName n = h.getName();
-            if (n.getLocalPart().equals("Security")
+            if ("Security".equals(n.getLocalPart())
                 && (n.getNamespaceURI().equals(WSS4JConstants.WSSE_NS)
                     || n.getNamespaceURI().equals(WSS4JConstants.WSSE11_NS))) {
                 return h;

@@ -66,8 +66,8 @@ public class WrapperClassInInterceptor extends AbstractPhaseInterceptor<Message>
 
         if (method != null && method.getName().endsWith("Async")) {
             Class<?> retType = method.getReturnType();
-            if (retType.getName().equals("java.util.concurrent.Future")
-                || retType.getName().equals("javax.xml.ws.Response")) {
+            if ("java.util.concurrent.Future".equals(retType.getName())
+                || "javax.xml.ws.Response".equals(retType.getName())) {
                 return;
             }
         }

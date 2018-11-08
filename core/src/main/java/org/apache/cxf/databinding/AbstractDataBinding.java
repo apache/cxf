@@ -153,7 +153,7 @@ public abstract class AbstractDataBinding implements DataBinding {
         while (n != null) {
             if (n instanceof Element) {
                 Element e = (Element)n;
-                if (e.getLocalName().equals("import")) {
+                if ("import".equals(e.getLocalName())) {
                     patchRequired = true;
                     break;
                 }
@@ -169,7 +169,7 @@ public abstract class AbstractDataBinding implements DataBinding {
             while (n != null) {
                 if (n instanceof Element) {
                     Element e = (Element)n;
-                    if (e.getLocalName().equals("import")) {
+                    if ("import".equals(e.getLocalName())) {
                         e = (Element)n;
                         String loc = e.getAttribute("schemaLocation");
                         if (ids == null || ids.contains(loc)) {

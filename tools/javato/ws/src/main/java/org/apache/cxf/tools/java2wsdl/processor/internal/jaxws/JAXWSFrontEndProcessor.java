@@ -172,7 +172,7 @@ public class JAXWSFrontEndProcessor implements Processor {
     private boolean isImplRmiRemote(Class<?> claz) {
         for (Method method : claz.getMethods()) {
             if (Modifier.isPublic(method.getModifiers()) && !Modifier.isStatic(method.getModifiers())
-                && !method.getDeclaringClass().getName().equals("java.lang.Object")) {
+                && !"java.lang.Object".equals(method.getDeclaringClass().getName())) {
                 Class<?>[] paraClasses = method.getParameterTypes();
                 for (Class<?> clz : paraClasses) {
                     getInfClass(clz);

@@ -152,7 +152,7 @@ public class ParseJavaDocMojo extends AbstractMojo {
             for (Object o : this.mavenProject.getPluginArtifacts()) {
                 if (o instanceof Artifact) {
                     Artifact artifact = (Artifact)o;
-                    if (artifact.getArtifactId().equals("cxf-java2wadl-plugin")) {
+                    if ("cxf-java2wadl-plugin".equals(artifact.getArtifactId())) {
                         docletArtifact.setGroupId(artifact.getGroupId());
                         docletArtifact.setArtifactId(artifact.getArtifactId());
                         docletArtifact.setVersion(artifact.getVersion());

@@ -84,9 +84,9 @@ public final class HttpAuthHeader {
                 if (!first) {
                     builder.append(", ");
                 }
-                if (entry.getKey().equals("nc")
-                    || entry.getKey().equals("qop")
-                    || entry.getKey().equals("algorithm")) {
+                if ("nc".equals(entry.getKey())
+                    || "qop".equals(entry.getKey())
+                    || "algorithm".equals(entry.getKey())) {
                     builder.append(entry.getKey() + "=" + param + "");
                 } else {
                     builder.append(entry.getKey() + "=\"" + param + "\"");

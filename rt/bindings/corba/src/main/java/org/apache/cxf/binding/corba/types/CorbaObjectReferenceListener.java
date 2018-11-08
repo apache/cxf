@@ -39,7 +39,7 @@ public class CorbaObjectReferenceListener extends AbstractCorbaTypeListener {
 
     public void processCharacters(String text) {
         //REVISIT, just checking the address for now.
-        if ((currentElement != null) && (currentElement.getLocalPart().equals("Address"))) {
+        if (currentElement != null && "Address".equals(currentElement.getLocalPart())) {
             org.omg.CORBA.Object ref = null;
 
             if (text.equals(CorbaObjectReferenceHelper.ADDRESSING_NAMESPACE_URI + "/anonymous")) {

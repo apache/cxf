@@ -176,7 +176,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         if (clientParameters == null) {
             clientParameters = tlsClientParameters;
         }
-        if (uri.getScheme().equals("https")
+        if ("https".equals(uri.getScheme())
             && clientParameters != null
             && clientParameters.getSSLSocketFactory() != null) {
             //if they configured in an SSLSocketFactory, we cannot do anything

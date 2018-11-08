@@ -2301,7 +2301,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                 if (signedPart.getId() == null && !"Token".equals(signedPart.getName())) {
                     throw new IllegalArgumentException(
                             "WSEncryptionPart must be ID based but no id was found.");
-                } else if (encryptedPart.getEncModifier().equals("Header")
+                } else if ("Header".equals(encryptedPart.getEncModifier())
                         && signedPart.getId().equals(encryptedPart.getId())) {
                     // We are to sign something that has already been encrypted.
                     // We need to preserve the original aspects of signedPart but

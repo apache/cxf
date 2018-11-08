@@ -34,7 +34,7 @@ public class WebServiceProviderConfiguration extends JaxWsServiceConfiguration {
 
     @Override
     public Boolean isOperation(Method method) {
-        return method.getName().equals("invoke")
+        return "invoke".equals(method.getName())
             && method.getParameterTypes().length == 1
             && (Source.class.isAssignableFrom(method.getParameterTypes()[0])
                 || SOAPMessage.class.isAssignableFrom(method.getParameterTypes()[0])

@@ -66,7 +66,7 @@ public class FlatArrayTest extends AbstractAegisTest {
                                             + "/xsd:sequence/xsd:element" + "[@name='array']", arrayWsdlDoc);
         Element typeElement = (Element)typeList.item(0);
         String nillableValue = typeElement.getAttribute("nillable");
-        assertTrue(nillableValue == null || "".equals(nillableValue) || "false".equals("nillableValue"));
+        assertTrue(nillableValue == null || "".equals(nillableValue) || "false".equals(nillableValue));
         String typeString = typeElement.getAttribute("type");
         assertEquals("xsd:string", typeString); // no ArrayOf
 

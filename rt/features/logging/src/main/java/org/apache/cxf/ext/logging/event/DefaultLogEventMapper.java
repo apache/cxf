@@ -187,7 +187,7 @@ public class DefaultLogEventMapper {
      */
     private boolean isSOAPMessage(Message message) {
         Binding binding = message.getExchange().getBinding();
-        return binding != null && binding.getClass().getSimpleName().equals("SoapBinding");
+        return binding != null && "SoapBinding".equals(binding.getClass().getSimpleName());
     }
 
     /**

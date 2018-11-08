@@ -84,7 +84,7 @@ public class WSDLToXMLProcessorTest extends ProcessorTestBase {
         found = false;
         for (Object obj :  bo.getBindingInput().getExtensibilityElements()) {
             if (obj instanceof XMLBindingMessageFormat
-                && ((XMLBindingMessageFormat)obj).getRootNode().getLocalPart().equals("sayHi")) {
+                && "sayHi".equals(((XMLBindingMessageFormat)obj).getRootNode().getLocalPart())) {
                 found = true;
                 break;
             }

@@ -291,7 +291,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
         boolean staticResourcesMatch = staticResourcesList != null
             && matchPath(staticResourcesList, request);
         boolean staticWelcomeFileMatch = staticWelcomeFile != null
-            && (StringUtils.isEmpty(request.getPathInfo()) || request.getPathInfo().equals("/"));
+            && (StringUtils.isEmpty(request.getPathInfo()) || "/".equals(request.getPathInfo()));
         if (staticResourcesMatch || staticWelcomeFileMatch) {
             serveStaticContent(request, response,
                                staticWelcomeFileMatch ? staticWelcomeFile : request.getPathInfo());

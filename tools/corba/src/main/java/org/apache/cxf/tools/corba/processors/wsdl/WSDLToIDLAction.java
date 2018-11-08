@@ -395,7 +395,7 @@ public class WSDLToIDLAction {
     }
 
     protected IdlType createType(QName idlType, String[] name, CorbaType corbaType) throws Exception {
-        if (idlType.getLocalPart().equals("CORBA.Object")) {
+        if ("CORBA.Object".equals(idlType.getLocalPart())) {
             return IdlInterface.create(null, "Object");
         }
 
@@ -424,7 +424,7 @@ public class WSDLToIDLAction {
             // name array.
             if ("CORBA".equals(dotScopedName.toString())
                 && name.length == 2 && i == 0
-                && name[1].equals("Object")) {
+                && "Object".equals(name[1])) {
                 break;
             }
 

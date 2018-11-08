@@ -311,7 +311,7 @@ public class BookStore {
     @Produces("application/xml")
     @Consumes("application/xml")
     public Response patchBook(Book book) {
-        if (book.getName().equals("Timeout")) {
+        if ("Timeout".equals(book.getName())) {
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
@@ -473,7 +473,7 @@ public class BookStore {
     @Path("emptyput")
     @Consumes("application/json")
     public void emptyput() {
-        if (!httpHeaders.getMediaType().toString().equals("application/json")) {
+        if (!"application/json".equals(httpHeaders.getMediaType().toString())) {
             throw new RuntimeException();
         }
     }

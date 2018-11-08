@@ -243,7 +243,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
     }
 
     private boolean mediaTypeSupported(MediaType mt) {
-        return mt.getType().equals("multipart") && MULTIPART_SUBTYPES.contains(mt.getSubtype());
+        return "multipart".equals(mt.getType()) && MULTIPART_SUBTYPES.contains(mt.getSubtype());
     }
 
     public long getSize(Object t, Class<?> type, Type genericType, Annotation[] annotations,

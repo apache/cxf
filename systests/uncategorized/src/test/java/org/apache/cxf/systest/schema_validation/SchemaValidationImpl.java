@@ -74,13 +74,13 @@ public class SchemaValidationImpl implements SchemaValidation {
     @Override
     public SomeResponse doSomething(SomeRequest in) throws DoSomethingFault {
         SomeResponse response = new SomeResponse();
-        if (in.getId().equals("1234567890")) {
+        if ("1234567890".equals(in.getId())) {
             response.setTransactionId("aaaaaaaaaaxxx"); // invalid transaction id
-        } else if (in.getId().equals("9999999999")) {
+        } else if ("9999999999".equals(in.getId())) {
             SomeFault someFault = new SomeFault();
             someFault.setErrorCode("1234");
             throw new DoSomethingFault("Fault", someFault);
-        } else if (in.getId().equals("8888888888")) {
+        } else if ("8888888888".equals(in.getId())) {
             SomeFault someFault = new SomeFault();
             someFault.setErrorCode("1");
             throw new DoSomethingFault("Fault", someFault);

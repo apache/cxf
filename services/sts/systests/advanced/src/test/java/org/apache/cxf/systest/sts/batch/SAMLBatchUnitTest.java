@@ -122,9 +122,9 @@ public class SAMLBatchUnitTest extends AbstractBusClientServerTestBase {
             requestSecurityTokens(bus, wsdlLocation, requestList, action, requestType, port);
         assertTrue(tokens != null && tokens.size() == 2);
 
-        assertTrue(tokens.get(0).getToken().getLocalName().equals("Assertion"));
+        assertTrue("Assertion".equals(tokens.get(0).getToken().getLocalName()));
         assertTrue(tokens.get(0).getToken().getNamespaceURI().equals(SAMLConstants.SAML1_NS));
-        assertTrue(tokens.get(1).getToken().getLocalName().equals("Assertion"));
+        assertTrue("Assertion".equals(tokens.get(1).getToken().getLocalName()));
         assertTrue(tokens.get(1).getToken().getNamespaceURI().equals(SAMLConstants.SAML20_NS));
 
         // Now validate the tokens

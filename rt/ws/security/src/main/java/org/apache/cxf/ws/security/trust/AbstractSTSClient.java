@@ -643,7 +643,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
     protected String findMEXLocation(Element ref) {
         Element el = DOMUtils.getFirstElement(ref);
         while (el != null) {
-            if (el.getLocalName().equals("Address")
+            if ("Address".equals(el.getLocalName())
                 && VersionTransformer.isSupported(el.getNamespaceURI())
                 && "MetadataReference".equals(ref.getLocalName())) {
                 return DOMUtils.getContent(el);

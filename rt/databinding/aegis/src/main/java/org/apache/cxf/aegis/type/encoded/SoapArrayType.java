@@ -195,8 +195,8 @@ public class SoapArrayType extends AegisType {
             List<String> tokens = CastUtils.cast(Collections.list(new StringTokenizer(positionString,
                     "[],",
                     true)));
-            if (tokens.size() == 2 + dimensions.size() + dimensions.size() - 1 && tokens.get(0).equals("[")
-                    && tokens.get(tokens.size() - 1).equals("]")) {
+            if (tokens.size() == 2 + dimensions.size() + dimensions.size() - 1 && "[".equals(tokens.get(0))
+                    && "]".equals(tokens.get(tokens.size() - 1))) {
 
                 // strip off leading [ and trailing ]
                 tokens = tokens.subList(1, tokens.size() - 1);
@@ -208,7 +208,7 @@ public class SoapArrayType extends AegisType {
 
                     index[i] = Integer.parseInt(tokens.get(tokenId));
 
-                    if (tokenId + 1 < tokens.size() && !tokens.get(tokenId + 1).equals(",")) {
+                    if (tokenId + 1 < tokens.size() && !",".equals(tokens.get(tokenId + 1))) {
                         throw new IllegalStateException(
                                 "Expected a comma but got " + tokens.get(tokenId + 1));
                     }

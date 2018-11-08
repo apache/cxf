@@ -241,7 +241,7 @@ public class DefaultServiceConfiguration extends AbstractServiceConfiguration {
 
     @Override
     public Boolean isHolder(Class<?> cls, Type type) {
-        if (cls.getSimpleName().equals("Holder")) {
+        if ("Holder".equals(cls.getSimpleName())) {
             for (Field f : cls.getDeclaredFields()) {
                 if (Modifier.isStatic(f.getModifiers())) {
                     continue;

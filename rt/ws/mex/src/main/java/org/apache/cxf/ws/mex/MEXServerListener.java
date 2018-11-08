@@ -33,7 +33,7 @@ public class MEXServerListener implements ServerLifeCycleListener {
     public void startServer(Server serv) {
         if (serv.getEndpoint().getBinding() instanceof SoapBinding) {
             QName qn = serv.getEndpoint().getService().getName();
-            if (!qn.getNamespaceURI().equals("http://mex.ws.cxf.apache.org/")) {
+            if (!"http://mex.ws.cxf.apache.org/".equals(qn.getNamespaceURI())) {
                 serv.getEndpoint().getInInterceptors().add(new MEXInInterceptor(serv));
             }
         }

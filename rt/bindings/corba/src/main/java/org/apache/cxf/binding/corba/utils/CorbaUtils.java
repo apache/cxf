@@ -230,7 +230,7 @@ public final class CorbaUtils {
             } else if (obj instanceof org.apache.cxf.binding.corba.wsdl.Object) {
                 org.apache.cxf.binding.corba.wsdl.Object objType =
                     (org.apache.cxf.binding.corba.wsdl.Object)obj;
-                if (objType.getName().equals("CORBA.Object")) {
+                if ("CORBA.Object".equals(objType.getName())) {
                     tc = orb.create_interface_tc(objType.getRepositoryID(), "Object");
                 } else {
                     tc = orb.create_interface_tc(objType.getRepositoryID(),

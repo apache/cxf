@@ -143,7 +143,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
             UriInfo ui = context.getUriInfo();
             String path = ui.getPath(false);
 
-            if (context.getMethod().equals("POST")
+            if ("POST".equals(context.getMethod())
                 && "bookstore/bookheaders/simple".equals(path) && !context.hasEntity()) {
                 byte[] bytes = StringUtils.toBytesUTF8("<Book><name>Book</name><id>126</id></Book>");
                 context.getHeaders().putSingle(HttpHeaders.CONTENT_LENGTH, Integer.toString(bytes.length));
@@ -169,7 +169,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
             }
 
             MediaType mt = context.getMediaType();
-            if (mt != null && mt.toString().equals("text/xml")) {
+            if (mt != null && "text/xml".equals(mt.toString())) {
                 String method = context.getMethod();
                 if ("PUT".equals(method)) {
                     context.setMethod("POST");
@@ -182,7 +182,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
                 }
             }
             List<MediaType> acceptTypes = context.getAcceptableMediaTypes();
-            if (acceptTypes.size() == 1 && acceptTypes.get(0).toString().equals("text/mistypedxml")) {
+            if (acceptTypes.size() == 1 && "text/mistypedxml".equals(acceptTypes.get(0).toString())) {
                 context.getHeaders().putSingle("Accept", "text/xml");
             }
         }
@@ -356,7 +356,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
         public void filter(ContainerRequestContext requestContext,
                            ContainerResponseContext responseContext) throws IOException {
             responseContext.getHeaders().add("Custom", "custom");
-            if (!responseContext.getEntity().equals("Postmatch filter error")) {
+            if (!"Postmatch filter error".equals(responseContext.getEntity())) {
                 Book book = (Book)responseContext.getEntity();
                 responseContext.setEntity(new Book(book.getName(), 1 + book.getId()), null, null);
             }

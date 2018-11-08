@@ -49,7 +49,7 @@ public class BusDefinitionParserTest extends Assert {
         List<Interceptor<? extends Message>> in = bus.getInInterceptors();
         boolean found = false;
         for (Interceptor<? extends Message> i : in) {
-            if (i.getClass().getSimpleName().equals("LoggingInInterceptor")) {
+            if ("LoggingInInterceptor".equals(i.getClass().getSimpleName())) {
                 found = true;
             }
         }
@@ -133,7 +133,7 @@ public class BusDefinitionParserTest extends Assert {
         List<Interceptor<? extends Message>> in = bus.getInInterceptors();
         boolean found = false;
         for (Interceptor<? extends Message> i : in) {
-            if (i.getClass().getSimpleName().equals("LoggingInInterceptor")) {
+            if ("LoggingInInterceptor".equals(i.getClass().getSimpleName())) {
                 found = true;
             }
         }

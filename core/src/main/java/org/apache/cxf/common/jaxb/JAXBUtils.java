@@ -587,7 +587,7 @@ public final class JAXBUtils {
             return cls;
         }
         if (cls != null) {
-            if (cls.getName().equals("javax.xml.ws.wsaddressing.W3CEndpointReference")) {
+            if ("javax.xml.ws.wsaddressing.W3CEndpointReference".equals(cls.getName())) {
                 return cls;
             }
             Constructor<?> cons = ReflectionUtil.getDeclaredConstructor(cls);
@@ -676,7 +676,7 @@ public final class JAXBUtils {
 
             Object ctx = null;
             for (Method m : cls.getDeclaredMethods()) {
-                if (m.getName().equals("newInstance")
+                if ("newInstance".equals(m.getName())
                     && m.getParameterTypes().length == 6) {
                     ctx = m.invoke(null, clses.toArray(new Class<?>[0]),
                                          typeRefs, null, null, true, null);

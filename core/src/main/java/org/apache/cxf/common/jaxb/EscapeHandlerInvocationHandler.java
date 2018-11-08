@@ -31,7 +31,7 @@ public final class EscapeHandlerInvocationHandler implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         Object result = null;
-        if (method.getName().equals("escape") && args.length == 5) {
+        if ("escape".equals(method.getName()) && args.length == 5) {
             if ((Integer)args[1] == 0 && (Integer)args[2] == 0) {
                 Writer writer = (Writer)args[4];
                 writer.write("");

@@ -30,7 +30,7 @@ public class UtilsTest extends Assert {
     @Test
     public void testGetMethod() {
         for (Method method : Utils.getGetters(MyException.class, XmlAccessType.PUBLIC_MEMBER)) {
-            if (method.getName().equals("toString")) {
+            if ("toString".equals(method.getName())) {
                 fail("toString should not be included in get methods list");
             }
         }

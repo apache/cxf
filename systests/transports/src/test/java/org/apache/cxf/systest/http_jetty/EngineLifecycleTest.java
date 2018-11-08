@@ -161,7 +161,7 @@ public class EngineLifecycleTest extends Assert {
         WebAppContext servletContext = null;
         for (Handler h : contexts) {
             WebAppContext wac = (WebAppContext) h;
-            if (wac.getContextPath().equals("/jsunit")) {
+            if ("/jsunit".equals(wac.getContextPath())) {
                 servletContext = wac;
                 break;
             }

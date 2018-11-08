@@ -98,7 +98,7 @@ public final class SchemaUtil {
                     schemaElem = schema.getElement();
                 } else if (obj instanceof UnknownExtensibilityElement) {
                     org.w3c.dom.Element elem = ((UnknownExtensibilityElement)obj).getElement();
-                    if (elem.getLocalName().equals("schema")) {
+                    if ("schema".equals(elem.getLocalName())) {
                         schemaElem = elem;
                     }
                 }

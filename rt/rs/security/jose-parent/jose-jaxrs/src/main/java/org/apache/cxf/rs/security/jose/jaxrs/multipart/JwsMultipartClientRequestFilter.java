@@ -35,7 +35,7 @@ public class JwsMultipartClientRequestFilter extends AbstractJwsMultipartSignatu
     @Override
     public void filter(ClientRequestContext ctx) throws IOException {
         MediaType contentType = ctx.getMediaType();
-        if (contentType != null && contentType.getType().equals("multipart")) {
+        if (contentType != null && "multipart".equals(contentType.getType())) {
             List<Object> parts = getAttachmentParts(ctx.getEntity());
             ctx.setEntity(parts);
         }

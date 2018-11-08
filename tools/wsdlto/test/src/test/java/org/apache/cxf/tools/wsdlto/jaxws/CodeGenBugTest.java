@@ -929,7 +929,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
 
         boolean existSayHiAsyn = false;
         for (Method m : methods) {
-            if (m.getName().equals("sayHiAsyn")) {
+            if ("sayHiAsyn".equals(m.getName())) {
                 existSayHiAsyn = true;
             }
         }

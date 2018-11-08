@@ -108,9 +108,9 @@ abstract class AbstractOAuthDataProviderTest extends Assert {
         List<Client> aliceClients = getProvider().getClients(new UserSubject("alice"));
         assertNotNull(aliceClients);
         assertEquals(2, aliceClients.size());
-        compareClients(c, aliceClients.get(0).getClientId().equals("12345")
+        compareClients(c, "12345".equals(aliceClients.get(0).getClientId())
                        ? aliceClients.get(0) : aliceClients.get(1));
-        compareClients(c2, aliceClients.get(0).getClientId().equals("56789")
+        compareClients(c2, "56789".equals(aliceClients.get(0).getClientId())
                        ? aliceClients.get(0) : aliceClients.get(1));
 
         List<Client> bobClients = getProvider().getClients(new UserSubject("bob"));

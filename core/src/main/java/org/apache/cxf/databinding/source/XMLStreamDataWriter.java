@@ -247,8 +247,8 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
                     NodeList subNodeList = nNode.getChildNodes();
                     for (int j = 0; j < subNodeList.getLength(); j++) {
                         Node subNode = subNodeList.item(j);
-                        if (subNode.getNamespaceURI().equals("http://www.w3.org/2004/08/xop/include")
-                            && subNode.getLocalName().equals("Include")) {
+                        if ("http://www.w3.org/2004/08/xop/include".equals(subNode.getNamespaceURI())
+                            && "Include".equals(subNode.getLocalName())) {
                             // This is the Mtom element which break the SchemaValidation so ignore this
                             return true;
                         }

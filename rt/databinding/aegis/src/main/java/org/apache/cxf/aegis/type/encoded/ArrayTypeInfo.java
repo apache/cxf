@@ -112,7 +112,7 @@ public class ArrayTypeInfo {
         if (tokens.size() < 3) {
             throw new DatabindingException("Invalid ArrayType value " + arrayTypeValue);
         }
-        if (tokens.get(1).equals(":")) {
+        if (":".equals(tokens.get(1))) {
             typeName =
                 new QName(namespaceContext.getNamespaceURI(tokens.get(0)), tokens.get(2), tokens.get(0));
             tokens = tokens.subList(3, tokens.size());
@@ -121,7 +121,7 @@ public class ArrayTypeInfo {
             tokens = tokens.subList(1, tokens.size());
         }
 
-        if (!tokens.get(0).equals("[")) {
+        if (!"[".equals(tokens.get(0))) {
             throw new DatabindingException("Invalid ArrayType value " + arrayTypeValue);
         }
 

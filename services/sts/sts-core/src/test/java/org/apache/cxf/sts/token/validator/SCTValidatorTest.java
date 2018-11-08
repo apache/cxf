@@ -79,7 +79,7 @@ public class SCTValidatorTest extends org.junit.Assert {
         assertTrue(
             validatorResponse.getAdditionalProperties().get(SCTValidator.SCT_VALIDATOR_SECRET) != null
         );
-        assertTrue(validatorResponse.getPrincipal().getName().equals("alice"));
+        assertTrue("alice".equals(validatorResponse.getPrincipal().getName()));
 
         // Now remove the SCT from the cache
         tokenStore.remove(tokenStore.getToken(providerResponse.getTokenId()).getId());

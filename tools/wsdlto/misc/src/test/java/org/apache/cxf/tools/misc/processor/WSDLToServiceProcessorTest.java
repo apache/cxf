@@ -78,7 +78,7 @@ public class WSDLToServiceProcessorTest extends ProcessorTestBase {
                 if (obj instanceof SOAPAddress) {
                     SOAPAddress soapAddress = (SOAPAddress)obj;
                     if (soapAddress.getLocationURI() != null
-                        && soapAddress.getLocationURI().equals("http://localhost:9000/newservice/newport")) {
+                        && "http://localhost:9000/newservice/newport".equals(soapAddress.getLocationURI())) {
                         found = true;
                         break;
                     }
@@ -168,7 +168,7 @@ public class WSDLToServiceProcessorTest extends ProcessorTestBase {
                 if (obj instanceof SOAPAddress) {
                     SOAPAddress soapAddress = (SOAPAddress)obj;
                     if (soapAddress.getLocationURI() != null
-                        && soapAddress.getLocationURI().equals("http://localhost:9000/serviceins/portins")) {
+                        && "http://localhost:9000/serviceins/portins".equals(soapAddress.getLocationURI())) {
                         found = true;
                         break;
                     }

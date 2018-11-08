@@ -151,12 +151,12 @@ public class SoapJMSInInterceptor extends AbstractSoapInterceptor {
         if (ru != null && !ru.isEmpty()) {
             String requestURI = ru.get(0);
             List<String> mr = headers.get(SoapJMSConstants.MALFORMED_REQUESTURI);
-            if (mr != null && !mr.isEmpty() && mr.get(0).equals("true")) {
+            if (mr != null && !mr.isEmpty() && "true".equals(mr.get(0))) {
                 jmsFault = JMSFaultFactory.createMalformedRequestURIFault(requestURI);
             }
 
             List<String> trn = headers.get(SoapJMSConstants.TARGET_SERVICE_IN_REQUESTURI);
-            if (trn != null && !trn.isEmpty() && trn.get(0).equals("true")) {
+            if (trn != null && !trn.isEmpty() && "true".equals(trn.get(0))) {
                 jmsFault = JMSFaultFactory.createTargetServiceNotAllowedInRequestURIFault();
             }
         } else {

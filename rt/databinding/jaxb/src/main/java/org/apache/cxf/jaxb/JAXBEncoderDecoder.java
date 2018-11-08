@@ -244,7 +244,7 @@ public final class JAXBEncoderDecoder {
                         writeObject(marshaller, source, newJAXBElement(elName, cls, mObj));
                     }
                 } else if (byte[].class == cls && part.getTypeQName() != null
-                           && part.getTypeQName().getLocalPart().equals("hexBinary")) {
+                           && "hexBinary".equals(part.getTypeQName().getLocalPart())) {
                     mObj = new HexBinaryAdapter().marshal((byte[])mObj);
                     writeObject(marshaller, source, newJAXBElement(elName, String.class, mObj));
                 } else if (mObj instanceof JAXBElement) {
@@ -731,7 +731,7 @@ public final class JAXBEncoderDecoder {
                 return o;
             }
         } else if (byte[].class == clazz && part != null && part.getTypeQName() != null
-                   && part.getTypeQName().getLocalPart().equals("hexBinary")) {
+                   && "hexBinary".equals(part.getTypeQName().getLocalPart())) {
 
             String obj = (String)unmarshall(u, source, elName, String.class, unwrap);
             return new HexBinaryAdapter().unmarshal(obj);
@@ -857,8 +857,8 @@ public final class JAXBEncoderDecoder {
         }
 
         if (clazz != null
-            && (clazz.getName().equals("javax.xml.datatype.XMLGregorianCalendar")
-                || clazz.getName().equals("javax.xml.datatype.Duration"))) {
+            && ("javax.xml.datatype.XMLGregorianCalendar".equals(clazz.getName())
+                || "javax.xml.datatype.Duration".equals(clazz.getName()))) {
             // special treat two jaxb defined built-in abstract types
             unmarshalWithClass = true;
         }
@@ -966,7 +966,7 @@ public final class JAXBEncoderDecoder {
                     NamedNodeMap namedNodeMap = element.getAttributes();
                     for (int i = 0; i < namedNodeMap.getLength(); i++) {
                         Attr attr = (Attr)namedNodeMap.item(i);
-                        if (attr.getPrefix() != null && attr.getPrefix().equals("xmlns")) {
+                        if (attr.getPrefix() != null && "xmlns".equals(attr.getPrefix())) {
                             nsMap.put(attr.getLocalName(), attr.getValue());
                         }
                     }

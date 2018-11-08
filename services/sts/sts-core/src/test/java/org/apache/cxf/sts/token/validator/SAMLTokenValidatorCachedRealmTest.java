@@ -96,7 +96,7 @@ public class SAMLTokenValidatorCachedRealmTest extends org.junit.Assert {
         assertTrue(validatorResponse != null);
         assertTrue(validatorResponse.getToken() != null);
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
-        assertTrue(validatorResponse.getTokenRealm().equals("A"));
+        assertTrue("A".equals(validatorResponse.getTokenRealm()));
 
     }
 

@@ -81,7 +81,7 @@ public class PortTypeVisitor extends VisitorBase {
 
 
         AST identifierNode = node.getFirstChild();
-        if (identifierNode.getText().equals("local")) {
+        if ("local".equals(identifierNode.getText())) {
             identifierNode = identifierNode.getNextSibling();
         }
         // Check if its a forward declaration

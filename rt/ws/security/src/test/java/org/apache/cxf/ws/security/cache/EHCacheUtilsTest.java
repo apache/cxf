@@ -45,7 +45,7 @@ public class EHCacheUtilsTest extends Assert {
         CacheManager manager = EHCacheUtils.getCacheManager(bus,
                 EHCacheManagerHolder.class.getResource("/cxf-test-ehcache.xml"));
 
-        assertFalse(manager.getName().equals("myGlobalConfig"));
+        assertFalse("myGlobalConfig".equals(manager.getName()));
         EHCacheManagerHolder.releaseCacheManger(manager);
         assertEquals(Status.STATUS_SHUTDOWN, manager.getStatus());
 
@@ -66,7 +66,7 @@ public class EHCacheUtilsTest extends Assert {
         manager = EHCacheUtils.getCacheManager(bus,
                 EHCacheManagerHolder.class.getResource("/cxf-test-ehcache.xml"));
 
-        assertFalse(manager.getName().equals("myGlobalConfig"));
+        assertFalse("myGlobalConfig".equals(manager.getName()));
         EHCacheManagerHolder.releaseCacheManger(manager);
         assertEquals(Status.STATUS_SHUTDOWN, manager.getStatus());
     }

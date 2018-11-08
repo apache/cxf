@@ -597,7 +597,7 @@ public class JAXRSUtilsTest extends Assert {
                                                  MediaType.valueOf("application/json"));
 
         assertEquals(1, candidateList.size());
-        assertTrue(candidateList.get(0).toString().equals("application/json"));
+        assertTrue("application/json".equals(candidateList.get(0).toString()));
 
         //test basic
         methodMimeTypes = JAXRSUtils.parseMediaTypes(
@@ -606,7 +606,7 @@ public class JAXRSUtilsTest extends Assert {
                                                       MediaType.valueOf("application/json"));
 
         assertEquals(1, candidateList.size());
-        assertTrue(candidateList.get(0).toString().equals("application/json"));
+        assertTrue("application/json".equals(candidateList.get(0).toString()));
 
         //test accept wild card */*
         candidateList = JAXRSUtils.intersectMimeTypes(

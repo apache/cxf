@@ -123,7 +123,7 @@ public class JAXWSContainerTest extends ProcessorTestBase {
             assertEquals(6, methods.size());
             Boolean methodSame = false;
             for (JavaMethod m1 : methods) {
-                if (m1.getName().equals("testDocLitFault")) {
+                if ("testDocLitFault".equals(m1.getName())) {
                     methodSame = true;
                     break;
                 }
@@ -182,7 +182,7 @@ public class JAXWSContainerTest extends ProcessorTestBase {
             Boolean methodSame = false;
             JavaMethod m1 = null;
             for (JavaMethod m2 : methods) {
-                if (m2.getName().equals("testDocLitFault")) {
+                if ("testDocLitFault".equals(m2.getName())) {
                     methodSame = true;
                     m1 = m2;
                     break;

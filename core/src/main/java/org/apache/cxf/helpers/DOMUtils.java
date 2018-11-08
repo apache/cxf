@@ -73,7 +73,7 @@ public final class DOMUtils {
             Method[] methods = DOMUtils.class.getClassLoader().
                 loadClass("com.sun.xml.messaging.saaj.soap.SOAPDocumentImpl").getMethods();
             for (Method method : methods) {
-                if (method.getName().equals("register")) {
+                if ("register".equals(method.getName())) {
                     //this is the 1.4+ SAAJ impl
                     setJava9SAAJ(true);
                     break;
@@ -87,7 +87,7 @@ public final class DOMUtils {
                 Method[] methods = DOMUtils.class.getClassLoader().
                     loadClass("com.sun.xml.internal.messaging.saaj.soap.SOAPDocumentImpl").getMethods();
                 for (Method method : methods) {
-                    if (method.getName().equals("register")) {
+                    if ("register".equals(method.getName())) {
                         //this is the SAAJ impl in JDK9
                         setJava9SAAJ(true);
                         break;

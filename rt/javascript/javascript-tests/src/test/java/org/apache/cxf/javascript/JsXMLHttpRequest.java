@@ -187,7 +187,7 @@ public class JsXMLHttpRequest extends ScriptableObject {
             throwError("SYNTAX_ERR");
         }
         // 7 scheme check. Well, for now ...
-        if (!uri.getScheme().equals("http") && !uri.getScheme().equals("https")) {
+        if (!"http".equals(uri.getScheme()) && !"https".equals(uri.getScheme())) {
             LOG.severe("Not http " + uri.toString());
             throwError("NOT_SUPPORTED_ERR");
         }

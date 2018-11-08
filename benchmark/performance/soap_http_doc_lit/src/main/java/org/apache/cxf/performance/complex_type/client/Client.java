@@ -85,11 +85,11 @@ public final class Client extends TestCaseBase<DocPortType> {
 
     public void processArgs() {
         super.processArgs();
-        if (getOperationName().equals("echoStringDoc")) {
+        if ("echoStringDoc".equals(getOperationName())) {
             opid = 0;
-        } else if (getOperationName().equals("echoBase64Doc")) {
+        } else if ("echoBase64Doc".equals(getOperationName())) {
             opid = 1;
-        } else if (getOperationName().equals("echoComplexTypeDoc")) {
+        } else if ("echoComplexTypeDoc".equals(getOperationName())) {
             opid = 2;
         } else {
             System.out.println("Invalid operation: " + getOperationName());

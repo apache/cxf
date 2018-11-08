@@ -104,7 +104,7 @@ public class JWTTokenValidatorRealmTest extends org.junit.Assert {
         assertTrue(validatorResponse != null);
         assertTrue(validatorResponse.getToken() != null);
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
-        assertTrue(validatorResponse.getTokenRealm().equals("A"));
+        assertTrue("A".equals(validatorResponse.getTokenRealm()));
 
         Principal principal = validatorResponse.getPrincipal();
         assertTrue(principal != null && principal.getName() != null);
@@ -155,7 +155,7 @@ public class JWTTokenValidatorRealmTest extends org.junit.Assert {
         assertTrue(validatorResponse != null);
         assertTrue(validatorResponse.getToken() != null);
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
-        assertTrue(validatorResponse.getTokenRealm().equals("B"));
+        assertTrue("B".equals(validatorResponse.getTokenRealm()));
 
         Principal principal = validatorResponse.getPrincipal();
         assertTrue(principal != null && principal.getName() != null);

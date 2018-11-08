@@ -176,8 +176,8 @@ public abstract class AbstractOutDatabindingInterceptor extends AbstractPhaseInt
         }
 
         String enc = (String)m.get(Message.ENCODING);
-        return info.getClass().getName().equals("org.apache.cxf.binding.soap.model.SoapBindingInfo")
-            && s.getDataBinding().getClass().getName().equals("org.apache.cxf.jaxb.JAXBDataBinding")
+        return "org.apache.cxf.binding.soap.model.SoapBindingInfo".equals(info.getClass().getName())
+            && "org.apache.cxf.jaxb.JAXBDataBinding".equals(s.getDataBinding().getClass().getName())
             && !MessageUtils.isDOMPresent(m)
             && (enc == null || StandardCharsets.UTF_8.name().equals(enc));
     }

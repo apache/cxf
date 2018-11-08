@@ -184,7 +184,7 @@ public class ReadHeaderInterceptorTest extends TestBase {
         assertEquals(2, headerChilds.size());
         for (int i = 0; i < headerChilds.size(); i++) {
             Element ele = headerChilds.get(i);
-            if (ele.getLocalName().equals("reservation")) {
+            if ("reservation".equals(ele.getLocalName())) {
                 Element reservation = ele;
                 List<Element> reservationChilds = new ArrayList<>();
                 Element elem = DOMUtils.getFirstElement(reservation);
@@ -201,7 +201,7 @@ public class ReadHeaderInterceptorTest extends TestBase {
                     .getTextContent());
 
             }
-            if (ele.getLocalName().equals("passenger")) {
+            if ("passenger".equals(ele.getLocalName())) {
                 Element passenger = ele;
                 assertNotNull(passenger);
                 Element child = DOMUtils.getFirstElement(passenger);

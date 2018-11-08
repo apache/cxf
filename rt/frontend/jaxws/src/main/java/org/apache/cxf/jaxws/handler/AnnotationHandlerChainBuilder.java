@@ -114,8 +114,8 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
                 while (node != null) {
                     if (node instanceof Element) {
                         el = (Element)node;
-                        if (!el.getNamespaceURI().equals("http://java.sun.com/xml/ns/javaee")
-                            || !el.getLocalName().equals("handler-chain")) {
+                        if (!"http://java.sun.com/xml/ns/javaee".equals(el.getNamespaceURI())
+                            || !"handler-chain".equals(el.getLocalName())) {
 
                             String xml = StaxUtils.toString(el);
                             throw new WebServiceException(
@@ -161,7 +161,7 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
             node = node.getNextSibling();
             if (cur instanceof Element) {
                 el = (Element)cur;
-                if (!el.getNamespaceURI().equals("http://java.sun.com/xml/ns/javaee")) {
+                if (!"http://java.sun.com/xml/ns/javaee".equals(el.getNamespaceURI())) {
                     String xml = StaxUtils.toString(el);
                     throw new WebServiceException(
                         BundleUtils.getFormattedString(BUNDLE,

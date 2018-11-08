@@ -1664,7 +1664,7 @@ public class WadlGenerator implements ContainerRequestFilter {
         while (n != null) {
             if (n instanceof Element) {
                 Element e = (Element)n;
-                if (e.getLocalName().equals("import")) {
+                if ("import".equals(e.getLocalName())) {
                     e.removeAttribute("schemaLocation");
                 }
             }

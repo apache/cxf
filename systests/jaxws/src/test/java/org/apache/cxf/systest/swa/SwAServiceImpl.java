@@ -107,7 +107,7 @@ public class SwAServiceImpl implements SwAServiceInterface {
             }
             if (attach2 == null || attach2.value == null) {
                 System.err.println("attach2.value is null (unexpected)");
-                if (theResponse.getReason().equals("ok")) {
+                if ("ok".equals(theResponse.getReason())) {
                     theResponse.setReason("attach2.value is null (unexpected)");
                 } else {
                     theResponse.setReason(theResponse.getReason() + "\nattach2.value is null (unexpected)");
@@ -116,7 +116,7 @@ public class SwAServiceImpl implements SwAServiceInterface {
             }
             if (attach3 == null || attach3.value == null) {
                 System.err.println("attach3.value is null (unexpected)");
-                if (theResponse.getReason().equals("ok")) {
+                if ("ok".equals(theResponse.getReason())) {
                     theResponse.setReason("attach3.value is null (unexpected)");
                 } else {
                     theResponse.setReason(theResponse.getReason() + "\nattach3.value is null (unexpected)");
@@ -125,7 +125,7 @@ public class SwAServiceImpl implements SwAServiceInterface {
             }
             if (attach4 == null || attach4.value == null) {
                 System.err.println("attach4.value is null (unexpected)");
-                if (theResponse.getReason().equals("ok")) {
+                if ("ok".equals(theResponse.getReason())) {
                     theResponse.setReason("attach4.value is null (unexpected)");
                 } else {
                     theResponse.setReason(theResponse.getReason() + "\nattach4.value is null (unexpected)");
@@ -134,7 +134,7 @@ public class SwAServiceImpl implements SwAServiceInterface {
             }
             if (attach5 == null || attach5.value == null) {
                 System.err.println("attach5.value is null (unexpected)");
-                if (theResponse.getReason().equals("ok")) {
+                if ("ok".equals(theResponse.getReason())) {
                     theResponse.setReason("attach5.value is null (unexpected)");
                 } else {
                     theResponse.setReason(theResponse.getReason() + "\nattach5.value is null (unexpected)");

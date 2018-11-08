@@ -36,7 +36,7 @@ public class JwsMultipartContainerResponseFilter extends AbstractJwsMultipartSig
     @Override
     public void filter(ContainerRequestContext reqCtx, ContainerResponseContext respCtx) throws IOException {
         MediaType contentType = respCtx.getMediaType();
-        if (contentType != null && contentType.getType().equals("multipart")) {
+        if (contentType != null && "multipart".equals(contentType.getType())) {
             List<Object> parts = getAttachmentParts(respCtx.getEntity());
             respCtx.setEntity(parts);
         }
