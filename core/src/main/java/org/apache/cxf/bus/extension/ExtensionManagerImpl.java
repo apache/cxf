@@ -277,7 +277,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
             Method[] methods = clazz.getMethods();
             for (int i = 0; i < methods.length; i++) {
                 Method method = methods[i];
-                Class<?> params[] = method.getParameterTypes();
+                Class<?>[] params = method.getParameterTypes();
                 if (method.getName().equals(methodName) && params.length == 1) {
                     Class<?> paramType = params[0];
                     if (paramType.isInstance(value)) {

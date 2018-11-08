@@ -183,7 +183,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
         try {
             Class<?> objectFactory = Class.forName(PackageUtils.getPackageName(cls) + ".ObjectFactory",
                                                    true, loader);
-            Method methods[] = ReflectionUtil.getDeclaredMethods(objectFactory);
+            Method[] methods = ReflectionUtil.getDeclaredMethods(objectFactory);
             for (Method method : methods) {
                 if (method.getParameterTypes().length == 1
                     && method.getParameterTypes()[0].equals(cls)) {
@@ -298,7 +298,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
             Class<?> objectFactory = Class.forName(PackageUtils.getPackageName(typeClass) + ".ObjectFactory",
                                                    true,
                                                    obj.getClass().getClassLoader());
-            Method methods[] = objectFactory.getDeclaredMethods();
+            Method[] methods = objectFactory.getDeclaredMethods();
             for (Method method : methods) {
                 if (method.getParameterTypes().length == 1
                     && method.getParameterTypes()[0].equals(typeClass)) {

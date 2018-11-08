@@ -2140,7 +2140,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
     }
 
     protected void createFaultForException(Class<?> exClass, FaultInfo fi) {
-        Field fields[] = exClass.getDeclaredFields();
+        Field[] fields = exClass.getDeclaredFields();
         for (Field field : fields) {
             MessagePartInfo mpi = fi
                 .addMessagePart(new QName(fi.getName().getNamespaceURI(), field.getName()));
@@ -2420,7 +2420,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
         checkServiceClassAnnotations(serviceClass);
     }
     protected void checkServiceClassAnnotations(Class<?> sc) {
-        Annotation anns[] = serviceClass.getAnnotations();
+        Annotation[] anns = serviceClass.getAnnotations();
         if (anns != null) {
             for (Annotation ann : anns) {
                 String pkg = ann.annotationType().getPackage().getName();

@@ -162,7 +162,7 @@ public abstract class AbstractServerPersistenceTest extends AbstractBusClientSer
 
         LOG.fine("Configured greeter client.");
 
-        Response<GreetMeResponse> responses[] = cast(new Response[4]);
+        Response<GreetMeResponse>[] responses = cast(new Response[4]);
 
         responses[0] = greeter.greetMeAsync("one");
         responses[1] = greeter.greetMeAsync("two");

@@ -51,8 +51,8 @@ import org.apache.cxf.service.model.MessagePartInfo;
  */
 public class JAXRSDataBinding extends AbstractDataBinding {
 
-    private static final Class<?> SUPPORTED_READER_FORMATS[] = new Class<?>[] {XMLStreamReader.class};
-    private static final Class<?> SUPPORTED_WRITER_FORMATS[] = new Class<?>[] {XMLStreamWriter.class};
+    private static final Class<?>[] SUPPORTED_READER_FORMATS = new Class<?>[] {XMLStreamReader.class};
+    private static final Class<?>[] SUPPORTED_WRITER_FORMATS = new Class<?>[] {XMLStreamWriter.class};
 
     private MessageBodyReader<?> xmlReader;
     private MessageBodyWriter<Object> xmlWriter;

@@ -203,7 +203,7 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
                 if (cls != null) {
                     Object ret = cls.newInstance();
                     //copy props
-                    Method meth[] = cause.getClass().getMethods();
+                    Method[] meth = cause.getClass().getMethods();
                     for (Method m : meth) {
                         if (m.getParameterTypes().length == 0
                             && (m.getName().startsWith("get")

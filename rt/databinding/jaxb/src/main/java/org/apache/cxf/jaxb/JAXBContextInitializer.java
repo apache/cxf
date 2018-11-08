@@ -392,7 +392,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         if (accessType != XmlAccessType.PROPERTY) {   // only look for fields if we are instructed to
             //fields are accessible even if not public, must look at the declared fields
             //then walk to parents declared fields, etc...
-            Field fields[] = ReflectionUtil.getDeclaredFields(cls);
+            Field[] fields = ReflectionUtil.getDeclaredFields(cls);
             for (Field f : fields) {
                 if (isFieldAccepted(f, accessType)) {
                     XmlJavaTypeAdapter xjta = Utils.getFieldXJTA(f);
@@ -410,7 +410,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         }
 
         if (accessType != XmlAccessType.FIELD) {   // only look for methods if we are instructed to
-            Method methods[] = ReflectionUtil.getDeclaredMethods(cls);
+            Method[] methods = ReflectionUtil.getDeclaredMethods(cls);
             for (Method m : methods) {
                 if (isMethodAccepted(m, accessType)) {
                     XmlJavaTypeAdapter xjta = Utils.getMethodXJTA(m);

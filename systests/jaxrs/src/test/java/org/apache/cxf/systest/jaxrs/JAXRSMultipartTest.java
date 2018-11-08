@@ -148,7 +148,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
 
     int countTempFiles() {
         File file = FileUtils.getDefaultTempDir();
-        File files[] = file.listFiles();
+        File[] files = file.listFiles();
         if (files == null) {
             return 0;
         }

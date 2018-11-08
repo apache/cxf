@@ -374,12 +374,12 @@ public class JaxWsImplementorInfo {
 
     private static Class<?> doGetProviderParameterType(Class<?> c) {
         while (c != null) {
-            Type intfTypes[] = c.getGenericInterfaces();
+            Type[] intfTypes = c.getGenericInterfaces();
             for (Type t : intfTypes) {
                 Class<?> clazz = JAXBEncoderDecoder.getClassFromType(t);
                 if (Provider.class.isAssignableFrom(clazz)) {
                     if (Provider.class == clazz) {
-                        Type paramTypes[] = ((ParameterizedType)t).getActualTypeArguments();
+                        Type[] paramTypes = ((ParameterizedType)t).getActualTypeArguments();
                         return JAXBEncoderDecoder.getClassFromType(paramTypes[0]);
                     }
                     return doGetProviderParameterType(clazz);

@@ -303,7 +303,7 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
         runForked(artifactsPath, ForkOnceCodeGenerator.class, args);
 
         for (WadlOption option : toDo) {
-            File dirs[] = option.getDeleteDirs();
+            File[] dirs = option.getDeleteDirs();
             if (dirs != null) {
                 for (int idx = 0; idx < dirs.length; ++idx) {
                     deleteDir(dirs[idx]);
@@ -576,7 +576,7 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
         } else if (timestamp > doneFile.lastModified()) {
             doWork = true;
         } else {
-            File files[] = wadlOption.getDependencies();
+            File[] files = wadlOption.getDependencies();
             if (files != null) {
                 for (int z = 0; z < files.length; ++z) {
                     if (files[z].lastModified() > doneFile.lastModified()) {

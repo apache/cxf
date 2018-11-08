@@ -196,7 +196,7 @@ public class Log4jLogger extends AbstractDelegatingLogger {
         }
     }
     private static void getFullInfoForLogUtils(LogRecord lr, String cname) {
-        StackTraceElement el[] = Thread.currentThread().getStackTrace();
+        StackTraceElement[] el = Thread.currentThread().getStackTrace();
         for (int x = el.length - 2; x >= 0; x--) {
             if (LogUtils.class.getName().equals(el[x].getClassName())
                 || cname.equals(el[x].getClassName())) {

@@ -739,7 +739,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         }
 
         private String readHeaders(Headers h) throws IOException {
-            Header headers[] = getHttpResponse().getAllHeaders();
+            Header[] headers = getHttpResponse().getAllHeaders();
             h.headerMap().clear();
             String ct = null;
             for (Header header : headers) {

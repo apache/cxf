@@ -60,7 +60,7 @@ public class JaxWsClientThreadTest extends AbstractCXFTest {
 
         String address = (String)requestContext.get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY);
 
-        final Throwable errorHolder[] = new Throwable[1];
+        final Throwable[] errorHolder = new Throwable[1];
 
         Runnable r = new Runnable() {
             public void run() {
@@ -145,7 +145,7 @@ public class JaxWsClientThreadTest extends AbstractCXFTest {
 
         String address = (String)requestContext.get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY);
 
-        final Throwable errorHolder[] = new Throwable[1];
+        final Throwable[] errorHolder = new Throwable[1];
 
         Runnable r = new Runnable() {
             public void run() {

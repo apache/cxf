@@ -126,7 +126,7 @@ public class WADL2JavaMojo extends AbstractCodeGeneratorMojo {
                 for (WadlOption o : effectiveWsdlOptions) {
                     bus = callCodeGenerator(o, bus, cp);
 
-                    File dirs[] = o.getDeleteDirs();
+                    File[] dirs = o.getDeleteDirs();
                     if (dirs != null) {
                         for (int idx = 0; idx < dirs.length; ++idx) {
                             result = result && deleteDir(dirs[idx]);

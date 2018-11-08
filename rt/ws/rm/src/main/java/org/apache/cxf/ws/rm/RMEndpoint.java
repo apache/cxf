@@ -410,7 +410,7 @@ public class RMEndpoint {
                                                                  .getResource("/schemas/wsdl/wsrm.xsd")
                                                                  .openStream());
 
-                javax.xml.transform.Source schemas[] = new javax.xml.transform.Source[] {ad, rm};
+                javax.xml.transform.Source[] schemas = new javax.xml.transform.Source[] {ad, rm};
                 rmSchema = factory.newSchema(schemas);
             } catch (Exception ex) {
                 //ignore

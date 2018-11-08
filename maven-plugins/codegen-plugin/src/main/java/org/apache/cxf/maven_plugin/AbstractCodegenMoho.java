@@ -275,7 +275,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
                 for (GenericWsdlOption o : effectiveWsdlOptions) {
                     bus = generate(o, bus, cp);
 
-                    File dirs[] = o.getDeleteDirs();
+                    File[] dirs = o.getDeleteDirs();
                     if (dirs != null) {
                         for (int idx = 0; idx < dirs.length; ++idx) {
                             result = result && deleteDir(dirs[idx]);
@@ -345,7 +345,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
     }
 
     private Resource scanForResources(File rootFile, Resource root) {
-        File files[] = rootFile.listFiles();
+        File[] files = rootFile.listFiles();
         if (files == null) {
             return root;
         }
@@ -553,7 +553,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         runForked(artifactsPath, getForkClass().getName(), args);
 
         for (GenericWsdlOption wsdlOption : toDo) {
-            File dirs[] = wsdlOption.getDeleteDirs();
+            File[] dirs = wsdlOption.getDeleteDirs();
             if (dirs != null) {
                 for (int idx = 0; idx < dirs.length; ++idx) {
                     deleteDir(dirs[idx]);

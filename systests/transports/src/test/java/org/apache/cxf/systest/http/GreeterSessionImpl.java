@@ -59,7 +59,7 @@ public class GreeterSessionImpl implements Greeter {
         LOG.info("Message received: " + me);
         MessageContext mc = context.getMessageContext();
         HttpServletRequest req = (HttpServletRequest)mc.get(MessageContext.SERVLET_REQUEST);
-        Cookie cookies[] = req.getCookies();
+        Cookie[] cookies = req.getCookies();
         String val = "";
         if (cookies != null) {
             for (Cookie cookie : cookies) {

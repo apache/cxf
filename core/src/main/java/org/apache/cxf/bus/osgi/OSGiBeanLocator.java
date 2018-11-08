@@ -60,7 +60,7 @@ public class OSGiBeanLocator implements ConfiguredBeanLocator {
     private <T> List<T> getBeansFromOsgiService(Class<T> type) {
         List<T> list = new ArrayList<>();
         try {
-            ServiceReference<?> refs[] = context.getServiceReferences(type.getName(), null);
+            ServiceReference<?>[] refs = context.getServiceReferences(type.getName(), null);
             if (refs != null) {
                 for (ServiceReference<?> r : refs) {
                     if (type == ClassLoader.class

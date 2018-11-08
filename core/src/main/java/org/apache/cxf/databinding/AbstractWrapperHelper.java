@@ -32,7 +32,7 @@ import org.apache.cxf.interceptor.Fault;
  */
 public abstract class AbstractWrapperHelper implements WrapperHelper {
 
-    public static final Class<?> NO_CLASSES[] = new Class<?>[0];
+    public static final Class<?>[] NO_CLASSES = new Class<?>[0];
     public static final Object[] NO_PARAMS = new Object[0];
 
     protected final Class<?> wrapperType;

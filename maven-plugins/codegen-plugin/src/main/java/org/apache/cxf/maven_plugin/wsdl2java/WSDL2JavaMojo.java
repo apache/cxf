@@ -223,7 +223,7 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
         } else if (wsdlOption.isDefServiceName()) {
             doWork = true;
         } else {
-            URI dependencies[] = wsdlOption.getDependencyURIs(project
+            URI[] dependencies = wsdlOption.getDependencyURIs(project
                     .getBasedir().toURI());
             if (dependencies != null) {
                 for (int z = 0; z < dependencies.length; ++z) {

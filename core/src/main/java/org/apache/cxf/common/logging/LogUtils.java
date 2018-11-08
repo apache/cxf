@@ -462,7 +462,7 @@ public final class LogUtils {
 
         //try to get the right class name/method name - just trace
         //back the stack till we get out of this class
-        StackTraceElement stack[] = (new Throwable()).getStackTrace();
+        StackTraceElement[] stack = (new Throwable()).getStackTrace();
         String cname = LogUtils.class.getName();
         for (int x = 0; x < stack.length; x++) {
             StackTraceElement frame = stack[x];

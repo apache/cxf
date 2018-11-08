@@ -51,7 +51,7 @@ public class JmsTopicExpressionConverter {
             return null;
         }
         int size = topics.size();
-        ActiveMQTopic childrenDestinations[] = new ActiveMQTopic[size];
+        ActiveMQTopic[] childrenDestinations = new ActiveMQTopic[size];
         for (int i = 0; i < size; i++) {
             childrenDestinations[i] = toActiveMQTopic(topics.get(i));
         }

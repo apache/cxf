@@ -87,7 +87,7 @@ abstract class CXFInvocationHandlerBase implements CXFInvocationHandler {
     private boolean isCheckedException(Method method, Throwable t) {
         boolean isCheckedException = false;
 
-        Class<?> checkExceptionTypes[] = method.getExceptionTypes();
+        Class<?>[] checkExceptionTypes = method.getExceptionTypes();
 
         for (int i = 0; i < checkExceptionTypes.length; i++) {
             if (checkExceptionTypes[i].isAssignableFrom(t.getClass())) {

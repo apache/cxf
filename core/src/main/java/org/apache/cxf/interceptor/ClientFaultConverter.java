@@ -207,7 +207,7 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
 
     private Constructor<?> getConstructor(Class<?> faultClass, Object e) throws NoSuchMethodException {
         Class<?> beanClass = e.getClass();
-        Constructor<?> cons[] = faultClass.getConstructors();
+        Constructor<?>[] cons = faultClass.getConstructors();
         for (Constructor<?> c : cons) {
             if (c.getParameterTypes().length == 2
                 && String.class.equals(c.getParameterTypes()[0])
@@ -352,7 +352,7 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
             }
         }
         //also use/try public getter/setter methods
-        Method meth[] = faultBean.getClass().getMethods();
+        Method[] meth = faultBean.getClass().getMethods();
         for (Method m : meth) {
             if (m.getParameterTypes().length == 0
                 && (m.getName().startsWith("get")

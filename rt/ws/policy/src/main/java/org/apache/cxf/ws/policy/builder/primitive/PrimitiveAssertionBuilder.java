@@ -31,7 +31,7 @@ import org.apache.neethi.builders.AssertionBuilder;
 
 public class PrimitiveAssertionBuilder implements AssertionBuilder<Element> {
 
-    private QName knownElements[] = {};
+    private QName[] knownElements = {};
 
     public PrimitiveAssertionBuilder() {
     }

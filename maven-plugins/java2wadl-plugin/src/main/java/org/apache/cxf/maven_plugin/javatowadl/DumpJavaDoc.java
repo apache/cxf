@@ -55,7 +55,7 @@ public final class DumpJavaDoc {
                         }
                     }
                 }
-                Tag retTags[] = method.tags("return");
+                Tag[] retTags = method.tags("return");
                 if (retTags != null && retTags.length == 1) {
                     Tag retTag = method.tags("return")[0];
                     javaDocMap.put(method.qualifiedName() + "." + "returnCommentTag",

@@ -69,7 +69,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
         Class<?> clz = classLoader.loadClass("com.mypizzaco.pizza.PizzaPortType");
 
-        Method meths[] = clz.getMethods();
+        Method[] meths = clz.getMethods();
         for (Method m : meths) {
             if ("orderPizzaBroken".equals(m.getName())) {
                 Annotation annotations[][] = m.getParameterAnnotations();
@@ -129,7 +129,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
         Class<?> clz = classLoader.loadClass("com.mypizzaco.pizza.PizzaPortType");
 
-        Method meths[] = clz.getMethods();
+        Method[] meths = clz.getMethods();
         for (Method m : meths) {
             if ("orderPizzaBroken".equals(m.getName())) {
                 Annotation annotations[][] = m.getParameterAnnotations();
@@ -163,7 +163,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
         Class<?> clz = classLoader.loadClass("com.mypizzaco.pizza.PizzaPortType");
 
-        Method meths[] = clz.getMethods();
+        Method[] meths = clz.getMethods();
         for (Method m : meths) {
             if ("orderPizzaBroken".equals(m.getName())) {
                 Annotation annotations[][] = m.getParameterAnnotations();
@@ -198,7 +198,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
         Class<?> clz = classLoader.loadClass("org.apache.cxf.pizza_wrapped.Pizza");
 
-        Method meths[] = clz.getMethods();
+        Method[] meths = clz.getMethods();
         for (Method m : meths) {
             if ("orderPizza".equals(m.getName())) {
                 Annotation annotations[][] = m.getParameterAnnotations();
@@ -230,7 +230,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         assertNotNull(output);
 
         Class<?> clz = classLoader.loadClass("org.apache.cxf.bugs.oobh.LoginInterface");
-        Method meths[] = clz.getMethods();
+        Method[] meths = clz.getMethods();
         for (Method m : meths) {
             if ("login".equals(m.getName())) {
                 assertEquals(String.class, m.getReturnType());
@@ -1174,7 +1174,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         processor.execute();
         Class<?> cls = classLoader.loadClass("org.apache.header_test.rpc.TestRPCHeaderPort");
 
-        Method meths[] = cls.getMethods();
+        Method[] meths = cls.getMethods();
         for (Method m : meths) {
             if ("testHeader1".equals(m.getName())) {
                 Annotation annotations[][] = m.getParameterAnnotations();
@@ -1434,7 +1434,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         File seif = new File(output, "org/apache/cxf/helloworld/HelloWorldServiceImpl.java");
         assertTrue(seif.exists());
         Class<?> sei = classLoader.loadClass("org.apache.cxf.helloworld.HelloWorldServiceImpl");
-        Method m[] = sei.getDeclaredMethods();
+        Method[] m = sei.getDeclaredMethods();
         assertEquals(1, m.length);
         assertTrue(m[0].getParameterAnnotations()[1][0] instanceof WebParam);
         WebParam wp = (WebParam)m[0].getParameterAnnotations()[1][0];

@@ -34,7 +34,7 @@ public class TestRPCHeaderTest extends Assert {
 
     @Test
     public void testHeader1() {
-        Method meths[] = cls.getMethods();
+        Method[] meths = cls.getMethods();
         for (Method m : meths) {
             if ("testHeader1".equals(m.getName())) {
                 Annotation annotations[][] = m.getParameterAnnotations();
@@ -53,7 +53,7 @@ public class TestRPCHeaderTest extends Assert {
 
     @Test
     public void testInOutHeader() {
-        Method meths[] = cls.getMethods();
+        Method[] meths = cls.getMethods();
         for (Method m : meths) {
             if ("testInOutHeader".equals(m.getName())) {
                 Annotation annotations[][] = m.getParameterAnnotations();

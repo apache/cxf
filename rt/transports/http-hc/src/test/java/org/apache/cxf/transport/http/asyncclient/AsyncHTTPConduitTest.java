@@ -295,10 +295,10 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
         final int warmupIter = 5000;
         final int runIter = 5000;
         final CountDownLatch wlatch = new CountDownLatch(warmupIter);
-        final boolean wdone[] = new boolean[warmupIter];
+        final boolean[] wdone = new boolean[warmupIter];
 
         @SuppressWarnings("unchecked")
-        AsyncHandler<GreetMeLaterResponse> whandler[] = new AsyncHandler[warmupIter];
+        AsyncHandler<GreetMeLaterResponse>[] whandler = new AsyncHandler[warmupIter];
         for (int x = 0; x < warmupIter; x++) {
             final int c = x;
             whandler[x] = new AsyncHandler<GreetMeLaterResponse>() {

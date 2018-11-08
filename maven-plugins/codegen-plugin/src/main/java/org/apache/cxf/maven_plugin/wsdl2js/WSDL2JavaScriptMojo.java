@@ -175,7 +175,7 @@ public class WSDL2JavaScriptMojo extends AbstractCodegenMoho {
         } else if (timestamp > doneFile.lastModified()) {
             doWork = true;
         } else {
-            File files[] = wsdlOption.getDependencies();
+            File[] files = wsdlOption.getDependencies();
             if (files != null) {
                 for (int z = 0; z < files.length; ++z) {
                     if (files[z].lastModified() > doneFile.lastModified()) {

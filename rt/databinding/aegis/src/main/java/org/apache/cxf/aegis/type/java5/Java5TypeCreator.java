@@ -233,7 +233,7 @@ public class Java5TypeCreator extends AbstractTypeCreator {
         }
         if (cls instanceof ParameterizedType) {
             ParameterizedType pt = (ParameterizedType)cls;
-            Type types[] = pt.getActualTypeArguments();
+            Type[] types = pt.getActualTypeArguments();
             TypeVariable<?>[] params = ((Class<?>)pt.getRawType()).getTypeParameters();
             for (int x = 0; x < types.length; x++) {
                 Type type = types[x];

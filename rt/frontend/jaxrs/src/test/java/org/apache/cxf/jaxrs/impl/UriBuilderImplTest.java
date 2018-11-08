@@ -1449,7 +1449,7 @@ public class UriBuilderImplTest extends Assert {
             "foo://example.com:8042/over/there?name=ferret#nose"
         };
 
-        URI urisReplace[] = new URI[urisOriginal.length];
+        URI[] urisReplace = new URI[urisOriginal.length];
 
         urisReplace[0] = new URI("http", "//ftp.is.co.za/rfc/rfc1808.txt",
                 null);

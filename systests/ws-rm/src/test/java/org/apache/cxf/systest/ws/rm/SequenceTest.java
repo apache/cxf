@@ -1136,7 +1136,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
             }
         }
 
-        ClientThread clients[] = new ClientThread[2];
+        ClientThread[] clients = new ClientThread[2];
 
         try {
             for (int i = 0; i < clients.length; i++) {
@@ -1226,7 +1226,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
             }
         }
 
-        ClientThread clients[] = new ClientThread[2];
+        ClientThread[] clients = new ClientThread[2];
 
         try {
             for (int i = 0; i < clients.length; i++) {

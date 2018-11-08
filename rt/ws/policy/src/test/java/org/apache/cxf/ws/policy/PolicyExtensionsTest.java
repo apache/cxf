@@ -155,7 +155,7 @@ public class PolicyExtensionsTest extends Assert {
 
     public static class TestAssertionBuilder implements AssertionBuilder<Element> {
 
-        QName knownElements[] = {KNOWN};
+        QName[] knownElements = {KNOWN};
 
         public TestAssertionBuilder() {
         }

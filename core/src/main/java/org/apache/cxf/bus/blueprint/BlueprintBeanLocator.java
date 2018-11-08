@@ -125,7 +125,7 @@ public class BlueprintBeanLocator implements ConfiguredBeanLocator {
         }
         if (list.isEmpty() && context != null) {
             try {
-                ServiceReference<?> refs[] = context.getServiceReferences(type.getName(), null);
+                ServiceReference<?>[] refs = context.getServiceReferences(type.getName(), null);
                 if (refs != null) {
                     for (ServiceReference<?> r : refs) {
                         list.add(type.cast(context.getService(r)));
@@ -169,7 +169,7 @@ public class BlueprintBeanLocator implements ConfiguredBeanLocator {
 
         try {
             if (context != null) {
-                ServiceReference<?> refs[] = context.getServiceReferences(type.getName(), null);
+                ServiceReference<?>[] refs = context.getServiceReferences(type.getName(), null);
                 if (refs != null) {
                     for (ServiceReference<?> r : refs) {
                         Object o2 = context.getService(r);

@@ -229,7 +229,7 @@ public class Option {
             return l1;
         }
         int len = l1.length + l2.length;
-        T ret[] = (T[])java.lang.reflect.Array.newInstance(cls, len);
+        T[] ret = (T[])java.lang.reflect.Array.newInstance(cls, len);
         System.arraycopy(l1, 0, ret, 0, l1.length);
         System.arraycopy(l2, 0, ret, l1.length, l2.length);
         return ret;

@@ -788,7 +788,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias(alias);
 
-        X509Certificate certs[] = crypto.getX509Certificates(cryptoType);
+        X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
         if (certs == null || certs.length == 0) {
             throw new Fault("Could not get X509Certificate for alias " + alias, LOG);
         }

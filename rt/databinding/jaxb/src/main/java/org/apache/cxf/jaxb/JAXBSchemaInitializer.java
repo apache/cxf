@@ -190,7 +190,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
                     }
                 }
                 if (!found) {
-                    Annotation tmp[] = new Annotation[anns.length + 1];
+                    Annotation[] tmp = new Annotation[anns.length + 1];
                     System.arraycopy(anns, 0, tmp, 0, anns.length);
                     tmp[anns.length] = jta;
                     anns = tmp;
@@ -438,7 +438,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             XmlSchemaSequence seq = new XmlSchemaSequence();
             ct.setParticle(seq);
 
-            Method methods[] = cls.getMethods();
+            Method[] methods = cls.getMethods();
             for (Method m : methods) {
                 if (m.getName().startsWith("get")
                     || m.getName().startsWith("is")) {

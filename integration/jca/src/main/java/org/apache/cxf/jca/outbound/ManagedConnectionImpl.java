@@ -242,7 +242,7 @@ public class ManagedConnectionImpl implements ManagedConnection {
 
     private Object createConnectionHandle(final CXFConnectionSpec spec) {
 
-        Class<?> interfaces[] = {CXFConnection.class, BindingProvider.class,
+        Class<?>[] interfaces = {CXFConnection.class, BindingProvider.class,
                 spec.getServiceClass()};
 
         return Proxy.newProxyInstance(spec.getServiceClass().getClassLoader(),

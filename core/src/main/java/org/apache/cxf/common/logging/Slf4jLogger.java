@@ -112,7 +112,7 @@ public class Slf4jLogger extends AbstractDelegatingLogger {
         Level level = record.getLevel();
         Throwable t = record.getThrown();
 
-        Handler targets[] = getHandlers();
+        Handler[] targets = getHandlers();
         if (targets != null) {
             for (Handler h : targets) {
                 h.publish(record);

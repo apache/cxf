@@ -111,7 +111,7 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
                 }
             }
             if (!found) {
-                Class<?> cls2[] = new Class<?>[cls.length + 1];
+                Class<?>[] cls2 = new Class<?>[cls.length + 1];
                 System.arraycopy(cls, 0, cls2, 0, cls.length);
                 cls2[cls.length] = seiClass;
                 cls = cls2;

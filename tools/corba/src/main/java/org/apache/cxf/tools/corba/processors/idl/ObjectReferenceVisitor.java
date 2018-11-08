@@ -101,7 +101,7 @@ public class ObjectReferenceVisitor extends VisitorBase {
         // type, we still need to create a schema type so that the visitor knows what
         // kind of parameter this is.  For a default endpoint, we'll just provide a
         // reference to a WS addressing EndpointReferenceType.
-        XmlSchema scs[] = schemas.getXmlSchema(ReferenceConstants.WSADDRESSING_NAMESPACE);
+        XmlSchema[] scs = schemas.getXmlSchema(ReferenceConstants.WSADDRESSING_NAMESPACE);
         XmlSchema wsaSchema = null;
         if (scs != null) {
             for (XmlSchema sc : scs) {
@@ -201,7 +201,7 @@ public class ObjectReferenceVisitor extends VisitorBase {
 
         // Create a schema namespace for WS addressing and use it to create an endpoint
         // reference type.  This will be used as the type for our endpoint reference.
-        XmlSchema scs[] = schemas.getXmlSchema(ReferenceConstants.WSADDRESSING_NAMESPACE);
+        XmlSchema[] scs = schemas.getXmlSchema(ReferenceConstants.WSADDRESSING_NAMESPACE);
         XmlSchema wsaSchema = null;
         if (scs != null) {
             for (XmlSchema sc : scs) {
