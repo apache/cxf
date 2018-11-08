@@ -116,9 +116,7 @@ public class ApplicationController implements ServletContextAware {
 
         clientManager.removeRegisteredClient(consumerKey);
 
-
-        ModelAndView modelAndView = new ModelAndView(new RedirectView("/app/listRegisteredClients"));
-        return modelAndView;
+        return new ModelAndView(new RedirectView("/app/listRegisteredClients"));
     }
 
     @RequestMapping("/revokeAccess")
@@ -127,8 +125,7 @@ public class ApplicationController implements ServletContextAware {
 
         clientManager.removeAllTokens(consumerKey);
 
-        ModelAndView modelAndView = new ModelAndView(new RedirectView("/app/listAuthorizedClients"));
-        return modelAndView;
+        return new ModelAndView(new RedirectView("/app/listAuthorizedClients"));
     }
 
     @RequestMapping("/displayVerifier")
