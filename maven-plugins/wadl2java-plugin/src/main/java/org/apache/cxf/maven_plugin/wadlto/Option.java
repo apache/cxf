@@ -36,12 +36,12 @@ public class Option {
      * A set of dependent files used to detect the generator must process WSDL, even
      * if generator marker files are up to date.
      */
-    File dependencies[];
+    File[] dependencies;
 
     /**
      * Redundant directories to be deleted after code generation
      */
-    File redundantDirs[];
+    File[] redundantDirs;
 
     /**
      * Extra arguments to pass to the command-line code generator. For compatibility as well as to

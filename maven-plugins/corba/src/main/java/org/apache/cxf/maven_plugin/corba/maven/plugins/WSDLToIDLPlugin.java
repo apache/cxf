@@ -54,7 +54,7 @@ public class WSDLToIDLPlugin extends AbstractMojo {
     /**
      * @parameter
      */
-    WsdltoidlOption wsdltoidlOptions[];
+    WsdltoidlOption[] wsdltoidlOptions;
 
     /**
      * @parameter expression="${project}"

@@ -36,15 +36,15 @@ public abstract class AbstractWrapperHelper implements WrapperHelper {
     public static final Object[] NO_PARAMS = new Object[0];
 
     protected final Class<?> wrapperType;
-    protected final Method setMethods[];
-    protected final Method getMethods[];
-    protected final Field fields[];
+    protected final Method[] setMethods;
+    protected final Method[] getMethods;
+    protected final Field[] fields;
     protected boolean validate;
 
 
     protected AbstractWrapperHelper(Class<?> wt,
-                  Method sets[],
-                  Method gets[],
+                  Method[] sets,
+                  Method[] gets,
                   Field f[]) {
         setMethods = sets;
         getMethods = gets;

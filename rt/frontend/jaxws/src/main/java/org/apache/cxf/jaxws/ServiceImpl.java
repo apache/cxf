@@ -117,7 +117,7 @@ public class ServiceImpl extends ServiceDelegate {
     private Class<?> clazz;
 
     private Map<QName, PortInfoImpl> portInfos = new HashMap<>();
-    private WebServiceFeature serviceFeatures[];
+    private WebServiceFeature[] serviceFeatures;
 
     public ServiceImpl(Bus b, URL url, QName name, Class<?> cls, WebServiceFeature ... f) {
         clazz = cls;

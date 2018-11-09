@@ -71,7 +71,7 @@ public class WSDL2JavaScriptMojo extends AbstractCodegenMoho {
      * If you have not enabled wsdl scanning, these options call out the wsdls to process.
      */
     @Parameter
-    WsdlOption wsdlOptions[];
+    WsdlOption[] wsdlOptions;
 
     @Override
     protected Bus generate(GenericWsdlOption genericWsdlOption,

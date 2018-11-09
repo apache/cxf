@@ -100,7 +100,7 @@ public class JAXBWrapperHelperTest extends Assert {
         @XmlElement(name = "Parameter2")
         protected int parameter2;
         @XmlElement(name = "Parameter3")
-        protected boolean parameter3[];
+        protected boolean[] parameter3;
         @XmlElement(name = "Parameter4")
         protected String parameter4;
         @XmlElement(name = "Parameter5")

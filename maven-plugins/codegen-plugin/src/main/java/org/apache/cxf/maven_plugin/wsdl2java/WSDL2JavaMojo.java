@@ -140,7 +140,7 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
      * If you have not enabled wsdl scanning, these options call out the wsdls to process.
      */
     @Parameter
-    WsdlOption wsdlOptions[];
+    WsdlOption[] wsdlOptions;
 
     /**
      * Default options to be used when a wsdl has not had it's options explicitly specified.

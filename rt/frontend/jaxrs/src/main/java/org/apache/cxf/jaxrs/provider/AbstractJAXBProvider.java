@@ -338,7 +338,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         return marshalAsJaxbElement && (!xmlTypeAsJaxbElementOnly || isXmlType(type))
             || isSupported(type, genericType, anns);
     }
-    public void writeTo(T t, Type genericType, Annotation annotations[],
+    public void writeTo(T t, Type genericType, Annotation[] annotations,
                  MediaType mediaType,
                  MultivaluedMap<String, Object> httpHeaders,
                  OutputStream entityStream) throws IOException, WebApplicationException {

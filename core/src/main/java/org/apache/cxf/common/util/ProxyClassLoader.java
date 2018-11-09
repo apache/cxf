@@ -28,7 +28,7 @@ import java.util.Set;
  * service class.
  */
 public class ProxyClassLoader extends ClassLoader {
-    private final Class<?> classes[];
+    private final Class<?>[] classes;
     private final Set<ClassLoader> loaders = new HashSet<>();
     private boolean checkSystem;
 

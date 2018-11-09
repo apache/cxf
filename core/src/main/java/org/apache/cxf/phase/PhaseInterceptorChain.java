@@ -71,19 +71,19 @@ public class PhaseInterceptorChain implements InterceptorChain {
     private static final ThreadLocal<Message> CURRENT_MESSAGE = new ThreadLocal<>();
 
     private final Map<String, Integer> nameMap;
-    private final Phase phases[];
+    private final Phase[] phases;
 
     // heads[phase] refers to the first interceptor of the given phase
-    private InterceptorHolder heads[];
+    private InterceptorHolder[] heads;
     // tails[phase] refers to the last interceptor of the given phase
-    private InterceptorHolder tails[];
+    private InterceptorHolder[] tails;
     // hasAfters[phase] indicates that the given phase has already inserted
     // interceptors that may need to be placed after future to-be-inserted
     // interceptors.  This flag is used to activate ordering of interceptors
     // when new ones are added to the list for this phase.
     // Note no hasBefores[] is needed because implementation adds subsequent
     // interceptors to the end of the list by default.
-    private boolean hasAfters[];
+    private boolean[] hasAfters;
 
 
     private State state;
@@ -752,7 +752,7 @@ public class PhaseInterceptorChain implements InterceptorChain {
     }
 
     static final class PhaseInterceptorIterator implements ListIterator<Interceptor<? extends Message>> {
-        InterceptorHolder heads[];
+        InterceptorHolder[] heads;
         InterceptorHolder prev;
         InterceptorHolder first;
 

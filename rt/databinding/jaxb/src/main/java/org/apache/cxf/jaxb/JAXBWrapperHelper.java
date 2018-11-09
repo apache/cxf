@@ -31,11 +31,11 @@ import org.apache.cxf.databinding.AbstractWrapperHelper;
  *
  */
 public class JAXBWrapperHelper extends AbstractWrapperHelper {
-    protected final Method jaxbObjectMethods[];
+    protected final Method[] jaxbObjectMethods;
     protected final Object objectFactory;
 
     protected JAXBWrapperHelper(Class<?> wt, Method[] sets, Method[] gets,
-                                Method jaxbs[], Field[] f, Object of) {
+                                Method[] jaxbs, Field[] f, Object of) {
         super(wt, sets, gets, f);
         jaxbObjectMethods = jaxbs;
         objectFactory = of;

@@ -285,7 +285,7 @@ public final class JAXBEncoderDecoder {
     //TODO: cache the JAXBRIContext
     public static void marshalWithBridge(QName qname,
                                          Class<?> cls,
-                                         Annotation anns[],
+                                         Annotation[] anns,
                                          Set<Class<?>> ctxClasses,
                                          Object elValue,
                                          Object source, AttachmentMarshaller am) {
@@ -321,7 +321,7 @@ public final class JAXBEncoderDecoder {
 //  TODO: cache the JAXBRIContext
     public static Object unmarshalWithBridge(QName qname,
                                              Class<?> cls,
-                                             Annotation anns[],
+                                             Annotation[] anns,
                                              Set<Class<?>> ctxClasses,
                                              Object source,
                                              AttachmentUnmarshaller am) {

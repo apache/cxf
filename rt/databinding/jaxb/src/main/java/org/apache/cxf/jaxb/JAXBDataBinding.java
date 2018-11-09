@@ -667,7 +667,7 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
         } catch (Exception e) {
             //ignore, probably won't need it
         }
-        Method allOFMethods[];
+        Method[] allOFMethods;
         if (objectFactory != null) {
             allOFMethods = objectFactory.getClass().getMethods();
         } else {
@@ -838,9 +838,9 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
     }
 
 
-    private static WrapperHelper createWrapperHelper(Class<?> wrapperType, Method setMethods[],
-                                                     Method getMethods[], Method jaxbMethods[],
-                                                     Field fields[], Object objectFactory) {
+    private static WrapperHelper createWrapperHelper(Class<?> wrapperType, Method[] setMethods,
+                                                     Method[] getMethods, Method jaxbMethods[],
+                                                     Field[] fields, Object objectFactory) {
 
         WrapperHelper wh = compileWrapperHelper(wrapperType, setMethods, getMethods, jaxbMethods, fields,
                                                 objectFactory);
@@ -852,9 +852,9 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
         return wh;
     }
 
-    private static WrapperHelper compileWrapperHelper(Class<?> wrapperType, Method setMethods[],
-                                                      Method getMethods[], Method jaxbMethods[],
-                                                      Field fields[], Object objectFactory) {
+    private static WrapperHelper compileWrapperHelper(Class<?> wrapperType, Method[] setMethods,
+                                                      Method[] getMethods, Method jaxbMethods[],
+                                                      Field[] fields, Object objectFactory) {
         return WrapperHelperCompiler.compileWrapperHelper(wrapperType, setMethods, getMethods,
                                                           jaxbMethods, fields, objectFactory);
     }

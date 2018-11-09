@@ -94,7 +94,7 @@ public class Option {
     /**
      * Redundant directories to be deleted after code generation
      */
-    File redundantDirs[];
+    File[] redundantDirs;
 
     /**
      * Specifies JAXWS or JAXB binding files. Use spaces to separate multiple entries.
