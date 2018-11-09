@@ -37,10 +37,26 @@ import org.apache.cxf.security.LoginSecurityContext;
  * Groups the principal is a member of
  */
 public class DefaultSecurityContext implements LoginSecurityContext {
-
+    
+    private static Class<?> javaGroup; 
+    private static Class<?> karafGroup;
+    
     private Principal p;
     private Subject subject;
 
+    static {
+        try {
+            javaGroup = Class.forName("java.security.acl.Group");
+        } catch (Throwable e) {
+            javaGroup = null;
+        }
+        try {
+            karafGroup = Class.forName("org.apache.karaf.jaas.boot.principal.Group");
+        } catch (Throwable e) {
+            karafGroup = null;
+        }
+    }
+    
     public DefaultSecurityContext(Subject subject) {
         this.p = findPrincipal(null, subject);
         this.subject = subject;
@@ -147,18 +163,18 @@ public class DefaultSecurityContext implements LoginSecurityContext {
     }
     
     
-    private static boolean instanceOf(Object obj, String className) { 
+    private static boolean instanceOfGroup(Object obj) { 
         try {
-            return Class.forName(className).isInstance(obj);
-        } catch (ClassNotFoundException ex) {
+            return (javaGroup != null && javaGroup.isInstance(obj)) 
+                || (karafGroup != null && karafGroup.isInstance(obj));
+        } catch (Exception ex) {
             return false;
         }
     }
     
     public static boolean isGroupPrincipal(Principal principal) {
         return principal instanceof GroupPrincipal
-            || instanceOf(principal, "java.security.acl.Group")
-            || instanceOf(principal, "org.apache.karaf.jaas.boot.principal.Group");
+            || instanceOfGroup(principal);
     }
 
 }
