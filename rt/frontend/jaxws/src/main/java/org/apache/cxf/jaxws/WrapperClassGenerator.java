@@ -150,8 +150,8 @@ public final class WrapperClassGenerator extends ASMHelper {
 
         ClassWriter cw = createClassWriter();
         if (cw == null) {
-            LOG.warning(op.getName() + "requires a wrapper bean but problems with"
-                + " ASM has prevented creating one.  Operation may not work correctly.");
+            LOG.warning(op.getName() + " requires a wrapper bean but problems with"
+                + " ASM has prevented creating one. Operation may not work correctly.");
             return;
         }
         QName wrapperElement = messageInfo.getName();
