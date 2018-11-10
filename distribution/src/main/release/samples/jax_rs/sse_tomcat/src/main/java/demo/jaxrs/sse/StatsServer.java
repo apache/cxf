@@ -48,6 +48,7 @@ public final class StatsServer {
         context.addApplicationListener(ContextLoaderListener.class.getName());
         context.setAddWebinfClassesResources(true);
         context.setResources(resourcesFrom(context, "target/classes"));
+        context.setParentClassLoader(Thread.currentThread().getContextClassLoader());
 
         final Wrapper cxfServlet = Tomcat.addServlet(context, "cxfServlet", new CXFServlet());
         cxfServlet.setAsyncSupported(true);

@@ -27,7 +27,7 @@
          http://cxf.apache.org/jaxrs
          http://cxf.apache.org/schemas/jaxrs.xsd">
 
-     <jaxrs:server id="statsServer" address="/api" transportId="http://cxf.apache.org/transports/http/sse">
+     <jaxrs:server id="statsServer" address="/api">
         <jaxrs:serviceBeans>
            <ref bean="statsRestService"/>
         </jaxrs:serviceBeans>
