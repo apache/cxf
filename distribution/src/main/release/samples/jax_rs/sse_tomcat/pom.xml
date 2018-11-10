@@ -13,7 +13,7 @@
     
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <cxf.tomcat.version>8.0.32</cxf.tomcat.version>
+        <cxf.tomcat.version>8.0.53</cxf.tomcat.version>
     </properties>
 
     <dependencies>
