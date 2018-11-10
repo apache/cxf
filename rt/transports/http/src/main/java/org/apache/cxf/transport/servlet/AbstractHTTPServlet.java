@@ -480,7 +480,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
                                            String originalPort) {
             super(request);
             this.newProtocol = originalProto;
-            if (newRemoteAddr != null) {
+            if (originalRemoteAddr != null) {
                 newRemoteAddr = (originalRemoteAddr.split(",")[0]).trim();
             }
             newRequestUri = calculateNewRequestUri(request, originalPrefix);
