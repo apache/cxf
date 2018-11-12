@@ -53,10 +53,10 @@ public class MessageVerifier {
                            SecurityProvider securityProvider,
                            AlgorithmProvider algorithmProvider,
                            boolean verifyMessageBody) {
-        Objects.requireNonNull(publicKeyProvider, "Public key provider cannot be null");
-        Objects.requireNonNull(publicKeyProvider, "Public key provider cannot be null");
-        Objects.requireNonNull(publicKeyProvider, "Public key provider cannot be null");
-        Objects.requireNonNull(publicKeyProvider, "Public key provider cannot be null");
+        Objects.requireNonNull(publicKeyProvider, "public key provider cannot be null");
+        Objects.requireNonNull(exceptionHandler, "exception handler cannot be null");
+        Objects.requireNonNull(securityProvider, "security provider cannot be null");
+        Objects.requireNonNull(algorithmProvider, "algorithm provider cannot be null");
         this.publicKeyProvider = publicKeyProvider;
         this.exceptionHandler = exceptionHandler;
         this.securityProvider = securityProvider;
@@ -149,6 +149,9 @@ public class MessageVerifier {
     private void inspectIllegalState() {
         if (publicKeyProvider == null) {
             throw new IllegalStateException("public key provider is not set");
+        }
+        if (exceptionHandler == null) {
+            throw new IllegalStateException("exception handler is not set");
         }
         if (securityProvider == null) {
             throw new IllegalStateException("security provider is not set");
