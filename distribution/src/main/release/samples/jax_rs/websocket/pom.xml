@@ -31,10 +31,9 @@
     <properties>
         <cxf.version>${project.version}</cxf.version>
         <!-- TODO remove these local entries after making the referenced dependency managed in parent/pom.xml -->
-        <cxf.ahc.version>1.8.5</cxf.ahc.version>
-        <cxf.atmosphere.version>2.4.3</cxf.atmosphere.version>
-        <cxf.jetty8.version>8.1.15.v20140411</cxf.jetty8.version>
-        <cxf.jetty9.version>9.2.2.v20140723</cxf.jetty9.version>
+        <cxf.ahc.version>1.9.40</cxf.ahc.version>
+        <cxf.jetty8.version>8.1.22.v20160922</cxf.jetty8.version>
+        <cxf.jetty9.version>9.4.12.v20180830</cxf.jetty9.version>
         <cxf.jetty.version>${cxf.jetty8.version}</cxf.jetty.version>
         <cxf.netty3.version>3.9.1.Final</cxf.netty3.version>
     </properties>
@@ -192,18 +191,8 @@
             <groupId>com.ning</groupId>
             <artifactId>async-http-client</artifactId>
             <version>${cxf.ahc.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>io.netty</groupId>
-                    <artifactId>netty</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty</artifactId>
-            <version>${cxf.netty3.version}</version>
-        </dependency>
+
         <!--  JettyHttpDestination is referring to org.springframework.util.ClassUtils -->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -214,7 +203,6 @@
         <dependency>
             <groupId>org.atmosphere</groupId>
             <artifactId>atmosphere-runtime</artifactId>
-            <version>${cxf.atmosphere.version}</version>
         </dependency>
                 
     </dependencies>

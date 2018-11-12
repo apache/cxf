@@ -74,7 +74,7 @@
         <cxf.artemis.version>2.4.0</cxf.artemis.version>
         <cxf.ahc.version>1.9.40</cxf.ahc.version>
         <cxf.apacheds.version>2.0.0.AM25</cxf.apacheds.version>
-        <cxf.atmosphere.version>2.4.23</cxf.atmosphere.version>
+        <cxf.atmosphere.version>2.5.2</cxf.atmosphere.version>
         <cxf.atmosphere.version.range>[2.4,3.0)</cxf.atmosphere.version.range>
         <cxf.bcprov.version>1.60</cxf.bcprov.version>
         <cxf.cglib.bundle.version>2.2_2</cxf.cglib.bundle.version>
