@@ -158,7 +158,29 @@ public class ClientCacheTest extends Assert {
             feature.close();
         }
     }
+    
 
+    @Test
+    public void testGetJaxbBookCacheByValue() {
+        // org.apache.cxf.jaxrs.client.cache.CacheControlFeature.storeByValue
+        CacheControlFeature feature = new CacheControlFeature();
+        try {
+            final WebTarget base = ClientBuilder.newBuilder()
+                .property("org.apache.cxf.jaxrs.client.cache.CacheControlFeature.storeByValue", "true")
+                .register(feature).build().target(ADDRESS);
+            final Invocation.Builder cached =
+                setAsLocal(base.request("application/xml")).header(HttpHeaders.CACHE_CONTROL, "public");
+            final Response r = cached.get();
+            assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
+            final Book b1 = r.readEntity(Book.class);
+            assertEquals("JCache", b1.getName());
+            assertNotNull(b1.getId());
+            waitABit();
+            assertEquals(b1, cached.get().readEntity(Book.class));
+        } finally {
+            feature.close();
+        }
+    }
 
     private static Invocation.Builder setAsLocal(final Invocation.Builder client) {
         WebClient.getConfig(client).getRequestContext().put(LocalConduit.DIRECT_DISPATCH, Boolean.TRUE);
