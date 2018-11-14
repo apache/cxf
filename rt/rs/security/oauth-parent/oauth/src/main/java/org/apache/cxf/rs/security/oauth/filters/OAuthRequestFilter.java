@@ -24,7 +24,6 @@ import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
-import net.oauth.OAuthProblemException;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.MessageContextImpl;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -47,8 +46,6 @@ public class OAuthRequestFilter extends AbstractAuthFilter implements ContainerR
             OAuthInfo info = handleOAuthRequest(mc.getHttpServletRequest());
             setSecurityContext(mc, m, info);
 
-        } catch (OAuthProblemException e) {
-            context.abortWith(Response.status(401).header("WWW-Authenticate", "OAuth").build());
         } catch (Exception e) {
             context.abortWith(Response.status(401).header("WWW-Authenticate", "OAuth").build());
         }

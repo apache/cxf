@@ -92,9 +92,7 @@ public class Base64Type extends AegisType {
             reader.next();
 
             return bos.toByteArray();
-        } catch (Base64Exception e) {
-            throw new DatabindingException("Could not parse base64Binary data.", e);
-        } catch (XMLStreamException e) {
+        } catch (Base64Exception | XMLStreamException e) {
             throw new DatabindingException("Could not parse base64Binary data.", e);
         }
     }

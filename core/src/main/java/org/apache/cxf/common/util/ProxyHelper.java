@@ -113,9 +113,7 @@ public class ProxyHelper {
                         }
                     }
                 }
-            } catch (NoClassDefFoundError e) {
-                return false;
-            } catch (ClassNotFoundException e) {
+            } catch (NoClassDefFoundError | ClassNotFoundException e) {
                 return false;
             }
         }

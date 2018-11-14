@@ -56,9 +56,7 @@ public final class HmacUtils {
     public static Mac getMac(String macAlgoJavaName, String provider) {
         try {
             return provider == null ? Mac.getInstance(macAlgoJavaName) : Mac.getInstance(macAlgoJavaName, provider);
-        } catch (NoSuchAlgorithmException e) {
-            throw new SecurityException(e);
-        } catch (NoSuchProviderException e) {
+        } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
             throw new SecurityException(e);
         }
     }
@@ -120,9 +118,7 @@ public final class HmacUtils {
             } else {
                 hmac.init(secretKey, spec);
             }
-        } catch (InvalidKeyException e) {
-            throw new SecurityException(e);
-        } catch (InvalidAlgorithmParameterException e) {
+        } catch (InvalidKeyException | InvalidAlgorithmParameterException e) {
             throw new SecurityException(e);
         }
     }

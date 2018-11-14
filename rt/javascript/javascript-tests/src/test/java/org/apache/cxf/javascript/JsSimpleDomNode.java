@@ -54,11 +54,7 @@ public class JsSimpleDomNode extends ScriptableObject {
     public static void register(ScriptableObject scope) {
         try {
             ScriptableObject.defineClass(scope, JsSimpleDomNode.class);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
     }

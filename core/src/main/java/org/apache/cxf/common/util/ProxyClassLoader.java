@@ -61,18 +61,14 @@ public class ProxyClassLoader extends ClassLoader {
         for (ClassLoader loader : loaders) {
             try {
                 return loader.loadClass(name);
-            } catch (ClassNotFoundException cnfe) {
-                // Try next
-            } catch (NoClassDefFoundError cnfe) {
+            } catch (ClassNotFoundException | NoClassDefFoundError cnfe) {
                 // Try next
             }
         }
         if (checkSystem) {
             try {
                 return getSystemClassLoader().loadClass(name);
-            } catch (ClassNotFoundException cnfe) {
-                // Try next
-            } catch (NoClassDefFoundError cnfe) {
+            } catch (ClassNotFoundException | NoClassDefFoundError cnfe) {
                 // Try next
             }
         }

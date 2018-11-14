@@ -293,9 +293,7 @@ public class SOAPHandlerInterceptor extends
             xmlReader = StaxUtils.createXMLStreamReader(bodySource);
             xmlReader.nextTag();
             xmlReader.nextTag(); // move past body tag
-        } catch (SOAPException e) {
-            e.printStackTrace();
-        } catch (XMLStreamException e) {
+        } catch (SOAPException | XMLStreamException e) {
             e.printStackTrace();
         }
         return xmlReader;

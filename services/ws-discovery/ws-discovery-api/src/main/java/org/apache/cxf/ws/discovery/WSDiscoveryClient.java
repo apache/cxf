@@ -376,9 +376,7 @@ public class WSDiscoveryClient implements Closeable {
                                 resetDispatch(h.getXAddrs().get(0));
                             }
                         }
-                    } catch (InterruptedException e) {
-                        // ?
-                    } catch (ExecutionException e) {
+                    } catch (InterruptedException | ExecutionException e) {
                         // ?
                     }
                 }
@@ -422,9 +420,7 @@ public class WSDiscoveryClient implements Closeable {
                                 resetDispatch(h.getXAddrs().get(0));
                             }
                         }
-                    } catch (InterruptedException e) {
-                        // ?
-                    } catch (ExecutionException e) {
+                    } catch (InterruptedException | ExecutionException e) {
                         // ?
                     }
                 }

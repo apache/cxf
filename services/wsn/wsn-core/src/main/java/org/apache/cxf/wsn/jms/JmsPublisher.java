@@ -100,11 +100,7 @@ public abstract class JmsPublisher extends AbstractPublisher implements Consumer
             jaxbContext.createMarshaller().marshal(notify, writer);
             Message message = session.createTextMessage(writer.toString());
             producer.send(message);
-        } catch (JMSException e) {
-            LOGGER.log(Level.WARNING, "Error dispatching message", e);
-        } catch (JAXBException e) {
-            LOGGER.log(Level.WARNING, "Error dispatching message", e);
-        } catch (InvalidTopicException e) {
+        } catch (JMSException | JAXBException | InvalidTopicException e) {
             LOGGER.log(Level.WARNING, "Error dispatching message", e);
         } finally {
             if (session != null) {

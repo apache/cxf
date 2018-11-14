@@ -46,7 +46,6 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
@@ -118,11 +117,7 @@ public class JsXMLHttpRequest extends ScriptableObject {
     public static void register(ScriptableObject scope) {
         try {
             ScriptableObject.defineClass(scope, JsXMLHttpRequest.class);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
     }
@@ -459,11 +454,7 @@ public class JsXMLHttpRequest extends ScriptableObject {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             transformerFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
             transformerFactory.newTransformer().transform(source, result);
-        } catch (TransformerConfigurationException e) {
-            throw new RuntimeException(e);
-        } catch (TransformerException e) {
-            throw new RuntimeException(e);
-        } catch (TransformerFactoryConfigurationError e) {
+        } catch (TransformerException | TransformerFactoryConfigurationError e) {
             throw new RuntimeException(e);
         }
         return baos.toByteArray();

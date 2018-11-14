@@ -129,8 +129,6 @@ public class XmlSecOutInterceptor extends AbstractPhaseInterceptor<Message> {
 
             newXMLStreamWriter = outboundXMLSec.processOutMessage(os, encoding);
             message.setContent(XMLStreamWriter.class, newXMLStreamWriter);
-        } catch (XMLSecurityException e) {
-            throwFault(e.getMessage(), e);
         } catch (Exception e) {
             throwFault(e.getMessage(), e);
         }

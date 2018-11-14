@@ -280,9 +280,7 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
                 tokenStream = !postBinding && isSupportDeflateEncoding()
                     ? new DeflateEncoderDecoder().inflateToken(deflatedToken)
                     : new ByteArrayInputStream(deflatedToken);
-            } catch (Base64Exception ex) {
-                throw ExceptionUtils.toBadRequestException(ex, null);
-            } catch (DataFormatException ex) {
+            } catch (Base64Exception | DataFormatException ex) {
                 throw ExceptionUtils.toBadRequestException(ex, null);
             }
         } else {

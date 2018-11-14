@@ -397,9 +397,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
                     }
                 }
             }
-        } catch (SecurityException e) {
-            throw new ServiceConstructionException(e);
-        } catch (NoSuchMethodException e) {
+        } catch (SecurityException | NoSuchMethodException e) {
             throw new ServiceConstructionException(e);
         }
 

@@ -204,9 +204,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
                     Thread thread2 = Thread.currentThread();
                     assertNotSame(thread, thread2);
                     assertEquals("Hello " + expected, response.get());
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
+                } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }
             }

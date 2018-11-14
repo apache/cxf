@@ -233,9 +233,7 @@ public abstract class AbstractDataBinding implements DataBinding {
     private Document copy(Document doc) {
         try {
             return StaxUtils.copy(doc);
-        } catch (XMLStreamException e) {
-            // ignore
-        } catch (ParserConfigurationException e) {
+        } catch (XMLStreamException | ParserConfigurationException e) {
             // ignore
         }
         return doc;

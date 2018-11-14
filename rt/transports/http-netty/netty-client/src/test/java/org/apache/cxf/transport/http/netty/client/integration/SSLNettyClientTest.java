@@ -104,9 +104,7 @@ public class SSLNettyClientTest extends AbstractBusClientServerTestBase {
             public void handleResponse(Response<GreetMeResponse> res) {
                 try {
                     res.get().getResponseType();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
+                } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }
             }
@@ -169,9 +167,7 @@ public class SSLNettyClientTest extends AbstractBusClientServerTestBase {
         public void handleResponse(Response<GreetMeLaterResponse> res) {
             try {
                 response = res.get();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
         }

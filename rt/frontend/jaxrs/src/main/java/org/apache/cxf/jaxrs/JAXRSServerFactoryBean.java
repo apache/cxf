@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.jaxrs;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,11 +30,9 @@ import java.util.Set;
 import javax.ws.rs.core.Application;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.BusException;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.endpoint.Endpoint;
-import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerImpl;
 import org.apache.cxf.feature.Feature;
@@ -215,12 +212,6 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
                     throw re;
                 }
             }
-        } catch (EndpointException e) {
-            throw new ServiceConstructionException(e);
-        } catch (BusException e) {
-            throw new ServiceConstructionException(e);
-        } catch (IOException e) {
-            throw new ServiceConstructionException(e);
         } catch (Exception e) {
             throw new ServiceConstructionException(e);
         } finally {

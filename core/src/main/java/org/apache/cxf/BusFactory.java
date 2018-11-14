@@ -398,9 +398,7 @@ public abstract class BusFactory {
                         idx = busFactoryCondition.indexOf(',');
                     }
                     cls.getClassLoader().loadClass(busFactoryCondition);
-                } catch (ClassNotFoundException e) {
-                    busFactoryClass = DEFAULT_BUS_FACTORY;
-                } catch (NoClassDefFoundError e) {
+                } catch (ClassNotFoundException | NoClassDefFoundError e) {
                     busFactoryClass = DEFAULT_BUS_FACTORY;
                 }
 

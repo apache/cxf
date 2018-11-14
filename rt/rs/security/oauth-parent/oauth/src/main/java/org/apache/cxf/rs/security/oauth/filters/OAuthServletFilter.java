@@ -31,7 +31,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
-import net.oauth.OAuthProblemException;
 import net.oauth.server.OAuthServlet;
 import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.rs.security.oauth.data.OAuthContext;
@@ -60,8 +59,6 @@ public class OAuthServletFilter extends AbstractAuthFilter implements javax.serv
             OAuthInfo info = handleOAuthRequest(req);
             req = setSecurityContext(req, info);
             chain.doFilter(req, resp);
-        } catch (OAuthProblemException e) {
-            OAuthServlet.handleException(resp, e, "");
         } catch (Exception e) {
             OAuthServlet.handleException(resp, e, "");
         }

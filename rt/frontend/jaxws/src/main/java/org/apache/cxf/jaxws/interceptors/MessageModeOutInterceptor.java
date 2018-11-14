@@ -306,10 +306,7 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
                     if (o instanceof Source) {
                         StaxUtils.copy((Source)o, new SAAJStreamWriter(part));
                     }
-                } catch (SOAPException e) {
-                    throw new SoapFault("Error creating SOAPMessage", e,
-                                        message.getVersion().getSender());
-                } catch (XMLStreamException e) {
+                } catch (SOAPException | XMLStreamException e) {
                     throw new SoapFault("Error creating SOAPMessage", e,
                                         message.getVersion().getSender());
                 }

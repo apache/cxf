@@ -193,9 +193,7 @@ public class JaxWsWebServicePublisherBeanPostProcessor
     public void setServletConfig(ServletConfig servletConfig) {
         try {
             shadowCxfServlet = (Servlet)servletClass.newInstance();
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
         try {

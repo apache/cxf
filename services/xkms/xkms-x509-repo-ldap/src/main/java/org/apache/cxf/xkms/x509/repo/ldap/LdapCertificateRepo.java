@@ -110,9 +110,7 @@ public class LdapCertificateRepo implements CertificateRepo {
                 }
             }
             return certificates;
-        } catch (CertificateException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        } catch (NamingException e) {
+        } catch (CertificateException | NamingException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -133,11 +131,7 @@ public class LdapCertificateRepo implements CertificateRepo {
                 }
             }
             return crls;
-        } catch (CertificateException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        } catch (NamingException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        } catch (CRLException e) {
+        } catch (CertificateException | NamingException | CRLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }

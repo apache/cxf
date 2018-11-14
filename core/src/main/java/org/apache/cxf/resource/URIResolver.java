@@ -404,9 +404,7 @@ public class URIResolver {
                 cache.put(uriStr, bout);
             }
             is = bout.createInputStream();
-        } catch (MalformedURLException e) {
-            // do nothing
-        } catch (URISyntaxException e) {
+        } catch (MalformedURLException | URISyntaxException e) {
             // do nothing
         }
     }

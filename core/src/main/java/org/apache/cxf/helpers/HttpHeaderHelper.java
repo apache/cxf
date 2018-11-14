@@ -120,9 +120,7 @@ public final class HttpHeaderHelper {
         if (newenc == null) {
             try {
                 newenc = Charset.forName(enc).name();
-            } catch (IllegalCharsetNameException icne) {
-                return null;
-            } catch (UnsupportedCharsetException uce) {
+            } catch (IllegalCharsetNameException | UnsupportedCharsetException e) {
                 return null;
             }
             String tmpenc = encodings.putIfAbsent(enc, newenc);

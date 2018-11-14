@@ -172,9 +172,7 @@ public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
                 try {
                     xif = (XMLOutputFactory)(cls.newInstance());
                     factories.put(o, xif);
-                } catch (InstantiationException e) {
-                    throw new Fault(e);
-                } catch (IllegalAccessException e) {
+                } catch (InstantiationException | IllegalAccessException e) {
                     throw new Fault(e);
                 }
             }

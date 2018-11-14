@@ -36,7 +36,6 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriBuilder;
 
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.interceptor.security.AuthenticationException;
 import org.apache.cxf.interceptor.security.JAASLoginInterceptor;
 import org.apache.cxf.interceptor.security.NamePasswordCallbackHandler;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
@@ -110,8 +109,6 @@ public class JAASAuthenticationFilter implements ContainerRequestFilter {
         Message m = JAXRSUtils.getCurrentMessage();
         try {
             interceptor.handleMessage(m);
-        } catch (AuthenticationException ex) {
-            context.abortWith(handleAuthenticationException(ex, m));
         } catch (SecurityException ex) {
             context.abortWith(handleAuthenticationException(ex, m));
         }

@@ -133,9 +133,6 @@ public class RequestParser {
                             );
                         }
                     }
-                } catch (STSException ex) {
-                    LOG.log(Level.WARNING, "", ex);
-                    throw ex;
                 } catch (RuntimeException ex) {
                     LOG.log(Level.WARNING, "", ex);
                     throw ex;
@@ -481,10 +478,7 @@ public class RequestParser {
                     }
                 }
             }
-        } catch (MarshalException e) {
-            LOG.log(Level.WARNING, "", e);
-            throw new STSException(e.getMessage(), e, STSException.INVALID_REQUEST);
-        } catch (KeyException e) {
+        } catch (MarshalException | KeyException e) {
             LOG.log(Level.WARNING, "", e);
             throw new STSException(e.getMessage(), e, STSException.INVALID_REQUEST);
         }

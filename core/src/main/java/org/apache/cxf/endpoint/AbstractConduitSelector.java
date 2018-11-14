@@ -113,9 +113,7 @@ public abstract class AbstractConduitSelector implements ConduitSelector, Closea
                 } else {
                     getLogger().warning("ConduitInitiatorManager not found");
                 }
-            } catch (BusException ex) {
-                throw new Fault(ex);
-            } catch (IOException ex) {
+            } catch (BusException | IOException ex) {
                 throw new Fault(ex);
             }
         }

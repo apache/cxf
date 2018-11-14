@@ -133,13 +133,7 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> imple
                 inboundXMLSec.processInMessage(originalXmlStreamReader, null, securityEventListener);
             inMsg.setContent(XMLStreamReader.class, newXmlStreamReader);
 
-        } catch (XMLStreamException e) {
-            throwFault(e.getMessage(), e);
-        } catch (XMLSecurityException e) {
-            throwFault(e.getMessage(), e);
-        } catch (IOException e) {
-            throwFault(e.getMessage(), e);
-        } catch (UnsupportedCallbackException e) {
+        } catch (XMLStreamException | XMLSecurityException | IOException | UnsupportedCallbackException e) {
             throwFault(e.getMessage(), e);
         }
     }

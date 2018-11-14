@@ -79,9 +79,7 @@ public abstract class AbstractSpnegoAuthSupplier {
 
             byte[] token = getToken(authPolicy, spn, oid, message);
             return HttpAuthHeader.AUTH_TYPE_NEGOTIATE + " " + Base64Utility.encode(token);
-        } catch (LoginException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        } catch (GSSException e) {
+        } catch (LoginException | GSSException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }

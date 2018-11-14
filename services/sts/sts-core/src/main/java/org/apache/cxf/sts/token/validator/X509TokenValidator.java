@@ -166,9 +166,6 @@ public class X509TokenValidator implements TokenValidator {
                     X509Certificate cert = x509Data.itemCertificate(0).getX509Certificate();
                     ((X509Security)binarySecurity).setX509Certificate(cert);
                 }
-            } catch (WSSecurityException ex) {
-                LOG.log(Level.WARNING, "", ex);
-                return response;
             } catch (XMLSecurityException ex) {
                 LOG.log(Level.WARNING, "", ex);
                 return response;

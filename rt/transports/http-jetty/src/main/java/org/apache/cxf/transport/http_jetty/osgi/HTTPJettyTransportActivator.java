@@ -119,9 +119,7 @@ public class HTTPJettyTransportActivator
 
             JettyHTTPServerEngine e = factory.retrieveJettyHTTPServerEngine(port);
             configure(e, properties);
-        } catch (GeneralSecurityException e) {
-            throw new ConfigurationException(null, null, e);
-        } catch (IOException e) {
+        } catch (GeneralSecurityException | IOException e) {
             throw new ConfigurationException(null, null, e);
         }
     }

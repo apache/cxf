@@ -84,9 +84,7 @@ public final class BadgerFishProvider
             Object obj = unmarshaller.unmarshal(xsw);
             xsw.close();
             return obj;
-        } catch (JAXBException e) {
-            e.printStackTrace();
-        } catch (XMLStreamException e) {
+        } catch (JAXBException | XMLStreamException e) {
             e.printStackTrace();
         }
 
@@ -108,9 +106,7 @@ public final class BadgerFishProvider
             marshaller.marshal(obj, xsw);
             xsw.close();
 
-        } catch (JAXBException e) {
-            e.printStackTrace();
-        } catch (XMLStreamException e) {
+        } catch (JAXBException | XMLStreamException e) {
             e.printStackTrace();
         }
     }

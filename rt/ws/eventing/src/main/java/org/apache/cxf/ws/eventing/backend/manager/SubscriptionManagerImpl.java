@@ -211,9 +211,7 @@ public class SubscriptionManagerImpl implements SubscriptionManager {
             if (!EPRInspectionTool.containsUsableEPR(notifyTo.getValue())) {
                 throw new NoDeliveryMechanismEstablished();
             }
-        } catch (NullPointerException npe) {
-            throw new NoDeliveryMechanismEstablished();
-        } catch (IndexOutOfBoundsException ioobe) {
+        } catch (NullPointerException | IndexOutOfBoundsException npe) {
             throw new NoDeliveryMechanismEstablished();
         }
         ticket.setDelivery(request);

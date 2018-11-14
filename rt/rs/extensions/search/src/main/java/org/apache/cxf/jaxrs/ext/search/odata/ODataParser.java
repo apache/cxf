@@ -284,13 +284,8 @@ public class ODataParser<T> extends AbstractSearchConditionParser<T> {
             final FilterExpression expression = parser.parseFilterString(searchExpression);
             final FilterExpressionVisitor visitor = new FilterExpressionVisitor(condition);
             return (SearchCondition< T >)expression.accept(visitor);
-        } catch (ODataMessageException ex) {
-            throw new SearchParseException(ex);
-        } catch (ODataApplicationException ex) {
-            throw new SearchParseException(ex);
-        } catch (InstantiationException ex) {
-            throw new SearchParseException(ex);
-        } catch (IllegalAccessException ex) {
+        } catch (ODataMessageException | ODataApplicationException
+            | InstantiationException | IllegalAccessException ex) {
             throw new SearchParseException(ex);
         }
     }

@@ -211,17 +211,7 @@ public class HttpConduitBeanDefinitionParser
                         + elementClass.getName() + ".");
                 }
                 bean.addPropertyValue(elementName, obj);
-            } catch (IllegalAccessException ex) {
-                throw new IllegalArgumentException(
-                    "Element '" + elementName + "' could not load "
-                    + classProperty
-                    + " - " + ex);
-            } catch (ClassNotFoundException ex) {
-                throw new IllegalArgumentException(
-                    "Element '" + elementName + "' could not load "
-                    + classProperty
-                    + " - " + ex);
-            } catch (InstantiationException ex) {
+            } catch (IllegalAccessException | ClassNotFoundException | InstantiationException ex) {
                 throw new IllegalArgumentException(
                     "Element '" + elementName + "' could not load "
                     + classProperty
