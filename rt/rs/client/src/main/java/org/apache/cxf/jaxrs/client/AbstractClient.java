@@ -555,7 +555,7 @@ public abstract class AbstractClient implements Client {
         }
 
         int status = r.getStatus();
-        if ((status < 200 || status == 204) && r.getLength() <= 0 || status >= 300) {
+        if ((status < 200 || status == 204) && r.getLength() <= 0 || (status >= 300 && status != 304)) {
             return null;
         }
         return ((ResponseImpl)r).doReadEntity(cls, type, anns);

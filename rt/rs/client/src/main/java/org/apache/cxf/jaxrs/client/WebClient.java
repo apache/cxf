@@ -900,7 +900,8 @@ public class WebClient extends AbstractClient {
             resetResponseStateImmediatelyIfNeeded();
         }
         
-        if (r.getStatus() >= 300 && responseClass != Response.class) {
+        int status = r.getStatus();
+        if (status != 304 && status >= 300 && responseClass != Response.class) {
             throw convertToWebApplicationException(r);
         }
         return r;
