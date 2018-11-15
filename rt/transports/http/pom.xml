@@ -40,7 +40,7 @@
             org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}",
             org.osgi.service.http,
             javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
-            javax.activation;version="${cxf.osgi.javax.annotation.version}",
+            javax.activation;version="${cxf.osgi.javax.activation.version}",
             com.sun.activation.registries;resolution:=optional
         </cxf.osgi.import>
         <cxf.osgi.export>

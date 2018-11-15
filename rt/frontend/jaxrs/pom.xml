@@ -34,7 +34,7 @@
         <cxf.module.name>org.apache.cxf.frontend.jaxrs</cxf.module.name>
         <cxf.osgi.import>
             javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
-            javax.activation;version="${cxf.osgi.javax.annotation.version}",
+            javax.activation;version="${cxf.osgi.javax.activation.version}",
             org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
             org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}",
             javax.validation*;resolution:=optional;version="${cxf.validation.api.package.version}",

@@ -34,7 +34,7 @@
         <cxf.module.name>org.apache.cxf.ws.security</cxf.module.name>
         <cxf.osgi.import>
             javax.xml.soap;version="${cxf.osgi.saaj.version}",
-            javax.activation;version="${cxf.osgi.javax.annotation.version}",
+            javax.activation;version="${cxf.osgi.javax.activation.version}",
             net.sf.ehcache*;resolution:=optional;version="[2.5, 3.0.0)",
             org.opensaml*;version="${cxf.opensaml.osgi.version.range}",
             javax.xml.ws*;version="${cxf.osgi.javax.xml.ws.version}",
