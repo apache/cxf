@@ -152,7 +152,7 @@ public class JAXBWrapperHelperTest extends Assert {
          * Sets the value of the parameter2 property.
          *
          */
-        public void setParameter3(boolean value[]) {
+        public void setParameter3(boolean[] value) {
             this.parameter3 = value;
         }
 

@@ -99,7 +99,7 @@ public class ResourceAdapterImpl extends ResourceBean implements ResourceAdapter
         endpoints.clear();
     }
 
-    public XAResource[] getXAResources(ActivationSpec as[])
+    public XAResource[] getXAResources(ActivationSpec[] as)
         throws ResourceException {
         throw new NotSupportedException();
     }

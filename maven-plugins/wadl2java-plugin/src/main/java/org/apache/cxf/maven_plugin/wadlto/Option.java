@@ -94,7 +94,7 @@ public class Option {
         super();
     }
 
-    public void setDependencies(File files[]) {
+    public void setDependencies(File[] files) {
         dependencies = files;
     }
 
@@ -102,7 +102,7 @@ public class Option {
         return dependencies;
     }
 
-    public void setDeleteDirs(File files[]) {
+    public void setDeleteDirs(File[] files) {
         redundantDirs = files;
     }
 

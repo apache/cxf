@@ -56,7 +56,7 @@ public class WSDLToIDLGenerationTest extends Assert {
     }
 
 
-    private void checkIDLStrings(byte[] orig, byte generated[]) throws Exception {
+    private void checkIDLStrings(byte[] orig, byte[] generated) throws Exception {
         BufferedReader origReader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(orig)));
         BufferedReader genReader = new BufferedReader(
                                        new InputStreamReader(new ByteArrayInputStream(generated)));

@@ -839,7 +839,7 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
 
 
     private static WrapperHelper createWrapperHelper(Class<?> wrapperType, Method[] setMethods,
-                                                     Method[] getMethods, Method jaxbMethods[],
+                                                     Method[] getMethods, Method[] jaxbMethods,
                                                      Field[] fields, Object objectFactory) {
 
         WrapperHelper wh = compileWrapperHelper(wrapperType, setMethods, getMethods, jaxbMethods, fields,
@@ -853,7 +853,7 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
     }
 
     private static WrapperHelper compileWrapperHelper(Class<?> wrapperType, Method[] setMethods,
-                                                      Method[] getMethods, Method jaxbMethods[],
+                                                      Method[] getMethods, Method[] jaxbMethods,
                                                       Field[] fields, Object objectFactory) {
         return WrapperHelperCompiler.compileWrapperHelper(wrapperType, setMethods, getMethods,
                                                           jaxbMethods, fields, objectFactory);

@@ -38,7 +38,7 @@ public class PrimitiveAssertionBuilder implements AssertionBuilder<Element> {
     public PrimitiveAssertionBuilder(Collection<QName> els) {
         knownElements = els.toArray(new QName[0]);
     }
-    public PrimitiveAssertionBuilder(QName els[]) {
+    public PrimitiveAssertionBuilder(QName[] els) {
         knownElements = els;
     }
 
@@ -54,7 +54,7 @@ public class PrimitiveAssertionBuilder implements AssertionBuilder<Element> {
     public void setKnownElements(Collection<QName> k) {
         knownElements = k.toArray(new QName[0]);
     }
-    public void setKnownElements(QName k[]) {
+    public void setKnownElements(QName[] k) {
         knownElements = k;
     }
 

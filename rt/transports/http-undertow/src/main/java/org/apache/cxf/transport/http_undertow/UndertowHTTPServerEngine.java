@@ -472,7 +472,7 @@ public class UndertowHTTPServerEngine implements ServerEngine {
         return context;
     }
 
-    protected KeyManager[] getKeyManagersWithCertAlias(KeyManager keyManagers[]) throws Exception {
+    protected KeyManager[] getKeyManagersWithCertAlias(KeyManager[] keyManagers) throws Exception {
         if (tlsServerParameters.getCertAlias() != null) {
             for (int idx = 0; idx < keyManagers.length; idx++) {
                 if (keyManagers[idx] instanceof X509KeyManager) {

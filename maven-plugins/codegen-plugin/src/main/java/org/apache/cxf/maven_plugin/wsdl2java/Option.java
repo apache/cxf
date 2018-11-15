@@ -273,7 +273,7 @@ public class Option {
         return uris;
     }
 
-    public void setDeleteDirs(File files[]) {
+    public void setDeleteDirs(File[] files) {
         redundantDirs = files;
     }
 

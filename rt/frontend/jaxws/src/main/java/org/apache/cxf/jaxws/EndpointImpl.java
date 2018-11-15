@@ -156,7 +156,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     public EndpointImpl(Bus b, Object i, String bindingUri, String wsdl) {
         this(b, i, bindingUri, wsdl, null);
     }
-    public EndpointImpl(Bus b, Object i, String bindingUri, String wsdl, WebServiceFeature f[]) {
+    public EndpointImpl(Bus b, Object i, String bindingUri, String wsdl, WebServiceFeature[] f) {
         bus = b;
         implementor = i;
         this.bindingUri = bindingUri;
@@ -170,7 +170,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     public EndpointImpl(Bus b, Object i, String bindingUri) {
         this(b, i, bindingUri, (String)null);
     }
-    public EndpointImpl(Bus b, Object i, String bindingUri, WebServiceFeature features[]) {
+    public EndpointImpl(Bus b, Object i, String bindingUri, WebServiceFeature[] features) {
         this(b, i, bindingUri, (String)null, features);
     }
 

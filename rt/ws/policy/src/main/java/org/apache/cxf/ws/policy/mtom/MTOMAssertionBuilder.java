@@ -32,7 +32,7 @@ import org.apache.neethi.AssertionBuilderFactory;
 import org.apache.neethi.builders.AssertionBuilder;
 
 public class MTOMAssertionBuilder implements AssertionBuilder<Element> {
-    private static final QName KNOWN_ELEMENTS[]
+    private static final QName[] KNOWN_ELEMENTS
         = {MetadataConstants.MTOM_ASSERTION_QNAME};
 
     public Assertion build(Element elem, AssertionBuilderFactory f) {

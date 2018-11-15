@@ -756,7 +756,7 @@ public class PhaseInterceptorChain implements InterceptorChain {
         InterceptorHolder prev;
         InterceptorHolder first;
 
-        PhaseInterceptorIterator(InterceptorHolder h[]) {
+        PhaseInterceptorIterator(InterceptorHolder[] h) {
             heads = h;
             first = findFirst();
         }

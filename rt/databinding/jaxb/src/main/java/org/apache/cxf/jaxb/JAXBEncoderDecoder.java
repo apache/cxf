@@ -1022,7 +1022,7 @@ public final class JAXBEncoderDecoder {
             }
             if (!nsMap.isEmpty()) {
                 @SuppressWarnings("unchecked")
-                final Map.Entry<String, String> namespaces[]
+                final Map.Entry<String, String>[] namespaces
                     = nsMap.entrySet().toArray(new Map.Entry[nsMap.size()]);
                 //OK. we have extra namespaces.  We'll need to wrapper the reader
                 //with a new one that will fake extra namespace events

@@ -650,7 +650,7 @@ public final class JAXBUtils {
     public static BridgeWrapper createBridge(Set<Class<?>> ctxClasses,
                                       QName qname,
                                       Class<?> refcls,
-                                      Annotation anns[]) throws JAXBException {
+                                      Annotation[] anns) throws JAXBException {
         try {
             Class<?> cls;
             Class<?> refClass;

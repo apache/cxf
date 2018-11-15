@@ -215,7 +215,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
         return actual != null && actual != Object.class ? actual : Attachment.class;
     }
 
-    private <T> Object fromAttachment(Attachment multipart, Class<T> c, Type t, Annotation anns[])
+    private <T> Object fromAttachment(Attachment multipart, Class<T> c, Type t, Annotation[] anns)
         throws IOException {
         if (DataHandler.class.isAssignableFrom(c)) {
             return multipart.getDataHandler();

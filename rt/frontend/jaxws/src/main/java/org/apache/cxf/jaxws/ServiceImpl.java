@@ -232,7 +232,7 @@ public class ServiceImpl extends ServiceDelegate {
         portInfos.put(portName, portInfo);
     }
 
-    private List<WebServiceFeature> getAllFeatures(WebServiceFeature features[]) {
+    private List<WebServiceFeature> getAllFeatures(WebServiceFeature[] features) {
         List<WebServiceFeature> f = new ArrayList<>();
         if (features != null) {
             f.addAll(Arrays.asList(features));

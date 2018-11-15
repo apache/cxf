@@ -34,7 +34,7 @@ public class Base64UtilityTest extends Assert {
         super();
     }
 
-    void assertEquals(byte[] b1, byte b2[]) {
+    void assertEquals(byte[] b1, byte[] b2) {
         assertEquals(b1.length, b2.length);
         for (int x = 0; x < b1.length; x++) {
             assertEquals(b1[x], b2[x]);

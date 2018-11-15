@@ -194,7 +194,7 @@ public abstract class AbstractServerPersistenceTest extends AbstractBusClientSer
         bus.shutdown(true);
     }
 
-    void verifyMissingResponse(Response<GreetMeResponse> responses[]) throws Exception {
+    void verifyMissingResponse(Response<GreetMeResponse>[] responses) throws Exception {
         awaitMessages(5, 3, 25000);
 
         int nDone = 0;
@@ -227,7 +227,7 @@ public abstract class AbstractServerPersistenceTest extends AbstractBusClientSer
         // mf.verifyAcknowledgements(new boolean[] {false, true, true}, false);
     }
 
-    void verifyServerRecovery(Response<GreetMeResponse> responses[]) throws Exception {
+    void verifyServerRecovery(Response<GreetMeResponse>[] responses) throws Exception {
 
         // wait until all messages have received their responses
         int nDone = 0;

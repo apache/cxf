@@ -58,7 +58,7 @@ public final class WsdlUtilities {
         return String.join(",", arr);
     }
 
-    public static List<File> getWsdlFiles(File dir, String[] includes, String excludes[])
+    public static List<File> getWsdlFiles(File dir, String[] includes, String[] excludes)
         throws MojoExecutionException {
 
         List<String> exList = new ArrayList<>();

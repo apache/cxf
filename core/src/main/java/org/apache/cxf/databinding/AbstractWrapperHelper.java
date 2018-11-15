@@ -45,7 +45,7 @@ public abstract class AbstractWrapperHelper implements WrapperHelper {
     protected AbstractWrapperHelper(Class<?> wt,
                   Method[] sets,
                   Method[] gets,
-                  Field f[]) {
+                  Field[] f) {
         setMethods = sets;
         getMethods = gets;
         fields = f;
