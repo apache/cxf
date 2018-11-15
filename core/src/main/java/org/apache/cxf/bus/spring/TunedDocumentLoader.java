@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.logging.Logger;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -87,6 +88,8 @@ class TunedDocumentLoader extends DefaultDocumentLoader {
             nsasaxParserFactory.setFeature("http://xml.org/sax/features/namespaces", true);
             nsasaxParserFactory.setFeature("http://xml.org/sax/features/namespace-prefixes",
                                            true);
+            saxParserFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+            nsasaxParserFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
         } catch (Throwable e) {
             //ignore
         }
