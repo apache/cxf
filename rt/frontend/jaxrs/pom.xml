@@ -40,7 +40,8 @@
             javax.validation*;resolution:=optional;version="${cxf.validation.api.package.version}",
             javax.ws.rs.client;version="[2.0,3)",
             javax.ws.rs*;version="[1.0,3)",
-            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}"
+            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
+            javax.annotation*;version="${cxf.osgi.javax.annotation.version}"
         </cxf.osgi.import>
         <cxf.osgi.export>
             org.apache.cxf.jaxrs*

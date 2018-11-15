@@ -35,7 +35,8 @@
         <cxf.checkstyle.extension>-corba</cxf.checkstyle.extension>
         <cxf.osgi.import>
             org.objectweb.asm*;version="${cxf.osgi.asm.version}",
-            javax.xml.ws*;version="${cxf.osgi.javax.xml.ws.version}"
+            javax.xml.ws*;version="${cxf.osgi.javax.xml.ws.version}",
+            javax.annotation*;version="${cxf.osgi.javax.annotation.version}"
         </cxf.osgi.import>
     </properties>
     <dependencies>

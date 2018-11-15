@@ -38,7 +38,8 @@
             net.sf.ehcache*;resolution:=optional;version="[2.5, 3.0.0)",
             org.opensaml*;version="${cxf.opensaml.osgi.version.range}",
             javax.xml.ws*;version="${cxf.osgi.javax.xml.ws.version}",
-            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}"
+            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
+            javax.annotation*;version="${cxf.osgi.javax.annotation.version}"
         </cxf.osgi.import>
     </properties>
     <dependencies>

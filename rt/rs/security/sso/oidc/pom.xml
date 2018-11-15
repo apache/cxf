@@ -33,6 +33,10 @@
   <properties>
     <compilerArguments>-Aopenjpa.source=7 -Aopenjpa.metamodel=true</compilerArguments>
     <cxf.module.name>org.apache.cxf.rs.security.sso.oidc</cxf.module.name>
+    <cxf.osgi.import>
+        javax.annotation*;version="${cxf.osgi.javax.annotation.version}",
+        *
+    </cxf.osgi.import>
   </properties>
   <dependencies>
     <dependency>

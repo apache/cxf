@@ -33,7 +33,8 @@
     <properties>
         <cxf.module.name>org.apache.cxf.wsdl</cxf.module.name>
         <cxf.osgi.import>
-           javax.xml.bind*;version="${cxf.osgi.javax.bind.version}"
+           javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
+           javax.annotation*;version="${cxf.osgi.javax.annotation.version}"
         </cxf.osgi.import>
     </properties>
     <dependencies>
