@@ -314,9 +314,7 @@ public class RMEndpoint {
             int seq = acknowledgementSequence.incrementAndGet();
             try {
                 modelMBean.sendNotification(new AcknowledgementNotification(this, seq, ssid, number));
-            } catch (RuntimeOperationsException e) {
-                LOG.log(Level.WARNING, "Error handling JMX notification", e);
-            } catch (MBeanException e) {
+            } catch (RuntimeOperationsException | MBeanException e) {
                 LOG.log(Level.WARNING, "Error handling JMX notification", e);
             }
         }

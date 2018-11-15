@@ -69,11 +69,7 @@ public abstract class AbstractXSLTInterceptor extends AbstractPhaseInterceptor<M
             }
 
             xsltTemplate = transformerFactory.newTemplates(new DOMSource(doc));
-        } catch (TransformerConfigurationException e) {
-            throw new IllegalArgumentException(
-                                               String.format("Cannot create XSLT template from path: %s",
-                                                             xsltPath), e);
-        } catch (XMLStreamException e) {
+        } catch (TransformerConfigurationException | XMLStreamException e) {
             throw new IllegalArgumentException(
                                                String.format("Cannot create XSLT template from path: %s",
                                                              xsltPath), e);

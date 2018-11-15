@@ -52,9 +52,7 @@ public final class ReflectionUtil {
                 try {
                     f.setAccessible(true);
                     return responseClass.cast(f.get(o));
-                } catch (SecurityException e) {
-                    return null;
-                } catch (IllegalAccessException e) {
+                } catch (SecurityException | IllegalAccessException e) {
                     return null;
                 } finally {
                     f.setAccessible(b);
@@ -73,9 +71,7 @@ public final class ReflectionUtil {
                 try {
                     f.setAccessible(true);
                     return responseClass.cast(f.get(o));
-                } catch (SecurityException e) {
-                    return null;
-                } catch (IllegalAccessException e) {
+                } catch (SecurityException | IllegalAccessException e) {
                     return null;
                 } finally {
                     f.setAccessible(b);
@@ -89,9 +85,7 @@ public final class ReflectionUtil {
             public Field run() {
                 try {
                     return cls.getDeclaredField(name);
-                } catch (SecurityException e) {
-                    return null;
-                } catch (NoSuchFieldException e) {
+                } catch (SecurityException | NoSuchFieldException e) {
                     return null;
                 }
             }
@@ -103,9 +97,7 @@ public final class ReflectionUtil {
             public Constructor<T> run() {
                 try {
                     return cls.getDeclaredConstructor(args);
-                } catch (SecurityException e) {
-                    return null;
-                } catch (NoSuchMethodException e) {
+                } catch (SecurityException | NoSuchMethodException e) {
                     return null;
                 }
             }
@@ -117,9 +109,7 @@ public final class ReflectionUtil {
             public Constructor<T> run() {
                 try {
                     return cls.getConstructor(args);
-                } catch (SecurityException e) {
-                    return null;
-                } catch (NoSuchMethodException e) {
+                } catch (SecurityException | NoSuchMethodException e) {
                     return null;
                 }
             }
@@ -247,9 +237,7 @@ public final class ReflectionUtil {
                         if (propertyDescriptor != null) {
                             descriptors.add(propertyDescriptor);
                         }
-                    } catch (IllegalArgumentException e) {
-                        throw new RuntimeException(e);
-                    } catch (IllegalAccessException e) {
+                    } catch (IllegalArgumentException | IllegalAccessException e) {
                         throw new RuntimeException(e);
                     } catch (InvocationTargetException e) {
                         throw new RuntimeException(e.getCause());

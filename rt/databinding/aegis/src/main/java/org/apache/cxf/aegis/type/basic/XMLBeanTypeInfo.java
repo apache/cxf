@@ -134,11 +134,7 @@ public class XMLBeanTypeInfo extends BeanTypeInfo {
                     }
                     customTypeObject.setTypeClass(typeClass);
                     customTypeObject.setSchemaType(schemaType);
-                } catch (ClassNotFoundException e1) {
-                    //
-                } catch (InstantiationException e2) {
-                    //
-                } catch (IllegalAccessException e3) {
+                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e1) {
                     //
                 }
             }

@@ -56,11 +56,7 @@ public class AttachmentDataSource implements DataSource {
                 if (delegate != null) {
                     delegate.setInputStream(cache.getInputStream());
                 }
-            } catch (CacheSizeExceededException cee) {
-                cache.close();
-                cache = null;
-                throw cee;
-            } catch (IOException cee) {
+            } catch (CacheSizeExceededException | IOException cee) {
                 cache.close();
                 cache = null;
                 throw cee;

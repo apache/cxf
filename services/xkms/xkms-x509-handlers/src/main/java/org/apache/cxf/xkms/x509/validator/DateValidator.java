@@ -49,9 +49,7 @@ public class DateValidator implements Validator {
 
         try {
             certificate.checkValidity(Date.from(now));
-        } catch (CertificateNotYetValidException e) {
-            return false;
-        } catch (CertificateExpiredException e) {
+        } catch (CertificateNotYetValidException | CertificateExpiredException e) {
             return false;
         }
         /*

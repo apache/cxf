@@ -178,9 +178,7 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
 
             newXMLStreamWriter = outboundWSSec.processOutMessage(os, encoding, outboundSecurityContext);
             mc.setContent(XMLStreamWriter.class, newXMLStreamWriter);
-        } catch (WSSecurityException e) {
-            throw new Fault(e);
-        } catch (WSSPolicyException e) {
+        } catch (WSSecurityException | WSSPolicyException e) {
             throw new Fault(e);
         }
 

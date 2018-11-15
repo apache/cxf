@@ -118,9 +118,7 @@ public class WSDL11Generator extends AbstractGenerator<Definition> {
             wex.printStackTrace();
         } catch (FileNotFoundException fnfe) {
             throw new ToolException("Output file " + file + " not found", fnfe);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (XMLStreamException e) {
+        } catch (IOException | XMLStreamException e) {
             e.printStackTrace();
         }
         return def;

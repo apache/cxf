@@ -124,10 +124,6 @@ public class WSDLToSoap extends AbstractCXFToolContainer {
                                WSDLToSoap.class.getResourceAsStream("wsdl2soap.xml"),
                                false,
                                pargs);
-        } catch (ToolException ex) {
-            System.err.println("WSDL2Soap Error : " + ex.getMessage());
-            System.err.println();
-            ex.printStackTrace();
         } catch (Exception ex) {
             System.err.println("WSDL2Soap Error : " + ex.getMessage());
             System.err.println();

@@ -211,11 +211,7 @@ public class JavascriptTestUtilities extends TestUtilities {
 
             // so that the stock test for IE can gracefully fail.
             rhinoContext.evaluateString(rhinoScope, "var window = new Object();", "<internal>", 0, null);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
             throw new RuntimeException(e);
         } finally {
             Context.exit();

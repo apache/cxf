@@ -84,9 +84,7 @@ public class ModelMBeanAssemblerTest extends  Assert {
 
         try {
             ton = new ObjectName("org.apache.cxf:Type=testInstrumentation");
-        } catch (MalformedObjectNameException e) {
-            e.printStackTrace();
-        } catch (NullPointerException e) {
+        } catch (MalformedObjectNameException | NullPointerException e) {
             e.printStackTrace();
         }
 

@@ -402,11 +402,7 @@ class ClassReader extends ByteArrayInputStream {
                 } catch (InvocationTargetException e) {
                     try {
                         throw e.getTargetException();
-                    } catch (Error ex) {
-                        throw ex;
-                    } catch (RuntimeException ex) {
-                        throw ex;
-                    } catch (IOException ex) {
+                    } catch (Error | RuntimeException | IOException ex) {
                         throw ex;
                     } catch (Throwable ex) {
                         pos = curPos;

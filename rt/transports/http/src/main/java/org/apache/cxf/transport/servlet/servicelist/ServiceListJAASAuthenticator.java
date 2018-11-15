@@ -153,9 +153,7 @@ public class ServiceListJAASAuthenticator {
         try {
             transformed = Base64Utility.decode(srcString);
             return new String(transformed, "ISO-8859-1");
-        } catch (UnsupportedEncodingException uee) {
-            return srcString;
-        } catch (Base64Exception e) {
+        } catch (UnsupportedEncodingException | Base64Exception e) {
             return srcString;
         }
     }

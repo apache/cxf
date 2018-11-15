@@ -141,9 +141,7 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
                     if (principal instanceof UsernameTokenPrincipal) {
                         storeResults((UsernameTokenPrincipal)principal, subject, message);
                     }
-                } catch (WSSecurityException ex) {
-                    throw new Fault(ex);
-                } catch (Base64DecodingException ex) {
+                } catch (WSSecurityException | Base64DecodingException ex) {
                     throw new Fault(ex);
                 }
             }

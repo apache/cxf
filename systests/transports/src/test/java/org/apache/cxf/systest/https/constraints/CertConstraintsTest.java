@@ -113,8 +113,6 @@ public class CertConstraintsTest extends AbstractBusClientServerTestBase {
         try {
             assertEquals(port.greetMe("Kitty"), "Hello Kitty");
             fail("Failure expected");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            // expected
         } catch (javax.xml.ws.WebServiceException ex) {
             // expected
         }

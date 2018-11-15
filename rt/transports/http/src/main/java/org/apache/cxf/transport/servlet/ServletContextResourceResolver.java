@@ -105,9 +105,7 @@ public class ServletContextResourceResolver implements ResourceResolver {
                     urlMap.put(url.toString(), url);
                     return clz.cast(url);
                 }
-            } catch (MalformedURLException e1) {
-                //ignore
-            } catch (URISyntaxException e) {
+            } catch (MalformedURLException | URISyntaxException e1) {
                 //ignore
             }
         } else if (clz.isAssignableFrom(InputStream.class)) {

@@ -55,9 +55,7 @@ public class TestUserPasswordLoginModule implements LoginModule {
         Callback[] callbacks = new Callback[] {nameCallback, passwordCallback};
         try {
             this.callbackHandler.handle(callbacks);
-        } catch (IOException e) {
-            throw new LoginException(e.getMessage());
-        } catch (UnsupportedCallbackException e) {
+        } catch (IOException | UnsupportedCallbackException e) {
             throw new LoginException(e.getMessage());
         }
         String userName = nameCallback.getName();

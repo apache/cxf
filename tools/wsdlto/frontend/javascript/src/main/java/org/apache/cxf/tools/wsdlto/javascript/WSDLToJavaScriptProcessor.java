@@ -22,7 +22,6 @@ package org.apache.cxf.tools.wsdlto.javascript;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -95,8 +94,6 @@ public class WSDLToJavaScriptProcessor extends WSDLToProcessor {
             serviceBuilder.walk();
             String serviceJavascript = serviceBuilder.getCode();
             writer.append(serviceJavascript);
-        } catch (FileNotFoundException e) {
-            throw new ToolException(e);
         } catch (IOException e) {
             throw new ToolException(e);
         } finally {

@@ -2160,9 +2160,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
             try {
                 Method m = exClass.getMethod("getFaultInfo");
                 return m.getReturnType();
-            } catch (SecurityException e) {
-                throw new ServiceConstructionException(e);
-            } catch (NoSuchMethodException e) {
+            } catch (SecurityException | NoSuchMethodException e) {
                 throw new ServiceConstructionException(e);
             }
         }

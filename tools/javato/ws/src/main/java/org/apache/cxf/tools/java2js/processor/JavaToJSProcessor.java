@@ -21,7 +21,6 @@ package org.apache.cxf.tools.java2js.processor;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -105,8 +104,6 @@ public class JavaToJSProcessor implements Processor {
             serviceBuilder.walk();
             String serviceJavascript = serviceBuilder.getCode();
             writer.append(serviceJavascript);
-        } catch (FileNotFoundException e) {
-            throw new ToolException(e);
         } catch (IOException e) {
             throw new ToolException(e);
         } finally {

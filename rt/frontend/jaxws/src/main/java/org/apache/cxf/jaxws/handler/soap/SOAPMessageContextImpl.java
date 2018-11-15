@@ -102,9 +102,7 @@ public class SOAPMessageContextImpl extends WrappedMessageContext implements SOA
                 }
             }
             return ret.toArray(new Object[0]);
-        } catch (SOAPException e) {
-            throw new WebServiceException(e);
-        } catch (JAXBException e) {
+        } catch (SOAPException | JAXBException e) {
             throw new WebServiceException(e);
         }
     }

@@ -1110,9 +1110,7 @@ public class RMTxStore implements RMStore {
                 }
                 Class.forName(driverClassName);
                 con = DriverManager.getConnection(url, userName, password);
-            } catch (ClassNotFoundException ex) {
-                LogUtils.log(LOG, Level.SEVERE, "CONNECT_EXC", ex);
-            } catch (SQLException ex) {
+            } catch (ClassNotFoundException | SQLException ex) {
                 LogUtils.log(LOG, Level.SEVERE, "CONNECT_EXC", ex);
             }
         }

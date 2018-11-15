@@ -359,10 +359,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     }
                 }
             }
-        } catch (WSSecurityException ex) {
-            LOG.log(Level.FINE, ex.getMessage(), ex);
-            throw new Fault(ex);
-        } catch (SOAPException ex) {
+        } catch (WSSecurityException | SOAPException ex) {
             LOG.log(Level.FINE, ex.getMessage(), ex);
             throw new Fault(ex);
         }

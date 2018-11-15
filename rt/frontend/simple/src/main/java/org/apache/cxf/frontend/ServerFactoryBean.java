@@ -189,11 +189,7 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
                     }
                 }
 
-            } catch (EndpointException e) {
-                throw new ServiceConstructionException(e);
-            } catch (BusException e) {
-                throw new ServiceConstructionException(e);
-            } catch (IOException e) {
+            } catch (EndpointException | BusException | IOException e) {
                 throw new ServiceConstructionException(e);
             }
 

@@ -196,10 +196,7 @@ public class SoapHeaderInterceptor extends AbstractInDatabindingInterceptor {
                     };
                     v.setErrorHandler(errorHandler);
                     v.validate(ds);
-                } catch (SAXException e) {
-                    throw new Fault("COULD_NOT_VALIDATE_SOAP_HEADER_CAUSED_BY", LOG, e, e.getClass()
-                        .getCanonicalName(), e.getMessage());
-                } catch (IOException e) {
+                } catch (SAXException | IOException e) {
                     throw new Fault("COULD_NOT_VALIDATE_SOAP_HEADER_CAUSED_BY", LOG, e, e.getClass()
                         .getCanonicalName(), e.getMessage());
                 }
