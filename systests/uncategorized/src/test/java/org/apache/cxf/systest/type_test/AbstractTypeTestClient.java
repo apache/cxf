@@ -193,7 +193,7 @@ public abstract class AbstractTypeTestClient
         if (!shouldRunTest("Short")) {
             return;
         }
-        short valueSets[][] = {{0, 1}, {-1, 0}, {Short.MIN_VALUE, Short.MAX_VALUE}};
+        short[][] valueSets = {{0, 1}, {-1, 0}, {Short.MIN_VALUE, Short.MAX_VALUE}};
 
         for (int i = 0; i < valueSets.length; i++) {
             short x = valueSets[i][0];
@@ -378,7 +378,7 @@ public abstract class AbstractTypeTestClient
             return;
         }
         float delta = 0.0f;
-        float valueSets[][] = getTestFloatData();
+        float[][] valueSets = getTestFloatData();
 
         for (int i = 0; i < valueSets.length; i++) {
             float x = valueSets[i][0];
@@ -430,7 +430,7 @@ public abstract class AbstractTypeTestClient
             return;
         }
         double delta = 0.0d;
-        double valueSets[][] = getTestDoubleData();
+        double[][] valueSets = getTestDoubleData();
         for (int i = 0; i < valueSets.length; i++) {
             double x = valueSets[i][0];
             Holder<Double> yOrig = new Holder<>(valueSets[i][1]);
@@ -476,7 +476,7 @@ public abstract class AbstractTypeTestClient
         if (!shouldRunTest("UnsignedByte")) {
             return;
         }
-        short valueSets[][] = {{0, 1}, {1, 0}, {0, Byte.MAX_VALUE * 2 + 1}};
+        short[][] valueSets = {{0, 1}, {1, 0}, {0, Byte.MAX_VALUE * 2 + 1}};
 
         for (int i = 0; i < valueSets.length; i++) {
             short x = valueSets[i][0];
@@ -506,7 +506,7 @@ public abstract class AbstractTypeTestClient
         if (!shouldRunTest("Boolean")) {
             return;
         }
-        boolean valueSets[][] = {{true, false}, {true, true}, {false, true}, {false, false}};
+        boolean[][] valueSets = {{true, false}, {true, true}, {false, true}, {false, false}};
 
         for (int i = 0; i < valueSets.length; i++) {
             boolean x = valueSets[i][0];
@@ -1111,7 +1111,7 @@ public abstract class AbstractTypeTestClient
         if (!shouldRunTest("Decimal")) {
             return;
         }
-        BigDecimal valueSets[][] = {{new BigDecimal("-1234567890.000000"),
+        BigDecimal[][] valueSets = {{new BigDecimal("-1234567890.000000"),
                                      new BigDecimal("1234567890.000000")},
                                     {new BigDecimal("-" + String.valueOf(Long.MAX_VALUE * Long.MAX_VALUE)
                                                     + ".000000"),

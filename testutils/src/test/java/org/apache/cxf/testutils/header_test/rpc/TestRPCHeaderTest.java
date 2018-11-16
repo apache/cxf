@@ -37,7 +37,7 @@ public class TestRPCHeaderTest extends Assert {
         Method[] meths = cls.getMethods();
         for (Method m : meths) {
             if ("testHeader1".equals(m.getName())) {
-                Annotation annotations[][] = m.getParameterAnnotations();
+                Annotation[][] annotations = m.getParameterAnnotations();
                 assertEquals(2, annotations.length);
                 assertEquals(1, annotations[0].length);
                 assertTrue(annotations[0][0] instanceof WebParam);
@@ -56,7 +56,7 @@ public class TestRPCHeaderTest extends Assert {
         Method[] meths = cls.getMethods();
         for (Method m : meths) {
             if ("testInOutHeader".equals(m.getName())) {
-                Annotation annotations[][] = m.getParameterAnnotations();
+                Annotation[][] annotations = m.getParameterAnnotations();
                 assertEquals(2, annotations.length);
                 assertEquals(1, annotations[1].length);
                 assertTrue(annotations[1][0] instanceof WebParam);

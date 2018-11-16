@@ -72,7 +72,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         Method[] meths = clz.getMethods();
         for (Method m : meths) {
             if ("orderPizzaBroken".equals(m.getName())) {
-                Annotation annotations[][] = m.getParameterAnnotations();
+                Annotation[][] annotations = m.getParameterAnnotations();
                 assertEquals(2, annotations.length);
                 for (int i = 0; i < 2; i++) {
                     assertTrue(annotations[i][0] instanceof WebParam);
@@ -93,7 +93,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
             }
             if ("orderPizza".equals(m.getName())) {
-                Annotation annotations[][] = m.getParameterAnnotations();
+                Annotation[][] annotations = m.getParameterAnnotations();
                 assertEquals(2, annotations.length);
                 for (int i = 0; i < 2; i++) {
                     assertTrue(annotations[i][0] instanceof WebParam);
@@ -132,7 +132,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         Method[] meths = clz.getMethods();
         for (Method m : meths) {
             if ("orderPizzaBroken".equals(m.getName())) {
-                Annotation annotations[][] = m.getParameterAnnotations();
+                Annotation[][] annotations = m.getParameterAnnotations();
                 assertEquals(1, annotations.length);
                 for (int i = 0; i < 1; i++) {
                     assertTrue(annotations[i][0] instanceof WebParam);
@@ -166,7 +166,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         Method[] meths = clz.getMethods();
         for (Method m : meths) {
             if ("orderPizzaBroken".equals(m.getName())) {
-                Annotation annotations[][] = m.getParameterAnnotations();
+                Annotation[][] annotations = m.getParameterAnnotations();
                 assertEquals(1, annotations.length);
                 for (int i = 0; i < 1; i++) {
                     assertTrue(annotations[i][0] instanceof WebParam);
@@ -201,7 +201,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         Method[] meths = clz.getMethods();
         for (Method m : meths) {
             if ("orderPizza".equals(m.getName())) {
-                Annotation annotations[][] = m.getParameterAnnotations();
+                Annotation[][] annotations = m.getParameterAnnotations();
                 assertEquals(2, annotations.length);
                 for (int i = 0; i < 2; i++) {
                     assertTrue(annotations[i][0] instanceof WebParam);
@@ -1177,7 +1177,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         Method[] meths = cls.getMethods();
         for (Method m : meths) {
             if ("testHeader1".equals(m.getName())) {
-                Annotation annotations[][] = m.getParameterAnnotations();
+                Annotation[][] annotations = m.getParameterAnnotations();
                 assertEquals(2, annotations.length);
                 assertEquals(1, annotations[1].length);
                 assertTrue(annotations[1][0] instanceof WebParam);
@@ -1191,7 +1191,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
         for (Method m : meths) {
             if ("testInOutHeader".equals(m.getName())) {
-                Annotation annotations[][] = m.getParameterAnnotations();
+                Annotation[][] annotations = m.getParameterAnnotations();
                 assertEquals(2, annotations.length);
                 assertEquals(1, annotations[1].length);
                 assertTrue(annotations[1][0] instanceof WebParam);
