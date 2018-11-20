@@ -2878,47 +2878,6 @@
                     <artifactId>saaj-impl</artifactId>
                     <version>1.4.0-b03</version>
                 </dependency>
-                <!--dependency>
-                    <groupId>org.glassfish.gmbal</groupId>
-                    <artifactId>gmbal</artifactId>
-                    <version>4.0.0-b001</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.glassfish.corba</groupId>
-                    <artifactId>glassfish-corba-omgapi</artifactId>
-                    <version>4.1.1-b001</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.glassfish.corba</groupId>
-                    <artifactId>glassfish-corba-orb</artifactId>
-                    <version>4.0.2-b002</version>
-                </dependency>
-                <dependency>
-                   <groupId>com.sun.corba</groupId>
-                   <artifactId>orb</artifactId>
-                   <version>9.1</version>
-                </dependency>
-                <dependency>
-                    <groupId>com.sun.corba</groupId>
-                    <artifactId>glassfish-corba-peorb</artifactId>
-                    <version>v3-test</version>
-                </dependency>
-                <dependency>
-                    <groupId>com.sun.corba</groupId>
-                    <artifactId>glassfish-corba-orb</artifactId>
-                    <version>3.2.0-b005</version>
-                </dependency>
-                <dependency>
-                    <groupId>com.sun.corba</groupId>
-                    <artifactId>glassfish-corba-omgapi</artifactId>
-                    <version>3.2.0-b005</version>
-                </dependency>
-                
-                <dependency>
-                    <groupId>com.github.demidenko05</groupId>
-                    <artifactId>a-javabeans</artifactId>
-                    <version>1.0.4</version>
-                </dependency-->
                 <dependency>
                     <groupId>org.jacorb</groupId>
                     <artifactId>jacorb</artifactId>
