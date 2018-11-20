@@ -29,7 +29,6 @@ import javax.jws.WebService;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 
 import org.junit.BeforeClass;
-import org.junit.Test;
 
 
 /**
@@ -54,12 +53,6 @@ public class DecoupledJMSTest extends MAPTestBase {
     }
     public String getPort() {
         return PORT;
-    }
-
-    @Test
-    @Override
-    public void testImplicitMAPs() throws Exception {
-        super.testImplicitMAPs();
     }
 
     public String getAddress() {

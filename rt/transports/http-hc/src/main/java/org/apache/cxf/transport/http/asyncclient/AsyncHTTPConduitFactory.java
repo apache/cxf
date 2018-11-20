@@ -53,12 +53,10 @@ import org.apache.http.impl.nio.conn.ManagedNHttpClientConnectionFactory;
 import org.apache.http.impl.nio.conn.PoolingNHttpClientConnectionManager;
 import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
 import org.apache.http.impl.nio.reactor.IOReactorConfig;
-import org.apache.http.nio.conn.ManagedNHttpClientConnection;
 import org.apache.http.nio.conn.NoopIOSessionStrategy;
 import org.apache.http.nio.conn.SchemeIOSessionStrategy;
 import org.apache.http.nio.conn.ssl.SSLIOSessionStrategy;
 import org.apache.http.nio.reactor.IOReactorException;
-import org.apache.http.nio.reactor.IOSession;
 import org.apache.http.protocol.HttpContext;
 
 /**
@@ -322,13 +320,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
                     .build();
 
 
-        ManagedNHttpClientConnectionFactory connectionFactory = new ManagedNHttpClientConnectionFactory() {
-
-            @Override
-            public ManagedNHttpClientConnection create(final IOSession iosession, final ConnectionConfig config) {
-                return super.create(iosession, config);
-            }
-        };
+        ManagedNHttpClientConnectionFactory connectionFactory = new ManagedNHttpClientConnectionFactory();
 
         DefaultConnectingIOReactor ioreactor = new DefaultConnectingIOReactor(config);
         connectionManager = new PoolingNHttpClientConnectionManager(
@@ -414,7 +406,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
                         // not just when a connection becomes available
                         connMgr.validatePendingRequests();
 
-                        if (connectionTTL == 0 
+                        if (connectionTTL == 0
                             && connectionMaxIdle > 0 && System.currentTimeMillis() >= nextIdleCheck) {
                             nextIdleCheck += connectionMaxIdle;
                             // close connections

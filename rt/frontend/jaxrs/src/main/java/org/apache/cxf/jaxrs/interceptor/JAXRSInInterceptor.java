@@ -256,11 +256,6 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         }
     }
 
-    @Override
-    public void handleFault(Message message) {
-        super.handleFault(message);
-    }
-
     private Message createOutMessage(Message inMessage, Response r) {
         Endpoint e = inMessage.getExchange().getEndpoint();
         Message mout = e.getBinding().createMessage();

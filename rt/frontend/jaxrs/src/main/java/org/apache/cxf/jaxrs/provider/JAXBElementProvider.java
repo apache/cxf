@@ -137,18 +137,6 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
         super.setContext(mc);
     }
 
-    public void setEnableBuffering(boolean enableBuf) {
-        super.setEnableBuffering(enableBuf);
-    }
-
-    public void setConsumeMediaTypes(List<String> types) {
-        super.setConsumeMediaTypes(types);
-    }
-
-    public void setProduceMediaTypes(List<String> types) {
-        super.setProduceMediaTypes(types);
-    }
-
     public void setMarshallerProperties(Map<String, Object> marshallProperties) {
         mProperties = marshallProperties;
     }

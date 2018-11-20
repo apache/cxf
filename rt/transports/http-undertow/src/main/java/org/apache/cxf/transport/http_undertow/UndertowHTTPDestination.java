@@ -20,7 +20,6 @@
 package org.apache.cxf.transport.http_undertow;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
@@ -230,11 +229,6 @@ public class UndertowHTTPDestination extends ServletDestination {
             super.setupContinuation(inMessage, req, resp);
         }
     }
-
-    protected OutputStream flushHeaders(Message outMessage, boolean getStream) throws IOException {
-        return super.flushHeaders(outMessage, getStream);
-    }
-
 
     protected String getAddress(EndpointInfo endpointInfo) {
         return endpointInfo.getAddress();

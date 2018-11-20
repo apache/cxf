@@ -39,17 +39,11 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.hello_world_doc_lit.PingMeFault;
 import org.apache.hello_world_doc_lit.types.FaultDetail;
 
-import org.junit.Before;
 import org.junit.Test;
 
 public class XMLFaultOutInterceptorTest extends TestBase {
 
     XMLFaultOutInterceptor out = new XMLFaultOutInterceptor();
-
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-    }
 
     @Test
     public void testFault() throws Exception {

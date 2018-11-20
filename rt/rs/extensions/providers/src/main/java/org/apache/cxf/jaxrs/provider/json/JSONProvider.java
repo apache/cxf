@@ -175,18 +175,6 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         wrapperMap = map;
     }
 
-    public void setEnableBuffering(boolean enableBuf) {
-        super.setEnableBuffering(enableBuf);
-    }
-
-    public void setConsumeMediaTypes(List<String> types) {
-        super.setConsumeMediaTypes(types);
-    }
-
-    public void setProduceMediaTypes(List<String> types) {
-        super.setProduceMediaTypes(types);
-    }
-
     public void setSerializeAsArray(boolean asArray) {
         this.serializeAsArray = asArray;
     }

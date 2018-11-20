@@ -111,11 +111,6 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
         this.mtomEnabled = allowMTOM;
     }
 
-    @Override
-    public Object getProperty(Object msgContext, String key) {
-        return super.getProperty(msgContext, key);
-    }
-
     protected void handleSecureMTOM(SoapMessage mc, WSSSecurityProperties secProps) {
         if (mtomEnabled) {
             return;

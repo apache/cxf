@@ -193,11 +193,6 @@ public class CircuitBreakerTargetSelector extends FailoverTargetSelector {
     }
 
     @Override
-    public void prepare(Message message) {
-        super.prepare(message);
-    }
-
-    @Override
     protected void onFailure(InvocationContext context, Exception ex) {
         super.onFailure(context, ex);
 

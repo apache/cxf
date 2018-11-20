@@ -24,7 +24,6 @@ import org.apache.cxf.ws.rm.persistence.jdbc.RMTxStore;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Test;
 
 /**
  * A simulated-large message version of ServerPersistenceTest.
@@ -46,11 +45,6 @@ public class CachedOutServerPersistenceTest extends AbstractServerPersistenceTes
         CachedOutputStream.setDefaultThreshold(-1);
         RMTxStore.deleteDatabaseFiles("cospt-recovery", false);
         RMTxStore.deleteDatabaseFiles("cospt-server", false);
-    }
-
-    @Test
-    public void testRecovery() throws Exception {
-        super.testRecovery();
     }
 
     public String getPort() {

@@ -21,7 +21,6 @@ package org.apache.cxf.ws.rm.persistence;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Test;
 
 
 /**
@@ -46,9 +45,4 @@ public class RMLargeMessageTest extends RMMessageTest {
         }
     }
 
-
-    @Test
-    public void testContentCachedOutputStream() throws Exception {
-        super.testContentCachedOutputStream();
-    }
 }
