@@ -92,11 +92,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-        <groupId>org.apache.geronimo.specs</groupId>
-          <artifactId>geronimo-jcache_1.0_spec</artifactId>
-          <version>1.0-alpha-1</version>
-          <scope>provided</scope>
-          <optional>true</optional>
+            <groupId>javax.cache</groupId>
+            <artifactId>cache-api</artifactId>
+            <version>${cxf.jcache.version}</version>
+            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
