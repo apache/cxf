@@ -25,6 +25,7 @@ import java.util.List;
 
 import javax.wsdl.Binding;
 import javax.wsdl.Definition;
+import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -271,7 +272,11 @@ public class ObjectReferenceVisitor extends VisitorBase {
             XmlSchemaAnnotation annotation = new XmlSchemaAnnotation();
             XmlSchemaAppInfo appInfo = new XmlSchemaAppInfo();
             try {
-                DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+                dbf.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+
+                DocumentBuilder db = dbf.newDocumentBuilder();
                 Document doc = db.newDocument();
                 Element el = doc.createElement("appinfo");
                 el.setTextContent("corba:binding=" + bindingName.getLocalPart());

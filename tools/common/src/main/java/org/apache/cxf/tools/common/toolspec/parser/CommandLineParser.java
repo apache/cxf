@@ -29,6 +29,7 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -96,6 +97,8 @@ public class CommandLineParser {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(true);
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
             resultDoc = factory.newDocumentBuilder().newDocument();
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "FAIL_CREATE_DOM_MSG");

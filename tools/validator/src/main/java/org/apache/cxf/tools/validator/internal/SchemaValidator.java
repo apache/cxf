@@ -108,6 +108,7 @@ public class SchemaValidator extends AbstractDefinitionValidator {
         try {
             docFactory.setNamespaceAware(true);
             docFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+            docFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
             docBuilder = docFactory.newDocumentBuilder();
         } catch (ParserConfigurationException e) {
             throw new ToolException(e);

@@ -117,6 +117,7 @@ public class XMLTypeCreator extends AbstractTypeCreator {
         AEGIS_DOCUMENT_BUILDER_FACTORY.setNamespaceAware(true);
         try {
             AEGIS_DOCUMENT_BUILDER_FACTORY.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            AEGIS_DOCUMENT_BUILDER_FACTORY.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
         } catch (javax.xml.parsers.ParserConfigurationException ex) {
             // ignore
         }
