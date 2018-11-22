@@ -90,6 +90,8 @@ class TunedDocumentLoader extends DefaultDocumentLoader {
                                            true);
             saxParserFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
             nsasaxParserFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+            saxParserFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            nsasaxParserFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
         } catch (Throwable e) {
             //ignore
         }

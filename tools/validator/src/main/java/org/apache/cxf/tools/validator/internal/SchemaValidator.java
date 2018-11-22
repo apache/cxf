@@ -186,6 +186,7 @@ public class SchemaValidator extends AbstractDefinitionValidator {
             SAXParserFactory saxFactory = SAXParserFactory.newInstance();
             saxFactory.setFeature("http://xml.org/sax/features/namespaces", true);
             saxFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+            saxFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
             saxParser = saxFactory.newSAXParser();
 
             if (defaultSchemas != null) {
