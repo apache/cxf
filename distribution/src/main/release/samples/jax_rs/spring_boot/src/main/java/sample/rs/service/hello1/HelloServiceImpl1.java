@@ -18,7 +18,7 @@
  */
 package sample.rs.service.hello1;
 
-import sample.rs.service.HelloService;
+import sample.rs.service.api.HelloService;
 
 public class HelloServiceImpl1 implements HelloService {
 
