@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.XMLConstants;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
@@ -77,6 +78,11 @@ public class SecuredElementsPolicyValidator implements SecurityPolicyValidator {
         // XPathFactory and XPath are not thread-safe so we must recreate them
         // each request.
         final XPathFactory factory = XPathFactory.newInstance();
+        try {
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+        } catch (javax.xml.xpath.XPathFactoryConfigurationException ex) {
+            // ignore
+        }
         final XPath xpath = factory.newXPath();
 
         Element soapEnvelope =

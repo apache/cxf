@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPEnvelope;
 import javax.xml.soap.SOAPException;
@@ -178,6 +179,11 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
         // XPathFactory and XPath are not thread-safe so we must recreate them
         // each request.
         final XPathFactory factory = XPathFactory.newInstance();
+        try {
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+        } catch (javax.xml.xpath.XPathFactoryConfigurationException ex) {
+            // ignore
+        }
         final XPath xpath = factory.newXPath();
 
         if (this.prefixMap != null) {

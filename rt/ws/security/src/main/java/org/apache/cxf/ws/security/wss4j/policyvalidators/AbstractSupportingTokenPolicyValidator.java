@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
@@ -746,6 +747,12 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
             // XPathFactory and XPath are not thread-safe so we must recreate them
             // each request.
             final XPathFactory factory = XPathFactory.newInstance();
+            try {
+                factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+            } catch (javax.xml.xpath.XPathFactoryConfigurationException ex) {
+                // ignore
+            }
+
             final XPath xpath = factory.newXPath();
 
             MapNamespaceContext namespaceContext = new MapNamespaceContext();

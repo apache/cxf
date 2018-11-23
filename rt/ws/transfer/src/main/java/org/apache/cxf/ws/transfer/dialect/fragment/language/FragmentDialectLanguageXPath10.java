@@ -20,6 +20,7 @@ package org.apache.cxf.ws.transfer.dialect.fragment.language;
 
 import java.util.Iterator;
 
+import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -41,6 +42,14 @@ import org.apache.cxf.ws.transfer.dialect.fragment.faults.InvalidExpression;
 public class FragmentDialectLanguageXPath10 implements FragmentDialectLanguage {
 
     private static XPathFactory xpathFactory = XPathFactory.newInstance();
+
+    static {
+        try {
+            xpathFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+        } catch (javax.xml.xpath.XPathFactoryConfigurationException ex) {
+            // ignore
+        }
+    }
 
     @Override
     public Object getResourceFragment(final Representation representation, ExpressionType expression) {

@@ -22,6 +22,7 @@ package org.apache.cxf.ws.eventing.shared.utils;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
+import javax.xml.XMLConstants;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.xpath.XPath;
@@ -43,6 +44,14 @@ public final class FilteringUtil {
 
     private static final Logger LOG = LogUtils.getLogger(FilteringUtil.class);
     private static XPathFactory xPathFactory = XPathFactory.newInstance();
+
+    static {
+        try {
+            xPathFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+        } catch (javax.xml.xpath.XPathFactoryConfigurationException ex) {
+            // ignore
+        }
+    }
 
     private FilteringUtil() {
 

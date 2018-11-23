@@ -36,6 +36,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.CallbackHandler;
+import javax.xml.XMLConstants;
 import javax.xml.crypto.dsig.Reference;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
@@ -1412,6 +1413,12 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                 );
 
             XPathFactory factory = XPathFactory.newInstance();
+            try {
+                factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+            } catch (javax.xml.xpath.XPathFactoryConfigurationException ex) {
+                // ignore
+            }
+
             for (org.apache.wss4j.policy.model.XPath xPath : xpaths) {
                 XPath xpath = factory.newXPath();
                 if (xPath.getPrefixNamespaceMap() != null) {

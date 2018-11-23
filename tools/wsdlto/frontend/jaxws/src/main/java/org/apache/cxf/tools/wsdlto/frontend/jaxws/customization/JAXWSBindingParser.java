@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.ExtensionRegistry;
+import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.xpath.XPath;
@@ -213,7 +214,14 @@ public class JAXWSBindingParser {
         NodeList nlst;
         try {
             ContextImpl contextImpl = new ContextImpl(target);
-            XPath xpath = XPathFactory.newInstance().newXPath();
+            XPathFactory xpathFactory = XPathFactory.newInstance();
+            try {
+                xpathFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+            } catch (javax.xml.xpath.XPathFactoryConfigurationException ex) {
+                // ignore
+            }
+
+            XPath xpath = xpathFactory.newXPath();
             xpath.setNamespaceContext(contextImpl);
             nlst = (NodeList)xpath.evaluate(expression, target, XPathConstants.NODESET);
         } catch (XPathExpressionException e) {

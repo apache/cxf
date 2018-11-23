@@ -553,7 +553,14 @@ public class JAXBDataBinding implements DataBindingProfile {
                 String s = r.getAttributeValue(null, "schemaLocation");
                 if (StringUtils.isEmpty(s)) {
                     Document d = StaxUtils.read(r);
-                    XPath p = XPathFactory.newInstance().newXPath();
+
+                    XPathFactory xpathFactory = XPathFactory.newInstance();
+                    try {
+                        xpathFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+                    } catch (javax.xml.xpath.XPathFactoryConfigurationException ex) {
+                        // ignore
+                    }
+                    XPath p = xpathFactory.newXPath();
                     p.setNamespaceContext(new W3CNamespaceContext(d.getDocumentElement()));
                     XPathExpression xpe = p.compile(d.getDocumentElement().getAttribute("node"));
                     for (XmlSchema schema : schemas.getXmlSchemas()) {
