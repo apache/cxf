@@ -27,7 +27,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.Bean;
 
-import sample.rs.service.HelloService;
+import sample.rs.service.api.HelloService;
 
 @SpringBootApplication
 @EnableJaxRsWebClient
