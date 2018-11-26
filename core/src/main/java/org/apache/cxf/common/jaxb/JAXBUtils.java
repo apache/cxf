@@ -1565,7 +1565,7 @@ public final class JAXBUtils {
     public static void setEscapeHandler(Marshaller marshaller, Object escapeHandler) {
         try {
             String postFix = getPostfix(marshaller.getClass());
-            if (postFix != null) {
+            if (postFix != null && escapeHandler != null) {
                 marshaller.setProperty("com.sun.xml" + postFix + ".bind.characterEscapeHandler", escapeHandler);
             }
         } catch (PropertyException e) {
