@@ -44,8 +44,7 @@ public class JsonMapObject implements Serializable {
             if (updateCount == null) {
                 updateCount = new LinkedHashMap<>();
             }
-            Integer count = updateCount.get(name);
-            count = count == null ? 2 : count++;
+            final Integer count = updateCount.getOrDefault(name, 1) + 1;
             updateCount.put(name, count);
         }
         if (value instanceof JsonMapObject) {
