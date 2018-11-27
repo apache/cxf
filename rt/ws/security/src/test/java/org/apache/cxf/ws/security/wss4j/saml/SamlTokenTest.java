@@ -116,7 +116,7 @@ public class SamlTokenTest extends AbstractSecurityTest {
         SamlAssertionWrapper receivedAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null && receivedAssertion.getSaml1() != null);
-        assert !receivedAssertion.isSigned();
+        assertFalse(receivedAssertion.isSigned());
 
         return message.get(SecurityContext.class);
     }
@@ -158,7 +158,7 @@ public class SamlTokenTest extends AbstractSecurityTest {
         SamlAssertionWrapper receivedAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null && receivedAssertion.getSaml1() != null);
-        assert !receivedAssertion.isSigned();
+        assertFalse(receivedAssertion.isSigned());
     }
 
     /**
@@ -195,7 +195,7 @@ public class SamlTokenTest extends AbstractSecurityTest {
         SamlAssertionWrapper receivedAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null && receivedAssertion.getSaml2() != null);
-        assert !receivedAssertion.isSigned();
+        assertFalse(receivedAssertion.isSigned());
     }
 
     @Test
@@ -237,7 +237,7 @@ public class SamlTokenTest extends AbstractSecurityTest {
         SamlAssertionWrapper receivedAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null && receivedAssertion.getSaml2() != null);
-        assert !receivedAssertion.isSigned();
+        assertFalse(receivedAssertion.isSigned());
     }
 
 
@@ -291,7 +291,7 @@ public class SamlTokenTest extends AbstractSecurityTest {
         SamlAssertionWrapper receivedAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null && receivedAssertion.getSaml1() != null);
-        assert receivedAssertion.isSigned();
+        assertTrue(receivedAssertion.isSigned());
 
         actionResult = handlerResults.get(0).getActionResults().get(WSConstants.SIGN).get(0);
         assertNotNull(actionResult);
@@ -355,7 +355,7 @@ public class SamlTokenTest extends AbstractSecurityTest {
         SamlAssertionWrapper receivedAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null && receivedAssertion.getSaml2() != null);
-        assert receivedAssertion.isSigned();
+        assertTrue(receivedAssertion.isSigned());
 
         actionResult = handlerResults.get(0).getActionResults().get(WSConstants.SIGN).get(0);
         assertNotNull(actionResult);

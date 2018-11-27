@@ -54,7 +54,7 @@ public class WSAFeatureXmlTest extends AbstractCXFTest {
     public void testServerFactory() {
         JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
 
-        assert bus != null;
+        assertNotNull(bus != null);
         sf.setServiceBean(new GreeterImpl());
         sf.setAddress("http://localhost:" + PORT + "/test");
         sf.setStart(false);

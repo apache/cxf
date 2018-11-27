@@ -321,7 +321,7 @@ public class MessageFlow extends Assert {
 
     public void verifySequenceFault(QName code, boolean outbound, int index) throws Exception {
         Document d = outbound ? outboundMessages.get(index) : inboundMessages.get(index);
-        assert null != getRMHeaderElement(d, RMConstants.SEQUENCE_FAULT_NAME);
+        assertNotNull(getRMHeaderElement(d, RMConstants.SEQUENCE_FAULT_NAME));
     }
 
     public void verifyHeader(QName name, boolean outbound, int index) throws Exception {

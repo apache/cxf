@@ -130,7 +130,6 @@ public class CertConstraintsTest extends org.junit.Assert {
                 }
             }
         }
-        assert false;
         throw new RuntimeException("error in test -- keystore " + id + " has no trusted certs");
     }
 
@@ -149,7 +148,7 @@ public class CertConstraintsTest extends org.junit.Assert {
                 final org.w3c.dom.NodeList elts = datum.getElementsByTagNameNS(
                     "http://cxf.apache.org/configuration/security", elementName
                 );
-                assert elts.getLength() == 1;
+                assertEquals(1, elts.getLength());
                 return unmarshal(cls, (org.w3c.dom.Element) elts.item(0));
             }
         }
