@@ -243,7 +243,7 @@ public class ValidateSamlUnitTest extends org.junit.Assert {
                 tokenType, STSConstants.BEARER_KEY_KEYTYPE, crypto, signatureUsername, callbackHandler
             );
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         return (Element)providerResponse.getToken();

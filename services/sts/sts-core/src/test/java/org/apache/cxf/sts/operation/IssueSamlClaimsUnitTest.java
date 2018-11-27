@@ -928,7 +928,7 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
         providerParameters.setRequestedSecondaryClaims(requestedClaims);
 
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         return (Element)providerResponse.getToken();

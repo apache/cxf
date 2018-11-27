@@ -31,7 +31,7 @@ public class ToolSpecTest extends Assert {
     public void testConstruct() {
         toolSpec = null;
         toolSpec = new ToolSpec();
-        assertTrue(toolSpec != null);
+        assertNotNull(toolSpec);
     }
 
     @Test
@@ -42,7 +42,7 @@ public class ToolSpecTest extends Assert {
         } catch (ToolException e) {
             throw new RuntimeException(e);
         }
-        assertTrue(toolSpec.getAnnotation() == null);
+        assertNull(toolSpec.getAnnotation());
     }
 
     @Test
@@ -51,9 +51,9 @@ public class ToolSpecTest extends Assert {
 
         toolSpec = new ToolSpec(getClass().getResourceAsStream(tsSource), false);
 
-        assertTrue(toolSpec.getAnnotation() == null);
-        assertTrue(toolSpec.getParameterDefault("namespace") == null);
-        assertTrue(toolSpec.getParameterDefault("wsdlurl") == null);
+        assertNull(toolSpec.getAnnotation());
+        assertNull(toolSpec.getParameterDefault("namespace"));
+        assertNull(toolSpec.getParameterDefault("wsdlurl"));
     }
 
     @Test

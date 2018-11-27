@@ -367,7 +367,7 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
         Element samlToken =
             createSAMLAssertion(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
                     callbackHandler, realms);
-        
+
         DocumentFragment f = samlToken.getOwnerDocument().createDocumentFragment();
         f.appendChild(samlToken);
         Document docToken = samlToken.getOwnerDocument();
@@ -727,7 +727,7 @@ public class IssueJWTClaimsUnitTest extends org.junit.Assert {
         providerParameters.setRequestedSecondaryClaims(requestedClaims);
 
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         return (Element)providerResponse.getToken();

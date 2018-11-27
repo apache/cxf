@@ -98,7 +98,7 @@ public class CorbaServerConduitTest extends Assert {
     @Test
     public void testCorbaServerConduit() throws Exception {
         CorbaServerConduit conduit = setupCorbaServerConduit(false);
-        assertTrue("conduit should not be null", conduit != null);
+        assertNotNull("conduit should not be null", conduit);
     }
 
     @Test
@@ -120,11 +120,11 @@ public class CorbaServerConduitTest extends Assert {
             ex.printStackTrace();
         }
         OutputStream os = message.getContent(OutputStream.class);
-        assertTrue("OutputStream should not be null", os != null);
+        assertNotNull("OutputStream should not be null", os);
         ORB orb2 = (ORB)message.get("orb");
-        assertTrue("Orb should not be null", orb2 != null);
+        assertNotNull("Orb should not be null", orb2);
         Object obj = message.get("endpoint");
-        assertTrue("EndpointReferenceType should not be null", obj != null);
+        assertNotNull("EndpointReferenceType should not be null", obj);
 
         assertTrue("passed in targetObject is used",
                 targetObject.equals(message.get(CorbaConstants.CORBA_ENDPOINT_OBJECT)));
@@ -149,7 +149,7 @@ public class CorbaServerConduitTest extends Assert {
 
         EndpointReferenceType t = null;
         EndpointReferenceType ref = conduit.getTargetReference(t);
-        assertTrue("ref should not be null", ref != null);
+        assertNotNull("ref should not be null", ref);
         destination.shutdown();
     }
 
@@ -168,7 +168,7 @@ public class CorbaServerConduitTest extends Assert {
                                                             orbConfig,
                                                             corbaTypeMap);
         String address = conduit.getAddress();
-        assertTrue("address should not be null", address != null);
+        assertNotNull("address should not be null", address);
         assertEquals(address, "corbaloc::localhost:40000/Simple");
     }
 
@@ -295,7 +295,7 @@ public class CorbaServerConduitTest extends Assert {
     public void testGetTarget()  {
         CorbaServerConduit conduit = setupCorbaServerConduit(false);
         EndpointReferenceType endpoint = conduit.getTarget();
-        assertTrue("EndpointReferenceType should not be null", endpoint != null);
+        assertNotNull("EndpointReferenceType should not be null", endpoint);
     }
 
 

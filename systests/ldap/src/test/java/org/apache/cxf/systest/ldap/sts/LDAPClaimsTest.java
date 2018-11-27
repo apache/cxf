@@ -390,7 +390,7 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
                 CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
                 InputStream in = new ByteArrayInputStream((byte[])c.getValues().get(0));
                 X509Certificate cert = (X509Certificate)certFactory.generateCertificate(in);
-                Assert.assertTrue(cert != null);
+                Assert.assertNotNull(cert);
             }
         }
 

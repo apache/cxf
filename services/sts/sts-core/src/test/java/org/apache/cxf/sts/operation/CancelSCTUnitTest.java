@@ -180,7 +180,7 @@ public class CancelSCTUnitTest extends org.junit.Assert {
 
         assertTrue(sctTokenProvider.canHandleToken(STSUtils.TOKEN_TYPE_SCT_05_12));
         TokenProviderResponse providerResponse = sctTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         return providerResponse;

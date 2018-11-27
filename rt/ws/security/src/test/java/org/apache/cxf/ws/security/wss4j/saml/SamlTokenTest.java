@@ -294,7 +294,7 @@ public class SamlTokenTest extends AbstractSecurityTest {
         assert receivedAssertion.isSigned();
 
         actionResult = handlerResults.get(0).getActionResults().get(WSConstants.SIGN).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
     }
 
     /**
@@ -358,7 +358,7 @@ public class SamlTokenTest extends AbstractSecurityTest {
         assert receivedAssertion.isSigned();
 
         actionResult = handlerResults.get(0).getActionResults().get(WSConstants.SIGN).get(0);
-        assertTrue(actionResult != null);
+        assertNotNull(actionResult);
     }
 
     /**

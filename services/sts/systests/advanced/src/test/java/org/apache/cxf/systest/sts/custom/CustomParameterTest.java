@@ -355,7 +355,7 @@ public class CustomParameterTest extends AbstractBusClientServerTestBase {
         assertTrue(results != null && results.size() == 1);
         SamlAssertionWrapper assertion =
             (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(assertion != null);
+        assertNotNull(assertion);
         if (saml2) {
             assertTrue(assertion.getSaml2() != null && assertion.getSaml1() == null);
         } else {

@@ -186,7 +186,7 @@ public class Wsdl11AttachmentPolicyProviderTest extends Assert {
         verifyAssertionsOnly(p, 3);
 
         EndpointInfo ei = new EndpointInfo();
-        assertTrue(app.getElementPolicy(ei) == null);
+        assertNull(app.getElementPolicy(ei));
     }
 
     @Test

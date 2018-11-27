@@ -229,7 +229,7 @@ public class JexlIssueSamlClaimsTest extends org.junit.Assert {
 
         // create a SAML Token via the SAMLTokenProvider which contains claims
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = createSAMLAssertion(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, 
+        Element samlToken = createSAMLAssertion(WSS4JConstants.WSS_SAML2_TOKEN_TYPE,
                                                 crypto, "mystskey", callbackHandler,
                                                 realms);
         Document docToken = samlToken.getOwnerDocument();
@@ -356,7 +356,7 @@ public class JexlIssueSamlClaimsTest extends org.junit.Assert {
         providerParameters.setRequestedSecondaryClaims(requestedClaims);
 
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         return (Element)providerResponse.getToken();

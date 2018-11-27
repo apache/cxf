@@ -28,9 +28,9 @@ public class ToolExceptionTest extends Assert {
     @Test
     public void testMassMethod() {
         ToolException e = new ToolException("e");
-        assertTrue(e.getCause() == null);
+        assertNull(e.getCause());
         e = new ToolException("run time exception", new RuntimeException("test run time exception"));
         assertTrue(e.getCause() instanceof RuntimeException);
-        assertTrue(e.toString() != null);
+        assertNotNull(e.toString());
     }
 }

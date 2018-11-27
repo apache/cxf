@@ -42,7 +42,7 @@ public class HandlerTest extends Assert {
         String urls = "resourceadapter:" + urlpath;
         URL res = new URL(null, urls, h);
         InputStream is = h.openConnection(res).getInputStream();
-        assertTrue("stream is not null", is != null);
+        assertNotNull("stream is not null", is);
     }
 
 

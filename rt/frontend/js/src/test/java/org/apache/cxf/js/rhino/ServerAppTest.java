@@ -218,7 +218,7 @@ public class ServerAppTest extends Assert {
     public void testDirectory() throws Exception {
         File f = new File(emptyFile);
         String dir = f.getParent();
-        assertTrue(dir != null);
+        assertNotNull(dir);
         EasyMock.checkOrder(phMock, false);
         phMock.createAndPublish(new File(emptyFile), epAddr, true);
         String file = getClass().getResource("empty/empty2.jsx").toURI().getPath();

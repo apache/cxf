@@ -30,7 +30,7 @@ public class ExtendedDocumentBuilderTest extends Assert {
         ExtendedDocumentBuilder builder = new ExtendedDocumentBuilder();
         builder.setValidating(false);
         String tsSource = "/org/apache/cxf/tools/common/toolspec/parser/resources/testtool.xml";
-        assertTrue(builder.parse(getClass().getResourceAsStream(tsSource)) != null);
+        assertNotNull(builder.parse(getClass().getResourceAsStream(tsSource)));
     }
 
     @Test

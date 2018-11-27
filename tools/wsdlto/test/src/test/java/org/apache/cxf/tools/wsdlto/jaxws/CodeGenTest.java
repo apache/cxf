@@ -1635,7 +1635,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         Method method = interfaceClass.getMethod("greetMe", new Class[] {
             Holder.class, Holder.class, Holder.class, Holder.class, Holder.class
         });
-        assertTrue("greetMe operation is NOT generated correctly as excepted", method != null);
+        assertNotNull("greetMe operation is NOT generated correctly as excepted", method);
         RequestWrapper reqWrapper = method.getAnnotation(RequestWrapper.class);
         assertNotNull("@RequestWrapper is expected", reqWrapper);
     }

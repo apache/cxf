@@ -96,7 +96,7 @@ public class AsymmetricEncryptionTest extends AbstractBusClientServerTestBase {
         BusFactory.setThreadDefaultBus(bus);
 
         SecurityToken token = requestSecurityToken(bus, test.getStsPort());
-        assertTrue(token != null);
+        assertNotNull(token);
 
         bus.shutdown(true);
     }

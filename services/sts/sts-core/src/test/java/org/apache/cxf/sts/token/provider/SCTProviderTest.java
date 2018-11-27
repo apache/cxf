@@ -59,7 +59,7 @@ public class SCTProviderTest extends org.junit.Assert {
 
         assertTrue(sctTokenProvider.canHandleToken(STSUtils.TOKEN_TYPE_SCT_05_12));
         TokenProviderResponse providerResponse = sctTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         Element token = (Element)providerResponse.getToken();
@@ -80,7 +80,7 @@ public class SCTProviderTest extends org.junit.Assert {
 
         assertTrue(sctTokenProvider.canHandleToken(STSUtils.TOKEN_TYPE_SCT_05_02));
         TokenProviderResponse providerResponse = sctTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         Element token = (Element)providerResponse.getToken();
@@ -102,15 +102,15 @@ public class SCTProviderTest extends org.junit.Assert {
 
         assertTrue(sctTokenProvider.canHandleToken(STSUtils.TOKEN_TYPE_SCT_05_12));
         TokenProviderResponse providerResponse = sctTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         assertTrue(providerResponse.getEntropy() != null && providerResponse.getEntropy().length > 0);
 
         ((SCTProvider)sctTokenProvider).setReturnEntropy(false);
         providerResponse = sctTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
-        assertTrue(providerResponse.getEntropy() == null);
+        assertNull(providerResponse.getEntropy());
     }
 
     /**
@@ -125,7 +125,7 @@ public class SCTProviderTest extends org.junit.Assert {
 
         assertTrue(sctTokenProvider.canHandleToken(STSUtils.TOKEN_TYPE_SCT_05_12));
         TokenProviderResponse providerResponse = sctTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         Element token = (Element)providerResponse.getToken();
@@ -147,7 +147,7 @@ public class SCTProviderTest extends org.junit.Assert {
 
         assertTrue(sctTokenProvider.canHandleToken(STSUtils.TOKEN_TYPE_SCT_05_12));
         TokenProviderResponse providerResponse = sctTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         assertTrue(256L == providerResponse.getKeySize());
 
@@ -155,7 +155,7 @@ public class SCTProviderTest extends org.junit.Assert {
         KeyRequirements keyRequirements = providerParameters.getKeyRequirements();
         keyRequirements.setKeySize(192);
         providerResponse = sctTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(192L == providerResponse.getKeySize());
 
         // Test a bad KeySize - it will just use the default keysize

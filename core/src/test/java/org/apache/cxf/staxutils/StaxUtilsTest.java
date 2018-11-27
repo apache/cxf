@@ -59,7 +59,7 @@ public class StaxUtilsTest extends Assert {
     @Test
     public void testFactoryCreation() {
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(getTestStream("./resources/amazon.xml"));
-        assertTrue(reader != null);
+        assertNotNull(reader);
     }
 
     private InputStream getTestStream(String resource) {

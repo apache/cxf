@@ -78,7 +78,7 @@ public class SAMLProviderOnBehalfOfTest extends org.junit.Assert {
 
         assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         Element token = (Element)providerResponse.getToken();
@@ -108,7 +108,7 @@ public class SAMLProviderOnBehalfOfTest extends org.junit.Assert {
 
         assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML2_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         Element token = (Element)providerResponse.getToken();
@@ -145,7 +145,7 @@ public class SAMLProviderOnBehalfOfTest extends org.junit.Assert {
 
         assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         Element token = (Element)providerResponse.getToken();
@@ -161,7 +161,7 @@ public class SAMLProviderOnBehalfOfTest extends org.junit.Assert {
         ((SAMLTokenProvider)samlTokenProvider).setAttributeStatementProviders(customProviderList);
 
         providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         token = (Element)providerResponse.getToken();
@@ -177,7 +177,7 @@ public class SAMLProviderOnBehalfOfTest extends org.junit.Assert {
         providerParameters.setPrincipal(new CustomTokenPrincipal(user));
         assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         return (Element)providerResponse.getToken();

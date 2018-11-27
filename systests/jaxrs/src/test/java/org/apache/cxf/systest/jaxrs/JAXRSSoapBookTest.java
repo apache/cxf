@@ -1004,7 +1004,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
             try {
                 // input stream will be closed by readBytesFromStream()
                 payload = IOUtils.readBytesFromStream(is);
-                assertTrue("payload was null", payload != null);
+                assertNotNull("payload was null", payload);
                 assertTrue("payload was EMPTY", payload.length > 0);
                 message.setContent(InputStream.class, new ByteArrayInputStream(payload));
             } catch (Exception e) {

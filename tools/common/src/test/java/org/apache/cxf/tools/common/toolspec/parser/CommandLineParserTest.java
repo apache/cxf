@@ -303,7 +303,7 @@ public class CommandLineParserTest extends Assert {
         CommandLineParser commandLineParser = new CommandLineParser(null);
         commandLineParser.setToolSpec(toolspec);
         CommandDocument commandDocument = commandLineParser.parseArguments("-r unknown");
-        assertTrue(commandDocument != null);
+        assertNotNull(commandDocument);
     }
 
     @Test

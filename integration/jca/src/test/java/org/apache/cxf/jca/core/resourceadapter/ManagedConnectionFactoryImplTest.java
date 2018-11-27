@@ -102,7 +102,7 @@ public class ManagedConnectionFactoryImplTest extends Assert {
         connectionSet.add(con1);
 
         ManagedConnection mcon = mcf.matchManagedConnections(connectionSet, subject, cri2);
-        assertTrue("should not get a match", mcon == null);
+        assertNull("should not get a match", mcon);
     }
 
     @Test
@@ -117,7 +117,7 @@ public class ManagedConnectionFactoryImplTest extends Assert {
         connectionSet.add(con1);
 
         ManagedConnection mcon = mcf.matchManagedConnections(connectionSet, subject, cri);
-        assertTrue("Connection must be null", mcon == null);
+        assertNull("Connection must be null", mcon);
     }
 
     @Test

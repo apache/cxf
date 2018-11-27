@@ -93,8 +93,8 @@ public class SAMLTokenValidatorCachedRealmTest extends org.junit.Assert {
         ((SAMLTokenValidator)samlTokenValidator).setSamlRealmCodec(samlRealmCodec);
 
         TokenValidatorResponse validatorResponse = samlTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
         assertTrue("A".equals(validatorResponse.getTokenRealm()));
 
@@ -126,8 +126,8 @@ public class SAMLTokenValidatorCachedRealmTest extends org.junit.Assert {
         ((SAMLTokenValidator)samlTokenValidator).setSamlRealmCodec(samlRealmCodec);
 
         TokenValidatorResponse validatorResponse = samlTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
         assertNull(validatorResponse.getTokenRealm());
 
@@ -182,7 +182,7 @@ public class SAMLTokenValidatorCachedRealmTest extends org.junit.Assert {
         ((SAMLTokenProvider)samlTokenProvider).setRealmMap(samlRealms);
 
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         return (Element)providerResponse.getToken();

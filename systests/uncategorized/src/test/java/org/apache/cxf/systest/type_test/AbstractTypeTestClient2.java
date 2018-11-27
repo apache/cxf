@@ -555,8 +555,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
     //org.apache.type_test.types1.StructWithList
 
     protected void assertEquals(String msg, StructWithList x, StructWithList y) throws Exception {
-        assertTrue(msg, x != null);
-        assertTrue(msg, y != null);
+        assertNotNull(msg, x);
+        assertNotNull(msg, y);
 
         List<String> xVar = x.getVarList();
         List<String> yVar = y.getVarList();
@@ -568,7 +568,7 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         List<Integer> xAttr = x.getAttribList();
         List<Integer> yAttr = y.getAttribList();
         if (xAttr == null) {
-            assertTrue(msg, yAttr == null);
+            assertNull(msg, yAttr);
         } else {
             assertTrue(xAttr.size() == yAttr.size());
             for (int i = 0; i < xAttr.size(); ++i) {
@@ -645,8 +645,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
     //org.apache.type_test.types1.StructWithUnion
 
     protected void assertEquals(String msg, StructWithUnion x, StructWithUnion y) throws Exception {
-        assertTrue(msg, x != null);
-        assertTrue(msg, y != null);
+        assertNotNull(msg, x);
+        assertNotNull(msg, y);
         assertEquals(msg, x.getVarUnion(), y.getVarUnion());
         assertEquals(msg, x.getAttribUnion(), y.getAttribUnion());
     }
@@ -2169,8 +2169,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
     }
 
     protected void assertEquals(String msg, UnionSimpleContent x, UnionSimpleContent y) throws Exception {
-        assertTrue(msg, x != null);
-        assertTrue(msg, y != null);
+        assertNotNull(msg, x);
+        assertNotNull(msg, y);
         assertEquals(msg, x.getValue(), y.getValue());
     }
     @Test

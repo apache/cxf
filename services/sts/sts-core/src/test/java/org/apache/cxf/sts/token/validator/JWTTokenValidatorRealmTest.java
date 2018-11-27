@@ -71,7 +71,7 @@ public class JWTTokenValidatorRealmTest extends org.junit.Assert {
 
         assertTrue(jwtTokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
         TokenProviderResponse providerResponse = jwtTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         String token = (String)providerResponse.getToken();
@@ -92,8 +92,8 @@ public class JWTTokenValidatorRealmTest extends org.junit.Assert {
 
         TokenValidatorResponse validatorResponse =
             jwtTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
         assertNull(validatorResponse.getTokenRealm());
 
@@ -101,8 +101,8 @@ public class JWTTokenValidatorRealmTest extends org.junit.Assert {
         ((JWTTokenValidator)jwtTokenValidator).setRealmCodec(new IssuerJWTRealmCodec());
 
         validatorResponse = jwtTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
         assertTrue("A".equals(validatorResponse.getTokenRealm()));
 
@@ -122,7 +122,7 @@ public class JWTTokenValidatorRealmTest extends org.junit.Assert {
 
         assertTrue(jwtTokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
         TokenProviderResponse providerResponse = jwtTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         String token = (String)providerResponse.getToken();
@@ -143,8 +143,8 @@ public class JWTTokenValidatorRealmTest extends org.junit.Assert {
 
         TokenValidatorResponse validatorResponse =
             jwtTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
         assertNull(validatorResponse.getTokenRealm());
 
@@ -152,8 +152,8 @@ public class JWTTokenValidatorRealmTest extends org.junit.Assert {
         ((JWTTokenValidator)jwtTokenValidator).setRealmCodec(new IssuerJWTRealmCodec());
 
         validatorResponse = jwtTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
         assertTrue("B".equals(validatorResponse.getTokenRealm()));
 

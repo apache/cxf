@@ -72,12 +72,12 @@ public class SCTCancellerTest extends org.junit.Assert {
         assertTrue(sctCanceller.canHandleToken(cancelTarget));
 
         TokenCancellerResponse cancellerResponse = sctCanceller.cancelToken(cancellerParameters);
-        assertTrue(cancellerResponse != null);
+        assertNotNull(cancellerResponse);
         assertTrue(cancellerResponse.getToken().getState() == STATE.CANCELLED);
 
         // Try to cancel the token again - this should fail
         cancellerResponse = sctCanceller.cancelToken(cancellerParameters);
-        assertTrue(cancellerResponse != null);
+        assertNotNull(cancellerResponse);
         assertFalse(cancellerResponse.getToken().getState() == STATE.CANCELLED);
     }
 
@@ -101,7 +101,7 @@ public class SCTCancellerTest extends org.junit.Assert {
         assertTrue(sctCanceller.canHandleToken(cancelTarget));
 
         TokenCancellerResponse cancellerResponse = sctCanceller.cancelToken(cancellerParameters);
-        assertTrue(cancellerResponse != null);
+        assertNotNull(cancellerResponse);
         assertFalse(cancellerResponse.getToken().getState() == STATE.CANCELLED);
     }
 

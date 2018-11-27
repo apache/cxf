@@ -81,7 +81,7 @@ public class JWTClaimsTest extends org.junit.Assert {
 
         assertTrue(tokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         String token = (String)providerResponse.getToken();
@@ -120,7 +120,7 @@ public class JWTClaimsTest extends org.junit.Assert {
         providerParameters.setRequestedSecondaryClaims(secondaryClaims);
 
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         String token = (String)providerResponse.getToken();
@@ -163,7 +163,7 @@ public class JWTClaimsTest extends org.junit.Assert {
         providerParameters.setRequestedSecondaryClaims(secondaryClaims);
 
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         String token = (String)providerResponse.getToken();
@@ -201,7 +201,7 @@ public class JWTClaimsTest extends org.junit.Assert {
         providerParameters.setRequestedPrimaryClaims(claims);
 
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         String token = (String)providerResponse.getToken();
@@ -235,7 +235,7 @@ public class JWTClaimsTest extends org.junit.Assert {
 
         assertTrue(tokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         String token = (String)providerResponse.getToken();
@@ -275,7 +275,7 @@ public class JWTClaimsTest extends org.junit.Assert {
 
         assertTrue(tokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         String token = (String)providerResponse.getToken();

@@ -137,7 +137,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         assertTrue(results != null && results.size() == 1);
         SamlAssertionWrapper assertion =
             (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(assertion != null);
+        assertNotNull(assertion);
         assertTrue(assertion.getSaml2() != null && assertion.getSaml1() == null);
         assertTrue(assertion.isSigned());
 
@@ -169,7 +169,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         assertTrue(results != null && results.size() == 1);
         SamlAssertionWrapper assertion =
             (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(assertion != null);
+        assertNotNull(assertion);
         assertTrue(assertion.getSaml2() == null && assertion.getSaml1() != null);
         assertTrue(assertion.isSigned());
 
@@ -202,7 +202,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         assertTrue(results != null && results.size() == 1);
         SamlAssertionWrapper assertion =
             (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(assertion != null);
+        assertNotNull(assertion);
         assertTrue(assertion.getSaml2() == null && assertion.getSaml1() != null);
         assertTrue(assertion.isSigned());
 
@@ -213,7 +213,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         }
         assertTrue(OpenSAMLUtil.isMethodHolderOfKey(confirmMethod));
         SAMLKeyInfo subjectKeyInfo = assertion.getSubjectKeyInfo();
-        assertTrue(subjectKeyInfo.getSecret() != null);
+        assertNotNull(subjectKeyInfo.getSecret());
 
         bus.shutdown(true);
     }
@@ -244,7 +244,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         assertTrue(results != null && results.size() == 1);
         SamlAssertionWrapper assertion =
             (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(assertion != null);
+        assertNotNull(assertion);
         assertTrue(assertion.getSaml2() == null && assertion.getSaml1() != null);
         assertTrue(assertion.isSigned());
 
@@ -255,7 +255,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         }
         assertTrue(OpenSAMLUtil.isMethodHolderOfKey(confirmMethod));
         SAMLKeyInfo subjectKeyInfo = assertion.getSubjectKeyInfo();
-        assertTrue(subjectKeyInfo.getSecret() != null);
+        assertNotNull(subjectKeyInfo.getSecret());
 
         bus.shutdown(true);
     }
@@ -286,7 +286,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         assertTrue(results != null && results.size() == 1);
         SamlAssertionWrapper assertion =
             (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(assertion != null);
+        assertNotNull(assertion);
         assertTrue(assertion.getSaml2() != null && assertion.getSaml1() == null);
         assertTrue(assertion.isSigned());
 
@@ -297,7 +297,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         }
         assertTrue(OpenSAMLUtil.isMethodHolderOfKey(confirmMethod));
         SAMLKeyInfo subjectKeyInfo = assertion.getSubjectKeyInfo();
-        assertTrue(subjectKeyInfo.getCerts() != null);
+        assertNotNull(subjectKeyInfo.getCerts());
 
         bus.shutdown(true);
     }
@@ -328,7 +328,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         assertTrue(results != null && results.size() == 1);
         SamlAssertionWrapper assertion =
             (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(assertion != null);
+        assertNotNull(assertion);
         assertTrue(assertion.getSaml2() != null && assertion.getSaml1() == null);
         assertTrue(assertion.isSigned());
 
@@ -339,7 +339,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         }
         assertTrue(OpenSAMLUtil.isMethodHolderOfKey(confirmMethod));
         SAMLKeyInfo subjectKeyInfo = assertion.getSubjectKeyInfo();
-        assertTrue(subjectKeyInfo.getCerts() != null);
+        assertNotNull(subjectKeyInfo.getCerts());
 
         bus.shutdown(true);
     }
@@ -370,7 +370,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         assertTrue(results != null && results.size() == 1);
         SamlAssertionWrapper assertion =
             (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(assertion != null);
+        assertNotNull(assertion);
         assertTrue(assertion.getSaml2() == null && assertion.getSaml1() != null);
         assertTrue(assertion.isSigned());
 
@@ -410,7 +410,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         assertTrue(results != null && results.size() == 1);
         SamlAssertionWrapper assertion =
             (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(assertion != null);
+        assertNotNull(assertion);
         assertTrue(assertion.getSaml2() == null && assertion.getSaml1() != null);
         assertTrue(assertion.isSigned());
 
@@ -450,7 +450,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         assertTrue(results != null && results.size() == 1);
         SamlAssertionWrapper assertion =
             (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(assertion != null);
+        assertNotNull(assertion);
         assertTrue(assertion.getSaml2() != null && assertion.getSaml1() == null);
         assertTrue(assertion.isSigned());
 
@@ -511,7 +511,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         assertTrue(results != null && results.size() == 1);
         SamlAssertionWrapper assertion =
             (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(assertion != null);
+        assertNotNull(assertion);
         assertTrue(assertion.getSaml2() != null && assertion.getSaml1() == null);
         assertTrue(assertion.isSigned());
 
@@ -533,7 +533,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         assertTrue(results != null && results.size() == 1);
         assertion =
             (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(assertion != null);
+        assertNotNull(assertion);
         assertTrue(assertion.getSaml2() != null && assertion.getSaml1() == null);
         assertTrue(assertion.isSigned());
 
@@ -863,7 +863,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         assertTrue(results != null && results.size() == 1);
         SamlAssertionWrapper assertion =
             (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(assertion != null);
+        assertNotNull(assertion);
         assertTrue(assertion.getSaml2() != null && assertion.getSaml1() == null);
         assertTrue(assertion.isSigned());
 
@@ -939,7 +939,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
 
-        assertTrue(jwt.getClaim("roles") == null);
+        assertNull(jwt.getClaim("roles"));
 
         // Now get another token specifying the role
         client.query("claim", "roles");
@@ -1280,7 +1280,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         assertTrue(results != null && results.size() == 1);
         SamlAssertionWrapper assertion =
             (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(assertion != null);
+        assertNotNull(assertion);
         if (saml2) {
             assertTrue(assertion.getSaml2() != null && assertion.getSaml1() == null);
         } else {

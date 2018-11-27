@@ -82,8 +82,8 @@ public class UsernameTokenValidatorTest extends org.junit.Assert {
         // This will fail as there is no password
         TokenValidatorResponse validatorResponse =
                 usernameTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
 
         // Add a password
@@ -97,8 +97,8 @@ public class UsernameTokenValidatorTest extends org.junit.Assert {
         usernameToken.getAny().add(passwordType);
 
         validatorResponse = usernameTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
 
         Principal principal = validatorResponse.getPrincipal();
@@ -143,16 +143,16 @@ public class UsernameTokenValidatorTest extends org.junit.Assert {
         // This will fail as the username is bad
         TokenValidatorResponse validatorResponse =
             usernameTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
 
         // This will fail as the password is bad
         username.setValue("alice");
         password.setValue("badpassword");
         validatorResponse = usernameTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
     }
 
@@ -218,8 +218,8 @@ public class UsernameTokenValidatorTest extends org.junit.Assert {
 
         TokenValidatorResponse validatorResponse =
                 usernameTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
 
         Principal principal = validatorResponse.getPrincipal();
@@ -228,8 +228,8 @@ public class UsernameTokenValidatorTest extends org.junit.Assert {
         // Expected failure on a bad password
         password.setValue("badpassword");
         validatorResponse = usernameTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
     }
 

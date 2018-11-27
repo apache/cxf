@@ -91,7 +91,7 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         Lifetime lifetime = new Lifetime();
         lifetime.setCreated(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
         lifetime.setExpires(expirationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
-        
+
         renewerParameters.getTokenRequirements().setLifetime(lifetime);
 
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
@@ -111,9 +111,9 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
 
         assertTrue(samlTokenRenewer.canHandleToken(renewTarget));
         TokenRenewerResponse renewerResponse = samlTokenRenewer.renewToken(renewerParameters);
-        assertTrue(renewerResponse != null);
-        assertTrue(renewerResponse.getToken() != null);
-        
+        assertNotNull(renewerResponse);
+        assertNotNull(renewerResponse.getToken());
+
         long duration = Duration.between(renewerResponse.getCreated(), renewerResponse.getExpires()).getSeconds();
         assertEquals(requestedLifetime, duration);
     }
@@ -153,9 +153,9 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
 
         assertTrue(samlTokenRenewer.canHandleToken(renewTarget));
         TokenRenewerResponse renewerResponse = samlTokenRenewer.renewToken(renewerParameters);
-        assertTrue(renewerResponse != null);
-        assertTrue(renewerResponse.getToken() != null);
-        
+        assertNotNull(renewerResponse);
+        assertNotNull(renewerResponse.getToken());
+
         long duration = Duration.between(renewerResponse.getCreated(), renewerResponse.getExpires()).getSeconds();
         assertEquals(providerLifetime, duration);
     }
@@ -187,7 +187,7 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         Lifetime lifetime = new Lifetime();
         lifetime.setCreated(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
         lifetime.setExpires(expirationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
-        
+
         renewerParameters.getTokenRequirements().setLifetime(lifetime);
 
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
@@ -238,7 +238,7 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         Lifetime lifetime = new Lifetime();
         lifetime.setCreated(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
         lifetime.setExpires(expirationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
-        
+
         renewerParameters.getTokenRequirements().setLifetime(lifetime);
 
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
@@ -294,7 +294,7 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         Lifetime lifetime = new Lifetime();
         lifetime.setCreated(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
         lifetime.setExpires(expirationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
-        
+
         renewerParameters.getTokenRequirements().setLifetime(lifetime);
 
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
@@ -314,9 +314,9 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
 
         assertTrue(samlTokenRenewer.canHandleToken(renewTarget));
         TokenRenewerResponse renewerResponse = samlTokenRenewer.renewToken(renewerParameters);
-        assertTrue(renewerResponse != null);
-        assertTrue(renewerResponse.getToken() != null);
-        
+        assertNotNull(renewerResponse);
+        assertNotNull(renewerResponse.getToken());
+
         long duration = Duration.between(renewerResponse.getCreated(), renewerResponse.getExpires()).getSeconds();
         assertEquals(maxLifetime, duration);
     }
@@ -386,7 +386,7 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         }
 
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         return (Element)providerResponse.getToken();

@@ -1225,7 +1225,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
             providerParameters.setRealm("A");
         }
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         return (Element)providerResponse.getToken();

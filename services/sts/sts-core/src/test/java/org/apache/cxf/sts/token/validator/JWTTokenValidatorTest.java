@@ -75,7 +75,7 @@ public class JWTTokenValidatorTest extends org.junit.Assert {
 
         assertTrue(jwtTokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
         TokenProviderResponse providerResponse = jwtTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         String token = (String)providerResponse.getToken();
@@ -96,8 +96,8 @@ public class JWTTokenValidatorTest extends org.junit.Assert {
 
         TokenValidatorResponse validatorResponse =
             jwtTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
 
         Principal principal = validatorResponse.getPrincipal();
@@ -119,7 +119,7 @@ public class JWTTokenValidatorTest extends org.junit.Assert {
 
         assertTrue(jwtTokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
         TokenProviderResponse providerResponse = jwtTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         String token = (String)providerResponse.getToken();
@@ -140,8 +140,8 @@ public class JWTTokenValidatorTest extends org.junit.Assert {
 
         TokenValidatorResponse validatorResponse =
             jwtTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
     }
 
@@ -160,7 +160,7 @@ public class JWTTokenValidatorTest extends org.junit.Assert {
 
         assertTrue(jwtTokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
         TokenProviderResponse providerResponse = jwtTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         String token = (String)providerResponse.getToken();
@@ -181,8 +181,8 @@ public class JWTTokenValidatorTest extends org.junit.Assert {
 
         TokenValidatorResponse validatorResponse =
             jwtTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
     }
 
@@ -200,7 +200,7 @@ public class JWTTokenValidatorTest extends org.junit.Assert {
 
         assertTrue(jwtTokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
         TokenProviderResponse providerResponse = jwtTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         String token = (String)providerResponse.getToken();
@@ -223,8 +223,8 @@ public class JWTTokenValidatorTest extends org.junit.Assert {
 
         TokenValidatorResponse validatorResponse =
             jwtTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
     }
 
@@ -242,7 +242,7 @@ public class JWTTokenValidatorTest extends org.junit.Assert {
 
         assertTrue(jwtTokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
         TokenProviderResponse providerResponse = jwtTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         String token = (String)providerResponse.getToken();
@@ -267,8 +267,8 @@ public class JWTTokenValidatorTest extends org.junit.Assert {
 
         TokenValidatorResponse validatorResponse =
             jwtTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
     }
 
@@ -285,7 +285,7 @@ public class JWTTokenValidatorTest extends org.junit.Assert {
 
         assertTrue(jwtTokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
         TokenProviderResponse providerResponse = jwtTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         String token = (String)providerResponse.getToken();
@@ -310,8 +310,8 @@ public class JWTTokenValidatorTest extends org.junit.Assert {
 
         TokenValidatorResponse validatorResponse =
             jwtTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
 
         Principal principal = validatorResponse.getPrincipal();

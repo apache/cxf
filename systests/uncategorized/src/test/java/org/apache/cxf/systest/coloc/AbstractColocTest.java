@@ -62,7 +62,7 @@ public abstract class AbstractColocTest extends Assert {
             if (cxfConfig == null) {
                 throw new Exception("Make sure " + getCxfConfig() + " is in the CLASSPATH");
             }
-            assertTrue(cxfConfig.toExternalForm() != null);
+            assertNotNull(cxfConfig.toExternalForm());
         }
 
         //Bus is shared by client, router and server.

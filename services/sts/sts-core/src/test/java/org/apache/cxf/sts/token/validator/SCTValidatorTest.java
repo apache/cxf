@@ -73,8 +73,8 @@ public class SCTValidatorTest extends org.junit.Assert {
 
         TokenValidatorResponse validatorResponse =
             sctValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
         assertTrue(
             validatorResponse.getAdditionalProperties().get(SCTValidator.SCT_VALIDATOR_SECRET) != null
@@ -85,8 +85,8 @@ public class SCTValidatorTest extends org.junit.Assert {
         tokenStore.remove(tokenStore.getToken(providerResponse.getTokenId()).getId());
         assertNull(tokenStore.getToken(providerResponse.getTokenId()));
         validatorResponse = sctValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
     }
 
@@ -110,8 +110,8 @@ public class SCTValidatorTest extends org.junit.Assert {
 
         TokenValidatorResponse validatorResponse =
             sctValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
     }
 

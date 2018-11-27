@@ -108,8 +108,8 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
 
         TokenValidatorResponse validatorResponse =
                 samlTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
 
         // Renew the Assertion
@@ -154,8 +154,8 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
         // Now successfully renew the token
         TokenRenewerResponse renewerResponse =
                 samlTokenRenewer.renewToken(renewerParameters);
-        assertTrue(renewerResponse != null);
-        assertTrue(renewerResponse.getToken() != null);
+        assertNotNull(renewerResponse);
+        assertNotNull(renewerResponse.getToken());
     }
 
     /**
@@ -185,8 +185,8 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
 
         TokenValidatorResponse validatorResponse =
                 samlTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
 
         // Renew the Assertion
@@ -288,7 +288,7 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
 
         if (ttlMs != 0) {
             Lifetime lifetime = new Lifetime();
-            
+
             Instant creationTime = Instant.now();
             Instant expirationTime = creationTime.plusNanos(ttlMs * 1000000L);
 
@@ -299,7 +299,7 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
         }
 
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         return (Element)providerResponse.getToken();

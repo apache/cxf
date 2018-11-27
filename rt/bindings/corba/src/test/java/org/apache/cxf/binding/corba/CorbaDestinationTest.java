@@ -50,11 +50,11 @@ public class CorbaDestinationTest extends Assert {
         CorbaDestination destination = new CorbaDestination(endpointInfo, orbConfig);
 
         EndpointReferenceType rtype = destination.getAddress();
-        assertTrue("EndpointReferenceType should not be null", rtype != null);
+        assertNotNull("EndpointReferenceType should not be null", rtype);
         BindingInfo bindingInfo = destination.getBindingInfo();
-        assertTrue("BindingInfo should not be null", bindingInfo != null);
+        assertNotNull("BindingInfo should not be null", bindingInfo);
         EndpointInfo e2 = destination.getEndPointInfo();
-        assertTrue("EndpointInfo should not be null", e2 != null);
+        assertNotNull("EndpointInfo should not be null", e2);
 
         Message m = new MessageImpl();
         CorbaServerConduit serverConduit = (CorbaServerConduit)destination.getBackChannel(m);
@@ -76,7 +76,7 @@ public class CorbaDestinationTest extends Assert {
        Endpoint endpoint = new EndpointImpl(bus, service, endpointInfo);
        MessageObserver observer = new ChainInitiationObserver(endpoint, bus);
        destination.setMessageObserver(observer);
-       assertTrue("orb should not be null",  destination.getOrb() != null);
+       assertNotNull("orb should not be null",  destination.getOrb());
 
        try {
            File file = new File("endpoint.ior");

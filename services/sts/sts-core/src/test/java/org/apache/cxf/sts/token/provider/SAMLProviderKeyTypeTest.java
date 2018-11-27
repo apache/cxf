@@ -66,7 +66,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
             createProviderParameters(WSS4JConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE);
         assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         Element token = (Element)providerResponse.getToken();
@@ -89,7 +89,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
             createProviderParameters(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE);
         assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML2_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         Element token = (Element)providerResponse.getToken();
@@ -130,7 +130,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         providerParameters.getKeyRequirements().setReceivedKey(receivedKey);
 
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         Element token = (Element)providerResponse.getToken();
@@ -170,7 +170,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         providerParameters.getKeyRequirements().setReceivedKey(receivedKey);
 
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         Element token = (Element)providerResponse.getToken();
@@ -218,7 +218,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         providerParameters.getKeyRequirements().setComputedKeyAlgorithm(STSConstants.COMPUTED_KEY_PSHA1);
 
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         Element token = (Element)providerResponse.getToken();
@@ -265,7 +265,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         providerParameters.getKeyRequirements().setEntropy(entropy);
 
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         Element token = (Element)providerResponse.getToken();
@@ -317,7 +317,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         providerParameters.getKeyRequirements().setComputedKeyAlgorithm(STSConstants.COMPUTED_KEY_PSHA1);
 
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         Element token = (Element)providerResponse.getToken();
@@ -386,7 +386,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         providerParameters.getStsProperties().getSignatureProperties().setUseKeyValue(true);
         assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         Element token = (Element)providerResponse.getToken();
@@ -414,7 +414,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         ((SAMLTokenProvider)samlTokenProvider).setSignToken(false);
 
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         Element token = (Element)providerResponse.getToken();
@@ -443,7 +443,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
             );
         assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         Element token = (Element)providerResponse.getToken();
@@ -470,7 +470,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
 
         // This will fail as the requested c14n algorithm is rejected
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         Element token = (Element)providerResponse.getToken();
@@ -488,7 +488,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
 
         // This will succeed as the requested c14n algorithm is accepted
         providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         token = (Element)providerResponse.getToken();
@@ -512,7 +512,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
 
         // Default
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         Element token = (Element)providerResponse.getToken();
@@ -525,7 +525,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
 
         // This will fail as the requested signature algorithm is rejected
         providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         token = (Element)providerResponse.getToken();
@@ -539,7 +539,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
 
         // This will succeed as the requested signature algorithm is accepted
         providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         token = (Element)providerResponse.getToken();
@@ -558,7 +558,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
 
         // Default
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         Element token = (Element)providerResponse.getToken();
@@ -571,7 +571,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         signatureProperties.setDigestAlgorithm(WSS4JConstants.SHA1);
 
         providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         token = (Element)providerResponse.getToken();
@@ -592,13 +592,13 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         keyRequirements.setEncryptWith(WSS4JConstants.AES_128);
         keyRequirements.setKeySize(92);
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         keyRequirements.setKeySize(128);
         keyRequirements.setEncryptWith(WSS4JConstants.AES_256);
         providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
     }
 

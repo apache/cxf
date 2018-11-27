@@ -78,7 +78,7 @@ public class SAMLProviderLifetimeTest extends org.junit.Assert {
 
         assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML2_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         long duration = Duration.between(providerResponse.getCreated(), providerResponse.getExpires()).getSeconds();
         assertEquals(requestedLifetime, duration);
@@ -116,7 +116,7 @@ public class SAMLProviderLifetimeTest extends org.junit.Assert {
 
         assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML2_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         assertEquals(providerResponse.getExpires().toEpochMilli(), expirationTime.toEpochMilli());
     }
@@ -143,7 +143,7 @@ public class SAMLProviderLifetimeTest extends org.junit.Assert {
 
         assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML2_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         long duration = Duration.between(providerResponse.getCreated(), providerResponse.getExpires()).getSeconds();
         assertEquals(providerLifetime, duration);
@@ -263,7 +263,7 @@ public class SAMLProviderLifetimeTest extends org.junit.Assert {
 
         assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML2_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         long duration = Duration.between(providerResponse.getCreated(), providerResponse.getExpires()).getSeconds();
@@ -304,7 +304,7 @@ public class SAMLProviderLifetimeTest extends org.junit.Assert {
 
         assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML2_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         long duration = Duration.between(providerResponse.getCreated(), providerResponse.getExpires()).getSeconds();
@@ -354,7 +354,7 @@ public class SAMLProviderLifetimeTest extends org.junit.Assert {
         conditionsProvider.setFutureTimeToLive(60L * 60L);
 
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         Element token = (Element)providerResponse.getToken();
         String tokenString = DOM2Writer.nodeToString(token);
@@ -390,7 +390,7 @@ public class SAMLProviderLifetimeTest extends org.junit.Assert {
         assertTrue(samlTokenProvider.canHandleToken(WSS4JConstants.WSS_SAML2_TOKEN_TYPE));
 
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         long duration = Duration.between(providerResponse.getCreated(), providerResponse.getExpires()).getSeconds();

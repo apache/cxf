@@ -74,7 +74,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
         sendOneWayMessage(conduit, outMessage);
         waitForReceiveDestMessage();
 
-        assertTrue("The destiantion should have got the message ", destMessage != null);
+        assertNotNull("The destiantion should have got the message ", destMessage);
         verifyReceivedMessage(destMessage);
         verifyHeaders(destMessage, outMessage);
         conduit.close();
@@ -118,7 +118,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
         // wait for the message to be get from the destination
         waitForReceiveDestMessage();
         // just verify the Destination inMessage
-        assertTrue("The destiantion should have got the message ", destMessage != null);
+        assertNotNull("The destiantion should have got the message ", destMessage);
         verifyReceivedMessage(destMessage);
         verifyHeaders(destMessage, outMessage);
         conduit.close();
@@ -395,7 +395,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
         sendOneWayMessage(conduit, outMessage);
         waitForReceiveDestMessage();
         // just verify the Destination inMessage
-        assertTrue("The destination should have got the message ", destMessage != null);
+        assertNotNull("The destination should have got the message ", destMessage);
         verifyReplyToNotSet(destMessage);
         destMessage = null;
 
@@ -404,7 +404,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
 
         sendOneWayMessage(conduit, outMessage);
         waitForReceiveDestMessage();
-        assertTrue("The destination should have got the message ", destMessage != null);
+        assertNotNull("The destination should have got the message ", destMessage);
         String exName = getQueueName(conduit.getJmsConfig().getReplyDestination());
         verifyReplyToSet(destMessage, Queue.class, exName);
         destMessage = null;
@@ -417,7 +417,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
         setupMessageHeader(outMessage, "cidValue", contextReplyTo);
         sendOneWayMessage(conduit, outMessage);
         waitForReceiveDestMessage();
-        assertTrue("The destiantion should have got the message ", destMessage != null);
+        assertNotNull("The destiantion should have got the message ", destMessage);
         verifyReplyToSet(destMessage, Queue.class, exName);
         destMessage = null;
 
@@ -429,7 +429,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
         outMessage.put(JMSConstants.JMS_SET_REPLY_TO, Boolean.FALSE);
         sendOneWayMessage(conduit, outMessage);
         waitForReceiveDestMessage();
-        assertTrue("The destiantion should have got the message ", destMessage != null);
+        assertNotNull("The destiantion should have got the message ", destMessage);
         verifyReplyToNotSet(destMessage);
         destMessage = null;
 
@@ -440,7 +440,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
         outMessage.put(JMSConstants.JMS_SET_REPLY_TO, Boolean.TRUE);
         sendOneWayMessage(conduit, outMessage);
         waitForReceiveDestMessage();
-        assertTrue("The destiantion should have got the message ", destMessage != null);
+        assertNotNull("The destiantion should have got the message ", destMessage);
         exName = getQueueName(conduit.getJmsConfig().getReplyDestination());
         verifyReplyToSet(destMessage, Queue.class, exName);
         destMessage = null;

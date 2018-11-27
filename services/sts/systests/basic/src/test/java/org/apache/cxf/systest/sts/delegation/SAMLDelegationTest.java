@@ -103,7 +103,7 @@ public class SAMLDelegationTest extends AbstractBusClientServerTestBase {
             requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, bus,
                                  DEFAULT_ADDRESS, "Transport_UT_Port");
         assertTrue(SAML2_TOKEN_TYPE.equals(token.getTokenType()));
-        assertTrue(token.getToken() != null);
+        assertNotNull(token.getToken());
 
         // Use the first token as OnBehalfOf to get another token
 
@@ -121,7 +121,7 @@ public class SAMLDelegationTest extends AbstractBusClientServerTestBase {
             requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, token.getToken(), bus,
                                  DEFAULT_ADDRESS, true, "Transport_Port");
         assertTrue(SAML2_TOKEN_TYPE.equals(token2.getTokenType()));
-        assertTrue(token2.getToken() != null);
+        assertNotNull(token2.getToken());
 
         bus.shutdown(true);
     }
@@ -140,7 +140,7 @@ public class SAMLDelegationTest extends AbstractBusClientServerTestBase {
             requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, bus,
                                  DEFAULT_ADDRESS, "Transport_UT_Port");
         assertTrue(SAML2_TOKEN_TYPE.equals(token.getTokenType()));
-        assertTrue(token.getToken() != null);
+        assertNotNull(token.getToken());
 
         // Use the first token as ActAs to get another token
 
@@ -158,7 +158,7 @@ public class SAMLDelegationTest extends AbstractBusClientServerTestBase {
             requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, token.getToken(), bus,
                                  DEFAULT_ADDRESS, false, "Transport_Port");
         assertTrue(SAML2_TOKEN_TYPE.equals(token2.getTokenType()));
-        assertTrue(token2.getToken() != null);
+        assertNotNull(token2.getToken());
 
         bus.shutdown(true);
     }
@@ -304,7 +304,7 @@ public class SAMLDelegationTest extends AbstractBusClientServerTestBase {
             );
 
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         return (Element)providerResponse.getToken();
@@ -322,7 +322,7 @@ public class SAMLDelegationTest extends AbstractBusClientServerTestBase {
             );
 
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         return (Element)providerResponse.getToken();
