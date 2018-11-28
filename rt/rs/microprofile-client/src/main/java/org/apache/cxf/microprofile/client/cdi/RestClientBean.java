@@ -48,7 +48,6 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.microprofile.client.CxfTypeSafeClientBuilder;
 import org.apache.cxf.microprofile.client.config.ConfigFacade;
-import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 public class RestClientBean implements Bean<Object>, PassivationCapable {
@@ -90,13 +89,13 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
 
     @Override
     public Object create(CreationalContext<Object> creationalContext) {
-        RestClientBuilder builder = new CxfTypeSafeClientBuilder();
+        CxfTypeSafeClientBuilder builder = new CxfTypeSafeClientBuilder();
         String baseUri = getBaseUri();
-        builder = builder.baseUri(URI.create(baseUri));
+        builder = (CxfTypeSafeClientBuilder) builder.baseUri(URI.create(baseUri));
         List<Class<?>> providers = getConfiguredProviders();
         Map<Class<?>, Integer> providerPriorities = getConfiguredProviderPriorities(providers);
         for (Class<?> providerClass : providers) {
-            builder = builder.register(providerClass, 
+            builder = (CxfTypeSafeClientBuilder) builder.register(providerClass, 
                                        providerPriorities.getOrDefault(providerClass, Priorities.USER));
         }
         return builder.build(clientInterface);
