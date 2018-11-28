@@ -226,7 +226,6 @@
         <cxf.olingo.version>2.0.10</cxf.olingo.version>
         <cxf.tika.version>1.19.1</cxf.tika.version>
         <cxf.jexl.version>2.1.1</cxf.jexl.version>
-        <cxf.htrace.version>4.2.0-incubating</cxf.htrace.version>
         <cxf.zest.version>2.1</cxf.zest.version>
         <cxf.brave.version>5.4.2</cxf.brave.version>
         <cxf.brave.zipkin.version>2.11.6</cxf.brave.zipkin.version>
@@ -689,11 +688,6 @@
             <dependency>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-integration-cdi</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-integration-tracing-htrace</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -2488,11 +2482,6 @@
                 <groupId>io.dropwizard.metrics</groupId>
                 <artifactId>metrics-core</artifactId>
                 <version>${cxf.dropwizard.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.htrace</groupId>
-                <artifactId>htrace-core4</artifactId>
-                <version>${cxf.htrace.version}</version>
             </dependency>
             <dependency>
                  <groupId>io.zipkin.brave</groupId>

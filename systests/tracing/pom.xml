@@ -86,11 +86,6 @@
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-integration-tracing-htrace</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-integration-tracing-brave</artifactId>
             <version>${project.version}</version>
         </dependency>

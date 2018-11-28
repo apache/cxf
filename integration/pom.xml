@@ -32,7 +32,6 @@
     <modules>
         <module>jca</module>
         <module>cdi</module>
-        <module>tracing/tracing-htrace</module>
         <module>tracing/tracing-brave</module>
         <module>tracing/tracing-opentracing</module>
         <module>spring-boot</module>
