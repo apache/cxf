@@ -55,9 +55,20 @@ public class JCacheCodeDataProvider extends JCacheOAuthDataProvider
                                      String codeCacheKey,
                                      String accessTokenKey,
                                      String refreshTokenKey) throws Exception {
-        super(configFileURL, bus, clientCacheKey, accessTokenKey, refreshTokenKey);
+        this(configFileURL, bus, clientCacheKey, codeCacheKey, accessTokenKey, refreshTokenKey, false);
+    }
+
+    protected JCacheCodeDataProvider(String configFileURL,
+                                     Bus bus,
+                                     String clientCacheKey,
+                                     String codeCacheKey,
+                                     String accessTokenKey,
+                                     String refreshTokenKey,
+                                     boolean storeJwtTokenKeyOnly) throws Exception {
+        super(configFileURL, bus, clientCacheKey, accessTokenKey, refreshTokenKey, storeJwtTokenKeyOnly);
         grantCache = createCache(cacheManager, codeCacheKey, String.class, ServerAuthorizationCodeGrant.class);
     }
+
 
     @Override
     protected void doRemoveClient(Client c) {
