@@ -151,7 +151,11 @@ public class JCacheOAuthDataProvider extends AbstractOAuthDataProvider {
 
     @Override
     protected void doRevokeAccessToken(ServerAccessToken at) {
-        accessTokenCache.remove(at.getTokenKey());
+        if (isUseJwtFormatForAccessTokens() && isStoreJwtTokenKeyOnly()) {
+            jwtAccessTokenCache.remove(at.getTokenKey());
+        } else {
+            accessTokenCache.remove(at.getTokenKey());
+        }
     }
 
     @Override
