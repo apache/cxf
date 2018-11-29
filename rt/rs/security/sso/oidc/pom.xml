@@ -87,7 +87,7 @@
     </dependency>
     <dependency>
       <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-ehcache</artifactId>
+      <artifactId>hibernate-jcache</artifactId>
       <version>${cxf.hibernate.em.version}</version>
       <scope>test</scope>
     </dependency>
@@ -145,6 +145,12 @@
       <groupId>org.hibernate.javax.persistence</groupId>
       <artifactId>hibernate-jpa-2.1-api</artifactId>
       <version>1.0.2.Final</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.ehcache</groupId>
+      <artifactId>ehcache</artifactId>
+      <version>${cxf.ehcache3.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

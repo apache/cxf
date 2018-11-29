@@ -24,7 +24,8 @@
             <property name="hibernate.connection.password" value=""/>
             <property name="javax.persistence.validation.mode" value="none"/>
             <property name="hibernate.cache.region.factory_class"
-                      value="org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory"/>
+                      value="org.hibernate.cache.jcache.JCacheRegionFactory"/>
+            <property name="hibernate.javax.cache.provider" value="org.ehcache.jsr107.EhcacheCachingProvider"/>
             <property name="hibernate.max_fetch_depth" value="3"/>
         </properties>
     </persistence-unit>

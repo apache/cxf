@@ -24,7 +24,7 @@ import java.util.Collections;
 
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.rs.security.oauth2.common.Client;
-import org.apache.cxf.rs.security.oauth2.grants.code.DefaultEHCacheCodeDataProvider;
+import org.apache.cxf.rs.security.oauth2.grants.code.JCacheCodeDataProvider;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.apache.xml.security.utils.ClassLoaderUtils;
@@ -32,7 +32,7 @@ import org.apache.xml.security.utils.ClassLoaderUtils;
 /**
  * Extend the DefaultEHCacheCodeDataProvider to allow refreshing of tokens
  */
-public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
+public class OAuthDataProviderImpl extends JCacheCodeDataProvider {
     public OAuthDataProviderImpl() throws Exception {
 
         Client client1 = new Client("CN=whateverhost.com,OU=Morpit,O=ApacheTest,L=Syracuse,C=US",
