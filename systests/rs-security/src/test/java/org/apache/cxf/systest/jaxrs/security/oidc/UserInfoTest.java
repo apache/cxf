@@ -60,18 +60,14 @@ import org.junit.runners.Parameterized.Parameters;
 /**
  * Some unit tests for the UserInfo Service in OpenId Connect. This can be used to return the User's claims given
  * an access token. The tests are run multiple times with different OAuthDataProvider implementations:
- * a) PORT - EhCache
- * b) JWT_PORT - EhCache with useJwtFormatForAccessTokens enabled
- * c) JCACHE_PORT - JCache
- * d) JWT_JCACHE_PORT - JCache with useJwtFormatForAccessTokens enabled
- * e) JPA_PORT - JPA provider
- * f) JWT_NON_PERSIST_JCACHE_PORT-  JCache with useJwtFormatForAccessTokens + !persistJwtEncoding
+ * a) JCACHE_PORT - JCache
+ * b) JWT_JCACHE_PORT - JCache with useJwtFormatForAccessTokens enabled
+ * c) JPA_PORT - JPA provider
+ * d) JWT_NON_PERSIST_JCACHE_PORT-  JCache with useJwtFormatForAccessTokens + !persistJwtEncoding
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class UserInfoTest extends AbstractBusClientServerTestBase {
 
-    static final String PORT = TestUtil.getPortNumber("jaxrs-userinfo");
-    static final String JWT_PORT = TestUtil.getPortNumber("jaxrs-userinfo-jwt");
     static final String JCACHE_PORT = TestUtil.getPortNumber("jaxrs-userinfo-jcache");
     static final String JCACHE_JWT_PORT = TestUtil.getPortNumber("jaxrs-userinfo-jcache-jwt");
     static final String JPA_PORT = TestUtil.getPortNumber("jaxrs-userinfo-jpa");
@@ -86,18 +82,6 @@ public class UserInfoTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue(
-                "Server failed to launch",
-                // run the server in the same process
-                // set this to false to fork
-                launchServer(UserInfoServer.class, true)
-        );
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(UserInfoServerJWT.class, true)
-        );
         assertTrue(
                    "Server failed to launch",
                    // run the server in the same process
@@ -132,7 +116,7 @@ public class UserInfoTest extends AbstractBusClientServerTestBase {
     @Parameters(name = "{0}")
     public static Collection<String> data() {
 
-        return Arrays.asList(PORT, JWT_PORT, JCACHE_PORT, JCACHE_JWT_PORT, JPA_PORT, JWT_NON_PERSIST_JCACHE_PORT);
+        return Arrays.asList(JCACHE_PORT, JCACHE_JWT_PORT, JPA_PORT, JWT_NON_PERSIST_JCACHE_PORT);
     }
 
     @org.junit.Test
@@ -331,47 +315,9 @@ public class UserInfoTest extends AbstractBusClientServerTestBase {
     // Server implementations
     //
 
-    public static class UserInfoServer extends AbstractBusTestServerBase {
-        private static final URL SERVER_CONFIG_FILE =
-            UserInfoServer.class.getResource("userinfo-server.xml");
-
-        protected void run() {
-            SpringBusFactory bf = new SpringBusFactory();
-            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
-            BusFactory.setDefaultBus(springBus);
-            setBus(springBus);
-
-            try {
-                new UserInfoServer();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-    }
-
-    public static class UserInfoServerJWT extends AbstractBusTestServerBase {
-        private static final URL SERVER_CONFIG_FILE =
-            UserInfoServerJWT.class.getResource("userinfo-server-jwt.xml");
-
-        protected void run() {
-            SpringBusFactory bf = new SpringBusFactory();
-            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
-            BusFactory.setDefaultBus(springBus);
-            setBus(springBus);
-
-            try {
-                new UserInfoServerJWT();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-    }
-
     public static class UserInfoServerJCache extends AbstractBusTestServerBase {
         private static final URL SERVER_CONFIG_FILE =
-            UserInfoServer.class.getResource("userinfo-server-jcache.xml");
+            UserInfoServerJCache.class.getResource("userinfo-server-jcache.xml");
 
         protected void run() {
             SpringBusFactory bf = new SpringBusFactory();
@@ -390,7 +336,7 @@ public class UserInfoTest extends AbstractBusClientServerTestBase {
 
     public static class UserInfoServerJCacheJWT extends AbstractBusTestServerBase {
         private static final URL SERVER_CONFIG_FILE =
-            UserInfoServerJWT.class.getResource("userinfo-server-jcache-jwt.xml");
+            UserInfoServerJCacheJWT.class.getResource("userinfo-server-jcache-jwt.xml");
 
         protected void run() {
             SpringBusFactory bf = new SpringBusFactory();
@@ -409,7 +355,7 @@ public class UserInfoTest extends AbstractBusClientServerTestBase {
 
     public static class UserInfoServerJPA extends AbstractBusTestServerBase {
         private static final URL SERVER_CONFIG_FILE =
-            UserInfoServer.class.getResource("userinfo-server-jpa.xml");
+            UserInfoServerJPA.class.getResource("userinfo-server-jpa.xml");
 
         protected void run() {
             SpringBusFactory bf = new SpringBusFactory();
@@ -428,7 +374,7 @@ public class UserInfoTest extends AbstractBusClientServerTestBase {
 
     public static class UserInfoServerJCacheJWTNonPersist extends AbstractBusTestServerBase {
         private static final URL SERVER_CONFIG_FILE =
-            UserInfoServerJWT.class.getResource("userinfo-server-jcache-jwt-non-persist.xml");
+            UserInfoServerJCacheJWTNonPersist.class.getResource("userinfo-server-jcache-jwt-non-persist.xml");
 
         protected void run() {
             SpringBusFactory bf = new SpringBusFactory();

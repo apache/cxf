@@ -47,16 +47,22 @@ public class JCacheOAuthDataProviderImpl extends JCacheCodeDataProvider {
     private Set<String> externalClients = new HashSet<>();
 
     public JCacheOAuthDataProviderImpl(String servicePort) throws Exception {
-        this(servicePort, null);
+        this(servicePort, null, false);
     }
 
     public JCacheOAuthDataProviderImpl(String servicePort, String partnerPort) throws Exception {
+        this(servicePort, partnerPort, false);
+    }
+
+    public JCacheOAuthDataProviderImpl(String servicePort, String partnerPort,
+                                       boolean storeJwtTokenKeyOnly) throws Exception {
         // Create random cache files, as this provider could be called by several test implementations
         super(DEFAULT_CONFIG_URL, BusFactory.getThreadDefaultBus(true),
               CLIENT_CACHE_KEY + "_" + Math.abs(new Random().nextInt()),
               CODE_GRANT_CACHE_KEY + "_" + Math.abs(new Random().nextInt()),
               ACCESS_TOKEN_CACHE_KEY + "_" + Math.abs(new Random().nextInt()),
-              REFRESH_TOKEN_CACHE_KEY + "_" + Math.abs(new Random().nextInt()));
+              REFRESH_TOKEN_CACHE_KEY + "_" + Math.abs(new Random().nextInt()),
+              storeJwtTokenKeyOnly);
         // filters/grants test client
         Client client = new Client("consumer-id", "this-is-a-secret", true);
         List<String> redirectUris = new ArrayList<>();

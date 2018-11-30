@@ -62,7 +62,7 @@ under the License.
         </httpj:engine>
     </httpj:engine-factory>
     
-   <bean id="oauthProvider" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuthDataProviderImpl">
+   <bean id="oauthProvider" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.JCacheOAuthDataProviderImpl">
        <constructor-arg><value>${testutil.ports.jaxrs-oauth2-filtersJwt}</value></constructor-arg>
        <property name="useJwtFormatForAccessTokens" value="true"/>
    </bean>
@@ -79,10 +79,11 @@ under the License.
        <property name="dataProvider" ref="oauthProvider"/>
    </bean>
    
-   <bean id="oauthProvider2" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuthDataProviderImpl">
+   <bean id="oauthProvider2" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.JCacheOAuthDataProviderImpl">
        <constructor-arg><value>${testutil.ports.jaxrs-oauth2-filtersJwt}</value></constructor-arg>
+       <constructor-arg><null /></constructor-arg>
+       <constructor-arg><value>true</value></constructor-arg>
        <property name="useJwtFormatForAccessTokens" value="true"/>
-       <property name="storeJwtTokenKeyOnly" value="true"/>
    </bean>
    
    <bean id="authorizationService2" class="org.apache.cxf.rs.security.oauth2.services.AuthorizationCodeGrantService">

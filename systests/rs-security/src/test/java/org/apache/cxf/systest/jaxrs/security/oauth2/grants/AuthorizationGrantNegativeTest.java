@@ -60,19 +60,13 @@ import org.junit.runners.Parameterized.Parameters;
 /**
  * Some (negative) tests for various authorization grants. The tests are run multiple times with different
  * OAuthDataProvider implementations:
- * a) PORT - EhCache
- * b) JWT_PORT - EhCache with useJwtFormatForAccessTokens enabled
- * c) JCACHE_PORT - JCache
- * d) JWT_JCACHE_PORT - JCache with useJwtFormatForAccessTokens enabled
- * e) JPA_PORT - JPA provider
- * f) JWT_NON_PERSIST_JCACHE_PORT-  JCache with useJwtFormatForAccessTokens + !persistJwtEncoding
+ * a) JCACHE_PORT - JCache
+ * b) JWT_JCACHE_PORT - JCache with useJwtFormatForAccessTokens enabled
+ * c) JPA_PORT - JPA provider
+ * d) JWT_NON_PERSIST_JCACHE_PORT-  JCache with useJwtFormatForAccessTokens + !persistJwtEncoding
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = TestUtil.getPortNumber("jaxrs-oauth2-grants-negative");
-    public static final String PORT2 = TestUtil.getPortNumber("jaxrs-oauth2-grants2-negative");
-    public static final String JWT_PORT = TestUtil.getPortNumber("jaxrs-oauth2-grants-negative-jwt");
-    public static final String JWT_PORT2 = TestUtil.getPortNumber("jaxrs-oauth2-grants2-negative-jwt");
     public static final String JCACHE_PORT = TestUtil.getPortNumber("jaxrs-oauth2-grants-negative-jcache");
     public static final String JCACHE_PORT2 = TestUtil.getPortNumber("jaxrs-oauth2-grants2-negative-jcache");
     public static final String JWT_JCACHE_PORT = TestUtil.getPortNumber("jaxrs-oauth2-grants-negative-jcache-jwt");
@@ -93,10 +87,6 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(BookServerOAuth2GrantsNegative.class, true));
-        assertTrue("server did not launch correctly",
-                   launchServer(BookServerOAuth2GrantsNegativeJWT.class, true));
-        assertTrue("server did not launch correctly",
                    launchServer(BookServerOAuth2GrantsNegativeJCache.class, true));
         assertTrue("server did not launch correctly",
                    launchServer(BookServerOAuth2GrantsNegativeJCacheJWT.class, true));
@@ -114,7 +104,7 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
     @Parameters(name = "{0}")
     public static Collection<String> data() {
 
-        return Arrays.asList(PORT, JWT_PORT, JCACHE_PORT, JWT_JCACHE_PORT, JPA_PORT, JWT_NON_PERSIST_JCACHE_PORT);
+        return Arrays.asList(JCACHE_PORT, JWT_JCACHE_PORT, JPA_PORT, JWT_NON_PERSIST_JCACHE_PORT);
     }
 
     //
@@ -921,47 +911,9 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
     // Server implementations
     //
 
-    public static class BookServerOAuth2GrantsNegative extends AbstractBusTestServerBase {
-        private static final URL SERVER_CONFIG_FILE =
-            BookServerOAuth2GrantsNegative.class.getResource("grants-negative-server.xml");
-
-        protected void run() {
-            SpringBusFactory bf = new SpringBusFactory();
-            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
-            BusFactory.setDefaultBus(springBus);
-            setBus(springBus);
-
-            try {
-                new BookServerOAuth2GrantsNegative();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-    }
-
-    public static class BookServerOAuth2GrantsNegativeJWT extends AbstractBusTestServerBase {
-        private static final URL SERVER_CONFIG_FILE =
-            BookServerOAuth2GrantsNegativeJWT.class.getResource("grants-negative-server-jwt.xml");
-
-        protected void run() {
-            SpringBusFactory bf = new SpringBusFactory();
-            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
-            BusFactory.setDefaultBus(springBus);
-            setBus(springBus);
-
-            try {
-                new BookServerOAuth2GrantsNegativeJWT();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-    }
-
     public static class BookServerOAuth2GrantsNegativeJCache extends AbstractBusTestServerBase {
         private static final URL SERVER_CONFIG_FILE =
-            BookServerOAuth2GrantsNegative.class.getResource("grants-negative-server-jcache.xml");
+            BookServerOAuth2GrantsNegativeJCache.class.getResource("grants-negative-server-jcache.xml");
 
         protected void run() {
             SpringBusFactory bf = new SpringBusFactory();
@@ -980,7 +932,7 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
 
     public static class BookServerOAuth2GrantsNegativeJCacheJWT extends AbstractBusTestServerBase {
         private static final URL SERVER_CONFIG_FILE =
-            BookServerOAuth2GrantsNegativeJWT.class.getResource("grants-negative-server-jcache-jwt.xml");
+            BookServerOAuth2GrantsNegativeJCacheJWT.class.getResource("grants-negative-server-jcache-jwt.xml");
 
         protected void run() {
             SpringBusFactory bf = new SpringBusFactory();
@@ -999,7 +951,7 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
 
     public static class BookServerOAuth2GrantsNegativeJPA extends AbstractBusTestServerBase {
         private static final URL SERVER_CONFIG_FILE =
-            BookServerOAuth2GrantsNegative.class.getResource("grants-negative-server-jpa.xml");
+            BookServerOAuth2GrantsNegativeJPA.class.getResource("grants-negative-server-jpa.xml");
 
         protected void run() {
             SpringBusFactory bf = new SpringBusFactory();
@@ -1018,7 +970,8 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
 
     public static class BookServerOAuth2GrantsNegativeJCacheJWTNonPersist extends AbstractBusTestServerBase {
         private static final URL SERVER_CONFIG_FILE =
-            BookServerOAuth2GrantsNegativeJWT.class.getResource("grants-negative-server-jcache-jwt-non-persist.xml");
+            BookServerOAuth2GrantsNegativeJCacheJWTNonPersist.class.getResource(
+                "grants-negative-server-jcache-jwt-non-persist.xml");
 
         protected void run() {
             SpringBusFactory bf = new SpringBusFactory();
