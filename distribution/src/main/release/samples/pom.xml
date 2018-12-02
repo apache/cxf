@@ -73,6 +73,7 @@
         <module>jax_rs/description_openapi_v3</module>
         <module>jax_rs/description_openapi_v3_osgi</module>
         <module>jax_rs/description_openapi_v3_web</module>
+        <module>jax_rs/description_openapi_v3_spring</module>
         <module>jax_rs/description_swagger2</module>
         <module>jax_rs/description_swagger2_osgi</module>
         <module>jax_rs/description_swagger2_spring</module>
