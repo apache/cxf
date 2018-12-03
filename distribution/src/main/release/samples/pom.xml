@@ -30,7 +30,7 @@
         <!-- don't deploy the samples, kind of pointless -->
         <maven.deploy.skip>true</maven.deploy.skip>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.boot.version>2.1.0.RELEASE</spring.boot.version>
+        <spring.boot.version>2.1.1.RELEASE</spring.boot.version>
         <spring.cloud.eureka.version>2.0.2.RELEASE</spring.cloud.eureka.version>
     </properties>
     <dependencies>
