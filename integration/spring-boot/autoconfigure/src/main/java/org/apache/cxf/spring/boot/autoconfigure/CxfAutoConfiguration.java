@@ -21,6 +21,7 @@ package org.apache.cxf.spring.boot.autoconfigure;
 import java.util.Map;
 
 import org.apache.cxf.bus.spring.SpringBus;
+import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.spring.SpringComponentScanServer;
 import org.apache.cxf.jaxrs.spring.SpringJaxrsClassesScanServer;
@@ -81,6 +82,7 @@ public class CxfAutoConfiguration {
     @Configuration
     @ConditionalOnClass(JAXRSServerFactoryBean.class)
     @ConditionalOnExpression("'${cxf.jaxrs.component-scan}'=='true' && '${cxf.jaxrs.classes-scan}'!='true'")
+    @ConditionalOnMissingBean(Server.class)
     @Import(SpringComponentScanServer.class)
     protected static class JaxRsComponentConfiguration {
 
@@ -89,6 +91,7 @@ public class CxfAutoConfiguration {
     @Configuration
     @ConditionalOnClass(JAXRSServerFactoryBean.class)
     @ConditionalOnExpression("'${cxf.jaxrs.classes-scan}'=='true' && '${cxf.jaxrs.component-scan}'!='true'")
+    @ConditionalOnMissingBean(Server.class)
     @Import(SpringJaxrsClassesScanServer.class)
     protected static class JaxRsClassesConfiguration {
 
