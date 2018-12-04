@@ -25,7 +25,6 @@ import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 
 public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
@@ -62,7 +61,7 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
         boolean httpOnly = false;
         int version = Cookie.DEFAULT_VERSION;
 
-        String[] tokens = StringUtils.split(c, ";");
+        String[] tokens = c.split(";");
         for (String token : tokens) {
             String theToken = token.trim();
 

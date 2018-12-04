@@ -175,7 +175,7 @@ public class ClasspathScanner {
     }
 
     public static Set<String> parsePackages(final String packagesAsCsv) {
-        final String[] values = StringUtils.split(packagesAsCsv, ",");
+        final String[] values = packagesAsCsv.split(",");
         final Set<String> basePackages = new HashSet<>(values.length);
         for (final String value : values) {
             final String trimmed = value.trim();

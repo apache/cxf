@@ -47,6 +47,7 @@ public final class StringUtils {
     private StringUtils() {
     }
 
+    /* String.split via fastpath preferred */
     public static String[] split(String s, String regex) {
         return split(s, regex, 0);
     }

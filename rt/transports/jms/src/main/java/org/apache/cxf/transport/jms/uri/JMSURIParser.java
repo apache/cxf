@@ -27,7 +27,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.StringUtils;
 
 /**
  * Unfortunately soap/jms URIs are not recognized correctly in URI.
@@ -76,7 +75,7 @@ final class JMSURIParser {
     public Map<String, Object> parseQuery() {
         Map<String, Object> rc = new HashMap<>();
         if (query != null) {
-            String[] parameters = StringUtils.split(query, "&");
+            String[] parameters = query.split("&");
             for (String parameter : parameters) {
                 int p = parameter.indexOf("=");
                 if (p >= 0) {

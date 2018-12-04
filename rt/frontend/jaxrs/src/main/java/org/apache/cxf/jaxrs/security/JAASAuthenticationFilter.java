@@ -35,7 +35,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriBuilder;
 
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.security.JAASLoginInterceptor;
 import org.apache.cxf.interceptor.security.NamePasswordCallbackHandler;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
@@ -144,7 +143,7 @@ public class JAASAuthenticationFilter implements ContainerRequestFilter {
         List<String> authHeader = headers.getRequestHeader(HttpHeaders.AUTHORIZATION);
         if (authHeader != null && !authHeader.isEmpty()) {
             // should HttpHeadersImpl do it ?
-            String[] authValues = StringUtils.split(authHeader.get(0), " ");
+            String[] authValues = authHeader.get(0).split(" ");
             if (authValues.length > 0) {
                 sb.append(authValues[0]);
             }

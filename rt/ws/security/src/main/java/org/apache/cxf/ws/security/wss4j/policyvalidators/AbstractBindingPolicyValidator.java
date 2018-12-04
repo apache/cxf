@@ -27,7 +27,6 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
@@ -119,7 +118,7 @@ public abstract class AbstractBindingPolicyValidator implements SecurityPolicyVa
                 for (WSDataRef dataRef : dataRefs) {
                     String xpath = dataRef.getXpath();
                     if (xpath != null) {
-                        String[] nodes = StringUtils.split(xpath, "/");
+                        String[] nodes = xpath.split("/");
                         // envelope/Body || envelope/Header/header || envelope/Header/wsse:Security/header
                         if (nodes.length < 3 || nodes.length > 5) {
                             return false;

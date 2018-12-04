@@ -93,7 +93,7 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
                 noCache = true;
                 addFields(noCacheFields, token);
             } else {
-                String[] extPair = StringUtils.split(token, "=");
+                String[] extPair = token.split("=");
                 String value = extPair.length == 2 ? extPair[1] : "";
                 extensions.put(extPair[0], value);
             }
@@ -193,7 +193,7 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
             }
             f = f.length() == 2 ? "" : f.substring(1, f.length() - 1);
             if (f.length() > 0) {
-                String[] values = StringUtils.split(f, ",");
+                String[] values = f.split(",");
                 for (String v : values) {
                     fields.add(v.trim());
                 }

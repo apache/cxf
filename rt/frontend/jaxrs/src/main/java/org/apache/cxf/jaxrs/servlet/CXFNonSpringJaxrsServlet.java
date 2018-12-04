@@ -201,7 +201,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         if (schemas == null) {
             return;
         }
-        String[] locations = StringUtils.split(schemas, " ");
+        String[] locations = schemas.split(" ");
         List<String> list = new ArrayList<>();
         for (String loc : locations) {
             String theLoc = loc.trim();
@@ -364,13 +364,13 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         if (sequence != null) {
             sequence = sequence.trim();
             Map<String, List<String>> map = new HashMap<>();
-            String[] pairs = StringUtils.split(sequence, " ");
+            String[] pairs = sequence.split(" ");
             for (String pair : pairs) {
                 String thePair = pair.trim();
                 if (thePair.length() == 0) {
                     continue;
                 }
-                String[] values = StringUtils.split(thePair, "=");
+                String[] values = thePair.split("=");
                 String key;
                 String value;
                 if (values.length == 2) {

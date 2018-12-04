@@ -989,7 +989,7 @@ public final class InjectionUtils {
         }
         List<String> newValues = new ArrayList<>();
         for (String v : values) {
-            String[] segments = StringUtils.split(v, "/");
+            String[] segments = v.split("/");
             for (String s : segments) {
                 if (s.length() != 0) {
                     newValues.add(s);

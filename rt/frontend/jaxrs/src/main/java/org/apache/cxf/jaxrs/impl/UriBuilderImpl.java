@@ -394,7 +394,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
                 // contain template vars - technically this can be covered by checking where a given template
                 // var is coming from and act accordingly. Confusing nonetheless.
                 StringBuilder buf = new StringBuilder();
-                String[] values = StringUtils.split(theValue, "/");
+                String[] values = theValue.split("/");
                 for (int i = 0; i < values.length; i++) {
                     buf.append(HttpUtils.encodePartiallyEncoded(values[i], false));
                     if (i + 1 < values.length) {

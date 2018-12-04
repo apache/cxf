@@ -181,7 +181,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
     protected static List<Pattern> parseListSequence(String values) {
         if (values != null) {
             List<Pattern> list = new LinkedList<>();
-            String[] pathValues = StringUtils.split(values, " ");
+            String[] pathValues = values.split(" ");
             for (String value : pathValues) {
                 String theValue = value.trim();
                 if (theValue.length() > 0) {
@@ -197,13 +197,13 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
         if (sequence != null) {
             sequence = sequence.trim();
             Map<String, String> map = new HashMap<>();
-            String[] pairs = StringUtils.split(sequence, " ");
+            String[] pairs = sequence.split(" ");
             for (String pair : pairs) {
                 String thePair = pair.trim();
                 if (thePair.length() == 0) {
                     continue;
                 }
-                String[] value = StringUtils.split(thePair, "=");
+                String[] value = thePair.split("=");
                 if (value.length == 2) {
                     map.put(value[0].trim(), value[1].trim());
                 } else {
