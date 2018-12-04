@@ -175,7 +175,7 @@ public class WebSocketUndertowServletRequest implements HttpServletRequest {
         try {
             return new URL(channel.getUrl()).getHost();
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            LOG.log(Level.FINE, "getLocalAddr error", e);
             return null;
         }
     }
@@ -186,7 +186,7 @@ public class WebSocketUndertowServletRequest implements HttpServletRequest {
         try {
             return new URL(channel.getUrl()).getHost();
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            LOG.log(Level.FINE, "getLocalName error", e);
             return null;
         }
     }
@@ -197,7 +197,7 @@ public class WebSocketUndertowServletRequest implements HttpServletRequest {
         try {
             return new URL(channel.getUrl()).getPort();
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            LOG.log(Level.FINE, "getLocalPort error", e);
             return 0;
         }
     }
@@ -248,7 +248,7 @@ public class WebSocketUndertowServletRequest implements HttpServletRequest {
         try {
             return new URL(channel.getUrl()).getProtocol();
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            LOG.log(Level.FINE, "getProtocol error", e);
             return null;
         }
     }
@@ -271,7 +271,7 @@ public class WebSocketUndertowServletRequest implements HttpServletRequest {
         try {
             return new URL(channel.getPeerAddress().toString()).getHost();
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            LOG.log(Level.FINE, "getRemoteAddr error", e);
             return null;
         }
     }
@@ -282,7 +282,7 @@ public class WebSocketUndertowServletRequest implements HttpServletRequest {
         try {
             return new URL(channel.getPeerAddress().toString()).getHost();
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            LOG.log(Level.FINE, "getRemoteHost error", e);
             return null;
         }
     }
@@ -293,7 +293,7 @@ public class WebSocketUndertowServletRequest implements HttpServletRequest {
         try {
             return new URL(channel.getPeerAddress().toString()).getPort();
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            LOG.log(Level.FINE, "getRemotePort error", e);
             return 0;
         }
     }
@@ -310,7 +310,7 @@ public class WebSocketUndertowServletRequest implements HttpServletRequest {
         try {
             return new URL(channel.getUrl()).getProtocol();
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            LOG.log(Level.FINE, "getScheme error", e);
             return null;
         }
     }
