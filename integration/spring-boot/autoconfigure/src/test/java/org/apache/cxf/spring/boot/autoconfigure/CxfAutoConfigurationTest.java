@@ -24,7 +24,10 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerImpl;
 import org.apache.cxf.spring.boot.jaxrs.CustomJaxRSServer;
 import org.hamcrest.Matcher;
-import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.beans.factory.UnsatisfiedDependencyException;
+import org.springframework.boot.context.properties.ConfigurationPropertiesBindException;
+import org.springframework.boot.context.properties.bind.BindException;
+import org.springframework.boot.context.properties.bind.validation.BindValidationException;
 import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.mock.web.MockServletContext;
@@ -36,9 +39,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -48,7 +55,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Vedran Pavic
  */
-public class CxfAutoConfigurationTests {
+public class CxfAutoConfigurationTest {
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -71,8 +78,12 @@ public class CxfAutoConfigurationTests {
 
     @Test
     public void customPathMustBeginWithASlash() {
-        this.thrown.expect(BeanCreationException.class);
-        this.thrown.expectMessage("Path must start with /");
+        this.thrown.expect(UnsatisfiedDependencyException.class);
+        this.thrown.expectCause(
+            allOf(instanceOf(ConfigurationPropertiesBindException.class), hasProperty("cause", 
+                allOf(instanceOf(BindException.class), hasProperty("cause",
+                    allOf(instanceOf(BindValidationException.class), 
+                        hasProperty("message", containsString("Path must start with /"))))))));
         load(CxfAutoConfiguration.class, "cxf.path=invalid");
     }
 
@@ -106,7 +117,7 @@ public class CxfAutoConfigurationTests {
     @Test
     public void customInitParameters() {
         load(CxfAutoConfiguration.class, "cxf.servlet.init.key1=value1",
-                "spring.cxf.servlet.init.key2=value2");
+                "cxf.servlet.init.key2=value2");
         ServletRegistrationBean<?> registrationBean = this.context
                 .getBean(ServletRegistrationBean.class);
         Matcher<Map<? extends String, ? extends String>> v1 = hasEntry("key1", "value1");
