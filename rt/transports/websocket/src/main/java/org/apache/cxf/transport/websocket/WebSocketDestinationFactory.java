@@ -39,8 +39,10 @@ import org.apache.cxf.transport.websocket.atmosphere.AtmosphereWebSocketServletD
 @NoJSR250Annotations()
 public class WebSocketDestinationFactory implements HttpDestinationFactory {
     private static final boolean ATMOSPHERE_AVAILABLE = probeClass("org.atmosphere.cpr.ApplicationConfig");
-    private static final boolean JETTY_AVAILABLE = probeClass("org.eclipse.jetty.server.Server");
-    private static final boolean UNDERTOW_AVAILABLE = probeClass("io.undertow.websockets.core.WebSockets");
+    private static final boolean JETTY_AVAILABLE = 
+        probeClass("org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory");
+    private static final boolean UNDERTOW_AVAILABLE = 
+        probeClass("org.apache.cxf.transport.http_undertow.UndertowHTTPServerEngineFactory");
     private static final Constructor<?> JETTY9_WEBSOCKET_DESTINATION_CTR =
         probeConstructor("org.apache.cxf.transport.websocket.jetty9.Jetty9WebSocketDestination");
     private static final Constructor<?> UNDERTOW_WEBSOCKET_DESTINATION_CTR =
