@@ -205,7 +205,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         List<String> list = new ArrayList<>();
         for (String loc : locations) {
             String theLoc = loc.trim();
-            if (theLoc.length() != 0) {
+            if (!theLoc.isEmpty()) {
                 list.add(theLoc);
             }
         }
@@ -229,12 +229,12 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         if (value == null) {
             return;
         }
-        String[] values = StringUtils.split(value, splitChar);
+        String[] values = value.split(splitChar);
         List<Interceptor<? extends Message>> list = new ArrayList<>();
         for (String interceptorVal : values) {
             Map<String, List<String>> props = new HashMap<>();
             String theValue = getClassNameAndProperties(interceptorVal, props);
-            if (theValue.length() != 0) {
+            if (!theValue.isEmpty()) {
                 try {
                     Class<?> intClass = loadClass(theValue, "Interceptor");
                     Object object = intClass.newInstance();
@@ -267,7 +267,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         }
         Map<String, List<String>> props = new HashMap<>();
         String theValue = getClassNameAndProperties(value, props);
-        if (theValue.length() != 0) {
+        if (!theValue.isEmpty()) {
             try {
                 Class<?> intClass = loadClass(theValue, "Invoker");
                 Object object = intClass.newInstance();
@@ -294,12 +294,12 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
             }
             throw new ServletException("At least one resource class should be specified");
         }
-        String[] classNames = StringUtils.split(serviceBeans, splitChar);
+        String[] classNames = serviceBeans.split(splitChar);
         Map<Class<?>, Map<String, List<String>>> map = new HashMap<>();
         for (String cName : classNames) {
             Map<String, List<String>> props = new HashMap<>();
             String theName = getClassNameAndProperties(cName, props);
-            if (theName.length() != 0) {
+            if (!theName.isEmpty()) {
                 Class<?> cls = loadClass(theName);
                 map.put(cls, props);
             }
@@ -317,12 +317,12 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         if (featuresList == null) {
             return Collections.< Feature >emptyList();
         }
-        String[] classNames = StringUtils.split(featuresList, splitChar);
+        String[] classNames = featuresList.split(splitChar);
         List< Feature > features = new ArrayList<>();
         for (String cName : classNames) {
             Map<String, List<String>> props = new HashMap<>();
             String theName = getClassNameAndProperties(cName, props);
-            if (theName.length() != 0) {
+            if (!theName.isEmpty()) {
                 Class<?> cls = loadClass(theName);
                 if (Feature.class.isAssignableFrom(cls)) {
                     features.add((Feature)createSingletonInstance(cls, props, servletConfig));
@@ -337,12 +337,12 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         if (providersList == null) {
             return Collections.emptyList();
         }
-        String[] classNames = StringUtils.split(providersList, splitChar);
+        String[] classNames = providersList.split(splitChar);
         List<Object> providers = new ArrayList<>();
         for (String cName : classNames) {
             Map<String, List<String>> props = new HashMap<>();
             String theName = getClassNameAndProperties(cName, props);
-            if (theName.length() != 0) {
+            if (!theName.isEmpty()) {
                 Class<?> cls = loadClass(theName);
                 providers.add(createSingletonInstance(cls, props, servletConfig));
             }
@@ -493,7 +493,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
 
         boolean ignoreApplicationPath = isIgnoreApplicationPath(servletConfig);
 
-        String[] classNames = StringUtils.split(applicationNames, getParameterSplitChar(servletConfig));
+        String[] classNames = applicationNames.split(getParameterSplitChar(servletConfig));
 
         if (classNames.length > 1 && ignoreApplicationPath) {
             throw new ServletException("\"" + IGNORE_APP_PATH_PARAM

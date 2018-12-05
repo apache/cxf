@@ -30,7 +30,6 @@ import java.util.regex.Pattern;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -131,7 +130,7 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
             return values.toArray(new String[0]);
         }
         String separator = getSeparator();
-        return StringUtils.split(c, separator);
+        return c.split(separator);
     }
 
     public String toString(CacheControl c) {

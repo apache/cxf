@@ -26,22 +26,16 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 public final class StringUtils {
-    public static final Map<String, Pattern> PATTERN_MAP = new HashMap<>();
-    static {
-        String[] patterns = {"/", " ", ":", ",", ";", "=", "\\.", "\\+"};
-        for (String p : patterns) {
-            PATTERN_MAP.put(p, Pattern.compile(p));
-        }
-    }
+    private static final Map<String, Pattern> PATTERN_MAP = new ConcurrentHashMap<>();
     private static final Predicate<String> NOT_EMPTY = (String s) -> !s.isEmpty();
 
     private StringUtils() {
@@ -51,13 +45,14 @@ public final class StringUtils {
     public static String[] split(String s, String regex) {
         return split(s, regex, 0);
     }
+    @Deprecated
     public static String[] split(String s, String regex, int limit) {
-        Pattern p = PATTERN_MAP.getOrDefault(regex, Pattern.compile(regex));
+        Pattern p = PATTERN_MAP.computeIfAbsent(regex, key -> Pattern.compile(key));
         return p.split(s, limit);
     }
-    
+    @Deprecated
     public static Stream<String> splitAsStream(String s, String regex) {
-        Pattern p = PATTERN_MAP.getOrDefault(regex, Pattern.compile(regex));
+        Pattern p = PATTERN_MAP.computeIfAbsent(regex, key -> Pattern.compile(key));
         return p.splitAsStream(s);
     }
 
