@@ -121,7 +121,7 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
 
         HttpServletRequest req = getMessageContext().getHttpServletRequest();
         for (OAuthPermission perm : permissions) {
-            boolean uriOK = checkRequestURI(req, perm.getUris());
+            boolean uriOK = checkRequestURI(req, perm.getUris(), m);
             boolean verbOK = checkHttpVerb(req, perm.getHttpVerbs());
             boolean scopeOk = checkScopeProperty(perm.getPermission());
             if (uriOK && verbOK && scopeOk) {
@@ -197,12 +197,16 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
         return true;
     }
 
-    protected boolean checkRequestURI(HttpServletRequest request, List<String> uris) {
+        
+    protected boolean checkRequestURI(HttpServletRequest request, List<String> uris, Message m) {
 
         if (uris.isEmpty()) {
             return true;
         }
         String servletPath = request.getPathInfo();
+        if (servletPath == null) {
+            servletPath = (String)m.get(Message.PATH_INFO);
+        }
         boolean foundValidScope = false;
         for (String uri : uris) {
             if (OAuthUtils.checkRequestURI(servletPath, uri)) {
