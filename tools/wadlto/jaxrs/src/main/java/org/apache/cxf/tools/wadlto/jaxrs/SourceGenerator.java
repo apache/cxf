@@ -750,7 +750,7 @@ public class SourceGenerator {
                     String mediaType = requestRepWithElement.getAttribute("mediaType");
                     if (!StringUtils.isEmpty(mediaType)) {
                         String subType = MediaType.valueOf(mediaType).getSubtype();
-                        String[] parts = StringUtils.split(subType, "\\+");
+                        String[] parts = subType.split("\\+");
                         if (parts.length == 2) {
                             suffixName += StringUtils.capitalize(parts[1]);
                         } else {
