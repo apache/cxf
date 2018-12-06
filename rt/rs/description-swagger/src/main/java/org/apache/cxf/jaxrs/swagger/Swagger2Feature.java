@@ -45,7 +45,6 @@ import org.apache.cxf.annotations.Provider;
 import org.apache.cxf.annotations.Provider.Scope;
 import org.apache.cxf.annotations.Provider.Type;
 import org.apache.cxf.common.util.PropertyUtils;
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.ext.ContextProvider;
@@ -553,7 +552,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature implements SwaggerUi
             rc.setScanAllResources(true);
             if (ignoreRoutesParam != null) {
                 Set<String> routes = new LinkedHashSet<>();
-                for (String route : StringUtils.split(ignoreRoutesParam, ",")) {
+                for (String route : ignoreRoutesParam.split(",")) {
                     routes.add(route.trim());
                 }
                 rc.setIgnoredRoutes(routes);

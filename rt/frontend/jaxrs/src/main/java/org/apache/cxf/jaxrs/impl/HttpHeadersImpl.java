@@ -188,13 +188,13 @@ public class HttpHeadersImpl implements HttpHeaders {
         List<Locale> newLs = new ArrayList<>();
         Map<Locale, Float> prefs = new HashMap<>();
         for (String l : ls) {
-            String[] pair = StringUtils.split(l, ";");
+            String[] pair = l.split(";");
 
             Locale locale = HttpUtils.getLocale(pair[0].trim());
 
             newLs.add(locale);
             if (pair.length > 1) {
-                String[] pair2 = StringUtils.split(pair[1], "=");
+                String[] pair2 = pair[1].split("=");
                 if (pair2.length > 1) {
                     prefs.put(locale, JAXRSUtils.getMediaTypeQualityFactor(pair2[1].trim()));
                 } else {

@@ -27,7 +27,6 @@ import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.rs.security.oauth2.client.ClientCodeRequestFilter;
@@ -60,7 +59,7 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
     }
 
     public void setAuthenticationContextRef(String acr) {
-        this.authenticationContextRef = Arrays.asList(StringUtils.split(acr, " "));
+        this.authenticationContextRef = Arrays.asList(acr.split(" "));
     }
 
     @Override

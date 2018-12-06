@@ -30,7 +30,6 @@ import java.util.regex.Pattern;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -93,7 +92,7 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
                 noCache = true;
                 addFields(noCacheFields, token);
             } else {
-                String[] extPair = StringUtils.split(token, "=");
+                String[] extPair = token.split("=");
                 String value = extPair.length == 2 ? extPair[1] : "";
                 extensions.put(extPair[0], value);
             }
@@ -131,7 +130,7 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
             return values.toArray(new String[0]);
         }
         String separator = getSeparator();
-        return StringUtils.split(c, separator);
+        return c.split(separator);
     }
 
     public String toString(CacheControl c) {
@@ -193,7 +192,7 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
             }
             f = f.length() == 2 ? "" : f.substring(1, f.length() - 1);
             if (f.length() > 0) {
-                String[] values = StringUtils.split(f, ",");
+                String[] values = f.split(",");
                 for (String v : values) {
                     fields.add(v.trim());
                 }

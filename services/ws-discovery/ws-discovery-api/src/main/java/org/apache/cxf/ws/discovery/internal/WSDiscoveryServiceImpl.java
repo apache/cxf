@@ -58,7 +58,6 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.jaxb.JAXBContextCache;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.spi.ProviderImpl;
@@ -336,8 +335,8 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
     private boolean matchURIs(URI probe, URI target) {
         if (compare(target.getScheme(), probe.getScheme())
             && compare(target.getAuthority(), probe.getAuthority())) {
-            String[] ppath = StringUtils.split(probe.getPath(), "/");
-            String[] tpath = StringUtils.split(target.getPath(), "/");
+            String[] ppath = probe.getPath().split("/");
+            String[] tpath = target.getPath().split("/");
 
             if (ppath.length <= tpath.length) {
                 for (int i = 0; i < ppath.length; i++) {

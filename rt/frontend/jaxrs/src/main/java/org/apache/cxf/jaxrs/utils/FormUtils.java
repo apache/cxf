@@ -131,8 +131,8 @@ public final class FormUtils {
         if (StringUtils.isEmpty(postBody)) {
             return;
         }
-        List<String> parts = Arrays.asList(StringUtils.split(postBody, "&"));
-        checkNumberOfParts(m, parts.size());
+        String[] parts = postBody.split("&");
+        checkNumberOfParts(m, parts.length);
         for (String part : parts) {
             String[] keyValue = new String[2];
             int index = part.indexOf("=");

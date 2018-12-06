@@ -32,7 +32,6 @@ import javax.ws.rs.core.Link;
 import javax.ws.rs.core.Link.Builder;
 import javax.ws.rs.core.UriBuilder;
 
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 
 public class LinkBuilderImpl implements Builder {
@@ -95,7 +94,7 @@ public class LinkBuilderImpl implements Builder {
             }
         }
 
-        String[] tokens = StringUtils.split(link, ";");
+        String[] tokens = link.split(";");
         for (String token : tokens) {
             String theToken = token.trim();
             if (!theToken.isEmpty()) {

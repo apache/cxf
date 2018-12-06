@@ -181,7 +181,7 @@ public final class JAXRSUtils {
     public static List<PathSegment> getPathSegments(String thePath, boolean decode,
                                                     boolean ignoreLastSlash) {
         List<PathSegment> theList = 
-            StringUtils.splitAsStream(thePath, "/")
+            Arrays.asList(thePath.split("/")).stream()
             .filter(StringUtils.notEmpty())
             .map(p -> new PathSegmentImpl(p, decode))
             .collect(Collectors.toList());

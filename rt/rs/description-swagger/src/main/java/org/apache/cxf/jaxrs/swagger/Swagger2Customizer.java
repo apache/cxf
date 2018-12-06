@@ -154,7 +154,7 @@ public class Swagger2Customizer {
     protected String getNormalizedPath(String classResourcePath, String operationResourcePath) {
         StringBuilder normalizedPath = new StringBuilder();
 
-        String[] segments = StringUtils.split(classResourcePath + operationResourcePath, "/");
+        String[] segments = (classResourcePath + operationResourcePath).split("/");
         for (String segment : segments) {
             if (!StringUtils.isEmpty(segment)) {
                 normalizedPath.append("/").append(segment);

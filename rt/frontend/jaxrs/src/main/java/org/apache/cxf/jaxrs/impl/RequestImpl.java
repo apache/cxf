@@ -166,9 +166,9 @@ public class RequestImpl implements Request {
             return Collections.emptyList();
         }
         List<String> list = new LinkedList<>();
-        String[] values = StringUtils.split(acceptEnc, ",");
+        String[] values = acceptEnc.split(",");
         for (String value : values) {
-            String[] pair = StringUtils.split(value.trim(), ";");
+            String[] pair = value.trim().split(";");
             // ignore encoding qualifiers if any for now
             list.add(pair[0]);
         }

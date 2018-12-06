@@ -25,7 +25,6 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 
@@ -45,7 +44,7 @@ public class SamlHeaderInHandler extends AbstractSamlBase64InHandler {
             throwFault("Authorization header must be available and use SAML profile", null);
         }
 
-        String[] parts = StringUtils.split(values.get(0), " ");
+        String[] parts = values.get(0).split(" ");
         if (parts.length != 2) {
             throwFault("Authorization header is malformed", null);
         }

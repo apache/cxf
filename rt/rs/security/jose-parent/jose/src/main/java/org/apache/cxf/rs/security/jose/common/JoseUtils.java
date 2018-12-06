@@ -32,7 +32,6 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PropertyUtils;
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -53,7 +52,7 @@ public final class JoseUtils {
         if (compactContent.startsWith("\"") && compactContent.endsWith("\"")) {
             compactContent = compactContent.substring(1, compactContent.length() - 1);
         }
-        return StringUtils.split(compactContent, "\\.");
+        return compactContent.split("\\.");
     }
     public static void setJoseContextProperty(JoseHeaders headers) {
         Message message = PhaseInterceptorChain.getCurrentMessage();
