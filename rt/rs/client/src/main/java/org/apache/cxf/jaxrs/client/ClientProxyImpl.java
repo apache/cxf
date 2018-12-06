@@ -21,11 +21,16 @@ package org.apache.cxf.jaxrs.client;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -154,6 +159,55 @@ public class ClientProxyImpl extends AbstractClient implements
         }
     }
 
+    private static class WrappedException extends Exception {
+        final Throwable wrapped;
+        WrappedException(Throwable wrapped) {
+            this.wrapped = wrapped;
+        }
+        Throwable getWrapped() {
+            return wrapped;
+        }
+    }
+
+    private static Object invokeDefaultMethod(Class<?> declaringClass, Object o, Method m, Object[] params)
+        throws Throwable {
+
+        try {
+            return AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
+                @Override
+                public Object run() throws Exception {
+                    try {
+                        final MethodHandles.Lookup lookup = MethodHandles.publicLookup()
+                                .in(declaringClass);
+
+                        // force private access so unreflectSpecial can invoke the interface's default method
+                        final Field f = MethodHandles.Lookup.class.getDeclaredField("allowedModes");
+                        final int modifiers = f.getModifiers();
+                        if (Modifier.isFinal(modifiers)) {
+                            final Field modifiersField = Field.class.getDeclaredField("modifiers");
+                            modifiersField.setAccessible(true);
+                            modifiersField.setInt(f, modifiers & ~Modifier.FINAL);
+                            f.setAccessible(true);
+                            f.set(lookup, MethodHandles.Lookup.PRIVATE);
+                        }
+
+                        return lookup.unreflectSpecial(m, declaringClass)
+                                     .bindTo(o)
+                                     .invokeWithArguments(params);
+                    } catch (Throwable t) {
+                        throw new WrappedException(t);
+                    }
+                }
+            });
+        } catch (PrivilegedActionException pae) {
+            Throwable wrapped = pae.getCause();
+            if (wrapped instanceof WrappedException) {
+                throw ((WrappedException)wrapped).getWrapped();
+            }
+            throw wrapped;
+        }
+    }
+
     /**
      * Updates the current state if Client method is invoked, otherwise
      * does the remote invocation or returns a new proxy if subresource
@@ -171,6 +225,9 @@ public class ClientProxyImpl extends AbstractClient implements
         resetResponse();
         OperationResourceInfo ori = cri.getMethodDispatcher().getOperationResourceInfo(m);
         if (ori == null) {
+            if (m.isDefault()) {
+                return invokeDefaultMethod(declaringClass, o, m, params);
+            }
             reportInvalidResourceMethod(m, "INVALID_RESOURCE_METHOD");
         }
 
