@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.microprofile.client.mock;
 
+import java.io.IOException;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
@@ -26,4 +28,11 @@ import javax.ws.rs.core.Response;
 public interface MyClient {
     @GET
     Response get();
+
+    default String myDefaultMethod(boolean throwException) throws IOException {
+        if (throwException) {
+            throw new IOException("expected");
+        }
+        return "defaultValue";
+    }
 }
