@@ -50,11 +50,14 @@ import org.apache.cxf.message.MessageUtils;
 
 public class HttpHeadersImpl implements HttpHeaders {
 
-    private static final String HEADER_SPLIT_PROPERTY =
+    static final String HEADER_SPLIT_PROPERTY =
         "org.apache.cxf.http.header.split";
-    private static final String COOKIE_SEPARATOR_PROPERTY =
+    static final String COOKIE_SEPARATOR_PROPERTY =
         "org.apache.cxf.http.cookie.separator";
     private static final String COOKIE_SEPARATOR_CRLF = "crlf";
+    private static final String COOKIE_SEPARATOR_CRLF_EXPRESSION = "\r\n";
+    private static final Pattern COOKIE_SEPARATOR_CRLF_PATTERN =
+            Pattern.compile(COOKIE_SEPARATOR_CRLF_EXPRESSION);
     private static final String DEFAULT_SEPARATOR = ",";
     private static final String DEFAULT_COOKIE_SEPARATOR = ";";
     private static final String DOLLAR_CHAR = "$";
@@ -145,7 +148,7 @@ public class HttpHeadersImpl implements HttpHeaders {
         if (cookiePropValue != null) {
             String separator = cookiePropValue.toString().trim();
             if (COOKIE_SEPARATOR_CRLF.equals(separator)) {
-                return "\r\n";
+                return COOKIE_SEPARATOR_CRLF_EXPRESSION;
             }
             if (separator.length() != 1) {
                 throw ExceptionUtils.toInternalServerErrorException(null, null);
@@ -254,10 +257,15 @@ public class HttpHeadersImpl implements HttpHeaders {
         return getHeaderValues(headerName, originalValue, DEFAULT_SEPARATOR);
     }
 
-    private List<String> getHeaderValues(String headerName, String originalValue, String sep) {
+    private static List<String> getHeaderValues(String headerName, String originalValue, String sep) {
         if (!originalValue.contains(QUOTE)
             || HEADERS_WITH_POSSIBLE_QUOTES.contains(headerName)) {
-            String[] ls = StringUtils.split(originalValue, sep);
+            final String[] ls; 
+            if (COOKIE_SEPARATOR_CRLF_EXPRESSION != sep) {
+                ls = originalValue.split(sep);
+            } else {
+                ls = COOKIE_SEPARATOR_CRLF_PATTERN.split(originalValue);
+            }
             if (ls.length == 1) {
                 return Collections.singletonList(ls[0].trim());
             }
