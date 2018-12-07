@@ -29,7 +29,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -167,10 +166,11 @@ public abstract class AbstractHTTPDestination
         if (credentials == null || StringUtils.isEmpty(credentials.trim())) {
             return null;
         }
-        List<String> creds = StringUtils.getParts(credentials, " ");
-        String authType = creds.get(0);
-        if ("Basic".equals(authType) && creds.size() == 2) {
-            String authEncoded = creds.get(1);
+
+        final String[] creds = credentials.split(" ");
+        String authType = creds[0];
+        if ("Basic".equals(authType) && creds.length == 2) {
+            String authEncoded = creds[1];
             try {
                 byte[] authBytes = Base64Utility.decode(authEncoded);
 

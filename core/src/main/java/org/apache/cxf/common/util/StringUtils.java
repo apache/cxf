@@ -25,35 +25,16 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 public final class StringUtils {
-    private static final Map<String, Pattern> PATTERN_MAP = new ConcurrentHashMap<>();
+
     private static final Predicate<String> NOT_EMPTY = (String s) -> !s.isEmpty();
 
     private StringUtils() {
-    }
-
-    /* String.split via fastpath preferred */
-    public static String[] split(String s, String regex) {
-        return split(s, regex, 0);
-    }
-    @Deprecated
-    public static String[] split(String s, String regex, int limit) {
-        Pattern p = PATTERN_MAP.computeIfAbsent(regex, key -> Pattern.compile(key));
-        return p.split(s, limit);
-    }
-    @Deprecated
-    public static Stream<String> splitAsStream(String s, String regex) {
-        Pattern p = PATTERN_MAP.computeIfAbsent(regex, key -> Pattern.compile(key));
-        return p.splitAsStream(s);
     }
 
     public static boolean isFileExist(String file) {
@@ -89,39 +70,6 @@ public final class StringUtils {
             return str1.substring(str2.length());
         }
         return str1;
-    }
-
-    public static List<String> getParts(String str, String separator) {
-        String[] parts = split(str, separator);
-        List<String> ret = new ArrayList<>(parts.length);
-        for (String part : parts) {
-            if (!isEmpty(part)) {
-                ret.add(part);
-            }
-        }
-        return ret;
-    }
-
-    public static String getFirstNotEmpty(String str, String separator) {
-        List<String> parts = Arrays.asList(split(str, separator));
-        for (String part : parts) {
-            if (!isEmpty(part)) {
-                return part;
-            }
-        }
-        return str;
-    }
-
-    public static String getFirstNotEmpty(List<String> list) {
-        if (isEmpty(list)) {
-            return null;
-        }
-        for (String item : list) {
-            if (!isEmpty(item)) {
-                return item;
-            }
-        }
-        return null;
     }
 
     public static List<String> getFound(String contents, String regex) {

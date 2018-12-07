@@ -19,7 +19,6 @@
 
 package org.apache.cxf.jaxrs.impl;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -39,33 +38,16 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
-
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 public class HttpHeadersImplTest extends Assert {
 
-    private IMocksControl control;
-
-    @Before
-    public void setUp() {
-        control = EasyMock.createNiceControl();
-    }
-
     @Test
     public void testNoRequestHeader() throws Exception {
 
-        Message m = control.createMock(Message.class);
-        m.get(Message.PROTOCOL_HEADERS);
-        MetadataMap<String, String> headers =
-            createHeader("COMPLEX_HEADER",  "b=c; param=c, a=b;param=b");
-        EasyMock.expectLastCall().andReturn(headers);
-        m.getContextualProperty("org.apache.cxf.http.header.split");
-        EasyMock.expectLastCall().andReturn("true");
-        control.replay();
+        Message m = createMessage(createHeader("COMPLEX_HEADER",  "b=c; param=c, a=b;param=b"));
+
         HttpHeaders h = new HttpHeadersImpl(m);
         List<String> values = h.getRequestHeader("HEADER");
         assertNull(values);
@@ -74,14 +56,9 @@ public class HttpHeadersImplTest extends Assert {
     @Test
     public void testGetHeaderNameValue() throws Exception {
 
-        Message m = control.createMock(Message.class);
-        m.get(Message.PROTOCOL_HEADERS);
-        MetadataMap<String, String> headers =
-            createHeader("COMPLEX_HEADER",  "b=c; param=c, a=b;param=b");
-        EasyMock.expectLastCall().andReturn(headers);
-        m.getContextualProperty("org.apache.cxf.http.header.split");
-        EasyMock.expectLastCall().andReturn("true");
-        control.replay();
+        Message m = createMessage(createHeader("COMPLEX_HEADER",  "b=c; param=c, a=b;param=b"));
+        m.put(HttpHeadersImpl.HEADER_SPLIT_PROPERTY, "true");
+
         HttpHeaders h = new HttpHeadersImpl(m);
         List<String> values = h.getRequestHeader("COMPLEX_HEADER");
         assertNotNull(values);
@@ -93,16 +70,13 @@ public class HttpHeadersImplTest extends Assert {
     @Test
     public void testGetHeaderWithQuotes1() throws Exception {
 
-        Message m = control.createMock(Message.class);
-        m.getContextualProperty("org.apache.cxf.http.header.split");
-        EasyMock.expectLastCall().andReturn("true");
-        m.get(Message.PROTOCOL_HEADERS);
         MetadataMap<String, String> headers = createHeader("COMPLEX_HEADER",
             "a1=\"a\", a2=\"a\";param, b, b;param, c1=\"c, d, e\", "
             + "c2=\"c, d, e\";param, a=b, a=b;p=p1, a2=\"a\";param=p,"
             + "a3=\"a\";param=\"p,b\"");
-        EasyMock.expectLastCall().andReturn(headers);
-        control.replay();
+        Message m = createMessage(headers);
+        m.put(HttpHeadersImpl.HEADER_SPLIT_PROPERTY, "true");
+
         HttpHeaders h = new HttpHeadersImpl(m);
         List<String> values = h.getRequestHeader("COMPLEX_HEADER");
         assertNotNull(values);
@@ -122,14 +96,11 @@ public class HttpHeadersImplTest extends Assert {
     @Test
     public void testGetHeaderWithQuotes2() throws Exception {
 
-        Message m = control.createMock(Message.class);
-        m.getContextualProperty("org.apache.cxf.http.header.split");
-        EasyMock.expectLastCall().andReturn("true");
-        m.get(Message.PROTOCOL_HEADERS);
         MetadataMap<String, String> headers =
             createHeader("X-WSSE", "UsernameToken Username=\"Foo\", Nonce=\"bar\"");
-        EasyMock.expectLastCall().andReturn(headers);
-        control.replay();
+        Message m = createMessage(headers);
+        m.put(HttpHeadersImpl.HEADER_SPLIT_PROPERTY, "true");
+
         HttpHeaders h = new HttpHeadersImpl(m);
         List<String> values = h.getRequestHeader("X-WSSE");
         assertNotNull(values);
@@ -142,14 +113,11 @@ public class HttpHeadersImplTest extends Assert {
     @Test
     public void testGetHeaderWithQuotes3() throws Exception {
 
-        Message m = control.createMock(Message.class);
-        m.getContextualProperty("org.apache.cxf.http.header.split");
-        EasyMock.expectLastCall().andReturn("true");
-        m.get(Message.PROTOCOL_HEADERS);
         MetadataMap<String, String> headers =
             createHeader("COMPLEX_HEADER", "\"value with space\"");
-        EasyMock.expectLastCall().andReturn(headers);
-        control.replay();
+        Message m = createMessage(headers);
+        m.put(HttpHeadersImpl.HEADER_SPLIT_PROPERTY, "true");
+
         HttpHeaders h = new HttpHeadersImpl(m);
         List<String> values = h.getRequestHeader("COMPLEX_HEADER");
         assertNotNull(values);
@@ -162,12 +130,9 @@ public class HttpHeadersImplTest extends Assert {
     @Test
     public void testGetHeaders() throws Exception {
 
-        Message m = control.createMock(Message.class);
-        m.get(Message.PROTOCOL_HEADERS);
-        EasyMock.expectLastCall().andReturn(createHeaders());
-        m.getContextualProperty("org.apache.cxf.http.header.split");
-        EasyMock.expectLastCall().andReturn("true").anyTimes();
-        control.replay();
+        Message m = createMessage(createHeaders());
+        m.put(HttpHeadersImpl.HEADER_SPLIT_PROPERTY, "true");
+
         HttpHeaders h = new HttpHeadersImpl(m);
         MultivaluedMap<String, String> hs = h.getRequestHeaders();
         List<String> acceptValues = hs.get("Accept");
@@ -181,10 +146,7 @@ public class HttpHeadersImplTest extends Assert {
     @Test
     public void testMediaType() throws Exception {
 
-        Message m = control.createMock(Message.class);
-        m.get(Message.PROTOCOL_HEADERS);
-        EasyMock.expectLastCall().andReturn(createHeaders());
-        control.replay();
+        Message m = createMessage(createHeaders());
         HttpHeaders h = new HttpHeadersImpl(m);
         assertEquals(MediaType.valueOf("*/*"), h.getMediaType());
     }
@@ -192,8 +154,7 @@ public class HttpHeadersImplTest extends Assert {
     @Test
     public void testGetMissingContentLength() throws Exception {
 
-        Message m = new MessageImpl();
-        m.put(Message.PROTOCOL_HEADERS, new MetadataMap<String, String>());
+        Message m = createMessage(new MetadataMap<String, String>());
         HttpHeaders h = new HttpHeadersImpl(m);
         assertEquals(-1, h.getLength());
     }
@@ -201,8 +162,7 @@ public class HttpHeadersImplTest extends Assert {
     @Test
     public void testGetContentLength() throws Exception {
 
-        Message m = new MessageImpl();
-        m.put(Message.PROTOCOL_HEADERS, createHeaders());
+        Message m = createMessage(createHeaders());
         HttpHeaders h = new HttpHeadersImpl(m);
         assertEquals(10, h.getLength());
     }
@@ -237,8 +197,7 @@ public class HttpHeadersImplTest extends Assert {
     @Test
     public void testGetDate() throws Exception {
 
-        Message m = new MessageImpl();
-        m.put(Message.PROTOCOL_HEADERS, createHeaders());
+        Message m = createMessage(createHeaders());
         HttpHeaders h = new HttpHeadersImpl(m);
 
         List<String> dateValues = h.getRequestHeader("Date");
@@ -254,8 +213,7 @@ public class HttpHeadersImplTest extends Assert {
     @Test
     public void testGetHeaderString() throws Exception {
 
-        Message m = new MessageImpl();
-        m.put(Message.PROTOCOL_HEADERS, createHeaders());
+        Message m = createMessage(createHeaders());
         HttpHeaders h = new HttpHeadersImpl(m);
 
         String date = h.getHeaderString("Date");
@@ -265,8 +223,7 @@ public class HttpHeadersImplTest extends Assert {
     @Test
     public void testGetHeaderString2() throws Exception {
 
-        Message m = new MessageImpl();
-        m.put(Message.PROTOCOL_HEADERS, createHeaders());
+        Message m = createMessage(createHeaders());
         HttpHeaders h = new HttpHeadersImpl(m);
 
         String date = h.getHeaderString("a");
@@ -276,8 +233,7 @@ public class HttpHeadersImplTest extends Assert {
     @Test
     public void testGetHeader2() throws Exception {
 
-        Message m = new MessageImpl();
-        m.put(Message.PROTOCOL_HEADERS, createHeaders());
+        Message m = createMessage(createHeaders());
         HttpHeaders h = new HttpHeadersImpl(m);
 
         List<String> values = h.getRequestHeader("a");
@@ -289,10 +245,7 @@ public class HttpHeadersImplTest extends Assert {
     @Test
     public void testGetMediaTypes() throws Exception {
 
-        Message m = control.createMock(Message.class);
-        m.get(Message.PROTOCOL_HEADERS);
-        EasyMock.expectLastCall().andReturn(createHeaders());
-        control.replay();
+        Message m = createMessage(createHeaders());
         HttpHeaders h = new HttpHeadersImpl(m);
         List<MediaType> acceptValues = h.getAcceptableMediaTypes();
         assertEquals(3, acceptValues.size());
@@ -304,10 +257,8 @@ public class HttpHeadersImplTest extends Assert {
     @Test
     public void testGetNoMediaTypes() throws Exception {
 
-        Message m = control.createMock(Message.class);
-        m.get(Message.PROTOCOL_HEADERS);
-        EasyMock.expectLastCall().andReturn(Collections.emptyMap());
-        control.replay();
+        Message m = new MessageImpl();
+        m.put(Message.PROTOCOL_HEADERS, Collections.emptyMap());
         HttpHeaders h = new HttpHeadersImpl(m);
         List<MediaType> acceptValues = h.getAcceptableMediaTypes();
         assertEquals(1, acceptValues.size());
@@ -317,10 +268,8 @@ public class HttpHeadersImplTest extends Assert {
     @Test
     public void testGetNoLanguages() throws Exception {
 
-        Message m = control.createMock(Message.class);
-        m.get(Message.PROTOCOL_HEADERS);
-        EasyMock.expectLastCall().andReturn(Collections.emptyMap());
-        control.replay();
+        Message m = new MessageImpl();
+        m.put(Message.PROTOCOL_HEADERS, Collections.emptyMap());
         HttpHeaders h = new HttpHeadersImpl(m);
         List<Locale> locales = h.getAcceptableLanguages();
         assertEquals(1, locales.size());
@@ -330,12 +279,8 @@ public class HttpHeadersImplTest extends Assert {
     @Test
     public void testGetHeader() throws Exception {
 
-        Message m = control.createMock(Message.class);
-        m.getContextualProperty("org.apache.cxf.http.header.split");
-        EasyMock.expectLastCall().andReturn("true");
-        m.get(Message.PROTOCOL_HEADERS);
-        EasyMock.expectLastCall().andReturn(createHeaders());
-        control.replay();
+        Message m = createMessage(createHeaders());
+        m.put(HttpHeadersImpl.HEADER_SPLIT_PROPERTY, "true");
         HttpHeaders h = new HttpHeadersImpl(m);
         List<String> acceptValues = h.getRequestHeader("Accept");
         assertEquals(3, acceptValues.size());
@@ -354,10 +299,7 @@ public class HttpHeadersImplTest extends Assert {
     @Test
     public void testGetNullLanguage() throws Exception {
 
-        Message m = control.createMock(Message.class);
-        m.get(Message.PROTOCOL_HEADERS);
-        EasyMock.expectLastCall().andReturn(createHeaders());
-        control.replay();
+        Message m = createMessage(createHeaders());
         HttpHeaders h = new HttpHeadersImpl(m);
         assertNull(h.getLanguage());
     }
@@ -365,12 +307,7 @@ public class HttpHeadersImplTest extends Assert {
     @Test
     public void testGetLanguage() throws Exception {
 
-        Message m = control.createMock(Message.class);
-        m.get(Message.PROTOCOL_HEADERS);
-        MetadataMap<String, String> headers = createHeaders();
-        headers.putSingle(HttpHeaders.CONTENT_LANGUAGE, "en-US");
-        EasyMock.expectLastCall().andReturn(headers);
-        control.replay();
+        Message m = createMessage(createHeader(HttpHeaders.CONTENT_LANGUAGE, "en-US"));
         HttpHeaders h = new HttpHeadersImpl(m);
         assertEquals("en_US", h.getLanguage().toString());
     }
@@ -378,12 +315,7 @@ public class HttpHeadersImplTest extends Assert {
     @Test
     public void testSingleAcceptableLanguages() throws Exception {
 
-        Message m = control.createMock(Message.class);
-        m.get(Message.PROTOCOL_HEADERS);
-        MetadataMap<String, String> headers = createHeaders();
-        headers.putSingle(HttpHeaders.ACCEPT_LANGUAGE, "en");
-        EasyMock.expectLastCall().andReturn(headers);
-        control.replay();
+        Message m = createMessage(createHeader(HttpHeaders.ACCEPT_LANGUAGE, "en"));
         HttpHeaders h = new HttpHeadersImpl(m);
         List<Locale> languages = h.getAcceptableLanguages();
         assertEquals(1, languages.size());
@@ -393,11 +325,7 @@ public class HttpHeadersImplTest extends Assert {
     @Test
     public void testGetCookies() throws Exception {
 
-        Message m = new MessageImpl();
-        m.setExchange(new ExchangeImpl());
-        MetadataMap<String, String> headers = createHeaders();
-        headers.putSingle(HttpHeaders.COOKIE, "a=$b;c=d");
-        m.put(Message.PROTOCOL_HEADERS, headers);
+        Message m = createMessage(createHeader(HttpHeaders.COOKIE, "a=$b;c=d"));
         HttpHeaders h = new HttpHeadersImpl(m);
         Map<String, Cookie> cookies = h.getCookies();
         assertEquals(2, cookies.size());
@@ -408,11 +336,7 @@ public class HttpHeadersImplTest extends Assert {
     @Test
     public void testGetCookieWithAttributes() throws Exception {
 
-        Message m = new MessageImpl();
-        m.setExchange(new ExchangeImpl());
-        MetadataMap<String, String> headers = createHeaders();
-        headers.putSingle(HttpHeaders.COOKIE, "$Version=1;a=b");
-        m.put(Message.PROTOCOL_HEADERS, headers);
+        Message m = createMessage(createHeader(HttpHeaders.COOKIE, "$Version=1;a=b"));
         HttpHeaders h = new HttpHeadersImpl(m);
         Map<String, Cookie> cookies = h.getCookies();
         assertEquals(1, cookies.size());
@@ -424,11 +348,7 @@ public class HttpHeadersImplTest extends Assert {
     @Test
     public void testGetCookiesWithAttributes() throws Exception {
 
-        Message m = new MessageImpl();
-        m.setExchange(new ExchangeImpl());
-        MetadataMap<String, String> headers = createHeaders();
-        headers.putSingle(HttpHeaders.COOKIE, "$Version=1;a=b, $Version=1;c=d");
-        m.put(Message.PROTOCOL_HEADERS, headers);
+        Message m = createMessage(createHeader(HttpHeaders.COOKIE, "$Version=1;a=b, $Version=1;c=d"));
         HttpHeaders h = new HttpHeadersImpl(m);
         Map<String, Cookie> cookies = h.getCookies();
         assertEquals(2, cookies.size());
@@ -444,14 +364,26 @@ public class HttpHeadersImplTest extends Assert {
     @Test
     public void testGetCookiesWithComma() throws Exception {
 
-        Message m = new MessageImpl();
+        Message m = createMessage(createHeader(HttpHeaders.COOKIE, "a=b,c=d"));
         Exchange ex = new ExchangeImpl();
         ex.setInMessage(m);
-        ex.put("org.apache.cxf.http.cookie.separator", ",");
+        ex.put(HttpHeadersImpl.COOKIE_SEPARATOR_PROPERTY, ",");
         m.setExchange(ex);
-        MetadataMap<String, String> headers = createHeaders();
-        headers.putSingle(HttpHeaders.COOKIE, "a=b,c=d");
-        m.put(Message.PROTOCOL_HEADERS, headers);
+        HttpHeaders h = new HttpHeadersImpl(m);
+        Map<String, Cookie> cookies = h.getCookies();
+        assertEquals(2, cookies.size());
+        assertEquals("b", cookies.get("a").getValue());
+        assertEquals("d", cookies.get("c").getValue());
+    }
+
+    @Test
+    public void testGetCookiesWithCRLF() throws Exception {
+
+        Message m = createMessage(createHeader(HttpHeaders.COOKIE, "a=b\r\nc=d"));
+        Exchange ex = new ExchangeImpl();
+        ex.setInMessage(m);
+        ex.put(HttpHeadersImpl.COOKIE_SEPARATOR_PROPERTY, "crlf");
+        m.setExchange(ex);
         HttpHeaders h = new HttpHeadersImpl(m);
         Map<String, Cookie> cookies = h.getCookies();
         assertEquals(2, cookies.size());
@@ -462,14 +394,11 @@ public class HttpHeadersImplTest extends Assert {
     @Test(expected = InternalServerErrorException.class)
     public void testInvalidCookieSeparator() throws Exception {
 
-        Message m = new MessageImpl();
+        Message m = createMessage(createHeader(HttpHeaders.COOKIE, "a=b,c=d"));
         Exchange ex = new ExchangeImpl();
         ex.setInMessage(m);
-        ex.put("org.apache.cxf.http.cookie.separator", "(e+)+");
+        ex.put(HttpHeadersImpl.COOKIE_SEPARATOR_PROPERTY, "(e+)+");
         m.setExchange(ex);
-        MetadataMap<String, String> headers = createHeaders();
-        headers.putSingle(HttpHeaders.COOKIE, "a=b,c=d");
-        m.put(Message.PROTOCOL_HEADERS, headers);
         HttpHeaders h = new HttpHeadersImpl(m);
         h.getCookies();
     }
@@ -477,13 +406,10 @@ public class HttpHeadersImplTest extends Assert {
     @Test
     public void testMultipleAcceptableLanguages() throws Exception {
 
-        Message m = control.createMock(Message.class);
-        m.get(Message.PROTOCOL_HEADERS);
         MetadataMap<String, String> headers =
             createHeader(HttpHeaders.ACCEPT_LANGUAGE,
                          "en;q=0.7, en-gb;q=0.8, da, zh-Hans-SG;q=0.9");
-        EasyMock.expectLastCall().andReturn(headers);
-        control.replay();
+        Message m = createMessage(headers);
         HttpHeaders h = new HttpHeadersImpl(m);
         List<Locale> languages = h.getAcceptableLanguages();
         assertEquals(4, languages.size());
@@ -494,40 +420,14 @@ public class HttpHeadersImplTest extends Assert {
     }
 
 
-    private MetadataMap<String, String> createHeaders() {
-        MetadataMap<String, String> hs = new MetadataMap<>();
-        hs.add("Accept", "text/bar;q=0.6");
-        hs.add("Accept", "text/*;q=1,application/xml");
-        hs.putSingle("Content-Type", "*/*");
-        hs.putSingle("Date", "Tue, 21 Oct 2008 17:00:00 GMT");
-        hs.putSingle("Content-Length", "10");
-        List<String> values = new ArrayList<>();
-        values.add("1");
-        values.add("2");
-        hs.addAll("a", values);
-        return hs;
-    }
-
-    private MetadataMap<String, String> createHeader(String name, String... values) {
-        MetadataMap<String, String> hs = new MetadataMap<>();
-        List<String> list = new ArrayList<>();
-        list.addAll(Arrays.asList(values));
-        hs.put(name, list);
-        return hs;
-    }
-
-    @Test
+    @Test(expected = UnsupportedOperationException.class)
     public void testUnmodifiableRequestHeaders() throws Exception {
 
-        Message m = control.createMock(Message.class);
-        m.getContextualProperty("org.apache.cxf.http.header.split");
-        EasyMock.expectLastCall().andReturn("true").anyTimes();
-        m.get(Message.PROTOCOL_HEADERS);
         MetadataMap<String, String> headers =
             createHeader(HttpHeaders.ACCEPT_LANGUAGE,
                          "en;q=0.7, en-gb;q=0.8, da");
-        EasyMock.expectLastCall().andReturn(headers);
-        control.replay();
+        Message m = createMessage(headers);
+        m.put(HttpHeadersImpl.HEADER_SPLIT_PROPERTY, "true");
         HttpHeaders h = new HttpHeadersImpl(m);
         List<Locale> languages = h.getAcceptableLanguages();
         assertEquals(3, languages.size());
@@ -538,11 +438,31 @@ public class HttpHeadersImplTest extends Assert {
         MultivaluedMap<String, String> rHeaders = h.getRequestHeaders();
         List<String> acceptL = rHeaders.get(HttpHeaders.ACCEPT_LANGUAGE);
         assertEquals(3, acceptL.size());
-        try {
-            rHeaders.clear();
-            fail();
-        } catch (UnsupportedOperationException ex) {
-            // expected
-        }
+
+        rHeaders.clear();
     }
+
+    private static MetadataMap<String, String> createHeaders() {
+        MetadataMap<String, String> hs = new MetadataMap<>();
+        hs.add("Accept", "text/bar;q=0.6");
+        hs.add("Accept", "text/*;q=1,application/xml");
+        hs.putSingle("Content-Type", "*/*");
+        hs.putSingle("Date", "Tue, 21 Oct 2008 17:00:00 GMT");
+        hs.putSingle("Content-Length", "10");
+        hs.addAll("a", Arrays.asList("1", "2"));
+        return hs;
+    }
+
+    private static MetadataMap<String, String> createHeader(String name, String... values) {
+        MetadataMap<String, String> hs = new MetadataMap<>();
+        hs.put(name, Arrays.asList(values));
+        return hs;
+    }
+
+    private static Message createMessage(MetadataMap<String, String> headers) {
+        Message m = new MessageImpl();
+        m.put(Message.PROTOCOL_HEADERS, headers);
+        return m;
+    }
+
 }
