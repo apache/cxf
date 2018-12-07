@@ -50,7 +50,7 @@
         <cxf.asm.artifactId>asm</cxf.asm.artifactId>
         <cxf.asm.version>6.2.1</cxf.asm.version>
         <cxf.osgi.asm.version>[3.0,7)</cxf.osgi.asm.version>
-        <cxf.easymock.version>4.0.1</cxf.easymock.version>
+        <cxf.easymock.version>4.0.2</cxf.easymock.version>
         <!-- OSGi related properties -->
         <cxf.fragment.host />
         <cxf.bundle.activator />
