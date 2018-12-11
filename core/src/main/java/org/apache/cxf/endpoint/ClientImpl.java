@@ -21,7 +21,6 @@ package org.apache.cxf.endpoint;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
@@ -30,7 +29,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
@@ -246,29 +244,12 @@ public class ClientImpl
         requestContext.remove(t);
         responseContext.remove(t);
     }
-
-    public Contexts getContexts() {
-        return new Contexts() {
-            @Override
-            public void close() throws Exception {
-                releaseThreadContexts();
-            }
-            @Override
-            public Map<String, Object> getRequestContext() {
-                return ClientImpl.this.getRequestContext();
-            }
-            @Override
-            public Map<String, Object> getResponseContext() {
-                return ClientImpl.this.getResponseContext();
-            }
-        };
-    }
-
+    
     public Map<String, Object> getRequestContext() {
         if (isThreadLocalRequestContext()) {
             final Thread t = Thread.currentThread();
             if (!requestContext.containsKey(t)) {
-                EchoContext freshRequestContext = new EchoContext(currentRequestContext);
+                EchoContext freshRequestContext = new EchoContext(currentRequestContext, requestContext);
                 requestContext.put(t, freshRequestContext);
             }
             latestContextThread = t;
@@ -277,21 +258,30 @@ public class ClientImpl
         return currentRequestContext;
     }
     public Map<String, Object> getResponseContext() {
-        if (!responseContext.containsKey(Thread.currentThread())) {
-            final Thread t = Thread.currentThread();
-            responseContext.put(t, new ResponseContext());
+        final Thread t = Thread.currentThread();
+        ResponseContext ret = responseContext.get(t);
+        if (ret == null) {
+            ret = new ResponseContext();
+            responseContext.put(t, ret);
         }
-        return responseContext.get(Thread.currentThread());
+        return ret;
     }
-    protected Map<String, Object> setResponseContext(Map<String, Object> ctx) {
-        if (ctx instanceof ResponseContext) {
-            ResponseContext c = (ResponseContext)ctx;
-            responseContext.put(Thread.currentThread(), c);
-            return c;
+    protected Map<String, Object> newResponseContext() {
+        final Thread t = Thread.currentThread();
+        ResponseContext ret = new ResponseContext();
+        responseContext.put(t, ret);
+        return ret;
+    }
+    protected Map<String, Object> reloadResponseContext(Map<String, Object> o) {
+        final Thread t = Thread.currentThread();
+        ResponseContext ctx = responseContext.get(t);
+        if (ctx == null) {
+            ctx = new ResponseContext(o);
+            responseContext.put(t, ctx);
+        } else if (o != ctx) {
+            ctx.reload(o);
         }
-        ResponseContext c = new ResponseContext(ctx);
-        responseContext.put(Thread.currentThread(), c);
-        return c;
+        return ctx;
     }
     public boolean isThreadLocalRequestContext() {
         Object o = currentRequestContext.get(THREAD_LOCAL_REQUEST_CONTEXT);
@@ -478,7 +468,7 @@ public class ClientImpl
                 context.put(REQUEST_CONTEXT, reqContext);
             }
             if (resContext == null) {
-                resContext = new ResponseContext();
+                resContext = newResponseContext();
                 context.put(RESPONSE_CONTEXT, resContext);
             }
             
@@ -514,7 +504,7 @@ public class ClientImpl
                                 // handle the right response
                                 List<Object> resList = null;
                                 Message inMsg = message.getExchange().getInMessage();
-                                Map<String, Object> ctx = responseContext.get(Thread.currentThread());
+                                Map<String, Object> ctx = getResponseContext();
                                 resList = CastUtils.cast(inMsg.getContent(List.class));
                                 Object[] result = resList == null ? null : resList.toArray();
                                 callback.handleResponse(ctx, result);
@@ -542,7 +532,9 @@ public class ClientImpl
                 return processResult(message, exchange, oi, resContext);
             }
         } finally {
-            setResponseContext(resContext);
+            if (callback == null) {
+                reloadResponseContext(resContext);
+            }
             if (origLoader != null) {
                 origLoader.reset();
             }
@@ -646,7 +638,7 @@ public class ClientImpl
                 resContext.putAll(inMsg);
                 // remove the recursive reference if present
                 resContext.remove(Message.INVOCATION_CONTEXT);
-                setResponseContext(resContext);
+                reloadResponseContext(resContext);
             }
             resList = CastUtils.cast(inMsg.getContent(List.class));
         }
@@ -821,9 +813,8 @@ public class ClientImpl
                                                 Message.INVOCATION_CONTEXT));
                         resCtx = CastUtils.cast((Map<?, ?>) resCtx
                                 .get(RESPONSE_CONTEXT));
-                        if (resCtx != null) {
-                            setResponseContext(resCtx);
-                        }
+                        resCtx = reloadResponseContext(resCtx);
+
                         // remove callback so that it won't be invoked twice
                         callback = message.getExchange().remove(ClientCallback.class);
                         if (callback != null) {
@@ -850,15 +841,14 @@ public class ClientImpl
                                                                 .getOutMessage()
                                                                 .get(Message.INVOCATION_CONTEXT));
                 resCtx = CastUtils.cast((Map<?, ?>)resCtx.get(RESPONSE_CONTEXT));
-                if (resCtx != null && responseContext != null) {
-                    setResponseContext(resCtx);
-                }
                 try {
                     Object obj[] = processResult(message, message.getExchange(),
                                                  null, resCtx);
 
+                    resCtx = reloadResponseContext(resCtx);
                     callback.handleResponse(resCtx, obj);
                 } catch (Throwable ex) {
+                    resCtx = reloadResponseContext(resCtx);
                     callback.handleException(resCtx, ex);
                 }
             }
@@ -1056,23 +1046,38 @@ public class ClientImpl
 
     public class EchoContext extends ConcurrentHashMap<String, Object> {
         private static final long serialVersionUID = 1L;
-        public EchoContext(Map<String, Object> sharedMap) {
+        
+        final Map<Thread, EchoContext> context;
+        public EchoContext(Map<String, Object> sharedMap, Map<Thread, EchoContext> ctx) {
             super(8, 0.75f, 4);
-            putAll(sharedMap);
+            if (sharedMap != null) {
+                super.putAll(sharedMap);
+            }
+            context = ctx;
+        }
+
+        public EchoContext(Map<Thread, EchoContext> ctx) {
+            super(8, 0.75f, 4);
+            context = ctx;
         }
 
         public void reload() {
+            reload(context.get(latestContextThread));
+        }
+        public void reload(Map<String, Object> content) {
             super.clear();
-            super.putAll(requestContext.get(latestContextThread));
+            if (content != null) {
+                putAll(content);
+            }
         }
         
         @Override
         public void clear() {
             super.clear();
             try {
-                for (Map.Entry<Thread, EchoContext> ent : requestContext.entrySet()) {
+                for (Map.Entry<Thread, EchoContext> ent : context.entrySet()) {
                     if (ent.getValue() == this) {
-                        requestContext.remove(ent.getKey());
+                        context.remove(ent.getKey());
                         return;
                     }
                 }
@@ -1082,25 +1087,30 @@ public class ClientImpl
         }
     }
 
-    /**
+    /** 
      * Class to handle the response contexts.   The clear is overloaded to remove
      * this context from the threadLocal caches in the ClientImpl
      */
-    class ResponseContext implements Map<String, Object>, Serializable {
-        private static final long serialVersionUID = 2L;
-        final Map<String, Object> wrapped;
+    class ResponseContext extends HashMap<String, Object> {
+        private static final long serialVersionUID = 1L;
         
         ResponseContext(Map<String, Object> origMap) {
-            wrapped = origMap;
+            super(origMap);
         }
 
         ResponseContext() {
-            wrapped = new HashMap<>();
         }
 
+        public void reload(Map<String, Object> content) {
+            super.clear();
+            if (content != null) {
+                putAll(content);
+            }
+        }
+        
         @Override
         public void clear() {
-            wrapped.clear();
+            super.clear();
             try {
                 for (Map.Entry<Thread, ResponseContext> ent : responseContext.entrySet()) {
                     if (ent.getValue() == this) {
@@ -1111,51 +1121,6 @@ public class ClientImpl
             } catch (Throwable t) {
                 //ignore
             }
-        }
-
-        @Override
-        public int size() {
-            return wrapped.size();
-        }
-        @Override
-        public boolean isEmpty() {
-            return wrapped.isEmpty();
-        }
-        @Override
-        public boolean containsKey(Object key) {
-            return wrapped.containsKey(key);
-        }
-        @Override
-        public boolean containsValue(Object value) {
-            return wrapped.containsKey(value);
-        }
-        @Override
-        public Object get(Object key) {
-            return wrapped.get(key);
-        }
-        @Override
-        public Object put(String key, Object value) {
-            return wrapped.put(key, value);
-        }
-        @Override
-        public Object remove(Object key) {
-            return wrapped.remove(key);
-        }
-        @Override
-        public void putAll(Map<? extends String, ? extends Object> m) {
-            wrapped.putAll(m);
-        }
-        @Override
-        public Set<String> keySet() {
-            return wrapped.keySet();
-        }
-        @Override
-        public Collection<Object> values() {
-            return wrapped.values();
-        }
-        @Override
-        public Set<Entry<String, Object>> entrySet() {
-            return wrapped.entrySet();
         }
     }
 
