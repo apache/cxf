@@ -279,7 +279,7 @@ public class ClientImpl
     public Map<String, Object> getResponseContext() {
         if (!responseContext.containsKey(Thread.currentThread())) {
             final Thread t = Thread.currentThread();
-            responseContext.put(t, new ResponseContext(responseContext));
+            responseContext.put(t, new ResponseContext());
         }
         return responseContext.get(Thread.currentThread());
     }
@@ -289,7 +289,7 @@ public class ClientImpl
             responseContext.put(Thread.currentThread(), c);
             return c;
         }
-        ResponseContext c = new ResponseContext(ctx, responseContext);
+        ResponseContext c = new ResponseContext(ctx);
         responseContext.put(Thread.currentThread(), c);
         return c;
     }
@@ -478,7 +478,7 @@ public class ClientImpl
                 context.put(REQUEST_CONTEXT, reqContext);
             }
             if (resContext == null) {
-                resContext = new ResponseContext(responseContext);
+                resContext = new ResponseContext();
                 context.put(RESPONSE_CONTEXT, resContext);
             }
             
@@ -1086,19 +1086,16 @@ public class ClientImpl
      * Class to handle the response contexts.   The clear is overloaded to remove
      * this context from the threadLocal caches in the ClientImpl
      */
-    static class ResponseContext implements Map<String, Object>, Serializable {
+    class ResponseContext implements Map<String, Object>, Serializable {
         private static final long serialVersionUID = 2L;
         final Map<String, Object> wrapped;
-        final Map<Thread, ResponseContext> responseContext;
         
-        ResponseContext(Map<String, Object> origMap, Map<Thread, ResponseContext> rc) {
+        ResponseContext(Map<String, Object> origMap) {
             wrapped = origMap;
-            responseContext = rc;
         }
 
-        ResponseContext(Map<Thread, ResponseContext> rc) {
+        ResponseContext() {
             wrapped = new HashMap<>();
-            responseContext = rc;
         }
 
         @Override
