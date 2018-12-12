@@ -68,11 +68,12 @@ public class CacheControlClientRequestFilter implements ClientRequestFilter {
             if (entry.isOutDated()) {
                 String ifNoneMatchHeader = entry.getCacheHeaders().get(HttpHeaders.IF_NONE_MATCH);
                 String ifModifiedSinceHeader = entry.getCacheHeaders().get(HttpHeaders.IF_MODIFIED_SINCE);
-                
+
                 if (StringUtils.isEmpty(ifNoneMatchHeader) && StringUtils.isEmpty(ifModifiedSinceHeader)) {
                     cache.remove(key, entry);
                 } else {
                     request.getHeaders().add(HttpHeaders.IF_NONE_MATCH, ifNoneMatchHeader);
+                    request.getHeaders().add(HttpHeaders.IF_MODIFIED_SINCE, ifModifiedSinceHeader);
                     request.setProperty(CACHED_ENTITY_PROPERTY, entry.getData());
                 }
             } else {
