@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.microprofile.client;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 
@@ -163,6 +164,24 @@ public class CxfTypeSafeClientBuilderTest extends Assert {
             WebClientUtil.getClientConfigFromProxy(client).getRequestContext().get("hello"));
     }
 
+    @Test
+    public void testCanInvokeDefaultInterfaceMethods() throws Exception {
+        MyClient client = RestClientBuilder.newBuilder()
+            .register(InvokedMethodClientRequestFilter.class)
+            .baseUri(new URI("http://localhost:8080/neverUsed"))
+            .build(MyClient.class);
+        assertEquals("defaultValue", client.myDefaultMethod(false));
+    }
+
+    @Test(expected = IOException.class)
+    public void testCanInvokeDefaultInterfaceMethodsWithException() throws Exception {
+        MyClient client = RestClientBuilder.newBuilder()
+            .register(InvokedMethodClientRequestFilter.class)
+            .baseUri(new URI("http://localhost:8080/neverUsed"))
+            .build(MyClient.class);
+        client.myDefaultMethod(true);
+        fail("Should have thrown IOException");
+    }
     private void fail(Response r, String failureMessage) {
         System.out.println(r.getStatus());
         fail(failureMessage);
