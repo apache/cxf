@@ -27,10 +27,12 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.eclipse.microprofile.rest.client.RestClientDefinitionException;
+import org.eclipse.microprofile.rest.client.annotation.ClientHeaderParam;
 
 import org.junit.Test;
 
@@ -94,6 +96,62 @@ public class ValidatorTest {
         Response get(@PathParam("any") String any);
     }
 
+    public interface ClientHeaderParamNoName {
+        @ClientHeaderParam(name = "", value = "something")
+        @GET
+        Response get();
+    }
+
+    public interface ClientHeaderParamNoComputeMethod {
+        @ClientHeaderParam(name = "SomeHeader", value = "{missingComputeMethod}")
+        @GET
+        Response get();
+    }
+
+    public interface ClientHeaderParamNonDefaultComputeMethod {
+        @ClientHeaderParam(name = "SomeHeader", value = "{nonDefaultComputeMethod}")
+        @GET
+        Response get();
+
+        String nonDefaultComputeMethod();
+    }
+
+    public interface ClientHeaderParamComputeMethodDoesNotExist {
+        @ClientHeaderParam(name = "SomeHeader", value = "{nonExistentComputeMethod}")
+        @GET
+        Response get();
+    }
+
+    public interface ClientHeaderParamInaccessibleComputeMethod {
+        @ClientHeaderParam(name = "SomeHeader", 
+            value = "{org.apache.cxf.microprofile.client.mock.HeaderGenerator.generateHeaderPrivate}")
+        @GET
+        Response get();
+    }
+
+    public interface ClientHeaderParamNoValidComputeMethodSignatures {
+        @ClientHeaderParam(name = "SomeHeader", value = "{computeMethod}")
+        @GET
+        Response get();
+
+        default String computeMethod(String x, String y) {
+            return "must only contain one String argument";
+        }
+        default String computeMethod(ClientRequestContext x, ClientRequestContext y) {
+            return "must only contain one ClientRequestContext argument";
+        }
+        default Integer computeMethod() {
+            return 5; // must return a String
+        }
+        default void computeMethod(String headerName) { } // must return a String
+        default String computeMethod(java.util.Date date) {
+            return "unexpected argument";
+        }
+        default String computeMethod(String headerName, ClientRequestContext context, int extra) {
+            return "too many arguments";
+        }
+    }
+
     private static RestClientBuilder newBuilder() {
         RestClientBuilder builder = RestClientBuilder.newBuilder();
         try {
@@ -130,6 +188,38 @@ public class ValidatorTest {
     @Test
     public void testMissingTemplate() {
         test(ExtraParamTemplate.class, "extra path segments", "ExtraParamTemplate");
+    }
+
+    @Test
+    public void testClientHeaderParamNoName() {
+        test(ClientHeaderParamNoName.class, ClientHeaderParamNoName.class.getName(), "null or empty name");
+    }
+
+    @Test
+    public void testClientHeaderParamNoComputeMethod() {
+        test(ClientHeaderParamNoComputeMethod.class, ClientHeaderParamNoComputeMethod.class.getName(), 
+             "value attribute specifies a method", "that does not exist");
+    }
+
+    @Test
+    public void testClientHeaderParamNonDefaultComputeMethod() {
+        test(ClientHeaderParamNonDefaultComputeMethod.class,
+             ClientHeaderParamNonDefaultComputeMethod.class.getName(),
+             " is not accessible");
+    }
+
+    @Test
+    public void testClientHeaderParamComputeMethodDoesNotExist() {
+        test(ClientHeaderParamNonDefaultComputeMethod.class,
+             ClientHeaderParamNonDefaultComputeMethod.class.getName(),
+             " does not exist");
+    }
+
+    @Test
+    public void testClientHeaderParamNoValidComputeMethodSignatures() {
+        test(ClientHeaderParamNoValidComputeMethodSignatures.class,
+             ClientHeaderParamNoValidComputeMethodSignatures.class.getName(),
+             " contains an incorrect signature");
     }
 
     private void test(Class<?> clientInterface, String...expectedMessageTexts) {

@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -55,6 +56,8 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
     public static final String REST_URI_FORMAT = "%s/mp-rest/uri";
     public static final String REST_SCOPE_FORMAT = "%s/mp-rest/scope";
     public static final String REST_PROVIDERS_FORMAT = "%s/mp-rest/providers";
+    public static final String REST_CONN_TIMEOUT_FORMAT = "%s/mp-rest/connectTimeout";
+    public static final String REST_READ_TIMEOUT_FORMAT = "%s/mp-rest/readTimeout";
     public static final String REST_PROVIDERS_PRIORITY_FORMAT = "%s/mp-rest/providers/%s/priority";
     private static final Logger LOG = LogUtils.getL7dLogger(RestClientBean.class);
     private static final Default DEFAULT_LITERAL = new DefaultLiteral();
@@ -98,6 +101,7 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
             builder = (CxfTypeSafeClientBuilder) builder.register(providerClass, 
                                        providerPriorities.getOrDefault(providerClass, Priorities.USER));
         }
+        setTimeouts(builder);
         return builder.build(clientInterface);
     }
 
@@ -228,5 +232,25 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
     private static final class DefaultLiteral extends AnnotationLiteral<Default> implements Default {
         private static final long serialVersionUID = 1L;
 
+    }
+
+    private void setTimeouts(CxfTypeSafeClientBuilder builder) {
+        final String interfaceName = clientInterface.getName();
+
+        ConfigFacade.getOptionalLong(String.format(REST_CONN_TIMEOUT_FORMAT, interfaceName)).ifPresent(
+            timeoutValue -> {
+                builder.connectTimeout(timeoutValue, TimeUnit.MILLISECONDS);
+                if (LOG.isLoggable(Level.FINEST)) {
+                    LOG.finest("readTimeout set by MP Config: " + timeoutValue);
+                }
+            });
+
+        ConfigFacade.getOptionalLong(String.format(REST_READ_TIMEOUT_FORMAT, interfaceName)).ifPresent(
+            timeoutValue -> {
+                builder.readTimeout(timeoutValue, TimeUnit.MILLISECONDS);
+                if (LOG.isLoggable(Level.FINEST)) {
+                    LOG.finest("readTimeout set by MP Config: " + timeoutValue);
+                }
+            });
     }
 }

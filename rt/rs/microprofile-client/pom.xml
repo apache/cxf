@@ -42,7 +42,7 @@
             org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://cxf.apache.org/blueprint/jaxrs-client"
         </cxf.export.service>
         <cxf.bundle.activator>org.apache.cxf.jaxrs.client.blueprint.Activator</cxf.bundle.activator>
-        <mp.rest.client.version>1.2-m2</mp.rest.client.version>
+        <mp.rest.client.version>1.2-RC1</mp.rest.client.version>
     </properties>
     <dependencies>
         <dependency>
