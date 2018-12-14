@@ -19,11 +19,12 @@
 
 package org.apache.cxf.helpers;
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  *
@@ -32,25 +33,50 @@ public class HttpHeaderHelperTest {
 
     @Test
     public void testMapCharset() {
-        String cs = HttpHeaderHelper.mapCharset("utf-8");
-        assertEquals(Charset.forName("utf-8").name(), cs);
+        final String charset = StandardCharsets.UTF_8.name();
+
+        String cs = HttpHeaderHelper.mapCharset(charset);
+        assertEquals(charset, cs);
+
+        cs = HttpHeaderHelper.mapCharset("\"" + charset + "\"");
+        assertEquals(charset, cs);
+
+        cs = HttpHeaderHelper.mapCharset("'" + charset + "'");
+        assertEquals(charset, cs);
+
         cs = HttpHeaderHelper.mapCharset(null);
-        assertEquals("ISO-8859-1", cs);
-        cs = HttpHeaderHelper.mapCharset("\"utf-8\"");
-        assertEquals(Charset.forName("utf-8").name(), cs);
-        cs = HttpHeaderHelper.mapCharset("'utf-8'");
-        assertEquals(Charset.forName("utf-8").name(), cs);
+        assertEquals(HttpHeaderHelper.ISO88591, cs);
+
+        cs = HttpHeaderHelper.mapCharset("''");
+        assertEquals(HttpHeaderHelper.ISO88591, cs);
+
+        cs = HttpHeaderHelper.mapCharset("wrong-charset-name");
+        assertNull(cs);
     }
 
     @Test
     public void testEmptyCharset() {
         String cs = HttpHeaderHelper.mapCharset(HttpHeaderHelper.findCharset("foo/bar; charset="));
-        assertEquals("ISO-8859-1", cs);
+        assertEquals(HttpHeaderHelper.ISO88591, cs);
     }
+
     @Test
     public void testEmptyCharset2() {
         String cs = HttpHeaderHelper.mapCharset(HttpHeaderHelper.findCharset("foo/bar; charset=;"));
-        assertEquals("ISO-8859-1", cs);
+        assertEquals(HttpHeaderHelper.ISO88591, cs);
+    }
+
+    @Test
+    public void testNoCharset() {
+        String cs = HttpHeaderHelper.mapCharset(HttpHeaderHelper.findCharset("foo/bar"));
+        assertEquals(HttpHeaderHelper.ISO88591, cs);
+    }
+
+    @Test
+    public void testFindCharset() {
+        final String charset = StandardCharsets.UTF_8.name();
+        String cs = HttpHeaderHelper.findCharset("foo/bar; charset=" + charset);
+        assertEquals(charset, cs);
     }
 
 }

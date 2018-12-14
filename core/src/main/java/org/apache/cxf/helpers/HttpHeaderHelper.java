@@ -21,12 +21,12 @@ package org.apache.cxf.helpers;
 
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
+import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Pattern;
 
 public final class HttpHeaderHelper {
     public static final String ACCEPT_ENCODING = "Accept-Encoding";
@@ -41,11 +41,10 @@ public final class HttpHeaderHelper {
     public static final String CONNECTION = "Connection";
     public static final String CLOSE = "close";
     public static final String AUTHORIZATION = "Authorization";
-    private static final String ISO88591 = Charset.forName("ISO-8859-1").name();
+    static final String ISO88591 = StandardCharsets.ISO_8859_1.name();
 
     private static Map<String, String> internalHeaders = new HashMap<>();
     private static ConcurrentHashMap<String, String> encodings = new ConcurrentHashMap<>();
-    private static Pattern charsetPattern = Pattern.compile("\"|'");
 
     static {
         internalHeaders.put("Accept-Encoding", "accept-encoding");
@@ -112,8 +111,8 @@ public final class HttpHeaderHelper {
         }
         // Charsets can be quoted. But it's quite certain that they can't have escaped quoted or
         // anything like that.
-        enc = charsetPattern.matcher(enc).replaceAll("").trim();
-        if ("".equals(enc)) {
+        enc = enc.replace('"', ' ').replace('\'', ' ').trim();
+        if (enc.isEmpty()) {
             return deflt;
         }
         String newenc = encodings.get(enc);
