@@ -22,17 +22,17 @@ import java.net.URI;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.WeakHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.Configuration;
@@ -57,16 +57,17 @@ public class CxfTypeSafeClientBuilder implements RestClientBuilder, Configurable
             new MicroProfileClientConfigurableImpl<>(this);
 
     private static Collection<RestClientListener> listeners() {
-        ClassLoader threadContextClassLoader = AccessController.doPrivileged(
-            (PrivilegedAction<ClassLoader>)() -> Thread.currentThread().getContextClassLoader());
+        ClassLoader threadContextClassLoader;
+        if (System.getSecurityManager() == null) {
+            threadContextClassLoader = Thread.currentThread().getContextClassLoader();
+        } else {
+            threadContextClassLoader = AccessController.doPrivileged(
+                (PrivilegedAction<ClassLoader>)() -> Thread.currentThread().getContextClassLoader());
+        }
         synchronized (REST_CLIENT_LISTENERS) {
-            return REST_CLIENT_LISTENERS.computeIfAbsent(threadContextClassLoader, key -> {
-                Collection<RestClientListener> listeners = new ArrayList<>();
-                for (RestClientListener listener : ServiceLoader.load(RestClientListener.class)) {
-                    listeners.add(listener);
-                }
-                return listeners;
-            });
+            return REST_CLIENT_LISTENERS.computeIfAbsent(threadContextClassLoader, key -> 
+                StreamSupport.stream(ServiceLoader.load(RestClientListener.class).spliterator(), false)
+                             .collect(Collectors.toList()));
         }
     }
 
@@ -134,28 +135,25 @@ public class CxfTypeSafeClientBuilder implements RestClientBuilder, Configurable
         }
 
         final String interfaceName = aClass.getName();
-        Optional<Long> timeout = ConfigFacade.getOptionalValue(
-            String.format(REST_CONN_TIMEOUT_FORMAT, interfaceName), Long.class).map(
-                timeoutValue -> {
-                    connectTimeout(timeoutValue, TimeUnit.MILLISECONDS);
-                    return timeoutValue;
-                });
-        if (!timeout.isPresent() && LOG.isLoggable(Level.FINEST)) {
-            LOG.finest("connectionTimeout set by MP Config: " + timeout.get());
-        }
-        timeout = ConfigFacade.getOptionalValue(
-            String.format(REST_READ_TIMEOUT_FORMAT, interfaceName), Long.class).map(
-                timeoutValue -> {
-                    readTimeout(timeoutValue, TimeUnit.MILLISECONDS);
-                    return timeoutValue;
-                });
-        if (!timeout.isPresent() && LOG.isLoggable(Level.FINEST)) {
-            LOG.finest("readTimeout set by MP Config: " + timeout.get());
-        }
 
-        for (RestClientListener listener : listeners()) {
-            listener.onNewClient(aClass, this);
-        }
+        ConfigFacade.getOptionalLong(String.format(REST_CONN_TIMEOUT_FORMAT, interfaceName)).ifPresent(
+            timeoutValue -> {
+                connectTimeout(timeoutValue, TimeUnit.MILLISECONDS);
+                if (LOG.isLoggable(Level.FINEST)) {
+                    LOG.finest("readTimeout set by MP Config: " + timeoutValue);
+                }
+            });
+
+        ConfigFacade.getOptionalLong(String.format(REST_READ_TIMEOUT_FORMAT, interfaceName)).ifPresent(
+            timeoutValue -> {
+                readTimeout(timeoutValue, TimeUnit.MILLISECONDS);
+                if (LOG.isLoggable(Level.FINEST)) {
+                    LOG.finest("readTimeout set by MP Config: " + timeoutValue);
+                }
+            });
+
+        listeners().forEach(l -> l.onNewClient(aClass, this));
+
         MicroProfileClientFactoryBean bean = new MicroProfileClientFactoryBean(configImpl,
                                                                                baseUri, aClass, executorService);
         return bean.create(aClass);

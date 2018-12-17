@@ -52,9 +52,8 @@ public interface CDIInterceptorWrapper {
                 Object cdiCurrent = currentMethod.invoke(null);
 
                 Method getBeanMgrMethod = cdiClass.getMethod("getBeanManager");
-                getBeanMgrMethod.invoke(cdiCurrent);
 
-                return new CDIInterceptorWrapperImpl(restClient);
+                return new CDIInterceptorWrapperImpl(restClient, getBeanMgrMethod.invoke(cdiCurrent));
             });
         } catch (PrivilegedActionException pae) {
             // expected for environments where CDI is not supported

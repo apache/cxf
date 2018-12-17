@@ -99,15 +99,13 @@ public class MicroProfileClientFactoryBean extends JAXRSClientFactoryBean {
     protected ClientProxyImpl createClientProxy(ClassResourceInfo cri, boolean isRoot,
                                                 ClientState actualState, Object[] varValues) {
         CDIInterceptorWrapper interceptorWrapper = CDIInterceptorWrapper.createWrapper(getServiceClass());
-        MicroProfileClientProxyImpl impl;
         if (actualState == null) {
-            impl = new MicroProfileClientProxyImpl(URI.create(getAddress()), proxyLoader, cri, isRoot,
+            return new MicroProfileClientProxyImpl(URI.create(getAddress()), proxyLoader, cri, isRoot,
                     inheritHeaders, executorService, configuration, interceptorWrapper, varValues);
         } else {
-            impl = new MicroProfileClientProxyImpl(actualState, proxyLoader, cri, isRoot,
+            return new MicroProfileClientProxyImpl(actualState, proxyLoader, cri, isRoot,
                     inheritHeaders, executorService, configuration, interceptorWrapper, varValues);
         }
-        return impl;
     }
 
     Configuration getConfiguration() {

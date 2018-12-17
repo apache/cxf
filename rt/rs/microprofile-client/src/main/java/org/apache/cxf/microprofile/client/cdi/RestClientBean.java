@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -139,18 +138,11 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
 
     private String getBaseUri() {
         String interfaceName = clientInterface.getName();
-        String property = String.format(REST_URI_FORMAT, interfaceName);
-        String baseURI = null;
-        try {
-            baseURI = ConfigFacade.getOptionalValue(property, String.class).orElse(null);
-        } catch (NoSuchElementException ex) {
-            // no-op - will revert to baseURL config value (as opposed to baseURI)
-        }
-        if (baseURI == null) {
-            // revert to baseUrl
-            property = String.format(REST_URL_FORMAT, interfaceName);
-            baseURI = ConfigFacade.getOptionalValue(property, String.class).orElse(null);
-        }
+        String baseURI = ConfigFacade
+            .getOptionalValue(String.format(REST_URI_FORMAT, interfaceName), String.class)
+            .orElseGet(() -> ConfigFacade.getOptionalValue(String.format(REST_URL_FORMAT, interfaceName),
+                                                           String.class).orElse(null));
+
         if (baseURI == null) {
             // last, if baseUrl/Uri is not specified via MP Config, check the @RegisterRestClient annotation
             RegisterRestClient anno = clientInterface.getAnnotation(RegisterRestClient.class);

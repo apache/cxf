@@ -35,7 +35,6 @@ import java.util.stream.Collectors;
 
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.CDI;
 import javax.enterprise.inject.spi.InterceptionType;
 import javax.enterprise.inject.spi.Interceptor;
 
@@ -48,8 +47,8 @@ class CDIInterceptorWrapperImpl implements CDIInterceptorWrapper {
     private final CreationalContext<?> creationalContext;
     private final Map<Method, List<InterceptorInvoker>> interceptorInvokers;
 
-    CDIInterceptorWrapperImpl(Class<?> restClient) {
-        BeanManager beanManager = CDI.current().getBeanManager();
+    CDIInterceptorWrapperImpl(Class<?> restClient, Object beanManagerObject) {
+        BeanManager beanManager = (BeanManager) beanManagerObject;
         creationalContext = beanManager != null ? beanManager.createCreationalContext(null) : null;
         interceptorInvokers = initInterceptorInvokers(beanManager, creationalContext, restClient);
     }
