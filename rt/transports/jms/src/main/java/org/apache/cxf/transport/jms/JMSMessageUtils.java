@@ -128,18 +128,7 @@ final class JMSMessageUtils {
 
 
     static String getEncoding(String ct) throws UnsupportedEncodingException {
-        String contentType = ct.toLowerCase();
-        String enc = null;
-
-        String[] tokens = contentType.split(";");
-        for (String token : tokens) {
-            int index = token.indexOf("charset=");
-            if (index >= 0) {
-                enc = token.substring(index + 8);
-                break;
-            }
-        }
-
+        String enc = HttpHeaderHelper.findCharset(ct);
         String normalizedEncoding = HttpHeaderHelper.mapCharset(enc, StandardCharsets.UTF_8.name());
         if (normalizedEncoding == null) {
             String m = new org.apache.cxf.common.i18n.Message("INVALID_ENCODING_MSG", LOG, new Object[] {
