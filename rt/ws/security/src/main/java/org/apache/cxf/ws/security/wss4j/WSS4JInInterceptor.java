@@ -419,7 +419,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         }
     }
 
-    private void checkActions(
+    protected void checkActions(
         SoapMessage msg,
         RequestData reqData,
         List<WSSecurityEngineResult> wsResult,
