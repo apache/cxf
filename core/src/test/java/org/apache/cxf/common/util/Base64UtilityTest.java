@@ -30,17 +30,6 @@ import org.junit.Test;
 
 public class Base64UtilityTest extends Assert {
 
-    public Base64UtilityTest() {
-        super();
-    }
-
-    void assertEquals(byte[] b1, byte[] b2) {
-        assertEquals(b1.length, b2.length);
-        for (int x = 0; x < b1.length; x++) {
-            assertEquals(b1[x], b2[x]);
-        }
-    }
-
     @Test
     public void testEncodeMultipleChunks() throws Exception {
         final String text = "The true sign of intelligence is not knowledge but imagination.";
@@ -83,7 +72,7 @@ public class Base64UtilityTest extends Assert {
         encodedChars = Base64Utility.encodeChunk(bytes, 0, bytes.length);
         assertNotNull(encodedChars);
         byte[] bytesDecoded = Base64Utility.decodeChunk(encodedChars, 0, encodedChars.length);
-        assertEquals(bytes, bytesDecoded);
+        assertArrayEquals(bytes, bytesDecoded);
 
         //require padding
         bytes = new byte[99];
@@ -93,7 +82,7 @@ public class Base64UtilityTest extends Assert {
         encodedChars = Base64Utility.encodeChunk(bytes, 0, bytes.length);
         assertNotNull(encodedChars);
         bytesDecoded = Base64Utility.decodeChunk(encodedChars, 0, encodedChars.length);
-        assertEquals(bytes, bytesDecoded);
+        assertArrayEquals(bytes, bytesDecoded);
 
         //require padding
         bytes = new byte[98];
@@ -103,7 +92,7 @@ public class Base64UtilityTest extends Assert {
         encodedChars = Base64Utility.encodeChunk(bytes, 0, bytes.length);
         assertNotNull(encodedChars);
         bytesDecoded = Base64Utility.decodeChunk(encodedChars, 0, encodedChars.length);
-        assertEquals(bytes, bytesDecoded);
+        assertArrayEquals(bytes, bytesDecoded);
 
         //require padding
         bytes = new byte[97];
@@ -113,7 +102,7 @@ public class Base64UtilityTest extends Assert {
         encodedChars = Base64Utility.encodeChunk(bytes, 0, bytes.length);
         assertNotNull(encodedChars);
         bytesDecoded = Base64Utility.decodeChunk(encodedChars, 0, encodedChars.length);
-        assertEquals(bytes, bytesDecoded);
+        assertArrayEquals(bytes, bytesDecoded);
 
 
         bytesDecoded = Base64Utility.decodeChunk(new char[3], 0, 3);
@@ -129,15 +118,10 @@ public class Base64UtilityTest extends Assert {
         assertEquals(in, encoded);
     }
 
-    @Test
+    @Test(expected = Base64Exception.class)
     public void testDecodeInvalidString() throws Exception {
-        try {
-            String in = "QWxhZGRpbjpcGVuIHNlc2FtZQ==";
-            Base64Utility.decode(in);
-            fail("This test should be fail");
-        } catch (Base64Exception e) {
-            //nothing to do
-        }
+        String in = "QWxhZGRpbjpcGVuIHNlc2FtZQ==";
+        Base64Utility.decode(in);
     }
 
     @Test
@@ -154,7 +138,7 @@ public class Base64UtilityTest extends Assert {
                              0,
                              encodedString.length(),
                              bout2);
-        assertEquals(bytes, bout2.toByteArray());
+        assertArrayEquals(bytes, bout2.toByteArray());
 
 
         String in = "QWxhZGRpbjpvcGVuIHNlc2FtZQ==";
