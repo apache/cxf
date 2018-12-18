@@ -208,7 +208,7 @@ public class RequestParserUnitTest extends org.junit.Assert {
 
         RequestRequirements requestRequirements = parser.parseRequest(request, msgContext, null, null);
 
-        assertNotNull(requestRequirements.getKeyRequirements().getReceivedKey().getX509Cert());
+        assertNotNull(requestRequirements.getKeyRequirements().getReceivedCredential().getX509Cert());
     }
 
     private Document parseStringToElement(String str) throws Exception {

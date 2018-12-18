@@ -39,7 +39,7 @@ import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.Lifetime;
-import org.apache.cxf.sts.request.ReceivedKey;
+import org.apache.cxf.sts.request.ReceivedCredential;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.sts.request.Renewing;
@@ -317,11 +317,11 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
 
         KeyRequirements keyRequirements = new KeyRequirements();
         keyRequirements.setKeyType(keyType);
-        ReceivedKey receivedKey = new ReceivedKey();
+        ReceivedCredential receivedCredential = new ReceivedCredential();
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias("myclientkey");
-        receivedKey.setX509Cert(crypto.getX509Certificates(cryptoType)[0]);
-        keyRequirements.setReceivedKey(receivedKey);
+        receivedCredential.setX509Cert(crypto.getX509Certificates(cryptoType)[0]);
+        keyRequirements.setReceivedCredential(receivedCredential);
         parameters.setKeyRequirements(keyRequirements);
 
         parameters.setPrincipal(new CustomTokenPrincipal("alice"));

@@ -49,7 +49,7 @@ import org.apache.cxf.sts.claims.ClaimsManager;
 import org.apache.cxf.sts.common.CustomUserClaimsHandler;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.request.KeyRequirements;
-import org.apache.cxf.sts.request.ReceivedKey;
+import org.apache.cxf.sts.request.ReceivedCredential;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.sts.service.ServiceMBean;
@@ -1247,9 +1247,9 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias("myclientkey");
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
-        ReceivedKey receivedKey = new ReceivedKey();
-        receivedKey.setX509Cert(certs[0]);
-        keyRequirements.setReceivedKey(receivedKey);
+        ReceivedCredential receivedCredential = new ReceivedCredential();
+        receivedCredential.setX509Cert(certs[0]);
+        keyRequirements.setReceivedCredential(receivedCredential);
 
         parameters.setKeyRequirements(keyRequirements);
 

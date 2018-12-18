@@ -36,7 +36,7 @@ import org.apache.cxf.sts.common.TestUtils;
 import org.apache.cxf.sts.request.BinarySecret;
 import org.apache.cxf.sts.request.Entropy;
 import org.apache.cxf.sts.request.KeyRequirements;
-import org.apache.cxf.sts.request.ReceivedKey;
+import org.apache.cxf.sts.request.ReceivedCredential;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.ws.security.sts.provider.STSException;
@@ -125,9 +125,9 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias("myclientkey");
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
-        ReceivedKey receivedKey = new ReceivedKey();
-        receivedKey.setX509Cert(certs[0]);
-        providerParameters.getKeyRequirements().setReceivedKey(receivedKey);
+        ReceivedCredential receivedCredential = new ReceivedCredential();
+        receivedCredential.setX509Cert(certs[0]);
+        providerParameters.getKeyRequirements().setReceivedCredential(receivedCredential);
 
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
         assertNotNull(providerResponse);
@@ -165,9 +165,9 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias("myclientkey");
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
-        ReceivedKey receivedKey = new ReceivedKey();
-        receivedKey.setX509Cert(certs[0]);
-        providerParameters.getKeyRequirements().setReceivedKey(receivedKey);
+        ReceivedCredential receivedCredential = new ReceivedCredential();
+        receivedCredential.setX509Cert(certs[0]);
+        providerParameters.getKeyRequirements().setReceivedCredential(receivedCredential);
 
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
         assertNotNull(providerResponse);

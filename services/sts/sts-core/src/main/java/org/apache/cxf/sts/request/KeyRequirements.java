@@ -32,7 +32,7 @@ public class KeyRequirements {
     private String c14nAlgorithm;
     private String computedKeyAlgorithm;
     private String keywrapAlgorithm;
-    private ReceivedKey receivedKey;
+    private ReceivedCredential receivedCredential;
     private Entropy entropy;
     private String encryptWith;
     private String signWith;
@@ -113,12 +113,12 @@ public class KeyRequirements {
         this.keywrapAlgorithm = keywrapAlgorithm;
     }
 
-    public ReceivedKey getReceivedKey() {
-        return receivedKey;
+    public ReceivedCredential getReceivedCredential() {
+        return receivedCredential;
     }
 
-    public void setReceivedKey(ReceivedKey receivedKey) {
-        this.receivedKey = receivedKey;
+    public void setReceivedCredential(ReceivedCredential receivedCredential) {
+        this.receivedCredential = receivedCredential;
     }
 
     public Entropy getEntropy() {

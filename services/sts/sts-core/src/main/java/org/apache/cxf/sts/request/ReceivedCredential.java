@@ -21,17 +21,13 @@ package org.apache.cxf.sts.request;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 
-import javax.crypto.SecretKey;
-
 /**
- * This class represents a received Key. It can contain either an X509Certificate, PublicKey or
- * SecretKey object.
+ * This class represents a received credential. It can contain either an X509Certificate or PublicKey.
  */
-public class ReceivedKey {
+public class ReceivedCredential {
 
     private X509Certificate x509Cert;
     private PublicKey publicKey;
-    private SecretKey secretKey;
 
     public X509Certificate getX509Cert() {
         return x509Cert;
@@ -44,12 +40,6 @@ public class ReceivedKey {
     }
     public void setPublicKey(PublicKey publicKey) {
         this.publicKey = publicKey;
-    }
-    public SecretKey getSecretKey() {
-        return secretKey;
-    }
-    public void setSecretKey(SecretKey secretKey) {
-        this.secretKey = secretKey;
     }
 
 }

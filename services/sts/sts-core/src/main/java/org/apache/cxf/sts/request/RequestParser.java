@@ -214,8 +214,8 @@ public class RequestParser {
             keyRequirements.setKeywrapAlgorithm(keywrapAlgorithm);
         } else if (QNameConstants.USE_KEY.equals(jaxbElement.getName())) {
             UseKeyType useKey = (UseKeyType)jaxbElement.getValue();
-            ReceivedKey receivedKey = parseUseKey(useKey, messageContext);
-            keyRequirements.setReceivedKey(receivedKey);
+            ReceivedCredential receivedCredential = parseUseKey(useKey, messageContext);
+            keyRequirements.setReceivedCredential(receivedCredential);
         } else if (QNameConstants.ENTROPY.equals(jaxbElement.getName())) {
             EntropyType entropyType = (EntropyType)jaxbElement.getValue();
             Entropy entropy = parseEntropy(entropyType, stsProperties);
@@ -320,7 +320,7 @@ public class RequestParser {
      * @return the ReceivedKey that has been parsed
      * @throws STSException
      */
-    private static ReceivedKey parseUseKey(
+    private static ReceivedCredential parseUseKey(
         UseKeyType useKey,
         Map<String, Object> messageContext
     ) throws STSException {
@@ -400,9 +400,9 @@ public class RequestParser {
                 X509Certificate cert =
                     (X509Certificate)cf.generateCertificate(new ByteArrayInputStream(x509));
                 LOG.fine("Successfully parsed X509 Certificate from UseKey");
-                ReceivedKey receivedKey = new ReceivedKey();
-                receivedKey.setX509Cert(cert);
-                return receivedKey;
+                ReceivedCredential receivedCredential = new ReceivedCredential();
+                receivedCredential.setX509Cert(cert);
+                return receivedCredential;
             } catch (CertificateException ex) {
                 LOG.log(Level.WARNING, "", ex);
                 throw new STSException("Error in parsing certificate: ", ex, STSException.INVALID_REQUEST);
@@ -442,10 +442,10 @@ public class RequestParser {
     }
 
     /**
-     * Parse the KeyInfo Element to return a ReceivedKey object containing the found certificate or
+     * Parse the KeyInfo Element to return a ReceivedCredential object containing the found certificate or
      * public key.
      */
-    private static ReceivedKey parseKeyInfoElement(Element keyInfoElement) throws STSException {
+    private static ReceivedCredential parseKeyInfoElement(Element keyInfoElement) throws STSException {
         KeyInfoFactory keyInfoFactory = null;
         try {
             keyInfoFactory = KeyInfoFactory.getInstance("DOM", "ApacheXMLDSig");
@@ -460,18 +460,18 @@ public class RequestParser {
             for (int i = 0; i < list.size(); i++) {
                 if (list.get(i) instanceof KeyValue) {
                     KeyValue keyValue = (KeyValue)list.get(i);
-                    ReceivedKey receivedKey = new ReceivedKey();
+                    ReceivedCredential receivedKey = new ReceivedCredential();
                     receivedKey.setPublicKey(keyValue.getPublicKey());
                     return receivedKey;
                 } else if (list.get(i) instanceof X509Certificate) {
-                    ReceivedKey receivedKey = new ReceivedKey();
+                    ReceivedCredential receivedKey = new ReceivedCredential();
                     receivedKey.setX509Cert((X509Certificate)list.get(i));
                     return receivedKey;
                 } else if (list.get(i) instanceof X509Data) {
                     X509Data x509Data = (X509Data)list.get(i);
                     for (int j = 0; j < x509Data.getContent().size(); j++) {
                         if (x509Data.getContent().get(j) instanceof X509Certificate) {
-                            ReceivedKey receivedKey = new ReceivedKey();
+                            ReceivedCredential receivedKey = new ReceivedCredential();
                             receivedKey.setX509Cert((X509Certificate)x509Data.getContent().get(j));
                             return receivedKey;
                         }

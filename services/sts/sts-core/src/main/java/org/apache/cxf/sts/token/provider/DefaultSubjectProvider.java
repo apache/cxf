@@ -39,7 +39,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.request.KeyRequirements;
-import org.apache.cxf.sts.request.ReceivedKey;
+import org.apache.cxf.sts.request.ReceivedCredential;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.sts.request.TokenRequirements;
@@ -269,23 +269,23 @@ public class DefaultSubjectProvider implements SubjectProvider {
                 throw new STSException(ex.getMessage(), ex);
             }
         } else if (STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
-            ReceivedKey receivedKey = keyRequirements.getReceivedKey();
+            ReceivedCredential receivedCredential = keyRequirements.getReceivedCredential();
 
             // Validate UseKey trust
             if (stsProperties.isValidateUseKey() && stsProperties.getSignatureCrypto() != null) {
-                if (receivedKey.getX509Cert() != null) {
+                if (receivedCredential.getX509Cert() != null) {
                     try {
                         Collection<Pattern> constraints = Collections.emptyList();
                         stsProperties.getSignatureCrypto().verifyTrust(
-                            new X509Certificate[]{receivedKey.getX509Cert()}, false, constraints, null);
+                            new X509Certificate[]{receivedCredential.getX509Cert()}, false, constraints, null);
                     } catch (WSSecurityException e) {
                         LOG.log(Level.FINE, "Error in trust validation of UseKey: ", e);
                         throw new STSException("Error in trust validation of UseKey", STSException.REQUEST_FAILED);
                     }
                 }
-                if (receivedKey.getPublicKey() != null) {
+                if (receivedCredential.getPublicKey() != null) {
                     try {
-                        stsProperties.getSignatureCrypto().verifyTrust(receivedKey.getPublicKey());
+                        stsProperties.getSignatureCrypto().verifyTrust(receivedCredential.getPublicKey());
                     } catch (WSSecurityException e) {
                         LOG.log(Level.FINE, "Error in trust validation of UseKey: ", e);
                         throw new STSException("Error in trust validation of UseKey", STSException.REQUEST_FAILED);
@@ -293,7 +293,7 @@ public class DefaultSubjectProvider implements SubjectProvider {
                 }
             }
 
-            return createPublicKeyKeyInfo(receivedKey.getX509Cert(), receivedKey.getPublicKey());
+            return createPublicKeyKeyInfo(receivedCredential.getX509Cert(), receivedCredential.getPublicKey());
         }
 
         return null;

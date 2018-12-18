@@ -451,9 +451,9 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
 
         String keyType = keyRequirements.getKeyType();
         if (STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
-            if (keyRequirements.getReceivedKey() == null
-                || (keyRequirements.getReceivedKey().getX509Cert() == null
-                    && keyRequirements.getReceivedKey().getPublicKey() == null)) {
+            if (keyRequirements.getReceivedCredential() == null
+                || (keyRequirements.getReceivedCredential().getX509Cert() == null
+                    && keyRequirements.getReceivedCredential().getPublicKey() == null)) {
                 LOG.log(Level.WARNING, "A PublicKey Keytype is requested, but no certificate is provided");
                 throw new STSException(
                     "No client certificate for PublicKey KeyType", STSException.INVALID_REQUEST
