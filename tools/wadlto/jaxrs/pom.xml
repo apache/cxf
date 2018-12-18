@@ -61,7 +61,7 @@
         <dependency>
             <groupId>org.jvnet.jaxb2_commons</groupId>
             <artifactId>jaxb2-basics</artifactId>
-            <version>0.6.4</version>
+            <version>0.12.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
