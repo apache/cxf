@@ -38,11 +38,13 @@ import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.Configuration;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.jaxrs.client.spec.ClientImpl;
 import org.apache.cxf.microprofile.client.config.ConfigFacade;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
 import org.eclipse.microprofile.rest.client.spi.RestClientListener;
+
+import static org.apache.cxf.jaxrs.client.ClientProperties.HTTP_CONNECTION_TIMEOUT_PROP;
+import static org.apache.cxf.jaxrs.client.ClientProperties.HTTP_RECEIVE_TIMEOUT_PROP;
 
 public class CxfTypeSafeClientBuilder implements RestClientBuilder, Configurable<RestClientBuilder> {
     private static final Logger LOG = LogUtils.getL7dLogger(CxfTypeSafeClientBuilder.class);
@@ -100,7 +102,7 @@ public class CxfTypeSafeClientBuilder implements RestClientBuilder, Configurable
         if (timeout < 0) {
             throw new IllegalArgumentException("timeout must be non-negative");
         }
-        return property(ClientImpl.HTTP_CONNECTION_TIMEOUT_PROP, unit.toMillis(timeout));
+        return property(HTTP_CONNECTION_TIMEOUT_PROP, unit.toMillis(timeout));
     }
 
     @Override
@@ -111,7 +113,7 @@ public class CxfTypeSafeClientBuilder implements RestClientBuilder, Configurable
         if (timeout < 0) {
             throw new IllegalArgumentException("timeout must be non-negative");
         }
-        return property(ClientImpl.HTTP_RECEIVE_TIMEOUT_PROP, unit.toMillis(timeout));
+        return property(HTTP_RECEIVE_TIMEOUT_PROP, unit.toMillis(timeout));
     }
 
     @Override

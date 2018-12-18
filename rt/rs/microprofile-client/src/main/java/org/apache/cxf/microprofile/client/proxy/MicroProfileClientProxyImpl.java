@@ -41,7 +41,6 @@ import org.apache.cxf.jaxrs.client.ClientProxyImpl;
 import org.apache.cxf.jaxrs.client.ClientState;
 import org.apache.cxf.jaxrs.client.JaxrsClientCallback;
 import org.apache.cxf.jaxrs.client.LocalClientState;
-import org.apache.cxf.jaxrs.client.spec.ClientImpl;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
@@ -51,6 +50,9 @@ import org.apache.cxf.microprofile.client.MPRestClientCallback;
 import org.apache.cxf.microprofile.client.MicroProfileClientProviderFactory;
 import org.apache.cxf.microprofile.client.cdi.CDIInterceptorWrapper;
 import org.eclipse.microprofile.rest.client.ext.ResponseExceptionMapper;
+
+import static org.apache.cxf.jaxrs.client.ClientProperties.HTTP_CONNECTION_TIMEOUT_PROP;
+import static org.apache.cxf.jaxrs.client.ClientProperties.HTTP_RECEIVE_TIMEOUT_PROP;
 
 public class MicroProfileClientProxyImpl extends ClientProxyImpl {
     private static final Logger LOG = LogUtils.getL7dLogger(MicroProfileClientProxyImpl.class);
@@ -196,8 +198,8 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
 
     protected void setTimeouts(Map<String, Object> props) {
         try {
-            Long connectTimeout = getIntFromProps(props, ClientImpl.HTTP_CONNECTION_TIMEOUT_PROP);
-            Long readTimeout = getIntFromProps(props, ClientImpl.HTTP_RECEIVE_TIMEOUT_PROP);
+            Long connectTimeout = getIntFromProps(props, HTTP_CONNECTION_TIMEOUT_PROP);
+            Long readTimeout = getIntFromProps(props, HTTP_RECEIVE_TIMEOUT_PROP);
             if (connectTimeout > -1) {
                 cfg.getHttpConduit().getClient().setConnectionTimeout(connectTimeout);
             }
