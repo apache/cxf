@@ -297,9 +297,9 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
                 Map<String, Key> secretKeys = kerberosToken.getSecretKey();
                 if (secretKeys != null) {
                     SecretKey foundKey = null;
-                    for (String key : kerberosToken.getSecretKey().keySet()) {
-                        if (secretKeys.get(key) instanceof SecretKey) {
-                            SecretKey secretKey = (SecretKey)secretKeys.get(key);
+                    for (Entry<String, Key> entry : kerberosToken.getSecretKey().entrySet()) {
+                        if (entry.getValue() instanceof SecretKey) {
+                            SecretKey secretKey = (SecretKey)entry.getValue();
                             if (foundKey == null
                                 || secretKey.getEncoded().length > foundKey.getEncoded().length) {
                                 foundKey = secretKey;
