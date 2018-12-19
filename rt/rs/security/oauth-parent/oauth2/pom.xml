@@ -35,7 +35,8 @@
     <cxf.osgi.import>
       javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
       javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
-      javax.annotation*;version="${cxf.osgi.javax.annotation.version}"
+      javax.annotation*;version="${cxf.osgi.javax.annotation.version}",
+      javax.persistence*;resolution:=optional
     </cxf.osgi.import>
     <compilerArguments>-Aopenjpa.source=7 -Aopenjpa.metamodel=true</compilerArguments>
   </properties>
