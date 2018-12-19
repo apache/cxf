@@ -245,6 +245,9 @@ public class CachedWriter extends Writer {
         doClose();
         currentStream.close();
         maybeDeleteTempFile(currentStream);
+        if (ciphers != null) {
+            ciphers.clean();
+        }
         postClose();
     }
 

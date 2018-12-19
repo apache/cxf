@@ -20,6 +20,9 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.crypto.SecretKey;
+import javax.security.auth.DestroyFailedException;
+
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
@@ -32,7 +35,7 @@ public abstract class AbstractContentEncryptionAlgorithm extends AbstractContent
     private byte[] iv;
     private AtomicInteger providedIvUsageCount;
     private boolean generateCekOnce;
-    
+
     protected AbstractContentEncryptionAlgorithm(ContentAlgorithm algo, boolean generateCekOnce) {
         super(algo);
         this.generateCekOnce = generateCekOnce;
@@ -50,12 +53,19 @@ public abstract class AbstractContentEncryptionAlgorithm extends AbstractContent
         byte[] theCek = null;
         if (cek == null) {
             String algoJava = getAlgorithm().getJavaName();
-            theCek = CryptoUtils.getSecretKey(AlgorithmUtils.stripAlgoProperties(algoJava),
-                          getContentEncryptionKeySize(headers)).getEncoded();
+            SecretKey secretKey = CryptoUtils.getSecretKey(AlgorithmUtils.stripAlgoProperties(algoJava),
+                          getContentEncryptionKeySize(headers));
+            theCek = secretKey.getEncoded();
             if (generateCekOnce) {
                 synchronized (this) {
                     cek = theCek;
                 }
+            }
+            // Clean the key after we're done with it
+            try {
+                secretKey.destroy();
+            } catch (DestroyFailedException e) {
+                // ignore
             }
         } else {
             theCek = cek;

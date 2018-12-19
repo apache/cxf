@@ -221,6 +221,9 @@ public class CachedOutputStream extends OutputStream {
         }
         doClose();
         currentStream.close();
+        if (ciphers != null) {
+            ciphers.clean();
+        }
         if (!maybeDeleteTempFile(currentStream)) {
             postClose();
         }

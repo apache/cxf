@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
+import javax.security.auth.DestroyFailedException;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
@@ -114,7 +115,16 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
     }
     protected byte[] encryptInternal(JweEncryptionInternal state, byte[] content) {
         try {
-            return CryptoUtils.encryptBytes(content, createCekSecretKey(state), state.keyProps);
+            SecretKey createCekSecretKey = createCekSecretKey(state);
+            byte[] encryptedBytes = CryptoUtils.encryptBytes(content, createCekSecretKey, state.keyProps);
+
+            // Here we're finished with the SecretKey we created, so we can destroy it
+            try {
+                createCekSecretKey.destroy();
+            } catch (DestroyFailedException e) {
+                // ignore
+            }
+            return encryptedBytes;
         } catch (SecurityException ex) {
             LOG.fine(ex.getMessage());
             if (ex.getCause() instanceof NoSuchAlgorithmException) {

@@ -26,11 +26,13 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.Provider;
 import java.security.spec.AlgorithmParameterSpec;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.Mac;
+import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.DestroyFailedException;
 
@@ -110,7 +112,7 @@ public final class HmacUtils {
         try {
             secretKey.destroy();
         } catch (DestroyFailedException e) {
-            LOG.log(Level.FINE, "Error destroying key: {}", e.getMessage());
+            // ignore
         }
         return digest;
     }
@@ -149,7 +151,19 @@ public final class HmacUtils {
     public static String generateKey(String algo) {
         try {
             KeyGenerator keyGen = KeyGenerator.getInstance(algo);
-            return Base64Utility.encode(keyGen.generateKey().getEncoded());
+            SecretKey secretKey = keyGen.generateKey();
+            byte[] encodedSecretKey = secretKey.getEncoded();
+            String encodedKey = Base64Utility.encode(encodedSecretKey);
+
+            // Clean the key after we're done with it
+            Arrays.fill(encodedSecretKey, (byte) 0);
+            try {
+                secretKey.destroy();
+            } catch (DestroyFailedException e) {
+                // ignore
+            }
+
+            return encodedKey;
         } catch (NoSuchAlgorithmException e) {
             throw new SecurityException(e);
         }
