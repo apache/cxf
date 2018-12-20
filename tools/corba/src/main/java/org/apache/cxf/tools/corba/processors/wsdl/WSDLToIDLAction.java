@@ -117,40 +117,39 @@ public class WSDLToIDLAction {
         if (printWriter == null) {
             printWriter = createPrintWriter(outputFile);
         }
-
-        if (!isGenerateAllBindings()) {
-            Binding binding = findBinding(def);
-            if (binding == null) {
-                String msgStr = "Binding " + bindingName + " doesn't exists in WSDL.";
-                org.apache.cxf.common.i18n.Message msg = new org.apache.cxf.common.i18n.Message(msgStr, LOG);
-                throw new Exception(msg.toString());
-            }
-            generateIDL(def, binding);
-        } else {
-            // generate idl for all bindings in the file.
-            // each idl file will have the name of the binding.
-            Collection<Binding> bindings = CastUtils.cast(def.getAllBindings().values());
-            if (bindings.isEmpty()) {
-                String msgStr = "No bindings exists within this WSDL.";
-                org.apache.cxf.common.i18n.Message msg = new org.apache.cxf.common.i18n.Message(msgStr, LOG);
-                throw new Exception(msg.toString());
-            }
-            List<QName> portTypes = new ArrayList<>();
-            for (Binding binding : bindings) {
-                List<?> ext = binding.getExtensibilityElements();
-                if (!(ext.get(0) instanceof BindingType)) {
-                    continue;
+        try (PrintWriter pw = printWriter != null ? printWriter : createPrintWriter(outputFile)) {
+            if (!isGenerateAllBindings()) {
+                Binding binding = findBinding(def);
+                if (binding == null) {
+                    String msgStr = "Binding " + bindingName + " doesn't exists in WSDL.";
+                    org.apache.cxf.common.i18n.Message msg = new org.apache.cxf.common.i18n.Message(msgStr, LOG);
+                    throw new Exception(msg.toString());
                 }
-                if (portTypes.contains(binding.getPortType().getQName())) {
-                    continue;
-                }
-                portTypes.add(binding.getPortType().getQName());
                 generateIDL(def, binding);
-                root = IdlRoot.create();
+            } else {
+                // generate idl for all bindings in the file.
+                // each idl file will have the name of the binding.
+                Collection<Binding> bindings = CastUtils.cast(def.getAllBindings().values());
+                if (bindings.isEmpty()) {
+                    String msgStr = "No bindings exists within this WSDL.";
+                    org.apache.cxf.common.i18n.Message msg = new org.apache.cxf.common.i18n.Message(msgStr, LOG);
+                    throw new Exception(msg.toString());
+                }
+                List<QName> portTypes = new ArrayList<>();
+                for (Binding binding : bindings) {
+                    List<?> ext = binding.getExtensibilityElements();
+                    if (!(ext.get(0) instanceof BindingType)) {
+                        continue;
+                    }
+                    if (portTypes.contains(binding.getPortType().getQName())) {
+                        continue;
+                    }
+                    portTypes.add(binding.getPortType().getQName());
+                    generateIDL(def, binding);
+                    root = IdlRoot.create();
+                }
             }
         }
-        printWriter.close();
-
     }
 
     private void generateIDL(Definition definition, Binding binding) {
