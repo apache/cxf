@@ -38,7 +38,7 @@ public abstract class ToolTestBase extends Assert {
     protected ByteArrayOutputStream stdOut = new ByteArrayOutputStream();
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
 
         oldStdErr = System.err;
         oldStdOut = System.out;
@@ -51,7 +51,7 @@ public abstract class ToolTestBase extends Assert {
     }
 
     @After
-    public void tearDown() {
+    public void tearDown() throws Exception {
 
         System.setErr(oldStdErr);
         System.setOut(oldStdOut);
