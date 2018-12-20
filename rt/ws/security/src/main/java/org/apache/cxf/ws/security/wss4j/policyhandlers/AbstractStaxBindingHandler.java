@@ -56,6 +56,7 @@ import org.apache.wss4j.common.saml.bean.KeyInfoBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.common.util.KeyUtils;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.SPConstants.IncludeTokenType;
 import org.apache.wss4j.policy.model.AbstractBinding;
@@ -213,9 +214,18 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
             unassertPolicy(token, "Could not find KerberosToken");
         }
 
+        // Get the kerberos token from the element
+        byte[] data = null;
+        if (secToken.getToken() != null) {
+            String text = XMLUtils.getElementText(secToken.getToken());
+            if (text != null) {
+                data = org.apache.xml.security.utils.XMLUtils.decode(text);
+            }
+        }
+
         // Convert to WSS4J token
         final KerberosClientSecurityToken wss4jToken =
-            new KerberosClientSecurityToken(secToken.getData(), secToken.getKey(), secToken.getId()) {
+            new KerberosClientSecurityToken(data, secToken.getKey(), secToken.getId()) {
 
                 @Override
                 public Key getSecretKey(String algorithmURI) throws XMLSecurityException {
@@ -525,7 +535,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                 properties.setIncludeSignatureToken(true);
             }
         }
-        
+
         String userNameKey = SecurityConstants.SIGNATURE_USERNAME;
         if (binding instanceof SymmetricBinding) {
             userNameKey = SecurityConstants.ENCRYPT_USERNAME;

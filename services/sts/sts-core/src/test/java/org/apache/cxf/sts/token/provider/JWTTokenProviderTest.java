@@ -21,7 +21,6 @@ package org.apache.cxf.sts.token.provider;
 import java.security.KeyStore;
 import java.security.Security;
 import java.security.cert.X509Certificate;
-import java.util.Arrays;
 import java.util.Properties;
 
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
@@ -45,7 +44,6 @@ import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.sts.token.provider.jwt.JWTTokenProvider;
-import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -202,11 +200,6 @@ public class JWTTokenProviderTest extends org.junit.Assert {
                             jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT));
         Assert.assertEquals(providerResponse.getExpires().getEpochSecond(),
                             jwt.getClaim(JwtConstants.CLAIM_EXPIRY));
-
-        // Check that the token is stored correctly in the cache
-        String signature = token.substring(token.lastIndexOf(".") + 1);
-        SecurityToken secToken = tokenStore.getToken(Integer.toString(Arrays.hashCode(signature.getBytes())));
-        Assert.assertNotNull(secToken);
     }
 
     @org.junit.Test

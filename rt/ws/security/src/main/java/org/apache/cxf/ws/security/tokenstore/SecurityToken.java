@@ -114,11 +114,6 @@ public class SecurityToken implements Serializable {
     private transient byte[] secret;
 
     /**
-     * Some binary data associated with the token
-     */
-    private byte[] data;
-
-    /**
      * A key associated with the token
      */
     private transient Key key;
@@ -531,14 +526,6 @@ public class SecurityToken implements Serializable {
 
     public void setKey(Key key) {
         this.key = key;
-    }
-
-    public byte[] getData() {
-        return data;
-    }
-
-    public void setData(byte[] data) {
-        this.data = data;
     }
 
     private void writeObject(ObjectOutputStream stream) throws IOException {
