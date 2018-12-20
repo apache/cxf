@@ -198,7 +198,7 @@
         <cxf.osgi.version>5.0.0</cxf.osgi.version>
         <cxf.karaf.version>4.2.2-SNAPSHOT</cxf.karaf.version>
         <cxf.pax.logging.version>1.6.0</cxf.pax.logging.version>
-        <cxf.pax.exam.version>4.13.0</cxf.pax.exam.version>
+        <cxf.pax.exam.version>4.13.1</cxf.pax.exam.version>
         <cxf.felix.configadmin.version>1.2.4</cxf.felix.configadmin.version>
         <cxf.servicemix.aspectj.version>1.9.1_1</cxf.servicemix.aspectj.version>
         <cxf.servicemix.cglib.version>3.2.0_1</cxf.servicemix.cglib.version>
@@ -2810,7 +2810,6 @@
 	    <id>java9-plus</id>
 	    <properties>
                 <cxf.jaxb.version>2.3.0</cxf.jaxb.version>
-                <cxf.pax.exam.version>4.13.0</cxf.pax.exam.version>
                 <org.apache.cxf.transport.websocket.atmosphere.disabled>true</org.apache.cxf.transport.websocket.atmosphere.disabled>
 	    </properties>
 	    <activation>
