@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import javax.security.auth.DestroyFailedException;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
@@ -157,6 +158,14 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
             sig.addKeyInfo(issuerCerts[0].getPublicKey());
         }
         sig.sign(privateKey);
+
+        // Clean the private key from memory when we're done
+        try {
+            privateKey.destroy();
+        } catch (DestroyFailedException ex) {
+            // ignore
+        }
+
         return sig.getElement().getOwnerDocument();
     }
 

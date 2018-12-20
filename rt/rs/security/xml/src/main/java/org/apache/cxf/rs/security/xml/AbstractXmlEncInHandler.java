@@ -25,6 +25,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -80,6 +81,9 @@ public abstract class AbstractXmlEncInHandler extends AbstractXmlSecInHandler {
         } catch (Exception ex) {
             throwFault("Payload can not be decrypted", ex);
         }
+
+        // Clean the secret key from memory
+        Arrays.fill(symmetricKeyBytes, (byte) 0);
 
         Document payloadDoc = null;
         try {

@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.crypto.SecretKey;
+import javax.security.auth.DestroyFailedException;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
@@ -99,7 +100,16 @@ public final class ModelEncryptionSupport {
     public static Client decryptClient(String encodedSequence, String encodedSecretKey,
                                        KeyProperties props) throws SecurityException {
         SecretKey key = CryptoUtils.decodeSecretKey(encodedSecretKey, props.getKeyAlgo());
-        return decryptClient(encodedSequence, key, props);
+        Client client = decryptClient(encodedSequence, key, props);
+
+        // Clean the secret key from memory when we're done
+        try {
+            key.destroy();
+        } catch (DestroyFailedException ex) {
+            // ignore
+        }
+
+        return client;
     }
 
     public static Client decryptClient(String encodedSequence, Key secretKey) throws SecurityException {
@@ -123,7 +133,16 @@ public final class ModelEncryptionSupport {
                                                  String encodedSecretKey,
                                                  KeyProperties props) throws SecurityException {
         SecretKey key = CryptoUtils.decodeSecretKey(encodedSecretKey, props.getKeyAlgo());
-        return decryptAccessToken(provider, encodedToken, key, props);
+        ServerAccessToken serverAccessToken = decryptAccessToken(provider, encodedToken, key, props);
+
+        // Clean the secret key from memory when we're done
+        try {
+            key.destroy();
+        } catch (DestroyFailedException ex) {
+            // ignore
+        }
+
+        return serverAccessToken;
     }
 
     public static ServerAccessToken decryptAccessToken(OAuthDataProvider provider,
@@ -151,7 +170,16 @@ public final class ModelEncryptionSupport {
                                                   String encodedSecretKey,
                                                   KeyProperties props) throws SecurityException {
         SecretKey key = CryptoUtils.decodeSecretKey(encodedSecretKey, props.getKeyAlgo());
-        return decryptRefreshToken(provider, encodedToken, key, props);
+        RefreshToken refreshToken = decryptRefreshToken(provider, encodedToken, key, props);
+
+        // Clean the secret key from memory when we're done
+        try {
+            key.destroy();
+        } catch (DestroyFailedException ex) {
+            // ignore
+        }
+
+        return refreshToken;
     }
 
     public static RefreshToken decryptRefreshToken(OAuthDataProvider provider,
@@ -179,7 +207,16 @@ public final class ModelEncryptionSupport {
                                                   String encodedSecretKey,
                                                   KeyProperties props) throws SecurityException {
         SecretKey key = CryptoUtils.decodeSecretKey(encodedSecretKey, props.getKeyAlgo());
-        return decryptCodeGrant(provider, encodedToken, key, props);
+        ServerAuthorizationCodeGrant authzCodeGrant = decryptCodeGrant(provider, encodedToken, key, props);
+
+        // Clean the secret key from memory when we're done
+        try {
+            key.destroy();
+        } catch (DestroyFailedException ex) {
+            // ignore
+        }
+
+        return authzCodeGrant;
     }
 
     public static ServerAuthorizationCodeGrant decryptCodeGrant(OAuthDataProvider provider,

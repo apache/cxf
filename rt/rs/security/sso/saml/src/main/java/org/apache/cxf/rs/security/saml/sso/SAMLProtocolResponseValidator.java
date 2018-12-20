@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -498,6 +499,9 @@ public class SAMLProtocolResponseValidator {
             LOG.log(Level.FINE, "Payload can not be decrypted", ex);
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
+
+        // Clean the symmetric key from memory now that we're done with it
+        Arrays.fill(decryptedBytes, (byte) 0);
 
         Document payloadDoc = null;
         try {

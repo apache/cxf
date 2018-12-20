@@ -24,6 +24,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.security.auth.DestroyFailedException;
 import javax.security.auth.callback.CallbackHandler;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -98,10 +99,19 @@ public class MetadataService extends AbstractSSOSpHandler {
                                                   privateKey, issuerCerts[0],
                                                   true);
             }
-            return metadataWriter.getMetaData(serviceAddress, assertionConsumerServiceAddress,
+            Document metadata = metadataWriter.getMetaData(serviceAddress, assertionConsumerServiceAddress,
                                               logoutServiceAddress,
                                               privateKey, issuerCerts[0],
                                               true);
+
+            // Clean the private key from memory when we're done
+            try {
+                privateKey.destroy();
+            } catch (DestroyFailedException ex) {
+                // ignore
+            }
+
+            return metadata;
         } catch (Exception ex) {
             LOG.log(Level.FINE, ex.getMessage(), ex);
             throw ExceptionUtils.toInternalServerErrorException(ex, null);

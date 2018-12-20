@@ -27,6 +27,7 @@ import java.security.cert.X509Certificate;
 import java.util.Base64;
 import java.util.logging.Level;
 
+import javax.security.auth.DestroyFailedException;
 import javax.security.auth.callback.CallbackHandler;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.HttpHeaders;
@@ -162,6 +163,13 @@ public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
         byte[] signBytes = signature.sign();
 
         String encodedSignature = Base64.getEncoder().encodeToString(signBytes);
+
+        // Clean the private key from memory when we're done
+        try {
+            privateKey.destroy();
+        } catch (DestroyFailedException ex) {
+            // ignore
+        }
 
         ub.queryParam(SSOConstants.SIGNATURE, URLEncoder.encode(encodedSignature, StandardCharsets.UTF_8.name()));
 
