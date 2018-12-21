@@ -187,6 +187,8 @@ public class TokenRenewOperation extends AbstractOperation implements RenewOpera
                 STSRenewSuccessEvent event = new STSRenewSuccessEvent(renewerParameters,
                         System.currentTimeMillis() - start);
                 publishEvent(event);
+
+                cleanRequest(requestRequirements);
                 return response;
             } catch (Throwable ex) {
                 LOG.log(Level.WARNING, "", ex);

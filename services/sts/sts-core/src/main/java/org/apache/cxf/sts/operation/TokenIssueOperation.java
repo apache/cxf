@@ -75,7 +75,7 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 public class TokenIssueOperation extends AbstractOperation implements IssueOperation, IssueSingleOperation {
 
     static final Logger LOG = LogUtils.getL7dLogger(TokenIssueOperation.class);
-    
+
 
     public RequestSecurityTokenResponseCollectionType issue(
             RequestSecurityTokenType request,
@@ -89,7 +89,7 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
         return responseCollection;
     }
 
-    
+
     public RequestSecurityTokenResponseCollectionType issue(
             RequestSecurityTokenCollectionType requestCollection,
             Principal principal,
@@ -198,6 +198,8 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
                 STSIssueSuccessEvent event = new STSIssueSuccessEvent(providerParameters,
                         System.currentTimeMillis() - start);
                 publishEvent(event);
+
+                cleanRequest(requestRequirements);
                 return response;
             } catch (Throwable ex) {
                 LOG.log(Level.WARNING, "", ex);

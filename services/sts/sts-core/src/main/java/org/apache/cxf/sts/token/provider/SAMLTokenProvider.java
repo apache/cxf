@@ -20,6 +20,7 @@
 package org.apache.cxf.sts.token.provider;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -171,6 +172,9 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
             response.setComputedKey(computedKey);
 
             LOG.fine("SAML Token successfully created");
+            if (secret != null) {
+                Arrays.fill(secret, (byte) 0);
+            }
             return response;
         } catch (Exception e) {
             LOG.log(Level.WARNING, "", e);

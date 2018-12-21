@@ -136,6 +136,8 @@ public class TokenCancelOperation extends AbstractOperation implements CancelOpe
                 STSCancelSuccessEvent event = new STSCancelSuccessEvent(cancellerParameters,
                         System.currentTimeMillis() - start);
                 publishEvent(event);
+
+                cleanRequest(requestRequirements);
                 return response;
             } catch (Throwable ex) {
                 LOG.log(Level.WARNING, "", ex);

@@ -215,6 +215,13 @@ public abstract class AbstractOperation {
                                           claimsManager.getClaimParsers());
     }
 
+    protected void cleanRequest(RequestRequirements requestRequirements) {
+        if (requestRequirements.getKeyRequirements() != null
+            && requestRequirements.getKeyRequirements().getEntropy() != null) {
+            requestRequirements.getKeyRequirements().getEntropy().clean();
+        }
+    }
+
     /**
      * Create a RequestedReferenceType object using a TokenReference object
      */
@@ -311,7 +318,7 @@ public abstract class AbstractOperation {
         if (tokenCreated == null) {
             creationTime = now;
         }
-        
+
         Instant expirationTime = tokenExpires;
         if (tokenExpires == null) {
             long lifeTimeOfToken = 300L;

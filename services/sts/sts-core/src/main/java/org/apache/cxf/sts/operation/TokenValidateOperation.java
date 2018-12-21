@@ -170,6 +170,8 @@ public class TokenValidateOperation extends AbstractOperation implements Validat
                 STSValidateSuccessEvent event = new STSValidateSuccessEvent(validatorParameters,
                         System.currentTimeMillis() - start);
                 publishEvent(event);
+
+                cleanRequest(requestRequirements);
                 return response;
             } catch (Throwable ex) {
                 LOG.log(Level.WARNING, "", ex);
