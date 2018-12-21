@@ -67,9 +67,6 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
@@ -79,7 +76,6 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.BundleUtils;
-import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.feature.Feature;
@@ -658,6 +654,13 @@ public final class ResourceUtils {
                                                ResourceTypes types,
                                                boolean jaxbOnly,
                                                MessageBodyWriter<?> jaxbWriter) {
+        Class<?> jaxbElement = null;
+        try {
+            jaxbElement = ClassLoaderUtils.loadClass("javax.xml.bind.JAXBElement", ResourceUtils.class);
+        } catch (final ClassNotFoundException e) {
+            // no-op
+        }
+
         for (OperationResourceInfo ori : resource.getMethodDispatcher().getOperationResourceInfos()) {
             Method method = ori.getAnnotatedMethod() == null ? ori.getMethodToInvoke() : ori.getAnnotatedMethod();
             Class<?> realReturnType = method.getReturnType();
@@ -668,7 +671,7 @@ public final class ResourceUtils {
             Type type = method.getGenericReturnType();
             if (jaxbOnly) {
                 checkJaxbType(resource.getServiceClass(), cls, realReturnType == Response.class || ori.isAsync()
-                    ? cls : type, types, method.getAnnotations(), jaxbWriter);
+                    ? cls : type, types, method.getAnnotations(), jaxbWriter, jaxbElement);
             } else {
                 types.getAllTypes().put(cls, type);
             }
@@ -680,7 +683,7 @@ public final class ResourceUtils {
                         Type paramType = method.getGenericParameterTypes()[pm.getIndex()];
                         if (jaxbOnly) {
                             checkJaxbType(resource.getServiceClass(), inType, paramType, types,
-                                          method.getParameterAnnotations()[pm.getIndex()], jaxbWriter);
+                                          method.getParameterAnnotations()[pm.getIndex()], jaxbWriter, jaxbElement);
                         } else {
                             types.getAllTypes().put(inType, paramType);
                         }
@@ -712,7 +715,8 @@ public final class ResourceUtils {
                                       Type genericType,
                                       ResourceTypes types,
                                       Annotation[] anns,
-                                      MessageBodyWriter<?> jaxbWriter) {
+                                      MessageBodyWriter<?> jaxbWriter,
+                                      Class<?> jaxbElement) {
         boolean isCollection = false;
         if (InjectionUtils.isSupportedCollectionOrArray(type)) {
             type = InjectionUtils.getActualType(genericType);
@@ -727,7 +731,7 @@ public final class ResourceUtils {
         }
         if (type == null
             || InjectionUtils.isPrimitive(type)
-            || JAXBElement.class.isAssignableFrom(type)
+            || (jaxbElement != null && jaxbElement.isAssignableFrom(type))
             || Response.class.isAssignableFrom(type)
             || type.isInterface()) {
             return;
@@ -1020,25 +1024,6 @@ public final class ResourceUtils {
             }
         }
         return true;
-    }
-
-    //TODO : consider moving JAXBDataBinding.createContext to JAXBUtils
-    public static JAXBContext createJaxbContext(Set<Class<?>> classes, Class<?>[] extraClass,
-                                          Map<String, Object> contextProperties) {
-        if (classes == null || classes.isEmpty()) {
-            return null;
-        }
-        JAXBUtils.scanPackages(classes, extraClass, null);
-
-        JAXBContext ctx;
-        try {
-            ctx = JAXBContext.newInstance(classes.toArray(new Class[0]),
-                                          contextProperties);
-            return ctx;
-        } catch (JAXBException ex) {
-            LOG.log(Level.SEVERE, "No JAXB context can be created", ex);
-        }
-        return null;
     }
 
 }

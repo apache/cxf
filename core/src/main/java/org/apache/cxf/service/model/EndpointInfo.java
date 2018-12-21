@@ -21,6 +21,7 @@ package org.apache.cxf.service.model;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 
@@ -94,7 +95,12 @@ public class EndpointInfo extends AbstractDescriptionElement implements NamedIte
 
     public void setAddress(String addr) {
         if (null == address) {
-            address = EndpointReferenceUtils.getEndpointReference(addr);
+            // address = EndpointReferenceUtils.getEndpointReference(addr); loads jaxb and we want to avoid it
+            final EndpointReferenceType reference = new EndpointReferenceType();
+            final AttributedURIType a = new AttributedURIType();
+            a.setValue("/");
+            reference.setAddress(a);
+            address = reference;
         } else {
             EndpointReferenceUtils.setAddress(address, addr);
         }
