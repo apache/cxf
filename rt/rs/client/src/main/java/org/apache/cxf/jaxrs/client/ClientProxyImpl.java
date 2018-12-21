@@ -160,6 +160,8 @@ public class ClientProxyImpl extends AbstractClient implements
     }
 
     private static class WrappedException extends Exception {
+        private static final long serialVersionUID = 1183890106889852917L;
+
         final Throwable wrapped;
         WrappedException(Throwable wrapped) {
             this.wrapped = wrapped;
@@ -177,9 +179,10 @@ public class ClientProxyImpl extends AbstractClient implements
                 @Override
                 public Object run() throws Exception {
                     try {
-                        final MethodHandles.Lookup lookup = MethodHandles.publicLookup()
+                        final MethodHandles.Lookup lookup = MethodHandles
+                                .publicLookup()
                                 .in(declaringClass);
-
+                        
                         // force private access so unreflectSpecial can invoke the interface's default method
                         final Field f = MethodHandles.Lookup.class.getDeclaredField("allowedModes");
                         final int modifiers = f.getModifiers();
@@ -195,7 +198,15 @@ public class ClientProxyImpl extends AbstractClient implements
                                      .bindTo(o)
                                      .invokeWithArguments(params);
                     } catch (Throwable t) {
-                        throw new WrappedException(t);
+                        if (t instanceof IllegalAccessException) {
+                            try {
+                                return invokeDefaultMethodUsingPrivateLookup(declaringClass, o, m, params);
+                            } catch (final NoSuchMethodException ex) {
+                                throw new WrappedException(t);
+                            }
+                        } else {
+                            throw new WrappedException(t);
+                        }
                     }
                 }
             });
@@ -205,6 +216,29 @@ public class ClientProxyImpl extends AbstractClient implements
                 throw ((WrappedException)wrapped).getWrapped();
             }
             throw wrapped;
+        }
+    }
+
+    /**
+     * For JDK 9+, we could use MethodHandles.privateLookupIn, which is not 
+     * available in JDK 8.
+     */
+    private static Object invokeDefaultMethodUsingPrivateLookup(Class<?> declaringClass, Object o, Method m, 
+            Object[] params) throws WrappedException, NoSuchMethodException {
+        try {
+            final Method privateLookup = MethodHandles
+                .class
+                .getDeclaredMethod("privateLookupIn", Class.class, MethodHandles.Lookup.class);
+            
+            return ((MethodHandles.Lookup)privateLookup
+                .invoke(null, declaringClass, MethodHandles.lookup()))
+                .unreflectSpecial(m, declaringClass)
+                .bindTo(o)
+                .invokeWithArguments(params);
+        } catch (NoSuchMethodException t) {
+            throw t;
+        } catch (Throwable t) {
+            throw new WrappedException(t);
         }
     }
 
