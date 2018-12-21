@@ -30,7 +30,7 @@
     <packaging>pom</packaging>
     <properties>
         <cxf.protect-xmlschema-collections>false</cxf.protect-xmlschema-collections>
-        <cxf.surefire.fork.mode>once</cxf.surefire.fork.mode>
+        <cxf.surefire.fork.count>1</cxf.surefire.fork.count>
         <cxf.surefire.format>brief</cxf.surefire.format>
         <cxf.surefire.usefile>false</cxf.surefire.usefile>
         <org.apache.cxf.transport.websocket.atmosphere.disabled>false</org.apache.cxf.transport.websocket.atmosphere.disabled>
@@ -465,7 +465,7 @@
                         <runOrder>alphabetical</runOrder>
                         <reportFormat>${cxf.surefire.format}</reportFormat>
                         <useFile>${cxf.surefire.usefile}</useFile>
-                        <forkMode>${cxf.surefire.fork.mode}</forkMode>
+                        <forkCount>${cxf.surefire.fork.count}</forkCount>
                         <childDelegation>false</childDelegation>
                         <argLine>${cxf.surefire.fork.vmargs} -D${cxf.jaxb.context.class.property}=${cxf.jaxb.context.class}</argLine>
                         <enableAssertions>${cxf.surefire.enable.assertions}</enableAssertions>
