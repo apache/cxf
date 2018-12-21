@@ -140,8 +140,8 @@ public class JweJsonProducer {
                 iv = currentIv;
             }
 
-            byte[] encryptedCek = state.getContentEncryptionKey();
-            if (encryptedCek.length == 0 
+            byte[] encryptedCek = state.getEncryptedContentEncryptionKey();
+            if (encryptedCek.length == 0
                 && encryptor.getKeyAlgorithm() != null
                 && !KeyAlgorithm.DIRECT.equals(encryptor.getKeyAlgorithm())) {
                 LOG.warning("Unexpected key encryption algorithm");

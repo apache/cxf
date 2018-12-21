@@ -40,7 +40,7 @@ public class DirectKeyDecryptionAlgorithm implements KeyDecryptionProvider {
     @Override
     public byte[] getDecryptedContentEncryptionKey(JweDecryptionInput jweDecryptionInput) {
         validateKeyEncryptionKey(jweDecryptionInput);
-        return contentDecryptionKey;
+        return contentDecryptionKey.clone();
     }
     @Override
     public KeyAlgorithm getAlgorithm() {

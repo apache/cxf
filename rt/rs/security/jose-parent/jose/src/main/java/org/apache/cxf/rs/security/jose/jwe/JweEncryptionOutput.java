@@ -25,7 +25,7 @@ import org.apache.cxf.rt.security.crypto.KeyProperties;
 public class JweEncryptionOutput {
     private Cipher cipher;
     private JweHeaders headers;
-    private byte[] contentEncryptionKey;
+    private byte[] encryptedContentEncryptionKey;
     private byte[] iv;
     private AuthenticationTagProducer authTagProducer;
     private byte[] encryptedContent;
@@ -35,7 +35,7 @@ public class JweEncryptionOutput {
     //CHECKSTYLE:OFF
     public JweEncryptionOutput(Cipher cipher,
                               JweHeaders headers,
-                              byte[] contentEncryptionKey,
+                              byte[] encryptedContentEncryptionKey,
                               byte[] iv,
                               AuthenticationTagProducer authTagProducer,
                               KeyProperties keyProps,
@@ -44,7 +44,7 @@ public class JweEncryptionOutput {
     //CHECKSTYLE:ON
         this.cipher = cipher;
         this.headers = headers;
-        this.contentEncryptionKey = contentEncryptionKey;
+        this.encryptedContentEncryptionKey = encryptedContentEncryptionKey;
         this.iv = iv;
         this.authTagProducer = authTagProducer;
         this.keyProps = keyProps;
@@ -57,8 +57,8 @@ public class JweEncryptionOutput {
     public JweHeaders getHeaders() {
         return headers;
     }
-    public byte[] getContentEncryptionKey() {
-        return contentEncryptionKey;
+    public byte[] getEncryptedContentEncryptionKey() {
+        return encryptedContentEncryptionKey;
     }
     public byte[] getIv() {
         return iv;
