@@ -32,6 +32,8 @@ import org.example.contract.doubleit.DoubleItPortType;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertTrue;
+
 /**
  * In this test case, a CXF client requests a SecurityContextToken from an STS, and then uses the
  * corresponding secret to secure a service request. The service endpoint must contact the STS to validate

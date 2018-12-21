@@ -41,6 +41,10 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Test sending claims that are defined in the policy of the WSDL to the STS for evaluation.
  * The SAML token is tested on the service side for the correct claims (role) information via a

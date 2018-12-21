@@ -33,6 +33,9 @@ import org.example.contract.doubleit.DoubleItPortType;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
  * In this test case, a CXF client sends a Username Token via (1-way) TLS to a CXF provider.
  * The provider dispatches the Username Token to an STS for validation (via TLS), and also

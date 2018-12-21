@@ -27,13 +27,17 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.sse.OutboundSseEvent;
 import javax.ws.rs.sse.Sse;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class OutboundSseEventImplTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class OutboundSseEventImplTest {
 
     /**
-     * Ensure that the <code>SseImpl</code> returns the correct builder class, 
+     * Ensure that the <code>SseImpl</code> returns the correct builder class,
      * <code>OutboundSseEventImpl.BuilderImpl.class</code>.
      */
     @Test
@@ -49,19 +53,19 @@ public class OutboundSseEventImplTest extends Assert {
     @Test
     public void testDefaultMediaType() {
         Sse sse = new SseImpl();
-        
+
         // test newEvent(data)
         OutboundSseEvent event = sse.newEvent("myData");
         assertNull(event.getName());
         assertEquals("myData", event.getData());
         assertEquals(MediaType.TEXT_PLAIN_TYPE, event.getMediaType());
-        
+
         // test newEvent(name, data)
         event = sse.newEvent("myName", "myData2");
         assertEquals("myName", event.getName());
         assertEquals("myData2", event.getData());
         assertEquals(MediaType.TEXT_PLAIN_TYPE, event.getMediaType());
-        
+
         // test newEventBuilder()...build()
         event = sse.newEventBuilder().comment("myComment").data("myData3").build();
         assertEquals("myComment", event.getComment());
@@ -78,25 +82,25 @@ public class OutboundSseEventImplTest extends Assert {
     @Test
     public void testDefaultClass() {
         Sse sse = new SseImpl();
-        
+
         // test newEvent(string)
         OutboundSseEvent event = sse.newEvent("myData");
         assertNull(event.getName());
         assertEquals("myData", event.getData());
         assertEquals(String.class, event.getType());
-        
+
         // test newEvent(name, data)
         event = sse.newEvent("myName", "myData2");
         assertEquals("myName", event.getName());
         assertEquals("myData2", event.getData());
         assertEquals(String.class, event.getType());
-        
+
         // test newEventBuilder()...build()
         event = sse.newEventBuilder().comment("myComment").data("myData3").build();
         assertEquals("myComment", event.getComment());
         assertEquals("myData3", event.getData());
         assertEquals(String.class, event.getType());
-        
+
         // test that object's class is re-enabled when calling different signatures of the data method
         OutboundSseEvent.Builder builder = sse.newEventBuilder();
         builder.data(TestData.class, new TestDataImpl("1", "2"));
@@ -105,7 +109,7 @@ public class OutboundSseEventImplTest extends Assert {
         builder.data("myString");
         event = builder.build();
         assertEquals(String.class, event.getType());
-        
+
         // same thing, but don't build in between calls to data
         event = sse.newEventBuilder().data(TestDataImpl.class, new TestDataImpl("3")).data("anotherString").build();
         assertEquals(String.class, event.getType());
@@ -121,35 +125,35 @@ public class OutboundSseEventImplTest extends Assert {
     public void testNullsForDataOrTypes() {
         Sse sse = new SseImpl();
         OutboundSseEvent.Builder builder = sse.newEventBuilder();
-        
+
         try {
             builder.data(null);
             fail("Passing a null data object should have resulted in an IllegalArgumentException");
         } catch (Throwable t) {
             assertTrue(t instanceof IllegalArgumentException);
         }
-        
+
         try {
             builder.data(Object.class, null);
             fail("Passing a null data object should have resulted in an IllegalArgumentException");
         } catch (Throwable t) {
             assertTrue(t instanceof IllegalArgumentException);
         }
-        
+
         try {
             builder.data((Class<?>)null, "123");
             fail("Passing a null data object should have resulted in an IllegalArgumentException");
         } catch (Throwable t) {
             assertTrue(t instanceof IllegalArgumentException);
         }
-        
+
         try {
             builder.data(new GenericType<List<String>>() { }, null);
             fail("Passing a null data object should have resulted in an IllegalArgumentException");
         } catch (Throwable t) {
             assertTrue(t instanceof IllegalArgumentException);
         }
-        
+
         try {
             builder.data((GenericType<?>)null, "456");
             fail("Passing a null data object should have resulted in an IllegalArgumentException");
@@ -159,7 +163,7 @@ public class OutboundSseEventImplTest extends Assert {
     }
     /**
      * Test that event built by the builder contains all of the data passed in
-     * to it. 
+     * to it.
      */
     @Test
     public void testBuilderAPIs() {
@@ -176,7 +180,7 @@ public class OutboundSseEventImplTest extends Assert {
         assertEquals(TestDataImpl.class, event.getType());
         assertTrue(event.getData() instanceof TestDataImpl);
         assertEquals("dataNoSpecifiedType", ((TestDataImpl)event.getData()).getData().get(0));
-        
+
         assertEquals("id", event.getId());
         assertEquals(MediaType.APPLICATION_JSON_TYPE, event.getMediaType());
         assertEquals("name", event.getName());
@@ -202,7 +206,7 @@ public class OutboundSseEventImplTest extends Assert {
     interface TestData {
         List<String> getData();
     }
-    
+
     class TestDataImpl implements TestData {
         final List<String> data = new ArrayList<>();
         TestDataImpl(String...entries) {

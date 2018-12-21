@@ -59,6 +59,11 @@ import org.example.contract.doubleit.DoubleItPortType;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * This test sends a custom parameter indicating the "realm" of the user, which is interpreted by the
  * STS's CustomUTValidator.

@@ -66,6 +66,10 @@ import org.apache.wss4j.common.util.DOM2Writer;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServerSaml.PORT;
 

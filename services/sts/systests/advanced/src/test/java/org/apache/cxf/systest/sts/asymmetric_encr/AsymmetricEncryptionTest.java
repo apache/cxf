@@ -39,6 +39,8 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * In this test, a CXF client gets a token from the STS over the Asymmetric Binding. The STS is configured

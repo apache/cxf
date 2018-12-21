@@ -38,6 +38,8 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertTrue;
+
 /**
  * In this test case, a CXF client requests a SecurityContextToken from an STS.
  */

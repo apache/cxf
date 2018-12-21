@@ -31,6 +31,9 @@ import org.apache.cxf.testutil.common.TestUtil;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 /**
  * Test case for CXF-6319 - namespace declarations in body and envelope are not processed correctly
  * when there is a SOAPHandler.

@@ -57,6 +57,10 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Some unit tests for the UserInfo Service in OpenId Connect. This can be used to return the User's claims given
  * an access token. The tests are run multiple times with different OAuthDataProvider implementations:

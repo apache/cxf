@@ -53,7 +53,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 @RunWith(Parameterized.class)
 public class Stax2ValidationUtilsTest {
@@ -118,7 +118,7 @@ public class Stax2ValidationUtilsTest {
     @Before
     public void setUp() throws Exception {
         XmlSchemaCollection schemaCol = new XmlSchemaCollection();
-        
+
         InputStream io = getClass().getClassLoader().getResourceAsStream(schemaPath);
         String sysId = getClass().getClassLoader().getResource(schemaPath).toString();
         schemaCol.setBaseUri(getTestBaseURI());

@@ -36,6 +36,10 @@ import org.example.contract.doubleit.DoubleItPortType;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * In this test case, a CXF client sends a Username Token via (1-way) TLS to a STS instance, and
  * receives a (HOK) SAML 1.1 Assertion. This is then sent via (1-way) TLS to an Intermediary

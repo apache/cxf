@@ -37,6 +37,10 @@ import org.example.contract.doubleit.DoubleItPortType;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * This tests JAAS authentication to the STS. A Username + Password extracted from either
  * a WS-Security UsernameToken for the JAX-WS service, or via HTTP/BA for a JAX-RS service,

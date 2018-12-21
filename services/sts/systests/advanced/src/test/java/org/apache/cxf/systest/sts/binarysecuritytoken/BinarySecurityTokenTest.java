@@ -39,6 +39,10 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * In this test case, a CXF client sends a BinarySecurityToken via the Asymmetric message
  * binding to a CXF provider. The provider dispatches the BinarySecurityToken to an STS for

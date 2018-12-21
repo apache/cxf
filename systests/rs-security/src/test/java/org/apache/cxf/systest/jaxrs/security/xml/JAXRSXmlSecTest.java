@@ -53,6 +53,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServerXmlSec.PORT;

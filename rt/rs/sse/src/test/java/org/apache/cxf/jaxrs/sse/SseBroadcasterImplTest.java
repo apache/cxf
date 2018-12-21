@@ -33,22 +33,22 @@ import org.springframework.mock.web.MockAsyncContext;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class SseBroadcasterImplTest extends Assert {
+public class SseBroadcasterImplTest {
     private SseBroadcaster broadcaster;
     private MessageBodyWriter<OutboundSseEvent> writer;
     private MockHttpServletResponse response;
     private MockAsyncContext ctx;
-    
-    @SuppressWarnings("unchecked") 
+
+    @SuppressWarnings("unchecked")
     @Before
     public void setUp() {
         broadcaster = new SseBroadcasterImpl();
@@ -62,31 +62,31 @@ public class SseBroadcasterImplTest extends Assert {
         final LongAdder adder = new LongAdder();
         final SseEventSinkImpl sink = new SseEventSinkImpl(writer, null, ctx);
         broadcaster.register(sink);
-        
+
         broadcaster.onClose(s -> {
             if (s == sink) {
                 adder.increment();
             }
         });
         assertThat(adder.intValue(), equalTo(0));
-        
+
         sink.close();
         assertThat(adder.intValue(), equalTo(1));
     }
-    
+
     @Test
     public void testOnCloseCallbackIsCalledForBroadcaster() {
         final LongAdder adder = new LongAdder();
         final SseEventSinkImpl sink = new SseEventSinkImpl(writer, null, ctx);
         broadcaster.register(sink);
-        
+
         broadcaster.onClose(s -> {
             if (s == sink) {
                 adder.increment();
             }
         });
         assertThat(adder.intValue(), equalTo(0));
-        
+
         broadcaster.close();
         assertThat(adder.intValue(), equalTo(1));
     }
@@ -94,29 +94,29 @@ public class SseBroadcasterImplTest extends Assert {
     @Test
     public void testOnErrorCallbackIsCalled() throws WebApplicationException, IOException {
         when(writer.isWriteable(any(), any(), any(), any())).thenReturn(true);
-        
+
         final LongAdder adder = new LongAdder();
         final SseEventSinkImpl sink = new SseEventSinkImpl(writer, null, ctx) {
             @Override
             public CompletionStage<?> send(OutboundSseEvent event) {
-                ctx.start(() -> { 
+                ctx.start(() -> {
                     throw new RuntimeException("Failed to schedule async task");
                 });
                 return CompletableFuture.completedFuture(null);
             }
         };
         broadcaster.register(sink);
-        
+
         broadcaster.onError((s, ex) -> {
             if (s == sink) {
                 adder.increment();
             }
         });
         assertThat(adder.intValue(), equalTo(0));
-        
+
         broadcaster.broadcast(new OutboundSseEventImpl.BuilderImpl().build());
         broadcaster.close();
-        
+
         assertThat(adder.intValue(), equalTo(1));
     }
 }

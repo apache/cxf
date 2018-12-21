@@ -54,6 +54,10 @@ import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Some tests for sending a SAML Token OnBehalfOf/ActAs to the STS. The STS is set up with
  * two endpoints, one requiring a UsernameToken over TLS, the other just requiring TLS

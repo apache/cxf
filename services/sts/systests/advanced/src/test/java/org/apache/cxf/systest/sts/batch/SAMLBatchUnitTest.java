@@ -41,6 +41,8 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertTrue;
+
 /**
  * In this test case, a CXF client requests a number of SAML Tokens from an STS using batch processing.
  * It uses a simple STSClient implementation to request both a SAML 1.1 and 2.0 token at the same time.

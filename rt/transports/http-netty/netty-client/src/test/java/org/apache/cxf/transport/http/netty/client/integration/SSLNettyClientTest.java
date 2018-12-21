@@ -50,6 +50,9 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class SSLNettyClientTest extends AbstractBusClientServerTestBase {
 
     public static final String PORT = allocatePort(SSLNettyClientTest.class);
@@ -137,7 +140,7 @@ public class SSLNettyClientTest extends AbstractBusClientServerTestBase {
         TrustManager[] myTrustStoreKeyManagers = getTrustManagers(trustStore);
         tlsCP.setTrustManagers(myTrustStoreKeyManagers);
 
-        
+
         tlsCP.setDisableCNCheck(true);
         httpConduit.setTlsClientParameters(tlsCP);
     }

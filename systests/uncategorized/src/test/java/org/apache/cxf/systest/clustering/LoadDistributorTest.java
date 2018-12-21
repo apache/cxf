@@ -30,6 +30,11 @@ import org.apache.cxf.frontend.ClientProxy;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 
 /**
  * Tests load distribution within a static cluster.

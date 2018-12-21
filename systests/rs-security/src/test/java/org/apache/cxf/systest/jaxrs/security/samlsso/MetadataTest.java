@@ -34,6 +34,10 @@ import org.apache.xml.security.utils.Constants;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Test the SAML SSO Metadata service
  */

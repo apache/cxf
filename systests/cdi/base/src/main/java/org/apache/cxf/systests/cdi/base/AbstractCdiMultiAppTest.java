@@ -35,6 +35,7 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public abstract class AbstractCdiMultiAppTest extends AbstractCdiSingleAppTest {
     @Test

@@ -37,6 +37,9 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
  * In this test case, a CXF client sends a Username Token via (1-way) TLS to a CXF intermediary.
  * The intermediary validates the UsernameToken, and then inserts the username into a SAML

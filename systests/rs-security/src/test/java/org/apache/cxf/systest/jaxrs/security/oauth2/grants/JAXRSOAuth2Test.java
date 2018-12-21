@@ -73,6 +73,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Some tests for OAuth 2.0. The tests are run multiple times with different OAuthDataProvider implementations:
  * a) JCACHE_PORT - JCache

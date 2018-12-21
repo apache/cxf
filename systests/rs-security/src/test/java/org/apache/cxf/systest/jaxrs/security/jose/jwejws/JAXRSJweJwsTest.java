@@ -57,6 +57,9 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServerJwt.PORT;
     private static final String CLIENT_JWEJWS_PROPERTIES =
@@ -440,12 +443,12 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
 
         bean.getProperties(true).put("rs.security.encryption.properties",
                                      "org/apache/cxf/systest/jaxrs/security/jwe.direct.properties");
-        
+
         BookStore bs = bean.create(BookStore.class);
         String text = bs.echoText("book");
         assertEquals("book", text);
     }
-    
+
     @Test
     public void testJweAesCbcHmac() throws Exception {
         String address = "https://localhost:" + PORT + "/jweaescbchmac";

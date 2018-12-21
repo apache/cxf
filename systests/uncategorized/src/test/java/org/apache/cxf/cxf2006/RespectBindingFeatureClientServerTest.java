@@ -30,6 +30,10 @@ import org.apache.hello_world_rpclit.SOAPServiceRPCLit;
 import org.junit.After;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class RespectBindingFeatureClientServerTest extends AbstractBusClientServerTestBase {
     public static final String PORT = Server.PORT;
     private final QName portName = new QName("http://apache.org/hello_world_rpclit", "SoapPortRPCLit");

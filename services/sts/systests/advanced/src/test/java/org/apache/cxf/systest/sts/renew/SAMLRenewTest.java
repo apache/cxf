@@ -35,6 +35,10 @@ import org.example.contract.doubleit.DoubleItPortType;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * This is a set of system tests to renew SAML tokens. The client obtains a (soon to be expired token)
  * from the STS, and sends it to the service provider, which should succeed. The client then sleeps to

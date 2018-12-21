@@ -42,6 +42,9 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class JAXRSJwsMultipartTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServerJwsMultipart.PORT;
     @BeforeClass
@@ -59,7 +62,7 @@ public class JAXRSJwsMultipartTest extends AbstractBusClientServerTestBase {
     public static void unregisterBouncyCastleIfNeeded() throws Exception {
         Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
     }
-        
+
     @Test
     public void testJwsJwkBookHMacMultipart() throws Exception {
         String address = "https://localhost:" + PORT + "/jwsjwkhmac";
@@ -68,7 +71,7 @@ public class JAXRSJwsMultipartTest extends AbstractBusClientServerTestBase {
         assertEquals("book", book.getName());
         assertEquals(123L, book.getId());
     }
-    
+
     @Test
     public void testJwsJwkBookHMacMultipartBuffered() throws Exception {
         String address = "https://localhost:" + PORT + "/jwsjwkhmac";
@@ -77,7 +80,7 @@ public class JAXRSJwsMultipartTest extends AbstractBusClientServerTestBase {
         assertEquals("book", book.getName());
         assertEquals(123L, book.getId());
     }
-    
+
     @Test
     public void testJwsJwkBookHMacMultipartJwsJson() throws Exception {
         String address = "https://localhost:" + PORT + "/jwsjwkhmacJwsJson";
@@ -86,7 +89,7 @@ public class JAXRSJwsMultipartTest extends AbstractBusClientServerTestBase {
         assertEquals("book", book.getName());
         assertEquals(123L, book.getId());
     }
-    
+
     @Test
     public void testJwsJwkBookRSAMultipart() throws Exception {
         String address = "https://localhost:" + PORT + "/jwsjwkrsa";
@@ -95,7 +98,7 @@ public class JAXRSJwsMultipartTest extends AbstractBusClientServerTestBase {
         assertEquals("book", book.getName());
         assertEquals(123L, book.getId());
     }
-    
+
     @Test
     public void testJwsJwkBooksHMacMultipart() throws Exception {
         String address = "https://localhost:" + PORT + "/jwsjwkhmac";
@@ -109,11 +112,11 @@ public class JAXRSJwsMultipartTest extends AbstractBusClientServerTestBase {
         assertEquals("book2", returnBooks.get(1).getName());
         assertEquals(124L, returnBooks.get(1).getId());
     }
-    
+
     @Test(expected = BadRequestException.class)
     public void testJwsJwkBooksHMacMultipartUnsigned() throws Exception {
         String address = "https://localhost:" + PORT + "/jwsjwkhmac";
-        BookStore bs = JAXRSClientFactory.create(address, BookStore.class, 
+        BookStore bs = JAXRSClientFactory.create(address, BookStore.class,
                             JAXRSJwsMultipartTest.class.getResource("client.xml").toString());
         bs.echoBookMultipart(new Book("book", 123L));
     }
@@ -129,11 +132,11 @@ public class JAXRSJwsMultipartTest extends AbstractBusClientServerTestBase {
         BookStore bs = createJwsBookStoreHMac(address, true, false);
         bs.echoBookMultipartModified(new Book("book", 123L));
     }
-    
-    private BookStore createJwsBookStoreHMac(String address, 
+
+    private BookStore createJwsBookStoreHMac(String address,
                                              boolean bufferPayload,
                                              boolean useJwsJsonSignatureFormat) throws Exception {
-        JAXRSClientFactoryBean bean = createJAXRSClientFactoryBean(address, bufferPayload, 
+        JAXRSClientFactoryBean bean = createJAXRSClientFactoryBean(address, bufferPayload,
                                                                    useJwsJsonSignatureFormat);
         bean.getProperties(true).put("rs.security.signature.properties",
             "org/apache/cxf/systest/jaxrs/security/secret.jwk.properties");
@@ -145,7 +148,7 @@ public class JAXRSJwsMultipartTest extends AbstractBusClientServerTestBase {
             "org/apache/cxf/systest/jaxrs/security/alice.jwk.properties");
         return bean.create(BookStore.class);
     }
-    private JAXRSClientFactoryBean createJAXRSClientFactoryBean(String address, 
+    private JAXRSClientFactoryBean createJAXRSClientFactoryBean(String address,
                                                                 boolean bufferPayload,
                                                                 boolean useJwsJsonSignatureFormat) throws Exception {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();

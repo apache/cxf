@@ -49,6 +49,10 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * This is a test for invoking on an STS using SOAP 1.2 via the TransportBinding. The CXF client gets a
  * token from the STS over TLS, and then sends it to the CXF endpoint over TLS.

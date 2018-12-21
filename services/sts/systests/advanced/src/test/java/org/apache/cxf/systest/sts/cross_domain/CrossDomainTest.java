@@ -34,6 +34,9 @@ import org.example.contract.doubleit.DoubleItPortType;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Some tests that illustrate how CXF clients can get tokens from different STS instances for
  * service invocations.

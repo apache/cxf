@@ -35,6 +35,9 @@ import org.example.contract.doubleit.DoubleItPortType;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
  * The CXF client gets a token from the STS by authenticating via an X.509 Cert over the asymmetric binding,
  * and then sends it to the CXF endpoint using the asymmetric binding. The SAML Token contains a role, that is

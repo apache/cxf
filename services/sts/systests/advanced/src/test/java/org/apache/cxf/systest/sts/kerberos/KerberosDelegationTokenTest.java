@@ -39,6 +39,9 @@ import org.ietf.jgss.GSSName;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
  * This tests credential delegation. The client enables credential delegation + sends a Kerberos
  * token to an Intermediary via WS-Security. The Intermediary validates the token, and then

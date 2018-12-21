@@ -51,6 +51,11 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class JAXRSOAuth2TlsTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServerOAuth2Tls.PORT;
 

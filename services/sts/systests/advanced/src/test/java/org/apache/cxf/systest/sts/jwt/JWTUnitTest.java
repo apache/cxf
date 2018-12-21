@@ -34,6 +34,9 @@ import org.apache.cxf.ws.security.trust.STSClient;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Some unit tests to get a JWT token from the STS
  */

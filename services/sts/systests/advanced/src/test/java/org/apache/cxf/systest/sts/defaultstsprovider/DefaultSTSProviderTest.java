@@ -35,6 +35,9 @@ import org.apache.wss4j.common.WSS4JConstants;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Test the DefaultSecurityTokenServiceProvider
  */

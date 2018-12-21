@@ -32,6 +32,9 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class TemporaryCredentialServiceTest extends AbstractBusClientServerTestBase {
 
     public static final String TEMPORARY_CREDENTIALS_URL = "/a/oauth/initiate";

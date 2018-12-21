@@ -50,7 +50,9 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(AsyncHTTPConduitTest.class);
@@ -126,7 +128,7 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
         ep.stop();
         ep = null;
     }
-    
+
     @Test
     public void testResponseSameBufferSize() throws Exception {
         updateAddressPort(g, PORT);
@@ -139,7 +141,7 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
             fail();
         }
     }
-    
+
     @Test
     public void testTimeout() throws Exception {
         updateAddressPort(g, PORT);

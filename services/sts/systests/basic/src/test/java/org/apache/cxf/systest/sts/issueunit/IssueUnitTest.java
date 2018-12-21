@@ -74,6 +74,9 @@ import org.apache.wss4j.dom.processor.SAMLTokenProcessor;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Some unit tests for the CXF STSClient Issue Binding.
  */

@@ -47,6 +47,8 @@ import org.apache.cxf.ws.security.trust.STSTokenRetriever.TokenRequestParams;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertTrue;
+
 /**
  * In this test case, a CXF JAX-RS client gets a JWT token from the STS + sends it to the
  * service provider, which validates it.

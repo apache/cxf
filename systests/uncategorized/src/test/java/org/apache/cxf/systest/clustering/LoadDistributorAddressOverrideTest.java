@@ -31,6 +31,10 @@ import org.apache.cxf.frontend.ClientProxy;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 public class LoadDistributorAddressOverrideTest  extends FailoverAddressOverrideTest {
     private static final String FAILOVER_CONFIG =
         "org/apache/cxf/systest/clustering/load_distributor_address_override.xml";

@@ -28,13 +28,15 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 @ContextConfiguration(classes = {CxfPropertiesTest.Config.class})
 @RunWith(SpringJUnit4ClassRunner.class)
-public class CxfPropertiesTest extends Assert {
+public class CxfPropertiesTest {
 
     @Configuration
     public static class Config {
@@ -56,17 +58,17 @@ public class CxfPropertiesTest extends Assert {
     public void throwsViolationExceptionWhenIsNull() {
         doTestInvalidPath(null);
     }
-    
+
     @Test
     public void throwsViolationExceptionWhenPathIsEmpty() {
         doTestInvalidPath("");
     }
-    
+
     @Test
     public void throwsViolationExceptionWhenHasNoSlash() {
         doTestInvalidPath("invalid");
     }
-    
+
     private void doTestInvalidPath(String value) {
         cxfproperties.setPath(value);
         try {
@@ -76,7 +78,7 @@ public class CxfPropertiesTest extends Assert {
             assertEquals(1, e.getConstraintViolations().size());
         }
     }
-    
+
     @Test
     public void noViolationExceptionWhenPathValid() {
         cxfproperties.setPath("/valid");

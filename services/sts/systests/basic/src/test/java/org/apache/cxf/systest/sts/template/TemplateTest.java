@@ -43,6 +43,10 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Test various aspects of the RequestSecurityTokenTemplate. Make sure that if we are expecting
  * a SAML 2.0 token, that's what we get etc. Same goes for the KeyType.

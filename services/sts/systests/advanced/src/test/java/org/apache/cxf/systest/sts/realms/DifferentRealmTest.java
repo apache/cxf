@@ -32,6 +32,9 @@ import org.example.contract.doubleit.DoubleItPortType;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
  * In this test, a CXF client obtains a SAML token from an STS in one realm and sends it to a CXF
  * endpoint. The CXF endpoint dispatches it for validation to a different STS.

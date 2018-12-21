@@ -42,10 +42,11 @@ import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Version;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 
-public abstract class AbstractLuceneQueryVisitorTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public abstract class AbstractLuceneQueryVisitorTest {
 
     private DirectoryReader ireader;
     private IndexSearcher isearcher;

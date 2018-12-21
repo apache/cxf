@@ -33,6 +33,9 @@ import org.apache.cxf.ws.security.trust.STSClient;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 /**
  * In this test case, a CXF client requests a SecurityContextToken from an STS and then cancels it. When
  * cancelling the token, the WSDL of the STS has an EndorsingSupportingToken consisting of the

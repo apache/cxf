@@ -36,9 +36,8 @@ import org.springframework.boot.test.rule.OutputCapture;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.ws.client.core.WebServiceTemplate;
 
-
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertThat;
 
 import sample.ws.SampleWsApplication;
 

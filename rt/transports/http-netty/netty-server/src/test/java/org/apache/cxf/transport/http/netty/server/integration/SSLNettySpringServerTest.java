@@ -29,6 +29,8 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertNotNull;
+
 /**
  * publish the service with SSL configuraiton with Spring
  */

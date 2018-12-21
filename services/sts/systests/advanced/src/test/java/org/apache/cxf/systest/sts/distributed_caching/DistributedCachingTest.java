@@ -32,6 +32,9 @@ import org.example.contract.doubleit.DoubleItPortType;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
  * This is a series of tests of the distributed caching abilities of the STS. In these test-cases,
  * a CXF client invokes on an STS and obtains a security token, which is sent to a service provider.

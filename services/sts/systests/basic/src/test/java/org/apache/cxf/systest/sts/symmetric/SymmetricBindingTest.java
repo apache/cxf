@@ -57,6 +57,10 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Test the Symmetric binding. The CXF client gets a token from the STS by authenticating via a
  * Username Token over the symmetric binding, and then sends it to the CXF endpoint using
