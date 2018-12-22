@@ -33,6 +33,7 @@ import org.apache.demo.resources.Book;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 
 public abstract class AbstractSciTest extends AbstractBusClientServerTestBase {
     @Test

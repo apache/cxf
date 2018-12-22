@@ -31,6 +31,8 @@ import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
 import org.apache.cxf.systest.jaxrs.sse.BookStore;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
+import static org.junit.Assert.fail;
+
 public abstract class AbstractTomcatServer extends AbstractBusTestServerBase {
 
     private Tomcat server;
