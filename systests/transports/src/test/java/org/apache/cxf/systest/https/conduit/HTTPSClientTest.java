@@ -40,6 +40,10 @@ import org.apache.hello_world.services.SOAPService;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * This test is meant to run against a spring-loaded
  * HTTP/S service.

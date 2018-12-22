@@ -40,6 +40,9 @@ import org.apache.hello_world_soap_http.SOAPService;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Tests thread pool config.
  */

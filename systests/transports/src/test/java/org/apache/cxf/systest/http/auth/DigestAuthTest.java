@@ -38,6 +38,9 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 
 public class DigestAuthTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(DigestServer.class);

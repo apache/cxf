@@ -24,7 +24,7 @@ import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-
+import static org.junit.Assert.assertTrue;
 
 /**
  * JAXRSClientServerWebSocketTest without atmosphere

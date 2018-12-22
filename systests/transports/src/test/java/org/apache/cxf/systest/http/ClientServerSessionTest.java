@@ -38,6 +38,11 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class ClientServerSessionTest extends AbstractBusClientServerTestBase {
     public static final String PORT = SessionServer.PORT;
     @BeforeClass
@@ -110,7 +115,7 @@ public class ClientServerSessionTest extends AbstractBusClientServerTestBase {
             assertEquals("Hello Hello", greeting);
             assertTrue(cookie.contains("a=a"));
             assertTrue(cookie.contains("b=b"));
-            
+
             Thread.sleep(30 * 1000); //let session expire
             greeting = greeter.greetMe("SessionExpire");
             cookie = "";

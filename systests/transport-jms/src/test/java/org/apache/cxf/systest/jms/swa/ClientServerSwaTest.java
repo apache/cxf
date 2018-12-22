@@ -39,6 +39,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
     public static final String ADDRESS
         = "jms:jndi:dynamicQueues/test.cxf.jmstransport.swa.queue"
