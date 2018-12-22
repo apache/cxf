@@ -44,7 +44,9 @@ import org.apache.cxf.testutil.common.TestUtil;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class MultiplexClientServerTest extends AbstractBusClientServerTestBase {
     public static final String PORT = TestUtil.getPortNumber(MultiplexClientServerTest.class);

@@ -32,6 +32,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 public class CORBADocLitClientTypeTest extends AbstractTypeTestClient5 {
     protected static final String WSDL_PATH
         = "/wsdl_systest/type_test_corba/type_test_corba-corba.wsdl";

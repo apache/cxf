@@ -35,6 +35,8 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 public class TransformFeatureTest extends AbstractBusClientServerTestBase {
     private static final String PORT = EchoServer.PORT;
     private static final QName PORT_NAME = new QName("http://apache.org/echo", "EchoPort");

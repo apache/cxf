@@ -31,6 +31,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class SOAPDocLitClientTypeTest extends AbstractTypeTestClient5 {
     protected static final String WSDL_PATH = "/wsdl/type_test/type_test_doclit_soap.wsdl";
     protected static final QName SERVICE_NAME = new QName("http://apache.org/type_test/doc", "SOAPService");

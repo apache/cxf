@@ -41,6 +41,10 @@ import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Test what happens when we make an invocation and get back an empty SOAP Body (see CXF-7653)
  */
@@ -88,7 +92,7 @@ public class EmptySOAPBodyTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Should have thown an exception");
         } catch (SOAPFaultException t) {
-            assertTrue("Wrong exception cause " + t.getCause(), 
+            assertTrue("Wrong exception cause " + t.getCause(),
                  t.getCause() instanceof IllegalEmptyResponseException);
         }
 
@@ -96,7 +100,7 @@ public class EmptySOAPBodyTest extends AbstractBusClientServerTestBase {
 
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testProviderSource() throws Exception {
         QName providerServiceName = new QName("http://apache.org/hello_world_xml_http/bare",
@@ -113,7 +117,7 @@ public class EmptySOAPBodyTest extends AbstractBusClientServerTestBase {
         Dispatch<Source> dispatch = service.createDispatch(providerPortName, Source.class,
                                                            javax.xml.ws.Service.Mode.PAYLOAD);
 
-        String str = new String("<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body>" 
+        String str = new String("<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body>"
                               + "<ns2:in xmlns=\"http://apache.org/hello_world_xml_http/bare/types\""
                               + " xmlns:ns2=\"http://apache.org/hello_world_xml_http/bare\">"
                               + "<elem1>empty</elem1><elem2>this is element 2</elem2><elem3>42</elem3></ns2:in>"

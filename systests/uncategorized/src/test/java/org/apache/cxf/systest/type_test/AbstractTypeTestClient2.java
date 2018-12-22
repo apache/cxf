@@ -79,7 +79,12 @@ import org.apache.type_test.types3.StructWithSubstitutionGroup;
 import org.apache.type_test.types3.StructWithSubstitutionGroupAbstract;
 import org.apache.type_test.types3.StructWithSubstitutionGroupNil;
 
+import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
 
@@ -369,11 +374,11 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         }
         if (!perfTestOnly) {
             for (int i = 0; i < 3; i++) {
-                assertEquals("testFixedArray(): Incorrect value for inout param",
+                Assert.assertEquals("testFixedArray(): Incorrect value for inout param",
                              x.getItem().get(i), y.value.getItem().get(i));
-                assertEquals("testFixedArray(): Incorrect value for out param",
+                Assert.assertEquals("testFixedArray(): Incorrect value for out param",
                              yOrig.getItem().get(i), z.value.getItem().get(i));
-                assertEquals("testFixedArray(): Incorrect return value",
+                Assert.assertEquals("testFixedArray(): Incorrect return value",
                              x.getItem().get(i), ret.getItem().get(i));
             }
         }
@@ -410,11 +415,11 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
             assertTrue("testBoundedArray() array size incorrect",
                        xSize == ySize && ySize == zSize && zSize == retSize && xSize == 3);
             for (int i = 0; i < xSize; i++) {
-                assertEquals("testBoundedArray(): Incorrect value for inout param",
+                Assert.assertEquals("testBoundedArray(): Incorrect value for inout param",
                              x.getItem().get(i), y.value.getItem().get(i), delta);
-                assertEquals("testBoundedArray(): Incorrect value for out param",
+                Assert.assertEquals("testBoundedArray(): Incorrect value for out param",
                              yOrig.getItem().get(i), z.value.getItem().get(i), delta);
-                assertEquals("testBoundedArray(): Incorrect return value",
+                Assert.assertEquals("testBoundedArray(): Incorrect return value",
                              x.getItem().get(i), ret.getItem().get(i), delta);
             }
         }
@@ -539,13 +544,13 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         if (!perfTestOnly) {
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 3; j++) {
-                    assertEquals("testNestedArray(): Incorrect value for inout param",
+                    Assert.assertEquals("testNestedArray(): Incorrect value for inout param",
                         x.getSubarray().get(i).getItem().get(j),
                         y.value.getSubarray().get(i).getItem().get(j));
-                    assertEquals("testNestedArray(): Incorrect value for out param",
+                    Assert.assertEquals("testNestedArray(): Incorrect value for out param",
                         yOrig.getSubarray().get(i).getItem().get(j),
                         z.value.getSubarray().get(i).getItem().get(j));
-                    assertEquals("testNestedArray(): Incorrect return value",
+                    Assert.assertEquals("testNestedArray(): Incorrect return value",
                         x.getSubarray().get(i).getItem().get(j), ret.getSubarray().get(i).getItem().get(j));
                 }
             }
@@ -562,7 +567,7 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         List<String> yVar = y.getVarList();
         assertTrue(xVar.size() == yVar.size());
         for (int i = 0; i < xVar.size(); ++i) {
-            assertEquals(msg, xVar.get(i), yVar.get(i));
+            Assert.assertEquals(msg, xVar.get(i), yVar.get(i));
         }
 
         List<Integer> xAttr = x.getAttribList();
@@ -572,7 +577,7 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         } else {
             assertTrue(xAttr.size() == yAttr.size());
             for (int i = 0; i < xAttr.size(); ++i) {
-                assertEquals(msg, xAttr.get(i), yAttr.get(i));
+                Assert.assertEquals(msg, xAttr.get(i), yAttr.get(i));
             }
         }
     }
@@ -647,8 +652,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
     protected void assertEquals(String msg, StructWithUnion x, StructWithUnion y) throws Exception {
         assertNotNull(msg, x);
         assertNotNull(msg, y);
-        assertEquals(msg, x.getVarUnion(), y.getVarUnion());
-        assertEquals(msg, x.getAttribUnion(), y.getAttribUnion());
+        Assert.assertEquals(msg, x.getVarUnion(), y.getVarUnion());
+        Assert.assertEquals(msg, x.getAttribUnion(), y.getAttribUnion());
     }
     @Test
     public void testStructWithUnion() throws Exception {
@@ -1194,9 +1199,9 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
             ret = rpcClient.testExtendsSimpleType(x, y, z);
         }
         if (!perfTestOnly) {
-            assertEquals(x.getValue(), y.value.getValue());
-            assertEquals(yOriginal.getValue(), z.value.getValue());
-            assertEquals(x.getValue(), ret.getValue());
+            Assert.assertEquals(x.getValue(), y.value.getValue());
+            Assert.assertEquals(yOriginal.getValue(), z.value.getValue());
+            Assert.assertEquals(x.getValue(), ret.getValue());
         }
     }
 
@@ -1222,17 +1227,17 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
             ret = rpcClient.testExtendsSimpleContent(x, y, z);
         }
         if (!perfTestOnly) {
-            assertEquals(x.getValue(), y.value.getValue());
-            assertEquals(yOriginal.getValue(), z.value.getValue());
-            assertEquals(x.getValue(), ret.getValue());
+            Assert.assertEquals(x.getValue(), y.value.getValue());
+            Assert.assertEquals(yOriginal.getValue(), z.value.getValue());
+            Assert.assertEquals(x.getValue(), ret.getValue());
         }
     }
 
     //org.apache.type_test.types1.Document
 
     protected void equals(String msg, Document x, Document y) throws Exception {
-        assertEquals(msg, x.getValue(), y.getValue());
-        assertEquals(msg, x.getID(), y.getID());
+        Assert.assertEquals(msg, x.getValue(), y.getValue());
+        Assert.assertEquals(msg, x.getID(), y.getID());
     }
     @Test
     public void testDocument() throws Exception {
@@ -2046,9 +2051,9 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
     }
 
     protected void equals(String msg, SimpleContent1 x, SimpleContent1 y) throws Exception {
-        assertEquals(msg, x.getAttrib1A(), y.getAttrib1A());
-        assertEquals(msg, x.getAttrib1B(), y.getAttrib1B());
-        assertEquals(msg, x.getValue(), y.getValue());
+        Assert.assertEquals(msg, x.getAttrib1A(), y.getAttrib1A());
+        Assert.assertEquals(msg, x.getAttrib1B(), y.getAttrib1B());
+        Assert.assertEquals(msg, x.getValue(), y.getValue());
     }
     @Test
     public void testSimpleContent1() throws Exception {
@@ -2083,8 +2088,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
     }
 
     protected void equals(String msg, SimpleContent2 x, SimpleContent2 y) throws Exception {
-        assertEquals(msg, x.getAttrib2A(), y.getAttrib2A());
-        assertEquals(msg, x.getAttrib2B(), y.getAttrib2B());
+        Assert.assertEquals(msg, x.getAttrib2A(), y.getAttrib2A());
+        Assert.assertEquals(msg, x.getAttrib2B(), y.getAttrib2B());
         equals(msg, (SimpleContent1)x, (SimpleContent1)y);
     }
     @Test
@@ -2124,8 +2129,8 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
     }
 
     protected void equals(String msg, SimpleContent3 x, SimpleContent3 y) throws Exception {
-        assertEquals(msg, x.getAttrib3A(), y.getAttrib3A());
-        assertEquals(msg, x.isAttrib3B(), y.isAttrib3B());
+        Assert.assertEquals(msg, x.getAttrib3A(), y.getAttrib3A());
+        Assert.assertEquals(msg, x.isAttrib3B(), y.isAttrib3B());
         equals(msg, (SimpleContent2)x, (SimpleContent2)y);
     }
     @Test
@@ -2171,7 +2176,7 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
     protected void assertEquals(String msg, UnionSimpleContent x, UnionSimpleContent y) throws Exception {
         assertNotNull(msg, x);
         assertNotNull(msg, y);
-        assertEquals(msg, x.getValue(), y.getValue());
+        Assert.assertEquals(msg, x.getValue(), y.getValue());
     }
     @Test
     public void testUnionSimpleContent() throws Exception {

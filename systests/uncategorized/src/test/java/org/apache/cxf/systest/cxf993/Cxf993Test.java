@@ -32,6 +32,10 @@ import testnotification.SendNotification;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class Cxf993Test extends AbstractBusClientServerTestBase {
     public static final String PORT = Server.PORT;
     private final QName serviceName = new QName("urn://testnotification", "NotificationService");

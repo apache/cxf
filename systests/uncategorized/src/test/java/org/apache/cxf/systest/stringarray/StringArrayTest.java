@@ -34,6 +34,9 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertTrue;
+
 public class StringArrayTest extends AbstractBusClientServerTestBase {
     public static final String PORT = Server.PORT;
 

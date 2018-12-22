@@ -33,6 +33,10 @@ import org.apache.hello_world_mixedstyle.types.GreetMeResponse;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class ClientServerVersioningTest extends AbstractClientServerTestBase {
     private static final String PORT = Server.PORT;
     private final QName portName = new QName("http://apache.org/hello_world_mixedstyle", "SoapPort");

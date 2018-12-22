@@ -61,12 +61,16 @@ import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(ClientMtomXopTest.class);
     public static final QName MTOM_PORT = new QName("http://cxf.apache.org/mime", "TestMtomPort");
     public static final QName MTOM_PORT_PROVIDER = new QName("http://cxf.apache.org/mime", "TestMtomProviderPort");
     public static final QName MTOM_SERVICE = new QName("http://cxf.apache.org/mime", "TestMtomService");
-    
+
 
 
     public static class Server extends AbstractBusTestServerBase {
@@ -84,7 +88,7 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
                 jaxep.getOutInterceptors().add(new LoggingOutInterceptor());
                 SOAPBinding jaxWsSoapBinding = (SOAPBinding) jaxep.getBinding();
                 jaxWsSoapBinding.setMTOMEnabled(true);
-                EndpointImpl endpoint = 
+                EndpointImpl endpoint =
                     (EndpointImpl)javax.xml.ws.Endpoint.publish(addressProvider, new TestMtomProviderImpl());
                 endpoint.getProperties().put("schema-validation-enabled", "true");
                 endpoint.getInInterceptors().add(new LoggingInInterceptor());
@@ -207,8 +211,8 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
             throw ex;
         }
     }
-        
-       
+
+
     @Test
     public void testMtomXopProvider() throws Exception {
         TestMtom mtomPort = createPort(MTOM_SERVICE, MTOM_PORT_PROVIDER, TestMtom.class, true, true);
