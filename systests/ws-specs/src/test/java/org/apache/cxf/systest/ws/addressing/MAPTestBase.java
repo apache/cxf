@@ -59,7 +59,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.apache.cxf.ws.addressing.JAXWSAConstants.CLIENT_ADDRESSING_PROPERTIES;
-
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 /**
  * Tests the addition of WS-Addressing Message Addressing Properties.

@@ -28,6 +28,8 @@ import org.jboss.weld.environment.servlet.Listener;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 
+import static org.junit.Assert.assertTrue;
+
 public class JettyWarTest extends AbstractCdiSingleAppTest {
     @Ignore
     public static class EmbeddedJettyServer extends AbstractJettyServer {

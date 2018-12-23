@@ -32,6 +32,9 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class JettyWarTest extends AbstractCdiSingleAppTest {
     @Ignore
     public static class EmbeddedJettyServer extends AbstractJettyServer {
@@ -48,7 +51,7 @@ public class JettyWarTest extends AbstractCdiSingleAppTest {
         assertTrue("server did not launch correctly", launchServer(EmbeddedJettyServer.class, true));
         createStaticBus();
     }
-    
+
     @Test
     public void testAddOneBookWithValidation() {
         final String id = UUID.randomUUID().toString();
@@ -74,7 +77,7 @@ public class JettyWarTest extends AbstractCdiSingleAppTest {
 
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), r.getStatus());
     }
-    
+
     @Test
     public void testBookHasBeenCreatedWhenPostedAsAtomFeed() {
         Response r = createWebClient(getBasePath() + "/books/feed", "application/atom+xml").post(

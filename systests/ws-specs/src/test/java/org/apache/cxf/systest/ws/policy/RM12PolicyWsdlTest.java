@@ -35,6 +35,10 @@ import org.apache.cxf.ws.rm.RM11Constants;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Tests the use of the WS-Policy Framework to automatically engage WS-RM 1.2 in response to Policies defined for the
  * endpoint via an direct attachment to the wsdl.

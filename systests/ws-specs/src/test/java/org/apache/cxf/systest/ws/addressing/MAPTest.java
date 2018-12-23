@@ -24,6 +24,7 @@ import javax.jws.WebService;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests the addition of WS-Addressing Message Addressing Properties.

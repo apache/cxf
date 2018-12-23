@@ -30,6 +30,8 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.webapp.WebAppContext;
 
+import static org.junit.Assert.fail;
+
 public abstract class AbstractJettyServer extends AbstractBusTestServerBase {
 
     private Server server;

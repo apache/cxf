@@ -44,6 +44,7 @@ import org.apache.cxf.ws.policy.PolicyOutInterceptor;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
 
 public class WSDLAddrPolicyAttachmentJaxwsMMProviderTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);

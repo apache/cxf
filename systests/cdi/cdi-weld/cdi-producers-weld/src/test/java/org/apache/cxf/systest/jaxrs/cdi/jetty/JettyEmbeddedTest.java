@@ -27,6 +27,8 @@ import org.jboss.weld.environment.servlet.Listener;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertTrue;
+
 public class JettyEmbeddedTest extends AbstractBookStoreCdiTest {
     public static class EmbeddedJettyServer extends AbstractJettyServer {
         public static final int PORT = allocatePortAsInt(EmbeddedJettyServer.class);
