@@ -44,6 +44,7 @@ Install CXF's cxf-rs-description-swagger2 feature that installs all the required
 for this demo bundle.
 
   feature:install cxf-rs-description-swagger2
+  feature:install aries-blueprint
 
 Install this demo bundle (using the appropriate bundle version number)
   

@@ -44,6 +44,7 @@ Install CXF's cxf-rs-description-openapi-v3 feature that installs all the requir
 for this demo bundle.
 
   feature:install cxf-rs-description-openapi-v3
+  feature:install aries-blueprint
 
 Install this demo bundle (using the appropriate bundle version number)
   

@@ -52,6 +52,7 @@ for this demo bundle.
   feature:install cxf-jaxrs
   feature:install cxf-jsr-json
   feature:install cxf-tracing-opentracing
+  feature:install aries-blueprint
   
 Install the distributed tracer compatible with OpenTracing API, as in this example 
 we are using Uber Jaeger:

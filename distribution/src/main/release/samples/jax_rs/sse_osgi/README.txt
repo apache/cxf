@@ -44,6 +44,7 @@ Install CXF's cxf-sse and cxf-jackson features that installs all the required bu
 for this demo.
 
   feature:install cxf-sse cxf-jackson
+  feature:install aries-blueprint
 
 Install this demo bundle (using the appropriate bundle version number)
 
