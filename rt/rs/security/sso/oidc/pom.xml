@@ -159,7 +159,6 @@
       <plugin>
         <groupId>org.bsc.maven</groupId>
         <artifactId>maven-processor-plugin</artifactId>
-        <version>3.2.0</version>
         <executions>
           <execution>
             <id>process</id>
