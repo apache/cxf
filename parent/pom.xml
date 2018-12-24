@@ -556,6 +556,11 @@
                         </lifecycleMappingMetadata>
                     </configuration>
                 </plugin>
+                <plugin>
+                    <groupId>org.bsc.maven</groupId>
+                    <artifactId>maven-processor-plugin</artifactId>
+                    <version>3.3.3</version> 
+                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
