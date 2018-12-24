@@ -81,6 +81,14 @@ import org.apache.hello_world_soap_http.types.GreetMeResponse;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class ClientServerTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
     static final String BARE_PORT = allocatePort(Server.class, 1);
@@ -742,7 +750,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
                 assertNotNull(brlf.getFaultInfo());
                 assertEquals("BadRecordLitFault", brlf.getFaultInfo());
             }
-            
+
             try {
                 greeter.testDocLitFaultAsync(noSuchCodeFault).get();
                 fail("Should have thrown NoSuchCodeLitFault exception");
@@ -998,7 +1006,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
                         "http://localhost:" + PORT + "/SoapContext/AsyncEchoProvider");
         Dispatch<StreamSource> dispatcher = service.createDispatch(fakePortName,
                                                                    StreamSource.class,
-                                                                   Service.Mode.PAYLOAD, 
+                                                                   Service.Mode.PAYLOAD,
                                                                    new LoggingFeature());
 
         Client client = ((DispatchImpl<StreamSource>)dispatcher).getClient();

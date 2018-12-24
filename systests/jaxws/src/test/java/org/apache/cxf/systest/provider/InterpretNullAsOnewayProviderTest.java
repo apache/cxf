@@ -35,6 +35,10 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Testing the null response behavior of jaxws provider (jaxws 2.2 section 5.1.1)
  */

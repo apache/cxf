@@ -48,6 +48,10 @@ import org.apache.hello_world_soap_http.SOAPService;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class DispatchClientServerWithHugeResponseTest extends AbstractBusClientServerTestBase {
 
     private static final QName SERVICE_NAME

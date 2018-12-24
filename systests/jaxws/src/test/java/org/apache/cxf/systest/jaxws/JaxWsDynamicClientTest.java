@@ -41,6 +41,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class JaxWsDynamicClientTest extends AbstractBusClientServerTestBase {
     static final String PORT = TestUtil.getPortNumber(ServerNoBodyParts.class);
     static final String PORT1 = TestUtil.getPortNumber(ArrayServiceServer.class);

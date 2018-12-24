@@ -37,6 +37,8 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 public class JaxwsAsyncFailOverTest  extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(ServerNoBodyParts.class, 1);
     static final String PORT2 = allocatePort(ServerNoBodyParts.class, 2);

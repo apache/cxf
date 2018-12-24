@@ -41,6 +41,8 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
+
 public class WsdlGetUtilsTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(WsdlGetUtilsTest.class);
 

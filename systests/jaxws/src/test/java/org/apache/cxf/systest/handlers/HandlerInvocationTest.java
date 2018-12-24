@@ -73,6 +73,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
     private static String port = TestUtil.getPortNumber(Server.class);
 

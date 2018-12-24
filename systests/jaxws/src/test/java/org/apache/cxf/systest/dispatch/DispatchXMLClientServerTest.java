@@ -47,6 +47,11 @@ import org.apache.hello_world_xml_http.wrapped.types.ObjectFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class DispatchXMLClientServerTest extends AbstractBusClientServerTestBase {
     private static final QName SERVICE_NAME
         = new QName("http://apache.org/hello_world_xml_http/wrapped", "XMLService");
