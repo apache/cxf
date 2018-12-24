@@ -72,7 +72,7 @@ import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.common.util.PrimitiveUtils;
-import org.apache.cxf.common.util.ProxyClassLoader;
+import org.apache.cxf.common.util.ProxyClassLoaderCache;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
@@ -138,11 +138,8 @@ public final class InjectionUtils {
 
     private static final String IGNORE_MATRIX_PARAMETERS = "ignore.matrix.parameters";
     
-    private static Map<String, ProxyClassLoader> proxyClassLoaderCache = 
-        Collections.synchronizedMap(new HashMap<String, ProxyClassLoader>());
-    
-    private static int cacheSize =
-        Integer.parseInt(System.getProperty("org.apache.cxf.proxy.classloader.size", "3000"));
+    private static ProxyClassLoaderCache proxyClassLoaderCache = 
+        new ProxyClassLoaderCache();
     
     private InjectionUtils() {
 
@@ -1082,24 +1079,19 @@ public final class InjectionUtils {
             proxy = createThreadLocalServletApiContext(type.getName());
         }
         if (proxy == null) {
-            ProxyClassLoader loader
-                = proxyClassLoaderCache.get(type.getName() + type.getClassLoader()); 
-            if (loader == null
-                || !canSeeAllClasses(loader, new Class<?>[]{Proxy.class, type, ThreadLocalProxy.class})) {
-                // to avoid creating too much ProxyClassLoader to save Metaspace usage
-                LOG.log(Level.FINE, "can't find required ProxyClassLoader for type " + type.getName());
+            ClassLoader loader
+                = proxyClassLoaderCache.getProxyClassLoader(Proxy.class.getClassLoader(), 
+                                                            new Class<?>[]{Proxy.class, ThreadLocalProxy.class, type}); 
+            if (!canSeeAllClasses(loader, new Class<?>[]{Proxy.class, ThreadLocalProxy.class, type})) {
+                LOG.log(Level.FINE, "find a loader from ProxyClassLoader cache," 
+                    + " but can't see all interfaces");
+                
                 LOG.log(Level.FINE, "create a new one with parent  " + Proxy.class.getClassLoader());
-                loader = new ProxyClassLoader(Proxy.class.getClassLoader());
-                loader.addLoader(type.getClassLoader());
-                LOG.log(Level.FINE, "type classloader is  " + type.getClassLoader());
-                loader.addLoader(ThreadLocalProxy.class.getClassLoader());
-                LOG.log(Level.FINE, "ThreadLocalProxy classloader is  " 
-                    + ThreadLocalProxy.class.getClassLoader().getClass().getName());
-                if (proxyClassLoaderCache.size() >= cacheSize) {
-                    LOG.log(Level.FINE, "proxyClassLoaderCache is full, need clear it");
-                    proxyClassLoaderCache.clear();
-                }
-                proxyClassLoaderCache.put(type.getName() + type.getClassLoader(), loader); 
+                proxyClassLoaderCache.removeStaleProxyClassLoader(type);
+                proxyClassLoaderCache.getProxyClassLoader(Proxy.class.getClassLoader(), 
+                                                          new Class<?>[]{Proxy.class, ThreadLocalProxy.class, type}); 
+                
+                
             } 
             return (ThreadLocalProxy<T>)Proxy.newProxyInstance(loader,
                                    new Class[] {type, ThreadLocalProxy.class },

@@ -22,11 +22,6 @@ package org.apache.cxf.common.util;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -49,11 +44,9 @@ public class ProxyHelper {
    
     private static final Logger LOG = LogUtils.getL7dLogger(ProxyHelper.class);
     
-    protected Map<String, ClassLoader> proxyClassLoaderCache = 
-        Collections.synchronizedMap(new HashMap<String, ClassLoader>());
-    protected int cacheSize =
-        Integer.parseInt(System.getProperty("org.apache.cxf.proxy.classloader.size", "3000"));
-    
+    protected ProxyClassLoaderCache proxyClassLoaderCache = 
+        new ProxyClassLoaderCache();
+      
     
     protected ProxyHelper() {
     }
@@ -77,46 +70,28 @@ public class ProxyHelper {
             return loader;
         }
         String sortedNameFromInterfaceArray = getSortedNameFromInterfaceArray(interfaces);
-        ClassLoader cachedLoader = proxyClassLoaderCache.get(sortedNameFromInterfaceArray);
-        if (cachedLoader != null) {
-            if (canSeeAllInterfaces(cachedLoader, interfaces)) {
-                //found cached loader
-                LOG.log(Level.FINE, "find required loader from ProxyClassLoader cache with key" 
-                        + sortedNameFromInterfaceArray);
-                return cachedLoader;
-            } else {
-                //found cached loader somehow can't see all interfaces
-                LOG.log(Level.FINE, "find a loader from ProxyClassLoader cache with key " 
-                        + sortedNameFromInterfaceArray
-                        + " but can't see all interfaces");
+        ClassLoader cachedLoader = proxyClassLoaderCache.getProxyClassLoader(loader, interfaces);
+        if (canSeeAllInterfaces(cachedLoader, interfaces)) {
+            LOG.log(Level.FINE, "find required loader from ProxyClassLoader cache with key" 
+                 + sortedNameFromInterfaceArray);
+            return cachedLoader;
+        } else {
+            LOG.log(Level.FINE, "find a loader from ProxyClassLoader cache with interfaces " 
+                + sortedNameFromInterfaceArray
+                + " but can't see all interfaces");
+            for (Class<?> currentInterface : interfaces) {
+                String ifName = currentInterface.getName();
+                
+                if (!ifName.startsWith("org.apache.cxf") && !ifName.startsWith("java")) {
+                    // remove the stale ProxyClassLoader and recreate one
+                    proxyClassLoaderCache.removeStaleProxyClassLoader(currentInterface);
+                    cachedLoader = proxyClassLoaderCache.getProxyClassLoader(loader, interfaces);
+                    
+                }
             }
         }
-        ProxyClassLoader combined;
-        LOG.log(Level.FINE, "can't find required ProxyClassLoader from cache, create a new one with parent " + loader);
-        final SecurityManager sm = System.getSecurityManager();
-        if (sm == null) {
-            combined = new ProxyClassLoader(loader, interfaces);
-        } else {
-            combined = AccessController.doPrivileged(new PrivilegedAction<ProxyClassLoader>() {
-                @Override
-                public ProxyClassLoader run() {
-                    return new ProxyClassLoader(loader, interfaces);
-                }
-            });
-        }
-        for (Class<?> currentInterface : interfaces) {
-            combined.addLoader(getClassLoader(currentInterface));
-            LOG.log(Level.FINE, "interface for new created ProxyClassLoader is "
-                + currentInterface.getName());
-            LOG.log(Level.FINE, "interface's classloader for new created ProxyClassLoader is "
-                + currentInterface.getClassLoader());
-        }
-        if (proxyClassLoaderCache.size() >= cacheSize) {
-            LOG.log(Level.FINE, "proxyClassLoaderCache is full, need clear it");
-            proxyClassLoaderCache.clear();
-        }
-        proxyClassLoaderCache.put(sortedNameFromInterfaceArray, combined);
-        return combined;
+               
+        return cachedLoader;
     }
     
     private String getSortedNameFromInterfaceArray(Class<?>[] interfaces) {
@@ -127,17 +102,6 @@ public class ProxyHelper {
         return arraySet.toString();
     }
 
-    private static ClassLoader getClassLoader(final Class<?> clazz) {
-        final SecurityManager sm = System.getSecurityManager();
-        if (sm != null) {
-            return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
-                public ClassLoader run() {
-                    return clazz.getClassLoader();
-                }
-            });
-        }
-        return clazz.getClassLoader();
-    }
 
     private boolean canSeeAllInterfaces(ClassLoader loader, Class<?>[] interfaces) {
         for (Class<?> currentInterface : interfaces) {
