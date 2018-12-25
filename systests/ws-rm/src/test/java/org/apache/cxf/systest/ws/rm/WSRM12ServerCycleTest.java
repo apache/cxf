@@ -48,9 +48,10 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
 
 /**
- * 
+ *
  */
 public class WSRM12ServerCycleTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(WSRM12ServerCycleTest.class);
@@ -102,17 +103,17 @@ public class WSRM12ServerCycleTest extends AbstractBusClientServerTestBase {
                    launchServer(Server.class, null, new String[] {PORT, "cxf7392"}, true));
 
     }
-    
-    private String getPrefix() { 
+
+    private String getPrefix() {
         return "cxf7392";
     }
-    
+
     public static RMFeature wsrm() {
         return wsrm(DEFAULT_BASE_RETRANSMISSION_INTERVAL, DEFAULT_ACKNOWLEDGEMENT_INTERVAL);
     }
 
     public static RMFeature wsrm(long brtxInterval, long ackInterval) {
-        RMAssertion.BaseRetransmissionInterval baseRetransmissionInterval 
+        RMAssertion.BaseRetransmissionInterval baseRetransmissionInterval
             = new RMAssertion.BaseRetransmissionInterval();
         baseRetransmissionInterval.setMilliseconds(Long.valueOf(brtxInterval));
         RMAssertion.AcknowledgementInterval acknowledgementInterval = new RMAssertion.AcknowledgementInterval();
@@ -155,7 +156,7 @@ public class WSRM12ServerCycleTest extends AbstractBusClientServerTestBase {
             System.clearProperty("javax.xml.transform.TransformerFactory");
         }
     }
-        
+
 
     public void runTest(String cfg, boolean faultOnRestart) throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -186,11 +187,11 @@ public class WSRM12ServerCycleTest extends AbstractBusClientServerTestBase {
 
 
         control.stopGreeter(cfg);
-        
+
         //make sure greeter is down
         Thread.sleep(1000);
         control.startGreeter(cfg);
-        
+
         //CXF-7392
         if (faultOnRestart) {
             try {
@@ -203,7 +204,7 @@ public class WSRM12ServerCycleTest extends AbstractBusClientServerTestBase {
             // this should work as the sequence should be recovered on the server side
             greeter.greetMe("four");
         }
-        
+
 
         ((Closeable)greeter).close();
         greeterBus.shutdown(true);

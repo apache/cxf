@@ -30,6 +30,8 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 public class WSRMOptionalPolicyTest extends AbstractBusClientServerTestBase {
     public static final String PORT = Server.PORT;
     private static final URL WSDL = GreetingService.class.getResource("greeting.wsdl");

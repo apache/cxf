@@ -58,6 +58,10 @@ import org.apache.cxf.ws.rm.RMManager;
 import org.junit.After;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Tests the operation of InOrder delivery assurance for one-way messages to the server.
  */
@@ -238,7 +242,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
             assertTrue("Message out of order", argNum < callArgs.length);
         }
     }
-    
+
     @Test
     public void testOnewayAtLeastOnceInOrderDelay() throws Exception {
         int numMessages = 4;

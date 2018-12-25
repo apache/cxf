@@ -38,6 +38,10 @@ import org.apache.cxf.ws.rm.RMManager;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Tests the gzip feature does not interfere with the ws-rm retransmission.
  * Note that the current retransmission logic isn't optimal (in some sense, wrong)
