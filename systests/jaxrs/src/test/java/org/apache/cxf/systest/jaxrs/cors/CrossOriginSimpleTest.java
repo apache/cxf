@@ -49,6 +49,10 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Unit tests for CORS. This isn't precisely simple as it's turned out.
  *
@@ -482,7 +486,7 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
             ((Closeable)httpclient).close();
         }
     }
-    
+
     @Test
     public void testAnnotatedClassCorrectOrigin2() throws Exception {
         HttpClient httpclient = HttpClientBuilder.create().build();

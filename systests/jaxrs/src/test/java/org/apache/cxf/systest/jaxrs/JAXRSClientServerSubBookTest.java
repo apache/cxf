@@ -26,6 +26,9 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class JAXRSClientServerSubBookTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServerSub.PORT;
 
@@ -39,7 +42,7 @@ public class JAXRSClientServerSubBookTest extends AbstractBusClientServerTestBas
 
     @Test
     public void testGetChapterFromBookSubObject() throws Exception {
-        WebClient wc = 
+        WebClient wc =
             WebClient.create("http://localhost:" + PORT + "/bookstore/booksubresourceobject/chaptersobject/sub/1");
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(100000000L);
         Chapter c = wc.accept("application/xml").get(Chapter.class);

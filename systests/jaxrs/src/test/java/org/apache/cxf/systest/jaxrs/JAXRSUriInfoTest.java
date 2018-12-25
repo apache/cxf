@@ -32,6 +32,8 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class JAXRSUriInfoTest extends AbstractClientServerTestBase {
     public static final int PORT = SpringServer.PORT;
     @BeforeClass
@@ -80,7 +82,7 @@ public class JAXRSUriInfoTest extends AbstractClientServerTestBase {
         String data = wc.get(String.class);
         assertEquals("http://localhost:" + PORT + "/app/v1/," + path + "," + pathParam, data);
     }
-    
+
     @Test
     public void testBasePathAndPathAndPathParamXForwarded() throws Exception {
         checkUriInfoXForwarded("http://localhost:" + PORT + "/app/v1", "\"\"", "/");
@@ -95,7 +97,7 @@ public class JAXRSUriInfoTest extends AbstractClientServerTestBase {
         checkUriInfoXForwarded("http://localhost:" + PORT + "/app/v1/bar", "\"bar\"", "bar");
         checkUriInfoXForwarded("http://localhost:" + PORT + "/app/v1/bar", "\"bar\"", "bar");
     }
-    
+
     private void checkUriInfoXForwarded(String address, String path, String pathParam) {
         WebClient wc = WebClient.create(address);
         wc.accept("text/plain");

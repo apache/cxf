@@ -40,6 +40,8 @@ import io.reactivex.disposables.Disposable;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class JAXRSRxJava2ObservableTest extends AbstractBusClientServerTestBase {
     public static final String PORT = RxJava2ObservableServer.PORT;
@@ -68,7 +70,7 @@ public class JAXRSRxJava2ObservableTest extends AbstractBusClientServerTestBase 
         Observable<HelloWorldBean> obs = wc.accept("application/json")
             .rx(ObservableRxInvoker.class)
             .get(HelloWorldBean.class);
-        
+
         Holder<HelloWorldBean> holder = new Holder<>();
         Disposable d = obs.subscribe(v -> {
             holder.value = v;
@@ -80,13 +82,13 @@ public class JAXRSRxJava2ObservableTest extends AbstractBusClientServerTestBase 
         assertEquals("Hello", holder.value.getGreeting());
         assertEquals("World", holder.value.getAudience());
     }
-    
+
     @Test
     public void testGetHelloWorldJsonList() throws Exception {
         String address = "http://localhost:" + PORT + "/rx2/observable/textJsonList";
         doTestGetHelloWorldJsonList(address);
-    } 
-    
+    }
+
     private void doTestGetHelloWorldJsonList(String address) throws Exception {
         WebClient wc = WebClient.create(address,
                                         Collections.singletonList(new JacksonJsonProvider()));

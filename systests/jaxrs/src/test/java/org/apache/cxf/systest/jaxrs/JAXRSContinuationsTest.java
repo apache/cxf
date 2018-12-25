@@ -23,6 +23,7 @@ import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertTrue;
 
 public class JAXRSContinuationsTest extends AbstractJAXRSContinuationsTest {
     public static final String PORT = BookContinuationServer.PORT;

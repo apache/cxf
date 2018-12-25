@@ -23,6 +23,8 @@ import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 public class Swagger2XForwardedDescriptionTest extends AbstractSwagger2ServiceDescriptionTest {
     private static final String PORT = Swagger2Server.PORT;
 
@@ -37,12 +39,12 @@ public class Swagger2XForwardedDescriptionTest extends AbstractSwagger2ServiceDe
     public void testApiListingIsProperlyReturnedJSON() throws Exception {
         doTestApiListingIsProperlyReturnedJSON();
     }
-    
+
     @Test
     public void testApiListingIsProperlyReturnedJSONXForwarded() throws Exception {
         doTestApiListingIsProperlyReturnedJSON(XForwarded.ONE_HOST);
     }
-    
+
     @Test
     public void testApiListingIsProperlyReturnedJSONXForwardedManyHosts() throws Exception {
         doTestApiListingIsProperlyReturnedJSON(XForwarded.MANY_HOSTS);

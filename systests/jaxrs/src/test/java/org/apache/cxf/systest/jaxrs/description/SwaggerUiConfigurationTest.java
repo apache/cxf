@@ -41,10 +41,11 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class SwaggerUiConfigurationTest extends AbstractBusClientServerTestBase {
     private static final String PORT = allocatePort(SwaggerUiConfigurationTest.class);
-    
+
     @Ignore
     public static class Server extends AbstractBusTestServerBase {
         @Override
@@ -61,7 +62,7 @@ public class SwaggerUiConfigurationTest extends AbstractBusClientServerTestBase 
             sf.setAddress("http://localhost:" + PORT + "/");
             sf.create();
         }
-        
+
         public static void main(String[] args) {
             try {
                 Server s = new Server();
@@ -85,36 +86,36 @@ public class SwaggerUiConfigurationTest extends AbstractBusClientServerTestBase 
 
     @Test
     public void testUiRootResourceRedirect() {
-        // Test that Swagger UI resources do not interfere with 
+        // Test that Swagger UI resources do not interfere with
         // application-specific ones and are accessible.
         final String url = "http://localhost:" + getPort() + "/api-docs";
-        
+
         WebClient uiClient = WebClient
             .create(url)
             .accept("*/*");
-        
+
         try (Response response = uiClient.get()) {
             assertThat(response.getStatus(), equalTo(Response.Status.TEMPORARY_REDIRECT.getStatusCode()));
             assertThat(response.getHeaderString("Location"), equalTo(url + "?url=/swagger.json"));
         }
     }
-    
+
     @Test
     public void testUiRootResource() {
-        // Test that Swagger UI resources do not interfere with 
+        // Test that Swagger UI resources do not interfere with
         // application-specific ones and are accessible.
         WebClient uiClient = WebClient
             .create("http://localhost:" + getPort() + "/api-docs")
             .query("url", "/swagger.json")
             .accept("*/*");
-        
+
         try (Response response = uiClient.get()) {
             String html = response.readEntity(String.class);
             assertThat(html, containsString("<!-- HTML"));
             assertThat(response.getMediaType(), equalTo(MediaType.TEXT_HTML_TYPE));
         }
     }
-    
+
     public static String getPort() {
         return PORT;
     }

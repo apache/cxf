@@ -27,6 +27,10 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class JAXRSJaasConfigurationSecurityTest extends AbstractSpringSecurityTest {
     public static final int PORT = BookServerJaasSecurity.PORT;
 

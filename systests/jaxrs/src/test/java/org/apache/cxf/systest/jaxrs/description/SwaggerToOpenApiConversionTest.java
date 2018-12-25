@@ -41,16 +41,19 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class SwaggerToOpenApiConversionTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(SwaggerToOpenApiConversionTest.class);
     static final String SECURITY_DEFINITION_NAME = "basicAuth";
-    
+
     private static final String CONTACT = "cxf@apache.org";
     private static final String TITLE = "CXF unittest";
     private static final String DESCRIPTION = "API Description";
     private static final String LICENSE = "API License";
     private static final String LICENSE_URL = "API License URL";
-    
+
     @Ignore
     public static class Server extends AbstractBusTestServerBase {
         @Override
@@ -65,7 +68,7 @@ public class SwaggerToOpenApiConversionTest extends AbstractBusClientServerTestB
             sf.setAddress("http://localhost:" + PORT + "/");
             sf.create();
         }
-        
+
         protected Swagger2Feature createSwagger2Feature() {
             final Swagger2Feature feature = new Swagger2Feature();
             feature.setContact(CONTACT);
@@ -98,9 +101,9 @@ public class SwaggerToOpenApiConversionTest extends AbstractBusClientServerTestB
         createStaticBus();
     }
 
-   
+
     @Test
-    public void testOpenApiJSON() throws Exception {    
+    public void testOpenApiJSON() throws Exception {
         final WebClient client = createWebClient("/openapi.json");
         String openApiResponse = client.get(String.class);
         JsonMapObject openApiJson = new JsonMapObjectReaderWriter().fromJsonToJsonObject(openApiResponse);
@@ -135,16 +138,16 @@ public class SwaggerToOpenApiConversionTest extends AbstractBusClientServerTestB
         //1: bookstore
         JsonMapObject bookstore = paths.getJsonMapProperty("/bookstore");
         assertEquals(1, bookstore.size());
-        // get 
+        // get
         verifyBookStoreGet(bookstore);
         //2: bookstore/{id}
         JsonMapObject bookstoreId = paths.getJsonMapProperty("/bookstore/{id}");
         assertEquals(2, bookstoreId.size());
-        // get 
+        // get
         verifyBookStoreIdGet(bookstoreId);
-        // delete 
+        // delete
         verifyBookStoreIdDelete(bookstoreId);
-        
+
         // components
         JsonMapObject comps = openApiJson.getJsonMapProperty("components");
         assertEquals(3, comps.size());
@@ -154,7 +157,7 @@ public class SwaggerToOpenApiConversionTest extends AbstractBusClientServerTestB
         assertEquals(1, schemas.size());
         JsonMapObject secSchemes = comps.getJsonMapProperty("securitySchemes");
         assertEquals(1, secSchemes.size());
-        
+
         // Finally check swagger.json can still be generated.
         doTestSwagger2JSON();
     }
@@ -263,8 +266,8 @@ public class SwaggerToOpenApiConversionTest extends AbstractBusClientServerTestB
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
         return wc;
     }
-    
-    private void doTestSwagger2JSON() throws Exception {    
+
+    private void doTestSwagger2JSON() throws Exception {
         final WebClient client = createWebClient("/swagger.json");
         AbstractSwagger2ServiceDescriptionTest.doTestApiListingIsProperlyReturnedJSON(client, XForwarded.NONE);
     }

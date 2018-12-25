@@ -33,6 +33,9 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class JAXRSRxJavaObservableTest extends AbstractBusClientServerTestBase {
     public static final String PORT = RxJavaObservableServer.PORT;
     @BeforeClass
@@ -49,7 +52,7 @@ public class JAXRSRxJavaObservableTest extends AbstractBusClientServerTestBase {
         String text = wc.accept("text/plain").get(String.class);
         assertEquals("Hello, world!", text);
     }
-    
+
     @Test
     public void testGetHelloWorldJson() throws Exception {
         String address = "http://localhost:" + PORT + "/rx/textJson";
@@ -79,5 +82,5 @@ public class JAXRSRxJavaObservableTest extends AbstractBusClientServerTestBase {
         assertEquals("World", beans.get(1).getAudience());
     }
 
-    
+
 }

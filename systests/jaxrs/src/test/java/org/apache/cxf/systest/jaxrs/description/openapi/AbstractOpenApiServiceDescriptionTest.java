@@ -55,16 +55,19 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public abstract class AbstractOpenApiServiceDescriptionTest extends AbstractBusClientServerTestBase {
     static final String SECURITY_DEFINITION_NAME = "basicAuth";
-    
+
     private static final String CONTACT = "cxf@apache.org";
     private static final String TITLE = "CXF unittest";
     private static final String DESCRIPTION = "API Description";
     private static final String LICENSE = "API License";
     private static final String LICENSE_URL = "API License URL";
-    
+
     @Ignore
     public abstract static class Server extends AbstractBusTestServerBase {
         protected final String port;
@@ -88,7 +91,7 @@ public abstract class AbstractOpenApiServiceDescriptionTest extends AbstractBusC
             sf.setAddress("http://localhost:" + port + "/");
             sf.create();
         }
-        
+
         protected OpenApiFeature createOpenApiFeature() {
             final OpenApiFeature feature = new OpenApiFeature();
             feature.setRunAsFilter(runAsFilter);
@@ -97,7 +100,7 @@ public abstract class AbstractOpenApiServiceDescriptionTest extends AbstractBusC
             feature.setDescription(DESCRIPTION);
             feature.setLicense(LICENSE);
             feature.setLicenseUrl(LICENSE_URL);
-            
+
             feature.setSecurityDefinitions(Collections.singletonMap(SECURITY_DEFINITION_NAME,
                 new SecurityScheme().type(Type.HTTP)));
 
@@ -136,7 +139,7 @@ public abstract class AbstractOpenApiServiceDescriptionTest extends AbstractBusC
         checkUiResource();
     }
     protected void doTestApiListingIsProperlyReturnedJSON(final WebClient client,
-            boolean useXForwarded, String basePath) throws Exception {    
+            boolean useXForwarded, String basePath) throws Exception {
         if (useXForwarded) {
             client.header("USE_XFORWARDED", true);
         }
@@ -144,18 +147,18 @@ public abstract class AbstractOpenApiServiceDescriptionTest extends AbstractBusC
             String swaggerJson = client.get(String.class);
             UserApplication ap = OpenApiParseUtils.getUserApplicationFromJson(swaggerJson);
             assertNotNull(ap);
-            
+
             if (basePath == null) {
                 assertEquals(useXForwarded ? "/reverse" : "/", ap.getBasePath());
             } else {
                 assertEquals(basePath, ap.getBasePath());
             }
-            
+
             List<UserResource> urs = ap.getResources();
             assertNotNull(urs);
             assertEquals(1, urs.size());
             UserResource r = urs.get(0);
-            
+
             Map<String, UserOperation> map = r.getOperationsAsMap();
             assertEquals(3, map.size());
             UserOperation getBooksOp = map.get("getBooks");
@@ -190,11 +193,11 @@ public abstract class AbstractOpenApiServiceDescriptionTest extends AbstractBusC
             client.close();
         }
     }
-    
+
     protected String getTags() {
         return "";
     }
-    
+
     protected String getSecurityDefinitionName() {
         return SECURITY_DEFINITION_NAME;
     }
@@ -221,7 +224,7 @@ public abstract class AbstractOpenApiServiceDescriptionTest extends AbstractBusC
 
     @Test
     public void testNonUiResource() {
-        // Test that Swagger UI resources do not interfere with 
+        // Test that Swagger UI resources do not interfere with
         // application-specific ones.
         WebClient uiClient = WebClient
             .create(getBaseUrl() + "/css/book.css")
@@ -229,10 +232,10 @@ public abstract class AbstractOpenApiServiceDescriptionTest extends AbstractBusC
         String css = uiClient.get(String.class);
         assertThat(css, equalTo("body { background-color: lightblue; }"));
     }
-    
+
     @Test
     public void testUiResource() {
-        // Test that Swagger UI resources do not interfere with 
+        // Test that Swagger UI resources do not interfere with
         // application-specific ones and are accessible.
         WebClient uiClient = WebClient
             .create(getBaseUrl() + "/swagger-ui.css")
@@ -244,26 +247,26 @@ public abstract class AbstractOpenApiServiceDescriptionTest extends AbstractBusC
             assertThat(response.getMediaType(), equalTo(MediaType.valueOf("text/css")));
         }
     }
-    
+
     @Test
     public void testUiRootResource() {
-        // Test that Swagger UI resources do not interfere with 
+        // Test that Swagger UI resources do not interfere with
         // application-specific ones and are accessible.
         WebClient uiClient = WebClient
             .create(getBaseUrl() + "/api-docs")
             .accept("*/*");
-        
+
         try (Response response = uiClient.get()) {
             String html = response.readEntity(String.class);
             assertThat(html, containsString("<!-- HTML"));
             assertThat(response.getMediaType(), equalTo(MediaType.TEXT_HTML_TYPE));
         }
     }
-    
+
     protected String getApplicationPath() {
         return "";
     }
-    
+
     protected String getBaseUrl() {
         return "http://localhost:" + getPort();
     }

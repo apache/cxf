@@ -30,6 +30,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
+import static org.junit.Assert.assertEquals;
+
 public abstract class AbstractSpringSecurityTest extends AbstractBusClientServerTestBase {
 
     private String getStringFromInputStream(InputStream in) throws Exception {

@@ -85,6 +85,14 @@ import org.apache.http.util.EntityUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 //CHECKSTYLE.OFF:JavaNCSS
 public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServer.PORT;
