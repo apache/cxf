@@ -150,7 +150,11 @@ public class UDPConduit extends AbstractConduit {
             if (s != null && c != null) {
                 c.getSession().removeAttribute(CXF_MESSAGE_ATTR);
 
-                Queue<ConnectFuture> q = connections.computeIfAbsent(s, k -> new ArrayBlockingQueue<ConnectFuture>(10));
+                Queue<ConnectFuture> q = connections.get(s);
+                if (q == null) {
+                    connections.putIfAbsent(s, new ArrayBlockingQueue<ConnectFuture>(10));
+                    q = connections.get(s);
+                }
                 if (!q.offer(c)) {
                     c.getSession().closeOnFlush();
                 }
