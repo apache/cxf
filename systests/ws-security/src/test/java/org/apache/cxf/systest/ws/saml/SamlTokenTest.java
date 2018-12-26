@@ -56,6 +56,9 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * A set of tests for SAML Tokens.
  */

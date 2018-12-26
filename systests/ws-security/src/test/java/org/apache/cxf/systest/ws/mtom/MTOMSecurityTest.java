@@ -39,6 +39,9 @@ import org.example.schema.doubleit.DoubleIt4;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
  * A set of secured MTOM
  */

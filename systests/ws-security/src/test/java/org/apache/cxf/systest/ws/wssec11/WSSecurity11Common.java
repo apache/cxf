@@ -35,6 +35,7 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import wssec.wssec11.IPingService;
 import wssec.wssec11.PingService11;
 
+import static org.junit.Assert.assertEquals;
 
 /**
  *

@@ -26,10 +26,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.AfterClass;
-import org.junit.Assert;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public abstract class AbstractClientServerTestBase extends Assert {
+public abstract class AbstractClientServerTestBase {
     private static List<ServerLauncher> launchers = new ArrayList<>();
 
 

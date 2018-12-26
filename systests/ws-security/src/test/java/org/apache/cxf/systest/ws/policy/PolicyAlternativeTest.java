@@ -38,6 +38,9 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * This is a test for policy alternatives. The endpoint requires either a UsernameToken (insecured) OR
  * a message signature using the Asymmetric binding.
