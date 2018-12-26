@@ -29,7 +29,6 @@ import java.net.InterfaceAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -51,8 +50,6 @@ import org.apache.cxf.workqueue.AutomaticWorkQueue;
 import org.apache.cxf.workqueue.WorkQueueManager;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.mina.core.buffer.IoBuffer;
-import org.apache.mina.core.session.AttributeKey;
-import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.handler.stream.StreamIoHandler;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
@@ -65,8 +62,6 @@ public class UDPDestination extends AbstractDestination {
     public static final String NETWORK_INTERFACE = UDPDestination.class.getName() + ".NETWORK_INTERFACE";
 
     private static final Logger LOG = LogUtils.getL7dLogger(UDPDestination.class);
-    private static final AttributeKey KEY_IN = new AttributeKey(StreamIoHandler.class, "in");
-    private static final AttributeKey KEY_OUT = new AttributeKey(StreamIoHandler.class, "out");
 
     NioDatagramAcceptor acceptor;
     AutomaticWorkQueue queue;
@@ -98,17 +93,13 @@ public class UDPDestination extends AbstractDestination {
                         }
                     };
 
-                    UDPConnectionInfo info = new UDPConnectionInfo(null,
-                                                                   out,
-                                                                   new ByteArrayInputStream(bytes, 0, p.getLength()));
-
                     final MessageImpl m = new MessageImpl();
                     final Exchange exchange = new ExchangeImpl();
                     exchange.setDestination(UDPDestination.this);
                     m.setDestination(UDPDestination.this);
                     exchange.setInMessage(m);
-                    m.setContent(InputStream.class, info.in);
-                    m.put(UDPConnectionInfo.class, info);
+                    m.setContent(InputStream.class, new ByteArrayInputStream(bytes, 0, p.getLength()));
+                    m.put(OutputStream.class, out);
                     queue.execute(new Runnable() {
                         public void run() {
                             getMessageObserver().onMessage(m);
@@ -124,14 +115,13 @@ public class UDPDestination extends AbstractDestination {
 
     /** {@inheritDoc}*/
     @Override
-    protected Conduit getInbuiltBackChannel(Message inMessage) {
+    protected Conduit getInbuiltBackChannel(final Message inMessage) {
         if (inMessage.getExchange().isOneWay()) {
             return null;
         }
-        final UDPConnectionInfo info = inMessage.get(UDPConnectionInfo.class);
         return new AbstractBackChannelConduit() {
             public void prepare(Message message) throws IOException {
-                message.setContent(OutputStream.class, info.out);
+                message.setContent(OutputStream.class, inMessage.get(OutputStream.class));
             }
         };
     }
@@ -190,8 +180,9 @@ public class UDPDestination extends AbstractDestination {
                 dcfg.setReuseAddress(true);
                 acceptor.bind();
             }
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception ex) {
-            ex.printStackTrace();
             throw new RuntimeException(ex);
         }
     }
@@ -235,35 +226,7 @@ public class UDPDestination extends AbstractDestination {
         }
     }
 
-    static class UDPConnectionInfo {
-        final IoSession session;
-        final OutputStream out;
-        final InputStream in;
-
-        UDPConnectionInfo(IoSession io, OutputStream o, InputStream i) {
-            session = io;
-            out = o;
-            in = i;
-        }
-    }
-
-
     class UDPIOHandler extends StreamIoHandler {
-
-
-        @Override
-        public void sessionOpened(IoSession session) {
-            // Set timeouts
-            session.getConfig().setWriteTimeout(getWriteTimeout());
-            session.getConfig().setIdleTime(IdleStatus.READER_IDLE, getReadTimeout());
-
-            // Create streams
-            InputStream in = new IoSessionInputStream();
-            OutputStream out = new IoSessionOutputStream(session);
-            session.setAttribute(KEY_IN, in);
-            session.setAttribute(KEY_OUT, out);
-            processStreamIo(session, in, out);
-        }
 
         protected void processStreamIo(IoSession session, InputStream in, OutputStream out) {
             final MessageImpl m = new MessageImpl();
@@ -273,68 +236,17 @@ public class UDPDestination extends AbstractDestination {
             exchange.setInMessage(m);
             m.setContent(InputStream.class, in);
             out = new UDPDestinationOutputStream(out);
-            m.put(UDPConnectionInfo.class, new UDPConnectionInfo(session, out, in));
-            queue.execute(new Runnable() {
-                public void run() {
-                    getMessageObserver().onMessage(m);
-                }
-            });
-        }
-
-        public void sessionClosed(IoSession session) throws Exception {
-            final InputStream in = (InputStream) session.getAttribute(KEY_IN);
-            final OutputStream out = (OutputStream) session.getAttribute(KEY_OUT);
-            try {
-                in.close();
-            } finally {
-                out.close();
-            }
-        }
-
-        public void messageReceived(IoSession session, Object buf) {
-            final IoSessionInputStream in = (IoSessionInputStream) session
-                    .getAttribute(KEY_IN);
-            in.setBuffer((IoBuffer) buf);
-        }
-
-        public void exceptionCaught(IoSession session, Throwable cause) {
-            final IoSessionInputStream in = (IoSessionInputStream) session
-                    .getAttribute(KEY_IN);
-
-            IOException e = null;
-            if (cause instanceof StreamIoException) {
-                e = (IOException) cause.getCause();
-            } else if (cause instanceof IOException) {
-                e = (IOException) cause;
-            }
-
-            if (e != null && in != null) {
-                in.throwException(e);
-            } else {
-                session.closeOnFlush().awaitUninterruptibly();
-            }
-        }
-        public void sessionIdle(IoSession session, IdleStatus status) {
-            if (status == IdleStatus.READER_IDLE) {
-                throw new StreamIoException(new SocketTimeoutException(
-                        "Read timeout"));
-            }
-        }
-    }
-    private static class StreamIoException extends RuntimeException {
-        private static final long serialVersionUID = 3976736960742503222L;
-
-        StreamIoException(IOException cause) {
-            super(cause);
+            m.put(OutputStream.class, out);
+            queue.execute(() -> getMessageObserver().onMessage(m));
         }
     }
 
-    public class UDPDestinationOutputStream extends OutputStream {
+    static class UDPDestinationOutputStream extends OutputStream {
         final OutputStream out;
         IoBuffer buffer = IoBuffer.allocate(64 * 1024 - 42); //max size
         boolean closed;
 
-        public UDPDestinationOutputStream(OutputStream out) {
+        UDPDestinationOutputStream(OutputStream out) {
             this.out = out;
         }
 
