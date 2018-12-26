@@ -49,10 +49,13 @@ import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 
 import org.junit.Assert;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Some unit tests for creating JWT Tokens with an OnBehalfOf element.
  */
-public class JWTProviderOnBehalfOfTest extends org.junit.Assert {
+public class JWTProviderOnBehalfOfTest {
 
     /**
      * Create a JWT Token with OnBehalfOf from a UsernameToken

@@ -36,7 +36,7 @@ import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 
 import org.junit.Assert;
 
-public class RealmSupportTest extends org.junit.Assert {
+public class RealmSupportTest {
 
 
     @org.junit.Test

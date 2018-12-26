@@ -40,10 +40,15 @@ import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Some unit tests for creating SecurityContextTokens.
  */
-public class SCTProviderTest extends org.junit.Assert {
+public class SCTProviderTest {
 
     private static TokenStore tokenStore = new DefaultInMemoryTokenStore();
 

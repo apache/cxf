@@ -43,12 +43,15 @@ import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.DateUtil;
 
-
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Some unit tests for creating SAML Tokens with lifetime
  */
-public class SAMLProviderLifetimeTest extends org.junit.Assert {
+public class SAMLProviderLifetimeTest {
 
     /**
      * Issue SAML 2 token with a valid requested lifetime

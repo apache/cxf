@@ -26,10 +26,11 @@ import org.w3c.dom.Document;
 
 import org.apache.cxf.staxutils.StaxUtils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class XPathAssertTest extends Assert {
+import static org.junit.Assert.fail;
+
+public class XPathAssertTest {
 
     @Test
     public void testAssert() throws Exception {

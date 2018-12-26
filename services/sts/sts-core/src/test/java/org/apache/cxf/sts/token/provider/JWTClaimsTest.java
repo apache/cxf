@@ -47,10 +47,14 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * A unit test for creating JWT Tokens with various claims populated by a ClaimsHandler.
  */
-public class JWTClaimsTest extends org.junit.Assert {
+public class JWTClaimsTest {
 
     public static final URI CLAIM_STATIC_COMPANY =
         URI.create("http://apache.org/claims/test/company");

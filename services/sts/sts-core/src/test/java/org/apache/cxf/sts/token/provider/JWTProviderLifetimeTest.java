@@ -43,11 +43,15 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.util.DateUtil;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Some unit tests for creating JWT Tokens with lifetime
  */
-public class JWTProviderLifetimeTest extends org.junit.Assert {
+public class JWTProviderLifetimeTest {
 
     /**
      * Issue JWT token with a valid requested lifetime

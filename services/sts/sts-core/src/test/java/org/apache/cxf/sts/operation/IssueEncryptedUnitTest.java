@@ -49,10 +49,13 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.dom.WSConstants;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Some unit tests for issuing encrypted tokens.
  */
-public class IssueEncryptedUnitTest extends org.junit.Assert {
+public class IssueEncryptedUnitTest {
 
     private static boolean unrestrictedPoliciesInstalled;
 

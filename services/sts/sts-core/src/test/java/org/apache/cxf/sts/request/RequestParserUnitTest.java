@@ -48,7 +48,10 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 
-public class RequestParserUnitTest extends org.junit.Assert {
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class RequestParserUnitTest {
 
     private static final String SECURITY_HEADER =
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?><wsse:Security "

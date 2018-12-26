@@ -35,8 +35,13 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 @RunWith(Parameterized.class)
-public class JexlClaimsMapperTest extends org.junit.Assert {
+public class JexlClaimsMapperTest {
 
     JexlClaimsMapper jcm;
 

@@ -43,11 +43,14 @@ import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Some unit tests for validating an X.509 Token via the X509TokenValidator.
  */
-public class X509TokenValidatorTest extends org.junit.Assert {
+public class X509TokenValidatorTest {
 
     /**
      * Test a valid certificate

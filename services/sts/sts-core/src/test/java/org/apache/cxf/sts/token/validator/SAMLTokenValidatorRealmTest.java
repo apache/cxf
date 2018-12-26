@@ -50,10 +50,14 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Some unit tests for validating a SAML token in different realms via the SAMLTokenValidator.
  */
-public class SAMLTokenValidatorRealmTest extends org.junit.Assert {
+public class SAMLTokenValidatorRealmTest {
 
     /**
      * Test a SAML 1.1 Assertion created in realm "A".

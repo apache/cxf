@@ -68,11 +68,15 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Some unit tests for renewing a SAML token via the SAMLTokenRenewer with proof of possession enabled
  * (message level, not TLS).
  */
-public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
+public class SAMLTokenRenewerPOPTest {
 
     private static TokenStore tokenStore;
 

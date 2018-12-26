@@ -83,10 +83,15 @@ import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.DOM2Writer;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Some unit tests for the issue operation to issue SAML tokens with Claims information.
  */
-public class JexlIssueSamlClaimsTest extends org.junit.Assert {
+public class JexlIssueSamlClaimsTest {
 
     public static final QName REQUESTED_SECURITY_TOKEN = QNameConstants.WS_TRUST_FACTORY
         .createRequestedSecurityToken(null).getName();

@@ -25,11 +25,12 @@ import javax.jws.WebParam;
 
 import org.apache.header_test.rpc.TestRPCHeader;
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class TestRPCHeaderTest extends Assert {
+public class TestRPCHeaderTest {
     Class<TestRPCHeader> cls = TestRPCHeader.class;
 
     @Test

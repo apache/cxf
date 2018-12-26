@@ -71,11 +71,14 @@ import org.apache.wss4j.common.util.DateUtil;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Some unit tests for validating a SAML token via the SAMLTokenValidator.
  */
-public class SAMLTokenValidatorTest extends org.junit.Assert {
+public class SAMLTokenValidatorTest {
 
     private static TokenStore tokenStore;
 

@@ -59,10 +59,13 @@ import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Some unit tests for validating JWTTokens.
  */
-public class JWTTokenValidatorTest extends org.junit.Assert {
+public class JWTTokenValidatorTest {
     private static TokenStore tokenStore = new DefaultInMemoryTokenStore();
 
     @org.junit.Test

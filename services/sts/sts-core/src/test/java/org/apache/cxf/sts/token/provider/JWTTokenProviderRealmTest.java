@@ -39,10 +39,14 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Some unit tests for creating JWT Tokens via the JWTTokenProvider in different realms
  */
-public class JWTTokenProviderRealmTest extends org.junit.Assert {
+public class JWTTokenProviderRealmTest {
 
     @org.junit.Test
     public void testRealms() throws Exception {

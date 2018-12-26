@@ -55,11 +55,15 @@ import org.apache.wss4j.common.util.DateUtil;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Some unit tests for renewing SAML Tokens with lifetime
  */
-public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
+public class SAMLTokenRenewerLifetimeTest {
 
     private static TokenStore tokenStore;
 
