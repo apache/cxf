@@ -63,6 +63,7 @@ public class UDPTransportTest {
         factory.setAddress("udp://:" + PORT);
         factory.setServiceClass(Greeter.class);
         factory.setServiceBean(new GreeterImpl());
+        // factory.setFeatures(Collections.singletonList(new LoggingFeature()));
         server = factory.create();
     }
 

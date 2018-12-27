@@ -114,11 +114,7 @@ public class UDPConduit extends AbstractConduit {
                     if (queue == null) {
                         queue = queuem.getAutomaticWorkQueue();
                     }
-                    queue.execute(new Runnable() {
-                        public void run() {
-                            incomingObserver.onMessage(inMessage);
-                        }
-                    });
+                    queue.execute(() -> incomingObserver.onMessage(inMessage));
                 } else {
                     incomingObserver.onMessage(inMessage);
                     if (!message.getExchange().isSynchronous() || multi) {

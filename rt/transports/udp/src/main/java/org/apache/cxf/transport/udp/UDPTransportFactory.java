@@ -20,7 +20,6 @@
 package org.apache.cxf.transport.udp;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -45,14 +44,10 @@ public class UDPTransportFactory extends AbstractTransportFactory
     implements DestinationFactory, ConduitInitiator {
 
     public static final String TRANSPORT_ID = "http://cxf.apache.org/transports/udp";
-    public static final List<String> DEFAULT_NAMESPACES
-        = Collections.unmodifiableList(Arrays.asList(TRANSPORT_ID));
+    public static final List<String> DEFAULT_NAMESPACES = Collections.singletonList(TRANSPORT_ID);
 
     private static final Logger LOG = LogUtils.getL7dLogger(UDPTransportFactory.class);
-    private static final Set<String> URI_PREFIXES = new HashSet<>();
-    static {
-        URI_PREFIXES.add("udp://");
-    }
+    private static final Set<String> URI_PREFIXES = Collections.singleton("udp://");
 
     private Set<String> uriPrefixes = new HashSet<>(URI_PREFIXES);
 
@@ -94,7 +89,7 @@ public class UDPTransportFactory extends AbstractTransportFactory
     public void setUriPrefixes(Set<String> s) {
         uriPrefixes = s;
     }
-    EndpointReferenceType createReference(EndpointInfo ei) {
+    static EndpointReferenceType createReference(EndpointInfo ei) {
         EndpointReferenceType epr = new EndpointReferenceType();
         AttributedURIType address = new AttributedURIType();
         address.setValue(ei.getAddress());
