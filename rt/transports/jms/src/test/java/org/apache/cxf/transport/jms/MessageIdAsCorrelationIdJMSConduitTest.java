@@ -21,7 +21,6 @@ package org.apache.cxf.transport.jms;
 import javax.jms.ConnectionFactory;
 
 import org.apache.activemq.pool.PooledConnectionFactory;
-import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
@@ -30,8 +29,10 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.transport.jms.util.TestReceiver;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Checks if a CXF client works correlates requests and responses correctly if the server sets the message id
@@ -40,7 +41,8 @@ import org.junit.Test;
 public class MessageIdAsCorrelationIdJMSConduitTest {
     private static final String SERVICE_QUEUE = "test";
     private static final String BROKER_URI = "vm://localhost?broker.persistent=false";
-    private ConnectionFactory connectionFactory;
+
+    private ConnectionFactory connectionFactory = new PooledConnectionFactory(BROKER_URI);
 
     @Test
     public void testSendReceiveWithTempReplyQueue() throws Exception {
@@ -52,13 +54,9 @@ public class MessageIdAsCorrelationIdJMSConduitTest {
         sendAndReceive(true, "testreply");
     }
 
-    public void sendAndReceive(boolean synchronous, String replyDestination) throws Exception {
-        BusFactory bf = BusFactory.newInstance();
-        Bus bus = bf.createBus();
-        BusFactory.setDefaultBus(bus);
+    private void sendAndReceive(boolean synchronous, String replyDestination) throws InterruptedException {
         EndpointReferenceType target = new EndpointReferenceType();
 
-        connectionFactory = new PooledConnectionFactory(BROKER_URI);
         TestReceiver receiver = new TestReceiver(connectionFactory, SERVICE_QUEUE, true);
         receiver.runAsync();
 
@@ -68,7 +66,7 @@ public class MessageIdAsCorrelationIdJMSConduitTest {
         jmsConfig.setUseConduitIdSelector(false);
         jmsConfig.setReplyDestination(replyDestination);
 
-        JMSConduit conduit = new JMSConduit(target, jmsConfig, bus);
+        JMSConduit conduit = new JMSConduit(target, jmsConfig, BusFactory.getDefaultBus());
         Exchange exchange = new ExchangeImpl();
         exchange.setSynchronous(synchronous);
         Message message = new MessageImpl();
@@ -76,21 +74,16 @@ public class MessageIdAsCorrelationIdJMSConduitTest {
         conduit.sendExchange(exchange, "Request");
         waitForAsyncReply(exchange);
         receiver.close();
-        if (exchange.getInMessage() == null) {
-            throw new RuntimeException("No reply received within 2 seconds");
-        }
+        assertNotNull("No reply received within 2 seconds", exchange.getInMessage());
         JMSMessageHeadersType inHeaders = (JMSMessageHeadersType)exchange.getInMessage()
             .get(JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
-        Assert.assertEquals(receiver.getRequestMessageId(), inHeaders.getJMSCorrelationID());
+        assertEquals(receiver.getRequestMessageId(), inHeaders.getJMSCorrelationID());
         conduit.close();
-        bus.shutdown(true);
     }
 
-    private void waitForAsyncReply(Exchange exchange) throws InterruptedException {
-        int count = 0;
-        while (exchange.getInMessage() == null && count <= 20) {
-            Thread.sleep(100);
-            count++;
+    private static void waitForAsyncReply(Exchange exchange) throws InterruptedException {
+        for (int count = 0; exchange.getInMessage() == null && count <= 20; count++) {
+            Thread.sleep(100L);
         }
     }
 

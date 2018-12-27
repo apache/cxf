@@ -40,7 +40,6 @@ import org.apache.geronimo.transaction.manager.GeronimoTransactionManager;
 import org.awaitility.Awaitility;
 
 import org.easymock.Capture;
-import org.junit.Assert;
 import org.junit.Test;
 
 
@@ -50,6 +49,7 @@ import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.newCapture;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
 
 public class MessageListenerTest {
 
@@ -77,7 +77,7 @@ public class MessageListenerTest {
         Awaitility.await().until(() -> !container.isRunning());
         verify(exListener);
         JMSException ex = captured.getValue();
-        Assert.assertEquals("The connection is already closed", ex.getMessage());
+        assertEquals("The connection is already closed", ex.getMessage());
     }
     
     @Test
@@ -106,7 +106,7 @@ public class MessageListenerTest {
         verify(exListener);
         JMSException ex = captured.getValue();
         // Closing the pooled connection will result in a NPE when using it
-        Assert.assertEquals("Wrapped exception. null", ex.getMessage());
+        assertEquals("Wrapped exception. null", ex.getMessage());
     }
 
     @Test
@@ -147,14 +147,14 @@ public class MessageListenerTest {
         container.setAcknowledgeMode(Session.AUTO_ACKNOWLEDGE);
         container.start();
 
-        assertNumMessagesInQueue("At the start the queue should be empty", connection, dest, 0, 0);
+        assertNumMessagesInQueue("At the start the queue should be empty", connection, dest, 0, 0L);
 
         sendMessage(connection, dest, OK);
-        assertNumMessagesInQueue("This message should be committed", connection, dest, 0, 1000);
+        assertNumMessagesInQueue("This message should be committed", connection, dest, 0, 1000L);
 
         sendMessage(connection, dest, FAIL);
         assertNumMessagesInQueue("Even when an exception occurs the message should be committed", connection,
-                                 dest, 0, 1000);
+                                 dest, 0, 1000L);
 
         container.stop();
         connection.close();
@@ -178,17 +178,17 @@ public class MessageListenerTest {
     private void testTransactionalBehaviour(Connection connection, Queue dest) throws JMSException,
         InterruptedException {
         Queue dlq = JMSUtil.createQueue(connection, "ActiveMQ.DLQ");
-        assertNumMessagesInQueue("At the start the queue should be empty", connection, dest, 0, 0);
-        assertNumMessagesInQueue("At the start the DLQ should be empty", connection, dlq, 0, 0);
+        assertNumMessagesInQueue("At the start the queue should be empty", connection, dest, 0, 0L);
+        assertNumMessagesInQueue("At the start the DLQ should be empty", connection, dlq, 0, 0L);
 
         sendMessage(connection, dest, OK);
-        assertNumMessagesInQueue("This message should be committed", connection, dest, 0, 1000);
+        assertNumMessagesInQueue("This message should be committed", connection, dest, 0, 1000L);
 
         sendMessage(connection, dest, FAILFIRST);
-        assertNumMessagesInQueue("Should succeed on second try", connection, dest, 0, 2000);
+        assertNumMessagesInQueue("Should succeed on second try", connection, dest, 0, 2000L);
 
         sendMessage(connection, dest, FAIL);
-        assertNumMessagesInQueue("Should be rolled back", connection, dlq, 1, 2500);
+        assertNumMessagesInQueue("Should be rolled back", connection, dlq, 1, 2500L);
     }
 
     private Connection createConnection(String name) throws JMSException {
@@ -227,25 +227,27 @@ public class MessageListenerTest {
         }
         consumer.close();
         session.close();
-        assertNumMessagesInQueue("", connection, dest, 0, 0);
+        assertNumMessagesInQueue("", connection, dest, 0, 0L);
     }
 
-    private void assertNumMessagesInQueue(String message, Connection connection, Queue queue,
-                                          int expectedNum, int timeout) throws JMSException,
+    private static void assertNumMessagesInQueue(String message, Connection connection, Queue queue,
+                                          int expectedNum, long timeout) throws JMSException,
         InterruptedException {
         long startTime = System.currentTimeMillis();
         int actualNum;
         do {
             actualNum = JMSUtil.getNumMessages(connection, queue);
-
+            if (actualNum == expectedNum) {
+                break;
+            }
             //System.out.println("Messages in queue " + queue.getQueueName() + ": " + actualNum
             //                   + ", expecting: " + expectedNum);
-            Thread.sleep(100);
+            Thread.sleep(100L);
         } while ((System.currentTimeMillis() - startTime < timeout) && expectedNum != actualNum);
-        Assert.assertEquals(message + " -> number of messages on queue", expectedNum, actualNum);
+        assertEquals(message + " -> number of messages on queue", expectedNum, actualNum);
     }
 
-    private void sendMessage(Connection connection, Destination dest, String content) throws JMSException,
+    private static void sendMessage(Connection connection, Destination dest, String content) throws JMSException,
         InterruptedException {
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         MessageProducer prod = session.createProducer(dest);
@@ -253,7 +255,7 @@ public class MessageListenerTest {
         prod.send(message);
         prod.close();
         session.close();
-        Thread.sleep(500); // Give receiver some time to process
+//        Thread.sleep(500L); // Give receiver some time to process
     }
 
     private static final class TestMessageListener implements MessageListener {

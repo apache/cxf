@@ -36,8 +36,7 @@ public class JMSConduitTest extends AbstractJMSTester {
 
     @Test
     public void testGetConfiguration() throws Exception {
-        EndpointInfo ei = setupServiceInfo("http://cxf.apache.org/hello_world_jms", WSDL,
-                         "HelloWorldQueueBinMsgService", "HelloWorldQueueBinMsgPort");
+        EndpointInfo ei = setupServiceInfo("HelloWorldQueueBinMsgService", "HelloWorldQueueBinMsgPort");
         JMSConduit conduit = setupJMSConduit(ei);
         assertEquals("Can't get the right ClientReceiveTimeout", 500L, conduit.getJmsConfig()
             .getReceiveTimeout().longValue());
@@ -46,8 +45,7 @@ public class JMSConduitTest extends AbstractJMSTester {
 
     @Test
     public void testPrepareSend() throws Exception {
-        EndpointInfo ei = setupServiceInfo("http://cxf.apache.org/hello_world_jms", WSDL,
-                         "HelloWorldService", "HelloWorldPort");
+        EndpointInfo ei = setupServiceInfo("HelloWorldService", "HelloWorldPort");
 
         JMSConduit conduit = setupJMSConduit(ei);
         Message message = new MessageImpl();
@@ -66,12 +64,11 @@ public class JMSConduitTest extends AbstractJMSTester {
      */
     @Test
     public void testTimeoutOnReceive() throws Exception {
-        EndpointInfo ei = setupServiceInfo("http://cxf.apache.org/hello_world_jms", WSDL,
-                         "HelloWorldServiceLoop", "HelloWorldPortLoop");
+        EndpointInfo ei = setupServiceInfo("HelloWorldServiceLoop", "HelloWorldPortLoop");
 
         JMSConduit conduit = setupJMSConduitWithObserver(ei);
         // If the system is extremely fast. The message could still get through
-        conduit.getJmsConfig().setReceiveTimeout(Long.valueOf(1));
+        conduit.getJmsConfig().setReceiveTimeout(1L);
         Message message = new MessageImpl();
         try {
             sendMessageSync(conduit, message);
