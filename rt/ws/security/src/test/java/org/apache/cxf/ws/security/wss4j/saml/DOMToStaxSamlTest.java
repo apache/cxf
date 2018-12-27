@@ -45,6 +45,8 @@ import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * In these test-cases, the client is using DOM and the service is using StaX.

@@ -52,6 +52,8 @@ import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * In these test-cases, the client is using StaX and the service is using DOM.

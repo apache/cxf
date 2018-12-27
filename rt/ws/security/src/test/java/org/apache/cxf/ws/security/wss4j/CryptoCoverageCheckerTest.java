@@ -45,7 +45,8 @@ import org.apache.wss4j.common.ConfigurationConstants;
 
 import org.junit.Test;
 
-
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class CryptoCoverageCheckerTest extends AbstractSecurityTest {
 

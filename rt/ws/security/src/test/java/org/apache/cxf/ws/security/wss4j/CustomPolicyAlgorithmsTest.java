@@ -26,6 +26,9 @@ import org.apache.wss4j.policy.model.AsymmetricBinding;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class CustomPolicyAlgorithmsTest extends AbstractPolicySecurityTest {
 
     @Test

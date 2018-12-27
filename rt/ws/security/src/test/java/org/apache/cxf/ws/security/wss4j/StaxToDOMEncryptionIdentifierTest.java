@@ -42,6 +42,7 @@ import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 
 /**
  * In these test-cases, the client is using StaX and the service is using DOM. The tests are

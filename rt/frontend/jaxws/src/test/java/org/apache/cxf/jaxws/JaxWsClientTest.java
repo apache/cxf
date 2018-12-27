@@ -66,6 +66,14 @@ import org.apache.hello_world_soap_http.GreeterImpl;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class JaxWsClientTest extends AbstractJaxWsTest {
 
     private final QName serviceName = new QName("http://apache.org/hello_world_soap_http",
@@ -133,7 +141,7 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
         Map<String, Object> requestContext = ((BindingProvider)handler).getRequestContext();
         requestContext.put(JaxWsClientProxy.THREAD_LOCAL_REQUEST_CONTEXT, Boolean.TRUE);
 
-        // future calls to getRequestContext() will use a thread local request context. 
+        // future calls to getRequestContext() will use a thread local request context.
         // That allows the request context to be threadsafe.
         requestContext = ((BindingProvider)handler).getRequestContext();
 
@@ -173,7 +181,7 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
         Map<String, Object> requestContext = disp.getRequestContext();
         requestContext.put(JaxWsClientProxy.THREAD_LOCAL_REQUEST_CONTEXT, Boolean.TRUE);
 
-        // future calls to getRequestContext() will use a thread local request context. 
+        // future calls to getRequestContext() will use a thread local request context.
         // That allows the request context to be threadsafe.
         requestContext = disp.getRequestContext();
 
@@ -200,7 +208,7 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
         assertEquals("main thread does not see removal",
                      "ho", requestContext.get(key));
     }
-    
+
     @Test
     public void testThreadLocalRequestContextIsIsolated() throws InterruptedException {
         URL url = getClass().getResource("/wsdl/hello_world.wsdl");

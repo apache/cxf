@@ -45,7 +45,7 @@ import org.opensaml.xacml.ctx.SubjectType;
 /**
  * Some unit tests to create a XACML Request using the RequestComponentBuilder.
  */
-public class RequestComponentBuilderTest extends org.junit.Assert {
+public class RequestComponentBuilderTest {
 
     private DocumentBuilder docBuilder;
     static {

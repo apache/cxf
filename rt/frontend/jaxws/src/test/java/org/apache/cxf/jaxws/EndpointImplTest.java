@@ -45,6 +45,13 @@ import org.apache.hello_world_soap_http.HelloWrongAnnotation;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class EndpointImplTest extends AbstractJaxWsTest {
 
 

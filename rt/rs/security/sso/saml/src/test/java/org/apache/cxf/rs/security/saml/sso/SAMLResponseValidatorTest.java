@@ -56,10 +56,14 @@ import org.opensaml.xmlsec.signature.KeyInfo;
 import org.opensaml.xmlsec.signature.Signature;
 import org.opensaml.xmlsec.signature.support.SignatureConstants;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Some unit tests for the SAMLProtocolResponseValidator.
  */
-public class SAMLResponseValidatorTest extends org.junit.Assert {
+public class SAMLResponseValidatorTest {
 
     static {
         WSSConfig.init();

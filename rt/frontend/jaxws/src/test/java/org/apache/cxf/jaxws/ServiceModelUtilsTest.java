@@ -44,6 +44,9 @@ import org.apache.hello_world_soap_http.RPCLitGreeterImpl;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class ServiceModelUtilsTest extends AbstractJaxWsTest {
 
     Message message;

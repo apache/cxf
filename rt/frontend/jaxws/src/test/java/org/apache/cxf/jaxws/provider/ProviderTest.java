@@ -26,6 +26,8 @@ import org.apache.cxf.transport.local.LocalTransportFactory;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+
 public class ProviderTest extends AbstractJaxWsTest {
     @Test
     public void testInvocation() throws Exception {

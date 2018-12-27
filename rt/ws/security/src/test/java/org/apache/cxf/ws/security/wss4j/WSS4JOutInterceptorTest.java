@@ -39,6 +39,8 @@ import org.apache.wss4j.dom.handler.WSHandler;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
 
     @Test

@@ -36,6 +36,9 @@ import org.apache.wss4j.common.ConfigurationConstants;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Test the DefaultCryptoCoverageChecker, which extends the CryptoCoverageChecker to provide
  * an easier way to check to see if the SOAP (1.1 + 1.2) Body was signed and/or encrypted, if

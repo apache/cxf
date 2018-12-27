@@ -27,6 +27,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
 
 public class SchemaFirstXmlConfigTest extends AbstractJaxWsTest {
 

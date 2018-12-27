@@ -35,7 +35,7 @@ import org.apache.cxf.security.SecurityContext;
 /**
  * Some unit tests to test the AbstractXACMLAuthorizingInterceptor.
  */
-public class XACMLAuthorizingInterceptorTest extends org.junit.Assert {
+public class XACMLAuthorizingInterceptorTest {
 
     static {
         org.apache.wss4j.common.saml.OpenSAMLUtil.initSamlEngine();

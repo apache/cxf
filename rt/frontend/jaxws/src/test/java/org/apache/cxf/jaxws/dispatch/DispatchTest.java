@@ -58,6 +58,11 @@ import org.apache.hello_world_soap_http.types.SayHiResponse;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class DispatchTest extends AbstractJaxWsTest {
     private final QName serviceName = new QName("http://apache.org/hello_world_soap_http", "SOAPService");
 

@@ -32,7 +32,10 @@ import javax.xml.bind.Unmarshaller;
 import org.apache.cxf.configuration.security.CertificateConstraintsType;
 import org.apache.cxf.staxutils.StaxUtils;
 
-public class CertConstraintsTest extends org.junit.Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class CertConstraintsTest {
 
     @org.junit.Test
     public void testCertConstraints() throws Exception {

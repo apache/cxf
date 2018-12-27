@@ -42,6 +42,9 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
 
 /**
  * Some tests for configuring outbound security using SecurityActionTokens.

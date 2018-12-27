@@ -45,7 +45,7 @@ import org.opensaml.xacml.profile.saml.XACMLAuthzDecisionQueryType;
 /**
  * Some unit tests for creating a SAML XACML Request.
  */
-public class SamlRequestComponentBuilderTest extends org.junit.Assert {
+public class SamlRequestComponentBuilderTest {
 
     private DocumentBuilder docBuilder;
     static {

@@ -36,7 +36,7 @@ import org.opensaml.xacml.ctx.ResourceType;
 /**
  * Some unit tests to create a XACML Request via the XACMLRequestBuilder interface.
  */
-public class XACMLRequestBuilderTest extends org.junit.Assert {
+public class XACMLRequestBuilderTest {
 
     static {
         org.apache.wss4j.common.saml.OpenSAMLUtil.initSamlEngine();

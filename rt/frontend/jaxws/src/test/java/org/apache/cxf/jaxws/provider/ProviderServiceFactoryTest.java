@@ -41,6 +41,10 @@ import org.apache.hello_world_soap_http.HWSoapMessageProvider;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class ProviderServiceFactoryTest extends AbstractJaxWsTest {
     @Test
     public void testFromWSDL() throws Exception {
