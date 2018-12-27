@@ -19,7 +19,6 @@
 
 package org.apache.cxf.systest.corba;
 
-
 import java.net.URL;
 import java.util.List;
 import java.util.Properties;
@@ -34,6 +33,8 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class CorbaBindingFactoryConfigurerTest extends AbstractBusClientServerTestBase {
 

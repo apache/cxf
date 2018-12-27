@@ -25,6 +25,8 @@ import org.apache.cxf.systest.type_test.AbstractTypeTestClient5;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertTrue;
+
 public class SOAPRpcLitClientTypeTest extends AbstractTypeTestClient5 {
     protected static final String WSDL_PATH = "/wsdl/type_test/type_test_rpclit_soap.wsdl";
 

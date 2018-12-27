@@ -54,9 +54,11 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
- * 
+ *
  */
 public class SequenceTimeoutTest extends AbstractBusClientServerTestBase {
     public static final String PORT = TestUtil.getPortNumber(SequenceTimeoutTest.class);
@@ -67,7 +69,7 @@ public class SequenceTimeoutTest extends AbstractBusClientServerTestBase {
         = new QName("http://cxf.apache.org/greeter_control", "GreeterService");
 
     private static RMManager rmManager;
-    
+
     private Bus greeterBus;
     private Greeter greeter;
 
@@ -81,9 +83,9 @@ public class SequenceTimeoutTest extends AbstractBusClientServerTestBase {
             Bus bus = bf.createBus("org/apache/cxf/systest/ws/rm/rminterceptors.xml");
             System.clearProperty("db.name");
             BusFactory.setDefaultBus(bus);
-            
+
             setBus(bus);
-            
+
             rmManager = bus.getExtension(RMManager.class);
             rmManager.getConfiguration().setInactivityTimeout(1000L);
 
@@ -99,8 +101,8 @@ public class SequenceTimeoutTest extends AbstractBusClientServerTestBase {
             endpoint.stop();
         }
     }
-    
-    
+
+
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
@@ -133,8 +135,8 @@ public class SequenceTimeoutTest extends AbstractBusClientServerTestBase {
         greeterBus = bf.createBus(cfgResource);
         BusFactory.setDefaultBus(greeterBus);
     }
-    
-    
+
+
     private Dispatch<DOMSource> initDispatch() {
         GreeterService gs = new GreeterService();
         Dispatch<DOMSource> dispatch = gs.createDispatch(GreeterService.GreeterPort,
@@ -175,10 +177,10 @@ public class SequenceTimeoutTest extends AbstractBusClientServerTestBase {
         int count = 5;
         for (int x = 0; x < count; x++) {
             Dispatch<DOMSource> dispatch = initDispatch();
-            AcksPolicyType ap = new AcksPolicyType();            
+            AcksPolicyType ap = new AcksPolicyType();
             //don't send the acks to cause a memory leak - CXF-7096
             ap.setImmediaAcksTimeout(500000L);
-            greeterBus.getExtension(RMManager.class).getDestinationPolicy().setAcksPolicy(ap);          
+            greeterBus.getExtension(RMManager.class).getDestinationPolicy().setAcksPolicy(ap);
             dispatch.invoke(getDOMRequest("One"));
             dispatches.add(dispatch);
         }

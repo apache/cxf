@@ -49,6 +49,12 @@ import org.apache.hello_world_soap_http.types.GreetMeLaterResponse;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class ClientServerWebSocketTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
 
@@ -239,7 +245,7 @@ public class ClientServerWebSocketTest extends AbstractBusClientServerTestBase {
             bp.getRequestContext().remove(BindingProvider.USERNAME_PROPERTY);
             bp.getRequestContext().remove(BindingProvider.PASSWORD_PROPERTY);
             ((Closeable)greeter).close();
-            
+
             greeter = service.getPort(portName, Greeter.class);
             updateGreeterAddress(greeter, PORT);
             //try setting on the conduit directly

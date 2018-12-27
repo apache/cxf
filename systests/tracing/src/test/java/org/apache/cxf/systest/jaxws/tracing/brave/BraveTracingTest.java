@@ -60,6 +60,9 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 
 public class BraveTracingTest extends AbstractBusClientServerTestBase {
@@ -185,14 +188,14 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
             try (SpanInScope scope = brave.tracer().withSpanInScope(span)) {
                 assertThat(service.getBooks().size(), equalTo(2));
                 assertThat(brave.tracer().currentSpan(), not(nullValue()));
-    
+
                 assertThat(TestSpanReporter.getAllSpans().size(), equalTo(3));
                 assertThat(TestSpanReporter.getAllSpans().get(0).name(), equalTo("get books"));
                 assertThat(TestSpanReporter.getAllSpans().get(0).parentId(), not(nullValue()));
                 assertThat(TestSpanReporter.getAllSpans().get(1).name(), equalTo("post /bookstore"));
                 assertThat(TestSpanReporter.getAllSpans().get(2).name(),
                     equalTo("post http://localhost:" + PORT + "/bookstore"));
-    
+
                 final Map<String, List<String>> response = getResponseHeaders(service);
                 assertThatTraceHeadersArePresent(response, true);
             }

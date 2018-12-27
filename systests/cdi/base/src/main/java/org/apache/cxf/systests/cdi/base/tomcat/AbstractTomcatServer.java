@@ -25,6 +25,8 @@ import java.io.IOException;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
+import static org.junit.Assert.fail;
+
 public abstract class AbstractTomcatServer extends AbstractBusTestServerBase {
 
     private Tomcat server;

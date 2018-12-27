@@ -52,6 +52,10 @@ import org.apache.cxf.transport.MessageObserver;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class MtomServerTest extends AbstractBusClientServerTestBase {
     public static final String PORT1 = TestUtil.getPortNumber(MtomServerTest.class);
     public static final String PORT2 = TestUtil.getPortNumber(MtomServerTest.class, 2);

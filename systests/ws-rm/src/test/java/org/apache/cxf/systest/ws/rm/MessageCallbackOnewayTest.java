@@ -61,6 +61,11 @@ import org.apache.cxf.ws.rm.RMMessageConstants;
 import org.junit.After;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Tests the operation of MessageCallback for one-way messages to the server.
  */

@@ -27,6 +27,8 @@ import org.jboss.weld.environment.tomcat.TomcatContainer;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertTrue;
+
 public class TomcatWarTest extends AbstractCdiMultiAppTest {
     public static class EmbeddedTomcatServer extends AbstractTomcatServer {
         public static final int PORT = allocatePortAsInt(EmbeddedTomcatServer.class);

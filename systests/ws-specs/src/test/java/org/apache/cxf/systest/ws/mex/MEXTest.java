@@ -29,6 +29,9 @@ import org.apache.cxf.ws.mex.model._2004_09.Metadata;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  *

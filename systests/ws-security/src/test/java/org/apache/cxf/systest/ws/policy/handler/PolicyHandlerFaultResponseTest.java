@@ -32,6 +32,10 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class PolicyHandlerFaultResponseTest extends AbstractBusClientServerTestBase {
     public static final String PORT = Server.PORT;
     private final QName serviceName = new QName("http://handler.policy.ws.systest.cxf.apache.org/",

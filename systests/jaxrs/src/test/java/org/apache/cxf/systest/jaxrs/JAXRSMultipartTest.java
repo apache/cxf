@@ -73,6 +73,11 @@ import org.apache.http.util.EntityUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+
 public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     public static final String PORT = MultipartServer.PORT;
 
@@ -928,7 +933,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         post.setHeader("Content-Type", ct);
 
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-        
+
         HttpEntity entity = builder.addPart("image", new ByteArrayBody(new byte[1024 * 9], "testfile.png"))
                                    .addPart("image", new ByteArrayBody(new byte[1024 * 11], "testfile2.png")).build();
 

@@ -47,6 +47,11 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Tests whether the stax transformer is correctly engaged and it does not interfere with logging.
  * This test uses a simple transformation. More complex transformation tests are found in the api package.

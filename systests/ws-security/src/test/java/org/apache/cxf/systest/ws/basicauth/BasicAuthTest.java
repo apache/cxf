@@ -37,6 +37,10 @@ import org.example.contract.doubleit.DoubleItPortType;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * A test for Basic Auth using the WS-SecurityPolicy HttpBasicAuthentication policy.
  * Note the basic auth credentials are not actually authenticated in this test...we are testing

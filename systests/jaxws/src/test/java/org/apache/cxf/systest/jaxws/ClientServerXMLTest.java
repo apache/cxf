@@ -51,6 +51,11 @@ import org.apache.hello_world_xml_http.wrapped.PingMeFault;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class ClientServerXMLTest extends AbstractBusClientServerTestBase {
     static final String REG_PORT = allocatePort(ServerXMLBinding.class);
     static final String WRAP_PORT = allocatePort(ServerXMLBinding.class, 1);

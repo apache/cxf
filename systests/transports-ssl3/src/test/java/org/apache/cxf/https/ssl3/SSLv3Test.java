@@ -43,6 +43,11 @@ import org.apache.hello_world.services.SOAPService;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * A set of tests SSL v3 protocol support. It should be disallowed by default on both the
  * (Jetty) server and CXF client side.

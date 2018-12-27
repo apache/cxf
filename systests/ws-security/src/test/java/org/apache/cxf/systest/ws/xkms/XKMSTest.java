@@ -38,6 +38,9 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
  * A set of tests that uses XKMS with WS-Security to locate + validate X.509 tokens.
  */

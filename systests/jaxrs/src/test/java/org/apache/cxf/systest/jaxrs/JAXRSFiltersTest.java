@@ -32,8 +32,11 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class JAXRSFiltersTest extends AbstractBusClientServerTestBase {
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
@@ -46,7 +49,7 @@ public class JAXRSFiltersTest extends AbstractBusClientServerTestBase {
         public static final String PORT = allocatePort(BookServer.class);
 
         org.apache.cxf.endpoint.Server server;
-        
+
         public AppServer() {
         }
 
@@ -68,7 +71,7 @@ public class JAXRSFiltersTest extends AbstractBusClientServerTestBase {
             server = null;
         }
     }
-    
+
     @Test
     public void testPostMatchingFilterOnSubresource() throws Exception {
         WebClient wc = WebClient.create("http://localhost:" + AppServer.PORT + "/info/app/nav");

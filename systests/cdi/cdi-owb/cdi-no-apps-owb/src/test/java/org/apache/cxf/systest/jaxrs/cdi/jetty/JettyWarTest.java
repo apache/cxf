@@ -25,6 +25,8 @@ import org.apache.webbeans.servlet.WebBeansConfigurationListener;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertTrue;
+
 public class JettyWarTest extends AbstractCdiSingleAppTest {
     public static class EmbeddedJettyServer extends AbstractJettyServer {
         public static final int PORT = allocatePortAsInt(EmbeddedJettyServer.class);

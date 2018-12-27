@@ -19,7 +19,6 @@
 
 package org.apache.cxf.testutil.common;
 
-
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
@@ -34,6 +33,9 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 
 import org.junit.After;
 import org.junit.AfterClass;
+
+import static org.junit.Assert.assertTrue;
+
 
 public abstract class AbstractBusClientServerTestBase extends AbstractClientServerTestBase {
 

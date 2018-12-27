@@ -45,6 +45,11 @@ import org.apache.type_test.types1.StringEnum;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public abstract class AbstractTypeTestClient
     extends AbstractBusClientServerTestBase implements TypeTestTester {
     protected static TypeTestPortType docClient;

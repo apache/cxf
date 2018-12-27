@@ -70,6 +70,10 @@ import org.example.schema.doubleit.DoubleIt;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
     public static final String PORT = allocatePort(SecurityPolicyTest.class);
     public static final String SSL_PORT = allocatePort(SecurityPolicyTest.class, 1);

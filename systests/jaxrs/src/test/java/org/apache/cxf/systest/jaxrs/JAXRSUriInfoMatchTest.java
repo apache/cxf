@@ -36,6 +36,8 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class JAXRSUriInfoMatchTest extends AbstractClientServerTestBase {
     public static final int PORT = SpringServer.PORT;
     @BeforeClass
@@ -53,7 +55,7 @@ public class JAXRSUriInfoMatchTest extends AbstractClientServerTestBase {
         }
     }
 
-    
+
     @Test
     public void testMatchedUris() throws Exception {
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/match/my/resource/1/matched/uris");
@@ -64,7 +66,7 @@ public class JAXRSUriInfoMatchTest extends AbstractClientServerTestBase {
     }
     @Test
     public void testMatchedUrisParam() throws Exception {
-        WebClient wc = WebClient.create("http://localhost:" + PORT 
+        WebClient wc = WebClient.create("http://localhost:" + PORT
                                         + "/match/my/resource/1/matched/uris/param");
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(100000000L);
         wc.accept("text/plain");
@@ -73,7 +75,7 @@ public class JAXRSUriInfoMatchTest extends AbstractClientServerTestBase {
     }
     @Test
     public void testMatchedUrisParam2() throws Exception {
-        WebClient wc = WebClient.create("http://localhost:" + PORT 
+        WebClient wc = WebClient.create("http://localhost:" + PORT
                                         + "/match/my/resource/1/matched/uris/param/2");
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(100000000L);
         wc.accept("text/plain");
@@ -117,9 +119,9 @@ public class JAXRSUriInfoMatchTest extends AbstractClientServerTestBase {
         public Object getMatchedResources() {
             return concat(uriInfo.getMatchedResources());
         }
-        
+
     }
-    
+
     private static String concat(List<?> data) {
         StringBuilder builder = new StringBuilder();
         Iterator<?> iterator = data.iterator();
@@ -132,5 +134,5 @@ public class JAXRSUriInfoMatchTest extends AbstractClientServerTestBase {
         return builder.toString();
     }
 
-    
+
 }

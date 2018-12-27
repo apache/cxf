@@ -75,7 +75,12 @@ import org.apache.type_test.types3.OccuringStruct;
 import org.apache.type_test.types3.OccuringStruct1;
 import org.apache.type_test.types3.OccuringStruct2;
 
+import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
 
@@ -1002,8 +1007,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
     //org.apache.type_test.types2.StructWithAny
 
     public void assertEqualsStructWithAny(StructWithAny a, StructWithAny b) throws Exception {
-        assertEquals("StructWithAny names don't match", a.getName(), b.getName());
-        assertEquals("StructWithAny addresses don't match", a.getAddress(), b.getAddress());
+        Assert.assertEquals("StructWithAny names don't match", a.getName(), b.getName());
+        Assert.assertEquals("StructWithAny addresses don't match", a.getAddress(), b.getAddress());
         assertEquals(a.getAny(), b.getAny());
     }
 
@@ -1011,9 +1016,9 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         if (elA instanceof SOAPElement && elB instanceof SOAPElement) {
             SOAPElement soapA = (SOAPElement)elA;
             SOAPElement soapB = (SOAPElement)elB;
-            assertEquals("StructWithAny soap element names don't match",
+            Assert.assertEquals("StructWithAny soap element names don't match",
                 soapA.getElementName(), soapB.getElementName());
-            assertEquals("StructWithAny soap element text nodes don't match",
+            Assert.assertEquals("StructWithAny soap element text nodes don't match",
                 soapA.getValue(), soapB.getValue());
 
             Iterator<?> itExp = soapA.getChildElements();
@@ -1170,13 +1175,13 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
     //org.apache.type_test.types2.StructWithAnyArray
 
     public void assertEqualsStructWithAnyArray(StructWithAnyArray a, StructWithAnyArray b) throws Exception {
-        assertEquals("StructWithAny names don't match", a.getName(), b.getName());
-        assertEquals("StructWithAny addresses don't match", a.getAddress(), b.getAddress());
+        Assert.assertEquals("StructWithAny names don't match", a.getName(), b.getName());
+        Assert.assertEquals("StructWithAny addresses don't match", a.getAddress(), b.getAddress());
 
         List<Element> ae = a.getAny();
         List<Element> be = b.getAny();
 
-        assertEquals("StructWithAny soap element lengths don't match", ae.size(), be.size());
+        Assert.assertEquals("StructWithAny soap element lengths don't match", ae.size(), be.size());
         for (int i = 0; i < ae.size(); i++) {
             assertEquals(ae.get(i), be.get(i));
         }
@@ -2250,11 +2255,11 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
             assertTrue(ret.length == 2);
             if (!perfTestOnly) {
                 for (int i = 0; i < 2; i++) {
-                    assertEquals("testAnonEnumList(): Incorrect value for inout param", x[i].shortValue(),
+                    Assert.assertEquals("testAnonEnumList(): Incorrect value for inout param", x[i].shortValue(),
                                  y.value[i].shortValue());
-                    assertEquals("testAnonEnumList(): Incorrect value for out param", yOrig[i].shortValue(),
+                    Assert.assertEquals("testAnonEnumList(): Incorrect value for out param", yOrig[i].shortValue(),
                                  z.value[i].shortValue());
-                    assertEquals("testAnonEnumList(): Incorrect return value", x[i].shortValue(), ret[i]
+                    Assert.assertEquals("testAnonEnumList(): Incorrect return value", x[i].shortValue(), ret[i]
                         .shortValue());
                 }
             }
@@ -2279,9 +2284,9 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         } else {
             ret = rpcClient.testUnionWithAnonEnum(x, y, z);
         }
-        assertEquals("testUnionWithAnonEnum(): Incorrect value for inout param", x, y.value);
-        assertEquals("testUnionWithAnonEnum(): Incorrect value for out param", yOrig, z.value);
-        assertEquals("testUnionWithAnonEnum(): Incorrect return value", x, ret);
+        Assert.assertEquals("testUnionWithAnonEnum(): Incorrect value for inout param", x, y.value);
+        Assert.assertEquals("testUnionWithAnonEnum(): Incorrect value for out param", yOrig, z.value);
+        Assert.assertEquals("testUnionWithAnonEnum(): Incorrect return value", x, ret);
     }
 
 }

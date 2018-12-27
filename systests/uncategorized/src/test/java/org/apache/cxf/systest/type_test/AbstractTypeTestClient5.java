@@ -38,7 +38,11 @@ import org.apache.type_test.types1.UnboundedArray;
 import org.apache.type_test.types2.StructWithAnyArrayLax;
 import org.apache.type_test.types2.StructWithAnyStrict;
 
+import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
 
@@ -66,11 +70,11 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
             ret = rpcClient.testComplexRestriction(x, y, z);
         }
         if (!perfTestOnly) {
-            assertEquals("testComplexRestriction(): Incorrect value for inout param",
+            Assert.assertEquals("testComplexRestriction(): Incorrect value for inout param",
                          x.getValue(), y.value.getValue());
-            assertEquals("testComplexRestriction(): Incorrect value for out param",
+            Assert.assertEquals("testComplexRestriction(): Incorrect value for out param",
                          yOrig.getValue(), z.value.getValue());
-            assertEquals("testComplexRestriction(): Incorrect return value",
+            Assert.assertEquals("testComplexRestriction(): Incorrect return value",
                          x.getValue(), ret.getValue());
         }
 
@@ -117,11 +121,11 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
             ret = rpcClient.testComplexRestriction2(x, y, z);
         }
         if (!perfTestOnly) {
-            assertEquals("testComplexRestriction2(): Incorrect value for inout param",
+            Assert.assertEquals("testComplexRestriction2(): Incorrect value for inout param",
                          x.getValue(), y.value.getValue());
-            assertEquals("testComplexRestriction2(): Incorrect value for out param",
+            Assert.assertEquals("testComplexRestriction2(): Incorrect value for out param",
                          yOrig.getValue(), z.value.getValue());
-            assertEquals("testComplexRestriction2(): Incorrect return value",
+            Assert.assertEquals("testComplexRestriction2(): Incorrect return value",
                          x.getValue(), ret.getValue());
         }
 
@@ -169,11 +173,11 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
             ret = rpcClient.testComplexRestriction3(x, y, z);
         }
         if (!perfTestOnly) {
-            assertEquals("testComplexRestriction3(): Incorrect value for inout param",
+            Assert.assertEquals("testComplexRestriction3(): Incorrect value for inout param",
                          x.getValue(), y.value.getValue());
-            assertEquals("testComplexRestriction3(): Incorrect value for out param",
+            Assert.assertEquals("testComplexRestriction3(): Incorrect value for out param",
                          yOrig.getValue(), z.value.getValue());
-            assertEquals("testComplexRestriction3(): Incorrect return value",
+            Assert.assertEquals("testComplexRestriction3(): Incorrect return value",
                          x.getValue(), ret.getValue());
         }
 
@@ -231,11 +235,11 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
             ret = rpcClient.testComplexRestriction4(x, y, z);
         }
         if (!perfTestOnly) {
-            assertEquals("testComplexRestriction4(): Incorrect value for inout param",
+            Assert.assertEquals("testComplexRestriction4(): Incorrect value for inout param",
                          x.getValue(), y.value.getValue());
-            assertEquals("testComplexRestriction4(): Incorrect value for out param",
+            Assert.assertEquals("testComplexRestriction4(): Incorrect value for out param",
                          yOrig.getValue(), z.value.getValue());
-            assertEquals("testComplexRestriction4(): Incorrect return value",
+            Assert.assertEquals("testComplexRestriction4(): Incorrect return value",
                          x.getValue(), ret.getValue());
         }
 
@@ -278,11 +282,11 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
             ret = rpcClient.testComplexRestriction5(x, y, z);
         }
         if (!perfTestOnly) {
-            assertEquals("testComplexRestriction5(): Incorrect value for inout param",
+            Assert.assertEquals("testComplexRestriction5(): Incorrect value for inout param",
                          x.getValue(), y.value.getValue());
-            assertEquals("testComplexRestriction5(): Incorrect value for out param",
+            Assert.assertEquals("testComplexRestriction5(): Incorrect value for out param",
                          yOrig.getValue(), z.value.getValue());
-            assertEquals("testComplexRestriction5(): Incorrect return value",
+            Assert.assertEquals("testComplexRestriction5(): Incorrect return value",
                          x.getValue(), ret.getValue());
         }
 
@@ -515,24 +519,24 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
     }
     public void assertEqualsStructWithAnyStrict(StructWithAnyStrict a,
                                                 StructWithAnyStrict b) throws Exception {
-        assertEquals("StructWithAnyStrict names don't match", a.getName(), b.getName());
-        assertEquals("StructWithAnyStrict addresses don't match", a.getAddress(), b.getAddress());
+        Assert.assertEquals("StructWithAnyStrict names don't match", a.getName(), b.getName());
+        Assert.assertEquals("StructWithAnyStrict addresses don't match", a.getAddress(), b.getAddress());
         if (a.getAny() instanceof SOAPElement && b.getAny() instanceof SOAPElement) {
             assertEquals((SOAPElement)a.getAny(), (SOAPElement)b.getAny());
         }
     }
-    
+
     public void assertEqualsStructWithAnyArrayLax(StructWithAnyArrayLax a,
             StructWithAnyArrayLax b) throws Exception {
-        assertEquals("StructWithAnyArrayLax names don't match", a.getName(), b.getName());
-        assertEquals("StructWithAnyArrayLax addresses don't match", a.getAddress(), b.getAddress());
-    
+        Assert.assertEquals("StructWithAnyArrayLax names don't match", a.getName(), b.getName());
+        Assert.assertEquals("StructWithAnyArrayLax addresses don't match", a.getAddress(), b.getAddress());
+
         List<Object> ae = a.getAny();
         List<Object> be = b.getAny();
-        assertEquals("StructWithAnyArrayLax soap element lengths don't match", ae.size(), be.size());
+        Assert.assertEquals("StructWithAnyArrayLax soap element lengths don't match", ae.size(), be.size());
         for (int i = 0; i < ae.size(); i++) {
             if (ae.get(i) instanceof SOAPElement && be.get(i) instanceof SOAPElement) {
-                assertEquals(ae.get(i), be.get(i));
+                Assert.assertEquals(ae.get(i), be.get(i));
             }
         }
     }
@@ -579,7 +583,7 @@ public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
             assertEqualsStructWithAnyStrict(x, ret);
         }
     }
-    
+
     @Test
     public void testStructWithAnyArrayLax() throws Exception {
         if (!shouldRunTest("StructWithAnyArrayLax")) {

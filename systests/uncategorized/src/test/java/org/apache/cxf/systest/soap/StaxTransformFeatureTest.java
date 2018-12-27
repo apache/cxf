@@ -32,6 +32,9 @@ import org.example.contract.doubleit.DoubleItPortType2;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
  * A test for the StaxTransformFeature. The client uses "DoubleIt2" but the service uses "DoubleIt".
  * The service uses the StaxTransformFeature's "inTransformElements" and "outTransformElements" to alter

@@ -38,6 +38,8 @@ import org.apache.neethi.All;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * Base class for testing WS-Policy Framework using engage WS-RM Policy to engage WS-RM.
  */

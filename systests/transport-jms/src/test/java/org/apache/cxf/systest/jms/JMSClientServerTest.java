@@ -75,6 +75,12 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class JMSClientServerTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(JMSClientServerTest.class);
@@ -581,7 +587,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         assertTrue("response Headers must conain the app property set in request context.",
                    responseHdr.getPropertyKeys().size() > 0);
 
-        
+
         boolean found = responseHdr.getPropertyKeys().contains(testReturnPropertyName);
         assertTrue("response Headers must match the app property set in request context.", found);
         ((Closeable)greeter).close();

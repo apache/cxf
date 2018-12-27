@@ -38,6 +38,11 @@ import org.apache.hello_world_xml_http.wrapped.XMLService;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class ProviderXMLClientServerTest extends AbstractBusClientServerTestBase {
     public static final String ADDRESS = XMLServer.ADDRESS;
 

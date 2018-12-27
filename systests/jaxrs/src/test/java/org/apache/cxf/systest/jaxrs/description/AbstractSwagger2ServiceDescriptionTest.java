@@ -58,27 +58,29 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBusClientServerTestBase {
     static final String SECURITY_DEFINITION_NAME = "basicAuth";
-    
+
     protected enum XForwarded {
         NONE,
         ONE_HOST,
         MANY_HOSTS;
-        
+
         boolean isSet() {
             return this != NONE;
         }
     }
-    
+
     private static final String CONTACT = "cxf@apache.org";
     private static final String TITLE = "CXF unittest";
     private static final String DESCRIPTION = "API Description";
     private static final String LICENSE = "API License";
     private static final String LICENSE_URL = "API License URL";
-    
+
     @Ignore
     public abstract static class Server extends AbstractBusTestServerBase {
         protected final String port;
@@ -104,7 +106,7 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
                  Collections.singletonMap("json", "application/json;charset=UTF-8"));
             sf.create();
         }
-        
+
         protected Swagger2Feature createSwagger2Feature() {
             final Swagger2Feature feature = new Swagger2Feature();
             feature.setRunAsFilter(runAsFilter);
@@ -145,24 +147,24 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
         doTestApiListingIsProperlyReturnedJSON(XForwarded.NONE);
     }
     protected void doTestApiListingIsProperlyReturnedJSON(XForwarded useXForwarded) throws Exception {
-        doTestApiListingIsProperlyReturnedJSON(createWebClient("/swagger.json"), 
+        doTestApiListingIsProperlyReturnedJSON(createWebClient("/swagger.json"),
                                                useXForwarded);
         checkUiResource();
     }
     protected static void doTestApiListingIsProperlyReturnedJSON(final WebClient client,
-                                                          XForwarded useXForwarded) throws Exception {    
+                                                          XForwarded useXForwarded) throws Exception {
         if (useXForwarded == XForwarded.ONE_HOST) {
             client.header("USE_XFORWARDED", true);
         } else if (useXForwarded == XForwarded.MANY_HOSTS) {
             client.header("USE_XFORWARDED_MANY_HOSTS", true);
         }
-        
+
         try {
             String swaggerJson = client.get(String.class);
             UserApplication ap = SwaggerParseUtils.getUserApplicationFromJson(swaggerJson);
             assertNotNull(ap);
             assertEquals(useXForwarded.isSet() ? "/reverse" : "/", ap.getBasePath());
-            
+
             List<UserResource> urs = ap.getResources();
             assertNotNull(urs);
             assertEquals(1, urs.size());
@@ -207,7 +209,7 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
 
     @Test
     public void testNonUiResource() {
-        // Test that Swagger UI resources do not interfere with 
+        // Test that Swagger UI resources do not interfere with
         // application-specific ones.
         WebClient uiClient = WebClient
             .create("http://localhost:" + getPort() + "/css/book.css")
@@ -215,15 +217,15 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
         String css = uiClient.get(String.class);
         assertThat(css, equalTo("body { background-color: lightblue; }"));
     }
-    
+
     @Test
     public void testUiResource() {
-        // Test that Swagger UI resources do not interfere with 
+        // Test that Swagger UI resources do not interfere with
         // application-specific ones and are accessible.
         WebClient uiClient = WebClient
             .create("http://localhost:" + getPort() + "/swagger-ui.css")
             .accept("text/css");
-        
+
         try (Response response = uiClient.get()) {
             String css = response.readEntity(String.class);
             assertThat(css, containsString(".swagger-ui{"));
@@ -233,12 +235,12 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
 
     @Test
     public void testUiRootResource() {
-        // Test that Swagger UI resources do not interfere with 
+        // Test that Swagger UI resources do not interfere with
         // application-specific ones and are accessible.
         WebClient uiClient = WebClient
             .create("http://localhost:" + getPort() + "/api-docs")
             .accept("*/*");
-        
+
         try (Response response = uiClient.get()) {
             String html = response.readEntity(String.class);
             assertThat(html, containsString("<!-- HTML"));
@@ -282,7 +284,7 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
         String uiHtml = uiClient.get(String.class);
         assertTrue(uiHtml.contains("<title>Swagger UI</title>"));
     }
-    
+
     private static String getExpectedValue(String name, Object... args) throws IOException {
         return String.format(IOUtils.readStringFromStream(
             AbstractSwagger2ServiceDescriptionTest.class.getResourceAsStream(name)), args);

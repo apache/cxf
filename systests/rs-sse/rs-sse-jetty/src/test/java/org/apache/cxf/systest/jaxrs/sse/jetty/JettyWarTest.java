@@ -25,6 +25,8 @@ import org.apache.cxf.systest.jaxrs.sse.AbstractSseTest;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 
+import static org.junit.Assert.assertTrue;
+
 public class JettyWarTest extends AbstractSseTest {
     @Ignore
     public static class EmbeddedJettyServer extends AbstractJettyServer {

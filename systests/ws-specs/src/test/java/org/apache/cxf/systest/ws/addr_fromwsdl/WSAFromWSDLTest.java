@@ -40,6 +40,10 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class WSAFromWSDLTest extends AbstractWSATestBase {
     static final String PORT = allocatePort(Server.class);
     static final String INVALID_PORT = allocatePort(Server.class, 1);

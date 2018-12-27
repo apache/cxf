@@ -27,6 +27,8 @@ import org.apache.cxf.systests.cdi.base.AbstractCdiSingleAppTest;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public abstract class AbstractBookStoreCdiTest extends AbstractCdiSingleAppTest {
 
     @Test

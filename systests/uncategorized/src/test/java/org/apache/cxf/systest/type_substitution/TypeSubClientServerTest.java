@@ -34,6 +34,11 @@ import org.apache.type_substitution.Porsche;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class TypeSubClientServerTest extends AbstractBusClientServerTestBase {
     public static final String PORT = Server.PORT;
 

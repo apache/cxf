@@ -19,7 +19,6 @@
 
 package org.apache.cxf.systest.factory_pattern;
 
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 
@@ -48,6 +47,8 @@ import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ManualHttpMulitplexClientServerTest extends AbstractBusClientServerTestBase {
     public static final String PORT = TestUtil.getPortNumber(ManualHttpMulitplexClientServerTest.class);

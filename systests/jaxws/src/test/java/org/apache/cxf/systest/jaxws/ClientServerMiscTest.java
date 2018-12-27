@@ -87,6 +87,13 @@ import org.apache.cxf.wsdl.WSDLConstants;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(ServerMisc.class);
 
@@ -477,7 +484,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         String echoMsg = port.echo("Hello");
         assertEquals("Hello", echoMsg);
     }
-    
+
     @Test
     public void testSimpleClientWithWsdlAndBindingId() throws Exception {
         QName portName = new QName("http://cxf.apache.org/systest/jaxws/DocLitWrappedCodeFirstService",
@@ -496,11 +503,11 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         assertNotNull(port);
         assertEquals(factory.getBindingId(), "http://cxf.apache.org/bindings/xformat");
         assertTrue(ClientProxy.getClient(port).getEndpoint().getBinding() instanceof XMLBinding);
-        
+
         String echoMsg = port.echo("Hello");
         assertEquals("Hello", echoMsg);
     }
-    
+
     private void runDocLitTest(DocLitWrappedCodeFirstService port) throws Exception {
         assertEquals("snarf", port.doBug2692("snarf"));
         CXF2411Result<CXF2411SubClass> o = port.doCXF2411();

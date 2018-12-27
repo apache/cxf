@@ -33,6 +33,11 @@ import org.apache.hello_world.services.SOAPService;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * This test is meant to run against a spring-loaded HTTP/S service. It tests the certificate
  * constraints logic.
@@ -82,7 +87,7 @@ public class CertConstraintsTest extends AbstractBusClientServerTestBase {
 
     //
     // tests
-    //
+    //s
     public final void testSuccessfulCall(String address) throws Exception {
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);

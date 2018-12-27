@@ -25,6 +25,8 @@ import org.apache.cxf.systests.cdi.base.tomcat.AbstractTomcatServer;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertTrue;
+
 public class TomcatWarTest extends AbstractCdiMultiAppTest {
     public static class EmbeddedTomcatServer extends AbstractTomcatServer {
         public static final int PORT = allocatePortAsInt(EmbeddedTomcatServer.class);

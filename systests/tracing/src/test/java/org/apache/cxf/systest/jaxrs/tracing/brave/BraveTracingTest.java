@@ -70,6 +70,9 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsMapContaining.hasEntry;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class BraveTracingTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(BraveTracingTest.class);
@@ -77,7 +80,7 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
     private Tracing brave;
     private BraveClientProvider braveClientProvider;
     private Random random;
-    
+
     @Ignore
     public static class Server extends AbstractBusTestServerBase {
         protected void run() {
@@ -247,7 +250,7 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
     @Test
     public void testThatNewSpansAreCreatedWhenNotProvidedUsingMultipleAsyncClients() throws Exception {
         final WebClient client = createWebClient("/bookstore/books", braveClientProvider);
-        
+
         // The intention is to make a calls one after another, not in parallel, to ensure the
         // thread have trace contexts cleared out.
         final Collection<Response> responses = IntStream
@@ -262,24 +265,24 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
         }
 
         assertThat(TestSpanReporter.getAllSpans().size(), equalTo(12));
-        
+
         IntStream
             .range(0, 4)
             .map(index -> index * 3)
             .forEach(index -> {
-                assertThat(TestSpanReporter.getAllSpans().get(index).name(), 
+                assertThat(TestSpanReporter.getAllSpans().get(index).name(),
                     equalTo("get books"));
-                assertThat(TestSpanReporter.getAllSpans().get(index + 1).name(), 
+                assertThat(TestSpanReporter.getAllSpans().get(index + 1).name(),
                     equalTo("get /bookstore/books"));
-                assertThat(TestSpanReporter.getAllSpans().get(index + 2).name(), 
+                assertThat(TestSpanReporter.getAllSpans().get(index + 2).name(),
                     equalTo("get " + client.getCurrentURI()));
             });
     }
-    
+
     @Test
     public void testThatNewSpansAreCreatedWhenNotProvidedUsingMultipleClients() throws Exception {
         final WebClient client = createWebClient("/bookstore/books", braveClientProvider);
-        
+
         // The intention is to make a calls one after another, not in parallel, to ensure the
         // thread have trace contexts cleared out.
         final Collection<Response> responses = IntStream
@@ -293,16 +296,16 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
         }
 
         assertThat(TestSpanReporter.getAllSpans().size(), equalTo(12));
-        
+
         IntStream
             .range(0, 4)
             .map(index -> index * 3)
             .forEach(index -> {
-                assertThat(TestSpanReporter.getAllSpans().get(index).name(), 
+                assertThat(TestSpanReporter.getAllSpans().get(index).name(),
                     equalTo("get books"));
-                assertThat(TestSpanReporter.getAllSpans().get(index + 1).name(), 
+                assertThat(TestSpanReporter.getAllSpans().get(index + 1).name(),
                     equalTo("get /bookstore/books"));
-                assertThat(TestSpanReporter.getAllSpans().get(index + 2).name(), 
+                assertThat(TestSpanReporter.getAllSpans().get(index + 2).name(),
                     equalTo("get " + client.getCurrentURI()));
             });
     }
@@ -316,19 +319,19 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
             try (SpanInScope scope = brave.tracer().withSpanInScope(span)) {
                 final Response r = client.get();
                 assertEquals(Status.OK.getStatusCode(), r.getStatus());
-    
+
                 assertThat(TestSpanReporter.getAllSpans().size(), equalTo(3));
                 assertThat(TestSpanReporter.getAllSpans().get(0).name(), equalTo("get books"));
                 assertThat(TestSpanReporter.getAllSpans().get(0).parentId(), not(nullValue()));
                 assertThat(TestSpanReporter.getAllSpans().get(1).name(), equalTo("get /bookstore/books"));
                 assertThat(TestSpanReporter.getAllSpans().get(2).name(), equalTo("get " + client.getCurrentURI()));
-    
+
                 assertThatTraceHeadersArePresent(r, true);
             }
         } finally {
             span.finish();
         }
-        
+
         // Await till flush happens, usually a second is enough
         await().atMost(Duration.ONE_SECOND).until(()-> TestSpanReporter.getAllSpans().size() == 4);
 
@@ -344,7 +347,7 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
         try {
             try (SpanInScope scope = brave.tracer().withSpanInScope(span)) {
                 final Future<Response> f = client.async().get();
-    
+
                 final Response r = f.get(1, TimeUnit.SECONDS);
                 assertEquals(Status.OK.getStatusCode(), r.getStatus());
                 assertThat(brave.tracer().currentSpan().context().spanId(), equalTo(span.context().spanId()));
@@ -353,7 +356,7 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
                 assertThat(TestSpanReporter.getAllSpans().get(0).name(), equalTo("get books"));
                 assertThat(TestSpanReporter.getAllSpans().get(1).name(), equalTo("get /bookstore/books"));
                 assertThat(TestSpanReporter.getAllSpans().get(2).name(), equalTo("get " + client.getCurrentURI()));
-    
+
                 assertThatTraceHeadersArePresent(r, true);
             }
         } finally {
@@ -432,7 +435,7 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
             assertFalse(r.getHeaders().containsKey(PARENT_SPAN_ID_NAME));
         }
     }
-    
+
     private<T> T get(final Future<T> future) {
         try {
             return future.get(1, TimeUnit.HOURS);

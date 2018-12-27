@@ -44,10 +44,12 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class OpenApiContextBasedConfigTest extends AbstractBusClientServerTestBase {
     private static final String PORT = allocatePort(OpenApiContextBasedConfigTest.class);
-    
+
     public static class OpenApiContextBased extends AbstractBusTestServerBase {
         @Override
         protected void run() {
@@ -65,11 +67,11 @@ public class OpenApiContextBasedConfigTest extends AbstractBusClientServerTestBa
             sf.create();
         }
 
-        
+
         protected OpenApiFeature createOpenApiFeature(final String description, final Class<?> resource) {
             final OpenApiCustomizer customizer = new OpenApiCustomizer();
             customizer.setDynamicBasePath(true);
-            
+
             final OpenApiFeature feature = new OpenApiFeature();
             feature.setDescription(description);
             feature.setCustomizer(customizer);
@@ -78,7 +80,7 @@ public class OpenApiContextBasedConfigTest extends AbstractBusClientServerTestBa
             feature.setResourceClasses(Collections.singleton(resource.getName()));
             return feature;
         }
-        
+
         public static void main(String[] args) {
             try {
                 new OpenApiContextBased().start();
@@ -96,14 +98,14 @@ public class OpenApiContextBasedConfigTest extends AbstractBusClientServerTestBa
         AbstractResourceInfo.clearAllMaps();
         //keep out of process due to stack traces testing failures
         assertTrue("server did not launch correctly", launchServer(OpenApiContextBased.class, false));
-        createStaticBus();    
+        createStaticBus();
     }
-    
+
     @Test
     public void testFirstApi() {
         final String swaggerJson = createWebClient("http://localhost:" + PORT + "/api/openapi.json").get(String.class);
         assertThat(swaggerJson, containsString("This is first API (api)"));
-        
+
         final UserApplication ap = OpenApiParseUtils.getUserApplicationFromJson(swaggerJson);
         assertNotNull(ap);
         assertThat(ap.getResourcesAsMap().size(), equalTo(1));
@@ -120,7 +122,7 @@ public class OpenApiContextBasedConfigTest extends AbstractBusClientServerTestBa
         assertThat(ap.getResourcesAsMap().size(), equalTo(1));
         assertThat(ap.getResourcesAsMap().get("").getOperations().size(), equalTo(1));
     }
-    
+
     protected WebClient createWebClient(final String url) {
         return WebClient
             .create(url,

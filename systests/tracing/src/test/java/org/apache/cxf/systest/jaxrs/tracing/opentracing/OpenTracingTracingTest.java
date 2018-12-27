@@ -74,6 +74,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(OpenTracingTracingTest.class);
@@ -81,7 +83,7 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
     private Tracer tracer;
     private OpenTracingClientProvider openTracingClientProvider;
     private Random random;
-    
+
     @Ignore
     public static class Server extends AbstractBusTestServerBase {
         protected void run() {
@@ -96,7 +98,7 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
                     }
                 ))
                 .getTracer();
-            
+
             final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setResourceClasses(BookStore.class);
             sf.setResourceProvider(BookStore.class, new SingletonResourceProvider(new BookStore<Scope>()));
@@ -202,7 +204,7 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
         assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("Processing books"));
         assertThat(TestSender.getAllSpans().get(1).getOperationName(), equalTo("GET /bookstore/books/async"));
         assertThat(TestSender.getAllSpans().get(1).getReferences(), not(empty()));
-        assertThat(TestSender.getAllSpans().get(1).getReferences().get(0).getSpanContext().getSpanId(), 
+        assertThat(TestSender.getAllSpans().get(1).getReferences().get(0).getSpanContext().getSpanId(),
             equalTo(spanId.getSpanId()));
     }
 
@@ -244,7 +246,7 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
     @Test
     public void testThatNewSpansAreCreatedWhenNotProvidedUsingMultipleAsyncClients() throws Exception {
         final WebClient client = createWebClient("/bookstore/books", openTracingClientProvider);
-        
+
         // The intention is to make a calls one after another, not in parallel, to ensure the
         // thread have trace contexts cleared out.
         final Collection<Response> responses = IntStream
@@ -258,24 +260,24 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
         }
 
         assertThat(TestSender.getAllSpans().size(), equalTo(12));
-        
+
         IntStream
             .range(0, 4)
             .map(index -> index * 3)
             .forEach(index -> {
-                assertThat(TestSender.getAllSpans().get(index).getOperationName(), 
+                assertThat(TestSender.getAllSpans().get(index).getOperationName(),
                     equalTo("Get Books"));
-                assertThat(TestSender.getAllSpans().get(index + 1).getOperationName(), 
+                assertThat(TestSender.getAllSpans().get(index + 1).getOperationName(),
                     equalTo("GET /bookstore/books"));
-                assertThat(TestSender.getAllSpans().get(index + 2).getOperationName(), 
+                assertThat(TestSender.getAllSpans().get(index + 2).getOperationName(),
                     equalTo("GET " + client.getCurrentURI()));
             });
     }
-    
+
     @Test
     public void testThatNewSpansAreCreatedWhenNotProvidedUsingMultipleClients() throws Exception {
         final WebClient client = createWebClient("/bookstore/books", openTracingClientProvider);
-        
+
         // The intention is to make a calls one after another, not in parallel, to ensure the
         // thread have trace contexts cleared out.
         final Collection<Response> responses = IntStream
@@ -288,16 +290,16 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
         }
 
         assertThat(TestSender.getAllSpans().size(), equalTo(12));
-        
+
         IntStream
             .range(0, 4)
             .map(index -> index * 3)
             .forEach(index -> {
-                assertThat(TestSender.getAllSpans().get(index).getOperationName(), 
+                assertThat(TestSender.getAllSpans().get(index).getOperationName(),
                     equalTo("Get Books"));
-                assertThat(TestSender.getAllSpans().get(index + 1).getOperationName(), 
+                assertThat(TestSender.getAllSpans().get(index + 1).getOperationName(),
                     equalTo("GET /bookstore/books"));
-                assertThat(TestSender.getAllSpans().get(index + 2).getOperationName(), 
+                assertThat(TestSender.getAllSpans().get(index + 2).getOperationName(),
                     equalTo("GET " + client.getCurrentURI()));
             });
     }
@@ -321,7 +323,7 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
 
         // Await till flush happens, usually every second
         await().atMost(Duration.ONE_SECOND).until(()-> TestSender.getAllSpans().size() == 4);
-        
+
         assertThat(TestSender.getAllSpans().size(), equalTo(4));
         assertThat(TestSender.getAllSpans().get(3).getOperationName(), equalTo("test span"));
         assertThat(TestSender.getAllSpans().get(3).getReferences(), empty());
@@ -375,18 +377,18 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
 
     protected WebClient withTrace(final WebClient client, final JaegerSpanContext spanContext) {
         tracer.inject(spanContext, Builtin.HTTP_HEADERS, new TextMap() {
-            
+
             @Override
             public void put(String key, String value) {
                 client.header(key, value);
             }
-            
+
             @Override
             public Iterator<Entry<String, String>> iterator() {
                 return null;
             }
         });
-        
+
         return client;
     }
 
@@ -399,7 +401,7 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
     }
 
     private JaegerSpanContext fromRandom() {
-        return new JaegerSpanContext(random.nextLong(), /* traceId */ random.nextLong() /* spanId */, 
+        return new JaegerSpanContext(random.nextLong(), /* traceId */ random.nextLong() /* spanId */,
             random.nextLong() /* parentId */, (byte)1 /* sampled */);
     }
 }

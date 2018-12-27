@@ -34,6 +34,8 @@ import org.example.schema.doubleit.DoubleIt3;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertTrue;
+
 /**
  * A set of tests for the SwA specification (SOAP with Attachments)
  */

@@ -67,7 +67,12 @@ import org.apache.type_test.types3.StructWithNillableStruct;
 import org.apache.type_test.types3.StructWithOccuringChoice;
 import org.apache.type_test.types3.StructWithOccuringStruct;
 
+import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
 
@@ -1190,7 +1195,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
             if (testDocLiteral) {
                 return docClient.testComplexArray(x, y, z);
             }
-            return rpcClient.testComplexArray(x, y, z); 
+            return rpcClient.testComplexArray(x, y, z);
         });
 
         if (!perfTestOnly) {
@@ -1254,7 +1259,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
             if (testDocLiteral) {
                 return docClient.testComplexChoice(x, y, z);
             }
-            return rpcClient.testComplexChoice(x, y, z); 
+            return rpcClient.testComplexChoice(x, y, z);
         });
 
         if (!perfTestOnly) {
@@ -1318,7 +1323,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
             if (testDocLiteral) {
                 return docClient.testComplexStruct(x, y, z);
             }
-            return rpcClient.testComplexStruct(x, y, z); 
+            return rpcClient.testComplexStruct(x, y, z);
         });
 
         if (!perfTestOnly) {
@@ -1378,7 +1383,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
             if (testDocLiteral) {
                 return docClient.testDerivedChoiceBaseComplex(x, y, z);
             }
-            return rpcClient.testDerivedChoiceBaseComplex(x, y, z); 
+            return rpcClient.testDerivedChoiceBaseComplex(x, y, z);
         });
 
         if (!perfTestOnly) {
@@ -1432,7 +1437,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
             if (testDocLiteral) {
                 return docClient.testDerivedAllBaseAll(x, y, z);
             }
-            return rpcClient.testDerivedAllBaseAll(x, y, z); 
+            return rpcClient.testDerivedAllBaseAll(x, y, z);
         });
         if (!perfTestOnly) {
             assertTrue("testDerivedAllBaseAll(): Incorrect value for inout param",
@@ -1479,7 +1484,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
             if (testDocLiteral) {
                 return docClient.testDerivedAllBaseChoice(x, y, z);
             }
-            return rpcClient.testDerivedAllBaseChoice(x, y, z); 
+            return rpcClient.testDerivedAllBaseChoice(x, y, z);
         });
         if (!perfTestOnly) {
             assertTrue("testDerivedAllBaseChoice(): Incorrect value for inout param",
@@ -1498,7 +1503,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
             && (x.getVarStringExt().equals(y.getVarStringExt()))
             && (x.getAttrString().equals(y.getAttrString()));
     }
-    @Test       
+    @Test
     public void testDerivedAllBaseStruct() throws Exception {
         if (!shouldRunTest("DerivedAllBaseStruct")) {
             return;
@@ -1532,7 +1537,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
             if (testDocLiteral) {
                 return docClient.testDerivedAllBaseStruct(x, y, z);
             }
-            return rpcClient.testDerivedAllBaseStruct(x, y, z); 
+            return rpcClient.testDerivedAllBaseStruct(x, y, z);
         });
         if (!perfTestOnly) {
             assertTrue("testDerivedAllBaseStruct(): Incorrect value for inout param",
@@ -1589,7 +1594,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
             if (testDocLiteral) {
                 return docClient.testDerivedChoiceBaseAll(x, y, z);
             }
-            return rpcClient.testDerivedChoiceBaseAll(x, y, z); 
+            return rpcClient.testDerivedChoiceBaseAll(x, y, z);
         });
         if (!perfTestOnly) {
             assertTrue("testDerivedChoiceBaseAll(): Incorrect value for inout param",
@@ -1600,7 +1605,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
         }
     }
 
-    
+
     /*
     //org.apache.type_test.types1.DerivedStructBaseAll
     protected boolean equals(DerivedStructBaseAll x, DerivedStructBaseAll y) {
@@ -1804,11 +1809,11 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
             List<String> ret = testDocLiteral ? docClient.testUnionWithStringList(x, y, z)
                     : xmlClient.testUnionWithStringList(x, y, z);
             if (!perfTestOnly) {
-                assertEquals("testUnionWithStringList(): Incorrect value for inout param",
+                Assert.assertEquals("testUnionWithStringList(): Incorrect value for inout param",
                              x, y.value);
-                assertEquals("testUnionWithStringList(): Incorrect value for out param",
+                Assert.assertEquals("testUnionWithStringList(): Incorrect value for out param",
                              yOrig, z.value);
-                assertEquals("testUnionWithStringList(): Incorrect return value", x, ret);
+                Assert.assertEquals("testUnionWithStringList(): Incorrect return value", x, ret);
             }
         } else {
             String[] x = {"5"};
@@ -1846,11 +1851,11 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
             List<String> ret = testDocLiteral ? docClient.testUnionWithStringListRestriction(x, y, z)
                     : xmlClient.testUnionWithStringListRestriction(x, y, z);
             if (!perfTestOnly) {
-                assertEquals("testUnionWithStringListRestriction(): Incorrect value for inout param",
+                Assert.assertEquals("testUnionWithStringListRestriction(): Incorrect value for inout param",
                              x, y.value);
-                assertEquals("testUnionWithStringListRestriction(): Incorrect value for out param",
+                Assert.assertEquals("testUnionWithStringListRestriction(): Incorrect value for out param",
                              yOrig, z.value);
-                assertEquals("testUnionWithStringListRestriction(): Incorrect return value", x, ret);
+                Assert.assertEquals("testUnionWithStringListRestriction(): Incorrect return value", x, ret);
             }
         } else {
             String[] x = {"5"};
@@ -1893,9 +1898,9 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
             List<String> ret = testDocLiteral ? docClient.testUnionWithAnonList(x, y, z)
                     : xmlClient.testUnionWithAnonList(x, y, z);
             if (!perfTestOnly) {
-                assertEquals("testUnionWithAnonList(): Incorrect value for inout param", x, y.value);
-                assertEquals("testUnionWithAnonList(): Incorrect value for out param", yOrig, z.value);
-                assertEquals("testUnionWithAnonList(): Incorrect return value", x, ret);
+                Assert.assertEquals("testUnionWithAnonList(): Incorrect value for inout param", x, y.value);
+                Assert.assertEquals("testUnionWithAnonList(): Incorrect value for out param", yOrig, z.value);
+                Assert.assertEquals("testUnionWithAnonList(): Incorrect return value", x, ret);
             }
         } else {
             String[] x = {"5"};
@@ -1938,9 +1943,9 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
             ret = rpcClient.testAnyURIRestriction(x, y, z);
         }
         if (!perfTestOnly) {
-            assertEquals("testString(): Incorrect value for inout param", x, y.value);
-            assertEquals("testString(): Incorrect value for out param", yOrig, z.value);
-            assertEquals("testString(): Incorrect return value", x, ret);
+            Assert.assertEquals("testString(): Incorrect value for inout param", x, y.value);
+            Assert.assertEquals("testString(): Incorrect value for out param", yOrig, z.value);
+            Assert.assertEquals("testString(): Incorrect return value", x, ret);
         }
 
         if (testDocLiteral || testXMLBinding) {

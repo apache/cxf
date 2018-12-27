@@ -36,6 +36,8 @@ import org.apache.cxf.testutil.common.ServerLauncher;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class JAXRSContinuationsServlet3Test extends AbstractJAXRSContinuationsTest {
     public static final String PORT = BookContinuationServlet3Server.PORT;

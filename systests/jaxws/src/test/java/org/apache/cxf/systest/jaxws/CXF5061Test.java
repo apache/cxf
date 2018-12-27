@@ -31,6 +31,8 @@ import org.apache.cxf.testutil.common.TestUtil;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 public class CXF5061Test extends AbstractBusClientServerTestBase {
 
     public static final String ADDRESS

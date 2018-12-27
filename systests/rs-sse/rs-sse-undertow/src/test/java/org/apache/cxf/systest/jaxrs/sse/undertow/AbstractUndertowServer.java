@@ -34,6 +34,7 @@ import io.undertow.servlet.api.DeploymentManager;
 import static io.undertow.servlet.Servlets.defaultContainer;
 import static io.undertow.servlet.Servlets.deployment;
 import static io.undertow.servlet.Servlets.servlet;
+import static org.junit.Assert.fail;
 
 public abstract class AbstractUndertowServer extends AbstractBusTestServerBase {
     private Undertow server;
@@ -66,12 +67,12 @@ public abstract class AbstractUndertowServer extends AbstractBusTestServerBase {
             PathHandler path = Handlers
                 .path(Handlers.redirect("/"))
                 .addPrefixPath("/", manager.start());
-            
+
             server = Undertow.builder()
                 .addHttpListener(port, "localhost")
                 .setHandler(path)
                 .build();
-            
+
             server.start();
         } catch (final Exception ex) {
             ex.printStackTrace();

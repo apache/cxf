@@ -52,6 +52,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class WSAPureWsdlTest extends AbstractWSATestBase {
     static final String PORT = allocatePort(Server.class);
     static final String PORT2 = allocatePort(Server.class, 1);
@@ -110,7 +115,7 @@ public class WSAPureWsdlTest extends AbstractWSATestBase {
         } catch (Exception t) {
             //expected
             assertTrue(t.getCause().getCause().toString(),
-                       t.getCause().getCause() instanceof java.net.ConnectException 
+                       t.getCause().getCause() instanceof java.net.ConnectException
                        ||  t.getCause().getCause() instanceof java.net.SocketTimeoutException);
         }
         synchronized (handler) {

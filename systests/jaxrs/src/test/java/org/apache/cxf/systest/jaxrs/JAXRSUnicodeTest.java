@@ -29,9 +29,11 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class JAXRSUnicodeTest extends AbstractBusClientServerTestBase {
     public static final int PORT = SpringServer.PORT;
-    
+
     @BeforeClass
     public static void beforeClass() throws Exception {
         // must be 'in-process' to communicate with inner class in single JVM
@@ -54,7 +56,7 @@ public class JAXRSUnicodeTest extends AbstractBusClientServerTestBase {
         wc.accept("text/plain");
         assertEquals("Hello", wc.get(String.class));
     }
-    
+
     @Ignore
     @Path("/")
     public static class Resource {

@@ -21,8 +21,6 @@ package org.apache.cxf.systest.corba;
 import org.apache.cxf.hello_world_corba.Greeter;
 import org.apache.cxf.hello_world_corba.PingMeFault;
 
-import org.junit.Assert;
-
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -48,7 +46,7 @@ import org.junit.Assert;
         wsdlLocation = "classpath:/wsdl_systest/hello_world_corba_timeout.wsdl",
         endpointInterface = "org.apache.cxf.hello_world_corba.Greeter")
 
-public class BaseGreeterTimeoutImpl extends Assert implements Greeter {
+public class BaseGreeterTimeoutImpl implements Greeter {
     public static final String GREETME_OUT = "test out";
     static final String EX_STRING = "CXF RUNTIME EXCEPTION";
 

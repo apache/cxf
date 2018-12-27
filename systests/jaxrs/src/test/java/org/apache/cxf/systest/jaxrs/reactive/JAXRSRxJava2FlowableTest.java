@@ -44,6 +44,9 @@ import io.reactivex.disposables.Disposable;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class JAXRSRxJava2FlowableTest extends AbstractBusClientServerTestBase {
     public static final String PORT = RxJava2FlowableServer.PORT;
@@ -61,7 +64,7 @@ public class JAXRSRxJava2FlowableTest extends AbstractBusClientServerTestBase {
         String text = wc.accept("text/plain").get(String.class);
         assertEquals("Hello, world!", text);
     }
-    
+
     @Test
     public void testGetHelloWorldJson() throws Exception {
         String address = "http://localhost:" + PORT + "/rx2/flowable/textJson";
@@ -72,7 +75,7 @@ public class JAXRSRxJava2FlowableTest extends AbstractBusClientServerTestBase {
         Flowable<HelloWorldBean> obs = wc.accept("application/json")
             .rx(FlowableRxInvoker.class)
             .get(HelloWorldBean.class);
-        
+
         Holder<HelloWorldBean> holder = new Holder<>();
         Disposable d = obs.subscribe(v -> {
             holder.value = v;
@@ -84,7 +87,7 @@ public class JAXRSRxJava2FlowableTest extends AbstractBusClientServerTestBase {
         assertEquals("Hello", holder.value.getGreeting());
         assertEquals("World", holder.value.getAudience());
     }
-    
+
     @Test
     public void testGetHelloWorldJsonImplicitListAsync() throws Exception {
         String address = "http://localhost:" + PORT + "/rx2/flowable/textJsonImplicitListAsync";
@@ -114,18 +117,18 @@ public class JAXRSRxJava2FlowableTest extends AbstractBusClientServerTestBase {
         assertEquals("Ciao", beans.get(1).getGreeting());
         assertEquals("World", beans.get(1).getAudience());
     }
-    
+
     @Test
     public void testGetHelloWorldJsonSingle() throws Exception {
         String address = "http://localhost:" + PORT + "/rx22/flowable/textJsonSingle";
         WebClient wc = WebClient.create(address,
                                         Collections.singletonList(new JacksonJsonProvider()));
-    
+
         HelloWorldBean bean = wc.accept("application/json").get(HelloWorldBean.class);
         assertEquals("Hello", bean.getGreeting());
         assertEquals("World", bean.getAudience());
     }
-    
+
     @Test
     public void testGetHelloWorldAsyncObservable() throws Exception {
         String address = "http://localhost:" + PORT + "/rx2/flowable/textAsync";
@@ -134,7 +137,7 @@ public class JAXRSRxJava2FlowableTest extends AbstractBusClientServerTestBase {
         Flowable<String> obs = wc.accept("text/plain")
             .rx(FlowableRxInvoker.class)
             .get(String.class);
-        
+
         Thread.sleep(2000);
 
         Disposable d = obs.map(
@@ -159,7 +162,7 @@ public class JAXRSRxJava2FlowableTest extends AbstractBusClientServerTestBase {
         if (d == null) {
             throw new IllegalStateException("Subscribe did not return a Disposable");
         }
-        
+
     }
 
     private void validateT(ExecutionException t) {

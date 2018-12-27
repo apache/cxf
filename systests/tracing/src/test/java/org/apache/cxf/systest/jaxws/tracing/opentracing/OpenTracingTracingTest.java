@@ -65,13 +65,15 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(OpenTracingTracingTest.class);
 
     private Tracer tracer;
     private Random random;
-    
+
     @Ignore
     public static class Server extends AbstractBusTestServerBase {
         protected void run() {
@@ -87,7 +89,7 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
                 ))
                 .getTracer();
             GlobalTracer.register(tracer);
-            
+
             final JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
             sf.setServiceClass(BookStore.class);
             sf.setAddress("http://localhost:" + PORT);
@@ -110,7 +112,7 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
     @Before
     public void setUp() {
         random = new Random();
-        
+
         tracer = new Configuration("tracer")
             .withSampler(new SamplerConfiguration().withType(ConstSampler.TYPE).withParam(1))
             .withReporter(new ReporterConfiguration().withSender(
@@ -272,7 +274,7 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
     }
 
     private JaegerSpanContext fromRandom() {
-        return new JaegerSpanContext(random.nextLong(), /* traceId */ random.nextLong() /* spanId */, 
+        return new JaegerSpanContext(random.nextLong(), /* traceId */ random.nextLong() /* spanId */,
             random.nextLong() /* parentId */, (byte)1 /* sampled */);
     }
 }

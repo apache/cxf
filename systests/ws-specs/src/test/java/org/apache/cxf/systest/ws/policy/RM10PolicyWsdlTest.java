@@ -35,26 +35,30 @@ import org.apache.cxf.ws.rm.RM10Constants;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Tests the use of the WS-Policy Framework to automatically engage WS-RM 1.0 in response to Policies defined for the
  * endpoint via an direct attachment to the wsdl.
  */
 public class RM10PolicyWsdlTest extends RMPolicyWsdlTestBase {
-    
+
     public static final String PORT = allocatePort(Server.class);
-    
+
     private static final Logger LOG = LogUtils.getLogger(RM10PolicyWsdlTest.class);
-    
+
     public static class Server extends ServerBase {
-        
+
         public static void main(String[] args) {
-            try { 
-                Server s = new Server(); 
+            try {
+                Server s = new Server();
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
                 System.exit(-1);
-            } finally { 
+            } finally {
                 System.out.println("done!");
             }
         }
@@ -64,14 +68,14 @@ public class RM10PolicyWsdlTest extends RMPolicyWsdlTestBase {
             return "org/apache/cxf/systest/ws/policy/rm10wsdl_server.xml";
         }
     }
-    
-    
+
+
     @BeforeClass
     public static void startServers() throws Exception {
         TestUtil.getNewPortNumber("decoupled");
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
-         
+
     @Test
     public void testUsingRM() throws Exception {
         setUpBus(PORT);
@@ -85,27 +89,27 @@ public class RM10PolicyWsdlTest extends RMPolicyWsdlTestBase {
 
         // two-way
 
-        assertEquals("CXF", greeter.greetMe("cxf")); 
+        assertEquals("CXF", greeter.greetMe("cxf"));
 
         // oneway
 
         greeter.greetMeOneWay("CXF");
-     
+
         // exception
 
         try {
             greeter.pingMe();
         } catch (PingMeFault ex) {
             fail("First invocation should have succeeded.");
-        } 
-       
+        }
+
         try {
             greeter.pingMe();
             fail("Expected PingMeFault not thrown.");
         } catch (PingMeFault ex) {
             assertEquals(2, ex.getFaultInfo().getMajor());
             assertEquals(1, ex.getFaultInfo().getMinor());
-        } 
+        }
 
         MessageRecorder mr = new MessageRecorder(outRecorder, inRecorder);
         mr.awaitMessages(5, 4, 5000);
@@ -115,11 +119,11 @@ public class RM10PolicyWsdlTest extends RMPolicyWsdlTestBase {
                                          inRecorder.getInboundMessages(),
                                          "http://schemas.xmlsoap.org/ws/2004/08/addressing",
                                          "http://schemas.xmlsoap.org/ws/2005/02/rm");
-        
-        
+
+
         mf.verifyMessages(5, true);
-        String[] expectedActions = new String[] {RM10Constants.INSTANCE.getCreateSequenceAction(), 
-                                                 GREETME_ACTION, 
+        String[] expectedActions = new String[] {RM10Constants.INSTANCE.getCreateSequenceAction(),
+                                                 GREETME_ACTION,
                                                  GREETMEONEWAY_ACTION,
                                                  PINGME_ACTION,
                                                  PINGME_ACTION};
@@ -130,7 +134,7 @@ public class RM10PolicyWsdlTest extends RMPolicyWsdlTestBase {
 
         mf.verifyMessages(4, false);
 //        mf.verifyMessages(9, false);
-//        mf.verifyPartialResponses(5);      
+//        mf.verifyPartialResponses(5);
 //        mf.purgePartialResponses();
 
         expectedActions = new String[] {

@@ -33,9 +33,12 @@ import org.example.contract.doubleit.DoubleItPortType;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
  * A test for Basic Auth using JAASLoginInterceptor.
- * To ensure the Interceptor Chain resume to use the 
+ * To ensure the Interceptor Chain resume to use the
  * expected next interceptor
  */
 public class BasicAuthJAASTest extends AbstractBusClientServerTestBase {
@@ -78,7 +81,7 @@ public class BasicAuthJAASTest extends AbstractBusClientServerTestBase {
         updateAddressPort(utPort, PORT);
 
         assertEquals(50, utPort.doubleIt(25));
-        //BeforeServiceInvokerInterceptor should be invoked only once 
+        //BeforeServiceInvokerInterceptor should be invoked only once
         assertEquals(1, BeforeServiceInvokerInterceptor.counter);
 
         ((java.io.Closeable)utPort).close();
