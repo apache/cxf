@@ -24,7 +24,7 @@ Pre-requisites
 
 To take advantage of this sample, you should have a working knowledge of the following:
 
-JSR-311 JAX-RS
+JSR-370 JAX-RS
 * Maven
 * OSGI
 * Servlet
@@ -34,7 +34,7 @@ Sample walkthrough
 
 Code walkthrough
 
-Let's start off with a basic JSR-311 JAX-RS application that you would like to deploy in an OSGI environment:
+Let's start off with a basic JSR-370 JAX-RS application that you would like to deploy in an OSGI environment:
 * SampleResource
 * SampleApplication
 
@@ -76,7 +76,7 @@ If you want to run it manually, do the following
 
   1) mvn package
   2) cd target/deliver/jax_rs_minimal_osgi-<version>-equinox/jax_rs_minimal_osgi-<version>/
-  3) java -jar org.eclipse.osgi-3.6.2.R36x_v20110210.jar
+  3) java -jar  org.eclipse.osgi-3.13.0.v20180226-1711.jar
 
 If all goes well, the Eclipse Equinox environment will start up and File Install will install all the necessary bundles.
 
@@ -84,35 +84,3 @@ If you visit the following URL in your favorite browser on the machine, you shou
 
 	http://localhost:8080/
 
-Bundles
--------
-
-If you're using Java 6, here is a listing of the bundles that are running inside Eclipse Equinox to make this example run successfully:
-
-id      State       Bundle
-0       ACTIVE      org.eclipse.osgi_3.6.2.R36x_v20110210                  ; OSGI system runtime
-1       ACTIVE      org.apache.felix.fileinstall_3.1.10                    ; Bundle deployment system - may be removed if you have some other way to deploy
-2       ACTIVE      org.codehaus.jettison.jettison_1.3.0                   ; CXF JAX-RS dependency for JSON
-3       ACTIVE      org.mortbay.jetty.util_6.1.24                          ; HTTP OSGI service dependency
-4       ACTIVE      org.apache.cxf.bundle-jaxrs_2.5.0.SNAPSHOT             ; CXF JAX-RS bundle
-5       ACTIVE      org.apache.neethi_3.0.1                                ; CXF JAX-RS dependency
-6       ACTIVE      org.eclipse.osgi.services_3.2.100.v20100503            ; CXF JAX-RS dependency / HTTP OSGI service dependency
-7       ACTIVE      org.apache.felix.http.whiteboard_2.2.0                 ; HTTP OSGI service dependency
-8       ACTIVE      org.mortbay.jetty.security_6.1.24                      ; HTTP OSGI service dependency
-9       ACTIVE      org.mortbay.jetty.server_6.1.24                        ; HTTP OSGI service dependency
-10      ACTIVE      org.apache.felix.http.bundle_2.2.0                     ; HTTP OSGI service dependency
-11      ACTIVE      org.apache.felix.http.base_2.2.0                       ; HTTP OSGI service dependency
-12      ACTIVE      org.apache.servicemix.specs.jsr311-api-1.1_1.8.0       ; CXF JAX-RS dependency
-13      ACTIVE      org.apache.felix.http.bridge_2.2.0                     ; HTTP OSGI service dependency
-14      ACTIVE      minimalosgi_0.0.0                                      ; Sample application
-15      ACTIVE      org.apache.felix.http.api_2.2.0                        ; HTTP OSGI service dependency
-16      ACTIVE      org.apache.felix.http.jetty_2.2.0                      ; HTTP OSGI service dependency
-
-If you're using Java 5, there's a few more bundles that are added to make things run successfully
-
-id      State       Bundle
-17      ACTIVE      org.apache.geronimo.specs.geronimo-activation_1.1_spec_1.1.0    ; CXF JAX-RS dependency
-18      ACTIVE      org.apache.servicemix.specs.stax-api-1.0_1.9.0                  ; CXF JAX-RS dependency
-19      ACTIVE      org.apache.servicemix.specs.activation-api-1.1_1.9.0            ; CXF JAX-RS dependency
-20      ACTIVE      org.apache.servicemix.specs.jaxb-api-2.2_1.9.0                  ; CXF JAX-RS dependency
-21      ACTIVE      org.apache.geronimo.specs.geronimo-annotation_1.0_spec_1.1.1    ; CXF JAX-RS dependency
