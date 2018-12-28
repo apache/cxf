@@ -50,7 +50,7 @@
         </argument>
     </bean>
     
-    <bean id="senderBuilder" class="io.jaegertracing.Configuration.SenderConfiguration" />
+    <bean id="senderBuilder" class="demo.jaxrs.tracing.server.CatalogSenderConfiguration" />
     
     <bean id="sender" factory-ref="senderBuilder" factory-method="withEndpoint">
     	<argument index="0" value="http://localhost:14268/api/traces"/>

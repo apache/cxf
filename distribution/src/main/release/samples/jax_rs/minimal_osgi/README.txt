@@ -84,3 +84,63 @@ If you visit the following URL in your favorite browser on the machine, you shou
 
 	http://localhost:8080/
 
+Bundles
+------------------
+
+   ID|State      |Level|Name                                                          
+    0|Active     |    0|OSGi System Bundle (3.13.0.v20180226-1711)|3.13.0.v20180226-1711
+    1|Active     |    4|Apache Felix File Install (3.6.4)|3.6.4              
+    2|Active     |    4|org.osgi:org.osgi.service.cm (1.6.0.201802012106)|1.6.0.201802012106
+    3|Active     |    4|org.osgi:org.osgi.service.event (1.4.0.201802012106)|1.4.0.201802012106
+    8|Active     |    1|Jetty :: Websocket :: Client (9.2.6.v20141205)|9.2.6.v20141205
+    9|Active     |    1|javax.annotation API (1.3.1)|1.3.1
+   10|Active     |    1|jcl-over-slf4j (1.7.25)|1.7.25
+   11|Active     |    1|Apache Felix Http Bridge (2.3.2)|2.3.2
+   12|Active     |    1|Old JAXB Runtime (2.3.0)|2.3.0                                    
+   13|Active     |    1|Jetty :: Websocket :: API (9.2.6.v20141205)|9.2.6.v20141205                                                                                                             
+   14|Active     |    1|Apache CXF Runtime HTTP Transport (3.3.0.SNAPSHOT)|3.3.0.SNAPSHOT
+   15|Active     |    1|Apache Felix Http Base (2.3.2)|2.3.2                         
+   16|Active     |    1|Apache Felix Http Jetty (3.0.0)|3.0.0   
+   18|Active     |    1|Jetty :: Websocket :: Servlet Interface (9.2.6.v20141205)|9.2.6.v20141205
+   19|Active     |    1|JavaBeans Activation Framework (1.2.0)|1.2.0
+   20|Active     |    1|Old JAXB XJC (2.3.0)|2.3.0
+   21|Active     |    1|Woodstox (5.0.3)|5.0.3
+   22|Active     |    1|javax.xml.soap API (1.4.0)|1.4.0
+   23|Active     |    1|Web Services Metadata 2.0 (1.1.3)|1.1.3
+   24|Active     |    1|Activation 1.1 (1.1.0)|1.1.0
+   25|Active     |    1|Jetty :: Http Utility (9.4.12.v20180830)|9.4.12.v20180830
+   26|Active     |    1|Jetty :: Websocket :: Common (9.2.6.v20141205)|9.2.6.v20141205
+   27|Active     |    1|jaxb-api (2.3.0)|2.3.0
+   28|Active     |    1|Jetty :: Utilities (9.4.12.v20180830)|9.4.12.v20180830
+   29|Active     |    1|Apache ServiceMix :: Specs :: JAX-RS API 2.1 (2.9.1)|2.9.1
+   30|Active     |    1|Apache Felix Http Bundle (3.0.0)|3.0.0
+   31|Active     |    1|Apache ServiceMix :: Specs :: SAAJ API 1.3 (2.9.0)|2.9.0
+   32|Active     |    1|Stax2 API (3.1.4)|3.1.4
+   33|Active     |    1|Extended StAX API (1.7.8)|1.7.8
+   34|Active     |    1|Jetty :: Webapp Application Support (9.4.12.v20180830)|9.4.12.v20180830
+   35|Active     |    1|Apache ServiceMix :: Specs :: Stax API 1.0 (2.9.0)|2.9.0
+   36|Active     |    1|Apache ServiceMix :: Specs :: JAXWS API 2.2 (2.9.0)|2.9.0
+   37|Active     |    1|Jetty :: XML utilities (9.4.12.v20180830)|9.4.12.v20180830
+   38|Active     |    1|Jetty :: Websocket :: Server (9.2.6.v20141205)|9.2.6.v20141205
+   39|Active     |    1|Jetty :: Server Core (9.4.12.v20180830)|9.4.12.v20180830
+   40|Active     |    1|Jetty :: Security (9.4.12.v20180830)|9.4.12.v20180830
+   41|Active     |    1|Apache Felix Http Api (2.3.2)|2.3.2
+   42|Active     |    1|Jetty :: IO Utility (9.4.12.v20180830)|9.4.12.v20180830
+   43|Active     |    1|Old JAXB Core (2.3.0)|2.3.0
+   44|Active     |    1|Apache CXF Core (3.3.0.SNAPSHOT)|3.3.0.SNAPSHOT
+   45|Active     |    1|Jetty :: JMX Management (9.4.12.v20180830)|9.4.12.v20180830
+   46|Active     |    1|Apache CXF Advanced Logging Feature (3.3.0.SNAPSHOT)|3.3.0.SNAPSHOT
+   47|Active     |    1|JavaBeans Activation Framework API jar (1.2.0)|1.2.0
+   48|Active     |    1|Java Servlet API (3.1.0)|3.1.0
+   49|Active     |    1|XmlSchema Core (2.2.4)|2.2.4
+   50|Active     |    1|MIME streaming extension (1.9.7)|1.9.7
+   51|Active     |    1|Apache CXF Runtime JAX-RS Frontend (3.3.0.SNAPSHOT)|3.3.0.SNAPSHOT
+   52|Active     |    1|Apache CXF Runtime Security functionality (3.3.0.SNAPSHOT)|3.3.0.SNAPSHOT
+   53|Active     |    1|Apache Felix Http Whiteboard (2.3.2)|2.3.2
+   54|Active     |    1|Jetty :: Servlet Handling (9.4.12.v20180830)|9.4.12.v20180830
+   55|Active     |    1|geronimo-stax-api_1.0_spec (1.0.1)|1.0.1
+   56|Active     |    1|Apache ServiceMix :: Specs :: JAXB API 2.2 (2.9.0)|2.9.0
+   57|Active     |    1|slf4j-api (1.7.25)|1.7.25
+   58|Active     |    1|geronimo-jta_1.1_spec (1.1.1)|1.1.1
+   59|Active     |    1|SAAJ 1.3 (1.1.0)|1.1.0
+   60|Active     |    1|minimalosgi (0.0.0)|0.0.0

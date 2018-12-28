@@ -57,12 +57,13 @@ for this demo bundle.
 Install the distributed tracer compatible with OpenTracing API, as in this example 
 we are using Uber Jaeger:
 
+  install -s mvn:org.apache.aries.spifly/org.apache.aries.spifly.dynamic.bundle/1.2
   install -s wrap:mvn:com.squareup.okio/okio/1.13.0
   install -s wrap:mvn:com.squareup.okhttp3/okhttp/3.9.0
   install -s wrap:mvn:org.apache.thrift/libthrift/0.11.0
+  install -s wrap:mvn:io.jaegertracing/jaeger-core/0.30.3 
   install -s wrap:mvn:io.jaegertracing/jaeger-thrift/0.30.3
-  install -s wrap:mvn:io.jaegertracing/jaeger-core/0.30.3  
-
+  
 Install this demo bundle (using the appropriate bundle version number)
   
   install -s mvn:org.apache.cxf.samples/jax_rs_tracing_opentracing_osgi/3.n.m
