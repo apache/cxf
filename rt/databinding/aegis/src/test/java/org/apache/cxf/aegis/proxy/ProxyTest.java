@@ -28,6 +28,8 @@ import org.apache.cxf.service.invoker.BeanInvoker;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 public class ProxyTest extends AbstractAegisTest {
     @Before
     public void setUp() throws Exception {

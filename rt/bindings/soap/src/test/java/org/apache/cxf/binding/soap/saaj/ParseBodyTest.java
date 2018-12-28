@@ -45,6 +45,8 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class ParseBodyTest extends Assert {
     static final String[] DATA = {
         "<SOAP-ENV:Body xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\">\n"

@@ -54,6 +54,10 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 public class SoapFaultSerializerTest extends Assert {
     private void assertValid(String xpathExpression, Document doc) {
         Map<String, String> namespaces = new HashMap<>();

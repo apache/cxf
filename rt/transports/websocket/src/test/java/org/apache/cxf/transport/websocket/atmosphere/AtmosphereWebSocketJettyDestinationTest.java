@@ -34,6 +34,8 @@ import org.atmosphere.cpr.AtmosphereInterceptor;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  *
  */

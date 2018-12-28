@@ -31,6 +31,9 @@ import org.apache.cxf.ws.policy.selector.MaximalAlternativeSelector;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class PolicyBeansTest extends Assert {
 
 

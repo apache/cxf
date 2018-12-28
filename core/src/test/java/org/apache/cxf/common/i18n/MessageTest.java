@@ -31,6 +31,10 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
 
 public class MessageTest extends Assert {
     private static final Logger LOG = LogUtils.getL7dLogger(MessageTest.class);

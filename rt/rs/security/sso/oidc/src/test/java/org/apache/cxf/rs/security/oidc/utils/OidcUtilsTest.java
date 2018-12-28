@@ -25,6 +25,9 @@ import org.apache.cxf.rs.security.oidc.common.AbstractUserInfo;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class OidcUtilsTest extends Assert {
     
     @Test

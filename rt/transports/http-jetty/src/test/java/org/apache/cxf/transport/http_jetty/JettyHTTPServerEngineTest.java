@@ -60,6 +60,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class JettyHTTPServerEngineTest extends Assert {
     private static final int PORT1
         = Integer.valueOf(TestUtil.getPortNumber(JettyHTTPServerEngineTest.class, 1));

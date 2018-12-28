@@ -37,6 +37,8 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+
 
 public class SpringBusFactoryTest extends Assert {
 

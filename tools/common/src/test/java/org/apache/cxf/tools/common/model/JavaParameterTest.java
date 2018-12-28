@@ -22,6 +22,8 @@ package org.apache.cxf.tools.common.model;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class JavaParameterTest extends Assert {
 
     @Test

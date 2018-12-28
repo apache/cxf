@@ -25,6 +25,9 @@ import org.apache.cxf.wsdl.WSDLConstants;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class WSDLGeneratorFactoryTest extends Assert {
 
     @Test

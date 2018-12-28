@@ -35,6 +35,10 @@ import org.eclipse.microprofile.rest.client.RestClientDefinitionException;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class ValidatorTest extends Assert {
 
     public abstract static class NotAnInterface {

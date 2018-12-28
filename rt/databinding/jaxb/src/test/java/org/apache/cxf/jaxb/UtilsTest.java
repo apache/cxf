@@ -25,6 +25,8 @@ import javax.xml.bind.annotation.XmlAccessType;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.fail;
+
 public class UtilsTest extends Assert {
 
     @Test

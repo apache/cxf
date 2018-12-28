@@ -29,6 +29,8 @@ import org.apache.cxf.tools.common.model.JavaField;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class WrapperBeanFieldAnnotatorTest extends Assert {
 
     @Test

@@ -33,6 +33,10 @@ import org.easymock.EasyMock;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class JCABusFactoryTest extends AbstractCXFTest {
 
 

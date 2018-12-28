@@ -25,6 +25,8 @@ import org.apache.cxf.endpoint.Server;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class ServerRegistryImpTest extends Assert {
 
     @Test

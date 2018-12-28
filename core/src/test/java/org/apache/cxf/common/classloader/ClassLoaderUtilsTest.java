@@ -26,6 +26,8 @@ import java.net.URLClassLoader;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class ClassLoaderUtilsTest extends Assert {
 
     private static void setTCCL(ClassLoader loader) {

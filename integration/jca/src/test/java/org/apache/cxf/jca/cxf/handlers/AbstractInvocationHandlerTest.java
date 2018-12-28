@@ -24,6 +24,9 @@ import org.apache.cxf.jca.cxf.CXFManagedConnectionFactory;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
 public abstract class AbstractInvocationHandlerTest
     extends HandlerTestBase {
 

@@ -22,6 +22,11 @@ package org.apache.cxf.helpers;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 public class NameSpaceTest extends Assert {
 
     private static final String MY_URL1 = "http://test.apache.org/testurl1";

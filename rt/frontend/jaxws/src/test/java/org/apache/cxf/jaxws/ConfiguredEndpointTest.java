@@ -50,6 +50,10 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 public class ConfiguredEndpointTest extends Assert {
     private static final QName SERVICE_NAME =
         new QName("http://apache.org/hello_world_soap_http", "SOAPService");

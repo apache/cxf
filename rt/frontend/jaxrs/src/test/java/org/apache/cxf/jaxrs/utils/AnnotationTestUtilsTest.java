@@ -33,6 +33,10 @@ import org.apache.cxf.jaxrs.Customer;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
+
 public class AnnotationTestUtilsTest extends Assert {
 
     @Test

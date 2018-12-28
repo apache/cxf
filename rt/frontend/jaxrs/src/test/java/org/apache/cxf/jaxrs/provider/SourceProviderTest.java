@@ -52,6 +52,10 @@ import org.apache.cxf.staxutils.transform.InTransformReader;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
 public class SourceProviderTest extends Assert {
 
 

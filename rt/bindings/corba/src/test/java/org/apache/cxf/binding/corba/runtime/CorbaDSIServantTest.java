@@ -40,6 +40,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 
 public class CorbaDSIServantTest extends Assert {
     protected static ORB orb;
@@ -138,6 +141,5 @@ public class CorbaDSIServantTest extends Assert {
         }
     }
 }
-
 
 

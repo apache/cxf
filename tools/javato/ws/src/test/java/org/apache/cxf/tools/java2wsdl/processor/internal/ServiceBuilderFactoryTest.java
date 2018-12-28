@@ -30,6 +30,9 @@ import org.apache.cxf.tools.fortest.simple.Hello;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class ServiceBuilderFactoryTest extends Assert {
     ServiceBuilderFactory factory = ServiceBuilderFactory.getInstance(new ArrayList<>(),
                                                                       "jaxb");

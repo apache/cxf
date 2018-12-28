@@ -27,6 +27,8 @@ import org.apache.cxf.jca.cxf.CXFInvocationHandlerData;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 public class InvokingInvocationHandlerTest
     extends AbstractInvocationHandlerTest {
 

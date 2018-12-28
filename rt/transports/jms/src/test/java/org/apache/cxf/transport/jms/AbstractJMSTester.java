@@ -51,6 +51,10 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public abstract class AbstractJMSTester extends Assert {
     protected static final String WSDL = "/jms_test.wsdl";
     protected static final String SERVICE_NS = "http://cxf.apache.org/hello_world_jms";

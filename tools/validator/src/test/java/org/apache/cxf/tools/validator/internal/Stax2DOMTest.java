@@ -33,6 +33,8 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 public class Stax2DOMTest extends Assert {
 
     @Test

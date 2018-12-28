@@ -38,6 +38,8 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class HBaseVisitorTest extends Assert {
     public static final byte[] BOOK_FAMILY = "book".getBytes();
     public static final byte[] NAME_QUALIFIER = "name".getBytes();

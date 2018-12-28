@@ -36,6 +36,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 @SuppressWarnings("deprecation")
 public class LoggingInInterceptorTest extends Assert {
     static String encoding = "UTF-8";

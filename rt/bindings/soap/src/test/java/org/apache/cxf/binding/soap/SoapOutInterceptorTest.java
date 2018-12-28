@@ -39,6 +39,9 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class SoapOutInterceptorTest extends TestBase {
     private ReadHeadersInterceptor rhi;
     private SoapOutInterceptor soi;

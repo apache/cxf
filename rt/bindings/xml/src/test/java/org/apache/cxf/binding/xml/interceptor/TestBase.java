@@ -59,6 +59,8 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 
+import static org.junit.Assert.assertNotNull;
+
 public class TestBase extends Assert {
 
     protected PhaseInterceptorChain chain;

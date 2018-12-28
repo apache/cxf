@@ -39,6 +39,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * This class "tests" the HTTPConduit that uses java.net.HttpURLConnection
  * and java.net.HttpsURLConnection for its implementation. Should the

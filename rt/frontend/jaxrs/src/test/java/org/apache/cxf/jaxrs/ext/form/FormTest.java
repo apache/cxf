@@ -25,6 +25,8 @@ import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class FormTest extends Assert {
 
     @Test

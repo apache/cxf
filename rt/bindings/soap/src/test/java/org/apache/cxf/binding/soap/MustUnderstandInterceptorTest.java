@@ -46,6 +46,10 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class MustUnderstandInterceptorTest extends TestBase {
 
     private static final QName RESERVATION = new QName("http://travelcompany.example.org/reservation",

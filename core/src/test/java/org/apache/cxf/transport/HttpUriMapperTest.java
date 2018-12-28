@@ -24,6 +24,8 @@ import java.net.URL;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class HttpUriMapperTest extends Assert {
 
     @Test

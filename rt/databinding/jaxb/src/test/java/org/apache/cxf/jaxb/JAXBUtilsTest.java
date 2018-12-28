@@ -34,6 +34,10 @@ import org.apache.hello_world_soap_http.types.GreetMe;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 
 public class JAXBUtilsTest extends Assert {
 

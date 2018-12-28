@@ -56,6 +56,8 @@ import org.apache.cxf.ws.rm.v200702.SequenceType;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 public class RMSoapOutInterceptorTest extends Assert {
 
     private static final Long ONE = Long.valueOf(1);

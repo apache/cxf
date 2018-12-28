@@ -46,6 +46,11 @@ import org.apache.cxf.ws.rm.v200702.SequenceType;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 public class RMSoapInInterceptorTest extends Assert {
 
     private static final String SEQ_IDENTIFIER = "http://Business456.com/RM/ABC";

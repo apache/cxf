@@ -31,6 +31,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+
 public class ExtensionManagerTest extends Assert {
 
     private static final String EXTENSIONMANAGER_TEST_RESOURECE_NAME = "extensionManagerTest";

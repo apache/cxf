@@ -22,6 +22,9 @@ package org.apache.cxf.management.utils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
 public class ManagementConsoleTest extends Assert {
     private ManagementConsole mc = new ManagementConsole();
 

@@ -31,6 +31,8 @@ import org.apache.cxf.aegis.services.BeanService;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class WrappedTest extends AbstractAegisTest {
 
     private ArrayService arrayService;

@@ -34,6 +34,8 @@ import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class FormUtilsTest extends Assert {
 
     private static final String HTTP_PARAM1 = "httpParam1";

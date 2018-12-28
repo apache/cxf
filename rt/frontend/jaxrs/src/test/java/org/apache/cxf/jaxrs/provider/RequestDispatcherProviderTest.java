@@ -24,6 +24,9 @@ import java.util.Collections;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class RequestDispatcherProviderTest extends Assert {
 
     @Test

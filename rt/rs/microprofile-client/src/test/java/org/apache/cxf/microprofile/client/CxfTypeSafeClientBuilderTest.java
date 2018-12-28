@@ -50,6 +50,10 @@ import org.eclipse.microprofile.rest.client.tck.providers.TestWriterInterceptor;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class CxfTypeSafeClientBuilderTest extends Assert {
 
     @Test

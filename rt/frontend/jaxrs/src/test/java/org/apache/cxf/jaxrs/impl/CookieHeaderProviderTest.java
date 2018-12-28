@@ -24,6 +24,9 @@ import javax.ws.rs.core.Cookie;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class CookieHeaderProviderTest extends Assert {
 
 

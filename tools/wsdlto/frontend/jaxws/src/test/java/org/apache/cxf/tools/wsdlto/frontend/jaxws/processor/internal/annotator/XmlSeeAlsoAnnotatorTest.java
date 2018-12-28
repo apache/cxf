@@ -28,6 +28,9 @@ import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.annotator.t
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
 public class XmlSeeAlsoAnnotatorTest extends Assert {
 
     @Test

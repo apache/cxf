@@ -33,6 +33,8 @@ import org.apache.cxf.transport.MessageObserver;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class RequestResponseTest extends AbstractJMSTester {
 
     private void verifyReceivedMessage(Message message) {

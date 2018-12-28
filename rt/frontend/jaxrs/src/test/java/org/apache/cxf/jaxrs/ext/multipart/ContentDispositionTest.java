@@ -23,6 +23,8 @@ package org.apache.cxf.jaxrs.ext.multipart;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class ContentDispositionTest extends Assert {
 
     @Test

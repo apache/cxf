@@ -27,6 +27,12 @@ import org.apache.cxf.transport.jms.uri.JMSEndpoint.DeliveryModeType;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class JMSEndpointTest extends Assert {
 
     private static final String TEST_VALUE = "testValue";

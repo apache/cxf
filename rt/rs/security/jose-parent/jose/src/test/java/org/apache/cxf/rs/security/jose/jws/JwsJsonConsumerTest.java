@@ -31,6 +31,10 @@ import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class JwsJsonConsumerTest extends Assert {
     private static final String DUAL_SIGNED_DOCUMENT =
         "{\"payload\":\n"

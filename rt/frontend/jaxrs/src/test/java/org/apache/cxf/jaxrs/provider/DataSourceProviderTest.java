@@ -34,6 +34,8 @@ import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class DataSourceProviderTest extends Assert {
 
     @Test

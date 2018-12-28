@@ -31,6 +31,10 @@ import org.apache.cxf.frontend.ServerFactoryBean;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class FlatArrayTest extends AbstractAegisTest {
 
     private static final int[] INT_ARRAY = new int[] {4, 6, 12};

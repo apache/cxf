@@ -27,6 +27,8 @@ import org.apache.cxf.message.MessageImpl;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 public class ResponseTimeMessageInInterceptorTest extends AbstractMessageResponseTestBase {
 
     private ResponseTimeMessageInInterceptor rtmii = new ResponseTimeMessageInInterceptor();

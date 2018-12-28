@@ -26,6 +26,8 @@ import org.apache.cxf.message.MessageImpl;
 
 import org.junit.Assert;
 
+import static org.junit.Assert.fail;
+
 /**
  * Some tests for JwtUtils
  */
@@ -174,4 +176,3 @@ public class JwtUtilsTest extends Assert {
     }
 
 }
-

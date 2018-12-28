@@ -27,6 +27,10 @@ import org.apache.cxf.common.util.URIParserUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 
 public class URIParserUtilTest extends Assert {
 

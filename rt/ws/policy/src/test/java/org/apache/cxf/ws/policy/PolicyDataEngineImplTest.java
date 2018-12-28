@@ -34,6 +34,8 @@ import org.easymock.IMocksControl;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 public class PolicyDataEngineImplTest extends Assert {
     private static final QName TEST_POLICY_NAME = new QName("http://test", "TestPolicy");
 

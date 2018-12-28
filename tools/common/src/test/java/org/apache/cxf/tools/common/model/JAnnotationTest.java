@@ -32,6 +32,9 @@ import javax.xml.ws.FaultAction;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class JAnnotationTest extends Assert {
     @Test
     public void testList() throws Exception {

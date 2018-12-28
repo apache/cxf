@@ -44,6 +44,12 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 abstract class AbstractOAuthDataProviderTest extends Assert {
     private static KeyPair keyPair;
     private AbstractOAuthDataProvider provider;

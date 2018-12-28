@@ -25,6 +25,8 @@ import org.apache.cxf.binding.corba.types.AbstractCorbaTypeListener;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class CorbaStreamWriterTest extends Assert {
 
     @Test

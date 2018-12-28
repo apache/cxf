@@ -27,6 +27,8 @@ import org.apache.cxf.tools.common.model.JavaType;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class ParameterProcessorTest extends Assert {
     @Test
     public void testAddParameter() throws Exception {

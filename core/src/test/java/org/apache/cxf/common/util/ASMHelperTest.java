@@ -24,6 +24,8 @@ import java.lang.reflect.Type;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class ASMHelperTest extends Assert {
     @Test
     public void testEnumParamType() throws Exception {

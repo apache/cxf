@@ -42,6 +42,8 @@ import org.junit.Test;
 
 import static org.apache.cxf.transport.common.gzip.GZIPOutInterceptor.UseGzip.FORCE;
 import static org.apache.cxf.transport.common.gzip.GZIPOutInterceptor.UseGzip.YES;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
 /**
  * Test for the parsing of Accept-Encoding by the GZIPOutInterceptor. For

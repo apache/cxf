@@ -40,6 +40,7 @@ import static org.easymock.EasyMock.createNiceControl;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.isA;
+import static org.junit.Assert.assertEquals;
 
 public class AbstractProtocolHandlerInterceptorTest extends Assert {
 

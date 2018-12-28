@@ -23,6 +23,9 @@ import java.util.Properties;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 
 public class UriHandlerInitTest extends Assert {
     private static final String PROP_NAME = "java.protocol.handler.pkgs";

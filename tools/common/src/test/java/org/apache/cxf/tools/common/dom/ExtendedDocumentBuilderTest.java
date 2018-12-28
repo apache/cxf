@@ -24,6 +24,9 @@ import org.w3c.dom.Document;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class ExtendedDocumentBuilderTest extends Assert {
     @Test
     public void testMassMethod() throws Exception {

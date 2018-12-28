@@ -41,6 +41,8 @@ import org.opensaml.xacml.ctx.RequestType;
 import org.opensaml.xacml.ctx.ResourceType;
 import org.opensaml.xacml.ctx.SubjectType;
 
+import static org.junit.Assert.assertNotNull;
+
 
 /**
  * Some unit tests to create a XACML Request using the RequestComponentBuilder.

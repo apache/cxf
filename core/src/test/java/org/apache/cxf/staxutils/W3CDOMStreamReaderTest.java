@@ -37,6 +37,9 @@ import org.w3c.dom.Element;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 
 public class W3CDOMStreamReaderTest extends Assert {
 

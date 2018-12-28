@@ -46,6 +46,9 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class ClientCacheTest extends Assert {
     public static final String ADDRESS = "local://transport";
     private static Server server;

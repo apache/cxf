@@ -28,6 +28,8 @@ import org.apache.cxf.interceptor.Fault;
 
 import org.junit.Assert;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file

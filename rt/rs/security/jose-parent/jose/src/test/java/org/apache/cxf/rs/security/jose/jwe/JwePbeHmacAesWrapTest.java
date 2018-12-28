@@ -30,6 +30,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class JwePbeHmacAesWrapTest extends Assert {
     @Before
     public void registerBouncyCastleIfNeeded() throws Exception {
@@ -75,4 +77,3 @@ public class JwePbeHmacAesWrapTest extends Assert {
 
     }
 }
-

@@ -41,6 +41,11 @@ import org.apache.hello_world_soap_http.GreeterImpl;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 public class ManagedBusTest extends Assert {
     public static final String JMX_PORT1 = TestUtil.getPortNumber(ManagedBusTest.class, 1);
     public static final String JMX_PORT2 = TestUtil.getPortNumber(ManagedBusTest.class, 3);

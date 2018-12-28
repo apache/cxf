@@ -26,6 +26,9 @@ import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 public class JwsCompactHeaderTest extends Assert {
 
     /**
@@ -200,4 +203,3 @@ public class JwsCompactHeaderTest extends Assert {
         assertFalse(consumer.validateCriticalHeaders());
     }
 }
-

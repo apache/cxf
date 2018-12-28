@@ -61,6 +61,9 @@ import org.junit.Test;
 
 import static org.easymock.EasyMock.createNiceControl;
 import static org.easymock.EasyMock.expect;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class DocLiteralInInterceptorTest extends Assert {
     PhaseInterceptorChain chain;

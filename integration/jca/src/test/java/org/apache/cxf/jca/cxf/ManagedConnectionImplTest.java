@@ -39,6 +39,10 @@ import org.easymock.EasyMock;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class ManagedConnectionImplTest extends ManagedConnectionTestBase {
 
     protected URL wsdl;

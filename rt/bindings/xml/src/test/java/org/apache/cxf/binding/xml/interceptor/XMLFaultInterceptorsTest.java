@@ -38,6 +38,9 @@ import org.apache.hello_world_xml_http.bare.types.MyComplexStructType;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class XMLFaultInterceptorsTest extends TestBase {
 
     @Test

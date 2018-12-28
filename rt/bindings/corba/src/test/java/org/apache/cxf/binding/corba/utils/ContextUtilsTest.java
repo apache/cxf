@@ -28,6 +28,8 @@ import org.apache.cxf.message.MessageImpl;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * Holder for utility methods relating to contexts.
  */
@@ -52,4 +54,3 @@ public final class ContextUtilsTest extends Assert {
     }
 
 }
-

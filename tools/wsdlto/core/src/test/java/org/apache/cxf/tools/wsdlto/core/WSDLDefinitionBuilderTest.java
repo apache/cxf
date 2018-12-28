@@ -36,6 +36,9 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class WSDLDefinitionBuilderTest extends Assert {
     @BeforeClass
     public static void ensureNewBus() {

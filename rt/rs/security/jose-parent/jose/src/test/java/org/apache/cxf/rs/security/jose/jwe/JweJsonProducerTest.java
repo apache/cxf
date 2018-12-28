@@ -38,6 +38,8 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class JweJsonProducerTest extends Assert {
     static final byte[] WRAPPER_BYTES1 = {91, 96, 105, 38, 99, 108, 110, 8, -93, 50, -15, 62, 0, -115, 73, -39};
     static final byte[] WRAPPER_BYTES2 = {-39, 96, 105, 38, 99, 108, 110, 8, -93, 50, -15, 62, 0, -115, 73, 91};
@@ -308,4 +310,3 @@ public class JweJsonProducerTest extends Assert {
         assertEquals(MULTIPLE_RECIPIENTS_OUTPUT, jweJson);
     }
 }
-

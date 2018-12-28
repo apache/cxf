@@ -28,6 +28,8 @@ import javax.xml.stream.XMLStreamReader;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class StaxStreamFilterTest extends Assert {
     public static final QName  SOAP_ENV =
         new QName("http://schemas.xmlsoap.org/soap/envelope/", "Envelope");

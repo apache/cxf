@@ -44,6 +44,9 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class JwsCompactReaderWriterTest extends Assert {
 
     public static final String TOKEN_WITH_DETACHED_UNENCODED_PAYLOAD =

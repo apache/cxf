@@ -53,6 +53,10 @@ import org.apache.cxf.wsdl11.WSDLServiceFactory;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class STSClientTest extends Assert {
 
     @Test

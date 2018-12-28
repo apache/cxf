@@ -31,6 +31,8 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.security.LoginSecurityContext;
 import org.apache.cxf.security.SecurityContext;
 
+import static org.junit.Assert.fail;
+
 
 /**
  * Some unit tests to test the AbstractXACMLAuthorizingInterceptor.

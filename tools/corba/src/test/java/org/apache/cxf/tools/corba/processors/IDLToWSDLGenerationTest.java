@@ -46,6 +46,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class IDLToWSDLGenerationTest extends ProcessorTestBase {
     public static final List<String> SCHEMA_IGNORE_ATTR = Arrays.asList(new String[]{"attributeFormDefault",
                                                                                      "elementFormDefault",

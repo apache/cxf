@@ -31,6 +31,11 @@ import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
 public class JwkUtilsTest extends Assert {
     private static final String RSA_KEY = "{"
       + "\"kty\": \"RSA\","

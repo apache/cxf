@@ -32,6 +32,9 @@ import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class StudentTest extends AbstractAegisTest {
 
     @Test

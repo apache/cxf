@@ -25,6 +25,8 @@ import javax.xml.namespace.QName;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 
 public class CXFConnectionRequestInfoTest extends Assert {
 

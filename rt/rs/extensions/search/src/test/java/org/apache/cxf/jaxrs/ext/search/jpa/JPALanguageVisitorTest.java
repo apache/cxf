@@ -24,6 +24,8 @@ import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class JPALanguageVisitorTest extends Assert {
 
     @Test

@@ -46,6 +46,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class ColocMessageObserverTest extends Assert {
     private IMocksControl control = EasyMock.createNiceControl();
     private ColocMessageObserver observer;

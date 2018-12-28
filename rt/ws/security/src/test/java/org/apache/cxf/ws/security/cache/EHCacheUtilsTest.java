@@ -30,6 +30,9 @@ import org.apache.wss4j.common.cache.EHCacheManagerHolder;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
 public class EHCacheUtilsTest extends Assert {
     @Test
     public void testUseGlobalManager() {

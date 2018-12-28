@@ -35,6 +35,8 @@ import org.atmosphere.cpr.FrameworkConfig;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  *
  */

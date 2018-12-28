@@ -34,6 +34,8 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * Tests the automatic table updating of RMTxStore that allows compatible changes
  * in the database tables.

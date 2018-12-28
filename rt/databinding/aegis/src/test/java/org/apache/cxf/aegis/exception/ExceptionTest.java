@@ -32,6 +32,8 @@ import org.apache.cxf.service.invoker.BeanInvoker;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.fail;
+
 public class ExceptionTest extends AbstractAegisTest {
     @Before
     public void setUp() throws Exception {

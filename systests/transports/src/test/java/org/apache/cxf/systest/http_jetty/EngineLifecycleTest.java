@@ -49,6 +49,11 @@ import org.springframework.core.io.Resource;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 
 /**
  * This class tests starting up and shutting down the embedded server when there

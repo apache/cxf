@@ -46,6 +46,9 @@ import org.springframework.context.support.GenericApplicationContext;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class AttributeTest extends AbstractCXFSpringTest {
     private JavascriptTestUtilities testUtilities;
     private XMLOutputFactory xmlOutputFactory;

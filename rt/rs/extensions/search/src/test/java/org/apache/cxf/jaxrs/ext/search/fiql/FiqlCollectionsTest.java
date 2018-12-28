@@ -26,6 +26,8 @@ import org.apache.cxf.jaxrs.ext.search.SearchParseException;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+
 public class FiqlCollectionsTest extends Assert {
     @Test
     public void testWithCollectionAfterFirstLevelOnCollection() throws SearchParseException {

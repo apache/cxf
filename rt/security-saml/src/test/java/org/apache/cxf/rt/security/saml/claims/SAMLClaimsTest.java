@@ -39,6 +39,9 @@ import org.apache.wss4j.common.saml.builder.SAML2Constants;
 
 import org.junit.Assert;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class SAMLClaimsTest extends Assert {
 
     @org.junit.Test

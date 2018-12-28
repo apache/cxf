@@ -30,6 +30,8 @@ import com.sun.xml.bind.v2.runtime.MarshallerImpl;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class JAXBUtilsTest extends Assert {
 
     @Test

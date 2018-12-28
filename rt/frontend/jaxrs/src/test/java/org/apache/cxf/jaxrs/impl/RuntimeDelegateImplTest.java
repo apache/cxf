@@ -31,6 +31,8 @@ import javax.ws.rs.ext.RuntimeDelegate;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertSame;
+
 public class RuntimeDelegateImplTest extends Assert {
 
     @Test

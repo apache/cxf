@@ -30,6 +30,9 @@ import org.apache.cxf.tools.common.model.JavaInterface;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class InterfaceMapperTest extends Assert {
 
     @Test

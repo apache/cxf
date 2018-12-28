@@ -28,6 +28,8 @@ import org.apache.cxf.service.model.BindingInfo;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 public class XMLBindingFactoryTest extends Assert {
 
     @Test

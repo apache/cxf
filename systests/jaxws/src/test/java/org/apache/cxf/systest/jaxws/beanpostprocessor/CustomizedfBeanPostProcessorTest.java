@@ -24,6 +24,8 @@ import org.apache.cxf.test.AbstractCXFSpringTest;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 /**
  * The majority of this test happens when the context is loaded.
  */

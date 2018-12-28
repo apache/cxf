@@ -31,6 +31,9 @@ import org.apache.cxf.tools.fortest.withannotation.doc.GreeterArray;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class ResponseWrapperTest extends Assert {
     JaxwsServiceBuilder builder = new JaxwsServiceBuilder();
 

@@ -26,6 +26,9 @@ import org.apache.cxf.tools.java2ws.JavaToWS;
 import org.junit.After;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class JavaToWSFlagTest extends ToolTestBase {
 
     @After

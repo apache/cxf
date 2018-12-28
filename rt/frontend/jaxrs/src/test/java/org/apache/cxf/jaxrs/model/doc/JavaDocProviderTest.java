@@ -26,6 +26,9 @@ import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class JavaDocProviderTest extends Assert {
 
     @Test

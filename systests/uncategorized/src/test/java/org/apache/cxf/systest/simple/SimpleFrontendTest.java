@@ -35,6 +35,8 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
+
 public class SimpleFrontendTest extends Assert {
     static final String PORT1 = TestUtil.getPortNumber(SimpleFrontendTest.class);
 

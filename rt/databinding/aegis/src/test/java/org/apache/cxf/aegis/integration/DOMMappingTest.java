@@ -38,6 +38,9 @@ import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Test mapping DOM.
  * Commented out code for the case of an embedded Node object,

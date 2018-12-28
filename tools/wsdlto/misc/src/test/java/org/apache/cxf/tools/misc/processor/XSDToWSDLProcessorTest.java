@@ -28,6 +28,8 @@ import org.apache.cxf.tools.misc.XSDToWSDL;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 public class XSDToWSDLProcessorTest
     extends ProcessorTestBase {
 

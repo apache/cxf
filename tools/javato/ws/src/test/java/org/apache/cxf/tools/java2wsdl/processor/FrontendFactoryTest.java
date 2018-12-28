@@ -26,6 +26,8 @@ import org.apache.cxf.tools.fortest.simple.Hello;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class FrontendFactoryTest extends Assert {
 
     FrontendFactory factory = FrontendFactory.getInstance();

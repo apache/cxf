@@ -41,6 +41,8 @@ import org.apache.hello_world_xml_http.wrapped.types.GreetMe;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class XMLMessageOutInterceptorTest extends TestBase {
 
     static String bareNs = "http://apache.org/hello_world_xml_http/bare";

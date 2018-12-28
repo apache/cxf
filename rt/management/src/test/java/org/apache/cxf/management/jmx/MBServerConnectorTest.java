@@ -29,6 +29,8 @@ import org.apache.cxf.testutil.common.TestUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
+
 
 
 public class MBServerConnectorTest extends Assert {

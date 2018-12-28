@@ -29,6 +29,9 @@ import org.apache.cxf.tools.common.model.JavaMethod;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class WebMethodAnnotatorTest extends Assert {
 
     @Test

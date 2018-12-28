@@ -30,6 +30,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+
 public class SchemaAddinsTest extends Assert {
     private TestUtilities testUtilities;
 

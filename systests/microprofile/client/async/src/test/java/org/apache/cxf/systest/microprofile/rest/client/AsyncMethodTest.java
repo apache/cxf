@@ -49,6 +49,7 @@ import org.junit.Test;
 
 //CHECKSTYLE:OFF
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static org.junit.Assert.assertEquals;
 //CHECKSTYLE:ON
 
 public class AsyncMethodTest extends Assert {

@@ -29,6 +29,8 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.test.AbstractCXFSpringTest;
 
+import static org.junit.Assert.assertEquals;
+
 public abstract class JavascriptRhinoTest extends AbstractCXFSpringTest {
     protected JavascriptTestUtilities testUtilities;
     protected JaxWsProxyFactoryBean clientProxyFactory;

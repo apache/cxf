@@ -27,6 +27,9 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class HTTPTransportFactoryTest extends Assert {
     @Test
     public void testGetDestination() {

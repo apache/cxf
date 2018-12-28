@@ -48,6 +48,9 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class JavaFirstSchemaValidationTest extends Assert {
     static final String PORT = TestUtil.getNewPortNumber(JavaFirstSchemaValidationTest.class);
     static final String PORT2 = TestUtil.getNewPortNumber(JavaFirstSchemaValidationTest.class);

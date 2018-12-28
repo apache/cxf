@@ -24,6 +24,9 @@ import org.apache.cxf.common.i18n.UncheckedException;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+
 
 public class SuspendedInvocationExceptionTest extends Assert {
 
