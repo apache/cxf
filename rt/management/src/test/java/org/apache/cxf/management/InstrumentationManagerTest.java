@@ -32,7 +32,6 @@ import org.apache.cxf.management.jmx.InstrumentationManagerImpl;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

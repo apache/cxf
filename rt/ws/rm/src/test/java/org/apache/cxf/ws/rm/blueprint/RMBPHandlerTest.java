@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.rm.blueprint;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;

@@ -25,7 +25,6 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;

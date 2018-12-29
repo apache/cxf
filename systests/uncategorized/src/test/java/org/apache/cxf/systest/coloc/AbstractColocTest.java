@@ -34,7 +34,6 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.testutil.common.TestUtil;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 
 import static org.junit.Assert.assertNotNull;

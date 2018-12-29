@@ -77,7 +77,6 @@ import io.undertow.util.HttpString;
 
 import org.easymock.EasyMock;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

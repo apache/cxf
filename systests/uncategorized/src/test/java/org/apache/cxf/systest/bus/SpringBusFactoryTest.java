@@ -34,7 +34,6 @@ import org.apache.cxf.workqueue.WorkQueueManager;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;

@@ -27,7 +27,6 @@ import org.apache.cxf.tools.plugin.FrontEnd;
 import org.apache.cxf.tools.plugin.Generator;
 import org.apache.cxf.tools.plugin.Plugin;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

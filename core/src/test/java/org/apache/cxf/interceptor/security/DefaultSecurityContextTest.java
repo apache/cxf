@@ -29,7 +29,6 @@ import org.apache.cxf.common.security.SimpleGroup;
 import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.security.LoginSecurityContext;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

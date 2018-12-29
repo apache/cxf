@@ -22,7 +22,6 @@ package org.apache.cxf.bus.managers;
 import org.apache.cxf.endpoint.DummyServer;
 import org.apache.cxf.endpoint.Server;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

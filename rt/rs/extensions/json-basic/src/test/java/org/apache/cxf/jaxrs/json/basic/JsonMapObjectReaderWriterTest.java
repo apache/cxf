@@ -26,7 +26,6 @@ import java.util.Map;
 
 import org.apache.cxf.helpers.CastUtils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

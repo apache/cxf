@@ -38,7 +38,6 @@ import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.resources.AegisTestBean;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

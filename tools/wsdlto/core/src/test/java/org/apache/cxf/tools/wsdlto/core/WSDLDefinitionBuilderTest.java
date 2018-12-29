@@ -32,7 +32,6 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.BusFactory;
 
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

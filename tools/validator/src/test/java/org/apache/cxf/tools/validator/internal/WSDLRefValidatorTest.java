@@ -30,7 +30,6 @@ import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.tools.validator.internal.model.XNode;
 import org.apache.cxf.wsdl.WSDLManager;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

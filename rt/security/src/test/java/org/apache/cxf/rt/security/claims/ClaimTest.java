@@ -20,7 +20,6 @@ package org.apache.cxf.rt.security.claims;
 
 import java.net.URI;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

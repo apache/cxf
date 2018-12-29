@@ -35,7 +35,6 @@ import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

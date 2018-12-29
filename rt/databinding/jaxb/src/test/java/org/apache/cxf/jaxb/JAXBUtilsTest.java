@@ -31,7 +31,6 @@ import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.hello_world_soap_http.types.GreetMe;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

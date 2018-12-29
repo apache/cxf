@@ -41,7 +41,6 @@ import javax.ws.rs.core.Variant;
 
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;

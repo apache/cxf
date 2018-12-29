@@ -23,7 +23,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import org.apache.cxf.transport.http.policy.impl.ClientPolicyCalculator;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

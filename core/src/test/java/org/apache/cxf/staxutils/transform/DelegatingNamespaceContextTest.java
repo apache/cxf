@@ -25,7 +25,6 @@ import java.util.Set;
 
 import javax.xml.namespace.NamespaceContext;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

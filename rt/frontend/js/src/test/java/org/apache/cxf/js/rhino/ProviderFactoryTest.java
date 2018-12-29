@@ -27,7 +27,6 @@ import org.mozilla.javascript.EvaluatorException;
 import org.mozilla.javascript.Scriptable;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

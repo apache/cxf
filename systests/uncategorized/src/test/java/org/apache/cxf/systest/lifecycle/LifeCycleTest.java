@@ -45,7 +45,6 @@ import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.apache.hello_world_soap_http.Greeter;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

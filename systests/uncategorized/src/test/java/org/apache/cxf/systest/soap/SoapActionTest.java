@@ -32,7 +32,6 @@ import org.apache.hello_world_soap_action.Greeter;
 import org.apache.hello_world_soap_action.WrappedGreeter;
 
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

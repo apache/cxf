@@ -22,7 +22,6 @@ import javax.ws.rs.core.Form;
 
 import org.apache.cxf.jaxrs.utils.FormUtils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

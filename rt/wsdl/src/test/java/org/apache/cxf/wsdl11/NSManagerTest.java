@@ -22,7 +22,6 @@ package org.apache.cxf.wsdl11;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.wsdl.WSDLConstants;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

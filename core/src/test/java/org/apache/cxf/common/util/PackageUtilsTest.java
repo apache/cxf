@@ -29,7 +29,6 @@ import java.util.Collections;
 import org.apache.cxf.validation.BeanValidationProvider;
 import org.apache.cxf.validation.ValidationConfiguration;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

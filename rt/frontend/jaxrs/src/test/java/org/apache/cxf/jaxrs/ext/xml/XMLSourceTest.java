@@ -36,7 +36,6 @@ import org.w3c.dom.Node;
 
 import org.apache.ws.commons.schema.constants.Constants;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

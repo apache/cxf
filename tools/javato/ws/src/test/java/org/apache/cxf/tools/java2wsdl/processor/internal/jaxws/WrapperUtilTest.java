@@ -21,7 +21,6 @@ package org.apache.cxf.tools.java2wsdl.processor.internal.jaxws;
 
 import java.lang.reflect.Method;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

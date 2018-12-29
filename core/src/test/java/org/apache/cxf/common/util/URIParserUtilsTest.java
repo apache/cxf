@@ -21,7 +21,6 @@ package org.apache.cxf.common.util;
 
 import java.net.URISyntaxException;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

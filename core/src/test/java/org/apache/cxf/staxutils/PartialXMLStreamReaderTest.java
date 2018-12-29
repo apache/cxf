@@ -27,7 +27,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Document;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;

@@ -21,7 +21,6 @@ package org.apache.cxf.jaxrs.ext.search;
 import java.util.Date;
 import java.util.Set;
 
-import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 

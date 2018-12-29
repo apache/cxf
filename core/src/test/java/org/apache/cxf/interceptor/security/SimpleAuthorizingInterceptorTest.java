@@ -33,7 +33,6 @@ import org.apache.cxf.service.invoker.MethodDispatcher;
 import org.apache.cxf.service.model.BindingOperationInfo;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

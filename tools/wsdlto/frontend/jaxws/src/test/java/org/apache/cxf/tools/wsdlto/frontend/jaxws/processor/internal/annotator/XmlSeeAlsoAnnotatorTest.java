@@ -25,7 +25,6 @@ import org.apache.cxf.tools.common.model.JavaInterface;
 import org.apache.cxf.tools.util.ClassCollector;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.annotator.types.ObjectFactory;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

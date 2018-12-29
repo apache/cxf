@@ -21,7 +21,6 @@ package org.apache.cxf.common.util;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

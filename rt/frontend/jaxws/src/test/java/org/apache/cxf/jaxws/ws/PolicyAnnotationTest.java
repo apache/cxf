@@ -48,7 +48,6 @@ import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.ServiceWSDLBuilder;
 import org.apache.neethi.Constants;
 
-import org.junit.Assert;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

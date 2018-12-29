@@ -28,7 +28,6 @@ import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;

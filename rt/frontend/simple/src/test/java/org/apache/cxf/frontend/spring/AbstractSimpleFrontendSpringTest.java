@@ -22,7 +22,6 @@ import org.apache.cxf.BusFactory;
 import org.springframework.context.support.AbstractApplicationContext;
 
 import org.junit.After;
-import org.junit.Assert;
 
 
 public class AbstractSimpleFrontendSpringTest {

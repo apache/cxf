@@ -30,7 +30,6 @@ import javax.ws.rs.container.PreMatching;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

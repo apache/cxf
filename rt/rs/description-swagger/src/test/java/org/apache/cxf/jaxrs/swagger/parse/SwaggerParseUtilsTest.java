@@ -27,7 +27,6 @@ import org.apache.cxf.jaxrs.model.UserApplication;
 import org.apache.cxf.jaxrs.model.UserOperation;
 import org.apache.cxf.jaxrs.model.UserResource;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

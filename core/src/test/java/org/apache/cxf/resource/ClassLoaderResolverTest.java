@@ -29,7 +29,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

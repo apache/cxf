@@ -24,7 +24,6 @@ import javax.xml.ws.WebServiceProvider;
 
 import org.apache.cxf.calculator.CalculatorImpl;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

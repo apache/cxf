@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.jca.core.resourceadapter;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 

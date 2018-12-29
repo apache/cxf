@@ -19,7 +19,6 @@
 
 package org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 

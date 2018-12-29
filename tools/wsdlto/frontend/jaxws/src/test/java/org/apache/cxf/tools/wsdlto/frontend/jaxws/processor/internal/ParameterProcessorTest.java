@@ -24,7 +24,6 @@ import org.apache.cxf.tools.common.model.JavaMethod;
 import org.apache.cxf.tools.common.model.JavaParameter;
 import org.apache.cxf.tools.common.model.JavaType;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

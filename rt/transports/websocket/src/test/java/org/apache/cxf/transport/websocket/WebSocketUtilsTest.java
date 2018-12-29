@@ -22,7 +22,6 @@ package org.apache.cxf.transport.websocket;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

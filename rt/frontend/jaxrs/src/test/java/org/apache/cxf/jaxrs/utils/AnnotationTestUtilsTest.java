@@ -30,7 +30,6 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.jaxrs.Customer;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

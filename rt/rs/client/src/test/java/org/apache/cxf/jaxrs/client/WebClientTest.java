@@ -30,7 +30,6 @@ import javax.ws.rs.ext.ParamConverterProvider;
 import org.apache.cxf.jaxrs.resources.BookInterface;
 import org.apache.cxf.jaxrs.resources.BookStore;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

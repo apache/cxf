@@ -34,7 +34,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

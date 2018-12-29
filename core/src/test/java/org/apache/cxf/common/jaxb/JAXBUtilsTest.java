@@ -27,7 +27,6 @@ import com.sun.xml.bind.marshaller.MinimumEscapeHandler;
 import com.sun.xml.bind.v2.runtime.JAXBContextImpl;
 import com.sun.xml.bind.v2.runtime.MarshallerImpl;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

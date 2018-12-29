@@ -28,7 +28,6 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.URITemplate.CurlyBraceTokenizer;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

@@ -23,7 +23,6 @@ package org.apache.cxf.tools.java2wsdl.processor;
 import org.apache.cxf.tools.fortest.classnoanno.docbare.Stock;
 import org.apache.cxf.tools.fortest.simple.Hello;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

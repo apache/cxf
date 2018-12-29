@@ -37,7 +37,6 @@ import org.apache.cxf.jaxrs.resources.BookStore;
 import org.apache.cxf.jaxrs.resources.UriBuilderWrongAnnotations;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

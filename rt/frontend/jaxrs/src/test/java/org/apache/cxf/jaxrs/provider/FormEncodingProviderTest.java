@@ -36,7 +36,6 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

@@ -31,7 +31,6 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.test.assertions.foo.FooType;
 import org.apache.neethi.Assertion;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

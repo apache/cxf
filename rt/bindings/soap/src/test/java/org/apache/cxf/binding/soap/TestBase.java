@@ -48,7 +48,6 @@ import org.apache.cxf.wsdl11.WSDLServiceBuilder;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 
 import static org.junit.Assert.assertNotNull;

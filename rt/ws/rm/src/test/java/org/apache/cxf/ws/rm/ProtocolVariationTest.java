@@ -22,7 +22,6 @@ package org.apache.cxf.ws.rm;
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;

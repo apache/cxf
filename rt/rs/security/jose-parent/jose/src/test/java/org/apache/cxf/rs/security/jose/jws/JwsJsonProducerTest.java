@@ -19,7 +19,6 @@
 package org.apache.cxf.rs.security.jose.jws;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

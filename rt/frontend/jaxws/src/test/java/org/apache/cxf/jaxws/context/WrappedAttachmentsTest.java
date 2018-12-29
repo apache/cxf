@@ -28,7 +28,6 @@ import javax.mail.util.ByteArrayDataSource;
 import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.message.Attachment;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

@@ -40,7 +40,6 @@ import org.apache.cxf.transport.http_undertow.UndertowHTTPServerEngine;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionStoreException;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

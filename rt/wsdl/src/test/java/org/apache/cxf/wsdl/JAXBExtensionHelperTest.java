@@ -41,7 +41,6 @@ import org.apache.cxf.abc.test.AnotherPolicyType;
 import org.apache.cxf.abc.test.NewServiceType;
 import org.apache.cxf.abc.test.TestPolicyType;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

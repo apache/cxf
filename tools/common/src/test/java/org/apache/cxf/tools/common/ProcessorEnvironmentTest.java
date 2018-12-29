@@ -22,7 +22,6 @@ package org.apache.cxf.tools.common;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

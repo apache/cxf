@@ -20,7 +20,6 @@ package org.apache.cxf.jca.core.resourceadapter;
 
 import java.util.Properties;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

@@ -21,7 +21,6 @@ package org.apache.cxf.common.i18n;
 
 import java.util.ResourceBundle;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

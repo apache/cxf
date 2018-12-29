@@ -25,7 +25,6 @@ import java.nio.charset.StandardCharsets;
 
 import org.apache.cxf.helpers.IOUtils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;

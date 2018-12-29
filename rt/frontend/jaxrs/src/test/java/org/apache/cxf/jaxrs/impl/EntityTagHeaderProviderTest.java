@@ -21,7 +21,6 @@ package org.apache.cxf.jaxrs.impl;
 
 import javax.ws.rs.core.EntityTag;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

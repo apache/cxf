@@ -24,7 +24,6 @@ import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchParseException;
 import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
 
-import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 

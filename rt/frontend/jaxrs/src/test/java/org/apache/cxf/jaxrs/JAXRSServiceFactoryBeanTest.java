@@ -29,7 +29,6 @@ import org.apache.cxf.jaxrs.model.MethodDispatcher;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.URITemplate;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

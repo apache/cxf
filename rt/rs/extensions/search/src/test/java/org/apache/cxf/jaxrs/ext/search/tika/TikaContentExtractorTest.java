@@ -26,7 +26,6 @@ import org.apache.cxf.jaxrs.ext.search.SearchConditionParser;
 import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
 import org.apache.tika.parser.pdf.PDFParser;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

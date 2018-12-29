@@ -31,7 +31,6 @@ import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.parser.stax.FOMEntry;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

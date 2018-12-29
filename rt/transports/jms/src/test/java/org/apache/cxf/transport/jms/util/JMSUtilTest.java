@@ -34,7 +34,6 @@ import org.apache.cxf.transport.jms.JMSConfiguration;
 import org.apache.cxf.transport.jms.JMSConstants;
 import org.apache.cxf.transport.jms.JMSFactory;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

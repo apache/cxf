@@ -36,7 +36,6 @@ import org.apache.cxf.tools.wsdlto.frontend.jaxws.wsdl11.JAXWSDefinitionBuilder;
 import org.apache.cxf.wsdl.JAXBExtensibilityElement;
 import org.apache.cxf.wsdl.http.AddressType;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

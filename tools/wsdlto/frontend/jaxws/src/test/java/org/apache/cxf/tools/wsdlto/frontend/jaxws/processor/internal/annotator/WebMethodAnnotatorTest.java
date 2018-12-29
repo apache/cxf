@@ -26,7 +26,6 @@ import org.apache.cxf.tools.common.model.JAnnotation;
 import org.apache.cxf.tools.common.model.JAnnotationElement;
 import org.apache.cxf.tools.common.model.JavaMethod;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

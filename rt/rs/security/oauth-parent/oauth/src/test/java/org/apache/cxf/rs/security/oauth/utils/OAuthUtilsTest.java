@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.rs.security.oauth.utils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;

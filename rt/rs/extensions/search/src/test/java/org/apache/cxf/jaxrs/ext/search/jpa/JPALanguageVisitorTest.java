@@ -21,7 +21,6 @@ package org.apache.cxf.jaxrs.ext.search.jpa;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

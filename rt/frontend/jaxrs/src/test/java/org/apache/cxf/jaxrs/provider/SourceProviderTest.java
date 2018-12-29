@@ -49,7 +49,6 @@ import org.apache.cxf.staxutils.StaxSource;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.transform.InTransformReader;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

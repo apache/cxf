@@ -41,9 +41,9 @@ import org.apache.type_test.types2.StructWithAnyStrict;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.junit.Assert.assertEquals;
 
 public abstract class AbstractTypeTestClient5 extends AbstractTypeTestClient4 {
 

@@ -43,7 +43,6 @@ import org.eclipse.microprofile.rest.client.tck.providers.TestParamConverterProv
 import org.eclipse.microprofile.rest.client.tck.providers.TestReaderInterceptor;
 import org.eclipse.microprofile.rest.client.tck.providers.TestWriterInterceptor;
 
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 

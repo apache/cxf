@@ -26,7 +26,6 @@ import java.io.PrintStream;
 import org.apache.cxf.helpers.FileUtils;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 
 public abstract class ToolTestBase {

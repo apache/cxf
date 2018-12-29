@@ -24,7 +24,6 @@ import java.io.PrintStream;
 import java.net.URL;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 
 public abstract class ToolTestBase {

@@ -55,7 +55,6 @@ import org.apache.hello_world_soap_http.types.GreetMeResponse;
 
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 
 import static org.easymock.EasyMock.createNiceControl;

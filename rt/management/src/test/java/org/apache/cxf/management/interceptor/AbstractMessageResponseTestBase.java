@@ -35,9 +35,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.OperationInfo;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.Before;
-
 
 
 public class AbstractMessageResponseTestBase {

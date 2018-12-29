@@ -23,7 +23,6 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.binding.corba.types.CorbaTypeEventProducer;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

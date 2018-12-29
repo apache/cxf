@@ -21,7 +21,6 @@ package org.apache.cxf.jaxrs.provider;
 
 import java.util.Collections;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

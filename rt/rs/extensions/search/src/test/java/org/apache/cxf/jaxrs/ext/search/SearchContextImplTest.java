@@ -26,7 +26,6 @@ import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

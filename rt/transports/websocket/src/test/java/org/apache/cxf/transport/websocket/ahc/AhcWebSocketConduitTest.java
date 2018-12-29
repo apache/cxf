@@ -21,7 +21,6 @@ package org.apache.cxf.transport.websocket.ahc;
 
 import org.apache.cxf.transport.websocket.WebSocketConstants;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

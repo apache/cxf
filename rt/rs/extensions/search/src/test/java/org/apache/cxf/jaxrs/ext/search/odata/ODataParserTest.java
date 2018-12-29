@@ -23,7 +23,6 @@ import java.util.Collections;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchParseException;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

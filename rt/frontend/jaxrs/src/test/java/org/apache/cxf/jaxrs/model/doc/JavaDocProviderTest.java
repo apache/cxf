@@ -23,7 +23,6 @@ import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.wadl.petstore.PetStore;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

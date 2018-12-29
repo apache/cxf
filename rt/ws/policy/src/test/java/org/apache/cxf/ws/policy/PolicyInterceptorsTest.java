@@ -45,7 +45,6 @@ import org.apache.neethi.Policy;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

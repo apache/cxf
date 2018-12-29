@@ -29,7 +29,6 @@ import org.apache.cxf.message.MessageImpl;
 
 import org.easymock.EasyMock;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNull;

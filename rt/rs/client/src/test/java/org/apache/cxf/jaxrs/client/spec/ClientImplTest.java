@@ -47,7 +47,6 @@ import org.apache.cxf.jaxrs.client.spec.ClientImpl.WebTargetImpl;
 import org.apache.cxf.jaxrs.impl.ConfigurableImpl;
 import org.apache.cxf.message.Message;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;

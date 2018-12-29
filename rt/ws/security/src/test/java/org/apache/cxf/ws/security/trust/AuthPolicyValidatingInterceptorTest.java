@@ -25,7 +25,6 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.apache.wss4j.dom.validate.Credential;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;

@@ -38,7 +38,6 @@ import org.apache.cxf.ws.rm.RMMessageConstants;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement.AcknowledgementRange;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

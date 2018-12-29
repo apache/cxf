@@ -30,7 +30,6 @@ import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 import org.apache.cxf.rs.security.jose.jwk.KeyType;
 import org.apache.cxf.rs.security.jose.jwk.PublicKeyUse;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

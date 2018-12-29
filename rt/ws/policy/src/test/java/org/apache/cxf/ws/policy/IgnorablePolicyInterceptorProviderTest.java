@@ -36,7 +36,6 @@ import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.neethi.Assertion;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

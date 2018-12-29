@@ -27,7 +27,6 @@ import org.apache.cxf.jaxrs.ext.search.SearchParseException;
 import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
 import org.apache.cxf.jaxrs.ext.search.visitor.SBThreadLocalVisitorState;
 
-import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 

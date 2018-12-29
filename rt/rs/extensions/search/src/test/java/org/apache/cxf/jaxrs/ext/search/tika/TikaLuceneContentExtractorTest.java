@@ -42,7 +42,6 @@ import org.apache.lucene.util.Version;
 import org.apache.tika.parser.pdf.PDFParser;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

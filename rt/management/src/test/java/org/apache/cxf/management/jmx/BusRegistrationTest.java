@@ -31,7 +31,6 @@ import org.apache.cxf.management.InstrumentationManager;
 import org.apache.cxf.management.ManagementConstants;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

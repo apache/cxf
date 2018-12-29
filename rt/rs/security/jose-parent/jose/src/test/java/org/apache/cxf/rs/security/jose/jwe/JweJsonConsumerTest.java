@@ -35,7 +35,6 @@ import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

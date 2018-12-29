@@ -25,7 +25,6 @@ import org.springframework.context.support.AbstractRefreshableApplicationContext
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.Test;
 
 

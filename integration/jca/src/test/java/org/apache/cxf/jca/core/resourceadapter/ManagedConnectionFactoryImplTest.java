@@ -33,7 +33,6 @@ import javax.security.auth.Subject;
 
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

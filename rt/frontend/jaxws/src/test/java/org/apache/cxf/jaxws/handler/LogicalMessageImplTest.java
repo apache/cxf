@@ -34,7 +34,6 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.handlers.types.AddNumbers;
 import org.apache.handlers.types.ObjectFactory;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

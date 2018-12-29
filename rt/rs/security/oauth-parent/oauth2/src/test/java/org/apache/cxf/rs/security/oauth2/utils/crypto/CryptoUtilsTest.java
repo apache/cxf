@@ -46,7 +46,6 @@ import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.apache.cxf.rt.security.crypto.KeyProperties;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

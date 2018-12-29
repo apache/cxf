@@ -24,7 +24,6 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.service.model.EndpointInfo;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;

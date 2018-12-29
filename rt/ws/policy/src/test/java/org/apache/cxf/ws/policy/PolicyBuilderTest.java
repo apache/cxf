@@ -31,7 +31,6 @@ import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
 import org.apache.neethi.PolicyReference;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

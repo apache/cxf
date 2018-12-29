@@ -21,7 +21,6 @@ package org.apache.cxf.common.security;
 import java.security.Principal;
 import java.util.Enumeration;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

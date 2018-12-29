@@ -21,7 +21,6 @@ package org.apache.cxf.common.util;
 
 import java.util.*;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

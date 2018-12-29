@@ -22,7 +22,6 @@ package org.apache.cxf.jaxws.handler;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

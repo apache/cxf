@@ -24,7 +24,6 @@ import java.net.URL;
 
 import org.apache.cxf.helpers.IOUtils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

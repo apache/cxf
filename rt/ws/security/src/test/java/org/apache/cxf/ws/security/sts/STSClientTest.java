@@ -50,7 +50,6 @@ import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.WSDLServiceFactory;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

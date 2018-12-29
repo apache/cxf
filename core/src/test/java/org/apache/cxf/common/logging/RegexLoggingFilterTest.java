@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.common.logging;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

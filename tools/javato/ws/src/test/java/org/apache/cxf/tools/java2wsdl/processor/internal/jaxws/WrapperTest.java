@@ -25,7 +25,6 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.tools.common.model.JavaClass;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

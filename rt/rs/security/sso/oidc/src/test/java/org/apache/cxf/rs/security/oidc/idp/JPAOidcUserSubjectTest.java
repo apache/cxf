@@ -30,7 +30,6 @@ import org.apache.cxf.rs.security.oauth2.provider.JPAOAuthDataProvider;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

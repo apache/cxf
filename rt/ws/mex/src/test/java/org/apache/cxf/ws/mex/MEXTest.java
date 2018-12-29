@@ -30,7 +30,6 @@ import org.apache.cxf.transport.local.LocalTransportFactory;
 import org.apache.cxf.ws.mex.model._2004_09.Metadata;
 
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

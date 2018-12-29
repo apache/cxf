@@ -31,7 +31,6 @@ import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.JweCompactConsumer;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

@@ -33,7 +33,6 @@ import javax.jws.WebService;
 import javax.xml.ws.WebServiceContext;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

@@ -25,7 +25,6 @@ import java.util.Locale;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Variant;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

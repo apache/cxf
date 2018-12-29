@@ -26,7 +26,6 @@ import javax.management.MBeanServerFactory;
 
 import org.apache.cxf.testutil.common.TestUtil;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;

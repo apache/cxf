@@ -29,7 +29,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

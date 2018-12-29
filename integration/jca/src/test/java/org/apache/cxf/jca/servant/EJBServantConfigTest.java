@@ -21,7 +21,6 @@ package org.apache.cxf.jca.servant;
 
 import javax.xml.namespace.QName;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

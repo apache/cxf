@@ -42,7 +42,6 @@ import org.apache.cxf.ws.rm.v200702.SequenceType;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -52,7 +51,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class DestinationSequenceTest {
 

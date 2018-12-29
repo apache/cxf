@@ -38,7 +38,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

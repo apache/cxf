@@ -26,7 +26,6 @@ import org.apache.cxf.hello_world_corba.PingMeFault;
 import org.apache.cxf.hello_world_corba.types.FaultDetail;
 import org.apache.cxf.interceptor.Fault;
 
-import org.junit.Assert;
 
 import static org.junit.Assert.assertEquals;
 

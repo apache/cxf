@@ -24,7 +24,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

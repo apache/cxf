@@ -29,7 +29,6 @@ import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.jaxrs.resources.TagVO;
 import org.apache.cxf.message.MessageImpl;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

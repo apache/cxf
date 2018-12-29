@@ -21,7 +21,6 @@ package org.apache.cxf.transport.http.policy;
 import org.apache.cxf.transport.http.policy.impl.ServerPolicyCalculator;
 import org.apache.cxf.transports.http.configuration.HTTPServerPolicy;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

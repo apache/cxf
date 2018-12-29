@@ -29,7 +29,6 @@ import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

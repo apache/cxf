@@ -30,7 +30,6 @@ import org.apache.cxf.message.Message;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

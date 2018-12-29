@@ -20,7 +20,6 @@ package org.apache.cxf.rs.security.oauth2.common;
 
 import java.util.Collections;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

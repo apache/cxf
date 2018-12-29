@@ -32,7 +32,6 @@ import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.TokenIntrospection;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

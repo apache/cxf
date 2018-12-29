@@ -44,7 +44,6 @@ import org.apache.cxf.ws.addressing.Names;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

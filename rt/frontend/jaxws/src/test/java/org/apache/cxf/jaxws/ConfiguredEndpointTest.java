@@ -47,7 +47,6 @@ import org.apache.hello_world_soap_http.GreeterImpl;
 import org.apache.hello_world_soap_http.SOAPService;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

@@ -29,7 +29,6 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

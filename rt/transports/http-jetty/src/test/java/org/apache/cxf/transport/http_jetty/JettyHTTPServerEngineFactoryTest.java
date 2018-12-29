@@ -34,7 +34,6 @@ import org.eclipse.jetty.server.HttpConnectionFactory;
 
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -45,8 +44,7 @@ import static org.junit.Assert.fail;
 
 
 
-public class JettyHTTPServerEngineFactoryTest
-        {
+public class JettyHTTPServerEngineFactoryTest {
     Bus bus;
 
     @BeforeClass

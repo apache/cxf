@@ -41,7 +41,6 @@ import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

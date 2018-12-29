@@ -30,7 +30,6 @@ import org.apache.cxf.transport.http.HTTPTransportFactory;
 
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -41,8 +40,7 @@ import static org.junit.Assert.fail;
 
 
 
-public class UndertowHTTPServerEngineFactoryTest
-        {
+public class UndertowHTTPServerEngineFactoryTest {
     Bus bus;
 
     @BeforeClass

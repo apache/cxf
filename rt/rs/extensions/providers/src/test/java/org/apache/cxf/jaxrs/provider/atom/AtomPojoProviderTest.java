@@ -36,7 +36,6 @@ import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

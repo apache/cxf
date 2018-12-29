@@ -35,7 +35,6 @@ import org.apache.cxf.endpoint.ServerRegistry;
 import org.apache.cxf.headers.HeaderManager;
 import org.apache.cxf.wsdl.WSDLManager;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;

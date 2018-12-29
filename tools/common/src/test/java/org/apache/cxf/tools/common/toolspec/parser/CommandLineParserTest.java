@@ -25,7 +25,6 @@ import java.util.StringTokenizer;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.tools.common.toolspec.ToolSpec;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

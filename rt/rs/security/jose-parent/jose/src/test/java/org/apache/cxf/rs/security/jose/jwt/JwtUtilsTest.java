@@ -24,7 +24,6 @@ import java.time.ZonedDateTime;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 
-import org.junit.Assert;
 
 import static org.junit.Assert.fail;
 
