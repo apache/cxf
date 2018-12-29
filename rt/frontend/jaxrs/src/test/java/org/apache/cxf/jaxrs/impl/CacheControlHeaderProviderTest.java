@@ -34,7 +34,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class CacheControlHeaderProviderTest extends Assert {
+public class CacheControlHeaderProviderTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testValueOfNull() {

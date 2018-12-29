@@ -27,7 +27,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class CorbaTypeMapTest extends Assert {
+public class CorbaTypeMapTest {
 
     @Test
     public void testCorbaTypeMap() throws Exception {

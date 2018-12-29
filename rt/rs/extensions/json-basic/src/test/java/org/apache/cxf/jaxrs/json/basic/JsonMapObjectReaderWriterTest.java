@@ -32,7 +32,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-public class JsonMapObjectReaderWriterTest extends Assert {
+public class JsonMapObjectReaderWriterTest {
 
     @Test
     public void testWriteMap() throws Exception {

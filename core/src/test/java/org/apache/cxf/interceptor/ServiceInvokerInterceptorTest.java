@@ -41,7 +41,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class ServiceInvokerInterceptorTest extends Assert {
+public class ServiceInvokerInterceptorTest {
 
     @Test
     public void testInterceptor() throws Exception {

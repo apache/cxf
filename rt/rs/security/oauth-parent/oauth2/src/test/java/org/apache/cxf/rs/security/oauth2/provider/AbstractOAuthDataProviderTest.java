@@ -50,7 +50,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-abstract class AbstractOAuthDataProviderTest extends Assert {
+abstract class AbstractOAuthDataProviderTest {
     private static KeyPair keyPair;
     private AbstractOAuthDataProvider provider;
 

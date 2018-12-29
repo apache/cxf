@@ -54,7 +54,7 @@ import static org.junit.Assert.fail;
 /**
  *
  */
-public class EffectivePolicyImplTest extends Assert {
+public class EffectivePolicyImplTest {
 
     private IMocksControl control;
     private Message msg = new MessageImpl();

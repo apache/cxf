@@ -34,7 +34,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-public class WrapperTest extends Assert {
+public class WrapperTest {
     @Test
     public void testGetWrapperBeanClassFromQName() {
         QName qname = new QName("http://cxf.apache.org", "sayHi");

@@ -36,7 +36,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 
-public class LoggerHelperTest extends Assert {
+public class LoggerHelperTest {
     public static final String TEST_LOGGER_NAME = "test.logger";
 
 

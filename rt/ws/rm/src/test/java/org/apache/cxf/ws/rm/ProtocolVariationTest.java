@@ -31,7 +31,7 @@ import static org.junit.Assert.assertNull;
 /**
  *
  */
-public class ProtocolVariationTest extends Assert {
+public class ProtocolVariationTest {
 
     @Test
     public void testFindVariant() {

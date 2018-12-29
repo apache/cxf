@@ -41,7 +41,7 @@ import static org.junit.Assert.assertTrue;
 /**
  *
  */
-public class DestinationRegistryImplTest extends Assert {
+public class DestinationRegistryImplTest {
     private static final String ADDRESS = "http://bar/snafu";
     private static final QName QNAME = new QName(ADDRESS, "foobar");
 

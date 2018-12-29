@@ -45,7 +45,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 
-public class NettyHttpServerEngineTest extends Assert {
+public class NettyHttpServerEngineTest {
     private static final int PORT1
         = Integer.valueOf(TestUtil.getPortNumber(NettyHttpServerEngineTest.class, 1));
     private static final int PORT2

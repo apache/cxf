@@ -26,7 +26,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class UserSubjectTest extends Assert {
+public class UserSubjectTest {
 
     @Test
     public void testId() {

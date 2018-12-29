@@ -34,7 +34,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class ResponseWrapperTest extends Assert {
+public class ResponseWrapperTest {
     JaxwsServiceBuilder builder = new JaxwsServiceBuilder();
 
     private OperationInfo getOperation(Class<?> clz, String opName) {

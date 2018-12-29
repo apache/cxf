@@ -37,7 +37,7 @@ import static org.junit.Assert.assertTrue;
 
 
 public class NettyHttpServerEngineFactoryTest
-        extends Assert {
+        {
     Bus bus;
 
     @BeforeClass

@@ -31,7 +31,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 
-public class LdapQueryVisitorTest extends Assert {
+public class LdapQueryVisitorTest {
     private FiqlParser<Condition> parser = new FiqlParser<>(Condition.class);
 
     @Test

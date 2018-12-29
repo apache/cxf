@@ -36,7 +36,7 @@ import static org.junit.Assert.assertEquals;
 
 
 
-public class ExceptionUtilsTest extends Assert {
+public class ExceptionUtilsTest {
 
     @Test
     public void testConvertFaultToResponseWAEWithResponse() {

@@ -41,7 +41,7 @@ import static org.junit.Assert.fail;
 /**
  *
  */
-public class DomainExpressionBuilderRegistryTest extends Assert {
+public class DomainExpressionBuilderRegistryTest {
 
     private IMocksControl control;
 

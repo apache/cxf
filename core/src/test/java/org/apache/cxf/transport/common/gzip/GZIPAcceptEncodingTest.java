@@ -52,7 +52,7 @@ import static org.junit.Assert.assertSame;
  * be set correctly. For Accept-Encoding values that do not enable gzip the
  * interceptor should not be added.
  */
-public class GZIPAcceptEncodingTest extends Assert {
+public class GZIPAcceptEncodingTest {
 
     private GZIPOutInterceptor interceptor;
     private Message inMessage;

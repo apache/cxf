@@ -39,7 +39,7 @@ import org.junit.Test;
 /**
  *
  */
-public class PolicyVerificationInFaultInterceptorTest extends Assert {
+public class PolicyVerificationInFaultInterceptorTest {
 
     private IMocksControl control;
     private Bus bus;

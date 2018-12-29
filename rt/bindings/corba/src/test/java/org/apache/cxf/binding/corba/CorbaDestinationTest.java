@@ -32,7 +32,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class CorbaDestinationTest extends Assert {
+public class CorbaDestinationTest {
 
     protected static TestUtils testUtils;
     EndpointInfo endpointInfo;

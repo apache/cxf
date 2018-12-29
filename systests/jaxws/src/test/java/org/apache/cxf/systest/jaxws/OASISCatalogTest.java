@@ -51,7 +51,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class OASISCatalogTest extends Assert {
+public class OASISCatalogTest {
     static final String PORT = TestUtil.getPortNumber(OASISCatalogTest.class);
 
     private final QName serviceName =

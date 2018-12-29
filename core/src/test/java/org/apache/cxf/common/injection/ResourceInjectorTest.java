@@ -46,7 +46,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class ResourceInjectorTest extends Assert {
+public class ResourceInjectorTest {
     private static final String RESOURCE_ONE = "resource one";
     private static final String RESOURCE_TWO = "resource two";
     private static final String RESOURCE_THREE = "resource three";

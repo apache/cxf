@@ -36,7 +36,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class FormUtilsTest extends Assert {
+public class FormUtilsTest {
 
     private static final String HTTP_PARAM1 = "httpParam1";
     private static final String HTTP_PARAM2 = "httpParam2";

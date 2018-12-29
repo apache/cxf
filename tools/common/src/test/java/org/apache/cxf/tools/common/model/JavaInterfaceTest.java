@@ -24,7 +24,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class JavaInterfaceTest extends Assert {
+public class JavaInterfaceTest {
     @Test
     public void testSetFullClassName() throws Exception {
         String fullName = "org.apache.cxf.tools.common.model.JavaInterface";

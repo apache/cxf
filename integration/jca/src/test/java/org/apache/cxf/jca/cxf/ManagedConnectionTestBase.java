@@ -36,7 +36,7 @@ import org.junit.Assert;
 import org.junit.Before;
 
 
-public abstract class ManagedConnectionTestBase extends Assert {
+public abstract class ManagedConnectionTestBase {
     protected Subject subj;
 
     protected CXFConnectionRequestInfo cri;

@@ -46,7 +46,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 
-public class PublishedEndpointUrlTest extends Assert {
+public class PublishedEndpointUrlTest {
     public static final String PORT = TestUtil.getPortNumber(PublishedEndpointUrlTest.class);
 
 

@@ -42,7 +42,7 @@ import static org.junit.Assert.fail;
 
 
 public class UndertowHTTPServerEngineFactoryTest
-        extends Assert {
+        {
     Bus bus;
 
     @BeforeClass

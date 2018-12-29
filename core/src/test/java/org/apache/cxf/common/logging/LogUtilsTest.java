@@ -36,7 +36,7 @@ import static org.junit.Assert.assertNotNull;
 
 
 
-public class LogUtilsTest extends Assert {
+public class LogUtilsTest {
 
     @Test
     public void testGetL7dLog() throws Exception {

@@ -71,7 +71,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class MAPCodecTest extends Assert {
+public class MAPCodecTest {
 
     private MAPCodec codec;
     private IMocksControl control;

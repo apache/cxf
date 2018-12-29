@@ -35,7 +35,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class JAnnotationTest extends Assert {
+public class JAnnotationTest {
     @Test
     public void testList() throws Exception {
         JAnnotation annotation = new JAnnotation(XmlSeeAlso.class);

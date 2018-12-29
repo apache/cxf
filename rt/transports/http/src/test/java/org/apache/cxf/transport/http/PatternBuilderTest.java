@@ -29,7 +29,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * A {@code PatternBuilderTest} is ...
  */
-public class PatternBuilderTest extends Assert {
+public class PatternBuilderTest {
 
     @Test
     public void testPatternBuilder() {

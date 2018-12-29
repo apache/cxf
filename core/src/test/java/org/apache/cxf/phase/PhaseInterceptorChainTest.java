@@ -47,7 +47,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class PhaseInterceptorChainTest extends Assert {
+public class PhaseInterceptorChainTest {
 
     private IMocksControl control;
 

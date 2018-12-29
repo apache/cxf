@@ -26,7 +26,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class HttpUriMapperTest extends Assert {
+public class HttpUriMapperTest {
 
     @Test
     public void testGetContext() throws Exception {

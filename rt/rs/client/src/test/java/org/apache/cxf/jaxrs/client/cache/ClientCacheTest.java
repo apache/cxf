@@ -49,7 +49,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class ClientCacheTest extends Assert {
+public class ClientCacheTest {
     public static final String ADDRESS = "local://transport";
     private static Server server;
 

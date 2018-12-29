@@ -29,7 +29,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
 
-public class WebSocketTransportFactoryTest extends Assert {
+public class WebSocketTransportFactoryTest {
 
     @Test
     public void testGetDestination() throws Exception {

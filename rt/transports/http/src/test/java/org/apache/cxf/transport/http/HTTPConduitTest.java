@@ -58,7 +58,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 
-public class HTTPConduitTest extends Assert {
+public class HTTPConduitTest {
 
     @Before
     public void setUp() throws Exception {

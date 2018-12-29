@@ -34,7 +34,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class CommandLineParserTest extends Assert {
+public class CommandLineParserTest {
     private CommandLineParser parser;
 
     @Before

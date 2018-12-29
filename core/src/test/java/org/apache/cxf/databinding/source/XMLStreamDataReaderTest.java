@@ -39,7 +39,7 @@ import static org.junit.Assert.assertTrue;
 /**
  *
  */
-public class XMLStreamDataReaderTest extends Assert {
+public class XMLStreamDataReaderTest {
     private static final byte[] DUMMY_DATA = "<ns:dummy xmlns:ns='http://www.apache.org/cxf'/>".getBytes();
 
     @Test

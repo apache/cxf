@@ -33,7 +33,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-public class MultipartBodyTest extends Assert {
+public class MultipartBodyTest {
 
     @Test
     public void testGetAttachments() {

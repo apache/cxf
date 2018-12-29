@@ -57,7 +57,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class ResourceUtilsTest extends Assert {
+public class ResourceUtilsTest {
 
     @Test
     public void testFindResourceConstructor() {

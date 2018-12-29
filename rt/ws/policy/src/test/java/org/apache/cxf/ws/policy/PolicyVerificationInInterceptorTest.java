@@ -38,7 +38,7 @@ import org.junit.Test;
 /**
  *
  */
-public class PolicyVerificationInInterceptorTest extends Assert {
+public class PolicyVerificationInInterceptorTest {
 
     private IMocksControl control;
     private Bus bus;

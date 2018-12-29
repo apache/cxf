@@ -25,7 +25,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 
-public class ProcessorUtilTest extends Assert {
+public class ProcessorUtilTest {
 
     private boolean isWindows() {
         return System.getProperty("os.name").contains("Windows");

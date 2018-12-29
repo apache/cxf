@@ -29,7 +29,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class JwsCompactHeaderTest extends Assert {
+public class JwsCompactHeaderTest {
 
     /**
      * JWS string, which lacks the "alg" header field.

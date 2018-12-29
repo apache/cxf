@@ -42,7 +42,7 @@ import static org.junit.Assert.fail;
 /**
  *
  */
-public class JaxbAssertionBuilderTest extends Assert {
+public class JaxbAssertionBuilderTest {
 
     @Test
     public void testConstructors() throws Exception {

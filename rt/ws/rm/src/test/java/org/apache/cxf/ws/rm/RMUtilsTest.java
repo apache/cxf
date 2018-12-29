@@ -39,7 +39,7 @@ import static org.junit.Assert.assertEquals;
 /**
  *
  */
-public class RMUtilsTest extends Assert {
+public class RMUtilsTest {
 
     private IMocksControl control;
 

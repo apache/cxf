@@ -65,7 +65,7 @@ import static org.junit.Assert.fail;
 /**
  *
  */
-public class ImportRepairTest extends Assert {
+public class ImportRepairTest {
 
     static boolean dumpSchemas;
 

@@ -47,7 +47,7 @@ import static org.junit.Assert.assertSame;
 /**
  *
  */
-public class FirstAlternativeSelectorTest extends Assert {
+public class FirstAlternativeSelectorTest {
 
     private IMocksControl control;
 

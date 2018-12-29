@@ -55,7 +55,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class AttachmentDeserializerTest extends Assert {
+public class AttachmentDeserializerTest {
 
     private MessageImpl msg;
 

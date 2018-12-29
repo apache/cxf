@@ -40,7 +40,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class ConnectionFactoryImplTest extends Assert {
+public class ConnectionFactoryImplTest {
 
     ManagedConnectionFactory mockConnectionFactory;
     ConnectionManager mockConnectionManager;

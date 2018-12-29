@@ -31,7 +31,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class ClientTest extends Assert {
+public class ClientTest {
     public static final String ADDRESS = "local://transport";
 
     @Test

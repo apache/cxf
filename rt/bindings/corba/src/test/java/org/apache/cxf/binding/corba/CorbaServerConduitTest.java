@@ -56,7 +56,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class CorbaServerConduitTest extends Assert {
+public class CorbaServerConduitTest {
     protected EndpointInfo endpointInfo;
     protected EndpointReferenceType target;
     protected MessageObserver observer;

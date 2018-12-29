@@ -23,7 +23,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
 
-public class JwtUserSubjectTest extends Assert {
+public class JwtUserSubjectTest {
 
     @Test
     public void testJwtUserSubject() {

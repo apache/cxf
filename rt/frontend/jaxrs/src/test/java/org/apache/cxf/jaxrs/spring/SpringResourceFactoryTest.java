@@ -40,7 +40,7 @@ import static org.junit.Assert.assertSame;
 
 
 
-public class SpringResourceFactoryTest extends Assert {
+public class SpringResourceFactoryTest {
 
     @After
     public void tearDown() throws Exception {

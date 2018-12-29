@@ -47,7 +47,7 @@ import static org.junit.Assert.assertEquals;
 /**
  *
  */
-public class OSGiBusListenerTest extends Assert {
+public class OSGiBusListenerTest {
     private static final String[] SERVICE_BUNDLE_NAMES = new String[]{"me.temp.foo.test", "me.temp.bar.sample"};
     private static final String EXCLUDES = "me\\.temp\\.bar\\..*";
     private static final String RESTRICTED = "me\\.my\\.app\\..*";

@@ -40,7 +40,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class HBaseVisitorTest extends Assert {
+public class HBaseVisitorTest {
     public static final byte[] BOOK_FAMILY = "book".getBytes();
     public static final byte[] NAME_QUALIFIER = "name".getBytes();
 

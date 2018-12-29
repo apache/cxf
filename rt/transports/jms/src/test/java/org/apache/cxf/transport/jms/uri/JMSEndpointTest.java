@@ -33,7 +33,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class JMSEndpointTest extends Assert {
+public class JMSEndpointTest {
 
     private static final String TEST_VALUE = "testValue";
 

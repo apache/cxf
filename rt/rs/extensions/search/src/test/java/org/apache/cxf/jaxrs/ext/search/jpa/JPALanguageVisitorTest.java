@@ -26,7 +26,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class JPALanguageVisitorTest extends Assert {
+public class JPALanguageVisitorTest {
 
     @Test
     public void testSimpleQuery() throws Exception {

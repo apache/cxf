@@ -39,7 +39,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class NormalizeTest extends Assert {
+public class NormalizeTest {
 
     private IMocksControl control;
 

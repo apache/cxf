@@ -25,7 +25,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 
-public class BuiltInTypesJavaMappingUtilTest extends Assert {
+public class BuiltInTypesJavaMappingUtilTest {
     private final String xmlSchemaNS = "http://www.w3.org/2000/10/XMLSchema";
 
     @Test

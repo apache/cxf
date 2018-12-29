@@ -32,7 +32,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class NewCookieHeaderProviderTest extends Assert {
+public class NewCookieHeaderProviderTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testNullValue() throws Exception {

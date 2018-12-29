@@ -31,7 +31,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class ClientRequestFilterTest extends Assert {
+public class ClientRequestFilterTest {
 
     public static class NonStringObject {
         private String theString;

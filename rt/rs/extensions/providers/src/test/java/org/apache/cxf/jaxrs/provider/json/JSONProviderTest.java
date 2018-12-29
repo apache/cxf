@@ -88,7 +88,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class JSONProviderTest extends Assert {
+public class JSONProviderTest {
 
     @Test
     public void testReadMalformedJson() throws Exception {

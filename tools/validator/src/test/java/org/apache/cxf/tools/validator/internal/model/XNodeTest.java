@@ -26,7 +26,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class XNodeTest extends Assert {
+public class XNodeTest {
     @Test
     public void testWSDLDefinition() {
         XDef def = new XDef();

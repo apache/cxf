@@ -26,7 +26,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 
-public class AbstractSequenceTest extends Assert {
+public class AbstractSequenceTest {
 
     @Test
     public void testIdentifierEquals() {

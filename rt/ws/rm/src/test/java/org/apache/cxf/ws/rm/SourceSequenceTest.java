@@ -44,7 +44,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-public class SourceSequenceTest extends Assert {
+public class SourceSequenceTest {
 
     private IMocksControl control;
     private ObjectFactory factory;

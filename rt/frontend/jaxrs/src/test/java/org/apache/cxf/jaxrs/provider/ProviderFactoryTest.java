@@ -90,7 +90,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-public class ProviderFactoryTest extends Assert {
+public class ProviderFactoryTest {
 
 
     @Before

@@ -42,7 +42,7 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.isA;
 import static org.junit.Assert.assertEquals;
 
-public class AbstractProtocolHandlerInterceptorTest extends Assert {
+public class AbstractProtocolHandlerInterceptorTest {
 
     private IMocksControl control;
     private Binding binding;

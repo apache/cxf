@@ -40,7 +40,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-public class JMSContinuationTest extends Assert {
+public class JMSContinuationTest {
 
     private Message m;
     private Bus b;

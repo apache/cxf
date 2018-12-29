@@ -39,7 +39,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 @SuppressWarnings("deprecation")
-public class LoggingInInterceptorTest extends Assert {
+public class LoggingInInterceptorTest {
     static String encoding = "UTF-8";
     static String contentType = "text/xml";
     

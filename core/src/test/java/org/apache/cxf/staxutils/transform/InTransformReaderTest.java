@@ -39,7 +39,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class InTransformReaderTest extends Assert {
+public class InTransformReaderTest {
 
     @Test
     public void testReadWithDefaultNamespace() throws Exception {

@@ -32,7 +32,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 
-public class URIParserUtilTest extends Assert {
+public class URIParserUtilTest {
 
     @Test
     public void testGetPackageName() {

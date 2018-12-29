@@ -28,7 +28,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 
-public class EJBServantConfigTest extends Assert {
+public class EJBServantConfigTest {
 
     @Test
     public void testNoWsdl() throws Exception {

@@ -40,7 +40,7 @@ import static org.junit.Assert.assertTrue;
 
 // Since the exception handler is essentially the same as the struct handler (just included in case
 // structs and exceptions diverge at a later date), this test should cover both.
-public class CorbaStructHandlerTest extends Assert {
+public class CorbaStructHandlerTest {
 
     private ORB orb;
 

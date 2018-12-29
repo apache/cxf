@@ -26,7 +26,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class WSDLVersionTest extends Assert {
+public class WSDLVersionTest {
 
     @Test
     public void testWSDLVersion() {

@@ -37,7 +37,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 
-public class AnnotationHandlerChainBuilderTest extends Assert {
+public class AnnotationHandlerChainBuilderTest {
 
     @Before
     public void setUp() {

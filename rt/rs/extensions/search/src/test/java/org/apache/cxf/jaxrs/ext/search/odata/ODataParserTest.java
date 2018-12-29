@@ -30,7 +30,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class ODataParserTest extends Assert {
+public class ODataParserTest {
     private ODataParser<Person> parser;
 
     public static class Person {

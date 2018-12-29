@@ -28,7 +28,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class ClassLoaderUtilsTest extends Assert {
+public class ClassLoaderUtilsTest {
 
     private static void setTCCL(ClassLoader loader) {
         Thread.currentThread().setContextClassLoader(loader);

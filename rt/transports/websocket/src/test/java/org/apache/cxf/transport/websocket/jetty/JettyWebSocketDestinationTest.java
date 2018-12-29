@@ -44,7 +44,7 @@ import static org.junit.Assert.assertNull;
 /**
  *
  */
-public class JettyWebSocketDestinationTest extends Assert {
+public class JettyWebSocketDestinationTest {
     private static final String ENDPOINT_ADDRESS = "ws://localhost:9001/websocket/nada";
     private static final QName ENDPOINT_NAME = new QName("urn:websocket:probe", "nada");
 

@@ -47,7 +47,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
-public class RequestImplTest extends Assert {
+public class RequestImplTest {
 
     private Message m;
     private MultivaluedMap<String, String> metadata;

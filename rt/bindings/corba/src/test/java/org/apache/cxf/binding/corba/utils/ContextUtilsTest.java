@@ -33,7 +33,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Holder for utility methods relating to contexts.
  */
-public final class ContextUtilsTest extends Assert {
+public final class ContextUtilsTest {
 
 
     @Test

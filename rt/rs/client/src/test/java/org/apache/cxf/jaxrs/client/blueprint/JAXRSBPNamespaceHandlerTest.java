@@ -27,7 +27,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  *
  */
-public class JAXRSBPNamespaceHandlerTest extends Assert {
+public class JAXRSBPNamespaceHandlerTest {
     @Test
     public void testGetSchemaLocation() {
         JAXRSBPNamespaceHandler handler = new JAXRSBPNamespaceHandler();

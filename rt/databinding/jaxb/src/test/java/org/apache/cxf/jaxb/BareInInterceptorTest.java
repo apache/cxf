@@ -66,7 +66,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-public class BareInInterceptorTest extends Assert {
+public class BareInInterceptorTest {
 
     PhaseInterceptorChain chain;
     MessageImpl message;

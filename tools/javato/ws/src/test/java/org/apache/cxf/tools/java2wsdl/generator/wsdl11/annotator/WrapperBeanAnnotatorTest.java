@@ -32,7 +32,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class WrapperBeanAnnotatorTest extends Assert {
+public class WrapperBeanAnnotatorTest {
 
     @Test
     public void testAnnotate() {

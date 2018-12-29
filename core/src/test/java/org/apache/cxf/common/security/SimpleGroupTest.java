@@ -28,7 +28,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class SimpleGroupTest extends Assert {
+public class SimpleGroupTest {
 
     @Test
     public void testName() {

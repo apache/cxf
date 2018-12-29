@@ -55,7 +55,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-public class LifeCycleTest extends Assert {
+public class LifeCycleTest {
     public static final String PORT1 = TestUtil.getPortNumber(LifeCycleTest.class, 1);
     public static final String PORT2 = TestUtil.getPortNumber(LifeCycleTest.class, 2);
     public static final String PORT3 = TestUtil.getPortNumber(LifeCycleTest.class, 3);

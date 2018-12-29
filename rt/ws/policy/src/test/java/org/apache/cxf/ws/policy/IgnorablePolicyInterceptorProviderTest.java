@@ -48,7 +48,7 @@ import static org.junit.Assert.fail;
 /**
  *
  */
-public class IgnorablePolicyInterceptorProviderTest extends Assert {
+public class IgnorablePolicyInterceptorProviderTest {
     private static final QName ONEWAY_QNAME = new QName("http://tempuri.org/policy", "OneWay");
     private static final QName DUPLEX_QNAME = new QName("http://tempuri.org/policy", "Duplex");
 

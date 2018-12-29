@@ -44,7 +44,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
 
-public class BusShutdownTest extends Assert {
+public class BusShutdownTest {
     public static final String PORT = TestUtil.getPortNumber(BusShutdownTest.class);
 
     @Test

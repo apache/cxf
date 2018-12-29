@@ -33,7 +33,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class CatalogTest extends Assert {
+public class CatalogTest {
     @Test
     public void testCatalog() throws Exception {
         OASISCatalogManager catalogManager = new OASISCatalogManager();

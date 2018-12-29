@@ -40,7 +40,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class JAXRSServiceFactoryBeanTest extends Assert {
+public class JAXRSServiceFactoryBeanTest {
 
     @Before
     public void setUp() throws Exception {

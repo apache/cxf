@@ -32,7 +32,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 
-public class JAXRSClientFactoryBeanTest extends Assert {
+public class JAXRSClientFactoryBeanTest {
 
     @After
     public void tearDown() throws Exception {

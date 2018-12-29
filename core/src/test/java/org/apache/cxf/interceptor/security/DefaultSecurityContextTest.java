@@ -37,7 +37,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-public class DefaultSecurityContextTest extends Assert {
+public class DefaultSecurityContextTest {
 
     @Test
     public void testUserNotInRole() {

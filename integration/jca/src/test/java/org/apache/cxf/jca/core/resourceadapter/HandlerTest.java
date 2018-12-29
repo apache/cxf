@@ -31,7 +31,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 
-public class HandlerTest extends Assert {
+public class HandlerTest {
     Handler h;
 
 

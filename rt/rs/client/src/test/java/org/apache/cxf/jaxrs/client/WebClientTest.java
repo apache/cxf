@@ -39,7 +39,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 
-public class WebClientTest extends Assert {
+public class WebClientTest {
 
     @Test
     public void testReplaceHeader() {

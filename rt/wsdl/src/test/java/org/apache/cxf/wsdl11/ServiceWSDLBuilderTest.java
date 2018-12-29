@@ -73,7 +73,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-public class ServiceWSDLBuilderTest extends Assert {
+public class ServiceWSDLBuilderTest {
 
     private static final Logger LOG = LogUtils.getLogger(ServiceWSDLBuilderTest.class);
     private static final String WSDL_PATH = "hello_world.wsdl";

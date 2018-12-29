@@ -55,7 +55,7 @@ import static org.junit.Assert.assertEquals;
         wsdlLocation = "classpath:/wsdl_systest/hello_world_corba.wsdl",
         endpointInterface = "org.apache.cxf.hello_world_corba.Greeter")
 
-public class BaseGreeterImpl extends Assert implements Greeter {
+public class BaseGreeterImpl implements Greeter {
     public static final String GREETME_IN = "test in";
     public static final String GREETME_OUT = "test out";
     static final String EX_STRING = "CXF RUNTIME EXCEPTION";

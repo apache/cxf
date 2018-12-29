@@ -27,7 +27,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  *
  */
-public class ColocBPNamespaceHandlerTest extends Assert {
+public class ColocBPNamespaceHandlerTest {
     @Test
     public void testGetSchemaLocation() {
         ColocBPNamespaceHandler handler = new ColocBPNamespaceHandler();

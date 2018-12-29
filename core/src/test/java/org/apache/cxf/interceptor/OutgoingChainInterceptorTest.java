@@ -45,7 +45,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class OutgoingChainInterceptorTest extends Assert {
+public class OutgoingChainInterceptorTest {
 
     private IMocksControl control;
     private Bus bus;

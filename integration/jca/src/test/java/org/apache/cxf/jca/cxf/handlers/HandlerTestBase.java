@@ -33,7 +33,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.fail;
 
-public class HandlerTestBase extends Assert {
+public class HandlerTestBase {
     protected Bus mockBus = EasyMock.createMock(Bus.class);
     protected CXFManagedConnection mockManagedConnection =
                 EasyMock.createMock(CXFManagedConnection.class);

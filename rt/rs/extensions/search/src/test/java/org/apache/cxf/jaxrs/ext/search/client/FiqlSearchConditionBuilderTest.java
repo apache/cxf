@@ -39,7 +39,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class FiqlSearchConditionBuilderTest extends Assert {
+public class FiqlSearchConditionBuilderTest {
     private static FiqlSearchConditionBuilder b = new FiqlSearchConditionBuilder();
     private static TimeZone tz;
 

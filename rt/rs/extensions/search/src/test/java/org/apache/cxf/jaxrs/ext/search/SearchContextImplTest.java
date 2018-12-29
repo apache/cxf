@@ -35,7 +35,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-public class SearchContextImplTest extends Assert {
+public class SearchContextImplTest {
 
     @Test
     public void testPlainQuery1() {

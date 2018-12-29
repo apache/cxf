@@ -38,7 +38,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class WSDLToIDLGenerationTest extends Assert {
+public class WSDLToIDLGenerationTest {
 
     protected static final String START_COMMENT = "/*";
     protected static final String END_COMMENT = "*/";

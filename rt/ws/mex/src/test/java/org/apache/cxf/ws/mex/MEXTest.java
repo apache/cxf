@@ -40,7 +40,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  *
  */
-public class MEXTest extends Assert {
+public class MEXTest {
     static Server server;
     static Server mexServer;
 

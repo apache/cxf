@@ -65,7 +65,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class ManagedRMManagerTest extends Assert {
+public class ManagedRMManagerTest {
     private static final String TEST_URI = "http://nowhere.com/bar/foo";
     private IMocksControl control;
 

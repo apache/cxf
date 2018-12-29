@@ -34,7 +34,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class DelegatingNamespaceContextTest extends Assert {
+public class DelegatingNamespaceContextTest {
 
     @Test
     public void testSomeAddsAndGets() throws Exception {

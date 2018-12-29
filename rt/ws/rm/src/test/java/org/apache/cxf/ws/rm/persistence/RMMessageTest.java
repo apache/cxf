@@ -32,7 +32,7 @@ import static org.junit.Assert.assertEquals;
 /**
  *
  */
-public class RMMessageTest extends Assert {
+public class RMMessageTest {
     private static final byte[] DATA =
         ("<greetMe xmlns=\"http://cxf.apache.org/greeter_control/types\">"
         + "<requestType>one</requestType></greetMe>").getBytes();

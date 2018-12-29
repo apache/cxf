@@ -66,7 +66,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class JAXWSMethodInvokerTest extends Assert {
+public class JAXWSMethodInvokerTest {
     private static final QName TEST_HEADER_NAME = new QName("testHeader");
     Factory factory = EasyMock.createMock(Factory.class);
     Object target = EasyMock.createMock(Hello.class);

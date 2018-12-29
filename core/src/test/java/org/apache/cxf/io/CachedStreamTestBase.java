@@ -45,7 +45,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-public abstract class CachedStreamTestBase extends Assert {
+public abstract class CachedStreamTestBase {
     // use two typical ciphers for testing
     private static final String[] CIPHER_LIST = {"RC4", "AES/CTR/NoPadding"};
 

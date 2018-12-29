@@ -24,7 +24,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class JavaTypeTest extends Assert {
+public class JavaTypeTest {
     @Test
     public void testGetPredefinedDefaultTypeValue() throws Exception {
         assertEquals("0", new JavaType("i", int.class.getName(), null).getDefaultTypeValue());

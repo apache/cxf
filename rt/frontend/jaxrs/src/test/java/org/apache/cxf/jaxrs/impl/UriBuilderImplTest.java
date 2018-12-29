@@ -43,7 +43,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-public class UriBuilderImplTest extends Assert {
+public class UriBuilderImplTest {
 
     @Test
     public void testFromUriRelativePath() throws Exception {

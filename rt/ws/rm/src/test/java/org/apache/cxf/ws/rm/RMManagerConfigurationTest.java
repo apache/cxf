@@ -41,7 +41,7 @@ import static org.junit.Assert.assertTrue;
 /**
  *
  */
-public class RMManagerConfigurationTest extends Assert {
+public class RMManagerConfigurationTest {
 
     private Bus bus;
 

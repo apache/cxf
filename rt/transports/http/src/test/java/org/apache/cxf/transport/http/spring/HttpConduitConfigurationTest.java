@@ -52,7 +52,7 @@ import static org.junit.Assert.assertTrue;
 /**
  *
  */
-public class HttpConduitConfigurationTest extends Assert {
+public class HttpConduitConfigurationTest {
     private static EndpointInfo ei;
     private Bus bus;
 

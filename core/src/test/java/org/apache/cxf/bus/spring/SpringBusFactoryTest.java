@@ -60,7 +60,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-public class SpringBusFactoryTest extends Assert {
+public class SpringBusFactoryTest {
 
     @After
     public void tearDown() {

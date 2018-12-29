@@ -32,7 +32,7 @@ import org.junit.Test;
 /**
  *
  */
-public class PolicyVerificationOutInterceptorTest extends Assert {
+public class PolicyVerificationOutInterceptorTest {
 
     private IMocksControl control;
 

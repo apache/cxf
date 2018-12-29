@@ -34,7 +34,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class MethodMapperTest extends Assert {
+public class MethodMapperTest {
 
     private OperationInfo getOperation() {
         OperationInfo operation = new OperationInfo();

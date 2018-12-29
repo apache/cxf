@@ -33,7 +33,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class InterfaceMapperTest extends Assert {
+public class InterfaceMapperTest {
 
     @Test
     public void testMap() throws Exception {

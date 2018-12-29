@@ -41,7 +41,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-public class DecoupledFaultHandlerTest extends Assert {
+public class DecoupledFaultHandlerTest {
 
     @Test
     public void testOnewayFault() {

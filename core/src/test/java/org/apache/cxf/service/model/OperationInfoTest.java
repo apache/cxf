@@ -32,7 +32,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class OperationInfoTest extends Assert {
+public class OperationInfoTest {
 
     private OperationInfo operationInfo;
 

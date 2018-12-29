@@ -28,7 +28,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class DepthXMLStreamReaderTest extends Assert {
+public class DepthXMLStreamReaderTest {
 
     @Test
     public void testReader() throws Exception {

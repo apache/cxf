@@ -27,7 +27,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  *
  */
-public class CXFAPINamespaceHandlerTest extends Assert {
+public class CXFAPINamespaceHandlerTest {
     @Test
     public void testGetSchemaLocation() {
         CXFAPINamespaceHandler handler = new CXFAPINamespaceHandler();

@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
 /**
  *
  */
-public class HTTPServerAssertionBuilderTest extends Assert {
+public class HTTPServerAssertionBuilderTest {
 
 
     @Test

@@ -34,7 +34,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 
-public class FireWallClassLoaderTest extends Assert {
+public class FireWallClassLoaderTest {
 
     public FireWallClassLoaderTest() {
     }

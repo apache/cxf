@@ -29,7 +29,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class JavaDocProviderTest extends Assert {
+public class JavaDocProviderTest {
 
     @Test
     public void testJava6Docs() throws Exception {

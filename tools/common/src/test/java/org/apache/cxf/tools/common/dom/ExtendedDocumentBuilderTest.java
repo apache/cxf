@@ -27,7 +27,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class ExtendedDocumentBuilderTest extends Assert {
+public class ExtendedDocumentBuilderTest {
     @Test
     public void testMassMethod() throws Exception {
         ExtendedDocumentBuilder builder = new ExtendedDocumentBuilder();

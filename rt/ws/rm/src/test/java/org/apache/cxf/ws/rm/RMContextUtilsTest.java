@@ -38,7 +38,7 @@ import static org.junit.Assert.assertTrue;
 /**
  *
  */
-public class RMContextUtilsTest extends Assert {
+public class RMContextUtilsTest {
 
     private IMocksControl control;
 

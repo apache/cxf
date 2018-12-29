@@ -61,7 +61,7 @@ import org.junit.Before;
 import static org.easymock.EasyMock.createNiceControl;
 import static org.easymock.EasyMock.expect;
 
-public class TestBase extends Assert {
+public class TestBase {
 
     PhaseInterceptorChain chain;
     MessageImpl message;

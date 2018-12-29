@@ -58,7 +58,7 @@ import static org.junit.Assert.fail;
 /**
  *
  */
-public abstract class RMTxStoreTestBase extends Assert {
+public abstract class RMTxStoreTestBase {
     protected static RMTxStore store;
 
     protected static final String CLIENT_ENDPOINT_ID =

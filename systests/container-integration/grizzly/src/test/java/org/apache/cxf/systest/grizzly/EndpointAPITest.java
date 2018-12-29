@@ -44,7 +44,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
-public class EndpointAPITest extends Assert {
+public class EndpointAPITest {
 
     private static int counter;
     private static int currentPort;

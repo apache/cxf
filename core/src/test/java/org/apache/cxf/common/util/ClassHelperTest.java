@@ -37,7 +37,7 @@ import static org.junit.Assert.assertSame;
 
 
 
-public class ClassHelperTest extends Assert {
+public class ClassHelperTest {
 
     private Object proxiedObject;
 

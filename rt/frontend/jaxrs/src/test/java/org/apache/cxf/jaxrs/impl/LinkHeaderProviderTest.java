@@ -26,7 +26,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class LinkHeaderProviderTest extends Assert {
+public class LinkHeaderProviderTest {
 
     @Test
     public void testFromSimpleString() {

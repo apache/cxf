@@ -37,7 +37,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 
-public class JMSContinuationProviderTest extends Assert {
+public class JMSContinuationProviderTest {
     private static Bus bus = BusFactory.getDefaultBus();
 
     @AfterClass

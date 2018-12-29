@@ -35,7 +35,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class PropertiesExpandingStreamReaderTest extends Assert {
+public class PropertiesExpandingStreamReaderTest {
 
     @Test
     public void testSystemPropertyExpansion() throws Exception {

@@ -38,7 +38,7 @@ import static org.junit.Assert.assertTrue;
 /**
  *
  */
-public class WrappedAttachmentsTest extends Assert {
+public class WrappedAttachmentsTest {
     @Test
     public void testCreateAndModify() {
         Map<String, DataHandler> content = new HashMap<>();

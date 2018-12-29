@@ -31,7 +31,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class JAASAuthenticationFilterTest extends Assert {
+public class JAASAuthenticationFilterTest {
 
     @Test
     public void testRFC2617() throws Exception {

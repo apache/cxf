@@ -27,7 +27,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.fail;
 
-public class UtilsTest extends Assert {
+public class UtilsTest {
 
     @Test
     public void testGetMethod() {

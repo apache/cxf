@@ -68,7 +68,7 @@ import static org.junit.Assert.fail;
 /**
  *
  */
-public class Wsdl11AttachmentPolicyProviderTest extends Assert {
+public class Wsdl11AttachmentPolicyProviderTest {
 
     private static final String NAMESPACE_URI = "http://apache.org/cxf/calculator";
     private static final QName OPERATION_NAME = new QName(NAMESPACE_URI, "add");

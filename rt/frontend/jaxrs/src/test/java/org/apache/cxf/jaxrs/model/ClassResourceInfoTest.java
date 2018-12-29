@@ -57,7 +57,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-public class ClassResourceInfoTest extends Assert {
+public class ClassResourceInfoTest {
 
     @Path("/bar")
     @Produces("test/bar")

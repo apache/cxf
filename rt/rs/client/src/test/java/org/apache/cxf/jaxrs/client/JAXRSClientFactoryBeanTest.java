@@ -53,7 +53,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-public class JAXRSClientFactoryBeanTest extends Assert {
+public class JAXRSClientFactoryBeanTest {
 
     @Test
     public void testCreateClient() throws Exception {

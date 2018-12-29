@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
 
 
 
-public class JarLoaderTest extends Assert {
+public class JarLoaderTest {
     private static final Logger LOG = LogUtils.getLogger(JarLoaderTest.class);
     private URL exampleRarURL;
 

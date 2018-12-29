@@ -34,7 +34,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 
-public class DeflateEncoderDecoderTest extends Assert {
+public class DeflateEncoderDecoderTest {
 
     @Test(expected = DataFormatException.class)
     public void testInvalidContent() throws Exception {

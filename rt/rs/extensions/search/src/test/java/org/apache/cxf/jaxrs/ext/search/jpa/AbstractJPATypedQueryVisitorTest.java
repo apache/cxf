@@ -47,7 +47,7 @@ import org.junit.Before;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public abstract class AbstractJPATypedQueryVisitorTest extends Assert {
+public abstract class AbstractJPATypedQueryVisitorTest {
 
     private EntityManagerFactory emFactory;
 

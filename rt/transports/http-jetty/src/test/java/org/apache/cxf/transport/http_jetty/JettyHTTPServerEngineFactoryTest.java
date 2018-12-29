@@ -46,7 +46,7 @@ import static org.junit.Assert.fail;
 
 
 public class JettyHTTPServerEngineFactoryTest
-        extends Assert {
+        {
     Bus bus;
 
     @BeforeClass

@@ -27,7 +27,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  *
  */
-public class ClusteringBPNamespaceHandlerTest extends Assert {
+public class ClusteringBPNamespaceHandlerTest {
     @Test
     public void testGetSchemaLocation() {
         ClusteringBPNamespaceHandler handler = new ClusteringBPNamespaceHandler();

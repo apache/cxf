@@ -42,7 +42,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
-public class LocalTransportFactoryTest extends Assert {
+public class LocalTransportFactoryTest {
     @Test
     public void testLocalTransportWithSeparateThread() throws Exception {
         testInvocation(false);

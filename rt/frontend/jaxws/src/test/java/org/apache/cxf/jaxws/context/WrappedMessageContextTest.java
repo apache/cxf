@@ -45,7 +45,7 @@ import static org.junit.Assert.fail;
 /**
  *
  */
-public class WrappedMessageContextTest extends Assert {
+public class WrappedMessageContextTest {
     @Test
     public void testPutAndGetJaxwsAttachments() throws Exception {
         WrappedMessageContext context =

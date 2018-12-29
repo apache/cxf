@@ -44,7 +44,7 @@ import static org.junit.Assert.fail;
 /**
  *
  */
-public class DestinationTest extends Assert {
+public class DestinationTest {
 
     private IMocksControl control;
     private RMEndpoint rme;

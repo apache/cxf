@@ -27,7 +27,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  *
  */
-public class WsBPHandlerTest extends Assert {
+public class WsBPHandlerTest {
     @Test
     public void testGetSchemaLocation() {
         WsBPHandler handler = new WsBPHandler();

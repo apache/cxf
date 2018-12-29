@@ -29,7 +29,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 
-public class AddressingConstantsImplTest extends Assert {
+public class AddressingConstantsImplTest {
     private AddressingConstants constants;
 
     @Before

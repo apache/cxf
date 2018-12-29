@@ -38,7 +38,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 
-public class ClassLoaderResolverTest extends Assert {
+public class ClassLoaderResolverTest {
     private static final String RESOURCE_DATA = "this is the resource data";
 
     private String resourceName;

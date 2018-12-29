@@ -31,7 +31,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class SecurityContextImplTest extends Assert {
+public class SecurityContextImplTest {
 
     @Test
     public void testAuthenticationScheme() {

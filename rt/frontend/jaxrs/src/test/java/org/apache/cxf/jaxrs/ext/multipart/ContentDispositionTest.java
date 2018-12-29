@@ -25,7 +25,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class ContentDispositionTest extends Assert {
+public class ContentDispositionTest {
 
     @Test
     public void testContentDisposition() {

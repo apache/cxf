@@ -49,7 +49,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class JAXBExtensionHelperTest extends Assert {
+public class JAXBExtensionHelperTest {
 
     private WSDLFactory wsdlFactory;
 

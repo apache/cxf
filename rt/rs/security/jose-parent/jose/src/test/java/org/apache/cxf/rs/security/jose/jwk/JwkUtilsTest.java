@@ -36,7 +36,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
-public class JwkUtilsTest extends Assert {
+public class JwkUtilsTest {
     private static final String RSA_KEY = "{"
       + "\"kty\": \"RSA\","
       + "\"n\": \"0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx4cbbfAAt"

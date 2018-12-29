@@ -43,7 +43,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 
-public class InstrumentationManagerTest extends Assert {
+public class InstrumentationManagerTest {
     InstrumentationManager im;
     Bus bus;
 

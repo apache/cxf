@@ -39,7 +39,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class ValidatorTest extends Assert {
+public class ValidatorTest {
 
     public abstract static class NotAnInterface {
         @GET

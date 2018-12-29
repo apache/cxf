@@ -37,7 +37,7 @@ import static org.junit.Assert.fail;
 
 
 
-public class ProviderFactoryTest extends Assert {
+public class ProviderFactoryTest {
 
     private String epAddr = "http://cxf.apache.org/";
 

@@ -30,7 +30,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class SoapBindingTest extends Assert {
+public class SoapBindingTest {
 
     @Test
     public void testCreateMessage() throws Exception {

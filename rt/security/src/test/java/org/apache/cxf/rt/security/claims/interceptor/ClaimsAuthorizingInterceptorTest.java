@@ -54,7 +54,7 @@ import org.junit.Test;
 import static org.junit.Assert.fail;
 
 
-public class ClaimsAuthorizingInterceptorTest extends Assert {
+public class ClaimsAuthorizingInterceptorTest {
 
     private ClaimsAuthorizingInterceptor interceptor;
 

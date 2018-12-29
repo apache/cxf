@@ -26,7 +26,7 @@ import org.easymock.IMocksControl;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class CXFBusLifeCycleManagerTest extends Assert {
+public class CXFBusLifeCycleManagerTest {
 
     @Test
     public void testListenerNotRegistered() {

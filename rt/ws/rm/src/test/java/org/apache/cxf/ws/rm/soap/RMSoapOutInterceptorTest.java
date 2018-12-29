@@ -58,7 +58,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 
-public class RMSoapOutInterceptorTest extends Assert {
+public class RMSoapOutInterceptorTest {
 
     private static final Long ONE = Long.valueOf(1);
     private static final Long TEN = Long.valueOf(10);

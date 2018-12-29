@@ -42,7 +42,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class MessageFlow extends Assert {
+public class MessageFlow {
 
     private final String addressingNamespace;
     private final String rmNamespace;

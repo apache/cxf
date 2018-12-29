@@ -34,7 +34,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
-public class AuthorizationUtilsTest extends Assert {
+public class AuthorizationUtilsTest {
 
     @Test
     public void testThrowAuthorizationFailureSingleChallenge() {

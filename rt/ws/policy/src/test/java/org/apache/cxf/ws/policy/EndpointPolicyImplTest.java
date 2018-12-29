@@ -58,7 +58,7 @@ import static org.junit.Assert.fail;
 /**
  *
  */
-public class EndpointPolicyImplTest extends Assert {
+public class EndpointPolicyImplTest {
 
     private IMocksControl control;
 

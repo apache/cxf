@@ -38,7 +38,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class OperationResourceInfoTest extends Assert {
+public class OperationResourceInfoTest {
 
     @Produces("text/xml")
     @Consumes("application/xml")

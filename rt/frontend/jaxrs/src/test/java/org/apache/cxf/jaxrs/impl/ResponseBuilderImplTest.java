@@ -51,7 +51,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 
-public class ResponseBuilderImplTest extends Assert {
+public class ResponseBuilderImplTest {
 
     @Test
     public void testStatusSet() throws Exception {

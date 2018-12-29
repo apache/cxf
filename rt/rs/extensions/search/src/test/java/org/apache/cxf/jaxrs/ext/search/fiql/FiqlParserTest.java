@@ -43,7 +43,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class FiqlParserTest extends Assert {
+public class FiqlParserTest {
     private FiqlParser<Condition> parser = new FiqlParser<>(Condition.class);
 
     @Test(expected = SearchParseException.class)

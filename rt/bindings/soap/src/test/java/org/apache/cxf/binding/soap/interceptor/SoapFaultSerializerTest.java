@@ -58,7 +58,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
-public class SoapFaultSerializerTest extends Assert {
+public class SoapFaultSerializerTest {
     private void assertValid(String xpathExpression, Document doc) {
         Map<String, String> namespaces = new HashMap<>();
         namespaces.put("s", "http://schemas.xmlsoap.org/soap/envelope/");

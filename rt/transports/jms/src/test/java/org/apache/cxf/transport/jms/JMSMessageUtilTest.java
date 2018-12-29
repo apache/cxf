@@ -28,7 +28,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-public class JMSMessageUtilTest extends Assert {
+public class JMSMessageUtilTest {
 
     @Test
     public void testGetEncoding() throws Exception {

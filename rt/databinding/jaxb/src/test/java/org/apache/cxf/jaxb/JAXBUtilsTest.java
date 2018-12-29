@@ -39,7 +39,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 
-public class JAXBUtilsTest extends Assert {
+public class JAXBUtilsTest {
 
     @Test
     public void testBuiltInTypeToJavaType() {

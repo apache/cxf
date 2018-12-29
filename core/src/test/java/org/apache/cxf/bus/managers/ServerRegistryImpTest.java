@@ -27,7 +27,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class ServerRegistryImpTest extends Assert {
+public class ServerRegistryImpTest {
 
     @Test
     public void testServerRegistryPreShutdown() {

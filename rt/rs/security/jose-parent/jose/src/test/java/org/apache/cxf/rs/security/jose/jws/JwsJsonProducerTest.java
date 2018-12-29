@@ -24,7 +24,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class JwsJsonProducerTest extends Assert {
+public class JwsJsonProducerTest {
 
     public static final String ENCODED_MAC_KEY_1 = "AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75"
                        + "aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow";

@@ -27,7 +27,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Simple tests of the name manager.
  */
-public class BasicNameManagerTest extends Assert {
+public class BasicNameManagerTest {
 
     @Test
     public void testPrefixGeneration() {

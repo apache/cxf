@@ -30,7 +30,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class HttpHandlerImplTest extends Assert {
+public class HttpHandlerImplTest {
 
     private IMocksControl control;
     private HttpHandler handler;

@@ -37,7 +37,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-public class EndpointResolverRegistryImplTest extends Assert {
+public class EndpointResolverRegistryImplTest {
 
     private EndpointResolverRegistryImpl registry;
     private EndpointResolver resolver1;

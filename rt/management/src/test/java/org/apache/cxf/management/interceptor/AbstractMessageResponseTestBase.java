@@ -40,7 +40,7 @@ import org.junit.Before;
 
 
 
-public class AbstractMessageResponseTestBase extends Assert {
+public class AbstractMessageResponseTestBase {
     protected static final QName SERVICE_NAME = new QName("http://org.apache.cxf", "hello");
     protected static final QName OPERATION_NAME = new QName("http://org.apache.cxf", "world");
     protected static final QName PORT_NAME = new QName("http://org.apache.cxf", "port");

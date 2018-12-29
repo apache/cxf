@@ -31,7 +31,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
-public class XmlSeeAlsoAnnotatorTest extends Assert {
+public class XmlSeeAlsoAnnotatorTest {
 
     @Test
     public void testAddXmlSeeAlsoAnnotation() throws Exception {

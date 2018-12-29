@@ -36,7 +36,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class CounterRepositoryTest extends Assert {
+public class CounterRepositoryTest {
     private Bus bus;
     private CounterRepository cr;
     private List<Interceptor<? extends Message>> inlist = new ArrayList<>();

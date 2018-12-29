@@ -33,7 +33,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-public class Base64UtilityTest extends Assert {
+public class Base64UtilityTest {
 
     @Test
     public void testEncodeMultipleChunks() throws Exception {

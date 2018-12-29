@@ -71,7 +71,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-public class WadlGeneratorTest extends Assert {
+public class WadlGeneratorTest {
 
     private IMocksControl control;
 

@@ -42,7 +42,7 @@ import static org.junit.Assert.assertNull;
 /**
  *
  */
-public class AtmosphereWebSocketServletDestinationTest extends Assert {
+public class AtmosphereWebSocketServletDestinationTest {
     private static final String ENDPOINT_ADDRESS = "/websocket/nada";
     private static final QName ENDPOINT_NAME = new QName("urn:websocket:probe", "nada");
 

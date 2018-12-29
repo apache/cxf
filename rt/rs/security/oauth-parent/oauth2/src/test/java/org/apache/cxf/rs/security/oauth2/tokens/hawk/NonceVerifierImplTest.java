@@ -28,7 +28,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-public class NonceVerifierImplTest extends Assert {
+public class NonceVerifierImplTest {
 
     private NonceVerifierImpl nonceVerifier;
     private NonceStore nonceStore = EasyMock.createMock(NonceStore.class);

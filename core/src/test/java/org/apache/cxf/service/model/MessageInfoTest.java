@@ -27,7 +27,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class MessageInfoTest extends Assert {
+public class MessageInfoTest {
 
     private MessageInfo messageInfo;
 

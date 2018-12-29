@@ -24,7 +24,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class JavaClassTest extends Assert {
+public class JavaClassTest {
     @Test
     public void testGetterSetter() throws Exception {
         JavaField field = new JavaField("arg0",

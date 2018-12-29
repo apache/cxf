@@ -28,7 +28,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
 
-public class SuspendedInvocationExceptionTest extends Assert {
+public class SuspendedInvocationExceptionTest {
 
     @Test
     public void testValidRuntimeException() {

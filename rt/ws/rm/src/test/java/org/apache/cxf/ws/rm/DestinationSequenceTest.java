@@ -54,7 +54,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class DestinationSequenceTest extends Assert {
+public class DestinationSequenceTest {
 
     private IMocksControl control;
     private ObjectFactory factory;

@@ -29,7 +29,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class CorbaStreamReaderTest extends Assert {
+public class CorbaStreamReaderTest {
 
     private CorbaStreamReader reader;
     private CorbaTypeEventProducer mock;

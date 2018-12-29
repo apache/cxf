@@ -58,7 +58,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class RMInInterceptorTest extends Assert {
+public class RMInInterceptorTest {
 
     private IMocksControl control;
     private RMInInterceptor interceptor;

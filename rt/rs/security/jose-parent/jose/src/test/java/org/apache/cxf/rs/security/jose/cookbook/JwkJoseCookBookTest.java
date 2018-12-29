@@ -35,7 +35,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class JwkJoseCookBookTest extends Assert {
+public class JwkJoseCookBookTest {
 
     private static final String EC_X_COORDINATE_VALUE = "AHKZLLOsCOzz5cY97ewNUajB957y-C-U88c3v13nmGZx6sYl_oJXu9"
         + "A5RkTKqjqvjyekWF-7ytDyRXYgCF5cj0Kt";

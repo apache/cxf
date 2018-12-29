@@ -58,7 +58,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Test resend logic.
  */
-public class RetransmissionQueueImplTest extends Assert {
+public class RetransmissionQueueImplTest {
     private static final Long ONE = Long.valueOf(1);
     private static final Long TWO = Long.valueOf(2);
     private static final Long TEN = Long.valueOf(10);

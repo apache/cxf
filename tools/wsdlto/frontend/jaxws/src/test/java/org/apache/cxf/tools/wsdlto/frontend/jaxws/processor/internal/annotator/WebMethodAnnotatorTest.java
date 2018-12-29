@@ -32,7 +32,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class WebMethodAnnotatorTest extends Assert {
+public class WebMethodAnnotatorTest {
 
     @Test
     public void testAddWebMethodAnnotation() throws Exception {

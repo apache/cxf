@@ -28,7 +28,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class PropertyUtilsTest extends Assert {
+public class PropertyUtilsTest {
     private static final String TEST_KEY = "my.key";
 
     @Test

@@ -32,7 +32,7 @@ import static org.junit.Assert.assertSame;
 /**
  *
  */
-public class PolicyRegistryImplTest extends Assert {
+public class PolicyRegistryImplTest {
 
     @Test
     public void testAll() {

@@ -34,7 +34,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class CorbaSequenceHandlerTest extends Assert {
+public class CorbaSequenceHandlerTest {
 
     private ORB orb;
     private CorbaSequenceHandler obj;

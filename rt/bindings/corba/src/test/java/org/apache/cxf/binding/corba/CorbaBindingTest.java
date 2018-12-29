@@ -36,7 +36,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 
-public class CorbaBindingTest extends Assert {
+public class CorbaBindingTest {
 
     private ORB orb;
 

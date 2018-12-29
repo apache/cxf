@@ -40,7 +40,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 
-public class WebServiceContextImplTest extends Assert {
+public class WebServiceContextImplTest {
 
     @After
     public void tearDown() {

@@ -40,7 +40,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class JweJsonProducerTest extends Assert {
+public class JweJsonProducerTest {
     static final byte[] WRAPPER_BYTES1 = {91, 96, 105, 38, 99, 108, 110, 8, -93, 50, -15, 62, 0, -115, 73, -39};
     static final byte[] WRAPPER_BYTES2 = {-39, 96, 105, 38, 99, 108, 110, 8, -93, 50, -15, 62, 0, -115, 73, 91};
     static final byte[] CEK_BYTES = {-43, 123, 77, 115, 40, 49, -4, -9, -48, -74, 62, 59, 60, 102, -22, -100};

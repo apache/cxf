@@ -30,7 +30,7 @@ import org.junit.Test;
 
 
 
-public class BusApplicationListenerTest extends Assert {
+public class BusApplicationListenerTest {
 
     @Test
     public void testParentApplicationEvent() {

@@ -34,7 +34,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class AutomaticWorkQueueTest extends Assert {
+public class AutomaticWorkQueueTest {
 
     public static final int UNBOUNDED_MAX_QUEUE_SIZE = -1;
     public static final int UNBOUNDED_HIGH_WATER_MARK = -1;

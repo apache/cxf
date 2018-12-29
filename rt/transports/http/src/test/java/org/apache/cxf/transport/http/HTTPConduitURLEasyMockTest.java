@@ -66,7 +66,7 @@ import static org.junit.Assert.assertTrue;
 
 /**
  */
-public class HTTPConduitURLEasyMockTest extends Assert {
+public class HTTPConduitURLEasyMockTest {
     private static String oldHttpProxyHost;
 
     private static final String HTTP_RESPONSE_MESSAGE = "Some Response Message I can test";

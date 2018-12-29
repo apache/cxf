@@ -31,7 +31,7 @@ import static org.junit.Assert.fail;
 /**
  * Some tests for JwtUtils
  */
-public class JwtUtilsTest extends Assert {
+public class JwtUtilsTest {
 
     @org.junit.Test
     public void testExpiredToken() throws Exception {

@@ -39,7 +39,7 @@ import org.junit.Before;
 
 import static org.junit.Assert.assertNotNull;
 
-public abstract class AbstractColocTest extends Assert {
+public abstract class AbstractColocTest {
     public static final String PORT = TestUtil.getPortNumber(AbstractColocTest.class);
 
     /**

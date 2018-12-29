@@ -27,7 +27,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-public class NameSpaceTest extends Assert {
+public class NameSpaceTest {
 
     private static final String MY_URL1 = "http://test.apache.org/testurl1";
     private static final String MY_URL2 = "http://test.apache.org/testurl2";

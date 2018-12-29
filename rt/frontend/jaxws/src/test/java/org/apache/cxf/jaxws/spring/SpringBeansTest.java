@@ -71,7 +71,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 
-public class SpringBeansTest extends Assert {
+public class SpringBeansTest {
 
     @After
     public void tearDown() throws Exception {

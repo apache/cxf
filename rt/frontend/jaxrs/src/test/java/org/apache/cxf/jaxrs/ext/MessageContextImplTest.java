@@ -57,7 +57,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
-public class MessageContextImplTest extends Assert {
+public class MessageContextImplTest {
 
     @Test
     public void testGetProperty() {

@@ -41,7 +41,7 @@ import static org.junit.Assert.fail;
 /**
  *
  */
-public class AssertionBuilderRegistryImplTest extends Assert {
+public class AssertionBuilderRegistryImplTest {
 
     private IMocksControl control;
 

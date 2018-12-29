@@ -49,7 +49,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class DOM4JProviderTest extends Assert {
+public class DOM4JProviderTest {
 
 
     @Test

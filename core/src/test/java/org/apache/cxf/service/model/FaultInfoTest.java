@@ -27,7 +27,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class FaultInfoTest extends Assert {
+public class FaultInfoTest {
 
     private FaultInfo faultInfo;
 

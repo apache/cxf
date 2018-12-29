@@ -43,7 +43,7 @@ import static org.junit.Assert.assertTrue;
 /**
  *
  */
-public class BusRegistrationTest extends Assert {
+public class BusRegistrationTest {
     private Bus serverBus;
     private Bus clientBus;
     private InstrumentationManager serverIM;

@@ -30,7 +30,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class StaxStreamFilterTest extends Assert {
+public class StaxStreamFilterTest {
     public static final QName  SOAP_ENV =
         new QName("http://schemas.xmlsoap.org/soap/envelope/", "Envelope");
     public static final QName  SOAP_BODY =

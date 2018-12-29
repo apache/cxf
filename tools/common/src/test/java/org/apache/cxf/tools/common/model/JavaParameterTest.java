@@ -24,7 +24,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class JavaParameterTest extends Assert {
+public class JavaParameterTest {
 
     @Test
     public void testGetHolderDefaultTypeValue() throws Exception {

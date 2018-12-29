@@ -42,7 +42,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class RMOutInterceptorTest extends Assert {
+public class RMOutInterceptorTest {
 
     private IMocksControl control;
 

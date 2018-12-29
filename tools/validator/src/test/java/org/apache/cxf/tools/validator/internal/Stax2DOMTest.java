@@ -35,7 +35,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 
-public class Stax2DOMTest extends Assert {
+public class Stax2DOMTest {
 
     @Test
     public void testGetDocument() throws Exception {

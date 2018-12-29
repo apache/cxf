@@ -67,7 +67,7 @@ import static org.junit.Assert.assertTrue;
 /**
  *
  */
-public class PolicyEngineTest extends Assert {
+public class PolicyEngineTest {
 
     private IMocksControl control;
     private PolicyEngineImpl engine;

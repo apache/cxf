@@ -32,7 +32,7 @@ import static org.junit.Assert.fail;
 
 
 
-public class AbstractDOMProviderTest extends Assert {
+public class AbstractDOMProviderTest {
 
     private String epAddr = "http://cxf.apache.org/";
 

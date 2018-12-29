@@ -35,7 +35,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class JwsJsonConsumerTest extends Assert {
+public class JwsJsonConsumerTest {
     private static final String DUAL_SIGNED_DOCUMENT =
         "{\"payload\":\n"
         + "\t\"eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ\",\n"

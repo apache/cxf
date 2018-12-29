@@ -25,7 +25,7 @@ import org.junit.After;
 import org.junit.Assert;
 
 
-public class AbstractSimpleFrontendSpringTest extends Assert {
+public class AbstractSimpleFrontendSpringTest {
     protected AbstractApplicationContext ctx;
 
     @After

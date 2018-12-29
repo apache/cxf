@@ -38,7 +38,7 @@ import static org.junit.Assert.assertNull;
 /**
  *
  */
-public class LocalDestinationTest extends Assert {
+public class LocalDestinationTest {
 
     /**
      * Tests if the status code is available after closing the destination so that it can be logged.

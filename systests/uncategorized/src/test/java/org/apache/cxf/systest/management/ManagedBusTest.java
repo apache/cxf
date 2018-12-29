@@ -46,7 +46,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-public class ManagedBusTest extends Assert {
+public class ManagedBusTest {
     public static final String JMX_PORT1 = TestUtil.getPortNumber(ManagedBusTest.class, 1);
     public static final String JMX_PORT2 = TestUtil.getPortNumber(ManagedBusTest.class, 3);
     public static final String SERVICE_PORT = TestUtil.getPortNumber(ManagedBusTest.class, 4);

@@ -33,7 +33,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertSame;
 
-public class RuntimeDelegateImplTest extends Assert {
+public class RuntimeDelegateImplTest {
 
     @Test
     public void testRuntimeDelegate() throws Exception {

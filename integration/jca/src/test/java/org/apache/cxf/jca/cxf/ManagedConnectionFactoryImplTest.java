@@ -50,7 +50,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 
-public class ManagedConnectionFactoryImplTest extends Assert {
+public class ManagedConnectionFactoryImplTest {
 
     protected ManagedConnectionFactoryImpl mci;
 

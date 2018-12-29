@@ -53,7 +53,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class XSLTJaxbProviderTest extends Assert {
+public class XSLTJaxbProviderTest {
 
     private static final String TEMPLATE_LOCATION = "classpath:/org/apache/cxf/jaxrs/provider/template.xsl";
     private static final String BOOK_XML = "<Book><id>123</id><name>TheBook</name></Book>";

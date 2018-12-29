@@ -34,7 +34,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertTrue;
 
 
-public class SQLPrinterVisitorTest extends Assert {
+public class SQLPrinterVisitorTest {
     private FiqlParser<Condition> parser = new FiqlParser<>(Condition.class);
 
     @Test

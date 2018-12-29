@@ -32,7 +32,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-public class CollectionUtilsTest extends Assert {
+public class CollectionUtilsTest {
 
     @Test
     public void testDiff() throws Exception {

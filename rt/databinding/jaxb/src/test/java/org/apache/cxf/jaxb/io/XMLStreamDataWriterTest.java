@@ -55,7 +55,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class XMLStreamDataWriterTest extends Assert {
+public class XMLStreamDataWriterTest {
     private ByteArrayOutputStream baos;
     private XMLStreamWriter streamWriter;
     private XMLInputFactory inFactory;

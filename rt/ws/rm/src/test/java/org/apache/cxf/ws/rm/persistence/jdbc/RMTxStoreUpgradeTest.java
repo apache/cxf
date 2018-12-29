@@ -40,7 +40,7 @@ import static org.junit.Assert.assertEquals;
  * Tests the automatic table updating of RMTxStore that allows compatible changes
  * in the database tables.
  */
-public class RMTxStoreUpgradeTest extends Assert {
+public class RMTxStoreUpgradeTest {
     private static final String CREATE_OLD_SRC_SEQ_TABLE_STMT =
         "CREATE TABLE CXF_RM_SRC_SEQUENCES "
         + "(SEQ_ID VARCHAR(256) NOT NULL, "

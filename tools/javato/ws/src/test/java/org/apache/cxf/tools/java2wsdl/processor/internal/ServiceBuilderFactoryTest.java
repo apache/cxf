@@ -33,7 +33,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class ServiceBuilderFactoryTest extends Assert {
+public class ServiceBuilderFactoryTest {
     ServiceBuilderFactory factory = ServiceBuilderFactory.getInstance(new ArrayList<>(),
                                                                       "jaxb");
 

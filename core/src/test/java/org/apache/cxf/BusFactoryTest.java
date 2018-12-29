@@ -27,7 +27,7 @@ import static org.junit.Assert.assertTrue;
 
 
 
-public class BusFactoryTest extends Assert {
+public class BusFactoryTest {
 
     @After
     public void tearDown() {

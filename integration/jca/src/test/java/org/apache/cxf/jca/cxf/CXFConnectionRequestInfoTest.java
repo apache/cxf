@@ -28,7 +28,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertTrue;
 
 
-public class CXFConnectionRequestInfoTest extends Assert {
+public class CXFConnectionRequestInfoTest {
 
 
     @Test

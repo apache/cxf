@@ -28,7 +28,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-public class ToolExceptionTest extends Assert {
+public class ToolExceptionTest {
     @Test
     public void testMassMethod() {
         ToolException e = new ToolException("e");

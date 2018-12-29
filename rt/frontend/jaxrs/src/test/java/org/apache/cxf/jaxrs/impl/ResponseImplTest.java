@@ -73,7 +73,7 @@ import static org.junit.Assert.assertTrue;
 
 
 @SuppressWarnings("resource") // Responses built in this test don't need to be closed
-public class ResponseImplTest extends Assert {
+public class ResponseImplTest {
 
     @Test
     public void testReadEntityWithNullOutMessage() {

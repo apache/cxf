@@ -60,7 +60,7 @@ import static org.junit.Assert.fail;
 /**
  *
  */
-public class ExternalAttachmentProviderTest extends Assert {
+public class ExternalAttachmentProviderTest {
 
     private static final QName TEST_ASSERTION_TYPE = new QName("http://a.b.c", "x");
 

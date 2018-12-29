@@ -40,7 +40,7 @@ import static org.junit.Assert.fail;
 
 
 
-public class PlugInClassLoaderTest extends Assert {
+public class PlugInClassLoaderTest {
     private static final Logger LOG = LogUtils.getLogger(PlugInClassLoaderTest.class);
     private static boolean debug;
     PlugInClassLoader plugInClassLoader;

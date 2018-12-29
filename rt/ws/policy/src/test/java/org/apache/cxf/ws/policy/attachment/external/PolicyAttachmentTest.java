@@ -43,7 +43,7 @@ import static org.junit.Assert.assertTrue;
 /**
  *
  */
-public class PolicyAttachmentTest extends Assert {
+public class PolicyAttachmentTest {
 
     private IMocksControl control;
 

@@ -32,7 +32,7 @@ import static org.junit.Assert.assertTrue;
 /**
  *
  */
-public class NamePasswordCallbackHandlerTest extends Assert {
+public class NamePasswordCallbackHandlerTest {
 
     @Test
     public void testHandleCallback() throws Exception {

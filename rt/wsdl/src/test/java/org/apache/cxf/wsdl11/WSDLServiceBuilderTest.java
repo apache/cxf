@@ -79,7 +79,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class WSDLServiceBuilderTest extends Assert {
+public class WSDLServiceBuilderTest {
     // TODO: reuse the wsdl in testutils and add the parameter order into one of the wsdl
     private static final Logger LOG = LogUtils.getLogger(WSDLServiceBuilderTest.class);
     private static final String WSDL_PATH = "hello_world.wsdl";

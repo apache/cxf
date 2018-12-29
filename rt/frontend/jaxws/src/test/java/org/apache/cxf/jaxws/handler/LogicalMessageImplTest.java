@@ -41,7 +41,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class LogicalMessageImplTest extends Assert {
+public class LogicalMessageImplTest {
     AddNumbers req;
     List<Object> args;
 

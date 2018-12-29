@@ -39,7 +39,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class CorbaUtilsTest extends Assert {
+public class CorbaUtilsTest {
 
     private static ORB orb;
 

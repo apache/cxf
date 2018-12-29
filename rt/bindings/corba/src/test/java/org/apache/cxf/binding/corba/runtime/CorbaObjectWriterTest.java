@@ -53,7 +53,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 
-public class CorbaObjectWriterTest extends Assert {
+public class CorbaObjectWriterTest {
 
     private static ORB orb;
 

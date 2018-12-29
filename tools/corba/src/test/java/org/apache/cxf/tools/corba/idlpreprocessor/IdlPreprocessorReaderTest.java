@@ -36,7 +36,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class IdlPreprocessorReaderTest extends Assert {
+public class IdlPreprocessorReaderTest {
 
     private URL findTestResource(String spec) {
         String location = "/idlpreprocessor/" + spec;

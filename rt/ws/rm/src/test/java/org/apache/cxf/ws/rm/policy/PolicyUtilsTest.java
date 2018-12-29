@@ -49,7 +49,7 @@ import static org.junit.Assert.assertTrue;
 /**
  *
  */
-public class PolicyUtilsTest extends Assert {
+public class PolicyUtilsTest {
 
     private IMocksControl control;
 

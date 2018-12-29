@@ -43,7 +43,7 @@ import static org.junit.Assert.assertNull;
 /**
  *
  */
-public class SoapActionInInterceptorTest extends Assert {
+public class SoapActionInInterceptorTest {
     private IMocksControl control;
 
     @Before

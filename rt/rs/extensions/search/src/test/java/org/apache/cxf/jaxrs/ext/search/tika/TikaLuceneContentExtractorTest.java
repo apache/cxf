@@ -49,7 +49,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class TikaLuceneContentExtractorTest extends Assert {
+public class TikaLuceneContentExtractorTest {
     private TikaLuceneContentExtractor extractor;
     private Directory directory;
     private IndexWriter writer;

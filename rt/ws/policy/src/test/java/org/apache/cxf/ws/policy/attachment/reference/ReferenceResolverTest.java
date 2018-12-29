@@ -46,7 +46,7 @@ import static org.junit.Assert.assertSame;
 /**
  *
  */
-public class ReferenceResolverTest extends Assert {
+public class ReferenceResolverTest {
 
     private IMocksControl control;
 

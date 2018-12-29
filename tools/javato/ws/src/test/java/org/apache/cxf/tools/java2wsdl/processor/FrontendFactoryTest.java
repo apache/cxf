@@ -28,7 +28,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class FrontendFactoryTest extends Assert {
+public class FrontendFactoryTest {
 
     FrontendFactory factory = FrontendFactory.getInstance();
 

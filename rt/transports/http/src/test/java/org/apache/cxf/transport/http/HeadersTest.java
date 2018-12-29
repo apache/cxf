@@ -48,7 +48,7 @@ import static org.junit.Assert.fail;
 /**
  *
  */
-public class HeadersTest extends Assert {
+public class HeadersTest {
 
     @Test
     public void setHeadersTest() throws Exception {

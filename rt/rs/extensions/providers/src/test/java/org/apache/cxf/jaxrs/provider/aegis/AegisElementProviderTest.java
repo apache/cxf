@@ -45,7 +45,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class AegisElementProviderTest extends Assert {
+public class AegisElementProviderTest {
 
     private Properties properties;
     private String simpleBeanXml;

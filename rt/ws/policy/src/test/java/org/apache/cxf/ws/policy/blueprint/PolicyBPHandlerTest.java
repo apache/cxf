@@ -27,7 +27,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  *
  */
-public class PolicyBPHandlerTest extends Assert {
+public class PolicyBPHandlerTest {
     @Test
     public void testGetSchemaLocation() {
         PolicyBPHandler handler = new PolicyBPHandler();

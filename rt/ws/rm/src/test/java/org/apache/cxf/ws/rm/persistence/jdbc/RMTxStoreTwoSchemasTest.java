@@ -39,7 +39,7 @@ import static org.junit.Assert.assertNull;
 /**
  *
  */
-public class RMTxStoreTwoSchemasTest extends Assert {
+public class RMTxStoreTwoSchemasTest {
     private static final String TEST_DB_NAME = "rmdbts";
 
     private static final String CLIENT_ENDPOINT_ID =

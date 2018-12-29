@@ -47,7 +47,7 @@ import static org.junit.Assert.assertSame;
 /**
  *
  */
-public class MinimalMaximalAlternativeSelectorTest extends Assert {
+public class MinimalMaximalAlternativeSelectorTest {
 
     private IMocksControl control;
 

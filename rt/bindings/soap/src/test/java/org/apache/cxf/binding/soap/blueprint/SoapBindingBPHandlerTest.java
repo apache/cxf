@@ -27,7 +27,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  *
  */
-public class SoapBindingBPHandlerTest extends Assert {
+public class SoapBindingBPHandlerTest {
     @Test
     public void testGetSchemaLocation() {
         SoapBindingBPHandler handler = new SoapBindingBPHandler();

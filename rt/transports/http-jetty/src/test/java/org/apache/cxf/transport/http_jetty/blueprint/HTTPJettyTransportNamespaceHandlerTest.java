@@ -27,7 +27,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  *
  */
-public class HTTPJettyTransportNamespaceHandlerTest extends Assert {
+public class HTTPJettyTransportNamespaceHandlerTest {
     @Test
     public void testGetSchemaLocation() {
         HTTPJettyTransportNamespaceHandler handler = new HTTPJettyTransportNamespaceHandler();

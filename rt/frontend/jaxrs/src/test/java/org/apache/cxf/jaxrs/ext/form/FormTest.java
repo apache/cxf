@@ -27,7 +27,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class FormTest extends Assert {
+public class FormTest {
 
     @Test
     public void testToString() {

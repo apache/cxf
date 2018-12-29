@@ -40,7 +40,7 @@ import static org.junit.Assert.assertTrue;
 /**
  *
  */
-public class EndpointReferenceDomainExpressionTest extends Assert {
+public class EndpointReferenceDomainExpressionTest {
 
     private IMocksControl control;
 

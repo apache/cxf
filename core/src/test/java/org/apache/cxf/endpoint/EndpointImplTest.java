@@ -34,7 +34,7 @@ import static org.junit.Assert.assertTrue;
 /**
  *
  */
-public class EndpointImplTest extends Assert {
+public class EndpointImplTest {
 
     @Test
     public void testEqualsAndHashCode() throws Exception {

@@ -48,7 +48,7 @@ import static org.junit.Assert.fail;
 /**
  *
  */
-public class AssertionInfoMapTest extends Assert {
+public class AssertionInfoMapTest {
 
     private IMocksControl control;
 

@@ -82,7 +82,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class JAXBDataBindingTest extends Assert {
+public class JAXBDataBindingTest {
 
     private static final Logger LOG = LogUtils.getLogger(JAXBDataBindingTest.class);
     private static final String WSDL_PATH = "/wsdl/jaxb/hello_world.wsdl";

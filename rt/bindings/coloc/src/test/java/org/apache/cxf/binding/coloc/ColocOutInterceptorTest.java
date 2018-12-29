@@ -63,7 +63,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.fail;
 
-public class ColocOutInterceptorTest extends Assert {
+public class ColocOutInterceptorTest {
     private static final String COLOCATED = Message.class.getName() + ".COLOCATED";
     private IMocksControl control = EasyMock.createNiceControl();
     private ColocOutInterceptor colocOut;

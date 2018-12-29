@@ -37,7 +37,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
 
-public class HawkAccessTokenValidatorTest extends Assert {
+public class HawkAccessTokenValidatorTest {
 
     private HawkAccessTokenValidator validator = new HawkAccessTokenValidator();
     private OAuthDataProvider dataProvider = EasyMock.createMock(OAuthDataProvider.class);

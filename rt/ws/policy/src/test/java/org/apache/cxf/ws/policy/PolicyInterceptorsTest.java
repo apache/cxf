@@ -54,7 +54,7 @@ import static org.junit.Assert.assertSame;
 /**
  *
  */
-public class PolicyInterceptorsTest extends Assert {
+public class PolicyInterceptorsTest {
     private static final QName ASSERTION_QNAME = new QName("http://apache.cxf", "test");
 
     private IMocksControl control;

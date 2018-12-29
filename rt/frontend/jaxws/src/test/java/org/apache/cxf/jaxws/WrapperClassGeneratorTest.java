@@ -42,7 +42,7 @@ import org.junit.Assert;
 
 import static org.junit.Assert.assertTrue;
 
-public class WrapperClassGeneratorTest extends Assert {
+public class WrapperClassGeneratorTest {
 
     @After
     public void tearDown() {

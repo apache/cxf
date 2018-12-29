@@ -61,7 +61,7 @@ import org.junit.Before;
 
 import static org.junit.Assert.assertNotNull;
 
-public class TestBase extends Assert {
+public class TestBase {
 
     protected PhaseInterceptorChain chain;
 

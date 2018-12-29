@@ -29,7 +29,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class ParameterProcessorTest extends Assert {
+public class ParameterProcessorTest {
     @Test
     public void testAddParameter() throws Exception {
         ParameterProcessor processor = new ParameterProcessor(new ToolContext());

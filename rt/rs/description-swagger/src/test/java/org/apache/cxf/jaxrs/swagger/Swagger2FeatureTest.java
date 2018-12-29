@@ -28,7 +28,7 @@ import static org.junit.Assert.assertNull;
 /**
  *
  */
-public class Swagger2FeatureTest extends Assert {
+public class Swagger2FeatureTest {
     @Test
     public void testSetBasePathByAddress() {
         Swagger2Feature f = new Swagger2Feature();

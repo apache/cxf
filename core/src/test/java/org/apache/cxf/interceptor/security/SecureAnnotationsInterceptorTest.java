@@ -41,7 +41,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 
-public class SecureAnnotationsInterceptorTest extends Assert {
+public class SecureAnnotationsInterceptorTest {
 
     private Method method;
     private Message message = new MessageImpl();

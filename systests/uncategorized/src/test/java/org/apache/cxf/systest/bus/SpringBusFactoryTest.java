@@ -40,7 +40,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertNotNull;
 
 
-public class SpringBusFactoryTest extends Assert {
+public class SpringBusFactoryTest {
 
     @Test
     public void testKnownExtensions() throws BusException {

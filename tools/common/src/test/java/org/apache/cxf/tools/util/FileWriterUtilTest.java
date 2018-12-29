@@ -26,7 +26,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
 
-public class FileWriterUtilTest extends Assert {
+public class FileWriterUtilTest {
 
     private void cleanDir(File dir) {
         try {

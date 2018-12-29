@@ -30,7 +30,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-public class BindingOperationInfoTest extends Assert {
+public class BindingOperationInfoTest {
     private static final String TEST_NS = "urn:test:ns";
     private BindingOperationInfo bindingOperationInfo;
 

@@ -42,7 +42,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class JAXWSProfileTest extends Assert {
+public class JAXWSProfileTest {
 
     @Test
     public void testLoadPlugins() {

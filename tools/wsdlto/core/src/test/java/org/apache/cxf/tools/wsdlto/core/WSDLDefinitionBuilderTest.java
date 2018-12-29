@@ -39,7 +39,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class WSDLDefinitionBuilderTest extends Assert {
+public class WSDLDefinitionBuilderTest {
     @BeforeClass
     public static void ensureNewBus() {
         BusFactory.setDefaultBus(null);

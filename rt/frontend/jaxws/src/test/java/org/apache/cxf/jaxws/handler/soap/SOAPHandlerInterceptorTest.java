@@ -85,7 +85,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class SOAPHandlerInterceptorTest extends Assert {
+public class SOAPHandlerInterceptorTest {
 
     @Before
     public void setUp() {

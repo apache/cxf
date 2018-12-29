@@ -33,7 +33,7 @@ import static org.junit.Assert.assertFalse;
 
 
 
-public class MBServerConnectorTest extends Assert {
+public class MBServerConnectorTest {
     private static final String PORT = TestUtil.getPortNumber(MBServerConnectorTest.class);
 
     @Test

@@ -30,7 +30,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 
-public class XMLBindingFactoryTest extends Assert {
+public class XMLBindingFactoryTest {
 
     @Test
     public void testContainsInAttachmentInterceptor() {

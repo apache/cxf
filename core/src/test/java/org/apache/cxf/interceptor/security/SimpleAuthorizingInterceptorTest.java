@@ -37,7 +37,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class SimpleAuthorizingInterceptorTest extends Assert {
+public class SimpleAuthorizingInterceptorTest {
 
     protected Message message = new MessageImpl();
     private Method method;

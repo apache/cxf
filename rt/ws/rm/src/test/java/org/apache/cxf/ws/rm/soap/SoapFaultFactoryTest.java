@@ -51,7 +51,7 @@ import static org.junit.Assert.assertSame;
 /**
  *
  */
-public class SoapFaultFactoryTest extends Assert {
+public class SoapFaultFactoryTest {
 
     private IMocksControl control;
     private SequenceFault sf;

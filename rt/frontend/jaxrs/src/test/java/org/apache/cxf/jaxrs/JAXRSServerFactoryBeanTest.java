@@ -36,7 +36,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 
-public class JAXRSServerFactoryBeanTest extends Assert {
+public class JAXRSServerFactoryBeanTest {
 
     @Test
     public void testRegisterProviders() {

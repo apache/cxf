@@ -26,7 +26,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 
-public class NameUtilTest extends Assert {
+public class NameUtilTest {
 
     @Test
     public void testMangleToClassName() {

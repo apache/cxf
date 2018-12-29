@@ -65,7 +65,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
-public class SelectMethodCandidatesTest extends Assert {
+public class SelectMethodCandidatesTest {
 
     @Test
     public void testFindFromAbstractGenericClass() throws Exception {

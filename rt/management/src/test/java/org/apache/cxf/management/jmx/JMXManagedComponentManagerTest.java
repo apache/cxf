@@ -38,7 +38,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-public class JMXManagedComponentManagerTest extends Assert {
+public class JMXManagedComponentManagerTest {
     private static final String PORT = TestUtil.getPortNumber(JMXManagedComponentManagerTest.class);
     private static final String NAME_ATTRIBUTE = "Name";
     private InstrumentationManagerImpl manager;

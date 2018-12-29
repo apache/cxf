@@ -33,7 +33,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-public class URIResolverTest extends Assert {
+public class URIResolverTest {
 
     private URIResolver uriResolver;
 

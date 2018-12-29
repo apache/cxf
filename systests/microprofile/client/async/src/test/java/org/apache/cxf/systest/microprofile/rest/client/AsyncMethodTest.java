@@ -52,7 +52,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.Assert.assertEquals;
 //CHECKSTYLE:ON
 
-public class AsyncMethodTest extends Assert {
+public class AsyncMethodTest {
 
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(WireMockConfiguration.options().dynamicPort());

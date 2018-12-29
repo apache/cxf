@@ -46,7 +46,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 
-public class AtomPojoProviderTest extends Assert {
+public class AtomPojoProviderTest {
 
     private ClassPathXmlApplicationContext ctx;
 

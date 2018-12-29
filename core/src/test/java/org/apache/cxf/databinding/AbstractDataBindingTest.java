@@ -28,7 +28,7 @@ import org.junit.Test;
 /**
  *
  */
-public class AbstractDataBindingTest extends Assert {
+public class AbstractDataBindingTest {
     @Test(expected = IllegalArgumentException.class)
     public void testNamespaceMapCheckDuplicates() {
         Map<String, String> testMap = new HashMap<>();

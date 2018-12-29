@@ -32,7 +32,7 @@ import static org.junit.Assert.assertEquals;
 /**
  *
  */
-public class EJBEndpointTest extends Assert {
+public class EJBEndpointTest {
 
     private EJBEndpoint endpoint;
 

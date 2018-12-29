@@ -40,7 +40,7 @@ import static org.junit.Assert.assertEquals;
 /**
  *
  */
-public class DefaultProtocolInterceptorTest extends Assert {
+public class DefaultProtocolInterceptorTest {
 
     @Test
     public void testCreateResponseWithHeadersFiltering() throws Exception {

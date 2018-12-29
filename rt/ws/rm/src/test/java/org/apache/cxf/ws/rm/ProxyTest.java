@@ -68,7 +68,7 @@ import static org.junit.Assert.assertSame;
 /**
  *
  */
-public class ProxyTest extends Assert {
+public class ProxyTest {
 
     private IMocksControl control;
     private RMEndpoint rme;

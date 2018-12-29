@@ -35,7 +35,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class WebParamAnnotatorTest extends Assert {
+public class WebParamAnnotatorTest {
 
     JavaMethod method;
     JavaParameter parameter;

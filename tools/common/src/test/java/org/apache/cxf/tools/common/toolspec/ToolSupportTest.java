@@ -24,7 +24,7 @@ import org.apache.cxf.tools.common.ToolException;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class ToolSupportTest extends Assert {
+public class ToolSupportTest {
 
     @Test
     public void testProtect() throws ToolException {

@@ -49,7 +49,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 @SuppressWarnings("deprecation")
-public class LoggingOutInterceptorTest extends Assert {
+public class LoggingOutInterceptorTest {
 
     protected IMocksControl control;
 

@@ -31,7 +31,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class WrapperBeanFieldAnnotatorTest extends Assert {
+public class WrapperBeanFieldAnnotatorTest {
 
     @Test
     public void testAnnotate() {

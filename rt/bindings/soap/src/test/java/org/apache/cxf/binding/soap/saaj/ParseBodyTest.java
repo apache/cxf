@@ -47,7 +47,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class ParseBodyTest extends Assert {
+public class ParseBodyTest {
     static final String[] DATA = {
         "<SOAP-ENV:Body xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\">\n"
             + "    <foo>\n        <bar/>\n    </foo>\n</SOAP-ENV:Body>",

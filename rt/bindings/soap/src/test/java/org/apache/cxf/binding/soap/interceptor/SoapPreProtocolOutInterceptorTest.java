@@ -51,7 +51,7 @@ import static org.junit.Assert.assertTrue;
 /**
  *
  */
-public class SoapPreProtocolOutInterceptorTest extends Assert {
+public class SoapPreProtocolOutInterceptorTest {
     private IMocksControl control;
     private SoapPreProtocolOutInterceptor interceptor;
 

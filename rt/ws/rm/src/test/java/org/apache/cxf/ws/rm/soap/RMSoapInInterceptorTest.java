@@ -51,7 +51,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-public class RMSoapInInterceptorTest extends Assert {
+public class RMSoapInInterceptorTest {
 
     private static final String SEQ_IDENTIFIER = "http://Business456.com/RM/ABC";
     private static final Long ONE = Long.valueOf(1);

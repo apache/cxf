@@ -36,7 +36,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class DataSourceProviderTest extends Assert {
+public class DataSourceProviderTest {
 
     @Test
     public void testReadDataHandler() throws Exception {

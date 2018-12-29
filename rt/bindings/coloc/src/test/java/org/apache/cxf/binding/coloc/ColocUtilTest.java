@@ -57,7 +57,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 
-public class ColocUtilTest extends Assert {
+public class ColocUtilTest {
     private IMocksControl control = EasyMock.createNiceControl();
     private Bus bus;
 

@@ -37,7 +37,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 
-public class AnnotationTestUtilsTest extends Assert {
+public class AnnotationTestUtilsTest {
 
     @Test
     public void testGetAnnotatedMethodFromInterface() throws Exception {

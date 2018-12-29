@@ -55,7 +55,7 @@ import static org.junit.Assert.assertNull;
 /**
  *
  */
-public class ContextUtilsTest extends Assert {
+public class ContextUtilsTest {
     private static final QName WSA_ACTION_QNAME =
         new QName(JAXWSAConstants.NS_WSA, Names.WSAW_ACTION_NAME);
     private static final QName OLD_WSDL_WSA_ACTION_QNAME =

@@ -43,7 +43,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
-public class CXFBusImplTest extends Assert {
+public class CXFBusImplTest {
 
     @Test
     public void testThreadBus() throws BusException {

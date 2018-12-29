@@ -48,7 +48,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @SuppressWarnings("rawtypes")
-public class HandlerChainBuilderTest extends Assert {
+public class HandlerChainBuilderTest {
 
     Handler[] allHandlers = {EasyMock.createMock(LogicalHandler.class), EasyMock.createMock(Handler.class),
                              EasyMock.createMock(Handler.class), EasyMock.createMock(LogicalHandler.class)};

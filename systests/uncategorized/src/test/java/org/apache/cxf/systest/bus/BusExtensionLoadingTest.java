@@ -40,7 +40,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
 
-public class BusExtensionLoadingTest extends Assert {
+public class BusExtensionLoadingTest {
 
     /**
      * Tests the ExtensionManagerBus can be built using a given classloader

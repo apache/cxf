@@ -66,7 +66,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 
-public class CorbaConduitTest extends Assert {
+public class CorbaConduitTest {
 
     private static IMocksControl control;
     private static ORB orb;

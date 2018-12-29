@@ -44,7 +44,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class JwsUtilsTest extends Assert {
+public class JwsUtilsTest {
 
     @Test
     public void testSignatureAlgorithm() {

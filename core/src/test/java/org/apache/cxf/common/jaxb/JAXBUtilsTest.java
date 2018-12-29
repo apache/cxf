@@ -32,7 +32,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class JAXBUtilsTest extends Assert {
+public class JAXBUtilsTest {
 
     @Test
     public void testCanSetEscapeHandlerWithStandardJaxbImpl() throws Exception {

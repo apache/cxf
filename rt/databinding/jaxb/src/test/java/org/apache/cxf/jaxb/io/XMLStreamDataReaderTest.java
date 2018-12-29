@@ -49,7 +49,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class XMLStreamDataReaderTest extends Assert {
+public class XMLStreamDataReaderTest {
 
     private XMLInputFactory factory;
     private XMLStreamReader reader;

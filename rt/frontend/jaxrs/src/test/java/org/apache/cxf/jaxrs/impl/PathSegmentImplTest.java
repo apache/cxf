@@ -27,7 +27,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class PathSegmentImplTest extends Assert {
+public class PathSegmentImplTest {
 
     @Test
     public void testPlainPathSegment() {

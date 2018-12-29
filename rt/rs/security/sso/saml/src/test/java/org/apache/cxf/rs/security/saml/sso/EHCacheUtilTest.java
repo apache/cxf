@@ -33,7 +33,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  *
  */
-public class EHCacheUtilTest extends Assert {
+public class EHCacheUtilTest {
 
     @Test
     public void testCreateCacheManager() {

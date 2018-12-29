@@ -34,7 +34,7 @@ import static org.junit.Assert.assertSame;
 /**
  *
  */
-public class AbstractEndpointTest extends Assert {
+public class AbstractEndpointTest {
 
     private IMocksControl control;
     private RMEndpoint rme;

@@ -81,7 +81,7 @@ import static org.junit.Assert.fail;
 /**
  * JAXBEncoderDecoderTest
  */
-public class JAXBEncoderDecoderTest extends Assert {
+public class JAXBEncoderDecoderTest {
     public static final QName  SOAP_ENV =
             new QName("http://schemas.xmlsoap.org/soap/envelope/", "Envelope");
     public static final QName  SOAP_BODY =

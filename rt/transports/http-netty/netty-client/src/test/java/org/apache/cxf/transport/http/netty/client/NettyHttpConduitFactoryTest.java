@@ -40,7 +40,7 @@ import static org.junit.Assert.assertTrue;
 
 
 
-public class NettyHttpConduitFactoryTest extends Assert {
+public class NettyHttpConduitFactoryTest {
     Bus bus;
 
     @BeforeClass

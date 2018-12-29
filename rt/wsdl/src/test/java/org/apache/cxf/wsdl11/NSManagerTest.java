@@ -27,7 +27,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class NSManagerTest extends Assert {
+public class NSManagerTest {
     @Test
     public void testGetPrefix() {
         NSManager nsMan = new NSManager();

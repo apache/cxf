@@ -23,7 +23,7 @@ import org.junit.Test;
 
 
 
-public class ResourceBeanTest extends Assert {
+public class ResourceBeanTest {
 
 
     @Test

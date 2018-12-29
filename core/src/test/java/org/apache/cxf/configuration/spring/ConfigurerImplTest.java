@@ -44,7 +44,7 @@ import static org.junit.Assert.assertTrue;
 
 
 
-public class ConfigurerImplTest extends Assert {
+public class ConfigurerImplTest {
 
     static {
         Class<?> cls;

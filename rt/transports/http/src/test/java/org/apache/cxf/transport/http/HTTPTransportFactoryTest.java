@@ -30,7 +30,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class HTTPTransportFactoryTest extends Assert {
+public class HTTPTransportFactoryTest {
     @Test
     public void testGetDestination() {
         Bus bus = BusFactory.getDefaultBus();

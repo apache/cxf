@@ -34,7 +34,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class PackageUtilsTest extends Assert {
+public class PackageUtilsTest {
     @Test
     public void testGetClassPackageName() throws Exception {
         String packageName = PackageUtils.getPackageName(this.getClass());

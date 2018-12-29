@@ -34,7 +34,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class ServerAppTest extends Assert {
+public class ServerAppTest {
 
     private String epAddr = "http://cxf.apache.org/";
 

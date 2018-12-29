@@ -59,7 +59,7 @@ import static org.junit.Assert.fail;
  * This class tests starting up and shutting down the embedded server when there
  * is extra jetty configuration.
  */
-public class EngineLifecycleTest extends Assert {
+public class EngineLifecycleTest {
     private static final String PORT1 = TestUtil.getPortNumber(EngineLifecycleTest.class, 1);
     private static final String PORT2 = TestUtil.getPortNumber(EngineLifecycleTest.class, 2);
     private GenericApplicationContext applicationContext;

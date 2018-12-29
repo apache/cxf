@@ -38,7 +38,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class WSDLRefValidatorTest extends Assert {
+public class WSDLRefValidatorTest {
 
     private Definition getWSDL(String wsdl) throws Exception {
         Bus b = BusFactory.getDefaultBus();

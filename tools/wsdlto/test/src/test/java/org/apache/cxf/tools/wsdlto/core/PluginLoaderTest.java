@@ -33,7 +33,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class PluginLoaderTest extends Assert {
+public class PluginLoaderTest {
 
     @Test
     public void testLoadPlugins() throws Exception {

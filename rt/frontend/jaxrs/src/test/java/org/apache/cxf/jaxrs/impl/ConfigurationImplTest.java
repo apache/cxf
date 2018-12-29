@@ -57,7 +57,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class ConfigurationImplTest extends Assert {
+public class ConfigurationImplTest {
 
     @Test
     public void testIsRegistered() throws Exception {

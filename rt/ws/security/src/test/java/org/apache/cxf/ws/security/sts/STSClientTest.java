@@ -57,7 +57,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class STSClientTest extends Assert {
+public class STSClientTest {
 
     @Test
     public void testConfigureViaEPR() throws Exception {

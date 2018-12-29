@@ -40,7 +40,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class RequestWrapperTest extends Assert {
+public class RequestWrapperTest {
     JaxwsServiceBuilder builder = new JaxwsServiceBuilder();
 
     private OperationInfo getOperation(Class<?> clz, String opName) {

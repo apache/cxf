@@ -40,7 +40,7 @@ import org.junit.Test;
 import static org.junit.Assert.fail;
 
 
-public class AnnotationProcessorTest extends Assert {
+public class AnnotationProcessorTest {
 
     AnnotatedGreeterImpl greeterImpl = new AnnotatedGreeterImpl();
     AnnotationProcessor processor = new AnnotationProcessor(greeterImpl);

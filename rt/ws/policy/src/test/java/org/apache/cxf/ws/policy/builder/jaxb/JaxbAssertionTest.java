@@ -46,7 +46,7 @@ import static org.junit.Assert.assertTrue;
 /**
  *
  */
-public class JaxbAssertionTest extends Assert {
+public class JaxbAssertionTest {
 
     @Test
     public void testBasic() {

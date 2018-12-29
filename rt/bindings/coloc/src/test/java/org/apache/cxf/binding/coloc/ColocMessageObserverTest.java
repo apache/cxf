@@ -49,7 +49,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class ColocMessageObserverTest extends Assert {
+public class ColocMessageObserverTest {
     private IMocksControl control = EasyMock.createNiceControl();
     private ColocMessageObserver observer;
     private Message msg;

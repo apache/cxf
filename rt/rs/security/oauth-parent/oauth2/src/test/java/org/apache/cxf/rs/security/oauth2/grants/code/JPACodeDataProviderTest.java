@@ -38,7 +38,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
-public class JPACodeDataProviderTest extends Assert {
+public class JPACodeDataProviderTest {
     private EntityManagerFactory emFactory;
     private Connection connection;
     private JPACodeDataProvider provider;

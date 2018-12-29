@@ -53,7 +53,7 @@ import static org.junit.Assert.assertTrue;
 /**
  *
  */
-public class PolicyExtensionsTest extends Assert {
+public class PolicyExtensionsTest {
 
     private static final QName KNOWN = new QName("http://cxf.apache.org/test/policy", "known");
     private static final QName KNOWN_DOMAIN_EXPR_TYPE

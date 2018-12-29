@@ -44,7 +44,7 @@ import static org.junit.Assert.assertEquals;
 
 
 
-public class RequestPreprocessorTest extends Assert {
+public class RequestPreprocessorTest {
 
     private IMocksControl control;
 

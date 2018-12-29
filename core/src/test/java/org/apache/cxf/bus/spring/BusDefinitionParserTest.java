@@ -42,7 +42,7 @@ import static org.junit.Assert.assertTrue;
 
 
 
-public class BusDefinitionParserTest extends Assert {
+public class BusDefinitionParserTest {
 
     @Test
     public void testFeatures() {

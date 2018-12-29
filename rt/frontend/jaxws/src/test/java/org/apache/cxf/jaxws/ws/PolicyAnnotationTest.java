@@ -58,7 +58,7 @@ import static org.junit.Assert.assertTrue;
 /**
  *
  */
-public class PolicyAnnotationTest extends Assert {
+public class PolicyAnnotationTest {
 
     @org.junit.Test
     public void testAnnotations() throws Exception {

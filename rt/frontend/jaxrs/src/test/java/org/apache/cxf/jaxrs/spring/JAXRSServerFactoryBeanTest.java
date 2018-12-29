@@ -43,7 +43,7 @@ import static org.junit.Assert.assertSame;
 
 
 
-public class JAXRSServerFactoryBeanTest extends Assert {
+public class JAXRSServerFactoryBeanTest {
 
     @After
     public void tearDown() throws Exception {

@@ -49,7 +49,7 @@ import static org.junit.Assert.assertTrue;
  * implementation of HTTPConduit change (i.e. no longer use the URLConnections)
  * this test will break.
  */
-public class HTTPConduitURLConnectionTest extends Assert {
+public class HTTPConduitURLConnectionTest {
 
     @Before
     public void setUp() throws Exception {

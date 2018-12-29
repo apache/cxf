@@ -32,7 +32,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class JwePbeHmacAesWrapTest extends Assert {
+public class JwePbeHmacAesWrapTest {
     @Before
     public void registerBouncyCastleIfNeeded() throws Exception {
         Security.addProvider(new BouncyCastleProvider());

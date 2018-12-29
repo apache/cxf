@@ -46,7 +46,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 
-public class CorbaHandlerUtilsTest extends Assert {
+public class CorbaHandlerUtilsTest {
 
     protected EndpointInfo endpointInfo;
     BindingFactory factory;

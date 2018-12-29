@@ -45,7 +45,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 
-public class ResourceAdapterImplTest extends Assert {
+public class ResourceAdapterImplTest {
 
     public ResourceAdapterImplTest() {
 

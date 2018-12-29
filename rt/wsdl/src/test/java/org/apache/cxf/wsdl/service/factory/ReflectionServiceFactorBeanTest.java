@@ -39,7 +39,7 @@ import static org.junit.Assert.fail;
 /**
  *
  */
-public class ReflectionServiceFactorBeanTest extends Assert {
+public class ReflectionServiceFactorBeanTest {
     protected IMocksControl control;
 
     @Before

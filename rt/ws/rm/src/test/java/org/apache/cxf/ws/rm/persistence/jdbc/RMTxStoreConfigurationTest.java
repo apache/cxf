@@ -37,7 +37,7 @@ import static org.junit.Assert.assertTrue;
 /**
  *
  */
-public class RMTxStoreConfigurationTest extends Assert {
+public class RMTxStoreConfigurationTest {
 
     @Test
     public void testTxStoreBean() {

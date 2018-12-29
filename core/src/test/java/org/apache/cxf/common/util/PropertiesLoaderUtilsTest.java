@@ -28,7 +28,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class PropertiesLoaderUtilsTest extends Assert {
+public class PropertiesLoaderUtilsTest {
 
     Properties properties;
     String soapBindingFactory = "org.apache.cxf.bindings.soap.SOAPBindingFactory";

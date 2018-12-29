@@ -40,7 +40,7 @@ import static org.junit.Assert.assertTrue;
 
 
 
-public class MetadataMapTest extends Assert {
+public class MetadataMapTest {
 
     @Test
     public void testPutSingle() {

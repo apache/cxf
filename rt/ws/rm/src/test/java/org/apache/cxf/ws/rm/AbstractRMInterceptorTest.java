@@ -49,7 +49,7 @@ import static org.junit.Assert.fail;
 /**
  *
  */
-public class AbstractRMInterceptorTest extends Assert {
+public class AbstractRMInterceptorTest {
 
     private IMocksControl control;
 

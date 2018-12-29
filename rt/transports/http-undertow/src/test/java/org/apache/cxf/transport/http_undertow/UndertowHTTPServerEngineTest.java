@@ -53,7 +53,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 
-public class UndertowHTTPServerEngineTest extends Assert {
+public class UndertowHTTPServerEngineTest {
     private static final int PORT1
         = Integer.valueOf(TestUtil.getPortNumber(UndertowHTTPServerEngineTest.class, 1));
     private static final int PORT2
