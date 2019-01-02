@@ -223,7 +223,7 @@
         <cxf.dom4j.bundle.version>1.6.1_5</cxf.dom4j.bundle.version>
         <cxf.jdom.bundle.version>1.1_4</cxf.jdom.bundle.version>
         <cxf.olingo.version>2.0.10</cxf.olingo.version>
-        <cxf.tika.version>1.19.1</cxf.tika.version>
+        <cxf.tika.version>1.20</cxf.tika.version>
         <cxf.jexl.version>2.1.1</cxf.jexl.version>
         <cxf.zest.version>2.1</cxf.zest.version>
         <cxf.brave.version>5.4.2</cxf.brave.version>
