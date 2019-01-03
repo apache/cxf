@@ -44,12 +44,10 @@ In order to install CXF's features, you need to add the CXF's features repo usin
 
 Install CXF's cxf-jaxws and cxf-features-clustering features:
 
-  feature:install cxf-jaxws cxf-features-clustering
+  feature:install aries-blueprint cxf-jaxws cxf-features-clustering
 
 Install the required bundles:
 
-  install -s mvn:org.apache.cxf.samples/failover_server
-  install -s mvn:org.apache.cxf.samples/failover_jaxws_osgi
   install -s wrap:mvn:org.codeartisans/org.json/20130213
   install -s mvn:joda-time/joda-time/2.8.1
   install -s mvn:org.qi4j.core/org.qi4j.core.functional/2.1
