@@ -22,12 +22,10 @@ package org.apache.cxf.transport.udp;
 import java.net.NetworkInterface;
 import java.util.Enumeration;
 
-import javax.jws.WebService;
-
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
-import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.hello_world.Greeter;
 
 import org.junit.AfterClass;
@@ -35,21 +33,18 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
  */
-public class UDPTransportTest extends AbstractBusClientServerTestBase {
-    static final String PORT = allocatePort(UDPTransportTest.class);
+public class UDPTransportTest {
+    private static final String PORT = TestUtil.getPortNumber(UDPTransportTest.class);
     private static Server server;
 
-    @WebService(serviceName = "SOAPService",
-        endpointInterface = "org.apache.hello_world.Greeter",
-        targetNamespace = "http://apache.org/hello_world")
     static class GreeterImpl implements Greeter {
         private String myName = "defaultGreeter";
-        GreeterImpl() {
-        }
+
         public String greetMe(String me) {
             return "Hello " + me;
         }
@@ -57,17 +52,18 @@ public class UDPTransportTest extends AbstractBusClientServerTestBase {
             return "Bonjour from " + myName;
         }
         public void pingMe() {
+            throw new UnsupportedOperationException();
         }
     }
 
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        createStaticBus();
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
-        factory.setBus(getStaticBus());
         factory.setAddress("udp://:" + PORT);
+        factory.setServiceClass(Greeter.class);
         factory.setServiceBean(new GreeterImpl());
+        // factory.setFeatures(Collections.singletonList(new LoggingFeature()));
         server = factory.create();
     }
 
@@ -84,11 +80,13 @@ public class UDPTransportTest extends AbstractBusClientServerTestBase {
         fact.setAddress("udp://localhost:" + PORT);
         Greeter g = fact.create(Greeter.class);
         for (int x = 0; x < 5; x++) {
-            assertEquals("Hello World", g.greetMe("World"));
+            final String message = Integer.toString(x);
+            assertTrue(g.greetMe(message).endsWith(message));
         }
 
         ((java.io.Closeable)g).close();
     }
+
     @Test
     public void testBroadcastUDP() throws Exception {
         // Disable the test on Redhat Enterprise Linux which doesn't enable the UDP broadcast by default
@@ -117,6 +115,7 @@ public class UDPTransportTest extends AbstractBusClientServerTestBase {
         fact.setAddress("udp://:" + PORT + "/foo");
         Greeter g = fact.create(Greeter.class);
         assertEquals("Hello World", g.greetMe("World"));
+
         ((java.io.Closeable)g).close();
     }
 
@@ -132,5 +131,13 @@ public class UDPTransportTest extends AbstractBusClientServerTestBase {
         assertEquals("Hello " + b.toString(), g.greetMe(b.toString()));
 
         ((java.io.Closeable)g).close();
+    }
+
+    @Test(expected = javax.xml.ws.soap.SOAPFaultException.class)
+    public void testFailure() throws Exception {
+        JaxWsProxyFactoryBean fact = new JaxWsProxyFactoryBean();
+        fact.setAddress("udp://localhost:" + PORT);
+        Greeter g = fact.create(Greeter.class);
+        g.pingMe();
     }
 }
