@@ -49,4 +49,11 @@
        </jaxws:properties>
     </jaxws:endpoint>
     
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Saml2TokenOverTransport2" address="https://localhost:${testutil.ports.saml.subjectconf.Server}/DoubleItSaml2Transport2" serviceName="s:DoubleItService" endpointName="s:DoubleItSaml2TransportPort2" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/saml/subjectconf//DoubleItSamlSubjectConf.wsdl" depends-on="tls-settings">
+        <jaxws:properties>
+            <entry key="security.signature.properties" value="morpit.properties"/>
+            <entry key="security.validate.saml.subject.conf" value="false"/>
+       </jaxws:properties>
+    </jaxws:endpoint>
+    
 </beans>

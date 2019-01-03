@@ -94,6 +94,7 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
     // HOK requires client auth + a internally signed token. The server is set up not to
     // require client auth to test this.
     //
+
     @org.junit.Test
     public void testHOKClientAuthentication() throws Exception {
 
@@ -179,6 +180,7 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         }
 
         ((java.io.Closeable)port).close();
+
         bus.shutdown(true);
     }
 
@@ -218,6 +220,18 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         }
 
         ((java.io.Closeable)port).close();
+
+        // Here we try against a service that has explicitly disabled the SAML Subject Confirmation Method requirements,
+        // and so the invocation should pass
+        portQName = new QName(NAMESPACE, "DoubleItSaml2TransportPort2");
+        port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, test.getPort());
+
+        ((BindingProvider)port).getRequestContext().put(SecurityConstants.SAML_CALLBACK_HANDLER, callbackHandler);
+        int result = port.doubleIt(25);
+        assertTrue(result == 50);
+        ((java.io.Closeable)port).close();
+
         bus.shutdown(true);
     }
 
@@ -401,7 +415,6 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-
 
 
 }
