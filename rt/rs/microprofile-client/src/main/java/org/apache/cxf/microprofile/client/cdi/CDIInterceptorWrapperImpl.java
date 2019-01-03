@@ -21,7 +21,6 @@ package org.apache.cxf.microprofile.client.cdi;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -34,6 +33,8 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.spi.CreationalContext;
+import javax.enterprise.inject.spi.AnnotatedMethod;
+import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.InterceptionType;
 import javax.enterprise.inject.spi.Interceptor;
@@ -59,11 +60,14 @@ class CDIInterceptorWrapperImpl implements CDIInterceptorWrapper {
         Map<Method, List<InterceptorInvoker>> invokers = new HashMap<>();
         // Interceptor as a key in a map is not entirely correct (custom interceptors) but should work in most cases
         Map<Interceptor<?>, Object> interceptorInstances = new HashMap<>();
+        
+        AnnotatedType<?> restClientType = beanManager.createAnnotatedType(restClient);
 
-        List<Annotation> classBindings = getBindings(restClient.getAnnotations(), beanManager);
+        List<Annotation> classBindings = getBindings(restClientType.getAnnotations(), beanManager);
 
-        for (Method method : restClient.getMethods()) {
-            if (method.isDefault() || Modifier.isStatic(method.getModifiers())) {
+        for (AnnotatedMethod<?> method : restClientType.getMethods()) {
+            Method javaMethod = method.getJavaMember();
+            if (javaMethod.isDefault() || method.isStatic()) {
                 continue;
             }
             List<Annotation> methodBindings = getBindings(method.getAnnotations(), beanManager);
@@ -88,7 +92,7 @@ class CDIInterceptorWrapperImpl implements CDIInterceptorWrapper {
                                                                                      i.getBeanClass(), 
                                                                                      creationalContext))));
                     }
-                    invokers.put(method, chain);
+                    invokers.put(javaMethod, chain);
                 }
             }
         }
@@ -108,8 +112,8 @@ class CDIInterceptorWrapperImpl implements CDIInterceptorWrapper {
         return merged.toArray(new Annotation[] {});
     }
 
-    private static List<Annotation> getBindings(Annotation[] annotations, BeanManager beanManager) {
-        if (annotations == null || annotations.length == 0) {
+    private static List<Annotation> getBindings(Set<Annotation> annotations, BeanManager beanManager) {
+        if (annotations == null || annotations.size() == 0) {
             return Collections.emptyList();
         }
         List<Annotation> bindings = new ArrayList<>();
