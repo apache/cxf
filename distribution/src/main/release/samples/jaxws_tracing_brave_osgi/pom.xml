@@ -109,6 +109,7 @@
                             javax.ws.rs.container,
                             org.apache.cxf.tracing.brave,
                             org.osgi.service.blueprint,
+                            javax.xml.ws;version="[2,3)",
                             brave,
                             *
                         </Import-Package>

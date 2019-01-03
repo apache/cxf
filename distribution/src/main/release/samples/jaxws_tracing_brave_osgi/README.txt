@@ -70,7 +70,7 @@ You can verify if the CXF JAX-RS OpenZipkin Brave Blueprint Demo is installed an
   START LEVEL 100 , List Threshold: 50
    ID | State  | Lvl | Version | Name                              
   -----------------------------------------------------------------
-  117 | Active |  80 | 3.3.0.SNAPSHOT | JAX-WS Demo Using Distributed Tracing
+  117 | Active |  80 | 3.3.0.SNAPSHOT | JAX-WS Demo Using Distributed Tracing with OpenZipkin Brave and OSGi
   karaf@root()>
 
 Now, you will be able to access this CXF JAXWS demo service on your Karaf instance at
