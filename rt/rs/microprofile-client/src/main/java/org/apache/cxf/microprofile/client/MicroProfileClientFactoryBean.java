@@ -40,6 +40,7 @@ import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.FilterProviderInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.provider.jsrjsonp.JsrJsonpProvider;
+import org.apache.cxf.microprofile.client.cdi.CDIInterceptorWrapper;
 import org.apache.cxf.microprofile.client.proxy.MicroProfileClientProxyImpl;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 
@@ -97,12 +98,13 @@ public class MicroProfileClientFactoryBean extends JAXRSClientFactoryBean {
     @Override
     protected ClientProxyImpl createClientProxy(ClassResourceInfo cri, boolean isRoot,
                                                 ClientState actualState, Object[] varValues) {
+        CDIInterceptorWrapper interceptorWrapper = CDIInterceptorWrapper.createWrapper(getServiceClass());
         if (actualState == null) {
             return new MicroProfileClientProxyImpl(URI.create(getAddress()), proxyLoader, cri, isRoot,
-                    inheritHeaders, executorService, configuration, varValues);
+                    inheritHeaders, executorService, configuration, interceptorWrapper, varValues);
         } else {
             return new MicroProfileClientProxyImpl(actualState, proxyLoader, cri, isRoot,
-                    inheritHeaders, executorService, configuration, varValues);
+                    inheritHeaders, executorService, configuration, interceptorWrapper, varValues);
         }
     }
 

@@ -42,6 +42,7 @@
             org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://cxf.apache.org/blueprint/jaxrs-client"
         </cxf.export.service>
         <cxf.bundle.activator>org.apache.cxf.jaxrs.client.blueprint.Activator</cxf.bundle.activator>
+        <mp.rest.client.version>1.2-m2</mp.rest.client.version>
     </properties>
     <dependencies>
         <dependency>
@@ -104,7 +105,7 @@
         <dependency>
             <groupId>org.eclipse.microprofile.rest.client</groupId>
             <artifactId>microprofile-rest-client-api</artifactId>
-            <version>1.1</version>
+            <version>${mp.rest.client.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -114,12 +115,12 @@
         <dependency>
             <groupId>javax.json</groupId>
             <artifactId>javax.json-api</artifactId>
-            <version>1.0</version>
+            <version>1.1</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.microprofile.rest.client</groupId>
             <artifactId>microprofile-rest-client-tck</artifactId>
-            <version>1.1</version>
+            <version>${mp.rest.client.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.testng</groupId>

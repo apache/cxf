@@ -41,8 +41,18 @@ public class MPAsyncInvocationInterceptorImpl extends AbstractPhaseInterceptor<M
     private final List<AsyncInvocationInterceptor> interceptors = new ArrayList<>();
 
     
-    MPAsyncInvocationInterceptorImpl() {
+    MPAsyncInvocationInterceptorImpl(Message message) {
         super(Phase.POST_MARSHAL);
+
+        MicroProfileClientProviderFactory factory = MicroProfileClientProviderFactory.getInstance(message);
+        List<ProviderInfo<Object>> aiiProviderList = 
+            factory.getAsyncInvocationInterceptorFactories();
+
+        for (ProviderInfo<Object> providerInfo: aiiProviderList) {
+            AsyncInvocationInterceptor aiInterceptor = 
+                ((AsyncInvocationInterceptorFactory) providerInfo.getProvider()).newInterceptor();
+            interceptors.add(0, aiInterceptor); // sort in reverse order
+        }
     }
 
     List<AsyncInvocationInterceptor> getInterceptors() {
@@ -52,23 +62,14 @@ public class MPAsyncInvocationInterceptorImpl extends AbstractPhaseInterceptor<M
     /** {@inheritDoc}*/
     @Override
     public void handleMessage(Message message) throws Fault {
-        MicroProfileClientProviderFactory factory = MicroProfileClientProviderFactory.getInstance(message);
-        List<ProviderInfo<Object>> aiiProviderList = 
-            factory.getAsyncInvocationInterceptorFactories();
-
-        for (ProviderInfo<Object> providerInfo: aiiProviderList) {
-            AsyncInvocationInterceptor aiInterceptor = 
-                ((AsyncInvocationInterceptorFactory) providerInfo.getProvider()).newInterceptor();
+        for (int i = interceptors.size() - 1; i >= 0; i--) {
             try {
-                aiInterceptor.prepareContext();
-                interceptors.add(0, aiInterceptor); // sort in reverse order
+                interceptors.get(i).prepareContext();
             } catch (Throwable t) {
                 LOG.log(Level.WARNING, "ASYNC_INTERCEPTOR_EXCEPTION_PREPARE_CONTEXT", 
-                        new Object[]{aiInterceptor.getClass().getName(), t});
+                        new Object[]{interceptors.get(i).getClass().getName(), t});
             }
         }
-        
-        //message.getInterceptorChain().add(new MPAsyncInvocationInterceptorPostAsyncImpl(interceptors));
     }
 
 }

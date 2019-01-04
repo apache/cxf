@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -48,6 +47,7 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.microprofile.client.CxfTypeSafeClientBuilder;
 import org.apache.cxf.microprofile.client.config.ConfigFacade;
+import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 public class RestClientBean implements Bean<Object>, PassivationCapable {
@@ -138,20 +138,25 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
 
     private String getBaseUri() {
         String interfaceName = clientInterface.getName();
-        String property = String.format(REST_URI_FORMAT, interfaceName);
-        String baseURI = null;
-        try {
-            baseURI = ConfigFacade.getValue(property, String.class);
-        } catch (NoSuchElementException ex) {
-            // no-op - will revert to baseURL config value (as opposed to baseURI)
-        }
+        String baseURI = ConfigFacade
+            .getOptionalValue(String.format(REST_URI_FORMAT, interfaceName), String.class)
+            .orElseGet(() -> ConfigFacade.getOptionalValue(String.format(REST_URL_FORMAT, interfaceName),
+                                                           String.class).orElse(null));
+
         if (baseURI == null) {
-            // revert to baseUrl
-            property = String.format(REST_URL_FORMAT, interfaceName);
-            baseURI = ConfigFacade.getValue(property, String.class);
-            if (baseURI == null) {
-                throw new IllegalStateException("Unable to determine base URI from configuration");
+            // last, if baseUrl/Uri is not specified via MP Config, check the @RegisterRestClient annotation
+            RegisterRestClient anno = clientInterface.getAnnotation(RegisterRestClient.class);
+            if (anno != null) {
+                String annoUri = anno.baseUri();
+                if (annoUri != null && !"".equals(anno.baseUri())) {
+                    baseURI = annoUri;
+                }
             }
+        }
+
+        if (baseURI == null) {
+            throw new IllegalStateException("Unable to determine base URI from configuration for "
+                                            + interfaceName);
         }
         return baseURI;
     }

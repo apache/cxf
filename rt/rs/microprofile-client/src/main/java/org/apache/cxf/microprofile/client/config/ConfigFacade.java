@@ -20,6 +20,7 @@
 package org.apache.cxf.microprofile.client.config;
 
 import java.util.Optional;
+import java.util.OptionalLong;
 
 import org.eclipse.microprofile.config.Config;
 import org.eclipse.microprofile.config.ConfigProvider;
@@ -28,7 +29,7 @@ public final class ConfigFacade {
 
     private ConfigFacade() {
     }
-    
+
     private static Optional<Config> config() {
         Config c;
         try {
@@ -39,15 +40,22 @@ public final class ConfigFacade {
         }
         return Optional.ofNullable(c);
     }
-    
+
     public static <T> Optional<T> getOptionalValue(String propertyName, Class<T> clazz) {
         Optional<Config> c = config();
         return c.isPresent() ? c.get().getOptionalValue(propertyName, clazz) : Optional.empty();
     }
-    
+
     public static <T> T getValue(String propertyName, Class<T> clazz) {
         Optional<Config> c = config();
         return c.isPresent() ? c.get().getValue(propertyName, clazz) : null;
     }
-    
+
+    public static OptionalLong getOptionalLong(String propName) {
+        Optional<Config> c = config();
+        Optional<Long> opt =
+            c.isPresent() ? c.get().getOptionalValue(propName, Long.class) : Optional.empty();
+        return opt.isPresent() ? OptionalLong.of(opt.get()) : OptionalLong.empty();
+
+    }
 }
