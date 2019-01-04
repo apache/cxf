@@ -20,13 +20,12 @@
 package org.apache.cxf.systest.servlet.resolver;
 
 
-import java.net.URL;
-
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 import org.junit.Test;
@@ -35,20 +34,13 @@ import org.junit.Test;
 public class ResolverTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(ResolverTest.class);
 
-    public ResolverTest() {
-    }
-
     @Test
     public void startServer() throws Throwable {
         Server server = new org.eclipse.jetty.server.Server(Integer.parseInt(PORT));
 
         WebAppContext webappcontext = new WebAppContext();
         webappcontext.setContextPath("/resolver");
-
-        URL res = getClass().getResource("/resolver");
-        String warPath = res.toURI().getPath();
-
-        webappcontext.setWar(warPath);
+        webappcontext.setBaseResource(Resource.newClassPathResource("/resolver"));
 
         HandlerCollection handlers = new HandlerCollection();
         handlers.setHandlers(new Handler[] {webappcontext, new DefaultHandler()});
