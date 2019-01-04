@@ -95,6 +95,7 @@
                                         <artifactId>cxf-systests-java2ws</artifactId>
                                         <version>${project.version}</version>
                                         <classifier>test</classifier>
+                                        <type>HelloWorld.wsdl</type>
                                     </wsdlArtifact>
                                 </wsdlOption>
                             </wsdlOptions>
@@ -141,7 +142,7 @@
             <artifactId>cxf-systests-java2ws</artifactId>
             <version>${project.version}</version>
             <classifier>test</classifier>
-            <type>wsdl</type>
+            <type>HelloWorld.wsdl</type>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
