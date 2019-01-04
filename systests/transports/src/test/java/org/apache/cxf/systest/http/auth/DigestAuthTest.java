@@ -49,8 +49,6 @@ public class DigestAuthTest extends AbstractBusClientServerTestBase {
         new QName("http://apache.org/hello_world", "SOAPService");
     private final QName mortimerQ =
         new QName("http://apache.org/hello_world", "Mortimer");
-    public DigestAuthTest() {
-    }
 
     @BeforeClass
     public static void startServer() throws Exception {
