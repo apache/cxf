@@ -2508,6 +2508,12 @@
                 <version>${cxf.opentracing.version}</version>
             </dependency>
             <dependency>
+                <groupId>io.opentracing</groupId>
+                <artifactId>opentracing-mock</artifactId>
+                <version>${cxf.opentracing.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>io.jaegertracing</groupId>
                 <artifactId>jaeger-core</artifactId>
                 <version>${cxf.jaeger.version}</version>

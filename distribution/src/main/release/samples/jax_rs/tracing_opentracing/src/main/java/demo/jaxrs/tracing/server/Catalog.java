@@ -21,6 +21,7 @@ package demo.jaxrs.tracing.server;
 
 
 import java.io.IOException;
+import java.io.Reader;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -36,6 +37,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
@@ -45,6 +47,12 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.tracing.Traceable;
 import org.apache.cxf.tracing.TracerContext;
+
+import demo.jaxrs.tracing.GoogleBooksApi;
+import feign.Feign;
+import feign.httpclient.ApacheHttpClient;
+import feign.opentracing.TracingClient;
+import io.opentracing.Tracer;
 
 @Path("/catalog")
 public class Catalog {
@@ -129,6 +137,21 @@ public class Catalog {
         }
 
         return Response.ok().build();
+    }
+    
+    @GET
+    @Path("/search")
+    @Produces(MediaType.APPLICATION_JSON)
+    public JsonObject search(@QueryParam("q") final String query, @Context final TracerContext tracing) throws Exception {
+        final GoogleBooksApi api = Feign
+            .builder()
+            .client(new TracingClient(new ApacheHttpClient(), tracing.unwrap(Tracer.class)))
+            .target(GoogleBooksApi.class, "https://www.googleapis.com");
+     
+        final feign.Response response = api.search(query);
+        try (final Reader reader = response.body().asReader()) {
+            return Json.createReader(reader).readObject();
+        }
     }
 }
 

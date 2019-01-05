@@ -97,6 +97,17 @@ public class OpenTracingContext implements TracerContext {
         }
     }
     
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> T unwrap(final Class<T> clazz) {
+        if (Tracer.class.equals(clazz)) {
+            return (T)tracer;
+        } else {
+            throw new IllegalArgumentException("The class is '" + clazz
+                + "'not supported and cannot be unwrapped");
+        }
+    }
+    
     private Scope newOrChildSpan(final String description, final Span parent) {
         if (parent == null) {
             return tracer.buildSpan(description).startActive(true);

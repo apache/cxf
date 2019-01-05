@@ -131,5 +131,20 @@
             <groupId>io.jaegertracing</groupId>
             <artifactId>jaeger-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.github.openfeign</groupId>
+            <artifactId>feign-core</artifactId>
+            <version>10.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.openfeign</groupId>
+            <artifactId>feign-httpclient</artifactId>
+            <version>10.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.openfeign.opentracing</groupId>
+            <artifactId>feign-opentracing</artifactId>
+            <version>0.1.0</version>
+        </dependency>
     </dependencies>
 </project>

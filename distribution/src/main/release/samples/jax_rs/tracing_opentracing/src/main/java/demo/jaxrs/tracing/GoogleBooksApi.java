@@ -17,29 +17,15 @@
  * under the License.
  */
 
-package demo.jaxrs.tracing.server;
+package demo.jaxrs.tracing;
 
+import feign.Headers;
+import feign.Param;
+import feign.RequestLine;
+import feign.Response;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
-
-import org.apache.cxf.jaxrs.provider.jsrjsonp.JsrJsonpProvider;
-import org.apache.cxf.tracing.opentracing.jaxrs.OpenTracingFeature;
-
-@ApplicationPath("/")
-public class CatalogApplication extends Application {
-    @Override
-    public Set<Object> getSingletons() {
-        return new HashSet<>(
-            Arrays.asList(
-                new Catalog(),
-                new OpenTracingFeature(),
-                new JsrJsonpProvider()
-            )
-        );
-    }
+public interface GoogleBooksApi {
+    @RequestLine("GET /books/v1/volumes?q={q}")
+    @Headers("Accept: application/json")
+    Response search(@Param("q") String query);
 }
