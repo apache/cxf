@@ -14,7 +14,7 @@ following REST(ful) endpoints are available:
 To collect the traces, please run Jaeger distributed tracer components, the
 simplest way would be using Docker:
 
-  docker run --rm -it --network=host jaegertracing/all-in-one
+  docker run --rm -it --network=host -p 16686:16686 -p 14268:14268 jaegertracing/all-in-one
 
 The following sample traces should be available in Jaeger UI (available
 be default at http://localhost:16686/search):

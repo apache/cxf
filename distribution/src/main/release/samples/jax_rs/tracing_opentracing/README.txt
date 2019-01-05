@@ -9,6 +9,10 @@ following services at URL http://localhost:9000/catalog:
  - POST to http://localhost:9000/catalog 
  - GET to http://localhost:9000/catalog/<id> 
  - DELETE to URL http://localhost:9000/catalog/<id> 
+ - GET to URL http://localhost:9000/catalog/search?q=<query>
+
+The last endpoint calls public Google Books API in order to search the books by 
+query criteria. It demonstrates the integration with native OpenTracing instrumentation.
 
 Building and running the demo using Maven
 ---------------------------------------

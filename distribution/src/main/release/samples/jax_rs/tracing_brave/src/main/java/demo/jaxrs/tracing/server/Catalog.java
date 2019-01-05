@@ -21,6 +21,9 @@ package demo.jaxrs.tracing.server;
 
 
 import java.io.IOException;
+import java.io.StringReader;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -36,6 +39,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
@@ -45,6 +49,14 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.tracing.Traceable;
 import org.apache.cxf.tracing.TracerContext;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.util.EntityUtils;
+
+import brave.http.HttpTracing;
+import brave.httpclient.TracingHttpClientBuilder;
 
 @Path("/catalog")
 public class Catalog {
@@ -119,6 +131,34 @@ public class Catalog {
 
         return book;
     }
+
+    @GET
+    @Path("/search")
+    @Produces(MediaType.APPLICATION_JSON)
+    public JsonObject search(@QueryParam("q") final String query, @Context final TracerContext tracing) throws Exception {
+        final CloseableHttpClient httpclient = TracingHttpClientBuilder
+            .create(tracing.unwrap(HttpTracing.class))
+            .build();
+    
+        try {
+            final URI uri = new URIBuilder("https://www.googleapis.com/books/v1/volumes")
+                .setParameter("q", query)
+                .build();
+            
+            final HttpGet request = new HttpGet(uri);
+            request.setHeader("Accept", "application/json");
+            
+            final HttpResponse response = httpclient.execute(request);
+            final String data = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
+            try (final StringReader reader = new StringReader(data)) {
+                return Json.createReader(reader).readObject();
+            }
+        } finally {
+            httpclient.close();
+        }
+    }
+
+    
 
     @DELETE
     @Path("/{id}")

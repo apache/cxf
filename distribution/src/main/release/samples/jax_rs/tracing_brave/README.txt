@@ -9,6 +9,10 @@ following services at URL http://localhost:9000/catalog:
  - POST to http://localhost:9000/catalog 
  - GET to URL http://localhost:9000/catalog/<id>
  - DELETE to URL http://localhost:9000/catalog/<id>
+ - GET to URL http://localhost:9000/catalog/search?q=<query>
+ 
+The last endpoint calls public Google Books API in order to search the books by 
+query criteria. It demonstrates the integration with native Brave instrumentation.
  
 Building and running the demo using Maven
 ---------------------------------------
@@ -26,7 +30,12 @@ Using either UNIX or Windows:
   mvn install
   mvn -Pserver  (from one command line window)
   mvn -Pclient  (from a second command line window)
-    
+  
+Alternatively, there are different client examples available (Apache HttpClient, OkHttp3, Apache HttpAsyncClient):
+  
+  mvn -Papache  (from a second command line window)
+  mvn -Pokhttp3  (from a second command line window)
+  mvn -Pasync  (from a second command line window)
 
 To remove the target dir, run mvn clean".
 

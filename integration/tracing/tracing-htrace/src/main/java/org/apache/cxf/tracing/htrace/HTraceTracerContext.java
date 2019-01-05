@@ -89,6 +89,17 @@ public class HTraceTracerContext implements TracerContext {
             currentSpan.addTimelineAnnotation(message);
         }
     }
+    
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> T unwrap(Class<T> clazz) {
+        if (Tracer.class.equals(clazz)) {
+            return (T)tracer;
+        } else {
+            throw new IllegalArgumentException("The class is '" + clazz
+                + "'not supported and cannot be unwrapped");
+        }
+    }
 
     private boolean isTracing() {
         return Tracer.getCurrentSpan() != null;

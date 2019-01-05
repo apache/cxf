@@ -17,29 +17,34 @@
  * under the License.
  */
 
-package demo.jaxrs.tracing.server;
+package org.apache.cxf.tracing.htrace;
 
+import org.apache.htrace.core.SpanReceiver;
+import org.apache.htrace.core.Tracer;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import org.junit.Before;
+import org.junit.Test;
 
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.junit.Assert.assertThat;
 
-import org.apache.cxf.jaxrs.provider.jsrjsonp.JsrJsonpProvider;
-import org.apache.cxf.tracing.opentracing.jaxrs.OpenTracingFeature;
+public class HTraceTracerContextTest {
+    private HTraceTracerContext context; 
+    private Tracer tracer;
 
-@ApplicationPath("/")
-public class CatalogApplication extends Application {
-    @Override
-    public Set<Object> getSingletons() {
-        return new HashSet<>(
-            Arrays.asList(
-                new Catalog(),
-                new OpenTracingFeature(),
-                new JsrJsonpProvider()
-            )
-        );
+    @Before
+    public void setUp() {
+        tracer = new Tracer.Builder("test").build();
+        context = new HTraceTracerContext(tracer);
+    }
+    
+    @Test
+    public void testUnwrapTracer() {
+        assertThat(context.unwrap(Tracer.class), sameInstance(tracer));
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testUnwrapUnsupportedClass() {
+        context.unwrap(SpanReceiver.class);
     }
 }

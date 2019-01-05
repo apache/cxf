@@ -22,6 +22,8 @@ package demo.jaxrs.tracing.server;
 import com.uber.jaeger.Configuration;
 import com.uber.jaeger.samplers.ConstSampler;
 
+import demo.jaxrs.tracing.Slf4jLogSender;
+
 import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -44,7 +46,7 @@ public class Server {
 
         final Tracer tracer = new Configuration("tracer-server", 
                 new Configuration.SamplerConfiguration(ConstSampler.TYPE, 1),
-                new Configuration.ReporterConfiguration()
+                new Configuration.ReporterConfiguration(new Slf4jLogSender())
             ).getTracer();
         GlobalTracer.register(tracer);
         
