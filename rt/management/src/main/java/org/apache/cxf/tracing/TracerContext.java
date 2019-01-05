@@ -59,4 +59,12 @@ public interface TracerContext {
      * @param message timeline message
      */
     void timeline(String message);
+    
+    /**
+     * Returns an object of the specified type to allow access to the specific API 
+     * of the tracing provider.
+     * @param clazz - the class of the object to be returned.
+     * @return an instance of the specified class 
+     */
+    <T> T unwrap(Class<T> clazz);
 }

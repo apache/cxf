@@ -25,6 +25,7 @@ import org.apache.cxf.tracing.TracerContext;
 import brave.Span;
 import brave.Tracer;
 import brave.Tracer.SpanInScope;
+import brave.Tracing;
 import brave.http.HttpTracing;
 
 public class BraveTracerContext implements TracerContext {
@@ -100,6 +101,21 @@ public class BraveTracerContext implements TracerContext {
         final Span current = tracer.currentSpan();
         if (current != null) {
             current.annotate(message);
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> T unwrap(final Class<T> clazz) {
+        if (HttpTracing.class.equals(clazz)) {
+            return (T)brave;
+        } else if (Tracing.class.equals(clazz)) {
+            return (T)brave.tracing();
+        } else if (Tracer.class.equals(clazz)) {
+            return (T)tracer;
+        } else {
+            throw new IllegalArgumentException("The class is '" + clazz
+                  + "'not supported and cannot be unwrapped");
         }
     }
     
