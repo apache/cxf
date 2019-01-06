@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.tracing.opentracing;
 
-import io.opentracing.ScopeManager;
 import io.opentracing.Tracer;
 import io.opentracing.mock.MockTracer;
 
@@ -45,7 +44,6 @@ public class OpenTracingContextTest {
     
     @Test(expected = IllegalArgumentException.class)
     public void testUnwrapUnsupportedClass() {
-        context.unwrap(ScopeManager.class);
+        context.unwrap(Tracer.SpanBuilder.class);
     }
-
 }
