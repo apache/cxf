@@ -16,12 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.httpsignature.exception;
+package org.apache.cxf.rs.security.httpsignature.provider;
 
-import org.apache.cxf.rs.security.httpsignature.SignatureException;
+import org.apache.cxf.rs.security.httpsignature.utils.DefaultSignatureConstants;
 
-public class MissingSignatureHeaderException extends SignatureException {
-    public MissingSignatureHeaderException(String message) {
-        super(message);
+public class MockAlgorithmProvider implements AlgorithmProvider {
+    @Override
+    public String getAlgorithmName(String keyId) {
+        return DefaultSignatureConstants.SIGNING_ALGORITHM;
     }
 }

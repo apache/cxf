@@ -16,13 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.httpsignature;
+package org.apache.cxf.rs.security.httpsignature.exception;
 
-import java.security.Provider;
-import java.security.Security;
-
-public class MockSecurityProvider implements SecurityProvider {
-    public Provider getProvider(String keyId) {
-        return Security.getProvider(DefaultSignatureConstants.SECURITY_PROVIDER);
+public class MissingDigestException extends SignatureException {
+    public MissingDigestException(String message) {
+        super(message);
     }
 }

@@ -16,12 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.httpsignature.exception;
+package org.apache.cxf.rs.security.httpsignature.provider;
 
-import org.apache.cxf.rs.security.httpsignature.SignatureException;
+import java.security.PublicKey;
 
-public class DifferentAlgorithmsException extends SignatureException {
-    public DifferentAlgorithmsException(String message) {
-        super(message);
+public class MockPublicKeyProvider implements PublicKeyProvider {
+
+    private PublicKey publicKey;
+
+    public MockPublicKeyProvider(PublicKey publicKey) {
+        this.publicKey = publicKey;
+    }
+
+    @Override
+    public PublicKey getKey(String keyId) {
+        return getPublicKey(keyId);
+    }
+
+    private PublicKey getPublicKey(String keyId) {
+        return publicKey;
     }
 }

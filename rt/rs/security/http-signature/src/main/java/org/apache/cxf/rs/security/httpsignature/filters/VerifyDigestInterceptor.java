@@ -16,16 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.httpsignature;
+package org.apache.cxf.rs.security.httpsignature.filters;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Scanner;
 import java.util.logging.Logger;
 
 import javax.annotation.Priority;
@@ -36,23 +34,25 @@ import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.ReaderInterceptorContext;
 
 import org.apache.cxf.common.logging.LogUtils;
-
+import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.rs.security.httpsignature.DigestVerifier;
+import org.apache.cxf.rs.security.httpsignature.exception.DigestFailureException;
 
 /**
- * RS CXF Reader Interceptor which extracts signature data from the message and sends it to the message verifier
+ * RS CXF Reader Interceptor which extract the body of the message and verifies the digest
  */
 @Provider
 @Priority(Priorities.AUTHENTICATION)
-public final class VerifySignatureReaderInterceptor implements ReaderInterceptor {
-    private static final Logger LOG = LogUtils.getL7dLogger(VerifySignatureReaderInterceptor.class);
+public final class VerifyDigestInterceptor implements ReaderInterceptor {
+    private static final Logger LOG = LogUtils.getL7dLogger(VerifyDigestInterceptor.class);
 
-    private MessageVerifier messageVerifier;
+    private DigestVerifier digestVerifier;
 
     private boolean enabled;
 
-    public VerifySignatureReaderInterceptor() {
+    public VerifyDigestInterceptor() {
         setEnabled(true);
-        setMessageVerifier(new MessageVerifier(true));
+        setDigestVerifier(new DigestVerifier());
     }
 
     @Override
@@ -65,11 +65,11 @@ public final class VerifySignatureReaderInterceptor implements ReaderInterceptor
 
         Map<String, List<String>> responseHeaders = context.getHeaders();
 
-        String messageBody = extractMessageBody(context);
+        byte[] messageBody = extractMessageBody(context);
 
-        messageVerifier.verifyMessage(responseHeaders, messageBody);
+        digestVerifier.inspectDigest(messageBody, responseHeaders);
 
-        context.setInputStream(new ByteArrayInputStream(messageBody.getBytes()));
+        context.setInputStream(new ByteArrayInputStream(messageBody));
         LOG.fine("Finished interceptor message verification process");
 
         return context.proceed();
@@ -83,24 +83,20 @@ public final class VerifySignatureReaderInterceptor implements ReaderInterceptor
         this.enabled = enabled;
     }
 
-    public void setMessageVerifier(MessageVerifier messageVerifier) {
-        Objects.requireNonNull(messageVerifier);
-        this.messageVerifier = messageVerifier;
+    public DigestVerifier getDigestVerifier() {
+        return digestVerifier;
     }
 
-    public MessageVerifier getMessageVerifier() {
-        return messageVerifier;
+    public void setDigestVerifier(DigestVerifier digestVerifier) {
+        Objects.requireNonNull(digestVerifier);
+        this.digestVerifier = digestVerifier;
     }
 
-    private String extractMessageBody(ReaderInterceptorContext context) {
+    private byte[] extractMessageBody(ReaderInterceptorContext context) {
         try (InputStream is = context.getInputStream()) {
-            try (Scanner scanner = new Scanner(is, StandardCharsets.UTF_8.name())) {
-                return scanner.useDelimiter("\\A").next();
-            }
-        } catch (IOException exception) {
-            throw messageVerifier.getExceptionHandler()
-                    .handle(new SignatureException("failed to validate the digest", exception),
-                            SignatureExceptionType.DIGEST_FAILURE);
+            return IOUtils.readBytesFromStream(is);
+        } catch (IOException e) {
+            throw new DigestFailureException("failed to validate the digest", e);
         }
     }
 

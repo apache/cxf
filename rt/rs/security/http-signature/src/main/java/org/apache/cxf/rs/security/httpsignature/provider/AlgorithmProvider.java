@@ -16,19 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.httpsignature;
-
-import java.security.PublicKey;
+package org.apache.cxf.rs.security.httpsignature.provider;
 
 @FunctionalInterface
-public interface PublicKeyProvider {
+public interface AlgorithmProvider {
 
     /**
      *
      * @param keyId
-     * @return the public key (which is never {@code null})
-     * @throws NullPointerException if the provided key ID is {@code null}
+     * @return the algorithm name (which is never {@code null})
      */
-    PublicKey getKey(String keyId);
-
+    String getAlgorithmName(String keyId);
 }

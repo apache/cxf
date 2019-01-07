@@ -16,14 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.httpsignature;
+package org.apache.cxf.rs.security.httpsignature.provider;
 
-public class SignatureException extends RuntimeException {
-    public SignatureException(String message) {
-        this(message, null);
-    }
+import java.security.Provider;
+import java.security.Security;
 
-    public SignatureException(String message, Throwable cause) {
-        super(message, cause);
+import org.apache.cxf.rs.security.httpsignature.utils.DefaultSignatureConstants;
+
+public class MockSecurityProvider implements SecurityProvider {
+    public Provider getProvider(String keyId) {
+        return Security.getProvider(DefaultSignatureConstants.SECURITY_PROVIDER);
     }
 }

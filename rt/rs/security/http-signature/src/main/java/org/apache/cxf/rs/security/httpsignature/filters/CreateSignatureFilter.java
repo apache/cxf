@@ -16,8 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.httpsignature;
+package org.apache.cxf.rs.security.httpsignature.filters;
 
+import java.io.IOException;
 import java.util.Objects;
 import java.util.logging.Logger;
 
@@ -30,24 +31,24 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.rs.security.httpsignature.MessageSigner;
 
 /**
- * RS CXF Filter which extracts signature data from the context and sends it to the message verifier
+ * RS CXF Filter which signs outgoing messages. It does not create a digest header
  *
  */
 @Provider
 @PreMatching
 @Priority(Priorities.AUTHENTICATION)
-public final class VerifySignatureFilter implements ContainerRequestFilter {
+public final class CreateSignatureFilter implements ContainerRequestFilter {
     private static final Logger LOG = LogUtils.getL7dLogger(VerifySignatureFilter.class);
 
-    private MessageVerifier messageVerifier;
+    private MessageSigner messageSigner;
 
     private boolean enabled;
 
-    public VerifySignatureFilter() {
+    public CreateSignatureFilter() {
         setEnabled(true);
-        setMessageVerifier(new MessageVerifier(false));
     }
 
     @Override
@@ -57,17 +58,34 @@ public final class VerifySignatureFilter implements ContainerRequestFilter {
             return;
         }
 
-        LOG.fine("Starting filter message verification process");
+        if (messageSigner == null) {
+            LOG.warning("Message signer cannot be null");
+            return;
+        }
 
         MultivaluedMap<String, String> responseHeaders = requestCtx.getHeaders();
+        if (responseHeaders.containsKey("Signature")) {
+            LOG.fine("Message already contains a signature");
+            return;
+        }
 
-        messageVerifier.verifyMessage(responseHeaders);
+        LOG.fine("Starting filter message signing process");
+        try {
+            messageSigner.sign(responseHeaders,
+                requestCtx.getUriInfo().getAbsolutePath().getPath(), requestCtx.getMethod());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         LOG.fine("Finished filter message verification process");
     }
 
-    public void setMessageVerifier(MessageVerifier messageVerifier) {
-        Objects.requireNonNull(messageVerifier);
-        this.messageVerifier = messageVerifier;
+    public MessageSigner getMessageSigner() {
+        return messageSigner;
+    }
+
+    public void setMessageSigner(MessageSigner messageSigner) {
+        Objects.requireNonNull(messageSigner);
+        this.messageSigner = messageSigner;
     }
 
     public void setEnabled(boolean enabled) {

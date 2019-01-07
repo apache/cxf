@@ -16,7 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jaxrs.security.httpsignature;
+package org.apache.cxf.rs.security.httpsignature.exception;
 
-public class HttpSignatureFilter {
+public class InvalidSignatureHeaderException extends SignatureException {
+    public InvalidSignatureHeaderException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

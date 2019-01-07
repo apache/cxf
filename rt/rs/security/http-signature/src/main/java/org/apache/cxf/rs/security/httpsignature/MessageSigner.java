@@ -24,69 +24,72 @@ import java.security.PrivateKey;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
-import org.tomitribe.auth.signatures.Signature;
+import org.apache.cxf.rs.security.httpsignature.utils.DefaultSignatureConstants;
+import org.apache.cxf.rs.security.httpsignature.utils.SignatureHeaderUtils;
 
 public class MessageSigner {
     private final String digestAlgorithmName;
-    private final String signatureAlgorithmName;
+    private SignatureCreator signatureCreator;
 
-    /**
-     * Message signer using standard digest and signing algorithm
-     */
-    public MessageSigner() {
-        this(DefaultSignatureConstants.SIGNING_ALGORITHM, DefaultSignatureConstants.DIGEST_ALGORITHM);
+    public MessageSigner(String signatureAlgorithmName,
+                         String digestAlgorithmName,
+                         PrivateKey privateKey,
+                         String keyId) {
+        this.digestAlgorithmName = digestAlgorithmName;
+        this.signatureCreator = new TomitribeSignatureCreator(signatureAlgorithmName, privateKey, keyId);
     }
 
-    public MessageSigner(String signatureAlgorithmName, String digestAlgorithmName) {
-        this.digestAlgorithmName = digestAlgorithmName;
-        this.signatureAlgorithmName = signatureAlgorithmName;
+    public MessageSigner(PrivateKey privateKey,
+                         String keyId) {
+        this(DefaultSignatureConstants.SIGNING_ALGORITHM,
+                DefaultSignatureConstants.DIGEST_ALGORITHM,
+                privateKey,
+                keyId);
     }
 
     public void sign(Map<String, List<String>> messageHeaders,
-                     String messageBody,
-                     PrivateKey privateKey,
-                     String keyId) throws NoSuchAlgorithmException, IOException {
-        if (messageBody != null) {
-            messageHeaders.put("Digest",
-                    Collections.singletonList(SignatureHeaderUtils
-                            .createDigestHeader(messageBody, digestAlgorithmName)));
-        }
+                     String uri,
+                     String method) throws IOException {
+        inspectArguments(messageHeaders, uri, method);
 
-        String method = SignatureHeaderUtils.getMethod(messageHeaders);
-        String uri = SignatureHeaderUtils.getUri(messageHeaders);
-
-        messageHeaders.put("Signature", Collections.singletonList(createSignature(messageHeaders,
-                privateKey,
-                keyId,
+        messageHeaders.put("Signature", Collections.singletonList(signatureCreator.createSignature(messageHeaders,
                 uri,
                 method
         )));
     }
 
-    private String createSignature(Map<String, List<String>> messageHeaders,
-                                   PrivateKey privateKey,
-                                   String keyId,
-                                   String uri,
-                                   String method) throws IOException {
-        if (messageHeaders == null) {
-            throw new IllegalArgumentException("Message headers cannot be null.");
+    public void sign(Map<String, List<String>> messageHeaders,
+                     String uri,
+                     String method,
+                     String messageBody) throws NoSuchAlgorithmException, IOException {
+        inspectArguments(messageHeaders, uri, method);
+
+        Objects.requireNonNull(messageBody);
+
+        messageHeaders.put("Digest",
+                Collections.singletonList(SignatureHeaderUtils
+                        .createDigestHeader(messageBody, digestAlgorithmName)));
+
+        messageHeaders.put("Signature",
+                Collections.singletonList(signatureCreator.createSignature(messageHeaders,
+                        uri,
+                        method
+        )));
+    }
+
+    private void inspectArguments(Map<String, List<String>> messageHeaders,
+                                  String uri,
+                                  String method) {
+        Objects.requireNonNull(messageHeaders);
+        Objects.requireNonNull(uri);
+        Objects.requireNonNull(method);
+
+        if (messageHeaders.isEmpty()) {
+            throw new IllegalStateException("message headers are empty");
         }
-
-        String[] headerKeysForSignature =
-                messageHeaders.keySet().stream().map(String::toLowerCase).toArray(String[]::new);
-
-        if (headerKeysForSignature.length == 0) {
-            throw new IllegalArgumentException("There has to be a value in the list of header keys for signature");
-        }
-
-        if (keyId == null) {
-            throw new IllegalArgumentException("Key id cannot be null.");
-        }
-
-        final Signature signature = new Signature(keyId, signatureAlgorithmName, null, headerKeysForSignature);
-        final org.tomitribe.auth.signatures.Signer signer =
-                new org.tomitribe.auth.signatures.Signer(privateKey, signature);
-        return signer.sign(method, uri, SignatureHeaderUtils.mapHeaders(messageHeaders)).toString();
+        messageHeaders.forEach((key, list) -> Objects.requireNonNull(list));
+        messageHeaders.forEach((key, list) -> list.forEach(Objects::requireNonNull));
     }
 }

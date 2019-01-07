@@ -18,14 +18,12 @@
  */
 package org.apache.cxf.rs.security.httpsignature;
 
-public enum SignatureExceptionType {
-    MISSING_SIGNATURE_HEADER,
-    INVALID_SIGNATURE_HEADER,
-    FAILED_TO_VERIFY_SIGNATURE,
-    INVALID_DATA_TO_VERIFY_SIGNATURE,
-    DIGEST_FAILURE,
-    MISSING_DIGEST,
-    DIFFERENT_DIGESTS,
-    MULTIPLE_SIGNATURE_HEADERS,
-    DIFFERENT_ALGORITHMS
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+public interface SignatureCreator {
+    String createSignature(Map<String, List<String>> messageHeaders,
+                           String uri,
+                           String method) throws IOException;
 }

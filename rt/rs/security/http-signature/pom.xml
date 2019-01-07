@@ -21,9 +21,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <packaging>bundle</packaging>
-    <name>Apache CXF Runtime JOSE Core</name>
+    <name>Apache CXF Runtime Http-Signature</name>
     <description>
-        Integrate https://tools.ietf.org/html/draft-cavage-http-signatures-09 as JAX-RS filters for signing and
+        Integrate https://tools.ietf.org/html/draft-cavage-http-signatures-10 as JAX-RS filters for signing and
         verifying requests.
     </description>
     <url>http://cxf.apache.org</url>
@@ -34,7 +34,7 @@
         <relativePath>../../../../parent/pom.xml</relativePath>
     </parent>
 
-    <artifactId>http-signature</artifactId>
+    <artifactId>cxf-rt-rs-security-http-signature</artifactId>
     <properties>
         <cxf.module.name>org.apache.cxf.rs.security.http.signature</cxf.module.name>
     </properties>
@@ -60,8 +60,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
             <version>${cxf.javax.ws.rs.version}</version>
         </dependency>
         <dependency>

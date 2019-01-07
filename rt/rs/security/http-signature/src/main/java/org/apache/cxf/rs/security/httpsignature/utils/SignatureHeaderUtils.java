@@ -16,14 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.httpsignature;
+package org.apache.cxf.rs.security.httpsignature.utils;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import java.util.regex.Pattern;
-
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
 
 public final class SignatureHeaderUtils {
 
@@ -42,18 +39,6 @@ public final class SignatureHeaderUtils {
     }
 
     /**
-     * Loads and decodes a PEM key to be ready to create a KeySpec
-     * @param resource The raw bytes from a PEM file
-     * @return decoded bytes which can be input to a KeySpec
-     */
-    public static byte[] loadPEM(byte[] resource) {
-        String pem = new String(resource, ISO_8859_1);
-        Pattern parse = Pattern.compile("(?m)(?s)^---*BEGIN.*---*$(.*)^---*END.*---*$.*");
-        String encoded = parse.matcher(pem).replaceFirst("$1");
-        return Base64.getMimeDecoder().decode(encoded);
-    }
-
-    /**
      * Get a base64 encoded digest using the Algorithm specified, typically SHA-256
      *
      * @param messageBody         The body of the message to be used to create the Digest
@@ -65,7 +50,7 @@ public final class SignatureHeaderUtils {
             throws NoSuchAlgorithmException {
         MessageDigest messageDigest = getDigestAlgorithm(digestAlgorithmName);
         messageDigest.update(messageBody.getBytes());
-        return digestAlgorithmName + "=" + new String(Base64.getEncoder().encode(messageDigest.digest()));
+        return digestAlgorithmName + "=" + Base64.getEncoder().encodeToString(messageDigest.digest());
     }
 
     /**
@@ -86,20 +71,6 @@ public final class SignatureHeaderUtils {
         }
     }
 
-    public static String getMethod(Map<String, List<String>> responseHeaders) {
-        if (responseHeaders.containsKey("(request-target)")) {
-            return getRequestTargetSubString(responseHeaders.get("(request-target)").get(0), 0);
-        }
-        return "";
-    }
-
-    public static String getUri(Map<String, List<String>> responseHeaders) {
-        if (responseHeaders.containsKey("(request-target)")) {
-            return getRequestTargetSubString(responseHeaders.get("(request-target)").get(0), 1);
-        }
-        return "";
-    }
-
     private static String concatValues(List<String> values) {
         StringBuilder sb = new StringBuilder();
         for (int x = 0; x < values.size(); x++) {
@@ -109,10 +80,5 @@ public final class SignatureHeaderUtils {
             }
         }
         return sb.toString();
-    }
-
-    private static String getRequestTargetSubString(String requestTarget, int index) {
-        List<String> subStrings = Arrays.asList(requestTarget.split(" "));
-        return subStrings.get(index);
     }
 }

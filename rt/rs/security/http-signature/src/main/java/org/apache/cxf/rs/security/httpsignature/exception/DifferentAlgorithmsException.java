@@ -16,9 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.httpsignature;
+package org.apache.cxf.rs.security.httpsignature.exception;
 
-@FunctionalInterface
-public interface ExceptionHandler {
-    RuntimeException handle(SignatureException exception, SignatureExceptionType type);
+public class DifferentAlgorithmsException extends SignatureException {
+    public DifferentAlgorithmsException(String message) {
+        super(message, null);
+    }
 }

@@ -16,15 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.httpsignature;
+package org.apache.cxf.rs.security.httpsignature.exception;
 
-@FunctionalInterface
-public interface AlgorithmProvider {
-
-    /**
-     *
-     * @param keyId
-     * @return the algorithm name (which is never {@code null})
-     */
-    String getAlgorithmName(String keyId);
+public class MissingSignatureHeaderException extends SignatureException {
+    public MissingSignatureHeaderException(String message) {
+        super(message);
+    }
 }

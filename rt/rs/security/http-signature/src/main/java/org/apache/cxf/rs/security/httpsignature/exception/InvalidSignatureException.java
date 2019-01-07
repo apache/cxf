@@ -16,18 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.httpsignature;
+package org.apache.cxf.rs.security.httpsignature.exception;
 
-import java.security.Provider;
-
-@FunctionalInterface
-public interface SecurityProvider {
-
-    /**
-     *
-     * @param keyId
-     * @return the security provider (which is never {@code null})
-     * @throws NullPointerException if the provided key ID is {@code null}
-     */
-    Provider getProvider(String keyId);
+public class InvalidSignatureException extends SignatureException {
+    public InvalidSignatureException(String message) {
+        super(message);
+    }
 }

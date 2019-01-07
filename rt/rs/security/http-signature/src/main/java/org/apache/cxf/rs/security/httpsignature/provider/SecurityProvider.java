@@ -16,12 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.httpsignature.exception;
+package org.apache.cxf.rs.security.httpsignature.provider;
 
-import org.apache.cxf.rs.security.httpsignature.SignatureException;
+import java.security.Provider;
 
-public class MissingDigestException extends SignatureException {
-    public MissingDigestException(String message) {
-        super(message);
-    }
+@FunctionalInterface
+public interface SecurityProvider {
+
+    /**
+     *
+     * @param keyId
+     * @return the security provider (which is never {@code null})
+     * @throws NullPointerException if the provided key ID is {@code null}
+     */
+    Provider getProvider(String keyId);
 }

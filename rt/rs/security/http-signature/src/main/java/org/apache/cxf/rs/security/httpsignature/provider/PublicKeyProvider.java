@@ -16,12 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.httpsignature.exception;
+package org.apache.cxf.rs.security.httpsignature.provider;
 
-import org.apache.cxf.rs.security.httpsignature.SignatureException;
+import java.security.PublicKey;
 
-public class InvalidSignatureHeaderException extends SignatureException {
-    public InvalidSignatureHeaderException(String message) {
-        super(message);
-    }
+@FunctionalInterface
+public interface PublicKeyProvider {
+
+    /**
+     *
+     * @param keyId
+     * @return the public key (which is never {@code null})
+     * @throws NullPointerException if the provided key ID is {@code null}
+     */
+    PublicKey getKey(String keyId);
+
 }

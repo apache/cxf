@@ -18,9 +18,18 @@
  */
 package org.apache.cxf.rs.security.httpsignature;
 
-public class MockAlgorithmProvider implements AlgorithmProvider {
-    @Override
-    public String getAlgorithmName(String keyId) {
-        return DefaultSignatureConstants.SIGNING_ALGORITHM;
-    }
+import java.util.List;
+import java.util.Map;
+
+import org.apache.cxf.rs.security.httpsignature.provider.AlgorithmProvider;
+import org.apache.cxf.rs.security.httpsignature.provider.PublicKeyProvider;
+import org.apache.cxf.rs.security.httpsignature.provider.SecurityProvider;
+
+public interface SignatureValidator {
+    void validate(Map<String, List<String>> messageHeaders,
+                  AlgorithmProvider algorithmProvider,
+                  PublicKeyProvider publicKeyProvider,
+                  SecurityProvider securityProvider,
+                  String method,
+                  String uri);
 }

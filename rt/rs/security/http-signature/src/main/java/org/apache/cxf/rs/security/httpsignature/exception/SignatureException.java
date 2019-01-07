@@ -18,10 +18,12 @@
  */
 package org.apache.cxf.rs.security.httpsignature.exception;
 
-import org.apache.cxf.rs.security.httpsignature.SignatureException;
+public class SignatureException extends RuntimeException {
+    public SignatureException(String message) {
+        this(message, null);
+    }
 
-public class DifferentDigestsException extends SignatureException {
-    public DifferentDigestsException(String message) {
-        super(message);
+    public SignatureException(String message, Throwable cause) {
+        super(message, cause);
     }
 }
