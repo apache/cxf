@@ -199,20 +199,9 @@
             <artifactId>${cxf.servlet-api.artifact}</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.ning</groupId>
+            <groupId>org.asynchttpclient</groupId>
             <artifactId>async-http-client</artifactId>
             <version>${cxf.ahc.version}</version>
-            <optional>true</optional>
-            <exclusions>
-                <exclusion>
-                    <groupId>io.netty</groupId>
-                    <artifactId>netty</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty</artifactId>
             <optional>true</optional>
         </dependency>
         <dependency>

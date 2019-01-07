@@ -392,8 +392,14 @@
     </feature>
     <feature name="cxf-transports-websocket-client" version="${project.version}">
         <feature version="${project.version}">cxf-http</feature>
-        <bundle dependency='true'>mvn:com.ning/async-http-client/${cxf.ahc.version}</bundle>
-        <bundle dependency='true'>mvn:io.netty/netty/${cxf.netty3.version}</bundle>
+        <feature prerequisite="true">wrap</feature>
+        <bundle dependency='true'>wrap:mvn:org.asynchttpclient/async-http-client/${cxf.ahc.version}</bundle>
+        <bundle dependency='true'>mvn:io.netty/netty-common/${cxf.netty.version}</bundle>
+        <bundle dependency='true'>mvn:io.netty/netty-handler/${cxf.netty.version}</bundle>
+        <bundle dependency='true'>mvn:io.netty/netty-buffer/${cxf.netty.version}</bundle>
+        <bundle dependency='true'>mvn:io.netty/netty-transport/${cxf.netty.version}</bundle>
+        <bundle dependency='true'>mvn:io.netty/netty-codec/${cxf.netty.version}</bundle>
+        <bundle dependency='true'>mvn:io.netty/netty-codec-http/${cxf.netty.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-transports-websocket/${project.version}</bundle>
     </feature>
     <feature name="cxf-transports-websocket-server" version="${project.version}">

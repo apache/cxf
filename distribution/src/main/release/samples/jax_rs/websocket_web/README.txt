@@ -27,6 +27,6 @@ To run the war file using tomcat7
 To remove the target dir, run mvn clean".
 
 
-You can use the same clients included in JAX-RS WebSockt Demo.
+You can use the same clients included in JAX-RS WebSocket Demo.
 Refer to samples/jax_rs/websocket/README.txt for more information.
 

@@ -72,7 +72,7 @@
         <cxf.abdera.osgi.version>1.1.3_2</cxf.abdera.osgi.version>
         <cxf.activemq.version>5.14.5</cxf.activemq.version><!-- >=5.15.0 causes org.apache.cxf.osgi.itests.soap.JmsServiceTest failure -->
         <cxf.artemis.version>2.4.0</cxf.artemis.version>
-        <cxf.ahc.version>1.9.40</cxf.ahc.version>
+        <cxf.ahc.version>2.0.39</cxf.ahc.version>
         <cxf.apacheds.version>2.0.0.AM25</cxf.apacheds.version>
         <cxf.atmosphere.version>2.5.2</cxf.atmosphere.version>
         <cxf.atmosphere.version.range>[2.4,3.0)</cxf.atmosphere.version.range>
@@ -138,7 +138,6 @@
         <cxf.msv.version>2013.6.1</cxf.msv.version>
         <cxf.neethi.version>3.1.1</cxf.neethi.version>
         <cxf.netty.version>4.0.56.Final</cxf.netty.version>
-        <cxf.netty3.version>3.10.6.Final</cxf.netty3.version>
         <cxf.netty.version.range>[4,5)</cxf.netty.version.range>
         <cxf.oauth.bundle.version>20100527_1</cxf.oauth.bundle.version>
         <cxf.oauth.version>20100527</cxf.oauth.version>
@@ -1431,11 +1430,6 @@
                 <groupId>io.projectreactor</groupId>
                 <artifactId>reactor-core</artifactId>
                 <version>${cxf.reactor.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.netty</groupId>
-                <artifactId>netty</artifactId>
-                <version>${cxf.netty3.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.derby</groupId>
