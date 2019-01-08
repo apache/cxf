@@ -18,15 +18,12 @@
  */
 package org.apache.cxf.systest.http_jetty;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URL;
-import java.net.URLConnection;
 import java.net.UnknownHostException;
 import java.util.Properties;
 
@@ -34,7 +31,6 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.ServerImpl;
 import org.apache.cxf.endpoint.ServerRegistry;
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.transport.http_jetty.JettyHTTPDestination;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngine;
@@ -44,13 +40,11 @@ import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 
@@ -63,24 +57,64 @@ public class EngineLifecycleTest {
     private static final String PORT2 = TestUtil.getPortNumber(EngineLifecycleTest.class, 2);
     private GenericApplicationContext applicationContext;
 
-    private void readBeans(Resource beanResource) {
-        XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(applicationContext);
-        reader.loadBeanDefinitions(beanResource);
+    @Test
+    public void testUpDownWithServlets() throws Exception {
+        setUpBus();
+
+        Bus bus = (Bus)applicationContext.getBean("cxf");
+        ServerRegistry sr = bus.getExtension(ServerRegistry.class);
+        ServerImpl si = (ServerImpl) sr.getServers().get(0);
+        JettyHTTPDestination jhd = (JettyHTTPDestination) si.getDestination();
+        JettyHTTPServerEngine e = (JettyHTTPServerEngine) jhd.getEngine();
+        org.eclipse.jetty.server.Server jettyServer = e.getServer();
+
+        for (Handler h : jettyServer.getChildHandlersByClass(WebAppContext.class)) {
+            WebAppContext wac = (WebAppContext) h;
+            if ("/jsunit".equals(wac.getContextPath())) {
+                wac.addServlet("org.eclipse.jetty.servlet.DefaultServlet", "/bloop");
+                break;
+            }
+        }
+
+        try {
+            verifyStaticHtml();
+            invokeService();
+        } finally {
+            shutdownService();
+        }
     }
 
-    public void setUpBus(boolean includeService) throws Exception {
-        applicationContext = new GenericApplicationContext();
-        readBeans(new ClassPathResource("/org/apache/cxf/systest/http_jetty/cxf.xml"));
-        readBeans(new ClassPathResource("META-INF/cxf/cxf.xml"));
-        readBeans(new ClassPathResource("jetty-engine.xml", getClass()));
-        if (includeService) {
-            readBeans(new ClassPathResource("server-lifecycle-beans.xml", getClass()));
+    @Test
+    public void testServerUpDownUp() throws Exception {
+        for (int i = 0; i < 2; ++i) { // twice
+            setUpBus();
+            try {
+                verifyStaticHtml();
+                invokeService();
+                invokeService8801();
+            } finally {
+                shutdownService();
+            }
         }
+    }
+
+    private void setUpBus() throws Exception {
+        verifyNoServer(PORT2);
+        verifyNoServer(PORT1);
+
+        applicationContext = new GenericApplicationContext();
+
+        XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(applicationContext);
+        reader.loadBeanDefinitions(
+                new ClassPathResource("META-INF/cxf/cxf.xml"),
+                new ClassPathResource("cxf.xml", getClass()),
+                new ClassPathResource("jetty-engine.xml", getClass()),
+                new ClassPathResource("server-lifecycle-beans.xml", getClass()));
 
         // bring in some property values from a Properties file
         PropertyPlaceholderConfigurer cfg = new PropertyPlaceholderConfigurer();
         Properties properties = new Properties();
-        properties.setProperty("staticResourceURL", getStaticResourceURL());
+        properties.setProperty("staticResourceURL", getClass().getPackage().getName().replace('.', '/'));
         cfg.setProperties(properties);
         // now actually do the replacement
         cfg.postProcessBeanFactory(applicationContext.getBeanFactory());
@@ -97,130 +131,46 @@ public class EngineLifecycleTest {
         assertEquals("We should get out put from this client", "hello world", client.echo("hello world"));
     }
 
-    private HttpURLConnection getHttpConnection(String target) throws Exception {
-        URL url = new URL(target);
-
-        URLConnection connection = url.openConnection();
-
-        assertTrue(connection instanceof HttpURLConnection);
-        return (HttpURLConnection)connection;
-    }
-
-    private void getTestHtml() throws Exception {
-        CachedOutputStream response = null;
-        for (int i = 0; i < 10; i++) {
-            try {
-                HttpURLConnection httpConnection =
-                    getHttpConnection("http://localhost:" + PORT2 + "/test.html");
-                httpConnection.connect();
-                InputStream in = httpConnection.getInputStream();
-                assertNotNull(in);
-                response = new CachedOutputStream();
-                IOUtils.copy(in, response);
-                in.close();
-                response.close();
-                break;
+    private static void verifyStaticHtml() throws Exception {
+        String response = null;
+        for (int i = 0; i < 50 && null == response; i++) {
+            try (InputStream in = new URL("http://localhost:" + PORT2 + "/test.html").openConnection()
+                    .getInputStream()) {
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                IOUtils.copy(in, os);
+                response = new String(os.toByteArray());
             } catch (Exception ex) {
-                response = null;
-                Thread.sleep(2 * 1000);
+                Thread.sleep(100L);
             }
         }
         assertNotNull("Test doc can not be read", response);
 
-        FileInputStream htmlFile =
-            new FileInputStream("target/test-classes/org/apache/cxf/systest/http_jetty/test.html");
-        CachedOutputStream html = new CachedOutputStream();
-        IOUtils.copy(htmlFile, html);
-        htmlFile.close();
-        html.close();
-
-        assertEquals("Can't get the right test html", html.toString(), response.toString());
-    }
-
-    public String getStaticResourceURL() throws Exception {
-        File staticFile = new File(this.getClass().getResource("test.html").toURI());
-        staticFile = staticFile.getParentFile();
-        staticFile = staticFile.getAbsoluteFile();
-        URL furl = staticFile.toURI().toURL();
-        return furl.toString();
-    }
-
-    public void shutdownService() throws Exception {
-        applicationContext.close();
-    }
-
-
-    @Test
-    public void testUpDownWithServlets() throws Exception {
-        setUpBus(true);
-
-        Bus bus = (Bus)applicationContext.getBean("cxf");
-        ServerRegistry sr = bus.getExtension(ServerRegistry.class);
-        ServerImpl si = (ServerImpl) sr.getServers().get(0);
-        JettyHTTPDestination jhd = (JettyHTTPDestination) si.getDestination();
-        JettyHTTPServerEngine e = (JettyHTTPServerEngine) jhd.getEngine();
-        org.eclipse.jetty.server.Server jettyServer = e.getServer();
-
-        Handler[] contexts = jettyServer.getChildHandlersByClass(WebAppContext.class);
-        WebAppContext servletContext = null;
-        for (Handler h : contexts) {
-            WebAppContext wac = (WebAppContext) h;
-            if ("/jsunit".equals(wac.getContextPath())) {
-                servletContext = wac;
-                break;
-            }
+        String html;
+        try (InputStream htmlFile = EngineLifecycleTest.class.getResourceAsStream("test.html")) {
+            byte[] buf = new byte[htmlFile.available()];
+            htmlFile.read(buf);
+            html = new String(buf);
         }
-        servletContext.addServlet("org.eclipse.jetty.servlet.DefaultServlet", "/bloop");
-        getTestHtml();
-        invokeService();
-        shutdownService();
+        assertEquals("Can't get the right test html", html, response);
+    }
+
+    private void shutdownService() throws Exception {
+        applicationContext.close();
+        applicationContext = null;
+//        System.gc(); // make sure the port is cleaned up a bit
+
         verifyNoServer(PORT2);
         verifyNoServer(PORT1);
     }
 
-    private void verifyNoServer(String port) {
-        try {
-            Socket socket = new Socket(InetAddress.getLoopbackAddress().getHostName(), Integer.parseInt(port));
-            socket.close();
+    private static void verifyNoServer(String port) {
+        try (Socket socket = new Socket(InetAddress.getLoopbackAddress().getHostName(), Integer.parseInt(port))) {
+            fail("Server on port " + port + " accepted a connection.");
         } catch (UnknownHostException e) {
             fail("Unknown host for local address");
         } catch (IOException e) {
-            return; // this is what we want.
+            // this is what we want.
         }
-        fail("Server on port " + port + " accepted a connection.");
-
-    }
-
-    /**
-     *
-     * @throws Exception
-     */
-    @Test
-    public void testServerUpDownUp() throws Exception {
-
-        setUpBus(true);
-
-        getTestHtml();
-        invokeService();
-        invokeService8801();
-        shutdownService();
-        System.gc(); //make sure the port is cleaned up a bit
-        Thread.sleep(2 * 100);
-        System.gc();
-        verifyNoServer(PORT2);
-        verifyNoServer(PORT1);
-
-
-        setUpBus(true);
-        Thread.sleep(2 * 100);
-        invokeService();
-        invokeService8801();
-        getTestHtml();
-        shutdownService();
-        verifyNoServer(PORT2);
-        verifyNoServer(PORT1);
-
-
     }
 
 }

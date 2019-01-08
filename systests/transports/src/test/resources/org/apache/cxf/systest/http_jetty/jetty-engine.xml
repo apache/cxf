@@ -31,7 +31,7 @@
                     <property name="handler">
                         <bean class="org.eclipse.jetty.server.handler.ResourceHandler">
                             <property name="baseResource">
-                                <bean class="org.eclipse.jetty.util.resource.FileResource">
+                                <bean class="org.eclipse.jetty.util.resource.Resource" factory-method="newClassPathResource">
                                     <constructor-arg value="${staticResourceURL}"/>
                                 </bean>
                             </property>
