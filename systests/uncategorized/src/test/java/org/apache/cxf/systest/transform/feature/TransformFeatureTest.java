@@ -65,6 +65,26 @@ public class TransformFeatureTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
+    public void testClientOutTransformationOnNonExistingEndpoint() {
+        Service service = Service.create(SERVICE_NAME);
+        String endpoint = "http://localhost:" + PORT + "/NonExistent";
+        service.addPort(PORT_NAME, SOAPBinding.SOAP11HTTP_BINDING, endpoint);
+
+        Echo port = service.getPort(PORT_NAME, Echo.class);
+        Client client = ClientProxy.getClient(port);
+        XSLTOutInterceptor outInterceptor = new XSLTOutInterceptor(XSLT_REQUEST_PATH);
+        client.getOutInterceptors().add(outInterceptor);
+
+        try {
+            port.echo("test");
+            fail("404 Not found was expected"); 
+        } catch (Exception e) { 
+            String exceptionMessage = e.getMessage();
+            assertTrue(exceptionMessage.toLowerCase().contains("404: not found")); 
+        } 
+    }
+
+    @Test
     public void testClientInTransformation() {
         Service service = Service.create(SERVICE_NAME);
         String endpoint = "http://localhost:" + PORT + "/EchoContext/EchoPort";
