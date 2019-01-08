@@ -36,6 +36,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class TransformFeatureTest extends AbstractBusClientServerTestBase {
     private static final String PORT = EchoServer.PORT;
