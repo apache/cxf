@@ -118,7 +118,7 @@ public class SAMLProviderActAsTest {
             }
         }
 
-        Assert.assertTrue(foundActAsAttribute);
+        assertTrue(foundActAsAttribute);
     }
 
     /**
@@ -166,7 +166,7 @@ public class SAMLProviderActAsTest {
             }
         }
 
-        Assert.assertTrue(foundActAsAttribute);
+        assertTrue(foundActAsAttribute);
     }
 
     /**
@@ -277,7 +277,7 @@ public class SAMLProviderActAsTest {
             }
         }
 
-        Assert.assertTrue(foundActAsAttribute);
+        assertTrue(foundActAsAttribute);
 
         // Check that claims are also present
         String tokenString = DOM2Writer.nodeToString(token);
@@ -335,7 +335,7 @@ public class SAMLProviderActAsTest {
             }
         }
 
-        Assert.assertTrue(foundActAsAttribute);
+        assertTrue(foundActAsAttribute);
 
         // Now get another token "ActAs" the previous token
         providerParameters =
@@ -376,8 +376,8 @@ public class SAMLProviderActAsTest {
             }
         }
 
-        Assert.assertTrue(foundBob);
-        Assert.assertTrue(foundTechnical);
+        assertTrue(foundBob);
+        assertTrue(foundTechnical);
     }
 
     private Element getSAMLAssertion() throws Exception {

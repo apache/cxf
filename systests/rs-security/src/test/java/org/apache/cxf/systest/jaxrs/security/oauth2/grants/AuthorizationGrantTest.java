@@ -52,7 +52,6 @@ import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.xml.security.utils.ClassLoaderUtils;
 
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
@@ -471,9 +470,9 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
             keystore.load(ClassLoaderUtils.getResourceAsStream("keys/alice.jks", this.getClass()),
                           "password".toCharArray());
             Certificate cert = keystore.getCertificate("alice");
-            Assert.assertNotNull(cert);
+            assertNotNull(cert);
 
-            Assert.assertTrue(jwtConsumer.verifySignatureWith((X509Certificate)cert,
+            assertTrue(jwtConsumer.verifySignatureWith((X509Certificate)cert,
                                                               SignatureAlgorithm.RS256));
         }
     }
@@ -545,17 +544,17 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         JwtToken jwt = jwtConsumer.getJwtToken();
 
         // Validate claims
-        Assert.assertNotNull(jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
-        Assert.assertNotNull(jwt.getClaim(JwtConstants.CLAIM_EXPIRY));
-        Assert.assertNotNull(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT));
+        assertNotNull(jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
+        assertNotNull(jwt.getClaim(JwtConstants.CLAIM_EXPIRY));
+        assertNotNull(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT));
 
         KeyStore keystore = KeyStore.getInstance("JKS");
         keystore.load(ClassLoaderUtils.getResourceAsStream("keys/alice.jks", this.getClass()),
                       "password".toCharArray());
         Certificate cert = keystore.getCertificate("alice");
-        Assert.assertNotNull(cert);
+        assertNotNull(cert);
 
-        Assert.assertTrue(jwtConsumer.verifySignatureWith((X509Certificate)cert,
+        assertTrue(jwtConsumer.verifySignatureWith((X509Certificate)cert,
                                                           SignatureAlgorithm.RS256));
     }
 

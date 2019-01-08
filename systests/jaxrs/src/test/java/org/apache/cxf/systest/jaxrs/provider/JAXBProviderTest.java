@@ -85,7 +85,7 @@ public class JAXBProviderTest extends AbstractBusClientServerTestBase {
                                                            String.class, "test");
         Response response = client.post(test);
         String result = response.readEntity(String.class);
-        Assert.assertTrue(result.contains("<jaxbelement xmlns=\"org.apache.cxf\">test</jaxbelement>"));
+        assertTrue(result.contains("<jaxbelement xmlns=\"org.apache.cxf\">test</jaxbelement>"));
         Assert.assertFalse(result.contains("WriteInCXFJaxbProvider"));
     }
 }

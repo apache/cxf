@@ -103,9 +103,9 @@ public class DigestAuthTest extends AbstractBusClientServerTestBase {
             Assert.fail("Unexpected reply (" + answer + "). Should throw exception");
         } catch (Exception e) {
             Throwable cause = e.getCause();
-            Assert.assertEquals(HTTPException.class, cause.getClass());
+            assertEquals(HTTPException.class, cause.getClass());
             HTTPException he = (HTTPException)cause;
-            Assert.assertEquals(401, he.getResponseCode());
+            assertEquals(401, he.getResponseCode());
         }
     }
 

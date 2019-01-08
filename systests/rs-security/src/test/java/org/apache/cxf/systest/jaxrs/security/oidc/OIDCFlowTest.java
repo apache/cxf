@@ -59,7 +59,6 @@ import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.xml.security.utils.ClassLoaderUtils;
 
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
@@ -509,8 +508,8 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
 
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(idToken);
         JwtToken jwt = jwtConsumer.getJwtToken();
-        Assert.assertNotNull(jwt.getClaims().getClaim(IdToken.ACCESS_TOKEN_HASH_CLAIM));
-        Assert.assertNotNull(jwt.getClaims().getClaim(IdToken.NONCE_CLAIM));
+        assertNotNull(jwt.getClaims().getClaim(IdToken.ACCESS_TOKEN_HASH_CLAIM));
+        assertNotNull(jwt.getClaims().getClaim(IdToken.NONCE_CLAIM));
         OidcUtils.validateAccessTokenHash(accessToken, jwt, true);
 
         if (isAccessTokenInJWTFormat()) {
@@ -578,8 +577,8 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
 
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(idToken);
         JwtToken jwt = jwtConsumer.getJwtToken();
-        Assert.assertNotNull(jwt.getClaims().getClaim(IdToken.ACCESS_TOKEN_HASH_CLAIM));
-        Assert.assertNotNull(jwt.getClaims().getClaim(IdToken.NONCE_CLAIM));
+        assertNotNull(jwt.getClaims().getClaim(IdToken.ACCESS_TOKEN_HASH_CLAIM));
+        assertNotNull(jwt.getClaims().getClaim(IdToken.NONCE_CLAIM));
         OidcUtils.validateAccessTokenHash(accessToken, jwt, true);
 
         if (isAccessTokenInJWTFormat()) {
@@ -642,8 +641,8 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
 
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(idToken);
         JwtToken jwt = jwtConsumer.getJwtToken();
-        Assert.assertNull(jwt.getClaims().getClaim(IdToken.ACCESS_TOKEN_HASH_CLAIM));
-        Assert.assertNotNull(jwt.getClaims().getClaim(IdToken.NONCE_CLAIM));
+        assertNull(jwt.getClaims().getClaim(IdToken.ACCESS_TOKEN_HASH_CLAIM));
+        assertNotNull(jwt.getClaims().getClaim(IdToken.NONCE_CLAIM));
     }
 
     @org.junit.Test
@@ -680,7 +679,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         // check the code hash is returned from the implicit authorization endpoint
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(idToken);
         JwtToken jwt = jwtConsumer.getJwtToken();
-        Assert.assertNotNull(jwt.getClaims().getClaim(IdToken.AUTH_CODE_HASH_CLAIM));
+        assertNotNull(jwt.getClaims().getClaim(IdToken.AUTH_CODE_HASH_CLAIM));
 
         // Now get the access token
         client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
@@ -701,7 +700,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         // check the code hash is returned from the token endpoint
         jwtConsumer = new JwsJwtCompactConsumer(idToken);
         jwt = jwtConsumer.getJwtToken();
-        Assert.assertNotNull(jwt.getClaims().getClaim(IdToken.AUTH_CODE_HASH_CLAIM));
+        assertNotNull(jwt.getClaims().getClaim(IdToken.AUTH_CODE_HASH_CLAIM));
 
         if (isAccessTokenInJWTFormat()) {
             validateAccessToken(accessToken.getTokenKey());
@@ -764,7 +763,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         // check the code hash is returned from the token endpoint
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(idToken);
         // returning c_hash in the id_token returned after exchanging the code is optional
-        Assert.assertNull(jwtConsumer.getJwtClaims().getClaim(IdToken.AUTH_CODE_HASH_CLAIM));
+        assertNull(jwtConsumer.getJwtClaims().getClaim(IdToken.AUTH_CODE_HASH_CLAIM));
 
         if (isAccessTokenInJWTFormat()) {
             validateAccessToken(accessToken.getTokenKey());
@@ -805,7 +804,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         // check the code hash is returned from the implicit authorization endpoint
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(idToken);
         JwtToken jwt = jwtConsumer.getJwtToken();
-        Assert.assertNotNull(jwt.getClaims().getClaim(IdToken.AUTH_CODE_HASH_CLAIM));
+        assertNotNull(jwt.getClaims().getClaim(IdToken.AUTH_CODE_HASH_CLAIM));
 
         // Check Access Token
         String accessToken = OAuth2TestUtils.getSubstring(location, "access_token");
@@ -813,9 +812,9 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
 
         jwtConsumer = new JwsJwtCompactConsumer(idToken);
         jwt = jwtConsumer.getJwtToken();
-        Assert.assertNotNull(jwt.getClaims().getClaim(IdToken.ACCESS_TOKEN_HASH_CLAIM));
+        assertNotNull(jwt.getClaims().getClaim(IdToken.ACCESS_TOKEN_HASH_CLAIM));
         OidcUtils.validateAccessTokenHash(accessToken, jwt, true);
-        Assert.assertNotNull(jwt.getClaims().getClaim(IdToken.AUTH_CODE_HASH_CLAIM));
+        assertNotNull(jwt.getClaims().getClaim(IdToken.AUTH_CODE_HASH_CLAIM));
 
         if (isAccessTokenInJWTFormat()) {
             validateAccessToken(accessToken);
@@ -956,7 +955,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         Response response = client.get();
         JsonWebKeys jsonWebKeys = response.readEntity(JsonWebKeys.class);
 
-        Assert.assertTrue(jwtConsumer.verifySignatureWith(jsonWebKeys.getKeys().get(0),
+        assertTrue(jwtConsumer.verifySignatureWith(jsonWebKeys.getKeys().get(0),
                                                           SignatureAlgorithm.RS256));
     }
 
@@ -966,22 +965,22 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         JwtToken jwt = jwtConsumer.getJwtToken();
 
         // Validate claims
-        Assert.assertEquals("alice", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
-        Assert.assertEquals("OIDC IdP", jwt.getClaim(JwtConstants.CLAIM_ISSUER));
-        Assert.assertEquals("consumer-id", jwt.getClaim(JwtConstants.CLAIM_AUDIENCE));
-        Assert.assertNotNull(jwt.getClaim(JwtConstants.CLAIM_EXPIRY));
-        Assert.assertNotNull(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT));
+        assertEquals("alice", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
+        assertEquals("OIDC IdP", jwt.getClaim(JwtConstants.CLAIM_ISSUER));
+        assertEquals("consumer-id", jwt.getClaim(JwtConstants.CLAIM_AUDIENCE));
+        assertNotNull(jwt.getClaim(JwtConstants.CLAIM_EXPIRY));
+        assertNotNull(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT));
         if (nonce != null) {
-            Assert.assertEquals(nonce, jwt.getClaim(IdToken.NONCE_CLAIM));
+            assertEquals(nonce, jwt.getClaim(IdToken.NONCE_CLAIM));
         }
 
         KeyStore keystore = KeyStore.getInstance("JKS");
         keystore.load(ClassLoaderUtils.getResourceAsStream("keys/alice.jks", this.getClass()),
                       "password".toCharArray());
         Certificate cert = keystore.getCertificate("alice");
-        Assert.assertNotNull(cert);
+        assertNotNull(cert);
 
-        Assert.assertTrue(jwtConsumer.verifySignatureWith((X509Certificate)cert,
+        assertTrue(jwtConsumer.verifySignatureWith((X509Certificate)cert,
                                                           SignatureAlgorithm.RS256));
     }
 
@@ -991,17 +990,17 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         JwtToken jwt = jwtConsumer.getJwtToken();
 
         // Validate claims
-        Assert.assertNotNull(jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
-        Assert.assertNotNull(jwt.getClaim(JwtConstants.CLAIM_EXPIRY));
-        Assert.assertNotNull(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT));
+        assertNotNull(jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
+        assertNotNull(jwt.getClaim(JwtConstants.CLAIM_EXPIRY));
+        assertNotNull(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT));
 
         KeyStore keystore = KeyStore.getInstance("JKS");
         keystore.load(ClassLoaderUtils.getResourceAsStream("keys/alice.jks", this.getClass()),
                       "password".toCharArray());
         Certificate cert = keystore.getCertificate("alice");
-        Assert.assertNotNull(cert);
+        assertNotNull(cert);
 
-        Assert.assertTrue(jwtConsumer.verifySignatureWith((X509Certificate)cert,
+        assertTrue(jwtConsumer.verifySignatureWith((X509Certificate)cert,
                                                           SignatureAlgorithm.RS256));
     }
 

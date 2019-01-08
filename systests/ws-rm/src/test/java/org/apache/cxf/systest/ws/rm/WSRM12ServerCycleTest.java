@@ -44,7 +44,6 @@ import org.apache.cxf.ws.rm.manager.DestinationPolicyType;
 import org.apache.cxf.ws.rm.persistence.jdbc.RMTxStore;
 import org.apache.cxf.ws.rmp.v200502.RMAssertion;
 
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -167,7 +166,7 @@ public class WSRM12ServerCycleTest extends AbstractBusClientServerTestBase {
         ConnectionHelper.setKeepAliveConnection(control, false, true);
         updateAddressPort(control, PORT);
 
-        Assert.assertTrue("Failed to start greeter", control.startGreeter(cfg));
+        assertTrue("Failed to start greeter", control.startGreeter(cfg));
 
         System.setProperty("db.name", getPrefix() + "-recovery");
         Bus greeterBus = new SpringBusFactory().createBus();

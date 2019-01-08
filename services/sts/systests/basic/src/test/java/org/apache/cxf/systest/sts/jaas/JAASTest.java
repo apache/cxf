@@ -407,12 +407,12 @@ public class JAASTest extends AbstractBusClientServerTestBase {
             if (authFailureExpected) {
                 throw new RuntimeException("Exception expected");
             }
-            org.junit.Assert.assertEquals(2 * numToDouble, resp);
+            assertEquals(2 * numToDouble, resp);
         } catch (WebApplicationException ex) {
             if (!authFailureExpected) {
                 throw new RuntimeException("Unexpected exception");
             }
-            org.junit.Assert.assertEquals(500, ex.getResponse().getStatus());
+            assertEquals(500, ex.getResponse().getStatus());
         }
     }
 

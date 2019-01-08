@@ -87,8 +87,6 @@ import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.DOM2Writer;
 
-import org.junit.Assert;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -160,7 +158,7 @@ public class IssueJWTClaimsUnitTest {
         // Validate the token
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token.getTextContent());
         JwtToken jwt = jwtConsumer.getJwtToken();
-        Assert.assertEquals("alice", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
+        assertEquals("alice", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
         assertEquals(jwt.getClaim(ClaimTypes.LASTNAME.toString()), "doe");
         assertEquals(jwt.getClaim(ROLE_CLAIM.toString()), "administrator");
     }
@@ -288,7 +286,7 @@ public class IssueJWTClaimsUnitTest {
         // Validate the token
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token.getTextContent());
         JwtToken jwt = jwtConsumer.getJwtToken();
-        Assert.assertEquals("alice", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
+        assertEquals("alice", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
         assertEquals(jwt.getClaim(ClaimTypes.LASTNAME.toString()), "doe");
     }
 
@@ -417,7 +415,7 @@ public class IssueJWTClaimsUnitTest {
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token.getTextContent());
         JwtToken jwt = jwtConsumer.getJwtToken();
         // subject unchanged
-        Assert.assertEquals("alice", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
+        assertEquals("alice", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
         // transformed claim (to uppercase)
         assertEquals(jwt.getClaim(ClaimTypes.LASTNAME.toString()), "DOE");
     }
@@ -568,7 +566,7 @@ public class IssueJWTClaimsUnitTest {
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token.getTextContent());
         JwtToken jwt = jwtConsumer.getJwtToken();
         // subject changed (to uppercase)
-        Assert.assertEquals("ALICE", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
+        assertEquals("ALICE", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
         // claim unchanged but requested
         assertEquals(jwt.getClaim(ClaimTypes.LASTNAME.toString()), "doe");
     }

@@ -203,7 +203,7 @@ public class OIDCNegativeTest extends AbstractBusClientServerTestBase {
 
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(idToken);
         JwtToken jwt = jwtConsumer.getJwtToken();
-        Assert.assertNotNull(jwt.getClaims().getClaim(IdToken.AUTH_TIME_CLAIM));
+        assertNotNull(jwt.getClaims().getClaim(IdToken.AUTH_TIME_CLAIM));
     }
 
     @org.junit.Test

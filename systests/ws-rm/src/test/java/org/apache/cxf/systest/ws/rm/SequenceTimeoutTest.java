@@ -197,7 +197,7 @@ public class SequenceTimeoutTest extends AbstractBusClientServerTestBase {
             fail("The sequence should have been terminated");
         } catch (Throwable t) {
             //expected
-            Assert.assertTrue(t.getMessage().contains("not a known Sequence identifier"));
+            assertTrue(t.getMessage().contains("not a known Sequence identifier"));
         }
         rmManager.getStore();
     }

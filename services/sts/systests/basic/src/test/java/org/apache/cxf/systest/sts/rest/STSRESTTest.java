@@ -72,7 +72,6 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.processor.Processor;
 import org.apache.wss4j.dom.processor.SAMLTokenProcessor;
 
-import org.junit.Assert;
 import org.junit.BeforeClass;
 
 import static org.junit.Assert.assertEquals;
@@ -1331,22 +1330,22 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         JwtToken jwt = jwtConsumer.getJwtToken();
 
         // Validate claims
-        Assert.assertEquals("DoubleItSTSIssuer", jwt.getClaim(JwtConstants.CLAIM_ISSUER));
+        assertEquals("DoubleItSTSIssuer", jwt.getClaim(JwtConstants.CLAIM_ISSUER));
         if (audience != null) {
             @SuppressWarnings("unchecked")
             List<String> audiences = (List<String>)jwt.getClaim(JwtConstants.CLAIM_AUDIENCE);
             assertEquals(1, audiences.size());
-            Assert.assertEquals(audience, audiences.get(0));
+            assertEquals(audience, audiences.get(0));
         }
-        Assert.assertNotNull(jwt.getClaim(JwtConstants.CLAIM_EXPIRY));
-        Assert.assertNotNull(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT));
+        assertNotNull(jwt.getClaim(JwtConstants.CLAIM_EXPIRY));
+        assertNotNull(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT));
 
         KeyStore keystore = KeyStore.getInstance("JKS");
         keystore.load(Loader.getResource("keys/servicestore.jks").openStream(), "sspass".toCharArray());
         Certificate cert = keystore.getCertificate("mystskey");
-        Assert.assertNotNull(cert);
+        assertNotNull(cert);
 
-        Assert.assertTrue(jwtConsumer.verifySignatureWith((X509Certificate)cert,
+        assertTrue(jwtConsumer.verifySignatureWith((X509Certificate)cert,
                                                           SignatureAlgorithm.RS256));
     }
 

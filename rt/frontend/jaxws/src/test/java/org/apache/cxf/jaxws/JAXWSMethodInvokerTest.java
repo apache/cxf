@@ -55,7 +55,6 @@ import org.apache.cxf.service.invoker.MethodDispatcher;
 import org.apache.cxf.service.model.BindingOperationInfo;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -123,7 +122,7 @@ public class JAXWSMethodInvokerTest {
             fail("Expected fault");
         } catch (Fault fault) {
             Message outMsg = ex.getOutMessage();
-            Assert.assertNull(outMsg);
+            assertNull(outMsg);
         }
     }
 
@@ -145,11 +144,11 @@ public class JAXWSMethodInvokerTest {
             fail("Expected fault");
         } catch (Fault fault) {
             Message outMsg = ex.getOutMessage();
-            Assert.assertNotNull(outMsg);
+            assertNotNull(outMsg);
             @SuppressWarnings("unchecked")
             List<Header> headers = (List<Header>)outMsg.get(Header.HEADER_LIST);
-            Assert.assertEquals(1, headers.size());
-            Assert.assertEquals(TEST_HEADER_NAME, headers.get(0).getName());
+            assertEquals(1, headers.size());
+            assertEquals(TEST_HEADER_NAME, headers.get(0).getName());
         }
     }
 

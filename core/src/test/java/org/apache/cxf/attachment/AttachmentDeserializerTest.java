@@ -46,7 +46,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.message.XMLMessage;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -85,9 +84,9 @@ public class AttachmentDeserializerTest {
             + "------=_Part_34950_1098328613.1263781527359--";
 
         Matcher m = Pattern.compile("^--(\\S*)$").matcher(message);
-        Assert.assertFalse(m.find());
+        assertFalse(m.find());
         m = Pattern.compile("^--(\\S*)$", Pattern.MULTILINE).matcher(message);
-        Assert.assertTrue(m.find());
+        assertTrue(m.find());
 
         msg = new MessageImpl();
         msg.setContent(InputStream.class, new ByteArrayInputStream(message.getBytes(StandardCharsets.UTF_8)));

@@ -61,7 +61,6 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.staxutils.StaxUtils;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -82,7 +81,7 @@ public class ResponseImplTest {
         Response response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                   .entity(str)
                   .build();
-        Assert.assertEquals(str, response.readEntity(String.class));
+        assertEquals(str, response.readEntity(String.class));
     }
 
     @Test

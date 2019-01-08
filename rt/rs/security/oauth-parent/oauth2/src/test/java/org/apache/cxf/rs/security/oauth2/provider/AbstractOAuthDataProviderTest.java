@@ -41,7 +41,6 @@ import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -365,10 +364,10 @@ abstract class AbstractOAuthDataProviderTest {
             JwtToken jwt = jwtConsumer.getJwtToken();
 
             // Validate claims
-            Assert.assertNotNull(jwt.getClaim(JwtConstants.CLAIM_EXPIRY));
-            Assert.assertNotNull(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT));
+            assertNotNull(jwt.getClaim(JwtConstants.CLAIM_EXPIRY));
+            assertNotNull(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT));
 
-            Assert.assertTrue(jwtConsumer.verifySignatureWith(keyPair.getPublic(), SignatureAlgorithm.RS256));
+            assertTrue(jwtConsumer.verifySignatureWith(keyPair.getPublic(), SignatureAlgorithm.RS256));
         }
     }
 

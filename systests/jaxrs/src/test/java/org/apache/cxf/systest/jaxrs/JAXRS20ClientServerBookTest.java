@@ -71,7 +71,6 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.systest.jaxrs.BookStore.BookInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -983,7 +982,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
                            ClientResponseContext respContext) throws IOException {
             MultivaluedMap<String, String> headers = respContext.getHeaders();
             if (!local) {
-                Assert.assertEquals(1, headers.get("Date").size());
+                assertEquals(1, headers.get("Date").size());
             }
             headers.putSingle(HttpHeaders.LOCATION, "http://localhost/redirect");
 

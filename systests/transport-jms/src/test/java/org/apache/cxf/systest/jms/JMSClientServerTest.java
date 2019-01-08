@@ -69,7 +69,6 @@ import org.apache.hello_world_doc_lit.SOAPService7;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -608,7 +607,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
 
         String name = "FooBar";
         String reply = greeter.greetMe(name);
-        Assert.assertEquals("Hello " + name, reply);
+        assertEquals("Hello " + name, reply);
         ((Closeable)greeter).close();
     }
 

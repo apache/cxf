@@ -135,7 +135,7 @@ public class KerberosDelegationTokenTest extends AbstractBusClientServerTestBase
         WebClient.getConfig(client).getHttpConduit().setAuthSupplier(authSupplier);
 
         int resp = client.post(numToDouble, Integer.class);
-        org.junit.Assert.assertEquals(2 * numToDouble, resp);
+        assertEquals(2 * numToDouble, resp);
     }
 
     private static void doubleIt(DoubleItPortType port, int numToDouble) {

@@ -30,7 +30,6 @@ import org.w3c.dom.Document;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -76,7 +75,7 @@ public class Stax2DOMTest {
         if (!deleted) {
             tempFile.deleteOnExit();
         }
-        Assert.assertTrue(
+        assertTrue(
                 "Stax2DOM left the input stream open, file cannot be deleted: "
                         + tempFile, deleted);
     }
