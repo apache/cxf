@@ -31,10 +31,11 @@ import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.message.Message;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.Test;
 
-public class FormUtilsTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class FormUtilsTest {
 
     private static final String HTTP_PARAM1 = "httpParam1";
     private static final String HTTP_PARAM2 = "httpParam2";

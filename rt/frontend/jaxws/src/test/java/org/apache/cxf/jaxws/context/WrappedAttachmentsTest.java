@@ -28,13 +28,16 @@ import javax.mail.util.ByteArrayDataSource;
 import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.message.Attachment;
 
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
  */
-public class WrappedAttachmentsTest extends Assert {
+public class WrappedAttachmentsTest {
     @Test
     public void testCreateAndModify() {
         Map<String, DataHandler> content = new HashMap<>();

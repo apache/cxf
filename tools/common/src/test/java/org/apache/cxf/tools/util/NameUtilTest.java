@@ -19,11 +19,13 @@
 
 package org.apache.cxf.tools.util;
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
-public class NameUtilTest extends Assert {
+
+public class NameUtilTest {
 
     @Test
     public void testMangleToClassName() {

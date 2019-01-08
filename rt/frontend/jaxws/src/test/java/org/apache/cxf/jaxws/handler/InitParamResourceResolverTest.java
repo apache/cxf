@@ -22,12 +22,13 @@ package org.apache.cxf.jaxws.handler;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 
-public class InitParamResourceResolverTest extends Assert {
+
+public class InitParamResourceResolverTest {
 
     public static final String STRING_PARAM = "stringParam";
     public static final String STRING_VALUE = "a string";

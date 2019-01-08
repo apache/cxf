@@ -36,11 +36,14 @@ import org.apache.cxf.testutil.common.TestUtil;
 import org.jvnet.jax_ws_commons.transport.grizzly_httpspi.GrizzlyHttpContextFactory;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class EndpointAPITest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
+public class EndpointAPITest {
 
     private static int counter;
     private static int currentPort;

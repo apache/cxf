@@ -46,15 +46,19 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 
 /**
  * This class tests starting up and shutting down the embedded server when there
  * is extra jetty configuration.
  */
-public class EngineLifecycleTest extends Assert {
+public class EngineLifecycleTest {
     private static final String PORT1 = TestUtil.getPortNumber(EngineLifecycleTest.class, 1);
     private static final String PORT2 = TestUtil.getPortNumber(EngineLifecycleTest.class, 2);
     private GenericApplicationContext applicationContext;

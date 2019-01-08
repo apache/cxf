@@ -26,6 +26,9 @@ import org.apache.cxf.BusException;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class ErrorContextSerletTest extends AbstractServletTest {
     @Override
     protected String getConfiguration() {

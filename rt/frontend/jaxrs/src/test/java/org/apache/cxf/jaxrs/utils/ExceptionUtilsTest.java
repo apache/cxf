@@ -29,12 +29,13 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 
 
-public class ExceptionUtilsTest extends Assert {
+
+public class ExceptionUtilsTest {
 
     @Test
     public void testConvertFaultToResponseWAEWithResponse() {

@@ -27,6 +27,9 @@ import org.apache.cxf.transport.local.LocalTransportFactory;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 /**
  * Test motivated by CXF-1504
  */

@@ -35,10 +35,13 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.MessageObserver;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class LocalTransportFactoryTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
+public class LocalTransportFactoryTest {
     @Test
     public void testLocalTransportWithSeparateThread() throws Exception {
         testInvocation(false);

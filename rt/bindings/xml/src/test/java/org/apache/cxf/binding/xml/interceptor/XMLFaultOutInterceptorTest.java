@@ -41,6 +41,8 @@ import org.apache.hello_world_doc_lit.types.FaultDetail;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class XMLFaultOutInterceptorTest extends TestBase {
 
     XMLFaultOutInterceptor out = new XMLFaultOutInterceptor();

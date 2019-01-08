@@ -49,14 +49,18 @@ import org.apache.cxf.ws.rm.v200702.TerminateSequenceResponseType;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
  */
-public class ServantTest extends Assert {
+public class ServantTest {
     private static final String SERVICE_URL = "http://localhost:9000/SoapContext/GreeterPort";
     private static final String DECOUPLED_URL = "http://localhost:9990/decoupled_endpoint";
 

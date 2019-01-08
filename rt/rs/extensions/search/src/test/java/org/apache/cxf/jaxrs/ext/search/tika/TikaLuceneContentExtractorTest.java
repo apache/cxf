@@ -42,11 +42,13 @@ import org.apache.lucene.util.Version;
 import org.apache.tika.parser.pdf.PDFParser;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TikaLuceneContentExtractorTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class TikaLuceneContentExtractorTest {
     private TikaLuceneContentExtractor extractor;
     private Directory directory;
     private IndexWriter writer;

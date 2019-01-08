@@ -19,13 +19,14 @@
 
 package org.apache.cxf.jaxrs.client.blueprint;
 
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
 
 /**
  *
  */
-public class JAXRSBPNamespaceHandlerTest extends Assert {
+public class JAXRSBPNamespaceHandlerTest {
     @Test
     public void testGetSchemaLocation() {
         JAXRSBPNamespaceHandler handler = new JAXRSBPNamespaceHandler();

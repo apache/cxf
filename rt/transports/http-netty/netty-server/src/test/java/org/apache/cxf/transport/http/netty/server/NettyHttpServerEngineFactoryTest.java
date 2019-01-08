@@ -27,14 +27,15 @@ import org.apache.cxf.transport.http.HTTPTransportFactory;
 
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 
-public class NettyHttpServerEngineFactoryTest
-        extends Assert {
+
+public class NettyHttpServerEngineFactoryTest {
     Bus bus;
 
     @BeforeClass

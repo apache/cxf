@@ -26,11 +26,12 @@ import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class JwePbeHmacAesWrapTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class JwePbeHmacAesWrapTest {
     @Before
     public void registerBouncyCastleIfNeeded() throws Exception {
         Security.addProvider(new BouncyCastleProvider());
@@ -75,4 +76,3 @@ public class JwePbeHmacAesWrapTest extends Assert {
 
     }
 }
-

@@ -29,10 +29,11 @@ import java.util.Collections;
 import org.apache.cxf.validation.BeanValidationProvider;
 import org.apache.cxf.validation.ValidationConfiguration;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class PackageUtilsTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class PackageUtilsTest {
     @Test
     public void testGetClassPackageName() throws Exception {
         String packageName = PackageUtils.getPackageName(this.getClass());

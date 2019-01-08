@@ -22,10 +22,11 @@ import java.lang.reflect.Method;
 
 import javax.xml.bind.annotation.XmlAccessType;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class UtilsTest extends Assert {
+import static org.junit.Assert.fail;
+
+public class UtilsTest {
 
     @Test
     public void testGetMethod() {

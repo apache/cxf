@@ -40,10 +40,14 @@ import org.apache.cxf.ws.security.sts.provider.model.StatusType;
 import org.apache.cxf.ws.security.sts.provider.model.ValidateTargetType;
 import org.apache.cxf.ws.security.sts.provider.model.secext.BinarySecurityTokenType;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Some unit tests for the validate operation.
  */
-public class ValidateUnitTest extends org.junit.Assert {
+public class ValidateUnitTest {
 
     private static final QName QNAME_WST_STATUS =
         QNameConstants.WS_TRUST_FACTORY.createStatus(null).getName();

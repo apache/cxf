@@ -30,6 +30,10 @@ import org.apache.cxf.aegis.xml.stax.ElementReader;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 public class SoapArrayTypeTest extends AbstractEncodedTest {
     private static final String[][][] ARRAY_2_3_4 = new String[][][] {
         new String[][]{

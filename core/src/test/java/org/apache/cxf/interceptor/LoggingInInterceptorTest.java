@@ -32,12 +32,13 @@ import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 @SuppressWarnings("deprecation")
-public class LoggingInInterceptorTest extends Assert {
+public class LoggingInInterceptorTest {
     static String encoding = "UTF-8";
     static String contentType = "text/xml";
     

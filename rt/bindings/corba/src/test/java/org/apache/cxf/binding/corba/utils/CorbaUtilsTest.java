@@ -31,11 +31,14 @@ import org.omg.CORBA.TCKind;
 import org.omg.CORBA.TypeCode;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class CorbaUtilsTest extends Assert {
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class CorbaUtilsTest {
 
     private static ORB orb;
 

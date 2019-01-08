@@ -38,10 +38,12 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class BinaryDataProviderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class BinaryDataProviderTest {
 
     @Test
     public void testIsWriteable() {

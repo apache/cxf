@@ -38,11 +38,13 @@ import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.resources.AegisTestBean;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class AegisElementProviderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class AegisElementProviderTest {
 
     private Properties properties;
     private String simpleBeanXml;

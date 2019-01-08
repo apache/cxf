@@ -19,13 +19,14 @@
 
 package org.apache.cxf.transport.http.blueprint;
 
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
 
 /**
  *
  */
-public class HttpBPHandlerTest extends Assert {
+public class HttpBPHandlerTest {
     @Test
     public void testGetSchemaLocation() {
         HttpBPHandler handler = new HttpBPHandler();

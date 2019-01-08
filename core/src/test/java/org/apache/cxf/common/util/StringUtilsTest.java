@@ -19,10 +19,13 @@
 
 package org.apache.cxf.common.util;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class StringUtilsTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class StringUtilsTest {
 
     @Test
     public void testDiff() throws Exception {

@@ -22,10 +22,12 @@ import java.util.List;
 
 import org.apache.cxf.rs.security.oidc.common.AbstractUserInfo;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class OidcUtilsTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class OidcUtilsTest {
     
     @Test
     public void testScopeToClaimsMappingNoValue() {

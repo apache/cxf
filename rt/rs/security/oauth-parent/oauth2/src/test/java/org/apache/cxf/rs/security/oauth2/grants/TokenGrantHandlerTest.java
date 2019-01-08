@@ -31,10 +31,13 @@ import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.tokens.bearer.BearerAccessToken;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class TokenGrantHandlerTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class TokenGrantHandlerTest {
 
 
 

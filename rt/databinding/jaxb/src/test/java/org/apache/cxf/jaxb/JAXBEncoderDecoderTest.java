@@ -67,14 +67,20 @@ import org.apache.hello_world_soap_http.types.GreetMe;
 import org.apache.hello_world_soap_http.types.GreetMeResponse;
 import org.apache.hello_world_soap_http.types.StringStruct;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * JAXBEncoderDecoderTest
  */
-public class JAXBEncoderDecoderTest extends Assert {
+public class JAXBEncoderDecoderTest {
     public static final QName  SOAP_ENV =
             new QName("http://schemas.xmlsoap.org/soap/envelope/", "Envelope");
     public static final QName  SOAP_BODY =
@@ -636,4 +642,3 @@ public class JAXBEncoderDecoderTest extends Assert {
 
 
 }
-

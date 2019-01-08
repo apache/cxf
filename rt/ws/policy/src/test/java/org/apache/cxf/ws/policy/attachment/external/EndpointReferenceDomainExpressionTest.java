@@ -29,14 +29,17 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
  */
-public class EndpointReferenceDomainExpressionTest extends Assert {
+public class EndpointReferenceDomainExpressionTest {
 
     private IMocksControl control;
 

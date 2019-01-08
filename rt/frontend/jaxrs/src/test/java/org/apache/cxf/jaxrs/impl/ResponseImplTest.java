@@ -64,9 +64,16 @@ import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
 
 @SuppressWarnings("resource") // Responses built in this test don't need to be closed
-public class ResponseImplTest extends Assert {
+public class ResponseImplTest {
 
     @Test
     public void testReadEntityWithNullOutMessage() {

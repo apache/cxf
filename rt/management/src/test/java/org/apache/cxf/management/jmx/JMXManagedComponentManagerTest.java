@@ -31,11 +31,13 @@ import org.apache.cxf.management.jmx.export.AnnotationTestInstrumentation;
 import org.apache.cxf.testutil.common.TestUtil;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class JMXManagedComponentManagerTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+public class JMXManagedComponentManagerTest {
     private static final String PORT = TestUtil.getPortNumber(JMXManagedComponentManagerTest.class);
     private static final String NAME_ATTRIBUTE = "Name";
     private InstrumentationManagerImpl manager;

@@ -28,12 +28,13 @@ import org.apache.cxf.message.MessageImpl;
 import org.omg.CORBA.ORB;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
 
-public class CorbaBindingTest extends Assert {
+
+public class CorbaBindingTest {
 
     private ORB orb;
 

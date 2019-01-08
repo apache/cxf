@@ -25,13 +25,18 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.ws.rm.RMManager;
 
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
  */
-public class RMTxStoreConfigurationTest extends Assert {
+public class RMTxStoreConfigurationTest {
 
     @Test
     public void testTxStoreBean() {

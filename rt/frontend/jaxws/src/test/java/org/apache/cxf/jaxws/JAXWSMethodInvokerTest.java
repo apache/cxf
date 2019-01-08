@@ -58,7 +58,15 @@ import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class JAXWSMethodInvokerTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class JAXWSMethodInvokerTest {
     private static final QName TEST_HEADER_NAME = new QName("testHeader");
     Factory factory = EasyMock.createMock(Factory.class);
     Object target = EasyMock.createMock(Hello.class);

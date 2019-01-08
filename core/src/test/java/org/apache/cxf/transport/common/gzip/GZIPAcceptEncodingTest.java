@@ -36,12 +36,13 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.apache.cxf.transport.common.gzip.GZIPOutInterceptor.UseGzip.FORCE;
 import static org.apache.cxf.transport.common.gzip.GZIPOutInterceptor.UseGzip.YES;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
 /**
  * Test for the parsing of Accept-Encoding by the GZIPOutInterceptor. For
@@ -50,7 +51,7 @@ import static org.apache.cxf.transport.common.gzip.GZIPOutInterceptor.UseGzip.YE
  * be set correctly. For Accept-Encoding values that do not enable gzip the
  * interceptor should not be added.
  */
-public class GZIPAcceptEncodingTest extends Assert {
+public class GZIPAcceptEncodingTest {
 
     private GZIPOutInterceptor interceptor;
     private Message inMessage;

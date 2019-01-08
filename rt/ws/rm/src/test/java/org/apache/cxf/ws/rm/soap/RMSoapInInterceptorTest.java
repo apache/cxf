@@ -43,10 +43,14 @@ import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement.AcknowledgementRange;
 import org.apache.cxf.ws.rm.v200702.SequenceType;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class RMSoapInInterceptorTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public class RMSoapInInterceptorTest {
 
     private static final String SEQ_IDENTIFIER = "http://Business456.com/RM/ABC";
     private static final Long ONE = Long.valueOf(1);

@@ -62,7 +62,6 @@
         <dependency>
             <groupId>jakarta.ws.rs</groupId>
             <artifactId>jakarta.ws.rs-api</artifactId>
-            <version>${cxf.javax.ws.rs.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.annotation</groupId>

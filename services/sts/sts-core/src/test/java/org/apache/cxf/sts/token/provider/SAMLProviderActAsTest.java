@@ -58,10 +58,14 @@ import org.opensaml.core.xml.XMLObject;
 
 import org.junit.Assert;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Some unit tests for creating SAML Tokens with an ActAs element.
  */
-public class SAMLProviderActAsTest extends org.junit.Assert {
+public class SAMLProviderActAsTest {
 
     /**
      * Create a default Saml1 Bearer Assertion with ActAs from a UsernameToken

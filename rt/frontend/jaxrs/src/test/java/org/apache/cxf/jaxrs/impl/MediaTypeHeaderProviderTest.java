@@ -25,10 +25,12 @@ import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class MediaTypeHeaderProviderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+public class MediaTypeHeaderProviderTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testNullValue() throws Exception {

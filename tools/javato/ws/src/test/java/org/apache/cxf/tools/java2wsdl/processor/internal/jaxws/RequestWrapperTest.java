@@ -32,10 +32,14 @@ import org.apache.cxf.tools.common.model.JavaMethod;
 import org.apache.cxf.tools.fortest.withannotation.doc.GreeterArray;
 import org.apache.cxf.tools.fortest.xmllist.AddNumbersPortType;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class RequestWrapperTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class RequestWrapperTest {
     JaxwsServiceBuilder builder = new JaxwsServiceBuilder();
 
     private OperationInfo getOperation(Class<?> clz, String opName) {

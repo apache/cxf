@@ -39,6 +39,10 @@ import org.apache.cxf.transport.local.LocalTransportFactory;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 public class SoapBindingSelectionTest extends AbstractSimpleFrontendTest {
 
     boolean service1Invoked;

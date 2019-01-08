@@ -56,11 +56,15 @@ import org.eclipse.jetty.util.thread.ThreadPool;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class JettyHTTPServerEngineTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class JettyHTTPServerEngineTest {
     private static final int PORT1
         = Integer.valueOf(TestUtil.getPortNumber(JettyHTTPServerEngineTest.class, 1));
     private static final int PORT2

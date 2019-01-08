@@ -39,10 +39,11 @@ import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.GreeterImpl;
 import org.apache.hello_world_soap_http.SOAPService;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class BusShutdownTest extends Assert {
+import static org.junit.Assert.assertNotNull;
+
+public class BusShutdownTest {
     public static final String PORT = TestUtil.getPortNumber(BusShutdownTest.class);
 
     @Test

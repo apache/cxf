@@ -27,10 +27,11 @@ import com.sun.xml.bind.marshaller.MinimumEscapeHandler;
 import com.sun.xml.bind.v2.runtime.JAXBContextImpl;
 import com.sun.xml.bind.v2.runtime.MarshallerImpl;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class JAXBUtilsTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class JAXBUtilsTest {
 
     @Test
     public void testCanSetEscapeHandlerWithStandardJaxbImpl() throws Exception {

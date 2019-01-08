@@ -36,10 +36,13 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class FormEncodingProviderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class FormEncodingProviderTest {
 
 
     @Test

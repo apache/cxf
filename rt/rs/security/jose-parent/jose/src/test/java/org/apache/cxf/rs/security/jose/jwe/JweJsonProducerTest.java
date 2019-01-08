@@ -34,11 +34,12 @@ import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class JweJsonProducerTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class JweJsonProducerTest {
     static final byte[] WRAPPER_BYTES1 = {91, 96, 105, 38, 99, 108, 110, 8, -93, 50, -15, 62, 0, -115, 73, -39};
     static final byte[] WRAPPER_BYTES2 = {-39, 96, 105, 38, 99, 108, 110, 8, -93, 50, -15, 62, 0, -115, 73, 91};
     static final byte[] CEK_BYTES = {-43, 123, 77, 115, 40, 49, -4, -9, -48, -74, 62, 59, 60, 102, -22, -100};
@@ -308,4 +309,3 @@ public class JweJsonProducerTest extends Assert {
         assertEquals(MULTIPLE_RECIPIENTS_OUTPUT, jweJson);
     }
 }
-

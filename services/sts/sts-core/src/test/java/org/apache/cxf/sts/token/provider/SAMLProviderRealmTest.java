@@ -40,10 +40,14 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.util.DOM2Writer;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Some unit tests for creating SAML Tokens via the SAMLTokenProvider in different realms
  */
-public class SAMLProviderRealmTest extends org.junit.Assert {
+public class SAMLProviderRealmTest {
 
     /**
      * Test that a SAML 1.1 Bearer Assertion is created in specific realms.

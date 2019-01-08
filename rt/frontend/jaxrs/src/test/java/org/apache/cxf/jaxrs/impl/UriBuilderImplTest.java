@@ -37,10 +37,12 @@ import org.apache.cxf.jaxrs.resources.BookStore;
 import org.apache.cxf.jaxrs.resources.UriBuilderWrongAnnotations;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class UriBuilderImplTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+public class UriBuilderImplTest {
 
     @Test
     public void testFromUriRelativePath() throws Exception {

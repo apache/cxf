@@ -72,11 +72,16 @@ import org.apache.hello_world_soap_http.types.GreetMeOneWay;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class JAXBDataBindingTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class JAXBDataBindingTest {
 
     private static final Logger LOG = LogUtils.getLogger(JAXBDataBindingTest.class);
     private static final String WSDL_PATH = "/wsdl/jaxb/hello_world.wsdl";

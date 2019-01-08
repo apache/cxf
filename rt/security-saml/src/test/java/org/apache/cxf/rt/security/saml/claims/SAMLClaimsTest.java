@@ -37,9 +37,11 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.bean.AttributeBean;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 
-import org.junit.Assert;
 
-public class SAMLClaimsTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class SAMLClaimsTest {
 
     @org.junit.Test
     public void testSAML2Claims() throws Exception {

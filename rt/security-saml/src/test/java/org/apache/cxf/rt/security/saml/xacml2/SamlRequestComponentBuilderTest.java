@@ -41,11 +41,13 @@ import org.opensaml.xacml.ctx.SubjectType;
 import org.opensaml.xacml.profile.saml.SAMLProfileConstants;
 import org.opensaml.xacml.profile.saml.XACMLAuthzDecisionQueryType;
 
+import static org.junit.Assert.assertNotNull;
+
 
 /**
  * Some unit tests for creating a SAML XACML Request.
  */
-public class SamlRequestComponentBuilderTest extends org.junit.Assert {
+public class SamlRequestComponentBuilderTest {
 
     private DocumentBuilder docBuilder;
     static {

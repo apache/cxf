@@ -32,11 +32,13 @@ import org.apache.hello_world_soap_action.Greeter;
 import org.apache.hello_world_soap_action.WrappedGreeter;
 
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class SoapActionTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+public class SoapActionTest {
     static final String PORT1 = TestUtil.getPortNumber(SoapActionTest.class, 1);
     static final String PORT2 = TestUtil.getPortNumber(SoapActionTest.class, 2);
     static final String PORT3 = TestUtil.getPortNumber(SoapActionTest.class, 3);

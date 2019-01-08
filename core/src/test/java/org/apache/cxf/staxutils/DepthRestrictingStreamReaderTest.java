@@ -23,10 +23,11 @@ import java.io.ByteArrayOutputStream;
 
 import javax.xml.stream.XMLStreamReader;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class DepthRestrictingStreamReaderTest extends Assert {
+import static org.junit.Assert.assertTrue;
+
+public class DepthRestrictingStreamReaderTest {
 
     @Test
     public void testReaderOK() throws Exception {

@@ -33,6 +33,8 @@ import org.apache.cxf.jaxws.service.AddNumbersImpl;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class SEIWithJAXBAnnoTest extends AbstractJaxWsTest {
     String address = "local://localhost:9000/Hello";

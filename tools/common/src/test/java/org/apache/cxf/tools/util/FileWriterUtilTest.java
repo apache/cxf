@@ -21,10 +21,11 @@ package org.apache.cxf.tools.util;
 import java.io.File;
 import java.io.IOException;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class FileWriterUtilTest extends Assert {
+import static org.junit.Assert.assertNotNull;
+
+public class FileWriterUtilTest {
 
     private void cleanDir(File dir) {
         try {

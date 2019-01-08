@@ -25,10 +25,13 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.apache.wss4j.dom.validate.Credential;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class AuthPolicyValidatingInterceptorTest extends Assert {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class AuthPolicyValidatingInterceptorTest {
 
     @Test
     public void testValidateAuthorizationPolicy() throws Exception {

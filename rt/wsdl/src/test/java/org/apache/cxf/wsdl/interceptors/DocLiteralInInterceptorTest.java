@@ -54,15 +54,16 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Unit test for testing DocLiteralInInterceptor to use Source Data Binding
  *
  */
-public class DocLiteralInInterceptorTest extends Assert {
+public class DocLiteralInInterceptorTest {
 
     private static final String NS = "http://cxf.apache.org/wsdl-first/types";
     protected IMocksControl control;

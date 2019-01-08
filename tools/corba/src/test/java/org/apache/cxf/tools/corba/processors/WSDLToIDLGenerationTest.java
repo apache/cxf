@@ -32,11 +32,12 @@ import java.net.URI;
 import org.apache.cxf.tools.corba.processors.wsdl.WSDLToIDLAction;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class WSDLToIDLGenerationTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class WSDLToIDLGenerationTest {
 
     protected static final String START_COMMENT = "/*";
     protected static final String END_COMMENT = "*/";

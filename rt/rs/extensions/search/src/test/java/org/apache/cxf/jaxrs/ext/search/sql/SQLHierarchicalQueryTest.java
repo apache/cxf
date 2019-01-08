@@ -23,11 +23,12 @@ import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchParseException;
 import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
 
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 //userName eq "admin@amarkevich.talend.com" and entitlements sw "TDP_"
 
-public class SQLHierarchicalQueryTest extends Assert {
+public class SQLHierarchicalQueryTest {
     @Test
     public void testSimpleHierarchicalQuery() throws SearchParseException {
         FiqlParser<SearchBean> parser = new FiqlParser<>(SearchBean.class);

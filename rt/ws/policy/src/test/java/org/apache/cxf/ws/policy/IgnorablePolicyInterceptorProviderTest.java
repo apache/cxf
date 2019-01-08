@@ -36,14 +36,18 @@ import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.neethi.Assertion;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 
 /**
  *
  */
-public class IgnorablePolicyInterceptorProviderTest extends Assert {
+public class IgnorablePolicyInterceptorProviderTest {
     private static final QName ONEWAY_QNAME = new QName("http://tempuri.org/policy", "OneWay");
     private static final QName DUPLEX_QNAME = new QName("http://tempuri.org/policy", "Duplex");
 

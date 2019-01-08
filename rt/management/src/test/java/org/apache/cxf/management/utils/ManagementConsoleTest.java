@@ -19,10 +19,12 @@
 
 package org.apache.cxf.management.utils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class ManagementConsoleTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
+public class ManagementConsoleTest {
     private ManagementConsole mc = new ManagementConsole();
 
     @Test

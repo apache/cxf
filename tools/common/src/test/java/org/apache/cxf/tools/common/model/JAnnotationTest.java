@@ -29,10 +29,12 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.ws.Action;
 import javax.xml.ws.FaultAction;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class JAnnotationTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class JAnnotationTest {
     @Test
     public void testList() throws Exception {
         JAnnotation annotation = new JAnnotation(XmlSeeAlso.class);

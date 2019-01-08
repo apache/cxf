@@ -28,10 +28,14 @@ import org.apache.cxf.rs.security.jose.common.KeyManagementUtils;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class JwkUtilsTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
+public class JwkUtilsTest {
     private static final String RSA_KEY = "{"
       + "\"kty\": \"RSA\","
       + "\"n\": \"0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx4cbbfAAt"

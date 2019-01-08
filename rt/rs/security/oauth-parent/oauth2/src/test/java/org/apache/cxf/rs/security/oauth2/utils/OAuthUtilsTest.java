@@ -20,10 +20,12 @@ package org.apache.cxf.rs.security.oauth2.utils;
 
 import java.util.List;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class OAuthUtilsTest extends Assert {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class OAuthUtilsTest {
 
     @Test
     public void testValidateScopesStrict() {

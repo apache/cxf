@@ -29,10 +29,13 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class IdlPreprocessorReaderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class IdlPreprocessorReaderTest {
 
     private URL findTestResource(String spec) {
         String location = "/idlpreprocessor/" + spec;

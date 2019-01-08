@@ -27,10 +27,14 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Link;
 import javax.ws.rs.core.MediaType;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class LinkBuilderImplTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class LinkBuilderImplTest {
 
 
     @Test

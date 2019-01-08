@@ -44,14 +44,20 @@ import org.apache.cxf.ws.rm.v200702.SequenceType;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test resend logic.
  */
-public class RetransmissionQueueImplTest extends Assert {
+public class RetransmissionQueueImplTest {
     private static final Long ONE = Long.valueOf(1);
     private static final Long TWO = Long.valueOf(2);
     private static final Long TEN = Long.valueOf(10);

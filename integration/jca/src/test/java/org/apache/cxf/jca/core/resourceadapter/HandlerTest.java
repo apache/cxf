@@ -22,12 +22,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class HandlerTest extends Assert {
+
+public class HandlerTest {
     Handler h;
 
 
@@ -63,4 +66,3 @@ public class HandlerTest extends Assert {
 
 
 }
-

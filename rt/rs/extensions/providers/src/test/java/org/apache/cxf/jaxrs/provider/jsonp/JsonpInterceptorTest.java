@@ -28,11 +28,12 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class JsonpInterceptorTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class JsonpInterceptorTest {
 
     public static final String JSON = "{}";
 

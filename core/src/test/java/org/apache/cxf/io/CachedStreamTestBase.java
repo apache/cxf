@@ -36,10 +36,15 @@ import org.apache.cxf.helpers.IOUtils;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Test;
 
-public abstract class CachedStreamTestBase extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public abstract class CachedStreamTestBase {
     // use two typical ciphers for testing
     private static final String[] CIPHER_LIST = {"RC4", "AES/CTR/NoPadding"};
 
@@ -295,5 +300,4 @@ public abstract class CachedStreamTestBase extends Assert {
         return result;
     }
 }
-
 

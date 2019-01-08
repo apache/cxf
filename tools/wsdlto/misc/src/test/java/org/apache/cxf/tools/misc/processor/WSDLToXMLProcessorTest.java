@@ -37,6 +37,9 @@ import org.apache.cxf.tools.misc.WSDLToXML;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 
 public class WSDLToXMLProcessorTest extends ProcessorTestBase {
 

@@ -30,14 +30,15 @@ import org.apache.cxf.wsdl.WSDLManager;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  *
  */
-public class ReflectionServiceFactorBeanTest extends Assert {
+public class ReflectionServiceFactorBeanTest {
     protected IMocksControl control;
 
     @Before

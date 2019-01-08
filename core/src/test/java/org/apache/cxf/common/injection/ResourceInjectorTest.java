@@ -39,10 +39,13 @@ import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.resource.ResourceResolver;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.Test;
 
-public class ResourceInjectorTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class ResourceInjectorTest {
     private static final String RESOURCE_ONE = "resource one";
     private static final String RESOURCE_TWO = "resource two";
     private static final String RESOURCE_THREE = "resource three";

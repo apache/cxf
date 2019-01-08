@@ -53,10 +53,14 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Some unit tests for validating JWTTokens in different realms
  */
-public class JWTTokenValidatorRealmTest extends org.junit.Assert {
+public class JWTTokenValidatorRealmTest {
     private static TokenStore tokenStore = new DefaultInMemoryTokenStore();
 
     @org.junit.Test

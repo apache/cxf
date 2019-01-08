@@ -32,11 +32,14 @@ import javax.xml.ws.handler.MessageContext.Scope;
 import org.apache.cxf.message.MessageImpl;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
-public class WebServiceContextImplTest extends Assert {
+
+public class WebServiceContextImplTest {
 
     @After
     public void tearDown() {

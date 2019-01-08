@@ -27,11 +27,12 @@ import org.apache.cxf.jca.cxf.ManagedConnectionFactoryImpl;
 import org.apache.cxf.jca.cxf.ManagedConnectionImpl;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class HandlerTestBase extends Assert {
+import static org.junit.Assert.fail;
+
+public class HandlerTestBase {
     protected Bus mockBus = EasyMock.createMock(Bus.class);
     protected CXFManagedConnection mockManagedConnection =
                 EasyMock.createMock(CXFManagedConnection.class);

@@ -30,13 +30,17 @@ import org.apache.cxf.ws.rm.persistence.RMStore;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
  */
-public class RMManagerConfigurationTest extends Assert {
+public class RMManagerConfigurationTest {
 
     private Bus bus;
 

@@ -22,13 +22,12 @@ package org.apache.cxf.databinding;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
  *
  */
-public class AbstractDataBindingTest extends Assert {
+public class AbstractDataBindingTest {
     @Test(expected = IllegalArgumentException.class)
     public void testNamespaceMapCheckDuplicates() {
         Map<String, String> testMap = new HashMap<>();

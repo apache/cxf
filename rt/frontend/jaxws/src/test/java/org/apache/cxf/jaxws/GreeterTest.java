@@ -33,6 +33,9 @@ import org.apache.hello_world_soap_http.GreeterImpl;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class GreeterTest extends AbstractJaxWsTest {
 
 

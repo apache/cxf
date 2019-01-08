@@ -31,6 +31,8 @@ import org.apache.cxf.testutil.common.TestUtil;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 public class SoapFaultHandlerTest extends AbstractCXFSpringTest {
 
     static String port = TestUtil.getPortNumber("SoapFaultHandler");

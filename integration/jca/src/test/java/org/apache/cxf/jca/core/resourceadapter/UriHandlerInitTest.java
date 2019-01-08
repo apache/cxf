@@ -20,11 +20,13 @@ package org.apache.cxf.jca.core.resourceadapter;
 
 import java.util.Properties;
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class UriHandlerInitTest extends Assert {
+
+public class UriHandlerInitTest {
     private static final String PROP_NAME = "java.protocol.handler.pkgs";
 
     private static final String PKG_ADD = "do.do";

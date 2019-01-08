@@ -54,11 +54,15 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ColocOutInterceptorTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.fail;
+
+public class ColocOutInterceptorTest {
     private static final String COLOCATED = Message.class.getName() + ".COLOCATED";
     private IMocksControl control = EasyMock.createNiceControl();
     private ColocOutInterceptor colocOut;

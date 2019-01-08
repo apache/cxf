@@ -44,12 +44,15 @@ import org.apache.cxf.testutil.common.TestUtil;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class UndertowHTTPServerEngineTest extends Assert {
+
+public class UndertowHTTPServerEngineTest {
     private static final int PORT1
         = Integer.valueOf(TestUtil.getPortNumber(UndertowHTTPServerEngineTest.class, 1));
     private static final int PORT2

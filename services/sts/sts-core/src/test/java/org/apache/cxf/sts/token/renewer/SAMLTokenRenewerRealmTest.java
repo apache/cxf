@@ -64,10 +64,13 @@ import org.apache.wss4j.common.util.DateUtil;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Some unit tests for renewing a SAML token in different realms.
  */
-public class SAMLTokenRenewerRealmTest extends org.junit.Assert {
+public class SAMLTokenRenewerRealmTest {
 
     private static TokenStore tokenStore;
 

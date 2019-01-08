@@ -53,10 +53,11 @@ import org.apache.cxf.ws.rm.v200702.ObjectFactory;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 import org.apache.cxf.ws.rm.v200702.SequenceType;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class RMSoapOutInterceptorTest extends Assert {
+import static org.junit.Assert.assertTrue;
+
+public class RMSoapOutInterceptorTest {
 
     private static final Long ONE = Long.valueOf(1);
     private static final Long TEN = Long.valueOf(10);

@@ -31,11 +31,14 @@ import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.parser.stax.FOMEntry;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class AtomEntryProviderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class AtomEntryProviderTest {
 
     private AtomEntryProvider afd;
 

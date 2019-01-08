@@ -40,11 +40,15 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ContextPropertiesMappingTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public class ContextPropertiesMappingTest {
     private static final String ADDRESS = "test address";
     private static final String REQUEST_METHOD = "GET";
     private static final String HEADER = "header";

@@ -32,12 +32,17 @@ import org.apache.cxf.management.jmx.InstrumentationManagerImpl;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-public class InstrumentationManagerTest extends Assert {
+
+public class InstrumentationManagerTest {
     InstrumentationManager im;
     Bus bus;
 

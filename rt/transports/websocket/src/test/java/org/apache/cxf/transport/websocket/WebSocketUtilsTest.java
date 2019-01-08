@@ -22,13 +22,15 @@ package org.apache.cxf.transport.websocket;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  *
  */
-public class WebSocketUtilsTest extends Assert {
+public class WebSocketUtilsTest {
     private static final byte[] TEST_BODY_BYTES = "buenos dias".getBytes();
     private static final byte[] TEST_HEADERS_BYTES = "200\r\nContent-Type: text/xml;charset=utf-8\r\n".getBytes();
     private static final byte[] TEST_ID_BYTES =

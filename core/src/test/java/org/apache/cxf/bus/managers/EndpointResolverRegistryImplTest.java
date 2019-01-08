@@ -27,11 +27,16 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class EndpointResolverRegistryImplTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
+public class EndpointResolverRegistryImplTest {
 
     private EndpointResolverRegistryImpl registry;
     private EndpointResolver resolver1;

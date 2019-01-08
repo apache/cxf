@@ -21,11 +21,13 @@ package org.apache.cxf.common.i18n;
 
 import java.util.ResourceBundle;
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-public class BundleUtilsTest extends Assert {
+
+public class BundleUtilsTest {
     @Test
     public void testGetBundleName() throws Exception {
         assertEquals("unexpected resource bundle name",

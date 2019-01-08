@@ -25,11 +25,15 @@ import java.util.StringTokenizer;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.tools.common.toolspec.ToolSpec;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class CommandLineParserTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class CommandLineParserTest {
     private CommandLineParser parser;
 
     @Before

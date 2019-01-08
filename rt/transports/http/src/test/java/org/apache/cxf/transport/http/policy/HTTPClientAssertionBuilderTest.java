@@ -24,13 +24,15 @@ import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertion;
 import org.apache.neethi.Assertion;
 
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
  */
-public class HTTPClientAssertionBuilderTest extends Assert {
+public class HTTPClientAssertionBuilderTest {
 
 
     @Test

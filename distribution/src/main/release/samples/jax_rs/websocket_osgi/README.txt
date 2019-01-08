@@ -45,9 +45,14 @@ Install CXF's cxf-jaxrs and cxf-transports-websocket-server features that instal
 for this demo bundle.
 
   feature:install cxf-jaxrs cxf-transports-websocket-server
+  feature:install aries-blueprint
 
 Install this demo bundle (using the appropriate bundle version number)
 
+  install -s mvn:org.eclipse.jetty.websocket/websocket-api/9.4.12.v20180830
+  install -s mvn:org.eclipse.jetty.websocket/websocket-common/9.4.12.v20180830
+  install -s mvn:org.eclipse.jetty.websocket/websocket-servlet/9.4.12.v20180830
+  install -s mvn:org.eclipse.jetty.websocket/websocket-server/9.4.12.v20180830
   install -s mvn:org.apache.cxf.samples/jax_rs_websocket_osgi/3.n.m
 
 And verify the bundles are installed.

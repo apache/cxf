@@ -23,13 +23,15 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
  */
-public class NamePasswordCallbackHandlerTest extends Assert {
+public class NamePasswordCallbackHandlerTest {
 
     @Test
     public void testHandleCallback() throws Exception {

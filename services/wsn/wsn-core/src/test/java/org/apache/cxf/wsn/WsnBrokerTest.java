@@ -51,13 +51,14 @@ import org.oasis_open.docs.wsn.b_2.NotificationMessageHolderType;
 import org.oasis_open.docs.wsn.b_2.TopicExpressionType;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-
-public abstract class WsnBrokerTest extends Assert {
+public abstract class WsnBrokerTest {
     private boolean useExternal;
 
 
@@ -83,7 +84,7 @@ public abstract class WsnBrokerTest extends Assert {
             .setContextClassLoader(new FakeClassLoader(impl));
         WSNHelper.getInstance().setClassLoader(false);
 
-        
+
 
         port2 = getFreePort();
         if (!useExternal) {

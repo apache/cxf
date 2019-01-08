@@ -21,10 +21,11 @@ package org.apache.cxf.transport;
 
 import java.net.URL;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class HttpUriMapperTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class HttpUriMapperTest {
 
     @Test
     public void testGetContext() throws Exception {

@@ -54,11 +54,14 @@ import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Some unit tests for validating a SAML token with a realm against the cached tokens realm.
  */
-public class SAMLTokenValidatorCachedRealmTest extends org.junit.Assert {
+public class SAMLTokenValidatorCachedRealmTest {
 
     private static TokenStore tokenStore;
 

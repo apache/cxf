@@ -47,10 +47,13 @@ import org.apache.hello_world_soap_http.GreeterImpl;
 import org.apache.hello_world_soap_http.SOAPService;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Test;
 
-public class ConfiguredEndpointTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public class ConfiguredEndpointTest {
     private static final QName SERVICE_NAME =
         new QName("http://apache.org/hello_world_soap_http", "SOAPService");
     private static final QName PORT_NAME =

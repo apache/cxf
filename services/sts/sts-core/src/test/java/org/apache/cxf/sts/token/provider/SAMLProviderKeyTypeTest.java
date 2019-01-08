@@ -51,10 +51,16 @@ import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Some unit tests for creating SAML Tokens with various KeyType parameters via the SAMLTokenProvider.
  */
-public class SAMLProviderKeyTypeTest extends org.junit.Assert {
+public class SAMLProviderKeyTypeTest {
 
     /**
      * Create a default Saml1 Bearer Assertion.

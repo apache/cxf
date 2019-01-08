@@ -55,10 +55,14 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import org.junit.Assert;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Some unit tests for creating JWTTokens.
  */
-public class JWTTokenProviderTest extends org.junit.Assert {
+public class JWTTokenProviderTest {
     private static boolean unrestrictedPoliciesInstalled;
     private static TokenStore tokenStore = new DefaultInMemoryTokenStore();
 

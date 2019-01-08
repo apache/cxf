@@ -23,10 +23,11 @@ import java.util.Set;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchParseException;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class FiqlCollectionsTest extends Assert {
+import static org.junit.Assert.assertNotNull;
+
+public class FiqlCollectionsTest {
     @Test
     public void testWithCollectionAfterFirstLevelOnCollection() throws SearchParseException {
         FiqlParser<Place> placeParser = new FiqlParser<>(Place.class);

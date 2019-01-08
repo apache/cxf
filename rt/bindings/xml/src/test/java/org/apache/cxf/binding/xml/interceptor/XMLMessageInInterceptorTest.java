@@ -34,6 +34,9 @@ import org.apache.hello_world_xml_http.wrapped.types.GreetMe;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class XMLMessageInInterceptorTest extends TestBase {
 
     XMLMessageInInterceptor in = new XMLMessageInInterceptor("phase1");

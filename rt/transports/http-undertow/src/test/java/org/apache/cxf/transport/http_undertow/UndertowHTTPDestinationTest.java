@@ -77,11 +77,18 @@ import io.undertow.util.HttpString;
 
 import org.easymock.EasyMock;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class UndertowHTTPDestinationTest extends Assert {
+
+public class UndertowHTTPDestinationTest {
     protected static final String AUTH_HEADER = "Authorization";
     protected static final String USER = "copernicus";
     protected static final String PASSWD = "epicycles";

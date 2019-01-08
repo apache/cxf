@@ -29,6 +29,8 @@ import org.springframework.context.support.GenericApplicationContext;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  *
  */

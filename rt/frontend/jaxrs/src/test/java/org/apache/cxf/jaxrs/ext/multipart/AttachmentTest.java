@@ -24,10 +24,11 @@ import javax.mail.util.ByteArrayDataSource;
 
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class AttachmentTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class AttachmentTest {
 
 
     @Test

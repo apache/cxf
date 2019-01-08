@@ -49,11 +49,14 @@ import org.apache.headers.rpc_lit.PingMeFault;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ColocUtilTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+
+public class ColocUtilTest {
     private IMocksControl control = EasyMock.createNiceControl();
     private Bus bus;
 

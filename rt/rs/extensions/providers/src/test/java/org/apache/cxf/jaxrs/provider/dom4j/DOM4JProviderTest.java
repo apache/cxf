@@ -42,10 +42,13 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.Test;
 
-public class DOM4JProviderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class DOM4JProviderTest {
 
 
     @Test

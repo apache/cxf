@@ -27,10 +27,12 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.wss4j.common.cache.EHCacheManagerHolder;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class EHCacheUtilsTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
+public class EHCacheUtilsTest {
     @Test
     public void testUseGlobalManager() {
         Bus bus = BusFactory.getThreadDefaultBus();

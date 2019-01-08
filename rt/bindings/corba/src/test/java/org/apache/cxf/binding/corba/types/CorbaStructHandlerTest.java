@@ -31,13 +31,15 @@ import org.omg.CORBA.TCKind;
 import org.omg.CORBA.TypeCode;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 // Since the exception handler is essentially the same as the struct handler (just included in case
 // structs and exceptions diverge at a later date), this test should cover both.
-public class CorbaStructHandlerTest extends Assert {
+public class CorbaStructHandlerTest {
 
     private ORB orb;
 

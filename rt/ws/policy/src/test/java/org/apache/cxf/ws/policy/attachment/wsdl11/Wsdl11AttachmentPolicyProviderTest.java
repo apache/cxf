@@ -54,15 +54,20 @@ import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  *
  */
-public class Wsdl11AttachmentPolicyProviderTest extends Assert {
+public class Wsdl11AttachmentPolicyProviderTest {
 
     private static final String NAMESPACE_URI = "http://apache.org/cxf/calculator";
     private static final QName OPERATION_NAME = new QName(NAMESPACE_URI, "add");

@@ -28,10 +28,11 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Variant.VariantListBuilder;
 import javax.ws.rs.ext.RuntimeDelegate;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class RuntimeDelegateImplTest extends Assert {
+import static org.junit.Assert.assertSame;
+
+public class RuntimeDelegateImplTest {
 
     @Test
     public void testRuntimeDelegate() throws Exception {

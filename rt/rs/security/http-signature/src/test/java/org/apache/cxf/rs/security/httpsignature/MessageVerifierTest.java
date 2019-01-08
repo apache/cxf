@@ -44,7 +44,7 @@ import org.junit.Test;
 public class MessageVerifierTest {
     private static final String KEY_ID = "testVerifier";
     private static final String MESSAGE_BODY = "Hello";
-    private static final String METHOD = "Get";
+    private static final String METHOD = "GET";
     private static final String URI = "/test/signature";
     private static final String KEY_PAIR_GENERATOR_ALGORITHM = "RSA";
 
@@ -171,4 +171,5 @@ public class MessageVerifierTest {
         newHeader.put("Content-Length", Collections.singletonList("18"));
         return newHeader;
     }
+
 }

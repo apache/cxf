@@ -24,6 +24,8 @@ import javax.persistence.Persistence;
 import org.junit.After;
 import org.junit.Before;
 
+import static org.junit.Assert.fail;
+
 public class JPAOAuthDataProviderTest extends AbstractOAuthDataProviderTest {
     protected EntityManagerFactory emFactory;
 

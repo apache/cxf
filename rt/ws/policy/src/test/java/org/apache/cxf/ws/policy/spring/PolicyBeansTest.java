@@ -28,10 +28,12 @@ import org.apache.cxf.ws.policy.PolicyProvider;
 import org.apache.cxf.ws.policy.attachment.external.ExternalAttachmentProvider;
 import org.apache.cxf.ws.policy.selector.MaximalAlternativeSelector;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class PolicyBeansTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class PolicyBeansTest {
 
 
     @Test

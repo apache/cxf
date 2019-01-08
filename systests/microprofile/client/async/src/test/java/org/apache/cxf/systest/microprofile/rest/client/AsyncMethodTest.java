@@ -43,15 +43,15 @@ import org.eclipse.microprofile.rest.client.tck.providers.TestParamConverterProv
 import org.eclipse.microprofile.rest.client.tck.providers.TestReaderInterceptor;
 import org.eclipse.microprofile.rest.client.tck.providers.TestWriterInterceptor;
 
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 
 //CHECKSTYLE:OFF
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static org.junit.Assert.assertEquals;
 //CHECKSTYLE:ON
 
-public class AsyncMethodTest extends Assert {
+public class AsyncMethodTest {
 
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(WireMockConfiguration.options().dynamicPort());

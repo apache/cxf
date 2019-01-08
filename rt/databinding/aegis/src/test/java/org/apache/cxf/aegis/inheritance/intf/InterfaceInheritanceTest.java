@@ -29,6 +29,10 @@ import org.apache.cxf.service.invoker.BeanInvoker;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+
 /**
  * This test ensures that we're handling inheritance of interfaces correctly.
  * Since we can't do multiple parent inheritance in XML schema, which interfaces

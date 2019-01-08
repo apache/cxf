@@ -74,15 +74,17 @@ import org.apache.cxf.staxutils.StaxUtils;
 
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 
 import static org.easymock.EasyMock.createNiceControl;
 import static org.easymock.EasyMock.expect;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-public class SOAPHandlerInterceptorTest extends Assert {
+public class SOAPHandlerInterceptorTest {
 
     @Before
     public void setUp() {

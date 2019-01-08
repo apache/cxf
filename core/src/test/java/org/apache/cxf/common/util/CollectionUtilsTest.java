@@ -23,10 +23,15 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Dictionary;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class CollectionUtilsTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public class CollectionUtilsTest {
 
     @Test
     public void testDiff() throws Exception {

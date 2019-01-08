@@ -36,12 +36,15 @@ import org.apache.cxf.testutil.common.TestUtil;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class NettyHttpServerEngineTest extends Assert {
+
+public class NettyHttpServerEngineTest {
     private static final int PORT1
         = Integer.valueOf(TestUtil.getPortNumber(NettyHttpServerEngineTest.class, 1));
     private static final int PORT2

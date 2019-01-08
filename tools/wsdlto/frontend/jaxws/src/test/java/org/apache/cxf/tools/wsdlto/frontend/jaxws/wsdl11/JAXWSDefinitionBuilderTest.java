@@ -34,11 +34,13 @@ import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSBinding;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class JAXWSDefinitionBuilderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class JAXWSDefinitionBuilderTest {
     private ToolContext env;
 
     @Before

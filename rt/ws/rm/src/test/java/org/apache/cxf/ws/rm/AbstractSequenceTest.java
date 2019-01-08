@@ -21,10 +21,11 @@ package org.apache.cxf.ws.rm;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.ObjectFactory;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class AbstractSequenceTest extends Assert {
+import static org.junit.Assert.assertTrue;
+
+public class AbstractSequenceTest {
 
     @Test
     public void testIdentifierEquals() {

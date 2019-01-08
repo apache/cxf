@@ -27,12 +27,13 @@ import org.apache.cxf.jaxrs.ext.search.SearchParseException;
 import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
 import org.apache.cxf.jaxrs.ext.search.visitor.SBThreadLocalVisitorState;
 
-import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
 
-public class SQLPrinterVisitorTest extends Assert {
+
+public class SQLPrinterVisitorTest {
     private FiqlParser<Condition> parser = new FiqlParser<>(Condition.class);
 
     @Test

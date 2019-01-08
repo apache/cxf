@@ -41,10 +41,13 @@ import org.opensaml.saml.saml2.core.NameID;
 import org.opensaml.saml.saml2.core.NameIDPolicy;
 import org.opensaml.saml.saml2.core.RequestedAuthnContext;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Some unit tests for the SamlpRequestComponentBuilder and AuthnRequestBuilder
  */
-public class AuthnRequestBuilderTest extends org.junit.Assert {
+public class AuthnRequestBuilderTest {
 
     static {
         OpenSAMLUtil.initSamlEngine();

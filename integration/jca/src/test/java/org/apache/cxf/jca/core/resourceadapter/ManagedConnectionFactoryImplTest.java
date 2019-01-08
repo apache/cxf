@@ -33,10 +33,15 @@ import javax.security.auth.Subject;
 
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.Test;
 
-public class ManagedConnectionFactoryImplTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class ManagedConnectionFactoryImplTest {
     DummyManagedConnectionFactoryImpl mcf = new DummyManagedConnectionFactoryImpl();
 
 

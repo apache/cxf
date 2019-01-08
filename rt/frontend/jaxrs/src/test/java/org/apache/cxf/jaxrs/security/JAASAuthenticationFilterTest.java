@@ -25,10 +25,12 @@ import javax.ws.rs.core.Response;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class JAASAuthenticationFilterTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class JAASAuthenticationFilterTest {
 
     @Test
     public void testRFC2617() throws Exception {

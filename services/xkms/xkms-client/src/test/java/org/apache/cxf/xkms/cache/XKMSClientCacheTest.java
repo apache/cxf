@@ -25,10 +25,15 @@ import java.security.cert.X509Certificate;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * A test for the XKMSClientCache
  */
-public class XKMSClientCacheTest extends org.junit.Assert {
+public class XKMSClientCacheTest {
 
     private final XKMSClientCache cache;
     private final X509Certificate alice;

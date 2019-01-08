@@ -25,10 +25,14 @@ import java.util.Map;
 import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.jaxrs.resources.BookStore;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class XPathProviderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class XPathProviderTest {
 
     @Test
     public void testIsReadableClassName() {

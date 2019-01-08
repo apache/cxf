@@ -45,12 +45,14 @@ import org.omg.CORBA.portable.InputStream;
 import org.omg.CORBA.portable.OutputStream;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-public class CorbaObjectWriterTest extends Assert {
+
+public class CorbaObjectWriterTest {
 
     private static ORB orb;
 

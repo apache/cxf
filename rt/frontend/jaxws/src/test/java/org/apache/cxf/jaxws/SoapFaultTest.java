@@ -39,6 +39,8 @@ import org.apache.hello_world_soap_http.GreeterImpl;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+
 public class SoapFaultTest extends AbstractJaxWsTest {
 
     private Service service;

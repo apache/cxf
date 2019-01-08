@@ -41,14 +41,17 @@ import org.apache.cxf.transport.http.HTTPTransportFactory;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
  */
-public class HttpConduitConfigurationTest extends Assert {
+public class HttpConduitConfigurationTest {
     private static EndpointInfo ei;
     private Bus bus;
 

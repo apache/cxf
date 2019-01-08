@@ -26,10 +26,12 @@ import org.apache.cxf.tools.common.model.JAnnotation;
 import org.apache.cxf.tools.common.model.JAnnotationElement;
 import org.apache.cxf.tools.common.model.JavaMethod;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class WebMethodAnnotatorTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class WebMethodAnnotatorTest {
 
     @Test
     public void testAddWebMethodAnnotation() throws Exception {

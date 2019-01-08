@@ -49,10 +49,14 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.Test;
 
-public class MessageContextImplTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+
+public class MessageContextImplTest {
 
     @Test
     public void testGetProperty() {

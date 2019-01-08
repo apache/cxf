@@ -28,13 +28,18 @@ import java.util.logging.Logger;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.IOUtils;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 
-public class PlugInClassLoaderTest extends Assert {
+
+public class PlugInClassLoaderTest {
     private static final Logger LOG = LogUtils.getLogger(PlugInClassLoaderTest.class);
     private static boolean debug;
     PlugInClassLoader plugInClassLoader;

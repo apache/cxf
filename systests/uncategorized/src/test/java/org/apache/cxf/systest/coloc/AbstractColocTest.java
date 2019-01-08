@@ -34,10 +34,11 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.testutil.common.TestUtil;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 
-public abstract class AbstractColocTest extends Assert {
+import static org.junit.Assert.assertNotNull;
+
+public abstract class AbstractColocTest {
     public static final String PORT = TestUtil.getPortNumber(AbstractColocTest.class);
 
     /**

@@ -39,11 +39,13 @@ import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.hello_world_soap_http.Greeter;
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-public class PublishedEndpointUrlTest extends Assert {
+
+public class PublishedEndpointUrlTest {
     public static final String PORT = TestUtil.getPortNumber(PublishedEndpointUrlTest.class);
 
 

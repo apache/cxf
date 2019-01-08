@@ -26,10 +26,14 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Test;
 
-public class AutomaticWorkQueueTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class AutomaticWorkQueueTest {
 
     public static final int UNBOUNDED_MAX_QUEUE_SIZE = -1;
     public static final int UNBOUNDED_HIGH_WATER_MARK = -1;

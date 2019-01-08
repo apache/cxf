@@ -45,14 +45,15 @@ import org.apache.neethi.Policy;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertSame;
 
 /**
  *
  */
-public class PolicyInterceptorsTest extends Assert {
+public class PolicyInterceptorsTest {
     private static final QName ASSERTION_QNAME = new QName("http://apache.cxf", "test");
 
     private IMocksControl control;

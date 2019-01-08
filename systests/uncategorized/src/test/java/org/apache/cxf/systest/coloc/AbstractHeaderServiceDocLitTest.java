@@ -34,6 +34,9 @@ import org.apache.headers.doc_lit.HeaderTester;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+
 /**
  * This class invokes the service described in /wsdl/header_doc_lit.wsdl.
  * This WSDL contains operations with in-out parameters.

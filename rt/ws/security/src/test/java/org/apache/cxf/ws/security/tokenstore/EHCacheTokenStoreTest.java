@@ -26,7 +26,11 @@ import org.apache.cxf.ws.security.SecurityConstants;
 
 import org.junit.BeforeClass;
 
-public class EHCacheTokenStoreTest extends org.junit.Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public class EHCacheTokenStoreTest {
 
     private static TokenStore store;
 

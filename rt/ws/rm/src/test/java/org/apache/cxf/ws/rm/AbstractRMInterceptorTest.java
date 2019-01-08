@@ -36,14 +36,19 @@ import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  *
  */
-public class AbstractRMInterceptorTest extends Assert {
+public class AbstractRMInterceptorTest {
 
     private IMocksControl control;
 

@@ -25,11 +25,13 @@ import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-public class JAXRSClientFactoryBeanTest extends Assert {
+
+public class JAXRSClientFactoryBeanTest {
 
     @After
     public void tearDown() throws Exception {

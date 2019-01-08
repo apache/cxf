@@ -48,11 +48,13 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Some unit tests for validating a UsernameToken via the UsernameTokenValidator.
  */
-public class UsernameTokenValidatorTest extends org.junit.Assert {
+public class UsernameTokenValidatorTest {
 
     /**
      * Test a valid UsernameToken with password text

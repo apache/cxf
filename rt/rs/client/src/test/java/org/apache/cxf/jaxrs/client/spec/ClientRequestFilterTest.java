@@ -26,10 +26,11 @@ import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.core.Response;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class ClientRequestFilterTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class ClientRequestFilterTest {
 
     public static class NonStringObject {
         private String theString;

@@ -64,10 +64,14 @@ import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 
 import org.junit.Assert;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Some unit tests for the issue operation to issue JWT tokens in a specific realm.
  */
-public class IssueJWTRealmUnitTest extends org.junit.Assert {
+public class IssueJWTRealmUnitTest {
 
     public static final QName REQUESTED_SECURITY_TOKEN =
         QNameConstants.WS_TRUST_FACTORY.createRequestedSecurityToken(null).getName();

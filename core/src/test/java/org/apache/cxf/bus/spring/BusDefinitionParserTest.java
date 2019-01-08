@@ -34,12 +34,14 @@ import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 
-public class BusDefinitionParserTest extends Assert {
+
+public class BusDefinitionParserTest {
 
     @Test
     public void testFeatures() {

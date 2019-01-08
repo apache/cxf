@@ -23,10 +23,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class ClassLoaderUtilsTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class ClassLoaderUtilsTest {
 
     private static void setTCCL(ClassLoader loader) {
         Thread.currentThread().setContextClassLoader(loader);

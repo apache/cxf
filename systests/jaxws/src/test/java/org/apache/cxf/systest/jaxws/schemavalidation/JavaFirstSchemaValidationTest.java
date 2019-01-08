@@ -44,11 +44,13 @@ import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class JavaFirstSchemaValidationTest extends Assert {
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class JavaFirstSchemaValidationTest {
     static final String PORT = TestUtil.getNewPortNumber(JavaFirstSchemaValidationTest.class);
     static final String PORT2 = TestUtil.getNewPortNumber(JavaFirstSchemaValidationTest.class);
     static final String PORT_UNUSED = TestUtil.getNewPortNumber(JavaFirstSchemaValidationTest.class);

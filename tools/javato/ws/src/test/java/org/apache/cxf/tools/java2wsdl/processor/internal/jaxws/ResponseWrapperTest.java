@@ -28,10 +28,12 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.model.JavaField;
 import org.apache.cxf.tools.fortest.withannotation.doc.GreeterArray;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class ResponseWrapperTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class ResponseWrapperTest {
     JaxwsServiceBuilder builder = new JaxwsServiceBuilder();
 
     private OperationInfo getOperation(Class<?> clz, String opName) {

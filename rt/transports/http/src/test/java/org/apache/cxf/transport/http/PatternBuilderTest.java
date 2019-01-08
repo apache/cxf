@@ -20,13 +20,15 @@ package org.apache.cxf.transport.http;
 
 import java.util.regex.Pattern;
 
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * A {@code PatternBuilderTest} is ...
  */
-public class PatternBuilderTest extends Assert {
+public class PatternBuilderTest {
 
     @Test
     public void testPatternBuilder() {

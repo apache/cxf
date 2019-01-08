@@ -32,7 +32,6 @@ import org.apache.cxf.message.Message;
 
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -40,8 +39,9 @@ import static org.easymock.EasyMock.createNiceControl;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.isA;
+import static org.junit.Assert.assertEquals;
 
-public class AbstractProtocolHandlerInterceptorTest extends Assert {
+public class AbstractProtocolHandlerInterceptorTest {
 
     private IMocksControl control;
     private Binding binding;

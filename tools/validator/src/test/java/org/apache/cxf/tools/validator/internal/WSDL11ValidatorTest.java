@@ -22,10 +22,12 @@ package org.apache.cxf.tools.validator.internal;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class WSDL11ValidatorTest extends Assert {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class WSDL11ValidatorTest {
     private ToolContext context = new ToolContext();
 
     @Test

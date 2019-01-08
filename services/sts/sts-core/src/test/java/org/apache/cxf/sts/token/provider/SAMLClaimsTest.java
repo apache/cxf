@@ -55,10 +55,16 @@ import org.apache.wss4j.common.util.DOM2Writer;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.saml.saml2.core.Attribute;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * A unit test for creating a SAML Tokens with various Attributes populated by a ClaimsHandler.
  */
-public class SAMLClaimsTest extends org.junit.Assert {
+public class SAMLClaimsTest {
 
     public static final String CLAIM_STATIC_COMPANY =
         "http://apache.org/claims/test/company";

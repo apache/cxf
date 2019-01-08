@@ -28,6 +28,8 @@ import org.apache.wss4j.policy.SP12Constants;
 
 import org.junit.Test;
 
+import static org.junit.Assert.fail;
+
 public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
 
     @Test

@@ -33,14 +33,16 @@ import org.apache.cxf.message.Message;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  *
  */
-public class SoapActionInInterceptorTest extends Assert {
+public class SoapActionInInterceptorTest {
     private IMocksControl control;
 
     @Before

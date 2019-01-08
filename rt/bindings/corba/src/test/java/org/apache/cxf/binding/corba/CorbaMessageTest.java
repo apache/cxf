@@ -31,11 +31,13 @@ import org.omg.CORBA.TypeCode;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class CorbaMessageTest extends Assert {
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class CorbaMessageTest {
 
     private static ORB orb;
     private Message message;

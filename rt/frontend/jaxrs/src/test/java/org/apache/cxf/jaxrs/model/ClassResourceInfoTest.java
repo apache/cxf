@@ -47,10 +47,16 @@ import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Test;
 
-public class ClassResourceInfoTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
+public class ClassResourceInfoTest {
 
     @Path("/bar")
     @Produces("test/bar")

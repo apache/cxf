@@ -27,10 +27,12 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Document;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class PartialXMLStreamReaderTest extends Assert {
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class PartialXMLStreamReaderTest {
 
     @Test
     public void testReader() throws Exception {
@@ -85,4 +87,3 @@ public class PartialXMLStreamReaderTest extends Assert {
 
     }
 }
-

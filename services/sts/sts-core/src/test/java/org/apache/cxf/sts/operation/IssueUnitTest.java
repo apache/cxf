@@ -49,10 +49,14 @@ import org.apache.cxf.ws.security.sts.provider.model.utility.AttributedDateTime;
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.util.DateUtil;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Some unit tests for the issue operation.
  */
-public class IssueUnitTest extends org.junit.Assert {
+public class IssueUnitTest {
 
     /**
      * Test to successfully issue a (dummy) token.

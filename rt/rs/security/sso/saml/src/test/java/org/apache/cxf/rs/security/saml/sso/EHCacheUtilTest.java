@@ -24,13 +24,15 @@ import net.sf.ehcache.Status;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.ConfigurationFactory;
 
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  *
  */
-public class EHCacheUtilTest extends Assert {
+public class EHCacheUtilTest {
 
     @Test
     public void testCreateCacheManager() {

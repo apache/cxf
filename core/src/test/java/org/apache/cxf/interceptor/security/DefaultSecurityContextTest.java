@@ -29,10 +29,14 @@ import org.apache.cxf.common.security.SimpleGroup;
 import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.security.LoginSecurityContext;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class DefaultSecurityContextTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
+public class DefaultSecurityContextTest {
 
     @Test
     public void testUserNotInRole() {

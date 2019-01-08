@@ -33,6 +33,9 @@ import org.apache.cxf.aegis.type.TypeCreationOptions;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class XmlParamTypeTest extends AbstractAegisTest {
     private DefaultTypeMapping tm;
     private Java5TypeCreator creator;

@@ -24,10 +24,12 @@ import java.io.StringReader;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class FragmentStreamReaderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class FragmentStreamReaderTest {
 
     @Test
     public void testReader() throws Exception {

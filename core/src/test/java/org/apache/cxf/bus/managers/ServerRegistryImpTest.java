@@ -22,10 +22,11 @@ package org.apache.cxf.bus.managers;
 import org.apache.cxf.endpoint.DummyServer;
 import org.apache.cxf.endpoint.Server;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class ServerRegistryImpTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class ServerRegistryImpTest {
 
     @Test
     public void testServerRegistryPreShutdown() {

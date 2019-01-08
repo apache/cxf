@@ -19,10 +19,14 @@
 
 package org.apache.cxf.helpers;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class NameSpaceTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public class NameSpaceTest {
 
     private static final String MY_URL1 = "http://test.apache.org/testurl1";
     private static final String MY_URL2 = "http://test.apache.org/testurl2";

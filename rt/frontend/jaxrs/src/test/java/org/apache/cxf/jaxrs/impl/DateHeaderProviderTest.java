@@ -25,10 +25,11 @@ import javax.ws.rs.ServiceUnavailableException;
 
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class DateHeaderProviderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class DateHeaderProviderTest {
 
     @Test
     public void testToFromSimpleString() {

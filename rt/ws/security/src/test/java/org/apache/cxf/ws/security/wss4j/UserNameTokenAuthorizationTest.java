@@ -40,6 +40,9 @@ import org.apache.wss4j.common.WSS4JConstants;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 public class UserNameTokenAuthorizationTest extends AbstractSecurityTest {
     private SimpleSubjectCreatingInterceptor wsIn;
     private WSS4JOutInterceptor wsOut;

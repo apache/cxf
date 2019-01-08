@@ -21,10 +21,11 @@ package org.apache.cxf.tools.validator.internal.model;
 
 import org.apache.cxf.wsdl.WSDLConstants;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class XNodeTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class XNodeTest {
     @Test
     public void testWSDLDefinition() {
         XDef def = new XDef();

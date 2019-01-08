@@ -42,6 +42,9 @@ import org.apache.hello_world_soap_http.GreeterImpl;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class WSAFeatureXmlTest extends AbstractCXFTest {
     static final String PORT = TestUtil.getPortNumber(WSAFeatureXmlTest.class);
 

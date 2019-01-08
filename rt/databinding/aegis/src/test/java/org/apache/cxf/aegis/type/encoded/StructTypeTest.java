@@ -35,6 +35,11 @@ import org.apache.cxf.helpers.DOMUtils;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+
 public class StructTypeTest extends AbstractEncodedTest {
     private StructType addressType;
     private StructType purchaseOrderType;

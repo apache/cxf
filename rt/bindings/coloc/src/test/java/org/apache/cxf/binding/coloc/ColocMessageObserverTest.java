@@ -42,11 +42,13 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ColocMessageObserverTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class ColocMessageObserverTest {
     private IMocksControl control = EasyMock.createNiceControl();
     private ColocMessageObserver observer;
     private Message msg;

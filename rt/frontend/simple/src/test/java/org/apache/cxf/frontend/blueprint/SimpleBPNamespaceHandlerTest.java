@@ -19,13 +19,14 @@
 
 package org.apache.cxf.frontend.blueprint;
 
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
 
 /**
  *
  */
-public class SimpleBPNamespaceHandlerTest extends Assert {
+public class SimpleBPNamespaceHandlerTest {
     @Test
     public void testGetSchemaLocation() {
         SimpleBPNamespaceHandler handler = new SimpleBPNamespaceHandler();

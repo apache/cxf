@@ -21,11 +21,14 @@ package org.apache.cxf.tools.common.toolspec;
 
 import org.apache.cxf.tools.common.ToolException;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class AbstractToolContainerTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class AbstractToolContainerTest {
     private DummyToolContainer dummyTool;
 
     @Before

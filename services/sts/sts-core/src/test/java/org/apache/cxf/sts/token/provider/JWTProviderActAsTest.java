@@ -49,10 +49,13 @@ import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 
 import org.junit.Assert;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Some unit tests for creating JWT Tokens with an ActAs element.
  */
-public class JWTProviderActAsTest extends org.junit.Assert {
+public class JWTProviderActAsTest {
 
     /**
      * Create a JWT Token with ActAs from a UsernameToken

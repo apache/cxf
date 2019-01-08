@@ -38,13 +38,16 @@ import org.apache.cxf.ws.rm.RMMessageConstants;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement.AcknowledgementRange;
 
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
  */
-public class PersistenceUtilsTest extends Assert {
+public class PersistenceUtilsTest {
 
     private static final String MULTIPART_TYPE = "multipart/related; type=\"text/xml\";"
         + " boundary=\"uuid:74b6a245-2e17-40eb-a86c-308664e18460\"; start=\"<root."

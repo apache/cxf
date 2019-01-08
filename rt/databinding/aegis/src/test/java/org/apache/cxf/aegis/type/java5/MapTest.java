@@ -39,6 +39,10 @@ import org.apache.cxf.aegis.type.java5.dto.MapDTOService;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class MapTest extends AbstractAegisTest {
     private DefaultTypeMapping tm;
     private Java5TypeCreator creator;

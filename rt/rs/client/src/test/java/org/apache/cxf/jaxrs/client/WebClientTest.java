@@ -30,11 +30,15 @@ import javax.ws.rs.ext.ParamConverterProvider;
 import org.apache.cxf.jaxrs.resources.BookInterface;
 import org.apache.cxf.jaxrs.resources.BookStore;
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class WebClientTest extends Assert {
+
+public class WebClientTest {
 
     @Test
     public void testReplaceHeader() {

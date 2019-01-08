@@ -33,11 +33,13 @@ import org.apache.cxf.transport.http.Servlet3ContinuationProvider;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class AsyncResponseImplTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class AsyncResponseImplTest {
 
     private IMocksControl control;
 

@@ -52,11 +52,14 @@ import org.apache.cxf.tools.corba.common.WSDLCorbaFactory;
 import org.apache.cxf.tools.corba.processors.wsdl.WSDLToCorbaBinding;
 import org.apache.cxf.tools.corba.processors.wsdl.WSDLToIDLAction;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class WSDLToCorbaBindingTypeTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class WSDLToCorbaBindingTypeTest {
     WSDLToCorbaBinding generator;
     WSDLWriter writer;
 

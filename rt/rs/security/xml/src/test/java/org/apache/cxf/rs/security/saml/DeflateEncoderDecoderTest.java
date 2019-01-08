@@ -27,11 +27,13 @@ import java.util.zip.InflaterInputStream;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.helpers.IOUtils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-public class DeflateEncoderDecoderTest extends Assert {
+
+public class DeflateEncoderDecoderTest {
 
     @Test(expected = DataFormatException.class)
     public void testInvalidContent() throws Exception {

@@ -32,10 +32,13 @@ import javax.ws.rs.core.Response;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.eclipse.microprofile.rest.client.RestClientDefinitionException;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class ValidatorTest extends Assert {
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class ValidatorTest {
 
     public abstract static class NotAnInterface {
         @GET

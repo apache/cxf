@@ -25,11 +25,12 @@ import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class CorbaDestinationTest extends Assert {
+import static org.junit.Assert.assertNotNull;
+
+public class CorbaDestinationTest {
 
     protected static TestUtils testUtils;
     EndpointInfo endpointInfo;

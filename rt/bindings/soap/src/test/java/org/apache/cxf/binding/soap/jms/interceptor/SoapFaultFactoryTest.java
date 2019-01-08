@@ -28,14 +28,17 @@ import org.apache.cxf.binding.soap.SoapFault;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 
 /**
  *
  */
-public class SoapFaultFactoryTest extends Assert {
+public class SoapFaultFactoryTest {
 
     private IMocksControl control;
     private JMSFault jmsFault;

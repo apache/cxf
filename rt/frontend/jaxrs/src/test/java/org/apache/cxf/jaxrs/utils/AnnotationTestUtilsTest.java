@@ -30,10 +30,13 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.jaxrs.Customer;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class AnnotationTestUtilsTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
+
+public class AnnotationTestUtilsTest {
 
     @Test
     public void testGetAnnotatedMethodFromInterface() throws Exception {

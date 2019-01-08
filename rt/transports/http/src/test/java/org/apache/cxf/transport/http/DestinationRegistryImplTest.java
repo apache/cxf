@@ -29,14 +29,18 @@ import org.apache.cxf.transport.MessageObserver;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
  */
-public class DestinationRegistryImplTest extends Assert {
+public class DestinationRegistryImplTest {
     private static final String ADDRESS = "http://bar/snafu";
     private static final QName QNAME = new QName(ADDRESS, "foobar");
 

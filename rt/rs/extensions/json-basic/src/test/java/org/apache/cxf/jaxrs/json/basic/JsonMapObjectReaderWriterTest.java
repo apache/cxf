@@ -26,10 +26,12 @@ import java.util.Map;
 
 import org.apache.cxf.helpers.CastUtils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class JsonMapObjectReaderWriterTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
+public class JsonMapObjectReaderWriterTest {
 
     @Test
     public void testWriteMap() throws Exception {

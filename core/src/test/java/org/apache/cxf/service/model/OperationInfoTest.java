@@ -21,11 +21,17 @@ package org.apache.cxf.service.model;
 
 import javax.xml.namespace.QName;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class OperationInfoTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class OperationInfoTest {
 
     private OperationInfo operationInfo;
 

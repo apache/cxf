@@ -34,10 +34,12 @@ import org.apache.cxf.transport.jms.JMSConfiguration;
 import org.apache.cxf.transport.jms.JMSConstants;
 import org.apache.cxf.transport.jms.JMSFactory;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class JMSUtilTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class JMSUtilTest {
 
     @Test
     public void testCorrelationIDGeneration() {

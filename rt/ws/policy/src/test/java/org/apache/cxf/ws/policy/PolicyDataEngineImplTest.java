@@ -31,10 +31,11 @@ import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertion;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Test;
 
-public class PolicyDataEngineImplTest extends Assert {
+import static org.junit.Assert.assertTrue;
+
+public class PolicyDataEngineImplTest {
     private static final QName TEST_POLICY_NAME = new QName("http://test", "TestPolicy");
 
     class TestPolicy {

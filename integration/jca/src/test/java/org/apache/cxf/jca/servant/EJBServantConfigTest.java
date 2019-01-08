@@ -21,11 +21,13 @@ package org.apache.cxf.jca.servant;
 
 import javax.xml.namespace.QName;
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
-public class EJBServantConfigTest extends Assert {
+
+public class EJBServantConfigTest {
 
     @Test
     public void testNoWsdl() throws Exception {

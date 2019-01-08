@@ -30,10 +30,13 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.Test;
 
-public class PerRequestResourceProviderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class PerRequestResourceProviderTest {
 
     @Test
     public void testGetInstance() {
@@ -71,6 +74,5 @@ public class PerRequestResourceProviderTest extends Assert {
         return m;
     }
 }
-
 
 

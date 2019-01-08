@@ -24,11 +24,14 @@ import java.nio.charset.StandardCharsets;
 
 import org.apache.cxf.common.util.URIParserUtil;
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-public class URIParserUtilTest extends Assert {
+
+public class URIParserUtilTest {
 
     @Test
     public void testGetPackageName() {

@@ -31,11 +31,12 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class SimpleFrontendTest extends Assert {
+import static org.junit.Assert.assertFalse;
+
+public class SimpleFrontendTest {
     static final String PORT1 = TestUtil.getPortNumber(SimpleFrontendTest.class);
 
 

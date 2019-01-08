@@ -40,6 +40,9 @@ import org.apache.hello_world_soap_http.Greeter;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class JaxWsClientThreadTest extends AbstractCXFTest {
 
     private final QName serviceName = new QName("http://apache.org/hello_world_soap_http", "SOAPService");
@@ -216,4 +219,3 @@ public class JaxWsClientThreadTest extends AbstractCXFTest {
     }
 
 }
-

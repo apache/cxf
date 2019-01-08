@@ -26,7 +26,10 @@ import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 
 import org.junit.BeforeClass;
 
-public class EhCacheIdentityCacheTest extends org.junit.Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class EhCacheIdentityCacheTest {
 
     @BeforeClass
     public static void init() throws Exception {

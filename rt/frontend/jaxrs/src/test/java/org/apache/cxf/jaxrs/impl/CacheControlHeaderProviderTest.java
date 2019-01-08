@@ -28,10 +28,12 @@ import javax.ws.rs.core.CacheControl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class CacheControlHeaderProviderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class CacheControlHeaderProviderTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testValueOfNull() {

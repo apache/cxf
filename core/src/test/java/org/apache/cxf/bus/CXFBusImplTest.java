@@ -36,10 +36,13 @@ import org.apache.cxf.transport.DestinationFactoryManager;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Test;
 
-public class CXFBusImplTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+
+public class CXFBusImplTest {
 
     @Test
     public void testThreadBus() throws BusException {

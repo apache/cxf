@@ -44,6 +44,10 @@ import org.apache.ws.commons.schema.constants.Constants;
 
 import org.junit.Before;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 public abstract class AbstractEncodedTest extends AbstractAegisTest {
     protected DefaultTypeMapping mapping;
     protected TrailingBlocks trailingBlocks;

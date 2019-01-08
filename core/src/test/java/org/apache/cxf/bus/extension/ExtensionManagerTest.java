@@ -27,11 +27,14 @@ import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.resource.ResourceResolver;
 import org.apache.cxf.resource.SinglePropertyResolver;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ExtensionManagerTest extends Assert {
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+
+public class ExtensionManagerTest {
 
     private static final String EXTENSIONMANAGER_TEST_RESOURECE_NAME = "extensionManagerTest";
     private ExtensionManagerImpl manager;

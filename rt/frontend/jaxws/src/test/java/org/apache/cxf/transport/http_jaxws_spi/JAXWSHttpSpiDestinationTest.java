@@ -36,14 +36,16 @@ import org.apache.cxf.transport.http.DestinationRegistryImpl;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.isA;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
-public class JAXWSHttpSpiDestinationTest extends Assert {
+public class JAXWSHttpSpiDestinationTest {
 
     private static final String ADDRESS = "http://localhost:80/foo/bar";
     private static final String CONTEXT_PATH = "/foo";

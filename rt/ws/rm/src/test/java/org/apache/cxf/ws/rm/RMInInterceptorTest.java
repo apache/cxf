@@ -49,11 +49,15 @@ import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class RMInInterceptorTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class RMInInterceptorTest {
 
     private IMocksControl control;
     private RMInInterceptor interceptor;

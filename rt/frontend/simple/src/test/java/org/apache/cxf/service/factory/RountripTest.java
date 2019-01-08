@@ -28,6 +28,8 @@ import org.apache.hello_world_doc_lit.GreeterImplDoc;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class RountripTest extends AbstractSimpleFrontendTest {
 
     @Test

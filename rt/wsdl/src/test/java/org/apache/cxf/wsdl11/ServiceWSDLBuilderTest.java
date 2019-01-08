@@ -65,10 +65,14 @@ import org.apache.ws.commons.schema.XmlSchemaCollection;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Test;
 
-public class ServiceWSDLBuilderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public class ServiceWSDLBuilderTest {
 
     private static final Logger LOG = LogUtils.getLogger(ServiceWSDLBuilderTest.class);
     private static final String WSDL_PATH = "hello_world.wsdl";

@@ -35,11 +35,14 @@ import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchParseException;
 import org.apache.cxf.jaxrs.ext.search.SearchUtils;
 
-import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class FiqlParserTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class FiqlParserTest {
     private FiqlParser<Condition> parser = new FiqlParser<>(Condition.class);
 
     @Test(expected = SearchParseException.class)

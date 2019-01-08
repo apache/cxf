@@ -18,10 +18,11 @@
  */
 package org.apache.cxf.common.logging;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class RegexLoggingFilterTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class RegexLoggingFilterTest {
     
     @Test
     public void testFilter() throws Exception {

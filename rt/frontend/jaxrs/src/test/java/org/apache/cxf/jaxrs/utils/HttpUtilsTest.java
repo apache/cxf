@@ -35,10 +35,13 @@ import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.Test;
 
-public class HttpUtilsTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class HttpUtilsTest {
 
     @Test
     public void testEncodePartiallyEncoded() {

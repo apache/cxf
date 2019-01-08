@@ -25,11 +25,13 @@ import org.omg.CORBA.ORB;
 import org.omg.CORBA.TCKind;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class CorbaPrimitiveHandlerTest extends Assert {
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class CorbaPrimitiveHandlerTest {
 
     private ORB orb;
 

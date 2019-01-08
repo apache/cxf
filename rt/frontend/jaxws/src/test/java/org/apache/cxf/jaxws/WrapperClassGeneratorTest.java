@@ -38,9 +38,10 @@ import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 
 import org.junit.After;
-import org.junit.Assert;
 
-public class WrapperClassGeneratorTest extends Assert {
+import static org.junit.Assert.assertTrue;
+
+public class WrapperClassGeneratorTest {
 
     @After
     public void tearDown() {

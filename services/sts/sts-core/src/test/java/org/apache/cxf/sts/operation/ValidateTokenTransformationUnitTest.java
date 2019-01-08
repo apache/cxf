@@ -85,10 +85,13 @@ import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.DOM2Writer;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * In this test, a token (UsernameToken or SAMLToken) is validated and transformed into a SAML Assertion.
  */
-public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
+public class ValidateTokenTransformationUnitTest {
 
     public static final QName REQUESTED_SECURITY_TOKEN =
         QNameConstants.WS_TRUST_FACTORY.createRequestedSecurityToken(null).getName();

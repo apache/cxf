@@ -22,10 +22,12 @@ package org.apache.cxf.transport.jms;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class JMSMessageUtilTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+public class JMSMessageUtilTest {
 
     @Test
     public void testGetEncoding() throws Exception {

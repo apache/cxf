@@ -30,14 +30,17 @@ import org.apache.neethi.builders.PrimitiveAssertion;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  *
  */
-public class AssertionBuilderRegistryImplTest extends Assert {
+public class AssertionBuilderRegistryImplTest {
 
     private IMocksControl control;
 

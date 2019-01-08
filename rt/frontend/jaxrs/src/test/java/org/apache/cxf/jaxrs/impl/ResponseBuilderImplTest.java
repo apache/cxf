@@ -41,11 +41,16 @@ import javax.ws.rs.core.Variant;
 
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
-public class ResponseBuilderImplTest extends Assert {
+
+public class ResponseBuilderImplTest {
 
     @Test
     public void testStatusSet() throws Exception {

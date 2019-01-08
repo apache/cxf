@@ -61,6 +61,12 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Some tests for creating and processing (signed) SAML Assertions.
  */

@@ -24,10 +24,15 @@ import java.util.Map;
 import org.apache.cxf.jaxrs.json.basic.JsonMapObject;
 import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class SwaggerToOpenApiConversionUtilsTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public class SwaggerToOpenApiConversionUtilsTest {
 
     @Test
     public void testConvertFromSwaggerToOpenApi() {

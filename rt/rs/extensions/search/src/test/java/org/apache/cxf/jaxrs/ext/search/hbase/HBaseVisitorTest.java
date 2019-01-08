@@ -33,12 +33,13 @@ import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.filter.Filter;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class HBaseVisitorTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class HBaseVisitorTest {
     public static final byte[] BOOK_FAMILY = "book".getBytes();
     public static final byte[] NAME_QUALIFIER = "name".getBytes();
 

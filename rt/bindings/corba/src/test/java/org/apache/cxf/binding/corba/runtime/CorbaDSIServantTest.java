@@ -36,12 +36,10 @@ import org.omg.CORBA.ORB;
 import org.omg.CORBA.ServerRequest;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-
-public class CorbaDSIServantTest extends Assert {
+public class CorbaDSIServantTest {
     protected static ORB orb;
     protected static Bus bus;
 
@@ -138,6 +136,5 @@ public class CorbaDSIServantTest extends Assert {
         }
     }
 }
-
 
 

@@ -48,10 +48,13 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.wsdl11.WSDLServiceFactory;
 
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 
-public abstract class AbstractJMSTester extends Assert {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public abstract class AbstractJMSTester {
     protected static final String WSDL = "/jms_test.wsdl";
     protected static final String SERVICE_NS = "http://cxf.apache.org/hello_world_jms";
     protected static final int MAX_RECEIVE_TIME = 10;

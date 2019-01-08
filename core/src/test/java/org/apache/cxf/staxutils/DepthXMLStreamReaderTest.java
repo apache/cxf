@@ -22,10 +22,12 @@ package org.apache.cxf.staxutils;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class DepthXMLStreamReaderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class DepthXMLStreamReaderTest {
 
     @Test
     public void testReader() throws Exception {

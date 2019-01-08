@@ -50,7 +50,11 @@ import org.eclipse.microprofile.rest.client.tck.providers.TestWriterInterceptor;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class CxfTypeSafeClientBuilderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class CxfTypeSafeClientBuilderTest {
 
     @Test
     public void testConfigMethods() {
@@ -180,11 +184,11 @@ public class CxfTypeSafeClientBuilderTest extends Assert {
             .baseUri(new URI("http://localhost:8080/neverUsed"))
             .build(MyClient.class);
         client.myDefaultMethod(true);
-        fail("Should have thrown IOException");
+        Assert.fail("Should have thrown IOException");
     }
     private void fail(Response r, String failureMessage) {
         System.out.println(r.getStatus());
-        fail(failureMessage);
+        Assert.fail(failureMessage);
     }
 
 }

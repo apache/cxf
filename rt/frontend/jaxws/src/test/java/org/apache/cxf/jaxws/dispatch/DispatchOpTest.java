@@ -45,6 +45,9 @@ import org.apache.cxf.transport.Destination;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class DispatchOpTest extends AbstractJaxWsTest {
     private final QName serviceName = new QName("http://cxf.apache.org/test/dispatch", "DispatchTest");
 

@@ -40,12 +40,17 @@ import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngine;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionStoreException;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class ApplicationContextTest extends Assert {
+
+public class ApplicationContextTest {
 
     private static final String S1 =
         ApplicationContextTest.class.getResource("/META-INF/cxf/cxf.xml").toString();

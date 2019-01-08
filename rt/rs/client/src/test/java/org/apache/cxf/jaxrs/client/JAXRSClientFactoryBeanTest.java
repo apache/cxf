@@ -45,10 +45,14 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.http.HTTPConduit;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class JAXRSClientFactoryBeanTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
+public class JAXRSClientFactoryBeanTest {
 
     @Test
     public void testCreateClient() throws Exception {

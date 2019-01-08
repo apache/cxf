@@ -50,10 +50,13 @@ import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.WSDLServiceFactory;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class STSClientTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class STSClientTest {
 
     @Test
     public void testConfigureViaEPR() throws Exception {

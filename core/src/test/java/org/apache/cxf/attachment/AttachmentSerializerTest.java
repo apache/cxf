@@ -39,10 +39,12 @@ import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class AttachmentSerializerTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class AttachmentSerializerTest {
 
     @Test
     public void testMessageWriteXopOn1() throws Exception {

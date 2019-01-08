@@ -24,7 +24,10 @@ import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 
 import org.junit.BeforeClass;
 
-public class MemoryIdentityCacheTest extends org.junit.Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class MemoryIdentityCacheTest {
 
     @BeforeClass
     public static void init() throws Exception {

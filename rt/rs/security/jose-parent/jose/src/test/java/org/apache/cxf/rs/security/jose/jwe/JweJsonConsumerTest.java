@@ -35,11 +35,13 @@ import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class JweJsonConsumerTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+public class JweJsonConsumerTest {
 
     static final String SINGLE_RECIPIENT_ALL_HEADERS_AAD_MODIFIED_OUTPUT =
         "{"
@@ -237,4 +239,3 @@ public class JweJsonConsumerTest extends Assert {
     }
 
 }
-

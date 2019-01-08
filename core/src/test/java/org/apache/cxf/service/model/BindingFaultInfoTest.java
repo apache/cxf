@@ -21,11 +21,14 @@ package org.apache.cxf.service.model;
 
 import javax.xml.namespace.QName;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class BindingFaultInfoTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+public class BindingFaultInfoTest {
 
     private BindingFaultInfo bindingFaultInfo;
 

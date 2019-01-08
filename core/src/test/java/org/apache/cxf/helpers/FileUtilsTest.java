@@ -20,10 +20,11 @@ package org.apache.cxf.helpers;
 
 
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class FileUtilsTest extends Assert {
+import static org.junit.Assert.assertTrue;
+
+public class FileUtilsTest {
 
 
     @Test

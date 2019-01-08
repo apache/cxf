@@ -28,15 +28,17 @@ import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 /**
  *
  */
-public class RMTxStoreTwoSchemasTest extends Assert {
+public class RMTxStoreTwoSchemasTest {
     private static final String TEST_DB_NAME = "rmdbts";
 
     private static final String CLIENT_ENDPOINT_ID =

@@ -24,10 +24,11 @@ import org.apache.cxf.tools.common.model.JavaMethod;
 import org.apache.cxf.tools.common.model.JavaParameter;
 import org.apache.cxf.tools.common.model.JavaType;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class ParameterProcessorTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class ParameterProcessorTest {
     @Test
     public void testAddParameter() throws Exception {
         ParameterProcessor processor = new ParameterProcessor(new ToolContext());

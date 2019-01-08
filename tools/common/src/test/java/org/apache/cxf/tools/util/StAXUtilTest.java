@@ -26,6 +26,8 @@ import org.apache.cxf.tools.common.Tag;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class StAXUtilTest extends ProcessorTestBase {
 
     @Test

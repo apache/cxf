@@ -41,10 +41,12 @@ import org.apache.cxf.jaxrs.ext.search.SearchUtils;
 import org.apache.cxf.jaxrs.ext.search.jpa.BookReview.Review;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 
-public abstract class AbstractJPATypedQueryVisitorTest extends Assert {
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public abstract class AbstractJPATypedQueryVisitorTest {
 
     private EntityManagerFactory emFactory;
 

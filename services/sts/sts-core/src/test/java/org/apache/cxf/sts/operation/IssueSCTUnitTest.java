@@ -58,10 +58,14 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.util.DOM2Writer;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Some unit tests for the issue operation to issue SecurityContextTokens.
  */
-public class IssueSCTUnitTest extends org.junit.Assert {
+public class IssueSCTUnitTest {
 
     public static final QName REQUESTED_SECURITY_TOKEN =
         QNameConstants.WS_TRUST_FACTORY.createRequestedSecurityToken(null).getName();

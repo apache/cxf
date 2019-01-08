@@ -27,10 +27,11 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.tools.common.model.JAnnotation;
 import org.apache.cxf.tools.java2wsdl.generator.wsdl11.model.WrapperBeanClass;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class WrapperBeanAnnotatorTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class WrapperBeanAnnotatorTest {
 
     @Test
     public void testAnnotate() {

@@ -19,10 +19,11 @@
 package org.apache.cxf.rs.security.jose.jws;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class JwsJsonProducerTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class JwsJsonProducerTest {
 
     public static final String ENCODED_MAC_KEY_1 = "AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75"
                        + "aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow";

@@ -38,12 +38,14 @@ import org.omg.CORBA.ORB;
 
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-public class CorbaHandlerUtilsTest extends Assert {
+
+public class CorbaHandlerUtilsTest {
 
     protected EndpointInfo endpointInfo;
     BindingFactory factory;

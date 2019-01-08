@@ -21,11 +21,12 @@ package org.apache.cxf.service.model;
 
 import javax.xml.namespace.QName;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class MessageInfoTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class MessageInfoTest {
 
     private MessageInfo messageInfo;
 

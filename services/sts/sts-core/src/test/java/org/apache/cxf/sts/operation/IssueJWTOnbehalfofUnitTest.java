@@ -80,10 +80,14 @@ import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 
 import org.junit.Assert;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Issue JWT tokens on behalf of other tokens.
  */
-public class IssueJWTOnbehalfofUnitTest extends org.junit.Assert {
+public class IssueJWTOnbehalfofUnitTest {
 
     public static final QName REQUESTED_SECURITY_TOKEN =
         QNameConstants.WS_TRUST_FACTORY.createRequestedSecurityToken(null).getName();

@@ -26,11 +26,14 @@ import org.apache.cxf.message.Message;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ServiceUtilsTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class ServiceUtilsTest {
     private IMocksControl control;
     private Message msg;
 

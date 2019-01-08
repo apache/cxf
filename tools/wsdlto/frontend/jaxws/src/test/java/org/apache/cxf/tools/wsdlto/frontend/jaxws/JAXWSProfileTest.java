@@ -35,10 +35,13 @@ import org.apache.cxf.tools.wsdlto.frontend.jaxws.generators.ImplGenerator;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.WSDLToJavaProcessor;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.wsdl11.JAXWSDefinitionBuilder;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class JAXWSProfileTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class JAXWSProfileTest {
 
     @Test
     public void testLoadPlugins() {

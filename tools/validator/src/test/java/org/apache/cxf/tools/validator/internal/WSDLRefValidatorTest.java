@@ -30,10 +30,14 @@ import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.tools.validator.internal.model.XNode;
 import org.apache.cxf.wsdl.WSDLManager;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class WSDLRefValidatorTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class WSDLRefValidatorTest {
 
     private Definition getWSDL(String wsdl) throws Exception {
         Bus b = BusFactory.getDefaultBus();

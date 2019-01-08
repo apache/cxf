@@ -31,10 +31,11 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.ext.multipart.InputStreamDataSource;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class DataSourceProviderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class DataSourceProviderTest {
 
     @Test
     public void testReadDataHandler() throws Exception {

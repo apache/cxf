@@ -27,10 +27,13 @@ import org.apache.cxf.jaxrs.model.UserApplication;
 import org.apache.cxf.jaxrs.model.UserOperation;
 import org.apache.cxf.jaxrs.model.UserResource;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class SwaggerParseUtilsTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+public class SwaggerParseUtilsTest {
 
     @Test
     public void testConvertPetShopDocToUserApp() {

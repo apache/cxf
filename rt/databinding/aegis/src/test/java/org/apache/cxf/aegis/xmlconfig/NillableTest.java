@@ -30,6 +30,8 @@ import org.apache.cxf.aegis.services.NillableService;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 public class NillableTest extends AbstractAegisTest {
 
     private Document arrayWsdlDoc;

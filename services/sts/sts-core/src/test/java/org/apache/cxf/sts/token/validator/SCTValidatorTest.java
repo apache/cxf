@@ -46,11 +46,14 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Some unit tests for validating a SecurityContextToken via the SCTValidator.
  */
-public class SCTValidatorTest extends org.junit.Assert {
+public class SCTValidatorTest {
 
     private static TokenStore tokenStore = new DefaultInMemoryTokenStore();
 

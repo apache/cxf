@@ -21,10 +21,12 @@ package org.apache.cxf.transport.http.policy;
 import org.apache.cxf.transport.http.policy.impl.ServerPolicyCalculator;
 import org.apache.cxf.transports.http.configuration.HTTPServerPolicy;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class ServerPolicyCalculatorTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class ServerPolicyCalculatorTest {
     @Test
     public void testCompatibleServerPolicies() {
         ServerPolicyCalculator spc = new ServerPolicyCalculator();

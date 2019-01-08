@@ -34,6 +34,8 @@ import org.apache.wss4j.common.ConfigurationConstants;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class RoundTripTest extends AbstractSecurityTest {
     private WSS4JInInterceptor wsIn;
     private WSS4JOutInterceptor wsOut;

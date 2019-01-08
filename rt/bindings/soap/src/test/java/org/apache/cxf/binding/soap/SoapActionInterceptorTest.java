@@ -35,10 +35,13 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class SoapActionInterceptorTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class SoapActionInterceptorTest {
 
 
     @Test

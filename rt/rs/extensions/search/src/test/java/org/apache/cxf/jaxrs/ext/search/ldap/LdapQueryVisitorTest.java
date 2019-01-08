@@ -24,12 +24,13 @@ import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchParseException;
 import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
 
-import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 
-public class LdapQueryVisitorTest extends Assert {
+
+public class LdapQueryVisitorTest {
     private FiqlParser<Condition> parser = new FiqlParser<>(Condition.class);
 
     @Test

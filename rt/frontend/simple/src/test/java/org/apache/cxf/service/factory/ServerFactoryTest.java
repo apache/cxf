@@ -41,6 +41,9 @@ import org.apache.hello_world_soap_http.types.GreetMeOneWay;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class ServerFactoryTest extends AbstractSimpleFrontendTest {
 
     @Test

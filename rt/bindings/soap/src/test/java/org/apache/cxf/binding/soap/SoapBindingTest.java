@@ -23,10 +23,13 @@ package org.apache.cxf.binding.soap;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class SoapBindingTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class SoapBindingTest {
 
     @Test
     public void testCreateMessage() throws Exception {

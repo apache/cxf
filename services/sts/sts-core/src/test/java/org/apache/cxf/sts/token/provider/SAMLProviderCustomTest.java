@@ -42,10 +42,14 @@ import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.DOM2Writer;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Some unit tests for creating custom SAML Tokens.
  */
-public class SAMLProviderCustomTest extends org.junit.Assert {
+public class SAMLProviderCustomTest {
 
     /**
      * Create a custom Saml1 Attribute Assertion.

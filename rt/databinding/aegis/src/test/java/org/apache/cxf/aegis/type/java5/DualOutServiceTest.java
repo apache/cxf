@@ -28,6 +28,8 @@ import org.apache.ws.commons.schema.constants.Constants;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+
 public class DualOutServiceTest extends AbstractAegisTest {
     @Test
     public void testWSDL() throws Exception {

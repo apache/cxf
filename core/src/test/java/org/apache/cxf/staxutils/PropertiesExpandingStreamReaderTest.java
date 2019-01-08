@@ -30,10 +30,11 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class PropertiesExpandingStreamReaderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class PropertiesExpandingStreamReaderTest {
 
     @Test
     public void testSystemPropertyExpansion() throws Exception {

@@ -43,6 +43,8 @@ import org.apache.wss4j.common.WSS4JConstants;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * A number of tests for fault codes that are thrown from WSS4JInInterceptor.

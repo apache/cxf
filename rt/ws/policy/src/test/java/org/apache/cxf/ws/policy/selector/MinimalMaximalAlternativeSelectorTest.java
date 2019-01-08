@@ -36,15 +36,17 @@ import org.apache.neethi.Policy;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
 
 /**
  *
  */
-public class MinimalMaximalAlternativeSelectorTest extends Assert {
+public class MinimalMaximalAlternativeSelectorTest {
 
     private IMocksControl control;
 

@@ -29,11 +29,13 @@ import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.jaxrs.resources.TagVO;
 import org.apache.cxf.message.MessageImpl;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ProviderFactoryAllTest extends Assert {
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
+public class ProviderFactoryAllTest {
 
     @Before
     public void setUp() {

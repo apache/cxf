@@ -51,10 +51,13 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.staxutils.StaxUtils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class SoapFaultSerializerTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
+public class SoapFaultSerializerTest {
     private void assertValid(String xpathExpression, Document doc) {
         Map<String, String> namespaces = new HashMap<>();
         namespaces.put("s", "http://schemas.xmlsoap.org/soap/envelope/");

@@ -29,10 +29,13 @@ import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.resources.BookStore;
 import org.apache.cxf.message.MessageImpl;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class JAXRSServerFactoryBeanTest extends Assert {
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
+
+public class JAXRSServerFactoryBeanTest {
 
     @Test
     public void testRegisterProviders() {

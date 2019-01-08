@@ -36,13 +36,14 @@ import org.apache.cxf.transport.servlet.ServletDestination;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 
 
-public class RequestPreprocessorTest extends Assert {
+
+public class RequestPreprocessorTest {
 
     private IMocksControl control;
 

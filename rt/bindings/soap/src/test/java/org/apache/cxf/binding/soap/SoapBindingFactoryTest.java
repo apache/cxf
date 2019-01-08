@@ -47,15 +47,18 @@ import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.cxf.wsdl11.WSDLServiceBuilder;
 
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.easymock.EasyMock.createNiceControl;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-public class SoapBindingFactoryTest extends Assert {
+public class SoapBindingFactoryTest {
     IMocksControl control;
 
     @Before

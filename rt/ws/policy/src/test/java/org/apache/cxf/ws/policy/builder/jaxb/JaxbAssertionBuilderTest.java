@@ -31,13 +31,17 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.test.assertions.foo.FooType;
 import org.apache.neethi.Assertion;
 
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
 
 /**
  *
  */
-public class JaxbAssertionBuilderTest extends Assert {
+public class JaxbAssertionBuilderTest {
 
     @Test
     public void testConstructors() throws Exception {

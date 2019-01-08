@@ -27,10 +27,12 @@ import org.apache.cxf.tools.plugin.FrontEnd;
 import org.apache.cxf.tools.plugin.Generator;
 import org.apache.cxf.tools.plugin.Plugin;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class PluginLoaderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class PluginLoaderTest {
 
     @Test
     public void testLoadPlugins() throws Exception {

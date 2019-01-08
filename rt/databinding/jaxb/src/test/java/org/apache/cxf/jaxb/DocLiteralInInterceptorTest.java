@@ -55,14 +55,16 @@ import org.apache.hello_world_soap_http.types.GreetMe;
 import org.apache.hello_world_soap_http.types.GreetMeResponse;
 
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.easymock.EasyMock.createNiceControl;
 import static org.easymock.EasyMock.expect;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-public class DocLiteralInInterceptorTest extends Assert {
+public class DocLiteralInInterceptorTest {
     PhaseInterceptorChain chain;
     MessageImpl message;
     Bus bus;

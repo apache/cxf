@@ -24,10 +24,11 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Destination;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class WebSocketTransportFactoryTest extends Assert {
+import static org.junit.Assert.assertNotNull;
+
+public class WebSocketTransportFactoryTest {
 
     @Test
     public void testGetDestination() throws Exception {

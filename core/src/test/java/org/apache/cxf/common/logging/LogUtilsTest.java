@@ -28,12 +28,14 @@ import org.apache.cxf.common.i18n.BundleUtils;
 
 import org.easymock.EasyMock;
 import org.easymock.IArgumentMatcher;
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 
-public class LogUtilsTest extends Assert {
+
+public class LogUtilsTest {
 
     @Test
     public void testGetL7dLog() throws Exception {

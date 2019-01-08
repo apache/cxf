@@ -21,11 +21,13 @@ package org.apache.cxf.rs.security.oauth2.tokens.hawk;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class NonceVerifierImplTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+public class NonceVerifierImplTest {
 
     private NonceVerifierImpl nonceVerifier;
     private NonceStore nonceStore = EasyMock.createMock(NonceStore.class);

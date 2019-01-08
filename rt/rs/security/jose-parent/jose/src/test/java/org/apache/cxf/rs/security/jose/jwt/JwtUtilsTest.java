@@ -24,12 +24,13 @@ import java.time.ZonedDateTime;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 
-import org.junit.Assert;
+
+import static org.junit.Assert.fail;
 
 /**
  * Some tests for JwtUtils
  */
-public class JwtUtilsTest extends Assert {
+public class JwtUtilsTest {
 
     @org.junit.Test
     public void testExpiredToken() throws Exception {
@@ -174,4 +175,3 @@ public class JwtUtilsTest extends Assert {
     }
 
 }
-

@@ -35,9 +35,12 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * This class "tests" the HTTPConduit that uses java.net.HttpURLConnection
@@ -45,7 +48,7 @@ import org.junit.Test;
  * implementation of HTTPConduit change (i.e. no longer use the URLConnections)
  * this test will break.
  */
-public class HTTPConduitURLConnectionTest extends Assert {
+public class HTTPConduitURLConnectionTest {
 
     @Before
     public void setUp() throws Exception {

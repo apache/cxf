@@ -25,10 +25,15 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.tools.common.model.JavaClass;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class WrapperTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public class WrapperTest {
     @Test
     public void testGetWrapperBeanClassFromQName() {
         QName qname = new QName("http://cxf.apache.org", "sayHi");

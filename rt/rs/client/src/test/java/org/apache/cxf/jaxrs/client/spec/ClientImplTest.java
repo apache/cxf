@@ -47,10 +47,13 @@ import org.apache.cxf.jaxrs.client.spec.ClientImpl.WebTargetImpl;
 import org.apache.cxf.jaxrs.impl.ConfigurableImpl;
 import org.apache.cxf.message.Message;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class ClientImplTest extends Assert {
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class ClientImplTest {
 
     private static final String MY_INTERCEPTOR_NAME = "MyInterceptor";
 

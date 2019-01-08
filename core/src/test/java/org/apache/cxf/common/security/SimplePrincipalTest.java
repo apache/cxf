@@ -19,10 +19,12 @@
 
 package org.apache.cxf.common.security;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class SimplePrincipalTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
+public class SimplePrincipalTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testNullName() {

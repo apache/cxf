@@ -48,10 +48,11 @@ import org.apache.cxf.wsdl11.WSDLServiceBuilder;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 
-public class TestBase extends Assert {
+import static org.junit.Assert.assertNotNull;
+
+public class TestBase {
 
     protected PhaseInterceptorChain chain;
     protected SoapMessage soapMessage;

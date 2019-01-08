@@ -26,10 +26,13 @@ import org.xml.sax.InputSource;
 import org.apache.cxf.catalog.OASISCatalogManager;
 import org.apache.cxf.resource.ExtendedURIResolver;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class CatalogTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class CatalogTest {
     @Test
     public void testCatalog() throws Exception {
         OASISCatalogManager catalogManager = new OASISCatalogManager();

@@ -24,13 +24,15 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 
-public class JarLoaderTest extends Assert {
+
+public class JarLoaderTest {
     private static final Logger LOG = LogUtils.getLogger(JarLoaderTest.class);
     private URL exampleRarURL;
 

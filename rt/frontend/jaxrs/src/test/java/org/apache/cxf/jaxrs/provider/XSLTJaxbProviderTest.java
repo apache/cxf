@@ -47,10 +47,12 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.staxutils.StaxUtils;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.Test;
 
-public class XSLTJaxbProviderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class XSLTJaxbProviderTest {
 
     private static final String TEMPLATE_LOCATION = "classpath:/org/apache/cxf/jaxrs/provider/template.xsl";
     private static final String BOOK_XML = "<Book><id>123</id><name>TheBook</name></Book>";

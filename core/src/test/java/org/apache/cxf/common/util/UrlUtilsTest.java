@@ -19,11 +19,14 @@
 
 package org.apache.cxf.common.util;
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class UrlUtilsTest extends Assert {
+
+public class UrlUtilsTest {
 
     @Test
     public void testUrlDecode() {

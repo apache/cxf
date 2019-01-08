@@ -37,10 +37,12 @@ import org.eclipse.microprofile.rest.client.tck.interfaces.InterfaceWithoutProvi
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Test;
 
-public class RestClientCdiTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class RestClientCdiTest {
 
     @Test
     public void testProvidersRegisteredViaMPConfigProperty() throws Exception {

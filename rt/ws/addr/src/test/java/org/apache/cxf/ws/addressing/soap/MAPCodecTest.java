@@ -56,7 +56,6 @@ import org.apache.cxf.ws.addressing.v200408.Relationship;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -64,8 +63,14 @@ import static org.apache.cxf.message.Message.MIME_HEADERS;
 import static org.apache.cxf.message.Message.REQUESTOR_ROLE;
 import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND;
 import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES_OUTBOUND;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class MAPCodecTest extends Assert {
+public class MAPCodecTest {
 
     private MAPCodec codec;
     private IMocksControl control;

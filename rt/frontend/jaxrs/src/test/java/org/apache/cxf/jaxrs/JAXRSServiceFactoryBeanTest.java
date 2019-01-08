@@ -29,11 +29,17 @@ import org.apache.cxf.jaxrs.model.MethodDispatcher;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.URITemplate;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class JAXRSServiceFactoryBeanTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class JAXRSServiceFactoryBeanTest {
 
     @Before
     public void setUp() throws Exception {

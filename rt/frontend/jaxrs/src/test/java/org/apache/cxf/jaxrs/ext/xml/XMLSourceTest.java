@@ -36,10 +36,16 @@ import org.w3c.dom.Node;
 
 import org.apache.ws.commons.schema.constants.Constants;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class XMLSourceTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public class XMLSourceTest {
 
 
     @Test

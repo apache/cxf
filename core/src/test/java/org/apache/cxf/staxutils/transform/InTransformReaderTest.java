@@ -33,10 +33,12 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.cxf.staxutils.PartialXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class InTransformReaderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class InTransformReaderTest {
 
     @Test
     public void testReadWithDefaultNamespace() throws Exception {

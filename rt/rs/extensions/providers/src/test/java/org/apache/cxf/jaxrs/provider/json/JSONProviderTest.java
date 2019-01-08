@@ -79,10 +79,15 @@ import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.transform.TransformUtils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class JSONProviderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class JSONProviderTest {
 
     @Test
     public void testReadMalformedJson() throws Exception {

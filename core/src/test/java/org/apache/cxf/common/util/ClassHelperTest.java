@@ -29,13 +29,14 @@ import org.springframework.aop.framework.ProxyFactory;
 
 import org.easymock.EasyMock;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertSame;
 
 
-public class ClassHelperTest extends Assert {
+
+public class ClassHelperTest {
 
     private Object proxiedObject;
 
