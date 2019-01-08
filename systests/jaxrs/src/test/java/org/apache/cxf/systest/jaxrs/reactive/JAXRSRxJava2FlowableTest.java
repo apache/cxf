@@ -22,13 +22,12 @@ package org.apache.cxf.systest.jaxrs.reactive;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.GenericType;
-import javax.xml.ws.Holder;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
@@ -39,14 +38,13 @@ import org.apache.cxf.jaxrs.rx2.client.FlowableRxInvokerProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import io.reactivex.Flowable;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.subscribers.TestSubscriber;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class JAXRSRxJava2FlowableTest extends AbstractBusClientServerTestBase {
     public static final String PORT = RxJava2FlowableServer.PORT;
@@ -76,16 +74,11 @@ public class JAXRSRxJava2FlowableTest extends AbstractBusClientServerTestBase {
             .rx(FlowableRxInvoker.class)
             .get(HelloWorldBean.class);
 
-        Holder<HelloWorldBean> holder = new Holder<>();
-        Disposable d = obs.subscribe(v -> {
-            holder.value = v;
-        });
-        if (d == null) {
-            throw new IllegalStateException("Subscribe did not return a Disposable");
-        }
-        Thread.sleep(3000);
-        assertEquals("Hello", holder.value.getGreeting());
-        assertEquals("World", holder.value.getAudience());
+        final TestSubscriber<HelloWorldBean> subscriber = new TestSubscriber<>();
+        obs.subscribe(subscriber);
+
+        subscriber.await(3, TimeUnit.SECONDS);
+        subscriber.assertResult(new HelloWorldBean("Hello", "World"));
     }
 
     @Test
@@ -138,37 +131,25 @@ public class JAXRSRxJava2FlowableTest extends AbstractBusClientServerTestBase {
             .rx(FlowableRxInvoker.class)
             .get(String.class);
 
-        Thread.sleep(2000);
-
-        Disposable d = obs.map(
-            s -> {
-                return s + s;
-            })
-            .subscribe(s -> assertDuplicateResponse(s));
-        if (d == null) {
-            throw new IllegalStateException("Subscribe did not return a Disposable");
-        }
+        final TestSubscriber<String> subscriber = new TestSubscriber<>();
+        obs.map(s -> s + s).subscribe(subscriber);
+        
+        subscriber.await(2, TimeUnit.SECONDS);
+        subscriber.assertResult("Hello, world!Hello, world!");
     }
+    
     @Test
     public void testGetHelloWorldAsyncObservable404() throws Exception {
         String address = "http://localhost:" + PORT + "/rx2/flowable/textAsync404";
         Invocation.Builder b = ClientBuilder.newClient().register(new FlowableRxInvokerProvider())
             .target(address).request();
-        Disposable d = b.rx(FlowableRxInvoker.class).get(String.class).subscribe(
-            s -> {
-                fail("Exception expected");
-            },
-            t -> validateT((ExecutionException)t));
-        if (d == null) {
-            throw new IllegalStateException("Subscribe did not return a Disposable");
-        }
 
-    }
-
-    private void validateT(ExecutionException t) {
-        assertTrue(t.getCause() instanceof NotFoundException);
-    }
-    private void assertDuplicateResponse(String s) {
-        assertEquals("Hello, world!Hello, world!", s);
+        final TestSubscriber<String> subscriber = new TestSubscriber<>();
+        b.rx(FlowableRxInvoker.class)
+            .get(String.class)
+            .subscribe(subscriber);
+        
+        subscriber.await(1, TimeUnit.SECONDS);
+        subscriber.assertError(NotFoundException.class);
     }
 }
