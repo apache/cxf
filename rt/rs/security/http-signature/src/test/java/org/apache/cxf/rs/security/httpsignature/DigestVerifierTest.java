@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.rs.security.httpsignature;
 
-import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -44,54 +43,47 @@ public class DigestVerifierTest {
 
     @Test
     public void validUnalteredDigest() {
-        try {
-            Map<String, List<String>> headers = new HashMap<>();
-            createDigestHeader(MESSAGE_BODY, headers, DefaultSignatureConstants.DIGEST_ALGORITHM);
-            digestVerifier.inspectDigest(MESSAGE_BODY.getBytes(), headers);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
+        Map<String, List<String>> headers = new HashMap<>();
+        createDigestHeader(MESSAGE_BODY, headers, DefaultSignatureConstants.DIGEST_ALGORITHM);
+        digestVerifier.inspectDigest(MESSAGE_BODY.getBytes(), headers);
     }
 
     @Test(expected = DifferentDigestsException.class)
     public void differentDigestsFails() {
-        try {
-            Map<String, List<String>> headers = new HashMap<>();
-            createDigestHeader(MESSAGE_BODY, headers, DefaultSignatureConstants.DIGEST_ALGORITHM);
-            String digest = "SHA-256=HEYHEYHEYHEY";
-            headers.replace("Digest", Collections.singletonList(digest));
-            digestVerifier.inspectDigest(MESSAGE_BODY.getBytes(), headers);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
+        Map<String, List<String>> headers = new HashMap<>();
+        createDigestHeader(MESSAGE_BODY, headers, DefaultSignatureConstants.DIGEST_ALGORITHM);
+        String digest = "SHA-256=HEYHEYHEYHEY";
+        headers.replace("Digest", Collections.singletonList(digest));
+        digestVerifier.inspectDigest(MESSAGE_BODY.getBytes(), headers);
     }
 
     @Test(expected = DifferentDigestsException.class)
     public void digestFailureAlteredMessageFails() {
-        try {
-            Map<String, List<String>> headers = new HashMap<>();
-            createDigestHeader(MESSAGE_BODY, headers, DefaultSignatureConstants.DIGEST_ALGORITHM);
-            digestVerifier.inspectDigest("TEST".getBytes(), headers);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
+        Map<String, List<String>> headers = new HashMap<>();
+        createDigestHeader(MESSAGE_BODY, headers, DefaultSignatureConstants.DIGEST_ALGORITHM);
+        digestVerifier.inspectDigest("TEST".getBytes(), headers);
     }
 
     @Test(expected = DigestFailureException.class)
     public void digestFailureFails() {
-        try {
-            Map<String, List<String>> headers = new HashMap<>();
-            createDigestHeader(MESSAGE_BODY, headers, DefaultSignatureConstants.DIGEST_ALGORITHM);
-            String digest = "HELLO=HEYHEYHEYHEY";
-            headers.replace("Digest", Collections.singletonList(digest));
-            digestVerifier.inspectDigest(MESSAGE_BODY.getBytes(), headers);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
+        Map<String, List<String>> headers = new HashMap<>();
+        createDigestHeader(MESSAGE_BODY, headers, DefaultSignatureConstants.DIGEST_ALGORITHM);
+        String digest = "HELLO=HEYHEYHEYHEY";
+        headers.replace("Digest", Collections.singletonList(digest));
+        digestVerifier.inspectDigest(MESSAGE_BODY.getBytes(), headers);
+    }
+
+    @Test(expected = DigestFailureException.class)
+    public void digestFailureAlteredDigestStringFails() {
+        Map<String, List<String>> headers = new HashMap<>();
+        createDigestHeader(MESSAGE_BODY, headers, DefaultSignatureConstants.DIGEST_ALGORITHM);
+        String digest = "BOERFKSEFK=VSJEFKSE=SRJSPAWKD";
+        headers.replace("Digest", Collections.singletonList(digest));
+        digestVerifier.inspectDigest(MESSAGE_BODY.getBytes(), headers);
     }
 
     private static void createDigestHeader(String messageBody, Map<String, List<String>> headers,
-                                           String digestAlgorithm) throws NoSuchAlgorithmException {
+                                           String digestAlgorithm) {
         String digest = SignatureHeaderUtils.createDigestHeader(messageBody, digestAlgorithm);
         headers.put("Digest", Collections.singletonList(digest));
     }

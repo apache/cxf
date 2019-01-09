@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -37,6 +38,7 @@ import org.apache.cxf.rs.security.httpsignature.exception.MultipleSignatureHeade
 import org.apache.cxf.rs.security.httpsignature.provider.MockAlgorithmProvider;
 import org.apache.cxf.rs.security.httpsignature.provider.MockPublicKeyProvider;
 import org.apache.cxf.rs.security.httpsignature.provider.MockSecurityProvider;
+import org.apache.cxf.rs.security.httpsignature.utils.SignatureHeaderUtils;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -164,12 +166,12 @@ public class MessageVerifierTest {
     }
 
     private static Map<String, List<String>> createMockHeaders() {
-        Map<String, List<String>> newHeader = new HashMap<>();
-        newHeader.put("Host", Collections.singletonList("example.org"));
-        newHeader.put("Date", Collections.singletonList("Tue, 07 Jun 2014 20:51:35 GMT"));
-        newHeader.put("Accept", Collections.singletonList(""));
-        newHeader.put("Content-Length", Collections.singletonList("18"));
-        return newHeader;
+        Map<String, List<String>> headers = new HashMap<>();
+        headers.put("Host", Collections.singletonList("example.org"));
+        headers.put("Accept", Collections.singletonList(""));
+        headers.put("Content-Length", Collections.singletonList("18"));
+        SignatureHeaderUtils.addDateHeader(headers, ZoneOffset.UTC);
+        return headers;
     }
 
 }

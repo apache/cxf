@@ -34,10 +34,12 @@ public class DigestVerifier {
         LOG.fine("Starting digest verification");
         if (responseHeaders.containsKey("Digest")) {
 
-            MessageDigest messageDigest = SignatureHeaderUtils.getDigestAlgorithm(responseHeaders.get("Digest").get(0));
+            MessageDigest messageDigest = SignatureHeaderUtils
+                    .createMessageDigestWithAlgorithm(splitDigestHeader(responseHeaders.get("Digest").get(0)).get(0));
             messageDigest.update(messageBody);
             byte[] generatedDigest = messageDigest.digest();
-            byte[] headerDigest = Base64.getDecoder().decode(trimAlgorithmName(responseHeaders.get("Digest").get(0)));
+            byte[] headerDigest = Base64.getDecoder()
+                    .decode(splitDigestHeader(responseHeaders.get("Digest").get(0)).get(1));
 
             if (!Arrays.equals(generatedDigest, headerDigest)) {
                 throw new DifferentDigestsException("the digest does not match the body of the message");
@@ -48,9 +50,8 @@ public class DigestVerifier {
         LOG.fine("Finished digest verification");
     }
 
-    private String trimAlgorithmName(String digest) {
-        int startingIndex = digest.indexOf("=");
-        return digest.substring(startingIndex + 1, digest.length());
+    private List<String> splitDigestHeader(String digestHeader) {
+        return Arrays.asList(digestHeader.split("=", 2));
     }
 
 }

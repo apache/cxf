@@ -20,6 +20,10 @@ package org.apache.cxf.rs.security.httpsignature.utils;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.Clock;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import org.apache.cxf.rs.security.httpsignature.exception.DigestFailureException;
@@ -28,7 +32,17 @@ public final class SignatureHeaderUtils {
     private SignatureHeaderUtils() { }
 
     /**
-     * Maps a multimap to a normal map with comma-separated values in case of duplicate headers
+     * Add a date header at the current time using the ZoneOffset. Date format is http
+     */
+    public static void addDateHeader(Map<String, List<String>> messageHeaders, ZoneOffset zoneOffset) {
+        String date = DateTimeFormatter.RFC_1123_DATE_TIME
+                .format(LocalDateTime.now().atZone(Clock.system(zoneOffset).getZone()));
+        messageHeaders.put("Date", Collections.singletonList(date));
+    }
+
+    /**
+     * Maps a multimap to a normal map with comma-separated values in case of duplicate headers according to
+     * the draft-cavage guidelines
      * @param multivaluedMap the multivalued map
      * @return A map with comma-separated values
      */
@@ -48,16 +62,21 @@ public final class SignatureHeaderUtils {
      * @return A base64 encoded digest ready to be added as a header to the message
      */
     public static String createDigestHeader(String messageBody, String digestAlgorithmName) {
-        MessageDigest messageDigest = getDigestAlgorithm(digestAlgorithmName);
+        MessageDigest messageDigest = createMessageDigestWithAlgorithm(digestAlgorithmName);
         messageDigest.update(messageBody.getBytes());
         return digestAlgorithmName + "=" + Base64.getEncoder().encodeToString(messageDigest.digest());
     }
 
-    public static MessageDigest getDigestAlgorithm(String digestString) {
+    /**
+     * Get a MessageDigest object based on the algorithm in the digest string
+     *
+     * @return a valid MessageDigest object
+     */
+    public static MessageDigest createMessageDigestWithAlgorithm(String algorithmName) {
         List<String> validDigestAlgorithms = Arrays.asList("SHA-256", "SHA-512");
         try {
             for (String validAlgorithm : validDigestAlgorithms) {
-                if (digestString.startsWith(validAlgorithm)) {
+                if (validAlgorithm.equalsIgnoreCase(algorithmName)) {
                     return MessageDigest.getInstance(validAlgorithm);
                 }
             }
