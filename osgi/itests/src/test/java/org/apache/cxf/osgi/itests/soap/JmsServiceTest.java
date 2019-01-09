@@ -29,7 +29,6 @@ import org.apache.cxf.osgi.itests.CXFOSGiTestSupport;
 import org.apache.cxf.transport.jms.ConnectionFactoryFeature;
 import org.osgi.framework.Constants;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
@@ -39,6 +38,7 @@ import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.ops4j.pax.tinybundles.core.TinyBundles;
 
+import static org.junit.Assert.assertEquals;
 import static org.ops4j.pax.exam.CoreOptions.provision;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 
@@ -50,10 +50,10 @@ public class JmsServiceTest extends CXFOSGiTestSupport {
     public void testJmsEndpoint() throws Exception {
         Greeter greeter = greeterJms();
         String res = greeter.greetMe("Chris");
-        Assert.assertEquals("Hi Chris", res);
+        assertEquals("Hi Chris", res);
     }
 
-    private Greeter greeterJms() {
+    private static Greeter greeterJms() {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(Greeter.class);
         factory.setAddress("jms:queue:greeter");
@@ -62,7 +62,7 @@ public class JmsServiceTest extends CXFOSGiTestSupport {
         return factory.create(Greeter.class);
     }
 
-    private ActiveMQConnectionFactory createConnectionFactory() {
+    private static ActiveMQConnectionFactory createConnectionFactory() {
         ActiveMQConnectionFactory connectionFactory
             = new ActiveMQConnectionFactory("vm://JmsServiceTest");
         connectionFactory.setUserName("karaf");
@@ -74,17 +74,21 @@ public class JmsServiceTest extends CXFOSGiTestSupport {
     public Option[] config() {
         return new Option[] {
             cxfBaseConfig(),
-            testUtils(),
-            features(springLegacyUrl, "spring/4.3.18.RELEASE_1"),
+            features(karafUrl, "aries-blueprint", "shell-compat"),
             features(cxfUrl, "cxf-core", "cxf-jaxws", "cxf-transports-jms"),
-            features(amqUrl, "aries-blueprint", "shell-compat", "activemq-broker-noweb"),
+            features(springLegacyUrl, "spring/4.3.18.RELEASE_1"),
+            features(amqUrl, "activemq-broker-noweb"),
             provision(serviceBundle())
         };
     }
 
-    private InputStream serviceBundle() {
-        return TinyBundles.bundle().add(JmsTestActivator.class).add(Greeter.class).add(GreeterImpl.class)
-            .set(Constants.BUNDLE_ACTIVATOR, JmsTestActivator.class.getName()).build(TinyBundles.withBnd());
+    private static InputStream serviceBundle() {
+        return TinyBundles.bundle()
+                .add(JmsTestActivator.class)
+                .add(Greeter.class)
+                .add(GreeterImpl.class)
+                .set(Constants.BUNDLE_ACTIVATOR, JmsTestActivator.class.getName())
+                .build(TinyBundles.withBnd());
     }
 
 }

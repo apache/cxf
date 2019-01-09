@@ -20,17 +20,16 @@ package org.apache.cxf.osgi.itests.jaxrs;
 
 import java.io.InputStream;
 
-import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.cxf.osgi.itests.AbstractServerActivator;
 import org.apache.cxf.osgi.itests.CXFOSGiTestSupport;
 import org.osgi.framework.Constants;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
@@ -41,7 +40,8 @@ import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.ops4j.pax.tinybundles.core.TinyBundles;
 
-
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.ops4j.pax.exam.CoreOptions.provision;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
@@ -53,17 +53,12 @@ public class JaxRsServiceTest extends CXFOSGiTestSupport {
 
     private static final String BASE_URL = "http://localhost:8181/cxf/jaxrs/bookstore";
 
-    private final WebTarget wt;
-
-    public JaxRsServiceTest() {
-        Client client = ClientBuilder.newClient();
-        wt = client.target(BASE_URL);
-    }
+    private final WebTarget wt = ClientBuilder.newClient().target(BASE_URL);
 
     @Test
     public void testJaxRsGet() throws Exception {
         Book book = wt.path("/books/123").request("application/xml").get(Book.class);
-        Assert.assertNotNull(book);
+        assertNotNull(book);
     }
 
     @Test
@@ -71,7 +66,7 @@ public class JaxRsServiceTest extends CXFOSGiTestSupport {
         Book book = new Book("New Book", 321);
         Response response = wt.path("/books/").request("application/xml").post(Entity.xml(book));
         assertStatus(Status.CREATED, response);
-        Assert.assertNotNull(response.getLocation());
+        assertNotNull(response.getLocation());
     }
     
     @Test
@@ -86,7 +81,7 @@ public class JaxRsServiceTest extends CXFOSGiTestSupport {
         Book book = new Book("A Book", 3212);
         Response response = wt.path("/books-validate/").request("application/xml").post(Entity.xml(book));
         assertStatus(Status.CREATED, response);
-        Assert.assertNotNull(response.getLocation());
+        assertNotNull(response.getLocation());
     }
 
     @Test
@@ -102,25 +97,24 @@ public class JaxRsServiceTest extends CXFOSGiTestSupport {
         assertStatus(Status.OK, response);
     }
 
+    private static void assertStatus(Status expectedStatus, Response response) {
+        assertEquals(expectedStatus.getStatusCode(), response.getStatus());
+    }
+
     @Configuration
     public Option[] config() {
         return new Option[] {
             cxfBaseConfig(),
-            features(cxfUrl, "aries-blueprint", "cxf-core", "cxf-wsdl", "cxf-jaxrs", "http",
-                    "cxf-bean-validation-core",
-                    "cxf-bean-validation"),
-            testUtils(),
+            features(karafUrl, "aries-blueprint", "http"),
+            features(cxfUrl, "cxf-core", "cxf-wsdl", "cxf-jaxrs", "cxf-bean-validation-core", "cxf-bean-validation"),
             logLevel(LogLevel.INFO),
             provision(serviceBundle())
         };
     }
 
-    private void assertStatus(Status expectedStatus, Response response) {
-        Assert.assertEquals(expectedStatus.getStatusCode(), response.getStatus());
-    }
-
-    private InputStream serviceBundle() {
+    private static InputStream serviceBundle() {
         return TinyBundles.bundle()
+                  .add(AbstractServerActivator.class)
                   .add(JaxRsTestActivator.class)
                   .add(Book.class)
                   .add(BookStore.class)

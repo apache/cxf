@@ -20,19 +20,18 @@ package org.apache.cxf.osgi.itests.soap;
 
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
+import org.apache.cxf.osgi.itests.AbstractServerActivator;
 import org.apache.cxf.testutil.common.TestUtil;
-import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
-public class HttpTestActivator implements BundleActivator {
+public class HttpTestActivator extends AbstractServerActivator {
     public static final String PORT = TestUtil.getPortNumber(HttpTestActivator.class);
-    private Server server;
     private Server serverJetty;
 
     @Override
-    public void start(BundleContext arg0) throws Exception {
-        server = createTestServer("/greeter");
+    protected Server createServer() {
         serverJetty = createTestServer("http://localhost:" + PORT + "/cxf/greeter");
+        return createTestServer("/greeter");
     }
 
     private Server createTestServer(String url) {
@@ -44,8 +43,8 @@ public class HttpTestActivator implements BundleActivator {
     }
 
     @Override
-    public void stop(BundleContext arg0) throws Exception {
-        server.destroy();
+    public void stop(BundleContext bundleContext) throws Exception {
+        super.stop(bundleContext);
         serverJetty.destroy();
     }
 
