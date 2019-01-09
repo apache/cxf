@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.rs.security.httpsignature.exception.DifferentDigestsException;
+import org.apache.cxf.rs.security.httpsignature.exception.DigestFailureException;
 import org.apache.cxf.rs.security.httpsignature.exception.MissingDigestException;
 import org.apache.cxf.rs.security.httpsignature.utils.SignatureHeaderUtils;
 
@@ -51,7 +52,11 @@ public class DigestVerifier {
     }
 
     private List<String> splitDigestHeader(String digestHeader) {
-        return Arrays.asList(digestHeader.split("=", 2));
+        List<String> items = Arrays.asList(digestHeader.split("=", 2));
+        if (items.size() != 2) {
+            throw new DigestFailureException("invalid digest header format");
+        }
+        return items;
     }
 
 }

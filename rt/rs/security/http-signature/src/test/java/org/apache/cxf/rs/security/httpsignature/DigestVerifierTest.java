@@ -82,6 +82,15 @@ public class DigestVerifierTest {
         digestVerifier.inspectDigest(MESSAGE_BODY.getBytes(), headers);
     }
 
+    @Test(expected = DigestFailureException.class)
+    public void digestFailureEmptyDigestStringFails() {
+        Map<String, List<String>> headers = new HashMap<>();
+        createDigestHeader(MESSAGE_BODY, headers, DefaultSignatureConstants.DIGEST_ALGORITHM);
+        String digest = "";
+        headers.replace("Digest", Collections.singletonList(digest));
+        digestVerifier.inspectDigest(MESSAGE_BODY.getBytes(), headers);
+    }
+
     private static void createDigestHeader(String messageBody, Map<String, List<String>> headers,
                                            String digestAlgorithm) {
         String digest = SignatureHeaderUtils.createDigestHeader(messageBody, digestAlgorithm);
