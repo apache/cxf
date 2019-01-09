@@ -22,7 +22,6 @@ import java.lang.reflect.Method;
 import java.security.Provider;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -121,24 +120,55 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
     public WSS4JInInterceptor(Map<String, Object> properties) {
         this();
         setProperties(properties);
+        WSSConfig config = WSSConfig.getNewInstance();
+
+        // Set any custom WSS4J Processor instances that are configured
         final Map<QName, Object> processorMap = CastUtils.cast(
             (Map<?, ?>)properties.get(PROCESSOR_MAP));
-        final Map<QName, Object> validatorMap = CastUtils.cast(
-            (Map<?, ?>)properties.get(VALIDATOR_MAP));
-
         if (processorMap != null) {
-            if (validatorMap != null) {
-                processorMap.putAll(validatorMap);
+            for (Map.Entry<QName, Object> entry : processorMap.entrySet()) {
+                Object val = entry.getValue();
+                if (val instanceof Class<?>) {
+                    config.setProcessor(entry.getKey(), (Class<?>)val);
+                } else if (val instanceof Processor) {
+                    config.setProcessor(entry.getKey(), (Processor)val);
+                } else if (val == null) {
+                    config.setProcessor(entry.getKey(), (Class<?>)null);
+                }
             }
-            secEngineOverride = createSecurityEngine(processorMap);
-        } else if (validatorMap != null) {
-            secEngineOverride = createSecurityEngine(validatorMap);
         }
+
+        // Set any custom WSS4J Validator instances that are configured
+        Map<QName, Object> validatorMap = CastUtils.cast(
+            (Map<?, ?>)properties.get(VALIDATOR_MAP));
+        if (validatorMap == null) {
+            validatorMap = CastUtils.cast((Map<?, ?>)properties.get(ConfigurationConstants.VALIDATOR_MAP));
+        }
+        if (validatorMap != null) {
+            for (Map.Entry<QName, Object> entry : validatorMap.entrySet()) {
+                Object val = entry.getValue();
+                if (val instanceof Class<?>) {
+                    config.setValidator(entry.getKey(), (Class<?>)val);
+                } else if (val instanceof Validator) {
+                    config.setValidator(entry.getKey(), (Validator)val);
+                }
+            }
+        }
+
+        secEngineOverride = new WSSecurityEngine();
+        secEngineOverride.setWssConfig(config);
     }
 
+    /**
+     * Setting this value to true means that WSS4J does not compare the "actions" that were processed against
+     * the list of actions that were configured. It also means that CXF/WSS4J does not throw an error if no actions
+     * were specified. Setting this to true could be a potential security risk, as there is then no guarantee that
+     * the message contains the desired security token.
+     */
     public void setIgnoreActions(boolean i) {
         ignoreActions = i;
     }
+
     private SOAPMessage getSOAPMessage(SoapMessage msg) {
         SAAJInInterceptor.INSTANCE.handleMessage(msg);
         return msg.getContent(SOAPMessage.class);
@@ -230,7 +260,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
 
             computeAction(msg, reqData);
             String action = getAction(msg, version);
-
             List<Integer> actions = WSSecurityUtil.decodeAction(action);
 
             String actor = (String)getOption(ConfigurationConstants.ACTOR);
@@ -578,7 +607,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         if (action == null) {
             action = (String)msg.get(ConfigurationConstants.ACTION);
         }
-        if (action == null) {
+        if (action == null && !ignoreActions) {
             LOG.warning("No security action was defined!");
             throw new SoapFault("No security action was defined!", version.getReceiver());
         }
@@ -648,39 +677,14 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         }
 
         if (!utWithCallbacks) {
-            Map<QName, Object> profiles = new HashMap<>(1);
-            Validator validator = new NoOpValidator();
-            profiles.put(WSConstants.USERNAME_TOKEN, validator);
-            return createSecurityEngine(profiles);
+            WSSConfig config = WSSConfig.getNewInstance();
+            config.setValidator(WSConstants.USERNAME_TOKEN, new NoOpValidator());
+            WSSecurityEngine ret = new WSSecurityEngine();
+            ret.setWssConfig(config);
+            return ret;
         }
 
         return null;
-    }
-
-    /**
-     * @return      a freshly minted WSSecurityEngine instance, using the
-     *              (non-null) processor map, to be used to initialize the
-     *              WSSecurityEngine instance.
-     */
-    protected static WSSecurityEngine createSecurityEngine(final Map<QName, Object> map) {
-        assert map != null;
-        final WSSConfig config = WSSConfig.getNewInstance();
-        for (Map.Entry<QName, Object> entry : map.entrySet()) {
-            final QName key = entry.getKey();
-            Object val = entry.getValue();
-            if (val instanceof Class<?>) {
-                config.setProcessor(key, (Class<?>)val);
-            } else if (val instanceof Processor) {
-                config.setProcessor(key, (Processor)val);
-            } else if (val instanceof Validator) {
-                config.setValidator(key, (Validator)val);
-            } else if (val == null) {
-                config.setProcessor(key, (Class<?>)null);
-            }
-        }
-        final WSSecurityEngine ret = new WSSecurityEngine();
-        ret.setWssConfig(config);
-        return ret;
     }
 
     /**

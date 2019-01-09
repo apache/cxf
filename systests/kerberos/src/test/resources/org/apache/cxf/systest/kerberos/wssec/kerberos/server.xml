@@ -17,7 +17,7 @@
  specific language governing permissions and limitations
  under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration" xmlns:sec="http://cxf.apache.org/configuration/security" xmlns:interop="http://WSSec/wssec10" xmlns:cxf="http://cxf.apache.org/core" xmlns:p="http://cxf.apache.org/policy" xsi:schemaLocation="         http://www.springframework.org/schema/beans                     http://www.springframework.org/schema/beans/spring-beans.xsd         http://cxf.apache.org/jaxws                                     http://cxf.apache.org/schemas/jaxws.xsd         http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd         http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd         http://cxf.apache.org/transports/http/configuration             http://cxf.apache.org/schemas/configuration/http-conf.xsd         http://cxf.apache.org/transports/http-jetty/configuration       http://cxf.apache.org/schemas/configuration/http-jetty.xsd         http://cxf.apache.org/configuration/security                    http://cxf.apache.org/schemas/configuration/security.xsd     ">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration" xmlns:sec="http://cxf.apache.org/configuration/security" xmlns:interop="http://WSSec/wssec10" xmlns:cxf="http://cxf.apache.org/core" xmlns:p="http://cxf.apache.org/policy" xsi:schemaLocation="         http://www.springframework.org/schema/beans                     http://www.springframework.org/schema/beans/spring-beans.xsd         http://cxf.apache.org/jaxws                                     http://cxf.apache.org/schemas/jaxws.xsd         http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd         http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd         http://cxf.apache.org/transports/http/configuration             http://cxf.apache.org/schemas/configuration/http-conf.xsd         http://cxf.apache.org/transports/http-jetty/configuration       http://cxf.apache.org/schemas/configuration/http-jetty.xsd         http://cxf.apache.org/configuration/security                    http://cxf.apache.org/schemas/configuration/security.xsd    http://www.w3.org/ns/ws-policy                                  http://www.w3.org/2007/02/ws-policy.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     <cxf:bus>
         <cxf:features>
@@ -179,6 +179,28 @@
             <entry key="security.callback-handler" value="org.apache.cxf.systest.kerberos.common.KeystorePasswordCallback"/>
             <entry key="security.signature.properties" value="serviceKeystore.properties"/>
         </jaxws:properties>
+    </jaxws:endpoint>
+    
+    <bean class="javax.xml.namespace.QName" id="bstQName">
+        <constructor-arg value="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"/>
+        <constructor-arg value="BinarySecurityToken"/>
+    </bean>
+    
+    <util:map id="kerberosValidatorMap">
+        <entry key-ref="bstQName" value-ref="kerberosValidator" />
+    </util:map>
+    
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="DoubleItKerberosTransportActionPort" address="https://localhost:${testutil.ports.Server.2}/DoubleItKerberosTransportAction" serviceName="s:DoubleItService" endpointName="s:DoubleItKerberosTransportActionPort" implementor="org.apache.cxf.systest.kerberos.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/kerberos/wssec/kerberos/DoubleItKerberos.wsdl" depends-on="tls-settings">
+        <jaxws:inInterceptors>
+            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+                <constructor-arg>
+                    <map>
+                        <entry key="validatorMap" value-ref="kerberosValidatorMap"/>
+                    </map>
+                </constructor-arg>
+                <property name="ignoreActions" value="true"/>
+            </bean>
+        </jaxws:inInterceptors>
     </jaxws:endpoint>
     
     <httpj:engine-factory id="STSClientAuthHttpsSettings" bus="cxf">

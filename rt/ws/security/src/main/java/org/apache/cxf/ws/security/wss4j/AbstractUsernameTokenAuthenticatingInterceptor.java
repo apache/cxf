@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.security.auth.Subject;
-import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 import javax.xml.stream.XMLStreamException;
 
@@ -44,12 +43,12 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.validate.UsernameTokenValidator;
-import org.apache.wss4j.dom.validate.Validator;
 
 
 /**
@@ -197,11 +196,11 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
 
     @Override
     protected WSSecurityEngine getSecurityEngine(boolean utNoCallbacks) {
-        Map<QName, Object> profiles = new HashMap<>(1);
-
-        Validator validator = new CustomValidator();
-        profiles.put(WSConstants.USERNAME_TOKEN, validator);
-        return createSecurityEngine(profiles);
+        WSSConfig config = WSSConfig.getNewInstance();
+        config.setValidator(WSConstants.USERNAME_TOKEN, new CustomValidator());
+        WSSecurityEngine ret = new WSSecurityEngine();
+        ret.setWssConfig(config);
+        return ret;
     }
 
     protected class CustomValidator extends UsernameTokenValidator {

@@ -434,4 +434,26 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
 
+    @org.junit.Test
+    public void testKerberosViaCustomTokenAction() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = KerberosTokenTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = KerberosTokenTest.class.getResource("DoubleItKerberos.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItKerberosTransportActionPort");
+        DoubleItPortType kerberosPort =
+                service.getPort(portQName, DoubleItPortType.class);
+
+        TestUtil.updateAddressPort(kerberosPort, PORT2);
+
+        Assert.assertEquals(50, kerberosPort.doubleIt(25));
+
+        ((java.io.Closeable)kerberosPort).close();
+        bus.shutdown(true);
+    }
 }
