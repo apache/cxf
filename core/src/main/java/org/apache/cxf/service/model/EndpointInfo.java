@@ -98,11 +98,14 @@ public class EndpointInfo extends AbstractDescriptionElement implements NamedIte
             // address = EndpointReferenceUtils.getEndpointReference(addr); loads jaxb and we want to avoid it
             final EndpointReferenceType reference = new EndpointReferenceType();
             final AttributedURIType a = new AttributedURIType();
-            a.setValue("/");
+            a.setValue(addr);
             reference.setAddress(a);
             address = reference;
         } else {
-            EndpointReferenceUtils.setAddress(address, addr);
+            final AttributedURIType a = new AttributedURIType();
+            a.setValue(addr);
+            address.setAddress(a);
+            // EndpointReferenceUtils.setAddress(address, addr);
         }
     }
 
