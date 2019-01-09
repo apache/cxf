@@ -19,7 +19,10 @@
 package org.apache.cxf.rs.security.httpsignature.exception;
 
 public class InvalidSignatureException extends SignatureException {
+    public InvalidSignatureException() { }
+
     public InvalidSignatureException(String message) {
         super(message);
     }
+
 }

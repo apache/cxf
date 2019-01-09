@@ -28,7 +28,6 @@ import org.apache.cxf.rs.security.httpsignature.utils.SignatureHeaderUtils;
 import org.tomitribe.auth.signatures.Signature;
 
 public class TomitribeSignatureCreator implements SignatureCreator {
-
     private final String signatureAlgorithmName;
     private final PrivateKey privateKey;
     private final String keyId;
@@ -59,4 +58,5 @@ public class TomitribeSignatureCreator implements SignatureCreator {
                 new org.tomitribe.auth.signatures.Signer(privateKey, signature);
         return signer.sign(method, uri, SignatureHeaderUtils.mapHeaders(messageHeaders)).toString();
     }
+
 }

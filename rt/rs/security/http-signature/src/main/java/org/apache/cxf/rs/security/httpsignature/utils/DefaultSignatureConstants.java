@@ -23,6 +23,6 @@ public final class DefaultSignatureConstants {
     public static final String DIGEST_ALGORITHM = "SHA-256";
     public static final String SECURITY_PROVIDER = "SunRsaSign";
 
-    private DefaultSignatureConstants() {
-    }
+    private DefaultSignatureConstants() { }
+
 }

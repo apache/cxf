@@ -36,8 +36,7 @@ import org.apache.cxf.rs.security.httpsignature.utils.SignatureHeaderUtils;
 import org.tomitribe.auth.signatures.Signature;
 import org.tomitribe.auth.signatures.Verifier;
 
-public class TomitribeSignatureValidator implements SignatureValidator {
-
+public final class TomitribeSignatureValidator implements SignatureValidator {
     private static final Logger LOG = LogUtils.getL7dLogger(TomitribeSignatureValidator.class);
 
     @Override
@@ -93,4 +92,5 @@ public class TomitribeSignatureValidator implements SignatureValidator {
         }
         LOG.fine("Finished signature validation");
     }
+
 }

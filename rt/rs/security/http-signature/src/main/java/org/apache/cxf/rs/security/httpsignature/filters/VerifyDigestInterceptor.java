@@ -47,7 +47,6 @@ public final class VerifyDigestInterceptor implements ReaderInterceptor {
     private static final Logger LOG = LogUtils.getL7dLogger(VerifyDigestInterceptor.class);
 
     private DigestVerifier digestVerifier;
-
     private boolean enabled;
 
     public VerifyDigestInterceptor() {

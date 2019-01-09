@@ -19,25 +19,22 @@
 package org.apache.cxf.rs.security.httpsignature;
 
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.rs.security.httpsignature.exception.DifferentDigestsException;
-import org.apache.cxf.rs.security.httpsignature.exception.DigestFailureException;
 import org.apache.cxf.rs.security.httpsignature.exception.MissingDigestException;
+import org.apache.cxf.rs.security.httpsignature.utils.SignatureHeaderUtils;
 
 public class DigestVerifier {
     private static final Logger LOG = LogUtils.getL7dLogger(DigestVerifier.class);
-
-    private final List<String> validDigestAlgorithms = Arrays.asList("SHA-256", "SHA-512");
 
     public void inspectDigest(byte[] messageBody, Map<String, List<String>> responseHeaders) {
         LOG.fine("Starting digest verification");
         if (responseHeaders.containsKey("Digest")) {
 
-            MessageDigest messageDigest = getDigestAlgorithm(responseHeaders.get("Digest").get(0));
+            MessageDigest messageDigest = SignatureHeaderUtils.getDigestAlgorithm(responseHeaders.get("Digest").get(0));
             messageDigest.update(messageBody);
             byte[] generatedDigest = messageDigest.digest();
             byte[] headerDigest = Base64.getDecoder().decode(trimAlgorithmName(responseHeaders.get("Digest").get(0)));
@@ -51,21 +48,9 @@ public class DigestVerifier {
         LOG.fine("Finished digest verification");
     }
 
-    private MessageDigest getDigestAlgorithm(String digestString) {
-        try {
-            for (String validAlgorithm : validDigestAlgorithms) {
-                if (digestString.startsWith(validAlgorithm)) {
-                    return MessageDigest.getInstance(validAlgorithm);
-                }
-            }
-            throw new NoSuchAlgorithmException("found no match in digest algorithm whitelist");
-        } catch (NoSuchAlgorithmException e) {
-            throw new DigestFailureException("failed to validate the digest", e);
-        }
-    }
-
     private String trimAlgorithmName(String digest) {
         int startingIndex = digest.indexOf("=");
         return digest.substring(startingIndex + 1, digest.length());
     }
+
 }

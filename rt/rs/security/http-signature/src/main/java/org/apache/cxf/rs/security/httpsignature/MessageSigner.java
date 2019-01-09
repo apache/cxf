@@ -19,7 +19,6 @@
 package org.apache.cxf.rs.security.httpsignature;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.util.Collections;
 import java.util.List;
@@ -37,8 +36,11 @@ public class MessageSigner {
                          String digestAlgorithmName,
                          PrivateKey privateKey,
                          String keyId) {
-        this.digestAlgorithmName = digestAlgorithmName;
-        this.signatureCreator = new TomitribeSignatureCreator(signatureAlgorithmName, privateKey, keyId);
+        this.digestAlgorithmName = Objects.requireNonNull(digestAlgorithmName);
+        this.signatureCreator = new TomitribeSignatureCreator(
+                Objects.requireNonNull(signatureAlgorithmName),
+                Objects.requireNonNull(privateKey),
+                Objects.requireNonNull(keyId));
     }
 
     public MessageSigner(PrivateKey privateKey,
@@ -63,7 +65,7 @@ public class MessageSigner {
     public void sign(Map<String, List<String>> messageHeaders,
                      String uri,
                      String method,
-                     String messageBody) throws NoSuchAlgorithmException, IOException {
+                     String messageBody) throws IOException {
         inspectArguments(messageHeaders, uri, method);
 
         Objects.requireNonNull(messageBody);
@@ -92,4 +94,5 @@ public class MessageSigner {
         messageHeaders.forEach((key, list) -> Objects.requireNonNull(list));
         messageHeaders.forEach((key, list) -> list.forEach(Objects::requireNonNull));
     }
+
 }

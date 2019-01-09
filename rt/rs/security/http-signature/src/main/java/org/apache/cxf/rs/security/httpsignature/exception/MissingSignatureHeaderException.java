@@ -19,7 +19,10 @@
 package org.apache.cxf.rs.security.httpsignature.exception;
 
 public class MissingSignatureHeaderException extends SignatureException {
+    public MissingSignatureHeaderException() { }
+
     public MissingSignatureHeaderException(String message) {
         super(message);
     }
+
 }

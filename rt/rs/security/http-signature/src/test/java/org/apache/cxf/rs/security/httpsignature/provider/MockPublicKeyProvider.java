@@ -19,13 +19,13 @@
 package org.apache.cxf.rs.security.httpsignature.provider;
 
 import java.security.PublicKey;
+import java.util.Objects;
 
 public class MockPublicKeyProvider implements PublicKeyProvider {
-
     private PublicKey publicKey;
 
     public MockPublicKeyProvider(PublicKey publicKey) {
-        this.publicKey = publicKey;
+        this.publicKey = Objects.requireNonNull(publicKey);
     }
 
     @Override
@@ -36,4 +36,5 @@ public class MockPublicKeyProvider implements PublicKeyProvider {
     private PublicKey getPublicKey(String keyId) {
         return publicKey;
     }
+
 }

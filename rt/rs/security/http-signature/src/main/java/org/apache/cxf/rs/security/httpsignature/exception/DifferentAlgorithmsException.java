@@ -19,7 +19,10 @@
 package org.apache.cxf.rs.security.httpsignature.exception;
 
 public class DifferentAlgorithmsException extends SignatureException {
+    public DifferentAlgorithmsException() { }
+
     public DifferentAlgorithmsException(String message) {
         super(message, null);
     }
+
 }

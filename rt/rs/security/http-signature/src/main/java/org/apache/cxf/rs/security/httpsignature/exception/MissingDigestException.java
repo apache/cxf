@@ -19,7 +19,10 @@
 package org.apache.cxf.rs.security.httpsignature.exception;
 
 public class MissingDigestException extends SignatureException {
+    public MissingDigestException() { }
+
     public MissingDigestException(String message) {
         super(message);
     }
+
 }

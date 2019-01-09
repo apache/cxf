@@ -49,25 +49,23 @@ public class MessageVerifier {
     public MessageVerifier(PublicKeyProvider publicKeyProvider,
                            SecurityProvider securityProvider,
                            AlgorithmProvider algorithmProvider) {
-        Objects.requireNonNull(publicKeyProvider, "public key provider cannot be null");
-        Objects.requireNonNull(securityProvider, "security provider cannot be null");
-        Objects.requireNonNull(algorithmProvider, "algorithm provider cannot be null");
-        this.publicKeyProvider = publicKeyProvider;
-        this.securityProvider = securityProvider;
-        this.algorithmProvider = algorithmProvider;
+        setPublicKeyProvider(publicKeyProvider);
+        setSecurityProvider(securityProvider);
+        setAlgorithmProvider(algorithmProvider);
         this.signatureValidator = new TomitribeSignatureValidator();
     }
 
-    public void setSecurityProvider(SecurityProvider securityProvider) {
-        this.securityProvider = securityProvider;
+    public final void setPublicKeyProvider(PublicKeyProvider publicKeyProvider) {
+        this.publicKeyProvider = Objects.requireNonNull(publicKeyProvider, "public key provider cannot be null");
     }
 
-    public void setPublicKeyProvider(PublicKeyProvider publicKeyProvider) {
-        this.publicKeyProvider = publicKeyProvider;
+    public final void setSecurityProvider(SecurityProvider securityProvider) {
+
+        this.securityProvider = Objects.requireNonNull(securityProvider, "security provider cannot be null");
     }
 
-    public void setAlgorithmProvider(AlgorithmProvider algorithmProvider) {
-        this.algorithmProvider = algorithmProvider;
+    public final void setAlgorithmProvider(AlgorithmProvider algorithmProvider) {
+        this.algorithmProvider = Objects.requireNonNull(algorithmProvider, "algorithm provider cannot be null");
     }
 
     public void verifyMessage(Map<String, List<String>> messageHeaders, String method, String uri) {
@@ -109,4 +107,5 @@ public class MessageVerifier {
             throw new MissingSignatureHeaderException("there is no signature header in request");
         }
     }
+
 }

@@ -26,4 +26,5 @@ public interface SignatureCreator {
     String createSignature(Map<String, List<String>> messageHeaders,
                            String uri,
                            String method) throws IOException;
+
 }

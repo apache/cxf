@@ -27,4 +27,5 @@ public class MockSecurityProvider implements SecurityProvider {
     public Provider getProvider(String keyId) {
         return Security.getProvider(DefaultSignatureConstants.SECURITY_PROVIDER);
     }
+
 }

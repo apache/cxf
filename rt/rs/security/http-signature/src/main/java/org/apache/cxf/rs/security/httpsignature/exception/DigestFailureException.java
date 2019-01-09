@@ -19,7 +19,10 @@
 package org.apache.cxf.rs.security.httpsignature.exception;
 
 public class DigestFailureException extends SignatureException {
+    public DigestFailureException() { }
+
     public DigestFailureException(String message, Throwable cause) {
         super(message, cause);
     }
+
 }

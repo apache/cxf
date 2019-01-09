@@ -19,7 +19,10 @@
 package org.apache.cxf.rs.security.httpsignature.exception;
 
 public class InvalidDataToVerifySignatureException extends SignatureException {
+    public InvalidDataToVerifySignatureException() { }
+
     public InvalidDataToVerifySignatureException(String message, Throwable cause) {
         super(message, cause);
     }
+
 }

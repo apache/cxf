@@ -19,7 +19,10 @@
 package org.apache.cxf.rs.security.httpsignature.exception;
 
 public class InvalidSignatureHeaderException extends SignatureException {
+    public InvalidSignatureHeaderException() { }
+
     public InvalidSignatureHeaderException(String message, Throwable cause) {
         super(message, cause);
     }
+
 }

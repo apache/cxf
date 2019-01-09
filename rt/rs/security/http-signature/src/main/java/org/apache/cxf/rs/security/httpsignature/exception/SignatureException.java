@@ -19,6 +19,8 @@
 package org.apache.cxf.rs.security.httpsignature.exception;
 
 public class SignatureException extends RuntimeException {
+    public SignatureException() { }
+
     public SignatureException(String message) {
         this(message, null);
     }
@@ -26,4 +28,5 @@ public class SignatureException extends RuntimeException {
     public SignatureException(String message, Throwable cause) {
         super(message, cause);
     }
+
 }

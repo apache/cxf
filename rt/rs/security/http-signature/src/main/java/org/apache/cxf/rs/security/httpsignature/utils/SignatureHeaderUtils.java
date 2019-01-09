@@ -22,9 +22,11 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
-public final class SignatureHeaderUtils {
+import org.apache.cxf.rs.security.httpsignature.exception.DigestFailureException;
 
+public final class SignatureHeaderUtils {
     private SignatureHeaderUtils() { }
+
     /**
      * Maps a multimap to a normal map with comma-separated values in case of duplicate headers
      * @param multivaluedMap the multivalued map
@@ -44,30 +46,24 @@ public final class SignatureHeaderUtils {
      * @param messageBody         The body of the message to be used to create the Digest
      * @param digestAlgorithmName The name of the algorithm used to create the digest, SHA-256 and SHA-512 are valid
      * @return A base64 encoded digest ready to be added as a header to the message
-     * @throws NoSuchAlgorithmException If the user gives an unexpected digestAlgorithmName
      */
-    public static String createDigestHeader(String messageBody, String digestAlgorithmName)
-            throws NoSuchAlgorithmException {
+    public static String createDigestHeader(String messageBody, String digestAlgorithmName) {
         MessageDigest messageDigest = getDigestAlgorithm(digestAlgorithmName);
         messageDigest.update(messageBody.getBytes());
         return digestAlgorithmName + "=" + Base64.getEncoder().encodeToString(messageDigest.digest());
     }
 
-    /**
-     * Get digest algorithm based on digestAlgorithmName
-     *
-     * @param digestAlgorithmName The name of the algorithm used to create the digest, SHA-256 and SHA-512 are valid
-     * @return The digest algorithm
-     * @throws NoSuchAlgorithmException If the user gives an unexpected digestAlgorithmName
-     */
-    public static MessageDigest getDigestAlgorithm(String digestAlgorithmName) throws NoSuchAlgorithmException {
-        String temporaryString = digestAlgorithmName.toUpperCase();
-        if (temporaryString.startsWith("SHA-256")) {
-            return MessageDigest.getInstance("SHA-256");
-        } else if (temporaryString.startsWith("SHA-512")) {
-            return MessageDigest.getInstance("SHA-512");
-        } else {
-            throw new NoSuchAlgorithmException("Found no valid algorithm in Digest");
+    public static MessageDigest getDigestAlgorithm(String digestString) {
+        List<String> validDigestAlgorithms = Arrays.asList("SHA-256", "SHA-512");
+        try {
+            for (String validAlgorithm : validDigestAlgorithms) {
+                if (digestString.startsWith(validAlgorithm)) {
+                    return MessageDigest.getInstance(validAlgorithm);
+                }
+            }
+            throw new NoSuchAlgorithmException("found no match in digest algorithm whitelist");
+        } catch (NoSuchAlgorithmException e) {
+            throw new DigestFailureException("failed to retrieve digest from digest string", e);
         }
     }
 
@@ -81,4 +77,5 @@ public final class SignatureHeaderUtils {
         }
         return sb.toString();
     }
+
 }

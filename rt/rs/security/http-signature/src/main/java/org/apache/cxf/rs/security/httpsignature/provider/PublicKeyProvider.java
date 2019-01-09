@@ -22,12 +22,11 @@ import java.security.PublicKey;
 
 @FunctionalInterface
 public interface PublicKeyProvider {
-
     /**
-     *
-     * @param keyId
+     * @param keyId is used as lookup to find the correct configured public key for this keyId
+     *              The keyId is sent in the message together with the signature
+     * @throws NullPointerException if it can't provide a public key based on keyId
      * @return the public key (which is never {@code null})
-     * @throws NullPointerException if the provided key ID is {@code null}
      */
     PublicKey getKey(String keyId);
 

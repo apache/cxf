@@ -44,7 +44,6 @@ public final class CreateSignatureFilter implements ContainerRequestFilter {
     private static final Logger LOG = LogUtils.getL7dLogger(VerifySignatureFilter.class);
 
     private MessageSigner messageSigner;
-
     private boolean enabled;
 
     public CreateSignatureFilter() {
@@ -95,4 +94,5 @@ public final class CreateSignatureFilter implements ContainerRequestFilter {
     public boolean isEnabled() {
         return enabled;
     }
+
 }

@@ -25,4 +25,5 @@ public class MockAlgorithmProvider implements AlgorithmProvider {
     public String getAlgorithmName(String keyId) {
         return DefaultSignatureConstants.SIGNING_ALGORITHM;
     }
+
 }

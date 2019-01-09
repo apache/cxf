@@ -150,7 +150,7 @@ public class MessageVerifierTest {
     private static void createAndAddSignature(Map<String, List<String>> headers, String messageBody) {
         try {
             messageSigner.sign(headers, URI, METHOD, messageBody);
-        } catch (NoSuchAlgorithmException | IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

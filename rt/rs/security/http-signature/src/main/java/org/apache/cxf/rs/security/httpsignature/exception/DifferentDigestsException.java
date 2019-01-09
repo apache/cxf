@@ -19,7 +19,10 @@
 package org.apache.cxf.rs.security.httpsignature.exception;
 
 public class DifferentDigestsException extends SignatureException {
+    public DifferentDigestsException() { }
+
     public DifferentDigestsException(String message) {
         super(message);
     }
+
 }

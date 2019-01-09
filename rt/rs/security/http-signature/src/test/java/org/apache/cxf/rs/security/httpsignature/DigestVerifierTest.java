@@ -95,4 +95,5 @@ public class DigestVerifierTest {
         String digest = SignatureHeaderUtils.createDigestHeader(messageBody, digestAlgorithm);
         headers.put("Digest", Collections.singletonList(digest));
     }
+
 }
