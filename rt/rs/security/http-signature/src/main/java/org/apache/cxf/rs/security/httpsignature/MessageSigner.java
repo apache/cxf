@@ -54,7 +54,9 @@ public class MessageSigner {
     public void sign(Map<String, List<String>> messageHeaders,
                      String uri,
                      String method) throws IOException {
-        inspectArguments(messageHeaders, uri, method);
+        SignatureHeaderUtils.inspectMessageHeaders(messageHeaders);
+        Objects.requireNonNull(uri);
+        Objects.requireNonNull(method);
 
         messageHeaders.put("Signature", Collections.singletonList(signatureCreator.createSignature(messageHeaders,
                 uri,
@@ -66,8 +68,9 @@ public class MessageSigner {
                      String uri,
                      String method,
                      String messageBody) throws IOException {
-        inspectArguments(messageHeaders, uri, method);
-
+        SignatureHeaderUtils.inspectMessageHeaders(messageHeaders);
+        Objects.requireNonNull(uri);
+        Objects.requireNonNull(method);
         Objects.requireNonNull(messageBody);
 
         messageHeaders.put("Digest",
@@ -79,20 +82,6 @@ public class MessageSigner {
                         uri,
                         method
         )));
-    }
-
-    private void inspectArguments(Map<String, List<String>> messageHeaders,
-                                  String uri,
-                                  String method) {
-        Objects.requireNonNull(messageHeaders);
-        Objects.requireNonNull(uri);
-        Objects.requireNonNull(method);
-
-        if (messageHeaders.isEmpty()) {
-            throw new IllegalStateException("message headers are empty");
-        }
-        messageHeaders.forEach((key, list) -> Objects.requireNonNull(list));
-        messageHeaders.forEach((key, list) -> list.forEach(Objects::requireNonNull));
     }
 
 }

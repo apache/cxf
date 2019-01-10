@@ -23,7 +23,7 @@ public interface AlgorithmProvider {
     /**
      * @param keyId is used as lookup to find the correct configured algorithm name for this keyId
      *              The keyId is sent in the message together with the signature
-     * @throws NullPointerException if it can't provide an algorithm based on keyId
+     * @throws IllegalArgumentException if it can't provide an algorithm based on keyId
      * @return the algorithm name (which is never {@code null})
      */
     String getAlgorithmName(String keyId);

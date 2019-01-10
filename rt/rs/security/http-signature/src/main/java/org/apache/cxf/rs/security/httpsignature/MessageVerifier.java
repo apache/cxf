@@ -31,6 +31,7 @@ import org.apache.cxf.rs.security.httpsignature.provider.AlgorithmProvider;
 import org.apache.cxf.rs.security.httpsignature.provider.PublicKeyProvider;
 import org.apache.cxf.rs.security.httpsignature.provider.SecurityProvider;
 import org.apache.cxf.rs.security.httpsignature.utils.DefaultSignatureConstants;
+import org.apache.cxf.rs.security.httpsignature.utils.SignatureHeaderUtils;
 
 public class MessageVerifier {
     private static final Logger LOG = LogUtils.getL7dLogger(MessageVerifier.class);
@@ -69,8 +70,7 @@ public class MessageVerifier {
     }
 
     public void verifyMessage(Map<String, List<String>> messageHeaders, String method, String uri) {
-        inspectIllegalState();
-
+        SignatureHeaderUtils.inspectMessageHeaders(messageHeaders);
         inspectMissingSignatureHeader(messageHeaders);
 
         inspectMultipleSignatureHeaders(messageHeaders);
@@ -82,18 +82,6 @@ public class MessageVerifier {
                                     method,
                                     uri);
         LOG.fine("Finished signature verification");
-    }
-
-    private void inspectIllegalState() {
-        if (publicKeyProvider == null) {
-            throw new IllegalStateException("public key provider is not set");
-        }
-        if (securityProvider == null) {
-            throw new IllegalStateException("security provider is not set");
-        }
-        if (algorithmProvider == null) {
-            throw new IllegalStateException("algorithm provider is not set");
-        }
     }
 
     private void inspectMultipleSignatureHeaders(Map<String, List<String>> responseHeaders) {

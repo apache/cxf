@@ -86,6 +86,16 @@ public final class SignatureHeaderUtils {
         }
     }
 
+    public static void inspectMessageHeaders(Map<String, List<String>> messageHeaders) {
+        Objects.requireNonNull(messageHeaders);
+
+        if (messageHeaders.isEmpty()) {
+            throw new IllegalStateException("message headers are empty");
+        }
+        messageHeaders.forEach((key, list) -> Objects.requireNonNull(list));
+        messageHeaders.forEach((key, list) -> list.forEach(Objects::requireNonNull));
+    }
+
     private static String concatValues(List<String> values) {
         StringBuilder sb = new StringBuilder();
         for (int x = 0; x < values.size(); x++) {

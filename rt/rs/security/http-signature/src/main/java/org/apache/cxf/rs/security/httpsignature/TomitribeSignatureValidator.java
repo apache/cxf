@@ -21,7 +21,6 @@ package org.apache.cxf.rs.security.httpsignature;
 import java.security.Key;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -36,7 +35,7 @@ import org.apache.cxf.rs.security.httpsignature.utils.SignatureHeaderUtils;
 import org.tomitribe.auth.signatures.Signature;
 import org.tomitribe.auth.signatures.Verifier;
 
-public final class TomitribeSignatureValidator implements SignatureValidator {
+public class TomitribeSignatureValidator implements SignatureValidator {
     private static final Logger LOG = LogUtils.getL7dLogger(TomitribeSignatureValidator.class);
 
     @Override
@@ -49,7 +48,6 @@ public final class TomitribeSignatureValidator implements SignatureValidator {
         Signature signature = extractSignatureFromHeader(messageHeaders.get("Signature").get(0));
 
         String providedAlgorithm = algorithmProvider.getAlgorithmName(signature.getKeyId());
-        Objects.requireNonNull(providedAlgorithm, "provided algorithm is null");
 
         String signatureAlgorithm = signature.getAlgorithm().toString();
         if (!providedAlgorithm.equals(signatureAlgorithm)) {
@@ -57,10 +55,8 @@ public final class TomitribeSignatureValidator implements SignatureValidator {
         }
 
         Key key = publicKeyProvider.getKey(signature.getKeyId());
-        Objects.requireNonNull(key, "provided public key is null");
 
         java.security.Provider provider = securityProvider.getProvider(signature.getKeyId());
-        Objects.requireNonNull(provider, "provided security provider is null");
 
         runVerifier(messageHeaders, key, signature, provider, method, uri);
     }

@@ -25,7 +25,7 @@ public interface PublicKeyProvider {
     /**
      * @param keyId is used as lookup to find the correct configured public key for this keyId
      *              The keyId is sent in the message together with the signature
-     * @throws NullPointerException if it can't provide a public key based on keyId
+     * @throws IllegalArgumentException if it can't provide a public key based on keyId
      * @return the public key (which is never {@code null})
      */
     PublicKey getKey(String keyId);
