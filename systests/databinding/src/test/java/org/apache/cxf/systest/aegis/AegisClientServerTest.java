@@ -25,14 +25,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
 
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.authservice.AuthService;
 import org.apache.cxf.authservice.Authenticate;
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.dynamic.DynamicClientFactory;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
@@ -56,7 +54,6 @@ import static org.junit.Assert.assertTrue;
 
 public class AegisClientServerTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(AegisServer.class);
-    static final Logger LOG = LogUtils.getLogger(AegisClientServerTest.class);
 
     @BeforeClass
     public static void startServers() throws Exception {
