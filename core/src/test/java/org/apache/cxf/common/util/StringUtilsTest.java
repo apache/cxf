@@ -38,12 +38,12 @@ public class StringUtilsTest {
     }
 
     @Test
-    public void testGetFound() throws Exception {
+    public void testGetFirstFound() throws Exception {
         String regex = "velocity-\\d+\\.\\d+\\.jar";
 
-        assertTrue(StringUtils.isEmpty(StringUtils.getFound("velocity-dep-1.4.jar", regex)));
-        assertFalse(StringUtils.isEmpty(StringUtils.getFound("velocity-1.4.jar", regex)));
-        assertTrue(StringUtils.isEmpty(StringUtils.getFound(null, regex)));
+        assertTrue(StringUtils.isEmpty(StringUtils.getFirstFound("velocity-dep-1.4.jar", regex)));
+        assertFalse(StringUtils.isEmpty(StringUtils.getFirstFound("velocity-1.4.jar", regex)));
+        assertTrue(StringUtils.isEmpty(StringUtils.getFirstFound(null, regex)));
     }
 
     @Test

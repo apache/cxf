@@ -24,7 +24,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -52,7 +51,7 @@ public final class StringUtils {
         }
         return true;
     }
-    
+
     public static Predicate<String> notEmpty() {
         return NOT_EMPTY;
     }
@@ -72,30 +71,21 @@ public final class StringUtils {
         return str1;
     }
 
-    public static List<String> getFound(String contents, String regex) {
+    public static String getFirstFound(String contents, String regex) {
         if (isEmpty(regex) || isEmpty(contents)) {
             return null;
         }
-        List<String> results = new ArrayList<>();
         Pattern pattern = Pattern.compile(regex, Pattern.UNICODE_CASE);
         Matcher matcher = pattern.matcher(contents);
 
-        while (matcher.find()) {
+        if (matcher.find()) {
             if (matcher.groupCount() > 0) {
-                results.add(matcher.group(1));
+                return matcher.group(1);
             } else {
-                results.add(matcher.group());
+                return matcher.group();
             }
         }
-        return results;
-    }
-
-    public static String getFirstFound(String contents, String regex) {
-        List<String> founds = getFound(contents, regex);
-        if (isEmpty(founds)) {
-            return null;
-        }
-        return founds.get(0);
+        return null;
     }
 
     public static String addDefaultPortIfMissing(String urlString) {
