@@ -363,36 +363,41 @@ public final class FileUtils {
         return rtn;
     }
 
-    public static List<File> getFiles(File dir, final String pattern) {
-        return getFiles(dir, pattern, null);
-    }
-    public static List<File> getFilesRecurse(File dir, final String pattern) {
-        return getFilesRecurse(dir, pattern, null);
+    public static List<File> getFilesUsingSuffix(File dir, final String suffix) {
+        return getFilesRecurseUsingSuffix(dir, suffix, false, new ArrayList<>());
     }
 
-    public static List<File> getFiles(File dir, final String pattern, File exclude) {
-        return getFilesRecurse(dir, Pattern.compile(pattern), exclude, false, new ArrayList<>());
+    public static List<File> getFilesRecurseUsingSuffix(File dir, final String suffix) {
+        return getFilesRecurseUsingSuffix(dir, suffix, true, new ArrayList<>());
     }
-    public static List<File> getFilesRecurse(File dir, final String pattern, File exclude) {
-        return getFilesRecurse(dir, Pattern.compile(pattern), exclude, true, new ArrayList<>());
-    }
-    private static List<File> getFilesRecurse(File dir,
-                                              Pattern pattern,
-                                              File exclude, boolean rec,
-                                              List<File> fileList) {
+
+    private static List<File> getFilesRecurseUsingSuffix(File dir, final String suffix,
+                                                        boolean rec, List<File> fileList) {
         File[] files = dir.listFiles();
         if (files != null) {
-            for (File file : dir.listFiles()) {
-                if (file.equals(exclude)) {
-                    continue;
-                }
+            int suffixLength = suffix.length();
+            for (File file : files) {
                 if (file.isDirectory() && rec) {
-                    getFilesRecurse(file, pattern, exclude, rec, fileList);
+                    getFilesRecurseUsingSuffix(file, suffix, rec, fileList);
                 } else {
-                    Matcher m = pattern.matcher(file.getName());
-                    if (m.matches()) {
+                    if (file.getName().endsWith(suffix) && file.getName().length() > suffixLength) {
                         fileList.add(file);
                     }
+                }
+            }
+        }
+        return fileList;
+    }
+
+    public static List<File> getFiles(File dir, final String pattern) {
+        List<File> fileList = new ArrayList<>();
+        File[] files = dir.listFiles();
+        if (files != null) {
+            Pattern p = Pattern.compile(pattern);
+            for (File file : files) {
+                Matcher m = p.matcher(file.getName());
+                if (m.matches()) {
+                    fileList.add(file);
                 }
             }
         }

@@ -71,7 +71,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
         container.execute();
 
         assertNotNull(output.list());
-        List<File> files = FileUtils.getFilesRecurse(output, ".+\\.class" + "$");
+        List<File> files = FileUtils.getFilesRecurseUsingSuffix(output, ".class");
         assertEquals(3, files.size());
         assertTrue(checkContains(files, "application" + ".Resource.class"));
         assertTrue(checkContains(files, "custom" + ".TestCompositeObject.class"));
@@ -121,7 +121,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
         assertNotNull(output.list());
 
-        List<File> files = FileUtils.getFilesRecurse(output, ".+\\." + "class" + "$");
+        List<File> files = FileUtils.getFilesRecurseUsingSuffix(output, ".class");
         assertEquals(1, files.size());
     }
 
@@ -165,7 +165,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
         assertNotNull(output.list());
 
-        List<File> javaFiles = FileUtils.getFilesRecurse(output, ".+\\." + "java" + "$");
+        List<File> javaFiles = FileUtils.getFilesRecurseUsingSuffix(output, ".java");
         assertEquals(2, javaFiles.size());
         for (File f : javaFiles) {
             if (!f.getName().endsWith("Impl.java")) {
@@ -187,7 +187,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
             for (String className : cc.getServiceClassNames().values()) {
                 final Class<?> generatedClass = loader.loadClass(className);
                 for (Map.Entry<String, Class<?>[]> entry : methods.entrySet()) {
-                    Method m; 
+                    Method m;
                     try {
                         m = generatedClass.getMethod(entry.getKey(), String.class);
                     } catch (NoSuchMethodException e) {
@@ -252,11 +252,11 @@ public class JAXRSContainerTest extends ProcessorTestBase {
         container.execute();
 
         assertNotNull(output.list());
-        List<File> schemafiles = FileUtils.getFilesRecurse(output, ".+\\." + "java" + "$");
+        List<File> schemafiles = FileUtils.getFilesRecurseUsingSuffix(output, ".java");
         assertEquals(10, schemafiles.size());
         doVerifyTypesWithSuffix(schemafiles, "superbooks", "java");
-        
-        List<File> classfiles = FileUtils.getFilesRecurse(output, ".+\\." + "class" + "$");
+
+        List<File> classfiles = FileUtils.getFilesRecurseUsingSuffix(output, ".class");
         assertEquals(10, classfiles.size());
         doVerifyTypesWithSuffix(classfiles, "superbooks", "class");
     }
@@ -320,7 +320,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
         assertNotNull(output.list());
 
-        List<File> files = FileUtils.getFilesRecurse(output, ".+\\." + "class" + "$");
+        List<File> files = FileUtils.getFilesRecurseUsingSuffix(output, ".class");
         assertEquals(8, files.size());
         assertTrue(checkContains(files, "org.apache.cxf.jaxrs.model.wadl" + ".BookStore.class"));
         assertTrue(checkContains(files, "org.apache.cxf.jaxrs.model.wadl" + ".PATCH.class"));
@@ -348,7 +348,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
         assertNotNull(output.list());
 
-        List<File> files = FileUtils.getFilesRecurse(output, ".+\\." + "class" + "$");
+        List<File> files = FileUtils.getFilesRecurseUsingSuffix(output, ".class");
         assertEquals(4, files.size());
         assertTrue(checkContains(files, "application" + ".BookstoreResource.class"));
         assertTrue(checkContains(files, "superbooks" + ".Book.class"));
@@ -376,7 +376,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
         assertNotNull(output.list());
 
-        List<File> files = FileUtils.getFilesRecurse(output, ".+\\." + "class" + "$");
+        List<File> files = FileUtils.getFilesRecurseUsingSuffix(output, ".class");
         assertEquals(1, files.size());
         assertTrue(checkContains(files, "application" + ".BookstoreResource.class"));
     }
@@ -395,7 +395,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
         assertNotNull(output.list());
 
-        List<File> files = FileUtils.getFilesRecurse(output, ".+\\." + "class" + "$");
+        List<File> files = FileUtils.getFilesRecurseUsingSuffix(output, ".class");
         assertEquals(2, files.size());
         assertTrue(checkContains(files, "application.Test1.class"));
         assertTrue(checkContains(files, "application.Test2.class"));
@@ -470,7 +470,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
         assertNotNull(output.list());
 
-        List<File> files = FileUtils.getFilesRecurse(output, ".+\\." + "class" + "$");
+        List<File> files = FileUtils.getFilesRecurseUsingSuffix(output, ".class");
         assertEquals(1, files.size());
         assertTrue(checkContains(files, "application.Resource.class"));
         @SuppressWarnings("resource")
@@ -519,7 +519,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
         assertNotNull(output.list());
 
-        List<File> files = FileUtils.getFilesRecurse(output, ".+\\." + "class" + "$");
+        List<File> files = FileUtils.getFilesRecurseUsingSuffix(output, ".class");
         assertEquals(4, files.size());
         assertTrue(checkContains(files, "application.Resource.class"));
         @SuppressWarnings("resource")
@@ -620,12 +620,12 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
         assertNotNull(output.list());
 
-        List<File> javaFiles = FileUtils.getFilesRecurse(output, ".+\\." + "java" + "$");
+        List<File> javaFiles = FileUtils.getFilesRecurseUsingSuffix(output, ".java");
         assertEquals(2, javaFiles.size());
         assertTrue(checkContains(javaFiles, "application.CustomResource.java"));
         assertTrue(checkContains(javaFiles, "application.Theid.java"));
 
-        List<File> classFiles = FileUtils.getFilesRecurse(output, ".+\\." + "class" + "$");
+        List<File> classFiles = FileUtils.getFilesRecurseUsingSuffix(output, ".class");
         assertEquals(2, classFiles.size());
         assertTrue(checkContains(classFiles, "application.CustomResource.class"));
         assertTrue(checkContains(classFiles, "application.Theid.class"));
@@ -645,11 +645,11 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
         assertNotNull(output.list());
 
-        List<File> javaFiles = FileUtils.getFilesRecurse(output, ".+\\." + "java" + "$");
+        List<File> javaFiles = FileUtils.getFilesRecurseUsingSuffix(output, ".java");
         assertEquals(2, javaFiles.size());
         assertTrue(checkContains(javaFiles, "application.BookstoreResource.java"));
         assertTrue(checkContains(javaFiles, "application.BooksResource.java"));
-        List<File> classFiles = FileUtils.getFilesRecurse(output, ".+\\." + "class" + "$");
+        List<File> classFiles = FileUtils.getFilesRecurseUsingSuffix(output, ".class");
         assertEquals(2, classFiles.size());
         assertTrue(checkContains(classFiles, "application.BookstoreResource.class"));
         assertTrue(checkContains(classFiles, "application.BooksResource.class"));
@@ -670,10 +670,10 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
         assertNotNull(output.list());
 
-        List<File> javaFiles = FileUtils.getFilesRecurse(output, ".+\\." + "java" + "$");
+        List<File> javaFiles = FileUtils.getFilesRecurseUsingSuffix(output, ".java");
         assertEquals(1, javaFiles.size());
         assertTrue(checkContains(javaFiles, "application.TestRsResource.java"));
-        List<File> classFiles = FileUtils.getFilesRecurse(output, ".+\\." + "class" + "$");
+        List<File> classFiles = FileUtils.getFilesRecurseUsingSuffix(output, ".class");
         assertEquals(1, classFiles.size());
         assertTrue(checkContains(classFiles, "application.TestRsResource.class"));
     }
@@ -690,13 +690,13 @@ public class JAXRSContainerTest extends ProcessorTestBase {
         container.setContext(context);
         container.execute();
 
-        List<File> javaFiles = FileUtils.getFilesRecurse(output, ".+\\." + "java" + "$");
+        List<File> javaFiles = FileUtils.getFilesRecurseUsingSuffix(output, ".java");
         assertEquals(4, javaFiles.size());
         assertTrue(checkContains(javaFiles, "application.Resource.java"));
         assertTrue(checkContains(javaFiles, "com.example.test.ObjectFactory.java"));
         assertTrue(checkContains(javaFiles, "com.example.test.package-info.java"));
         assertTrue(checkContains(javaFiles, "com.example.test.TestCompositeObject.java"));
-        List<File> classFiles = FileUtils.getFilesRecurse(output, ".+\\." + "class" + "$");
+        List<File> classFiles = FileUtils.getFilesRecurseUsingSuffix(output, ".class");
         assertEquals(4, classFiles.size());
         assertTrue(checkContains(classFiles, "application.Resource.class"));
         assertTrue(checkContains(classFiles, "com.example.test.ObjectFactory.class"));
@@ -722,11 +722,11 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
         assertNotNull(output.list());
 
-        List<File> javaFiles = FileUtils.getFilesRecurse(output, ".+\\." + "java" + "$");
+        List<File> javaFiles = FileUtils.getFilesRecurseUsingSuffix(output, ".java");
         assertEquals(1, javaFiles.size());
         assertTrue(checkContains(javaFiles, "application.CustomResource.java"));
 
-        List<File> classFiles = FileUtils.getFilesRecurse(output, ".+\\." + "class" + "$");
+        List<File> classFiles = FileUtils.getFilesRecurseUsingSuffix(output, ".class");
         assertEquals(1, classFiles.size());
         assertTrue(checkContains(classFiles, "application.CustomResource.class"));
     }
@@ -835,7 +835,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
     private void verifyFiles(String ext, boolean subresourceExpected, boolean interfacesAndImpl,
                              String schemaPackage, String resourcePackage, int expectedCount,
                              boolean enumTypeExpected) {
-        List<File> files = FileUtils.getFilesRecurse(output, ".+\\." + ext + "$");
+        List<File> files = FileUtils.getFilesRecurseUsingSuffix(output, "." + ext);
         int offset = enumTypeExpected ? 1 : 2;
         int size = interfacesAndImpl ? expectedCount : expectedCount - offset;
         if (!subresourceExpected) {
@@ -858,7 +858,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
     }
 
     private void verifyTypes(String schemaPackage, String ext, boolean enumTypeExpected) {
-        List<File> files = FileUtils.getFilesRecurse(output, ".+\\." + ext + "$");
+        List<File> files = FileUtils.getFilesRecurseUsingSuffix(output, "." + ext);
         assertEquals(enumTypeExpected ? 6 : 5, files.size());
         doVerifyTypes(files, schemaPackage, ext);
     }

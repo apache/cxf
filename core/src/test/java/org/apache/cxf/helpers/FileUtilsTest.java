@@ -19,6 +19,8 @@
 package org.apache.cxf.helpers;
 
 import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -27,6 +29,7 @@ import java.util.Optional;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class FileUtilsTest {
@@ -60,5 +63,19 @@ public class FileUtilsTest {
 
         List<String> lines = FileUtils.readLines(p.get().toFile());
         assertTrue(!lines.isEmpty());
+    }
+
+    @Test
+    public void testGetFiles() throws URISyntaxException {
+        URL resource = FileUtilsTest.class.getResource("FileUtilsTest.class");
+        File directory = Paths.get(resource.toURI()).getParent().toFile();
+        assertTrue(directory.exists());
+
+        List<File> foundFiles = FileUtils.getFilesUsingSuffix(directory, ".class");
+        assertTrue(foundFiles.size() > 0);
+
+        List<File> foundFiles2 = FileUtils.getFiles(directory, ".*\\.class$");
+
+        assertEquals(foundFiles, foundFiles2);
     }
 }

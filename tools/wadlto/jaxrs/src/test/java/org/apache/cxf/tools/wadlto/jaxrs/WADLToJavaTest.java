@@ -135,7 +135,7 @@ public class WADLToJavaTest extends ProcessorTestBase {
 
     private void verifyFiles(String ext, boolean subresourceExpected, boolean interfacesAndImpl,
                              String schemaPackage, String resourcePackage) {
-        List<File> files = FileUtils.getFilesRecurse(output, ".+\\." + ext + "$");
+        List<File> files = FileUtils.getFilesRecurseUsingSuffix(output, "." + ext);
         int size = interfacesAndImpl ? 11 : 10;
         if (!subresourceExpected) {
             size--;

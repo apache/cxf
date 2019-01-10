@@ -385,7 +385,7 @@ public class DynamicClientFactory {
             throw new RuntimeException(ex);
         }
 
-        List<File> srcFiles = FileUtils.getFilesRecurse(src, ".+\\.java$");
+        List<File> srcFiles = FileUtils.getFilesRecurseUsingSuffix(src, ".java");
         if (!srcFiles.isEmpty() && !compileJavaSrc(classPath.toString(), srcFiles, classes.toString())) {
             LOG.log(Level.SEVERE, new Message("COULD_NOT_COMPILE_SRC", LOG, wsdlUrl).toString());
         }
