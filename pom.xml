@@ -683,6 +683,12 @@
                             <requireMavenVersion>
                                 <version>3.1</version>
                             </requireMavenVersion>
+                            <bannedDependencies>
+                                <excludes>
+                                    <exclude>javax.ws.rs:javax.ws.rs-api</exclude>
+                                    <exclude>javax.xml.bind:jaxb-api</exclude>
+                                </excludes>
+                            </bannedDependencies>
                         </rules>
                     </configuration>
                 </plugin>
