@@ -170,11 +170,12 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         File classFile = new java.io.File(output.getCanonicalPath() + "/classes");
         classFile.mkdir();
 
-        String java9PlusFolder = output.getParent() + "/java9";
-        System.setProperty("java.class.path", getClassPath() + classFile.getCanonicalPath()
-            + File.separatorChar + ":" + java9PlusFolder + "/jaxb-api-2.3.0.jar"
-            + ":" + java9PlusFolder + "/jaxws-api-2.3.0.jar"
-            + ":" + java9PlusFolder + "/geronimo-ws-metadata_2.0_spec-1.1.3.jar");
+        if (JavaUtils.isJava9Compatible()) {
+            System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
+            String java9PlusFolder = output.getParent() + java.io.File.separator + "java9";
+            System.setProperty("java.class.path", System.getProperty("java.class.path")
+                               + java.io.File.pathSeparator + java9PlusFolder + java.io.File.separator + "*");
+        }
 
         env.put(ToolConstants.CFG_COMPILE, ToolConstants.CFG_COMPILE);
         env.put(ToolConstants.CFG_CLASSDIR, output.getCanonicalPath() + "/classes");
