@@ -118,6 +118,10 @@
                     <artifactId>jaxws-api</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>javax.xml.bind</groupId>
+                    <artifactId>jaxb-api</artifactId>
+                </exclusion>
+                <exclusion>
                     <groupId>com.sun.xml.messaging.saaj</groupId>
                     <artifactId>saaj-impl</artifactId>
                 </exclusion>
