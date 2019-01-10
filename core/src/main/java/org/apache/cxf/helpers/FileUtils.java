@@ -21,13 +21,13 @@ package org.apache.cxf.helpers;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -401,16 +401,8 @@ public final class FileUtils {
 
     public static List<String> readLines(File file) throws Exception {
         if (!file.exists()) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
-        List<String> results = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line = reader.readLine();
-            while (line != null) {
-                results.add(line);
-                line = reader.readLine();
-            }
-        }
-        return results;
+        return Files.readAllLines(file.toPath());
     }
 }

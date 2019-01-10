@@ -18,7 +18,12 @@
  */
 package org.apache.cxf.helpers;
 
-
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
 
 import org.junit.Test;
 
@@ -39,5 +44,21 @@ public class FileUtilsTest {
         } finally {
             System.setProperty("java.io.tmpdir", originaltmpdir);
         }
+    }
+
+    @Test
+    public void testReadLines() throws Exception {
+        String basedir = System.getProperty("basedir");
+        if (basedir == null) {
+            basedir = new File(".").getCanonicalPath();
+        }
+
+        Optional<Path> p =
+            Files.find(Paths.get(basedir), 20, (path, attrs) -> path.getFileName().endsWith("FileUtilsTest.java"))
+                .findFirst();
+        assertTrue(p.isPresent());
+
+        List<String> lines = FileUtils.readLines(p.get().toFile());
+        assertTrue(!lines.isEmpty());
     }
 }
