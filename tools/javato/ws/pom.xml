@@ -229,8 +229,8 @@
                                             <outputDirectory>${project.basedir}/target/java9</outputDirectory>
                                         </artifactItem>
                                         <artifactItem>
-                                            <groupId>javax.xml.ws</groupId>
-                                            <artifactId>jaxws-api</artifactId>
+                                            <groupId>jakarta.xml.ws</groupId>
+                                            <artifactId>jakarta.xml.ws-api</artifactId>
                                             <type>jar</type>
                                             <overWrite>false</overWrite>
                                             <outputDirectory>${project.basedir}/target/java9</outputDirectory>
