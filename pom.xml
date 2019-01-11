@@ -687,6 +687,7 @@
                                 <excludes>
                                     <exclude>javax.ws.rs:javax.ws.rs-api</exclude>
                                     <exclude>javax.xml.bind:jaxb-api</exclude>
+                                    <exclude>com.sun.xml.bind:jaxb-core</exclude>
                                 </excludes>
                             </bannedDependencies>
                         </rules>
