@@ -81,7 +81,7 @@
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>com.sun.xml.bind</groupId>
+                    <groupId>org.glassfish.jaxb</groupId>
                     <artifactId>jaxb-xjc</artifactId>
                 </exclusion>
             </exclusions>

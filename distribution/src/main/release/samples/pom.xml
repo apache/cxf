@@ -230,8 +230,8 @@
             </activation>
             <dependencies>
                 <dependency>
-                    <groupId>javax.xml.bind</groupId>
-                    <artifactId>jaxb-api</artifactId>
+                    <groupId>jakarta.xml.bind</groupId>
+                    <artifactId>jakarta.xml.bind-api</artifactId>
                     <version>${cxf.jaxb.version}</version>
                 </dependency>
                 <dependency>
@@ -265,17 +265,12 @@
                     <version>1.1.1</version>
                 </dependency>
                 <dependency>
-                    <groupId>com.sun.xml.bind</groupId>
-                    <artifactId>jaxb-impl</artifactId>
+                    <groupId>org.glassfish.jaxb</groupId>
+                    <artifactId>jaxb-runtime</artifactId>
                     <version>${cxf.jaxb.version}</version>
                 </dependency>
                 <dependency>
-                    <groupId>com.sun.xml.bind</groupId>
-                    <artifactId>jaxb-core</artifactId>
-                    <version>${cxf.jaxb.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>com.sun.xml.bind</groupId>
+                    <groupId>org.glassfish.jaxb</groupId>
                     <artifactId>jaxb-xjc</artifactId>
                     <version>${cxf.jaxb.version}</version>
                 </dependency>

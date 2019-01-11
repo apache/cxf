@@ -199,8 +199,8 @@
                 </executions>
                 <dependencies>
                    <dependency>
-                       <groupId>javax.xml.bind</groupId>
-                       <artifactId>jaxb-api</artifactId>
+                       <groupId>jakarta.xml.bind</groupId>
+                       <artifactId>jakarta.xml.bind-api</artifactId>
                        <version>${cxf.jaxb.version}</version>
                     </dependency>
                 </dependencies>
