@@ -29,7 +29,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -253,9 +252,6 @@ public final class FileUtils {
     }
     public static void delete(File f, boolean inShutdown) {
         if (!f.delete()) {
-            if (isWindows()) {
-                System.gc();
-            }
             try {
                 Thread.sleep(RETRY_SLEEP_MILLIS);
             } catch (InterruptedException ex) {
@@ -265,11 +261,6 @@ public final class FileUtils {
                 f.deleteOnExit();
             }
         }
-    }
-
-    private static boolean isWindows() {
-        String osName = SystemPropertyAction.getProperty("os.name").toLowerCase(Locale.US);
-        return osName.indexOf("windows") > -1;
     }
 
     public static File createTempFile(String prefix, String suffix) throws IOException {
