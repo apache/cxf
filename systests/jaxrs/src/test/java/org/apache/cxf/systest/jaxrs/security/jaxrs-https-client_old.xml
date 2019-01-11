@@ -23,7 +23,7 @@ under the License.
 	xmlns:jaxrs="http://cxf.apache.org/jaxrs" 
 	xmlns:cxf="http://cxf.apache.org/core" 
 	xmlns:sec="http://cxf.apache.org/configuration/security" 
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 	                    http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd 
 	                    http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd 
 	                    http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd

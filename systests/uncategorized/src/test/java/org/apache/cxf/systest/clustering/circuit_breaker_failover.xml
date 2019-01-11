@@ -17,7 +17,11 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:clustering="http://cxf.apache.org/clustering" xmlns:http="http://cxf.apache.org/transports/http/configuration" 
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:jaxws="http://cxf.apache.org/jaxws"
+    xmlns:clustering="http://cxf.apache.org/clustering"
+    xmlns:http="http://cxf.apache.org/transports/http/configuration" 
 xsi:schemaLocation="http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
                     http://cxf.apache.org/clustering http://cxf.apache.org/schemas/clustering.xsd
                     http://cxf.apache.org/transports/http/configuration
