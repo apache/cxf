@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.osgi.itests.jaxrs;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.osgi.itests.AbstractServerActivator;
@@ -26,10 +28,10 @@ public class JaxRsTestActivator extends AbstractServerActivator {
 
     @Override
     protected Server createServer() {
-//        Bus bus = BusFactory.newInstance().createBus();
-//        bus.setExtension(JaxRsTestActivator.class.getClassLoader(), ClassLoader.class);
+        Bus bus = BusFactory.newInstance().createBus();
+        bus.setExtension(JaxRsTestActivator.class.getClassLoader(), ClassLoader.class);
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
-//        sf.setBus(bus);
+        sf.setBus(bus);
         sf.setResourceClasses(BookStore.class);
         sf.setAddress("/jaxrs");
         return sf.create();
