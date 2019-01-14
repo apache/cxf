@@ -117,7 +117,7 @@ public final class ClientNonSpring {
 
     private static TrustManager[] getTrustManagers(KeyStore trustStore)
         throws NoSuchAlgorithmException, KeyStoreException {
-        String alg = KeyManagerFactory.getDefaultAlgorithm();
+        String alg = TrustManagerFactory.getDefaultAlgorithm();
         TrustManagerFactory fac = TrustManagerFactory.getInstance(alg);
         fac.init(trustStore);
         return fac.getTrustManagers();

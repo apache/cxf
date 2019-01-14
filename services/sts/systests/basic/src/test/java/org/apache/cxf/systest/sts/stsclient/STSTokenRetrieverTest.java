@@ -222,7 +222,7 @@ public class STSTokenRetrieverTest extends AbstractBusClientServerTestBase {
         KeyStore keyStore = loadClientKeystore();
         trustManagerFactory.init(keyStore);
         TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
-        SSLContext sc = SSLContext.getInstance("SSL");
+        SSLContext sc = SSLContext.getInstance("TLS");
         sc.init(null, trustManagers, new java.security.SecureRandom());
         HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 

@@ -291,7 +291,7 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
             ts.load(trustStore, "password".toCharArray());
         }
 
-        TrustManagerFactory tmf = TrustManagerFactory.getInstance("PKIX");
+        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         tmf.init(ts);
 
         KeyStore ks = KeyStore.getInstance("JKS");
@@ -300,7 +300,7 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
             ks.load(keyStore, "password".toCharArray());
         }
 
-        KeyManagerFactory kmf = KeyManagerFactory.getInstance("PKIX");
+        KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
         kmf.init(ks, "password".toCharArray());
 
         sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), new java.security.SecureRandom());
@@ -441,7 +441,7 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
             ts.load(trustStore, "password".toCharArray());
         }
 
-        TrustManagerFactory tmf = TrustManagerFactory.getInstance("PKIX");
+        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         tmf.init(ts);
 
         KeyStore ks = KeyStore.getInstance("JKS");
@@ -450,7 +450,7 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
             ks.load(keyStore, "password".toCharArray());
         }
 
-        KeyManagerFactory kmf = KeyManagerFactory.getInstance("PKIX");
+        KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
         kmf.init(ks, "password".toCharArray());
 
         TLSClientParameters tlsParams = new TLSClientParameters();
@@ -486,7 +486,7 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
             ts.load(trustStore, "password".toCharArray());
         }
 
-        TrustManagerFactory tmf = TrustManagerFactory.getInstance("PKIX");
+        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         tmf.init(ts);
 
         KeyStore ks = KeyStore.getInstance("JKS");
@@ -495,7 +495,7 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
             ks.load(keyStore, "password".toCharArray());
         }
 
-        KeyManagerFactory kmf = KeyManagerFactory.getInstance("PKIX");
+        KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
         kmf.init(ks, "password".toCharArray());
 
         SSLContext sslContext = SSLContext.getInstance("TLS");

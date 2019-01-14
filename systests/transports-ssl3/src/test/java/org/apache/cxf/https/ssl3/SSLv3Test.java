@@ -97,7 +97,7 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
             trustedCertStore.load(keystore, null);
         }
 
-        TrustManagerFactory tmf = TrustManagerFactory.getInstance("PKIX");
+        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         tmf.init(trustedCertStore);
         TrustManager[] trustManagers = tmf.getTrustManagers();
 
@@ -144,7 +144,7 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
             trustedCertStore.load(keystore, null);
         }
 
-        TrustManagerFactory tmf = TrustManagerFactory.getInstance("PKIX");
+        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         tmf.init(trustedCertStore);
         TrustManager[] trustManagers = tmf.getTrustManagers();
 
