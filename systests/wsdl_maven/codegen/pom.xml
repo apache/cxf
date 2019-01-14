@@ -152,6 +152,12 @@
             <groupId>org.apache.cxf.xjc-utils</groupId>
             <artifactId>cxf-xjc-runtime</artifactId>
             <version>${cxf.xjc-utils.version}</version>
+            <exclusions>
+                <exclusion><!-- TODO can be removed with next cxf-xjc-runtime release -->
+                    <groupId>javax.xml.ws</groupId>
+                    <artifactId>jaxws-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf.systests.wsdl_maven</groupId>
