@@ -215,8 +215,8 @@
                                 <configuration>
                                     <artifactItems>
                                         <artifactItem>
-                                            <groupId>org.apache.geronimo.specs</groupId>
-                                            <artifactId>geronimo-ws-metadata_2.0_spec</artifactId>
+                                            <groupId>jakarta.jws</groupId>
+                                            <artifactId>jakarta.jws-api</artifactId>
                                             <type>jar</type>
                                             <overWrite>false</overWrite>
                                             <outputDirectory>${project.basedir}/target/java9</outputDirectory>
