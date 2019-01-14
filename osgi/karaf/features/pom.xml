@@ -160,7 +160,7 @@
                     <dependency>
                         <groupId>org.glassfish.jaxb</groupId>
                         <artifactId>jaxb-runtime</artifactId>
-                        <version>${cxf.jaxb.impl.version}</version>
+                        <version>${cxf.jaxb.runtime.version}</version>
                     </dependency>
                 </dependencies>
                 <executions>

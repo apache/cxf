@@ -223,7 +223,7 @@
         <profile>
 	    <id>java9-plus</id>
 	    <properties>
-                <cxf.jaxb.version>2.3.0</cxf.jaxb.version>
+                <cxf.jaxb.version>2.3.2</cxf.jaxb.version>
 	    </properties>
 	    <activation>
         	<jdk>[9,)</jdk>
