@@ -32,6 +32,9 @@
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.xkms.x509.handlers</cxf.module.name>
+        <cxf.osgi.import>
+            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}"
+        </cxf.osgi.import>
     </properties>
     <dependencies>
         <dependency>

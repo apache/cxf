@@ -34,6 +34,7 @@
         <cxf.module.name>org.apache.cxf.xkms.common</cxf.module.name>
         <cxf.osgi.import>
             javax.xml.ws*;version="${cxf.osgi.javax.xml.ws.version}",
+            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}"
         </cxf.osgi.import>
     </properties>
     <dependencies>

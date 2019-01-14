@@ -36,7 +36,8 @@
             javax.xml.soap;version="${cxf.osgi.saaj.version}",
             javax.xml.ws*;version="${cxf.osgi.javax.xml.ws.version}",
             javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
-            javax.annotation*;version="${cxf.osgi.javax.annotation.version}"
+            javax.annotation*;version="${cxf.osgi.javax.annotation.version}",
+            javax.activation;version="${cxf.osgi.javax.activation.version}"
         </cxf.osgi.import>
     </properties>
     <dependencies>

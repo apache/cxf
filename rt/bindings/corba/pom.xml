@@ -36,7 +36,8 @@
         <cxf.osgi.import>
             org.objectweb.asm*;version="${cxf.osgi.asm.version}",
             javax.xml.ws*;version="${cxf.osgi.javax.xml.ws.version}",
-            javax.annotation*;version="${cxf.osgi.javax.annotation.version}"
+            javax.annotation*;version="${cxf.osgi.javax.annotation.version}",
+            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}"
         </cxf.osgi.import>
     </properties>
     <dependencies>

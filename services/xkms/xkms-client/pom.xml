@@ -58,6 +58,7 @@
                     <instructions>
                         <Import-Package>
                             javax.xml.ws*;version="${cxf.osgi.javax.xml.ws.version}", <!-- To workaround issue with BindingProvider interface not visible -->
+                            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
                             *
                         </Import-Package>
                         <Export-Package>
