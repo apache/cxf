@@ -327,7 +327,8 @@ public class WadlGenerator implements ContainerRequestFilter {
 
         JAXBContext jaxbContext = null;
         if (useJaxbContextForQnames && !allTypes.isEmpty()) {
-            jaxbContext = ResourceUtils.createJaxbContext(new HashSet<>(allTypes), null, jaxbContextProperties);
+            jaxbContext = org.apache.cxf.jaxrs.utils.JAXBUtils
+                    .createJaxbContext(new HashSet<>(allTypes), null, jaxbContextProperties);
             if (jaxbContext == null) {
                 LOG.warning("JAXB Context is null: possibly due to one of input classes being not accepted");
             }

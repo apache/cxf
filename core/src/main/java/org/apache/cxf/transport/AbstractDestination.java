@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import org.apache.cxf.Bus;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 
@@ -95,7 +96,7 @@ public abstract class AbstractDestination
     protected abstract class AbstractBackChannelConduit extends AbstractConduit {
 
         public AbstractBackChannelConduit() {
-            super(EndpointReferenceUtils.getAnonymousEndpointReference());
+            super(getAnonymousEndpointReference());
         }
 
         /**
@@ -110,6 +111,15 @@ public abstract class AbstractDestination
         protected Logger getLogger() {
             return AbstractDestination.this.getLogger();
         }
+    }
+
+    // EndpointReferenceUtils#getAnonymousEndpointReference would load jaxb, avoid it
+    private static EndpointReferenceType getAnonymousEndpointReference() {
+        final EndpointReferenceType reference = new EndpointReferenceType();
+        final AttributedURIType a = new AttributedURIType();
+        a.setValue(EndpointReferenceUtils.ANONYMOUS_ADDRESS);
+        reference.setAddress(a);
+        return reference;
     }
 
     /**

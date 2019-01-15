@@ -43,6 +43,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
+import org.apache.cxf.ws.addressing.ContextJAXBUtils;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
@@ -96,7 +97,7 @@ public class MAPCodecTest {
         expectedNamespaceURI = null;
         mimeHeaders = null;
         correlatedExchange = null;
-        ContextUtils.setJAXBContext(null);
+        ContextJAXBUtils.setJAXBContext(null);
         nonReplyRelationship = null;
     }
 
@@ -315,7 +316,7 @@ public class MAPCodecTest {
         });
         List<Header> headers = message.getHeaders();
         JAXBContext jaxbContext = control.createMock(JAXBContext.class);
-        ContextUtils.setJAXBContext(jaxbContext);
+        ContextJAXBUtils.setJAXBContext(jaxbContext);
         Names200408.setJAXBContext(jaxbContext);
         Names200403.setJAXBContext(jaxbContext);
         if (outbound) {
@@ -350,7 +351,7 @@ public class MAPCodecTest {
     private void setUpDecode(SoapMessage message, List<Header> headers, AddressingProperties maps,
                              String mapProperty, boolean requestor) throws Exception {
         Unmarshaller unmarshaller = control.createMock(Unmarshaller.class);
-        ContextUtils.getJAXBContext().createUnmarshaller();
+        ContextJAXBUtils.getJAXBContext().createUnmarshaller();
         EasyMock.expectLastCall().andReturn(unmarshaller);
         String uri = maps.getNamespaceURI();
         boolean exposedAsNative = Names.WSA_NAMESPACE_NAME.equals(uri);

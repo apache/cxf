@@ -482,7 +482,7 @@ public class VersionTransformer {
     public static JAXBContext getExposedJAXBContext(String exposedURI) throws JAXBException {
 
         return NATIVE_VERSION.equals(exposedURI)
-            ? ContextUtils.getJAXBContext() : Names200408.WSA_NAMESPACE_NAME.equals(exposedURI) ? Names200408
+            ? ContextJAXBUtils.getJAXBContext() : Names200408.WSA_NAMESPACE_NAME.equals(exposedURI) ? Names200408
                 .getJAXBContext() : Names200403.WSA_NAMESPACE_NAME.equals(exposedURI) ? Names200403
                 .getJAXBContext() : null;
     }

@@ -752,7 +752,7 @@ public final class EndpointReferenceUtils {
      * @return EndpointReferenceType - the endpoint reference
      */
     public static EndpointReferenceType getAnonymousEndpointReference() {
-        EndpointReferenceType reference = new EndpointReferenceType();
+        final EndpointReferenceType reference = new EndpointReferenceType();
         setAddress(reference, ANONYMOUS_ADDRESS);
         return reference;
     }

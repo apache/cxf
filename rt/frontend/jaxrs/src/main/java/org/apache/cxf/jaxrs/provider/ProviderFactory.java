@@ -139,22 +139,33 @@ public abstract class ProviderFactory {
         return new ProviderCache(checkAll);
     }
     protected static void initFactory(ProviderFactory factory) {
+        // ensure to not load providers not available in a module environment if not needed
         factory.setProviders(false,
                              false,
                      new BinaryDataProvider<Object>(),
                      new SourceProvider<Object>(),
-                     new DataSourceProvider<Object>(),
+                     tryCreateInstance("org.apache.cxf.jaxrs.provider.DataSourceProvider"),
                      new FormEncodingProvider<Object>(),
                      new StringTextProvider(),
                      new PrimitiveTextProvider<Object>(),
-                     new JAXBElementProvider<Object>(),
-                     new JAXBElementTypedProvider(),
-                     new MultipartProvider());
+                     tryCreateInstance(JAXB_PROVIDER_NAME),
+                     tryCreateInstance("org.apache.cxf.jaxrs.provider.JAXBElementTypedProvider"),
+                     tryCreateInstance("org.apache.cxf.jaxrs.provider.MultipartProvider"));
         Object prop = factory.getBus().getProperty("skip.default.json.provider.registration");
         if (!PropertyUtils.isTrue(prop)) {
             factory.setProviders(false, false, createProvider(JSON_PROVIDER_NAME, factory.getBus()));
         }
 
+    }
+
+    protected static Object tryCreateInstance(final String className) {
+        try {
+            final Class<?> cls = ClassLoaderUtils.loadClass(className, ProviderFactory.class);
+            return cls.getConstructor().newInstance();
+        } catch (final Throwable ex) {
+            LOG.fine(className + " not available, skipping");
+        }
+        return null;
     }
 
     protected static Object createProvider(String className, Bus bus) {
