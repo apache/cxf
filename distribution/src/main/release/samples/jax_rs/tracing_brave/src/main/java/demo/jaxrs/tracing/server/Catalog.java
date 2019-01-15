@@ -135,7 +135,9 @@ public class Catalog {
     @GET
     @Path("/search")
     @Produces(MediaType.APPLICATION_JSON)
-    public JsonObject search(@QueryParam("q") final String query, @Context final TracerContext tracing) throws Exception {
+    public JsonObject search(@QueryParam("q") final String query,
+                             @Context final TracerContext tracing
+                             ) throws Exception {
         final CloseableHttpClient httpclient = TracingHttpClientBuilder
             .create(tracing.unwrap(HttpTracing.class))
             .build();
