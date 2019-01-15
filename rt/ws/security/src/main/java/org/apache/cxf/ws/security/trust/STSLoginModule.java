@@ -165,6 +165,10 @@ public class STSLoginModule implements LoginModule {
     private String namespace;
     private Map<String, Object> stsClientProperties = new HashMap<>();
 
+    /** the authentication status*/
+    private boolean succeeded;
+    private boolean commitSucceeded;
+
     @Override
     public void initialize(Subject subj, CallbackHandler cbHandler, Map<String, ?> sharedState,
                            Map<String, ?> options) {
@@ -275,6 +279,7 @@ public class STSLoginModule implements LoginModule {
             throw new LoginException("User " + user + " authentication failed: " + e.getMessage());
         }
 
+        succeeded = true;
         return true;
     }
 
@@ -381,16 +386,31 @@ public class STSLoginModule implements LoginModule {
 
     @Override
     public boolean commit() throws LoginException {
-        if (userPrincipal == null) {
+        if (!succeeded || userPrincipal == null) {
+            roles.clear();
+            succeeded = false;
+            userPrincipal = null;
             return false;
-        }
+        } 
         subject.getPrincipals().add(userPrincipal);
         subject.getPrincipals().addAll(roles);
+        commitSucceeded = true;
         return true;
     }
 
     @Override
     public boolean abort() throws LoginException {
+        if (!succeeded) {
+            return false;
+        } else if (succeeded && commitSucceeded) {
+            // we succeeded, but another required module failed
+            logout();
+        } else {
+            // our commit failed
+            roles.clear();
+            userPrincipal = null;
+            succeeded = false;
+        }
         return true;
     }
 
@@ -400,6 +420,10 @@ public class STSLoginModule implements LoginModule {
         subject.getPrincipals().removeAll(roles);
         roles.clear();
         userPrincipal = null;
+
+        succeeded = false;
+        commitSucceeded = false;
+
         return true;
     }
 
