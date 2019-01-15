@@ -40,6 +40,7 @@
         <module>jaxws</module>
         <module>databinding</module>
         <module>jaxrs</module>
+        <module>jaxrs-restr</module>
         <module>ws-specs</module>
         <module>ws-rm</module>
         <module>ws-security</module>
