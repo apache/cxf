@@ -105,6 +105,9 @@ public final class AnnotationUtils {
     }
 
     public static int getBindingPriority(Class<?> providerCls) {
+        if (PRIORITY_API == null) {
+            return Priorities.USER;
+        }
         Annotation b = getClassAnnotation(providerCls, PRIORITY_API);
         try {
             return b == null ? Priorities.USER : Integer.class.cast(PRIORITY_VALUE.invoke(b));
