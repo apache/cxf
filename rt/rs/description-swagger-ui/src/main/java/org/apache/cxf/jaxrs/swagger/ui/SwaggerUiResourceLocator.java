@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.jaxrs.swagger;
+package org.apache.cxf.jaxrs.swagger.ui;
 
 import java.io.IOException;
 import java.net.MalformedURLException;

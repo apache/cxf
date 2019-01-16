@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.swagger;
+package org.apache.cxf.jaxrs.swagger.ui;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,6 @@ import java.util.Properties;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.util.PropertyUtils;
-import org.apache.cxf.jaxrs.swagger.ui.SwaggerUiConfig;
 
 /**
  * Generic trait to support Swagger UI integration for Swagger 1.5.x and
