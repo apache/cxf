@@ -64,7 +64,6 @@ import org.apache.cxf.common.i18n.UncheckedException;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.common.util.URIParserUtil;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.databinding.source.SourceDataBinding;
@@ -609,8 +608,8 @@ public class ServiceImpl extends ServiceDelegate {
         }
 
         String tns = webService.targetNamespace();
-        if (tns.length() == 0) {
-            tns = URIParserUtil.getNamespace(PackageUtils.getPackageName(seiClass));
+        if (tns.isEmpty()) {
+            tns = PackageUtils.getNamespace(PackageUtils.getPackageName(seiClass));
         }
 
         return new QName(tns, name);

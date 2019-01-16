@@ -826,7 +826,7 @@ public final class StaxUtils {
 
         // Write out the element name
         if (uri != null) {
-            if (prefix.length() == 0 && StringUtils.isEmpty(uri)) {
+            if (prefix.isEmpty() && StringUtils.isEmpty(uri)) {
                 writer.writeStartElement(local);
             } else {
                 writer.writeStartElement(prefix, local, uri);
@@ -845,7 +845,7 @@ public final class StaxUtils {
             if (nsURI == null) {
                 nsURI = "";
             }
-            if (nsPrefix.length() == 0) {
+            if (nsPrefix.isEmpty()) {
                 writer.writeDefaultNamespace(nsURI);
                 writer.setDefaultNamespace(nsURI);
             } else {
@@ -862,7 +862,7 @@ public final class StaxUtils {
         // We need this check because namespace writing works
         // different on Woodstox and the RI.
         if (writeElementNS) {
-            if (prefix.length() == 0) {
+            if (prefix.isEmpty()) {
                 writer.writeDefaultNamespace(uri);
                 writer.setDefaultNamespace(uri);
             } else {
@@ -875,9 +875,9 @@ public final class StaxUtils {
         for (int i = 0; i < reader.getAttributeCount(); i++) {
             String ns = reader.getAttributeNamespace(i);
             String nsPrefix = reader.getAttributePrefix(i);
-            if (ns == null || ns.length() == 0) {
+            if (ns == null || ns.isEmpty()) {
                 writer.writeAttribute(reader.getAttributeLocalName(i), reader.getAttributeValue(i));
-            } else if (nsPrefix == null || nsPrefix.length() == 0) {
+            } else if (nsPrefix == null || nsPrefix.isEmpty()) {
                 writer.writeAttribute(reader.getAttributeNamespace(i), reader.getAttributeLocalName(i),
                                       reader.getAttributeValue(i));
             } else {
@@ -976,7 +976,7 @@ public final class StaxUtils {
         String decUri = writer.getNamespaceContext().getNamespaceURI(prefix);
         boolean declareNamespace = decUri == null || !decUri.equals(ns);
 
-        if (ns == null || ns.length() == 0) {
+        if (ns == null || ns.isEmpty()) {
             writer.writeStartElement(localName);
             if (StringUtils.isEmpty(decUri)) {
                 declareNamespace = false;
@@ -1015,9 +1015,9 @@ public final class StaxUtils {
                 } else {
                     String attns = attr.getNamespaceURI();
                     String value = attr.getNodeValue();
-                    if (attns == null || attns.length() == 0) {
+                    if (attns == null || attns.isEmpty()) {
                         writer.writeAttribute(name, value);
-                    } else if (attrPrefix.length() == 0) {
+                    } else if (attrPrefix.isEmpty()) {
                         writer.writeAttribute(attns, name, value);
                     } else {
                         if (repairing && writer.getNamespaceContext().getNamespaceURI(attrPrefix) == null) {

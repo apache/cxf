@@ -118,7 +118,7 @@ public final class StringUtils {
      * @return capitalized form.
      */
     public static String capitalize(String name) {
-        if (name == null || name.length() == 0) {
+        if (name == null || name.isEmpty()) {
             return name;
         }
         char[] chars = name.toCharArray();
@@ -127,7 +127,7 @@ public final class StringUtils {
     }
 
     public static String uncapitalize(String str) {
-        if (str == null || str.length() == 0) {
+        if (str == null || str.isEmpty()) {
             return str;
         }
         return new StringBuilder(str.length())

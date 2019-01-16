@@ -100,7 +100,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
             return;
         }
         String value = nsMap.get(uri);
-        if ((value != null && value.length() == 0)
+        if ((value != null && value.isEmpty())
             || uri.equals(replaceNamespace)) {
             return;
         }
@@ -108,7 +108,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
         uri = value != null ? value : uri;
 
         if (writtenUris.get(0).contains(uri)
-            && (prefix.length() == 0 || prefix.equals(namespaceContext.getPrefix(uri)))) {
+            && (prefix.isEmpty() || prefix.equals(namespaceContext.getPrefix(uri)))) {
             return;
         }
 
@@ -116,7 +116,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
             super.writeDefaultNamespace(uri);
             namespaceContext.addPrefix("", uri);
         } else {
-            if (prefix.length() == 0) {
+            if (prefix.isEmpty()) {
                 prefix = namespaceContext.findUniquePrefix(uri);
             }
             super.writeNamespace(prefix, uri);
@@ -132,7 +132,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
             return;
         }
         String value = nsMap.get(uri);
-        if ((value != null && value.length() == 0)
+        if ((value != null && value.isEmpty())
             || (isDefaultNamespaceRedefined() && !isDefaultNamespaceRedefined(uri))
             || uri.equals(replaceNamespace)) {
             return;
@@ -154,7 +154,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
             return;
         }
         String value = nsMap.get(uri);
-        if ((value != null && value.length() == 0)
+        if ((value != null && value.isEmpty())
             || (isDefaultNamespaceRedefined() && !isDefaultNamespaceRedefined(uri))) {
             return;
         }
@@ -188,8 +188,8 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
         if (expected == null) {
             expected = theName;
         } else {
-            if (prefix.length() == 0 && expected.getNamespaceURI().length() > 0
-                && theName.getNamespaceURI().length() == 0) {
+            if (prefix.isEmpty() && !expected.getNamespaceURI().isEmpty()
+                && theName.getNamespaceURI().isEmpty()) {
                 // if the element is promoted to a qualified element, use the prefix bound
                 // to that namespace. If the namespace is unbound, generate a new prefix and
                 // write its declaration later.
@@ -197,7 +197,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
                 if (prefix == null) {
                     prefix = namespaceContext.findUniquePrefix(expected.getNamespaceURI());
                 }
-            } else if (prefix.length() > 0 && expected.getNamespaceURI().length() == 0) {
+            } else if (!prefix.isEmpty() && expected.getNamespaceURI().isEmpty()) {
                 // if the element is demoted to a unqualified element, use an empty prefix.
                 prefix = "";
             }
@@ -255,7 +255,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
             return;
         }
         write(expected, false);
-        if (expected.getNamespaceURI().length() > 0 && theName.getNamespaceURI().length() == 0) {
+        if (!expected.getNamespaceURI().isEmpty() && theName.getNamespaceURI().isEmpty()) {
             // the element is promoted to a qualified element, thus write its declaration
             writeNamespace(expected.getPrefix(), expected.getNamespaceURI());
         }
@@ -377,9 +377,9 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
     private void write(QName qname, boolean replacePrefix) throws XMLStreamException {
         boolean writeNs = false;
         String prefix = "";
-        if (qname.getNamespaceURI().length() > 0) {
+        if (!qname.getNamespaceURI().isEmpty()) {
             if ((replacePrefix || isDefaultNamespaceRedefined())
-                && qname.getPrefix().length() == 0) {
+                && qname.getPrefix().isEmpty()) {
                 // if the default namespace is configured to be replaced, a non-empty prefix must be assigned
                 prefix = namespaceContext.getPrefix(qname.getNamespaceURI());
                 if (prefix == null) {

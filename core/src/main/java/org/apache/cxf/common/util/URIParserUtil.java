@@ -26,6 +26,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -69,13 +70,8 @@ public final class URIParserUtil {
     }
 
     public static String parsePackageName(String namespace, String defaultPackageName) {
-        String packageName = (defaultPackageName != null && defaultPackageName.trim().length() > 0)
-            ? defaultPackageName : null;
-
-        if (packageName == null) {
-            packageName = getPackageName(namespace);
-        }
-        return packageName;
+        return (defaultPackageName != null && !defaultPackageName.isEmpty())
+            ? defaultPackageName : getPackageName(namespace);
     }
 
     public static String getPackageName(String nameSpaceURI) {
@@ -108,11 +104,12 @@ public final class URIParserUtil {
         if (idx >= 0) {
             domain = domain.substring(0, idx);
         }
-        List<String> r = reverse(tokenize(domain, "urn".equals(scheme) ? ".-" : "."));
-        if ("www".equalsIgnoreCase(r.get(r.size() - 1))) {
+        List<String> r = tokenize(domain, "urn".equals(scheme) ? ".-" : ".");
+        if ("www".equalsIgnoreCase(r.get(0))) {
             // remove leading www
-            r.remove(r.size() - 1);
+            r.remove(0);
         }
+        Collections.reverse(r);
 
         // replace the domain name with tokenized items
         tokens.addAll(1, r);
@@ -134,33 +131,7 @@ public final class URIParserUtil {
         }
 
         // concat all the pieces and return it
-        return combine(tokens, '.');
-    }
-
-    public static String getNamespace(String packageName) {
-        if (packageName == null || packageName.length() == 0) {
-            return null;
-        }
-        StringTokenizer tokenizer = new StringTokenizer(packageName, ".");
-        String[] tokens;
-        if (tokenizer.countTokens() == 0) {
-            tokens = new String[0];
-        } else {
-            tokens = new String[tokenizer.countTokens()];
-            for (int i = tokenizer.countTokens() - 1; i >= 0; i--) {
-                tokens[i] = tokenizer.nextToken();
-            }
-        }
-        StringBuilder namespace = new StringBuilder("http://");
-        String dot = "";
-        for (int i = 0; i < tokens.length; i++) {
-            if (i == 1) {
-                dot = ".";
-            }
-            namespace.append(dot + tokens[i]);
-        }
-        namespace.append('/');
-        return namespace.toString();
+        return String.join(".", tokens);
     }
 
     private static List<String> tokenize(String str, String sep) {
@@ -190,26 +161,6 @@ public final class URIParserUtil {
             }
         }
         return newToken.toString();
-    }
-
-    private static String combine(List<String> r, char sep) {
-        StringBuilder buf = new StringBuilder(r.get(0));
-
-        for (int i = 1; i < r.size(); i++) {
-            buf.append(sep);
-            buf.append(r.get(i));
-        }
-
-        return buf.toString();
-    }
-
-    private static <T> List<T> reverse(List<T> a) {
-        List<T> r = new ArrayList<>();
-
-        for (int i = a.size() - 1; i >= 0; i--) {
-            r.add(a.get(i));
-        }
-        return r;
     }
 
     public static boolean containsReservedKeywords(String token) {

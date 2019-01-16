@@ -29,13 +29,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 import org.apache.cxf.common.logging.LogUtils;
 
 public class TextExtensionFragmentParser {
     private static final Logger LOG = LogUtils.getL7dLogger(TextExtensionFragmentParser.class);
-    private static Pattern colonPattern = Pattern.compile(":");
 
     final ClassLoader loader;
     public TextExtensionFragmentParser(ClassLoader loader) {
@@ -43,21 +41,11 @@ public class TextExtensionFragmentParser {
     }
 
     public List<Extension> getExtensions(final URL url) {
-        InputStream is = null;
-        try {
-            is = url.openStream();
+        try (InputStream is = url.openStream()) {
             return getExtensions(is);
         } catch (Exception e) {
             LOG.log(Level.WARNING, e.getMessage(), e);
             return new ArrayList<>();
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    // Ignore
-                }
-            }
         }
     }
 
@@ -86,18 +74,18 @@ public class TextExtensionFragmentParser {
 
     private Extension getExtensionFromTextLine(String line) {
         line = line.trim();
-        if (line.length() == 0 || line.charAt(0) == '#') {
+        if (line.isEmpty() || line.charAt(0) == '#') {
             return null;
         }
         final Extension ext = new Extension(loader);
-        String[] parts = colonPattern.split(line, 0);
+        final String[] parts = line.split(":");
         ext.setClassname(parts[0]);
         if (ext.getClassname() == null) {
             return null;
         }
         if (parts.length >= 2) {
             String interfaceName = parts[1];
-            if (interfaceName != null && "".equals(interfaceName)) {
+            if (interfaceName != null && interfaceName.isEmpty()) {
                 interfaceName = null;
             }
             ext.setInterfaceName(interfaceName);

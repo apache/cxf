@@ -124,13 +124,13 @@ public class InTransformReader extends DepthXMLStreamReader {
                 expected = theName;
             } else {
                 String prefix = theName.getPrefix();
-                if (prefix.length() == 0 && theName.getNamespaceURI().length() == 0
-                    && expected.getNamespaceURI().length() > 0) {
+                if (prefix.isEmpty() && theName.getNamespaceURI().isEmpty()
+                    && !expected.getNamespaceURI().isEmpty()) {
                     prefix = namespaceContext.getPrefix(expected.getNamespaceURI());
                     if (prefix == null) {
                         prefix = namespaceContext.findUniquePrefix(expected.getNamespaceURI());
                     }
-                } else if (prefix.length() > 0 && expected.getNamespaceURI().length() == 0) {
+                } else if (!prefix.isEmpty() && expected.getNamespaceURI().isEmpty()) {
                     prefix = "";
                 }
                 expected = new QName(expected.getNamespaceURI(), expected.getLocalPart(), prefix);
@@ -290,7 +290,7 @@ public class InTransformReader extends DepthXMLStreamReader {
     public String getPrefix() {
         QName name = readCurrentElement();
         String prefix = name.getPrefix();
-        if (prefix.length() == 0 && getNamespaceURI().length() > 0) {
+        if (prefix.isEmpty() && !getNamespaceURI().isEmpty()) {
             prefix = namespaceContext.getPrefix(getNamespaceURI());
             if (prefix == null) {
                 prefix = "";

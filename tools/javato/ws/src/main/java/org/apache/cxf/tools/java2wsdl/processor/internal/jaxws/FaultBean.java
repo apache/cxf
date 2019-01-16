@@ -29,7 +29,6 @@ import javax.xml.ws.WebFault;
 
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.common.util.URIParserUtil;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.model.JavaClass;
 import org.apache.cxf.tools.common.model.JavaField;
@@ -82,10 +81,10 @@ public final class FaultBean {
 
         String pkg = PackageUtils.getPackageName(exceptionClass);
         if (pkg.length() > 0) {
-            jClass.setElementName(new QName(URIParserUtil.getNamespace(pkg),
+            jClass.setElementName(new QName(PackageUtils.getNamespace(pkg),
                                         exceptionClass.getSimpleName()));
         } else {
-            jClass.setElementName(new QName(URIParserUtil.getNamespace(ToolConstants.DEFAULT_PACKAGE_NAME),
+            jClass.setElementName(new QName(PackageUtils.getNamespace(ToolConstants.DEFAULT_PACKAGE_NAME),
                                         exceptionClass.getSimpleName()));
         }
         jClass.annotate(new WrapperBeanAnnotator(exceptionClass));

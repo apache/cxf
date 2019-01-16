@@ -25,7 +25,7 @@ import java.util.Map;
 
 import org.xml.sax.InputSource;
 
-import org.apache.cxf.common.util.URIParserUtil;
+import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.util.PropertyUtil;
 
@@ -149,7 +149,7 @@ public class ProcessorEnvironment {
     }
 
     public String getCustomizedNS(String ns) {
-        return URIParserUtil.getNamespace(mapPackageName(ns));
+        return PackageUtils.getNamespace(mapPackageName(ns));
     }
 
     public void addJaxbBindingFile(String location, InputSource is) {

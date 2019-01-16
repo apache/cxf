@@ -45,14 +45,7 @@ public class W3CNamespaceContext implements NamespaceContext {
     }
 
     public String getNamespaceURI(String prefix) {
-        String name = prefix;
-        if (name.length() == 0) {
-            name = "xmlns";
-        } else {
-            name = "xmlns:" + prefix;
-        }
-
-        return getNamespaceURI(currentNode, name);
+        return getNamespaceURI(currentNode, !prefix.isEmpty() ? "xmlns:" + prefix : "xmlns");
     }
 
     private String getNamespaceURI(Element e, String name) {

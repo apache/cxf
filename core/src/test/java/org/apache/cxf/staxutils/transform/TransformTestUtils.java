@@ -212,7 +212,7 @@ public final class TransformTestUtils {
                 return e;
             } else if (e == XMLStreamConstants.CHARACTERS) {
                 String text = reader.getText();
-                if (text.trim().length() == 0) {
+                if (text.trim().isEmpty()) {
                     continue;
                 }
                 return e;

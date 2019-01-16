@@ -115,4 +115,18 @@ public class PackageUtilsTest {
               org.apache.cxf.configuration.spring.JAXBBeanFactory.class));
         assertEquals("org.apache.cxf", packageName);
     }
+
+    @Test
+    public void testParsePackageName() throws Exception {
+        final String packageName = PackageUtils.parsePackageName("http://www.example.com/test", "");
+        assertEquals("com.example.test", packageName);
+    }
+
+    @Test
+    public void testGetNamespace() throws Exception {
+        final String packageName = PackageUtils.getNamespace(getClass().getPackage().getName());
+        assertEquals("http://util.common.cxf.apache.org/", packageName);
+    }
+
+
 }

@@ -53,4 +53,10 @@ public class URIParserUtilsTest {
                                               "jar:file:/home/a.jar!/wsdl/others/hello_world_schema2.xsd"));
     }
 
+    @Test
+    public void testParseEmptyPackageName() throws Exception {
+        final String packageName = URIParserUtil.parsePackageName("", null);
+        assertEquals("cxf", packageName);
+    }
+
 }

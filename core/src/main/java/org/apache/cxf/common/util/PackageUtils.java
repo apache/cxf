@@ -22,6 +22,7 @@ package org.apache.cxf.common.util;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -85,13 +86,8 @@ public final class PackageUtils {
     }
 
     public static String parsePackageName(String namespace, String defaultPackageName) {
-        String packageName = (defaultPackageName != null && defaultPackageName.trim().length() > 0)
-            ? defaultPackageName : null;
-
-        if (packageName == null) {
-            packageName = getPackageNameByNameSpaceURI(namespace);
-        }
-        return packageName;
+        return (defaultPackageName != null && !defaultPackageName.isEmpty())
+            ? defaultPackageName : getPackageNameByNameSpaceURI(namespace);
     }
 
     public static String getPackageNameByNameSpaceURI(String nameSpaceURI) {
@@ -123,11 +119,12 @@ public final class PackageUtils {
         if (idx >= 0) {
             domain = domain.substring(0, idx);
         }
-        List<String> r = reverse(tokenize(domain, "urn".equals(scheme) ? ".-" : "."));
-        if ("www".equalsIgnoreCase(r.get(r.size() - 1))) {
+        List<String> r = tokenize(domain, "urn".equals(scheme) ? ".-" : ".");
+        if ("www".equalsIgnoreCase(r.get(0))) {
             // remove leading www
-            r.remove(r.size() - 1);
+            r.remove(0);
         }
+        Collections.reverse(r);
 
         // replace the domain name with tokenized items
         tokens.addAll(1, r);
@@ -149,7 +146,7 @@ public final class PackageUtils {
         }
 
         // concat all the pieces and return it
-        return combine(tokens, '.');
+        return String.join(".", tokens);
     }
 
     private static List<String> tokenize(String str, String sep) {
@@ -158,15 +155,6 @@ public final class PackageUtils {
 
         while (tokens.hasMoreTokens()) {
             r.add(tokens.nextToken());
-        }
-        return r;
-    }
-
-    private static <T> List<T> reverse(List<T> a) {
-        List<T> r = new ArrayList<>();
-
-        for (int i = a.size() - 1; i >= 0; i--) {
-            r.add(a.get(i));
         }
         return r;
     }
@@ -190,45 +178,17 @@ public final class PackageUtils {
         return newToken.toString();
     }
 
-    private static String combine(List<?> r, char sep) {
-        StringBuilder buf = new StringBuilder(r.get(0).toString());
-
-        for (int i = 1; i < r.size(); i++) {
-            buf.append(sep);
-            buf.append(r.get(i));
-        }
-
-        return buf.toString();
-    }
-
     private static boolean containsReservedKeywords(String token) {
         return JavaUtils.isJavaKeyword(token);
     }
 
     public static String getNamespace(String packageName) {
-        if (packageName == null || packageName.length() == 0) {
+        if (packageName == null || packageName.isEmpty()) {
             return null;
         }
-        StringTokenizer tokenizer = new StringTokenizer(packageName, ".");
-        String[] tokens;
-        if (tokenizer.countTokens() == 0) {
-            tokens = new String[0];
-        } else {
-            tokens = new String[tokenizer.countTokens()];
-            for (int i = tokenizer.countTokens() - 1; i >= 0; i--) {
-                tokens[i] = tokenizer.nextToken();
-            }
-        }
-        StringBuilder namespace = new StringBuilder("http://");
-        String dot = "";
-        for (int i = 0; i < tokens.length; i++) {
-            if (i == 1) {
-                dot = ".";
-            }
-            namespace.append(dot + tokens[i]);
-        }
-        namespace.append('/');
-        return namespace.toString();
+        final List<String> parts = Arrays.asList(packageName.split("\\."));
+        Collections.reverse(parts); 
+        return "http://" + String.join(".", parts) + '/';
     }
 
 }
