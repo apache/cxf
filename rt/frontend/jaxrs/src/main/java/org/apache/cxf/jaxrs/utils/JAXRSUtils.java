@@ -705,6 +705,18 @@ public final class JAXRSUtils {
         }
         return size1 == size2 ? 0 : size1 < size2 ? -1 : 1;
     }
+    
+    public static int compareMethodParameters(Class<?>[] para1, Class<?>[] para2) {
+        int size1 = para1.length;
+        int size2 = para2.length;
+        for (int i = 0; i < size1 && i < size2; i++) {
+            int result = para1[i].getName().compareTo(para2[i].getName());
+            if (result != 0) {
+                return result;
+            }
+        }
+        return size1 == size2 ? 0 : size1 < size2 ? -1 : 1;
+    }
     public static int compareMediaTypes(MediaType mt1, MediaType mt2) {
         return compareMediaTypes(mt1, mt2, MEDIA_TYPE_Q_PARAM);
     }

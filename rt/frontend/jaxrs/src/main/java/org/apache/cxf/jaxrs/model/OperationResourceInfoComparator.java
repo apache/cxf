@@ -117,6 +117,9 @@ public class OperationResourceInfoComparator implements Comparator<OperationReso
             } else if (!e1IsDefault && e2IsDefault) {
                 result = -1;
             }
+        } 
+        if (result == 0) {
+            result = JAXRSUtils.compareMethodParameters(e1.getInParameterTypes(), e2.getInParameterTypes());
         }
         if (result == 0) {
             String m1Name =
