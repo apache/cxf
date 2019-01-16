@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.swagger;
+package org.apache.cxf.jaxrs.swagger.ui;
 
 import java.lang.annotation.Annotation;
 import java.net.URL;

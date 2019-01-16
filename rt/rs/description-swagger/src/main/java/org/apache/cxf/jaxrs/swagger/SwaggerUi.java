@@ -19,6 +19,9 @@
 
 package org.apache.cxf.jaxrs.swagger;
 
+import org.apache.cxf.jaxrs.swagger.ui.OsgiSwaggerUiResolver;
+import org.apache.cxf.jaxrs.swagger.ui.SwaggerUiResolver;
+
 import io.swagger.annotations.Api;
 
 /**

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.jaxrs.swagger;
+package org.apache.cxf.jaxrs.swagger.ui;
 
 import java.io.IOException;
 import java.net.URL;
@@ -33,8 +33,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-
-import org.apache.cxf.jaxrs.swagger.ui.SwaggerUiConfig;
 
 
 @Path("api-docs")
