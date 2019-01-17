@@ -44,8 +44,8 @@ import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.model.ApplicationInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
-import org.apache.cxf.jaxrs.swagger.SwaggerUiSupport;
 import org.apache.cxf.jaxrs.swagger.ui.SwaggerUiConfig;
+import org.apache.cxf.jaxrs.swagger.ui.SwaggerUiSupport;
 
 import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;

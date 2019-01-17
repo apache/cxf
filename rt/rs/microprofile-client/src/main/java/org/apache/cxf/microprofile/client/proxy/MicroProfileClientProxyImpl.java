@@ -18,9 +18,11 @@
  */
 package org.apache.cxf.microprofile.client.proxy;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,10 +34,13 @@ import java.util.logging.Logger;
 
 import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.core.Configuration;
+import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxrs.client.ClientProxyImpl;
 import org.apache.cxf.jaxrs.client.ClientState;
@@ -43,12 +48,18 @@ import org.apache.cxf.jaxrs.client.JaxrsClientCallback;
 import org.apache.cxf.jaxrs.client.LocalClientState;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
+import org.apache.cxf.jaxrs.model.Parameter;
+import org.apache.cxf.jaxrs.model.ParameterType;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.microprofile.client.MPRestClientCallback;
 import org.apache.cxf.microprofile.client.MicroProfileClientProviderFactory;
 import org.apache.cxf.microprofile.client.cdi.CDIInterceptorWrapper;
+import org.eclipse.microprofile.rest.client.annotation.ClientHeaderParam;
+import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
+import org.eclipse.microprofile.rest.client.ext.ClientHeadersFactory;
 import org.eclipse.microprofile.rest.client.ext.ResponseExceptionMapper;
 
 import static org.apache.cxf.jaxrs.client.ClientProperties.HTTP_CONNECTION_TIMEOUT_PROP;
@@ -65,8 +76,25 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
         public void completed(Object o) { }
     };
 
-    private final CDIInterceptorWrapper interceptorWrapper;
+    private static final Method JAXRS_UTILS_GET_CURRENT_MESSAGE_METHOD;
     
+    static {
+        Method m;
+        try {
+            Class<?> jaxrsUtilsClass = Class.forName("org.apache.cxf.jaxrs.utils.JAXRSUtils");
+            m = jaxrsUtilsClass.getDeclaredMethod("getCurrentMessage");
+        } catch (Throwable t) {
+            // expected in non-JAX-RS server environments
+            if (LOG.isLoggable(Level.FINEST)) {
+                LOG.log(Level.FINEST, "Caught exception getting JAXRUtils class", t);
+            }
+            m = null;
+        }
+        JAXRS_UTILS_GET_CURRENT_MESSAGE_METHOD = m;
+    }
+    private final CDIInterceptorWrapper interceptorWrapper;
+    private Object objectInstance;
+
     //CHECKSTYLE:OFF
     public MicroProfileClientProxyImpl(URI baseURI, ClassLoader loader, ClassResourceInfo cri,
                                        boolean isRoot, boolean inheritHeaders, ExecutorService executorService,
@@ -88,8 +116,6 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
         this.interceptorWrapper = interceptorWrapper;
     }
     //CHECKSTYLE:ON
-
-
 
     @SuppressWarnings("unchecked")
     @Override
@@ -207,7 +233,9 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
                 cfg.getHttpConduit().getClient().setReceiveTimeout(readTimeout);
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            if (LOG.isLoggable(Level.FINEST)) {
+                LOG.log(Level.FINEST, "Caught exception setting timeouts", ex);
+            }
         }
     }
 
@@ -237,8 +265,144 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
         return l;
     }
 
+    private String invokeBestFitComputeMethod(Class<?> clientIntf, ClientHeaderParam anno) throws Throwable {
+        String methodName = anno.value()[0];
+        methodName = methodName.substring(1, methodName.length() - 1);
+        Class<?> computeClass = clientIntf;
+        if (methodName.contains(".")) {
+            String className = methodName.substring(0, methodName.lastIndexOf('.'));
+            methodName = methodName.substring(methodName.lastIndexOf('.') + 1);
+            try {
+                computeClass = ClassLoaderUtils.loadClass(className, clientIntf);
+            } catch (ClassNotFoundException ex) {
+                LOG.warning("Cannot find specified computeValue class, " + className);
+                return null;
+            }
+        }
+        Method m = null;
+        boolean includeHeaderName = false;
+        try {
+            m = computeClass.getMethod(methodName, String.class);
+            includeHeaderName = true;
+        } catch (NoSuchMethodException expected) {
+            try {
+                m = computeClass.getMethod(methodName);
+            } catch (NoSuchMethodException expected2) { }
+        }
+
+        String value;
+        if (m == null) {
+            value = null;
+            LOG.warning("Cannot find specified computeValue method, "
+                + methodName + ", on client interface, " + clientIntf.getName());
+        } else {
+            try {
+                Object valueFromComputeMethod;
+                if (includeHeaderName) {
+                    valueFromComputeMethod = m.invoke(computeClass == clientIntf ? objectInstance : null,
+                                                      anno.name());
+                } else {
+                    valueFromComputeMethod = m.invoke(computeClass == clientIntf ? objectInstance : null);
+                }
+                if (valueFromComputeMethod instanceof String[]) {
+                    value = HttpUtils.getHeaderString(Arrays.asList((String[]) valueFromComputeMethod));
+                } else {
+                    value = (String) valueFromComputeMethod;
+                }
+            } catch (Throwable t) {
+                if (LOG.isLoggable(Level.FINEST)) {
+                    LOG.log(Level.FINEST, "Caught exception invoking compute method", t);
+                }
+                if (t instanceof InvocationTargetException) {
+                    t = t.getCause();
+                }
+                throw t;
+            }
+        }
+        return value;
+    }
+
+    private Parameter createClientHeaderParameter(ClientHeaderParam anno, Class<?> clientIntf) {
+        Parameter p = new Parameter(ParameterType.HEADER, anno.name());
+        String[] values = anno.value();
+        String headerValue;
+        if (values[0] != null && values[0].length() > 2 && values[0].startsWith("{") && values[0].endsWith("}")) {
+            try {
+                headerValue = invokeBestFitComputeMethod(clientIntf, anno);
+            } catch (Throwable t) {
+                if (anno.required()) {
+                    throwException(t);
+                }
+                return null;
+            }
+        } else {
+            headerValue = HttpUtils.getHeaderString(Arrays.asList(values));
+        }
+
+        p.setDefaultValue(headerValue);
+        return p;
+    }
+
+    @Override
+    protected void handleHeaders(Method m,
+                                 Object[] params,
+                                 MultivaluedMap<String, String> headers,
+                                 List<Parameter> beanParams,
+                                 MultivaluedMap<ParameterType, Parameter> map) {
+        super.handleHeaders(m, params, headers, beanParams, map);
+
+        try {
+            Class<?> declaringClass = m.getDeclaringClass();
+            ClientHeaderParam[] clientHeaderAnnosOnInterface = declaringClass
+                .getAnnotationsByType(ClientHeaderParam.class);
+            ClientHeaderParam[] clientHeaderAnnosOnMethod = m.getAnnotationsByType(ClientHeaderParam.class);
+            RegisterClientHeaders headersFactoryAnno = declaringClass.getAnnotation(RegisterClientHeaders.class);
+            if (clientHeaderAnnosOnInterface.length < 1 && clientHeaderAnnosOnMethod.length < 1
+                && headersFactoryAnno == null) {
+                return;
+            }
+            
+            for (ClientHeaderParam methodAnno : clientHeaderAnnosOnMethod) {
+                String headerName = methodAnno.name();
+                if (!headers.containsKey(headerName)) {
+                    Parameter p = createClientHeaderParameter(methodAnno, declaringClass);
+                    if (p != null) {
+                        headers.putSingle(p.getName(), p.getDefaultValue());
+                    }
+                }
+            }
+            for (ClientHeaderParam intfAnno : clientHeaderAnnosOnInterface) {
+                String headerName = intfAnno.name();
+                if (!headers.containsKey(headerName)) {
+                    Parameter p = createClientHeaderParameter(intfAnno, declaringClass);
+                    if (p != null) {
+                        headers.putSingle(p.getName(), p.getDefaultValue());
+                    }
+                }
+            }
+
+            ClientHeadersFactory headersFactory = null;
+            
+            if (headersFactoryAnno != null) {
+                Class<?> headersFactoryClass = headersFactoryAnno.value();
+                headersFactory = (ClientHeadersFactory) headersFactoryClass.newInstance();
+                mergeHeaders(headersFactory, headers);
+            }
+        } catch (Throwable t) {
+            throwException(t);
+        }
+    }
+
+    private void mergeHeaders(ClientHeadersFactory factory,
+                              MultivaluedMap<String, String> existingHeaders) {
+
+        MultivaluedMap<String, String> jaxrsHeaders = getJaxrsHeaders();
+        MultivaluedMap<String, String> updatedHeaders = factory.update(jaxrsHeaders, existingHeaders);
+        existingHeaders.putAll(updatedHeaders);
+    }
     @Override
     public Object invoke(Object o, Method m, Object[] params) throws Throwable {
+        objectInstance = o;
         return interceptorWrapper.invoke(o, m, params, new Invoker(o, m, params, this));
     }
 
@@ -270,5 +434,31 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
                 throw new RuntimeException(t);
             }
         }
+    }
+    
+    private void throwException(Throwable t) {
+        if (t instanceof Error) {
+            throw (Error) t;
+        }
+        if (t instanceof RuntimeException) {
+            throw (RuntimeException) t;
+        }
+        throw new RuntimeException(t);
+    }
+
+    private static MultivaluedMap<String, String> getJaxrsHeaders() {
+        MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
+        try {
+            if (JAXRS_UTILS_GET_CURRENT_MESSAGE_METHOD != null) {
+                Message m = (Message) JAXRS_UTILS_GET_CURRENT_MESSAGE_METHOD.invoke(null);
+                headers.putAll(CastUtils.cast((Map<?, ?>)m.get(Message.PROTOCOL_HEADERS)));
+            }
+        } catch (Throwable t) {
+            // expected if not running in a JAX-RS server environment.
+            if (LOG.isLoggable(Level.FINEST)) {
+                LOG.log(Level.FINEST, "Caught exception getting JAX-RS incoming headers", t);
+            }
+        }
+        return headers;
     }
 }

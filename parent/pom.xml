@@ -87,6 +87,7 @@
         <cxf.commons-lang3.version>3.8.1</cxf.commons-lang3.version>
         <cxf.commons-text.version>1.6</cxf.commons-text.version>
         <cxf.derby.version>10.14.2.0</cxf.derby.version>
+        <cxf.dom4j.version>2.1.1</cxf.dom4j.version>
         <cxf.dropwizard.version>3.2.6</cxf.dropwizard.version>
         <cxf.ehcache.version>2.10.6</cxf.ehcache.version>
         <cxf.ehcache3.version>3.0.3</cxf.ehcache3.version>
@@ -167,6 +168,7 @@
         <cxf.swagger.v3.version>2.0.6</cxf.swagger.v3.version>
         <cxf.swagger.ui.version>3.20.5</cxf.swagger.ui.version>
         <cxf.tomcat.version>8.0.53</cxf.tomcat.version>
+        <cxf.tomitribe.http.signature.version>1.1</cxf.tomitribe.http.signature.version>
         <cxf.velocity.version>2.0</cxf.velocity.version>
         <cxf.woodstox.core.version>5.0.3</cxf.woodstox.core.version>
         <cxf.woodstox.stax2-api.version>3.1.4</cxf.woodstox.stax2-api.version>

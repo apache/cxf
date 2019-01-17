@@ -19,8 +19,8 @@
 
 package org.apache.cxf.jaxrs.openapi;
 
-import org.apache.cxf.jaxrs.swagger.OsgiSwaggerUiResolver;
-import org.apache.cxf.jaxrs.swagger.SwaggerUiResolver;
+import org.apache.cxf.jaxrs.swagger.ui.OsgiSwaggerUiResolver;
+import org.apache.cxf.jaxrs.swagger.ui.SwaggerUiResolver;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 

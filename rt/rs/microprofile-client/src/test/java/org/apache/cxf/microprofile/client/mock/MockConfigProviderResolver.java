@@ -77,7 +77,6 @@ public class MockConfigProviderResolver extends ConfigProviderResolver {
     }
 
     public MockConfigProviderResolver(Map<String, String> configValues) {
-        System.out.println("MockConfigProviderResolver ctor " + configValues);
         this.configValues = configValues;
     }
 

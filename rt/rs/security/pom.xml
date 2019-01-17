@@ -36,5 +36,6 @@
         <module>sso/saml</module>
         <module>sso/oidc</module>
         <module>cors</module>
+        <module>http-signature</module>
     </modules>
 </project>

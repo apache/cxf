@@ -16,11 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.swagger;
+
+package org.apache.cxf.jaxrs.swagger.ui;
 
 import java.io.IOException;
-import java.net.URI;
-import java.util.regex.Pattern;
 
 import javax.annotation.Priority;
 import javax.ws.rs.HttpMethod;
@@ -31,27 +30,24 @@ import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.UriInfo;
 
 @PreMatching
-@Priority(Priorities.USER)
-class SwaggerUiResourceFilter implements ContainerRequestFilter {
-    private static final Pattern PATTERN =
-        Pattern.compile(
-              ".*[.]js|.*[.]gz|.*[.]map|oauth2*[.]html|.*[.]png|.*[.]css|.*[.]ico|"
-              + "/css/.*|/images/.*|/lib/.*|/fonts/.*"
-        );
-
-    private final SwaggerUiResourceLocator locator;
+@Priority(Priorities.USER + 1)
+class SwaggerUiServiceFilter implements ContainerRequestFilter {
+    private final SwaggerUiService uiService;
     
-    SwaggerUiResourceFilter(SwaggerUiResourceLocator locator) {
-        this.locator = locator;
+    SwaggerUiServiceFilter(SwaggerUiService uiService) {
+        this.uiService = uiService;
     }
     
     @Override
     public void filter(ContainerRequestContext rc) throws IOException {
         if (HttpMethod.GET.equals(rc.getRequest().getMethod())) {
             UriInfo ui = rc.getUriInfo();
-            String path = "/" + ui.getPath();
-            if (PATTERN.matcher(path).matches() && locator.exists(path)) {
-                rc.setRequestUri(URI.create("api-docs" + path));
+            String path = ui.getPath();
+            int uiPathIndex = path.lastIndexOf("api-docs");
+            if (uiPathIndex >= 0) {
+                String resourcePath = uiPathIndex + 8 < path.length()
+                    ? path.substring(uiPathIndex + 8) : "";
+                rc.abortWith(uiService.getResource(ui, resourcePath));
             }
         }
     }
