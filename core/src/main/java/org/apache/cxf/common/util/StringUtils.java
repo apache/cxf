@@ -19,7 +19,6 @@
 
 package org.apache.cxf.common.util;
 
-import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -34,10 +33,6 @@ public final class StringUtils {
     private static final Predicate<String> NOT_EMPTY = (String s) -> !s.isEmpty();
 
     private StringUtils() {
-    }
-
-    public static boolean isFileExist(String file) {
-        return new File(file).exists() && new File(file).isFile();
     }
 
     public static boolean isEmpty(String str) {

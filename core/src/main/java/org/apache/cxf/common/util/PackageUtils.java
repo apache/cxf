@@ -91,18 +91,23 @@ public final class PackageUtils {
     }
 
     public static String getPackageNameByNameSpaceURI(String nameSpaceURI) {
+        return getPackageNameByNameSpaceURI(nameSpaceURI, null);
+    }
+
+    static String getPackageNameByNameSpaceURI(String nameSpaceURI, String defaultPackageName) {
         int idx = nameSpaceURI.indexOf(':');
-        String scheme = "";
+        boolean urnScheme = false;
         if (idx >= 0) {
-            scheme = nameSpaceURI.substring(0, idx);
-            if ("http".equalsIgnoreCase(scheme) || "urn".equalsIgnoreCase(scheme)) {
+            String scheme = nameSpaceURI.substring(0, idx);
+            urnScheme = "urn".equalsIgnoreCase(scheme);
+            if ("http".equalsIgnoreCase(scheme) || urnScheme) {
                 nameSpaceURI = nameSpaceURI.substring(idx + 1);
             }
         }
 
-        List<String> tokens = tokenize(nameSpaceURI, "/ ");
+        List<String> tokens = tokenize(nameSpaceURI, urnScheme ? "/: " : "/ ");
         if (tokens.isEmpty()) {
-            return null;
+            return defaultPackageName;
         }
 
         if (tokens.size() > 1) {
@@ -119,7 +124,7 @@ public final class PackageUtils {
         if (idx >= 0) {
             domain = domain.substring(0, idx);
         }
-        List<String> r = tokenize(domain, "urn".equals(scheme) ? ".-" : ".");
+        List<String> r = tokenize(domain, urnScheme ? ".-" : ".");
         Collections.reverse(r);
         final int last = r.size() - 1;
         if ("www".equalsIgnoreCase(r.get(last))) {

@@ -32,6 +32,7 @@ import org.apache.cxf.validation.ValidationConfiguration;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class PackageUtilsTest {
     @Test
@@ -118,8 +119,10 @@ public class PackageUtilsTest {
 
     @Test
     public void testParsePackageName() throws Exception {
-        final String packageName = PackageUtils.parsePackageName("http://www.example.com:8080/test", " ");
-        assertEquals("com.example.test", packageName);
+        assertEquals("com.example.test", PackageUtils.parsePackageName("http://www.example.com:8080/test", " "));
+        assertEquals("org.apache.cxf.no_body_parts.wsdl",
+                PackageUtils.parsePackageName("urn:org:apache:cxf:no_body_parts/wsdl", null));
+        assertNull(PackageUtils.parsePackageName(" ", null));
     }
 
     @Test
