@@ -115,10 +115,10 @@ public class MicroProfileClientFactoryBean extends JAXRSClientFactoryBean {
     private Set<Object> processProviders() {
         Set<Object> providers = new LinkedHashSet<>();
         for (Object provider : configuration.getInstances()) {
-            Class<?> providerCls = ClassHelper.getRealClass(bus, provider);
+            Class<?> providerCls = ClassHelper.getRealClass(getBus(), provider);
             if (provider instanceof ClientRequestFilter || provider instanceof ClientResponseFilter) {
                 FilterProviderInfo<Object> filter = new FilterProviderInfo<>(providerCls, providerCls,
-                        provider, bus, configuration.getContracts(providerCls));
+                        provider, getBus(), configuration.getContracts(providerCls));
                 providers.add(filter);
             } else {
                 providers.add(provider);

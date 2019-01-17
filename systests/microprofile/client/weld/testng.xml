@@ -6,6 +6,7 @@
             <package name="org.eclipse.microprofile.rest.client.tck" />
             <package name="org.eclipse.microprofile.rest.client.tck.asynctests" />
             <package name="org.eclipse.microprofile.rest.client.tck.cditests" />
+            <package name="org.eclipse.microprofile.rest.client.tck.timeout" />
         </packages>
     </test>
 </suite>
