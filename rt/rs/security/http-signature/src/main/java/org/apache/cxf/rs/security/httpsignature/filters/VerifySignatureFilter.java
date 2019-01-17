@@ -64,7 +64,7 @@ public final class VerifySignatureFilter implements ContainerRequestFilter {
         LOG.fine("Starting filter message verification process");
         MultivaluedMap<String, String> responseHeaders = requestCtx.getHeaders();
         messageVerifier.verifyMessage(responseHeaders,
-                requestCtx.getUriInfo().getAbsolutePath().getPath(), requestCtx.getMethod());
+                                      requestCtx.getMethod(), requestCtx.getUriInfo().getAbsolutePath().getPath());
         LOG.fine("Finished filter message verification process");
     }
 
