@@ -19,14 +19,18 @@
 package org.apache.cxf.rs.security.httpsignature.filters;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.container.PreMatching;
+import javax.ws.rs.client.ClientRequestContext;
+import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 
@@ -34,24 +38,23 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.rs.security.httpsignature.MessageSigner;
 
 /**
- * RS CXF container Filter which signs outgoing messages. It does not create a digest header
+ * RS CXF client Filter which signs outgoing messages. It does not create a digest header
  *
  */
 @Provider
-@PreMatching
 @Priority(Priorities.AUTHENTICATION)
-public final class CreateSignatureFilter implements ContainerRequestFilter {
+public final class CreateSignatureClientFilter implements ClientRequestFilter {
     private static final Logger LOG = LogUtils.getL7dLogger(VerifySignatureFilter.class);
 
     private MessageSigner messageSigner;
     private boolean enabled;
 
-    public CreateSignatureFilter() {
+    public CreateSignatureClientFilter() {
         setEnabled(true);
     }
 
     @Override
-    public void filter(ContainerRequestContext requestCtx) {
+    public void filter(ClientRequestContext requestCtx) {
         if (!enabled) {
             LOG.fine("Create signature filter is disabled");
             return;
@@ -62,20 +65,32 @@ public final class CreateSignatureFilter implements ContainerRequestFilter {
             return;
         }
 
-        MultivaluedMap<String, String> responseHeaders = requestCtx.getHeaders();
-        if (responseHeaders.containsKey("Signature")) {
+        MultivaluedMap<String, Object> requestHeaders = requestCtx.getHeaders();
+        if (requestHeaders.containsKey("Signature")) {
             LOG.fine("Message already contains a signature");
             return;
         }
 
         LOG.fine("Starting filter message signing process");
+        Map<String, List<String>> convertedHeaders = convertHeaders(requestHeaders);
         try {
-            messageSigner.sign(responseHeaders,
-                requestCtx.getUriInfo().getAbsolutePath().getPath(), requestCtx.getMethod());
+            messageSigner.sign(convertedHeaders,
+                requestCtx.getUri().getPath(), requestCtx.getMethod());
         } catch (IOException e) {
             e.printStackTrace();
         }
+        requestHeaders.put("Signature", Collections.singletonList(convertedHeaders.get("Signature").get(0)));
         LOG.fine("Finished filter message verification process");
+    }
+
+    // Convert the headers from List<Object> -> List<String>
+    private Map<String, List<String>> convertHeaders(MultivaluedMap<String, Object> requestHeaders) {
+        Map<String, List<String>> convertedHeaders = new HashMap<>(requestHeaders.size());
+        for (Map.Entry<String, List<Object>> entry : requestHeaders.entrySet()) {
+            convertedHeaders.put(entry.getKey(),
+                                 entry.getValue().stream().map(o -> o.toString()).collect(Collectors.toList()));
+        }
+        return convertedHeaders;
     }
 
     public MessageSigner getMessageSigner() {
