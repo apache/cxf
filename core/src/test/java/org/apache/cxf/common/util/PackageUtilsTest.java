@@ -118,7 +118,7 @@ public class PackageUtilsTest {
 
     @Test
     public void testParsePackageName() throws Exception {
-        final String packageName = PackageUtils.parsePackageName("http://www.example.com/test", "");
+        final String packageName = PackageUtils.parsePackageName("http://www.example.com:8080/test", " ");
         assertEquals("com.example.test", packageName);
     }
 

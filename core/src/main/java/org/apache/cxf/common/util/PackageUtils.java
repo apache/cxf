@@ -86,7 +86,7 @@ public final class PackageUtils {
     }
 
     public static String parsePackageName(String namespace, String defaultPackageName) {
-        return (defaultPackageName != null && !defaultPackageName.isEmpty())
+        return (defaultPackageName != null && !defaultPackageName.trim().isEmpty())
             ? defaultPackageName : getPackageNameByNameSpaceURI(namespace);
     }
 
@@ -100,7 +100,7 @@ public final class PackageUtils {
             }
         }
 
-        List<String> tokens = tokenize(nameSpaceURI, "/: ");
+        List<String> tokens = tokenize(nameSpaceURI, "/ ");
         if (tokens.isEmpty()) {
             return null;
         }
@@ -114,21 +114,21 @@ public final class PackageUtils {
             }
         }
 
-        String domain = tokens.get(0);
+        String domain = tokens.remove(0);
         idx = domain.indexOf(':');
         if (idx >= 0) {
             domain = domain.substring(0, idx);
         }
         List<String> r = tokenize(domain, "urn".equals(scheme) ? ".-" : ".");
-        if ("www".equalsIgnoreCase(r.get(0))) {
-            // remove leading www
-            r.remove(0);
-        }
         Collections.reverse(r);
+        final int last = r.size() - 1;
+        if ("www".equalsIgnoreCase(r.get(last))) {
+            // remove leading www
+            r.remove(last);
+        }
 
         // replace the domain name with tokenized items
-        tokens.addAll(1, r);
-        tokens.remove(0);
+        tokens.addAll(0, r);
 
         // iterate through the tokens and apply xml->java name algorithm
         for (int i = 0; i < tokens.size(); i++) {
