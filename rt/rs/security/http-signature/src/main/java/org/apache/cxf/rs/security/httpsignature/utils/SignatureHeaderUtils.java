@@ -48,8 +48,8 @@ public final class SignatureHeaderUtils {
      */
     public static Map<String, String> mapHeaders(Map<String, List<String>> multivaluedMap) {
         Map<String, String> mappedStrings = new HashMap<>();
-        for (String key : multivaluedMap.keySet()) {
-            mappedStrings.put(key, concatValues(multivaluedMap.get(key)));
+        for (Map.Entry<String, List<String>> entry : multivaluedMap.entrySet()) {
+            mappedStrings.put(entry.getKey(), concatValues(entry.getValue()));
         }
         return mappedStrings;
     }

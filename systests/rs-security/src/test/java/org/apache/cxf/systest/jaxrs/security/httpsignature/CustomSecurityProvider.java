@@ -16,26 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.microprofile.client.mock;
 
-import javax.ws.rs.DELETE;
-import javax.ws.rs.Path;
+package org.apache.cxf.systest.jaxrs.security.httpsignature;
 
+import java.security.Provider;
+import java.security.Security;
 
+import org.apache.cxf.rs.security.httpsignature.provider.SecurityProvider;
 
-public interface HeadersOnMethodClient {
+public class CustomSecurityProvider implements SecurityProvider {
 
-    default String computeHeader(String headerName) {
-        return "HeadersOnMethodClientValueFor" + headerName;
+    @Override
+    public Provider getProvider(String keyId) {
+        return Security.getProvider("SunRsaSign");
     }
-
-    //TODO: uncomment once @ClientHeaderParams (plural) is updated to include target of TYPE and METHOD
-//    @ClientHeaderParam(name = "MethodHeader1", value = "valueA")
-//    @ClientHeaderParam(name = "MethodHeader2", value = {"valueB", "valueC"})
-//    @ClientHeaderParam(name = "MethodHeader3", value = "{computeHeader}")
-//    @ClientHeaderParam(name = "MethodHeader4",
-//        value = "{org.apache.cxf.microprofile.client.mock.HeaderGenerator.generateHeader}")
-    @DELETE
-    @Path("/")
-    String delete(String someValue);
 }

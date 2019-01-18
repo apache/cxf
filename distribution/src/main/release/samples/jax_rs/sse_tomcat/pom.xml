@@ -13,7 +13,7 @@
     
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <cxf.tomcat.version>8.0.53</cxf.tomcat.version>
+        <cxf.tomcat.version>8.5.37</cxf.tomcat.version>
     </properties>
 
     <dependencies>
@@ -52,12 +52,6 @@
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
-            <version>${cxf.tomcat.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.tomcat.embed</groupId>
-            <artifactId>tomcat-embed-logging-juli</artifactId>
             <version>${cxf.tomcat.version}</version>
         </dependency>
 

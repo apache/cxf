@@ -16,26 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.microprofile.client.mock;
 
-import javax.ws.rs.DELETE;
-import javax.ws.rs.Path;
+package org.apache.cxf.systest.jaxrs.security.httpsignature;
 
+import org.apache.cxf.rs.security.httpsignature.provider.AlgorithmProvider;
 
+public class CustomAlgorithmProvider implements AlgorithmProvider {
 
-public interface HeadersOnMethodClient {
-
-    default String computeHeader(String headerName) {
-        return "HeadersOnMethodClientValueFor" + headerName;
+    @Override
+    public String getAlgorithmName(String keyId) {
+        return "rsa-sha512";
     }
-
-    //TODO: uncomment once @ClientHeaderParams (plural) is updated to include target of TYPE and METHOD
-//    @ClientHeaderParam(name = "MethodHeader1", value = "valueA")
-//    @ClientHeaderParam(name = "MethodHeader2", value = {"valueB", "valueC"})
-//    @ClientHeaderParam(name = "MethodHeader3", value = "{computeHeader}")
-//    @ClientHeaderParam(name = "MethodHeader4",
-//        value = "{org.apache.cxf.microprofile.client.mock.HeaderGenerator.generateHeader}")
-    @DELETE
-    @Path("/")
-    String delete(String someValue);
 }
