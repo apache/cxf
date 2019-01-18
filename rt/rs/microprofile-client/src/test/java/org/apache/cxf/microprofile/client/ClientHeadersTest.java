@@ -23,7 +23,6 @@ import java.net.URI;
 import org.apache.cxf.microprofile.client.mock.HeaderCaptureClientRequestFilter;
 import org.apache.cxf.microprofile.client.mock.HeadersFactoryClient;
 import org.apache.cxf.microprofile.client.mock.HeadersOnInterfaceClient;
-import org.apache.cxf.microprofile.client.mock.HeadersOnMethodClient;
 import org.apache.cxf.microprofile.client.mock.MyClientHeadersFactory;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 
@@ -57,19 +56,21 @@ public class ClientHeadersTest {
         assertEquals("valueForIntfHeader4", getOutboundHeaders().getFirst("IntfHeader4"));
     }
 
-    @Test
-    public void testClientHeaderParamsOnMethod() {
-        HeadersOnMethodClient client = RestClientBuilder.newBuilder()
-                                                        .baseUri(URI.create("http://localhost/notUsed"))
-                                                        .register(HeaderCaptureClientRequestFilter.class)
-                                                        .build(HeadersOnMethodClient.class);
-        assertEquals("SUCCESS", client.delete("ignored"));
-        assertNotNull(getOutboundHeaders());
-        assertEquals("valueA", getOutboundHeaders().getFirst("MethodHeader1"));
-        assertEquals("valueB,valueC", getOutboundHeaders().getFirst("MethodHeader2"));
-        assertEquals("HeadersOnMethodClientValueForMethodHeader3", getOutboundHeaders().getFirst("MethodHeader3"));
-        assertEquals("valueForMethodHeader4", getOutboundHeaders().getFirst("MethodHeader4"));
-    }
+
+    //TODO: uncomment once @ClientHeaderParams (plural) is updated to include target of TYPE and METHOD
+//    @Test
+//    public void testClientHeaderParamsOnMethod() {
+//        HeadersOnMethodClient client = RestClientBuilder.newBuilder()
+//                                                        .baseUri(URI.create("http://localhost/notUsed"))
+//                                                        .register(HeaderCaptureClientRequestFilter.class)
+//                                                        .build(HeadersOnMethodClient.class);
+//        assertEquals("SUCCESS", client.delete("ignored"));
+//        assertNotNull(getOutboundHeaders());
+//        assertEquals("valueA", getOutboundHeaders().getFirst("MethodHeader1"));
+//        assertEquals("valueB,valueC", getOutboundHeaders().getFirst("MethodHeader2"));
+//        assertEquals("HeadersOnMethodClientValueForMethodHeader3", getOutboundHeaders().getFirst("MethodHeader3"));
+//        assertEquals("valueForMethodHeader4", getOutboundHeaders().getFirst("MethodHeader4"));
+//    }
 
     @Test
     public void testClientHeadersFactory() {
