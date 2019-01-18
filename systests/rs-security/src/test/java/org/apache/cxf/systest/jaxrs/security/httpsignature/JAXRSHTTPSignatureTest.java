@@ -143,7 +143,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         client.type("application/xml").accept("application/xml");
 
         Response response = client.post(new Book("CXF", 126L));
-        assertEquals(response.getStatus(), 500);
+        assertEquals(response.getStatus(), 400);
     }
 
     @Test
@@ -157,7 +157,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         client.type("application/xml").accept("application/xml");
 
         Response response = client.post(new Book("CXF", 126L));
-        assertEquals(response.getStatus(), 500);
+        assertEquals(response.getStatus(), 400);
     }
 
     @Test
@@ -183,7 +183,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         client.type("application/xml").accept("application/xml");
 
         Response response = client.post(new Book("CXF", 126L));
-        assertEquals(response.getStatus(), 500);
+        assertEquals(response.getStatus(), 400);
     }
 
     @Test
@@ -209,7 +209,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         client.type("application/xml").accept("application/xml");
 
         Response response = client.post(new Book("CXF", 126L));
-        assertEquals(response.getStatus(), 500);
+        assertEquals(response.getStatus(), 400);
     }
 
     @Test
@@ -235,7 +235,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         client.type("application/xml").accept("application/xml");
 
         Response response = client.post(new Book("CXF", 126L));
-        assertEquals(response.getStatus(), 500);
+        assertEquals(response.getStatus(), 400);
     }
 
     @Provider

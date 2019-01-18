@@ -22,6 +22,7 @@ import java.util.Objects;
 import java.util.logging.Logger;
 
 import javax.annotation.Priority;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
@@ -31,6 +32,12 @@ import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.rs.security.httpsignature.MessageVerifier;
+import org.apache.cxf.rs.security.httpsignature.exception.DifferentAlgorithmsException;
+import org.apache.cxf.rs.security.httpsignature.exception.InvalidDataToVerifySignatureException;
+import org.apache.cxf.rs.security.httpsignature.exception.InvalidSignatureException;
+import org.apache.cxf.rs.security.httpsignature.exception.InvalidSignatureHeaderException;
+import org.apache.cxf.rs.security.httpsignature.exception.MissingSignatureHeaderException;
+import org.apache.cxf.rs.security.httpsignature.exception.MultipleSignatureHeaderException;
 
 /**
  * RS CXF Filter which extracts signature data from the context and sends it to the message verifier
@@ -63,8 +70,15 @@ public final class VerifySignatureFilter implements ContainerRequestFilter {
 
         LOG.fine("Starting filter message verification process");
         MultivaluedMap<String, String> responseHeaders = requestCtx.getHeaders();
-        messageVerifier.verifyMessage(responseHeaders,
-                                      requestCtx.getMethod(), requestCtx.getUriInfo().getAbsolutePath().getPath());
+        try {
+            messageVerifier.verifyMessage(responseHeaders,
+                                          requestCtx.getMethod(), requestCtx.getUriInfo().getAbsolutePath().getPath());
+        } catch (DifferentAlgorithmsException | InvalidSignatureHeaderException
+            | InvalidDataToVerifySignatureException | InvalidSignatureException
+            | MultipleSignatureHeaderException | MissingSignatureHeaderException ex) {
+            LOG.warning(ex.getMessage());
+            throw new BadRequestException();
+        }
         LOG.fine("Finished filter message verification process");
     }
 
