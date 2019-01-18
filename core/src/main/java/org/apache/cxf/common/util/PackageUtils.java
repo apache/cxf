@@ -87,27 +87,23 @@ public final class PackageUtils {
 
     public static String parsePackageName(String namespace, String defaultPackageName) {
         return (defaultPackageName != null && !defaultPackageName.trim().isEmpty())
-            ? defaultPackageName : getPackageNameByNameSpaceURI(namespace);
+            ? defaultPackageName : getPackageNameByNameSpaceURI(namespace.trim());
     }
 
     public static String getPackageNameByNameSpaceURI(String nameSpaceURI) {
-        return getPackageNameByNameSpaceURI(nameSpaceURI, null);
-    }
-
-    static String getPackageNameByNameSpaceURI(String nameSpaceURI, String defaultPackageName) {
         int idx = nameSpaceURI.indexOf(':');
         boolean urnScheme = false;
         if (idx >= 0) {
-            String scheme = nameSpaceURI.substring(0, idx);
+            final String scheme = nameSpaceURI.substring(0, idx);
             urnScheme = "urn".equalsIgnoreCase(scheme);
             if ("http".equalsIgnoreCase(scheme) || urnScheme) {
-                nameSpaceURI = nameSpaceURI.substring(idx + 1);
+                nameSpaceURI = nameSpaceURI.substring(idx + (urnScheme ? 1 : 3)); //
             }
         }
 
-        List<String> tokens = tokenize(nameSpaceURI, urnScheme ? "/: " : "/ ");
+        List<String> tokens = tokenize(nameSpaceURI, "/:");
         if (tokens.isEmpty()) {
-            return defaultPackageName;
+            return null;
         }
 
         if (tokens.size() > 1) {
@@ -120,16 +116,16 @@ public final class PackageUtils {
         }
 
         String domain = tokens.remove(0);
-        idx = domain.indexOf(':');
-        if (idx >= 0) {
-            domain = domain.substring(0, idx);
-        }
+        // comma was removed by tokenize
+//        idx = domain.indexOf(':');
+//        if (idx >= 0) {
+//            domain = domain.substring(0, idx);
+//        }
         List<String> r = tokenize(domain, urnScheme ? ".-" : ".");
         Collections.reverse(r);
-        final int last = r.size() - 1;
-        if ("www".equalsIgnoreCase(r.get(last))) {
+        if ("www".equalsIgnoreCase(r.get(r.size() - 1))) {
             // remove leading www
-            r.remove(last);
+            r.remove(r.size() - 1);
         }
 
         // replace the domain name with tokenized items
@@ -143,7 +139,7 @@ public final class PackageUtils {
             token = removeIllegalIdentifierChars(token);
 
             // this will check for reserved keywords
-            if (containsReservedKeywords(token)) {
+            if (JavaUtils.isJavaKeyword(token)) {
                 token = '_' + token;
             }
 
@@ -181,10 +177,6 @@ public final class PackageUtils {
             }
         }
         return newToken.toString();
-    }
-
-    private static boolean containsReservedKeywords(String token) {
-        return JavaUtils.isJavaKeyword(token);
     }
 
     public static String getNamespace(String packageName) {

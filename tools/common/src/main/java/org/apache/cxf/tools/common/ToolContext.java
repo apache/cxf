@@ -32,7 +32,6 @@ import org.xml.sax.InputSource;
 
 
 import org.apache.cxf.common.util.PackageUtils;
-import org.apache.cxf.common.util.URIParserUtil;
 import org.apache.cxf.tools.common.model.JavaModel;
 import org.apache.cxf.tools.util.PropertyUtil;
 
@@ -228,7 +227,7 @@ public class ToolContext {
         if (getPackageName() != null) {
             return getPackageName();
         }
-        return URIParserUtil.parsePackageName(ns, null);
+        return PackageUtils.parsePackageName(ns, null);
     }
 
     public String getCustomizedNS(String ns) {

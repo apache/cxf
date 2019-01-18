@@ -32,7 +32,6 @@ import org.apache.cxf.validation.ValidationConfiguration;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 public class PackageUtilsTest {
     @Test
@@ -119,10 +118,20 @@ public class PackageUtilsTest {
 
     @Test
     public void testParsePackageName() throws Exception {
-        assertEquals("com.example.test", PackageUtils.parsePackageName("http://www.example.com:8080/test", " "));
+        assertEquals("com.example.test.passed",
+                PackageUtils.parsePackageName("http://www.example.com/test:passed", " "));
         assertEquals("org.apache.cxf.no_body_parts.wsdl",
-                PackageUtils.parsePackageName("urn:org:apache:cxf:no_body_parts/wsdl", null));
-        assertNull(PackageUtils.parsePackageName(" ", null));
+                PackageUtils.parsePackageName("urn:org:apache:cxf:no_body_parts/wsdl", ""));
+    }
+
+    @Test
+    public void testGetPackageNameByNameSpaceURI() throws Exception {
+        assertEquals("com.iona.cxf", PackageUtils.getPackageNameByNameSpaceURI("http://www.cxf.iona.com"));
+        assertEquals("com.iona._class", PackageUtils.getPackageNameByNameSpaceURI("urn:www.class.iona.com"));
+        assertEquals("uri.cxf_apache_org.jstest",
+                PackageUtils.getPackageNameByNameSpaceURI("uri:cxf.apache.org:jstest"));
+        assertEquals("soapinterface.ems.esendex.com",
+                PackageUtils.getPackageNameByNameSpaceURI("com.esendex.ems.soapinterface"));
     }
 
     @Test

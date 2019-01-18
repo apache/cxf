@@ -28,7 +28,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.StringTokenizer;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
-import org.apache.cxf.helpers.JavaUtils;
 
 public final class URIParserUtil {
     private static final String EXCLUDED_CHARS = "<>\"{}|\\^`";
@@ -64,19 +63,6 @@ public final class URIParserUtil {
             urls = tmp;
         }
         return urls;
-    }
-
-    public static String parsePackageName(String namespace, String defaultPackageName) {
-        return (defaultPackageName != null && !defaultPackageName.trim().isEmpty())
-            ? defaultPackageName : getPackageName(namespace);
-    }
-
-    public static String getPackageName(String nameSpaceURI) {
-        return PackageUtils.getPackageNameByNameSpaceURI(nameSpaceURI, "cxf");
-    }
-
-    public static boolean containsReservedKeywords(String token) {
-        return JavaUtils.isJavaKeyword(token);
     }
 
     public static String escapeChars(String s) {

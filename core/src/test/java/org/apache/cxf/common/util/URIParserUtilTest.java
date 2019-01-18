@@ -17,29 +17,44 @@
  * under the License.
  */
 
-package org.apache.cxf.tools.util;
+package org.apache.cxf.common.util;
 
+import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-
-import org.apache.cxf.common.util.URIParserUtil;
 
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 
 public class URIParserUtilTest {
 
     @Test
-    public void testGetPackageName() {
-
-        String packageName = URIParserUtil.getPackageName("http://www.cxf.iona.com");
-        assertEquals(packageName, "com.iona.cxf");
-        packageName = URIParserUtil.getPackageName("urn://www.class.iona.com");
-        assertEquals(packageName, "com.iona._class");
+    public void testRelativize() throws URISyntaxException {
+        assertNull(URIParserUtil.relativize(null, "foo"));
+        assertNull(URIParserUtil.relativize("foo", null));
+        assertEquals("", URIParserUtil.relativize("", ""));
+        assertEquals("", URIParserUtil.relativize("fds", ""));
+        assertEquals("../", URIParserUtil.relativize("fds/", ""));
+        assertEquals("fdsfs", URIParserUtil.relativize("", "fdsfs"));
+        assertEquals("fdsfs/a", URIParserUtil.relativize("", "fdsfs/a"));
+        assertEquals("../de", URIParserUtil.relativize("ab/cd", "de"));
+        assertEquals("../de/fe/gh", URIParserUtil.relativize("ab/cd", "de/fe/gh"));
+        assertEquals("../../../de/fe/gh", URIParserUtil.relativize("/abc/def/", "de/fe/gh"));
+        assertNull(URIParserUtil.relativize("file:/c:/abc/def/", "de/fe/gh")); // null as the URI obtained by
+                                                                               // the 2 strings are not both
+                                                                               // absolute or not absolute
+        assertEquals("pippo2.xsd", URIParserUtil.relativize("/abc/def/pippo1.xsd", "/abc/def/pippo2.xsd"));
+        assertEquals("../default/pippo2.xsd",
+                     URIParserUtil.relativize("/abc/def/pippo1.xsd", "/abc/default/pippo2.xsd"));
+        assertEquals("def/pippo2.xsd", URIParserUtil.relativize("/abc/def", "/abc/def/pippo2.xsd"));
+        assertEquals("hello_world_schema2.xsd",
+                     URIParserUtil.relativize("jar:file:/home/a.jar!/wsdl/others/",
+                                              "jar:file:/home/a.jar!/wsdl/others/hello_world_schema2.xsd"));
     }
 
     @Test
@@ -78,7 +93,7 @@ public class URIParserUtilTest {
         assertTrue(uri2.contains(uri));
         assertTrue(uri2.contains(new java.io.File("").toString()));
 
-        uri = getClass().getResource("/schemas/wsdl/test.xsd").toString();
+        uri = getClass().getResource("/schemas/echoSchema.xsd").toString();
         uri2 = URIParserUtil.getAbsoluteURI(uri);
         assertNotNull(uri2);
         assertTrue(uri2.startsWith("file"));
@@ -108,4 +123,5 @@ public class URIParserUtilTest {
         String s = URIParserUtil.escapeChars(orig);
         assertEquals(orig, URLDecoder.decode(s, StandardCharsets.UTF_8.name()));
     }
+
 }

@@ -812,19 +812,14 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
 
     @Test
     public void testParameterOrderDifferentNS() throws Exception {
-        try {
-            env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/bug978/bug.wsdl"));
-            processor.setContext(env);
-            processor.execute();
+        env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/bug978/bug.wsdl"));
+        processor.setContext(env);
+        processor.execute();
 
-            String results = FileUtils.getStringFromFile(new File(output.getCanonicalPath(),
-                                                                  "org/tempuri/GreeterRPCLit.java"));
-            assertTrue(results.indexOf("@WebParam(partName  =  \"inInt\",  name  =  \"inInt\")") != -1);
-            assertTrue(results.indexOf("Style.RPC") != -1);
-
-        } catch (Exception e) {
-            fail("The cxf978.wsdl is a valid wsdl, should pass the test, caused by: " + e.getMessage());
-        }
+        String results = FileUtils.getStringFromFile(new File(output,
+                                                              "org/tempuri/GreeterRPCLit.java"));
+        assertTrue(results.indexOf("@WebParam(partName  =  \"inInt\",  name  =  \"inInt\")") != -1);
+        assertTrue(results.indexOf("Style.RPC") != -1);
     }
 
     @Test
