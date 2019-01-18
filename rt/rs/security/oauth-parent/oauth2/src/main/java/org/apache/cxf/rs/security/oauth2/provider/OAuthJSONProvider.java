@@ -25,7 +25,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -302,31 +302,16 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
         if (str.length() == 0) {
             return Collections.emptyMap();
         }
-        if (!str.startsWith("{") || !str.endsWith("}")) {
-            throw new IOException("JSON Sequence is broken");
-        }
-        Map<String, String> map = new LinkedHashMap<>();
 
-        str = str.substring(1, str.length() - 1).trim();
-        String[] jsonPairs = str.split(",");
-        for (int i = 0; i < jsonPairs.length; i++) {
-            String pair = jsonPairs[i].trim();
-            if (pair.length() == 0) {
-                continue;
-            }
-            int index = pair.indexOf(":");
-            String key = pair.substring(0, index).trim();
-            if (key.startsWith("\"") && key.endsWith("\"")) {
-                key = key.substring(1, key.length() - 1);
-            }
-            String value = pair.substring(index + 1).trim();
-            if (value.startsWith("\"") && value.endsWith("\"")) {
-                value = value.substring(1, value.length() - 1);
-            }
-            map.put(key, value);
+        Map<String, Object> response = new JsonMapObjectReaderWriter().fromJson(str);
+
+        // Here we're going to assume the values are all Strings
+        Map<String, String> forcedStringResponse = new HashMap<>(response.size());
+        for (Map.Entry<String, Object> entry : response.entrySet()) {
+            forcedStringResponse.put(entry.getKey(), entry.getValue().toString());
         }
 
-        return map;
+        return forcedStringResponse;
     }
 
 }
