@@ -21,6 +21,7 @@ package org.apache.cxf.microprofile.client.mock;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.Path;
 
+import org.eclipse.microprofile.rest.client.annotation.ClientHeaderParam;
 
 
 public interface HeadersOnMethodClient {
@@ -29,12 +30,11 @@ public interface HeadersOnMethodClient {
         return "HeadersOnMethodClientValueFor" + headerName;
     }
 
-    //TODO: uncomment once @ClientHeaderParams (plural) is updated to include target of TYPE and METHOD
-//    @ClientHeaderParam(name = "MethodHeader1", value = "valueA")
-//    @ClientHeaderParam(name = "MethodHeader2", value = {"valueB", "valueC"})
-//    @ClientHeaderParam(name = "MethodHeader3", value = "{computeHeader}")
-//    @ClientHeaderParam(name = "MethodHeader4",
-//        value = "{org.apache.cxf.microprofile.client.mock.HeaderGenerator.generateHeader}")
+    @ClientHeaderParam(name = "MethodHeader1", value = "valueA")
+    @ClientHeaderParam(name = "MethodHeader2", value = {"valueB", "valueC"})
+    @ClientHeaderParam(name = "MethodHeader3", value = "{computeHeader}")
+    @ClientHeaderParam(name = "MethodHeader4",
+        value = "{org.apache.cxf.microprofile.client.mock.HeaderGenerator.generateHeader}")
     @DELETE
     @Path("/")
     String delete(String someValue);
