@@ -17,7 +17,7 @@
  specific language governing permissions and limitations
  under the License.
 -->
-<wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.example.org/contract/DoubleIt" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsaws="http://www.w3.org/2005/08/addressing" xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion" name="DoubleIt" targetNamespace="http://www.example.org/contract/DoubleIt">
+<wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:tns="http://www.example.org/contract/DoubleIt" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsaws="http://www.w3.org/2005/08/addressing" xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion" name="DoubleIt" targetNamespace="http://www.example.org/contract/DoubleIt">
     <wsdl:import location="src/test/resources/DoubleItLogical.wsdl" namespace="http://www.example.org/contract/DoubleIt"/>
     <wsdl:binding name="DoubleItSaml1TransportBinding" type="tns:DoubleItPortType">
         <wsp:PolicyReference URI="#DoubleItSaml1TransportPolicy"/>
@@ -140,6 +140,24 @@
             </wsdl:output>
             <wsdl:fault name="DoubleItFault">
                 <soap:body use="literal" name="DoubleItFault"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="DoubleItSaml2SymmetricSoap12Binding" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItSaml2SymmetricPolicy"/>
+        <soap12:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="DoubleIt">
+            <soap12:operation soapAction=""/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
+            </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap12:body use="literal" name="DoubleItFault"/>
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
@@ -348,6 +366,9 @@
         </wsdl:port>
         <wsdl:port name="DoubleItSaml2SymmetricPort" binding="tns:DoubleItSaml2SymmetricBinding">
             <soap:address location="http://localhost:9001/DoubleItSaml2Symmetric"/>
+        </wsdl:port>
+        <wsdl:port name="DoubleItSaml2SymmetricSoap12Port" binding="tns:DoubleItSaml2SymmetricSoap12Binding">
+            <soap:address location="http://localhost:9001/DoubleItSaml2SymmetricSoap12"/>
         </wsdl:port>
         <wsdl:port name="DoubleItSaml2SymmetricSupportingPort" binding="tns:DoubleItSaml2SymmetricSupportingBinding">
             <soap:address location="http://localhost:9001/DoubleItSaml2Symmetric"/>
