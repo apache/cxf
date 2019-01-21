@@ -77,7 +77,7 @@ public final class VerifySignatureFilter implements ContainerRequestFilter {
             | InvalidDataToVerifySignatureException | InvalidSignatureException
             | MultipleSignatureHeaderException | MissingSignatureHeaderException ex) {
             LOG.warning(ex.getMessage());
-            throw new BadRequestException();
+            throw new BadRequestException(ex);
         }
         LOG.fine("Finished filter message verification process");
     }
