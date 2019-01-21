@@ -20,7 +20,9 @@ package org.apache.cxf.rs.security.oauth2.provider;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -39,6 +41,38 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class OAuthJSONProviderTest {
+
+    @Test
+    public void testReadException() throws IOException {
+        String response =
+            "{"
+            + "\"error\":\"invalid_client\","
+            + "\"error_description\":\"Client authentication failed\""
+            + "}";
+
+        OAuthJSONProvider provider = new OAuthJSONProvider();
+        Map<String, String> responseMap =
+            provider.readJSONResponse(new ByteArrayInputStream(response.getBytes(StandardCharsets.UTF_8)));
+        assertEquals(responseMap.size(), 2);
+        assertEquals("invalid_client", responseMap.get("error"));
+        assertEquals("Client authentication failed", responseMap.get("error_description"));
+    }
+
+    @Test
+    public void testReadExceptionWithCommaInMessage() throws IOException {
+        String response =
+            "{"
+            + "\"error\":\"invalid_client\","
+            + "\"error_description\":\"Client authentication failed, due to xyz\""
+            + "}";
+
+        OAuthJSONProvider provider = new OAuthJSONProvider();
+        Map<String, String> responseMap =
+            provider.readJSONResponse(new ByteArrayInputStream(response.getBytes(StandardCharsets.UTF_8)));
+        assertEquals(responseMap.size(), 2);
+        assertEquals("invalid_client", responseMap.get("error"));
+        assertEquals("Client authentication failed, due to xyz", responseMap.get("error_description"));
+    }
 
     @Test
     public void testWriteBearerClientAccessToken() throws Exception {

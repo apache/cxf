@@ -47,6 +47,10 @@ Full license text: <http://mozilla.org/MPL/2.0/>
 This product includes software from the Spring Framework, under the Apache
 License 2.0
 
+This project includes Apache Ant. The <sync> task is based on code Copyright
+(c) 2002, Landmark Graphics Corp that has been kindly donated to the Apache
+Software Foundation.
+
 Additional copyright notices and license terms applicable are
 present in the licenses directory of this distribution.
 
