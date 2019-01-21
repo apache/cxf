@@ -361,6 +361,59 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
 
+    // Re-enable once we pick up WSS4J 2.2.3 (https://issues.apache.org/jira/browse/WSS-640)
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testSaml2OverSymmetricSoap12() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SamlTokenTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSaml2SymmetricSoap12Port");
+        DoubleItPortType saml2Port =
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(saml2Port, test.getPort());
+
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(saml2Port);
+        }
+
+        try {
+            saml2Port.doubleIt(25);
+            fail("Expected failure on an invocation with no SAML Assertion");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            assertTrue(ex.getMessage().contains("No SAML CallbackHandler available"));
+        }
+
+        ((BindingProvider)saml2Port).getRequestContext().put(
+            SecurityConstants.SAML_CALLBACK_HANDLER, new SamlCallbackHandler(false)
+        );
+        try {
+            saml2Port.doubleIt(25);
+            fail("Expected failure on an invocation with a SAML1 Assertion");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            assertTrue(ex.getMessage().contains("Wrong SAML Version")
+                       || ex.getMessage().contains("enforces SamlVersion20Profile11 but we got 1.1"));
+        }
+
+        SamlCallbackHandler samlCallbackHandler = new SamlCallbackHandler();
+        samlCallbackHandler.setSignAssertion(true);
+        ((BindingProvider)saml2Port).getRequestContext().put(
+            SecurityConstants.SAML_CALLBACK_HANDLER, samlCallbackHandler
+        );
+        int result = saml2Port.doubleIt(25);
+        assertTrue(result == 50);
+
+        ((java.io.Closeable)saml2Port).close();
+        bus.shutdown(true);
+    }
+
     // Some negative tests. Send a sender-vouches assertion as a SupportingToken...this will
     // fail as the provider will demand that there is a signature covering both the assertion
     // and the message body.
