@@ -336,7 +336,7 @@ public final class ContextUtils {
     public static boolean hasEmptyAction(AddressingProperties maps) {
         boolean empty = maps.getAction() == null;
         if (maps.getAction() != null
-            && maps.getAction().getValue().length() == 0) {
+            && maps.getAction().getValue().isEmpty()) {
             maps.setAction(null);
             empty = false;
         }

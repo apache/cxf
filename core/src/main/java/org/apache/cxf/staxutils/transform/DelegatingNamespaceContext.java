@@ -59,7 +59,7 @@ public class DelegatingNamespaceContext implements NamespaceContext {
     }
 
     public String findUniquePrefix(String ns) {
-        if (ns.length() == 0) {
+        if (ns.isEmpty()) {
             return null;
         }
         String existingPrefix = getPrefix(ns);
@@ -103,11 +103,11 @@ public class DelegatingNamespaceContext implements NamespaceContext {
     }
 
     public String getPrefix(String ns) {
-        if (ns.length() == 0) {
+        if (ns.isEmpty()) {
             return null;
         }
         String value = nsMap.get(ns);
-        if (value != null && value.length() == 0) {
+        if (value != null && value.isEmpty()) {
             return null;
         }
         if (value != null) {

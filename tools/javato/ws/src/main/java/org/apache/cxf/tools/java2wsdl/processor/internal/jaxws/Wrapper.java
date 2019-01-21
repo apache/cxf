@@ -37,7 +37,6 @@ import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.common.util.URIParserUtil;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolException;
@@ -89,7 +88,7 @@ public class Wrapper {
         }
         String ns = wrapperBeanName.getNamespaceURI();
         jClass.setNamespace(ns);
-        jClass.setPackageName(URIParserUtil.getPackageName(ns));
+        jClass.setPackageName(PackageUtils.getPackageNameByNameSpaceURI(ns));
         jClass.setName(NameUtil.mangleNameToClassName(wrapperBeanName.getLocalPart()));
         jClass.setElementName(wrapperBeanName);
         return jClass;

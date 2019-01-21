@@ -36,7 +36,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.common.jaxb.JAXBUtils;
-import org.apache.cxf.common.util.URIParserUtil;
+import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.service.model.MessagePartInfo;
@@ -175,13 +175,7 @@ public final class ProcessorUtil {
     }
 
     public static String parsePackageName(String namespace, String defaultPackageName) {
-        String packageName = (defaultPackageName != null && defaultPackageName.trim().length() > 0)
-            ? defaultPackageName : null;
-
-        if (packageName == null) {
-            packageName = URIParserUtil.getPackageName(namespace);
-        }
-        return packageName;
+        return PackageUtils.parsePackageName(namespace, defaultPackageName);
     }
 
     public static String getAbsolutePath(String location) throws IOException {
