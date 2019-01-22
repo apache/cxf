@@ -22,13 +22,11 @@ package org.apache.cxf.systest.https.ciphersuites;
 import java.net.URL;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.Arrays;
 import java.util.Collections;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import javax.xml.ws.BindingProvider;
@@ -36,10 +34,7 @@ import javax.xml.ws.BindingProvider;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.configuration.jsse.SSLUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
-import org.apache.cxf.configuration.security.FiltersType;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.helpers.JavaUtils;
@@ -53,7 +48,6 @@ import org.junit.Assume;
 import org.junit.BeforeClass;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -679,55 +673,6 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
-    }
-
-    @org.junit.Test
-    public void testDefaultCipherSuitesFilterExcluded() throws Exception {
-        SSLContext sslContext = SSLContext.getInstance("TLS");
-        sslContext.init(null, null, new java.security.SecureRandom());
-
-        FiltersType filtersType = new FiltersType();
-        filtersType.getInclude().add(".*_AES_.*");
-        String[] supportedCipherSuites = sslContext.getSocketFactory().getSupportedCipherSuites();
-        String[] filteredCipherSuites = SSLUtils.getFilteredCiphersuites(filtersType, supportedCipherSuites,
-                                         LogUtils.getL7dLogger(CipherSuitesTest.class), false);
-
-        // Check we have no anon/EXPORT/NULL/etc ciphersuites
-        assertFalse(Arrays.stream(
-            filteredCipherSuites).anyMatch(c -> c.matches(".*NULL|anon|EXPORT|DES|MD5|CBC|RC4.*")));
-    }
-
-    @org.junit.Test
-    public void testExclusionFilter() throws Exception {
-        SSLContext sslContext = SSLContext.getInstance("TLS");
-        sslContext.init(null, null, new java.security.SecureRandom());
-
-        FiltersType filtersType = new FiltersType();
-        filtersType.getInclude().add(".*_AES_.*");
-        filtersType.getExclude().add(".*anon.*");
-        String[] supportedCipherSuites = sslContext.getSocketFactory().getSupportedCipherSuites();
-        String[] filteredCipherSuites = SSLUtils.getFilteredCiphersuites(filtersType, supportedCipherSuites,
-                                         LogUtils.getL7dLogger(CipherSuitesTest.class), false);
-
-        // Check we have no anon ciphersuites
-        assertFalse(Arrays.stream(
-            filteredCipherSuites).anyMatch(c -> c.matches(".*anon.*")));
-    }
-
-    @org.junit.Test
-    public void testInclusionFilter() throws Exception {
-        SSLContext sslContext = SSLContext.getInstance("TLS");
-        sslContext.init(null, null, new java.security.SecureRandom());
-
-        FiltersType filtersType = new FiltersType();
-        filtersType.getInclude().add(".*anon.*");
-        String[] supportedCipherSuites = sslContext.getSocketFactory().getSupportedCipherSuites();
-        String[] filteredCipherSuites = SSLUtils.getFilteredCiphersuites(filtersType, supportedCipherSuites,
-                                         LogUtils.getL7dLogger(CipherSuitesTest.class), false);
-
-        // Check we have anon ciphersuites
-        assertTrue(Arrays.stream(
-            filteredCipherSuites).anyMatch(c -> c.matches(".*anon.*")));
     }
 
     private static class NoOpX509TrustManager implements X509TrustManager {
