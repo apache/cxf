@@ -48,7 +48,7 @@ public class Entry implements Serializable {
     }
 
     public boolean isOutDated() {
-        return now() - initialTimestamp > expiresValue * 1000;
+        return now() - initialTimestamp > expiresValue * 1000L;
     }
 
     public Map<String, String> getCacheHeaders() {
@@ -77,7 +77,7 @@ public class Entry implements Serializable {
         this.headers = new HashMap<String, List<String>>();
         headers.putAll(mHeaders);
     }
-    
+
     public void setHeaders(final MultivaluedMap<String, String> headers) {
         initHeaders(headers);
     }

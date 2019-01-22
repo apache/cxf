@@ -103,21 +103,7 @@ public class CacheControlClientReaderInterceptor implements ReaderInterceptor {
         if (!validCacheControl) {
             return responseEntity;
         }
-        // if a max-age property is set then it overrides Expires
-        long expiry = cacheControl.getMaxAge();
-        if (expiry == -1) {
-            //TODO: Review if Expires can be supported as an alternative to Cache-Control
-            String expiresHeader = responseHeaders.getFirst(HttpHeaders.EXPIRES);
-            if (expiresHeader.startsWith("'") && expiresHeader.endsWith("'")) {
-                expiresHeader = expiresHeader.substring(1, expiresHeader.length() - 1);
-            }
-            try {
-                expiry = (Headers.getHttpDateFormat().parse(expiresHeader).getTime()
-                    - System.currentTimeMillis()) / 1000;
-            } catch (final ParseException e) {
-                // TODO: Revisit the possibility of supporting multiple formats
-            }
-        }
+
         Serializable ser = null;
         if (cachedBytes != null) {
             // store the cached bytes - they will be parsed again when a client cache will return them
@@ -135,9 +121,11 @@ public class CacheControlClientReaderInterceptor implements ReaderInterceptor {
             // the cached bytes will be returned immediately when a client cache will return them
             ser = new BytesEntity((byte[])responseEntity, false);
         }
+
         if (ser != null) {
             final Entry entry =
-                new Entry(ser, responseHeaders, computeCacheHeaders(responseHeaders), expiry);
+                new Entry(ser, responseHeaders,
+                          computeCacheHeaders(responseHeaders), computeExpiry(cacheControl, responseHeaders));
             final URI uri = uriInfo.getRequestUri();
             final String accepts = (String)context.getProperty(CacheControlClientRequestFilter.CLIENT_ACCEPTS);
             cache.put(new Key(uri, accepts), entry);
@@ -158,6 +146,25 @@ public class CacheControlClientReaderInterceptor implements ReaderInterceptor {
         }
 
         return cacheHeaders;
+    }
+
+    private long computeExpiry(CacheControl cacheControl, MultivaluedMap<String, String> responseHeaders) {
+        // if a max-age property is set then it overrides Expires
+        long expiry = cacheControl.getMaxAge();
+        if (expiry == -1) {
+            //TODO: Review if Expires can be supported as an alternative to Cache-Control
+            String expiresHeader = responseHeaders.getFirst(HttpHeaders.EXPIRES);
+            if (expiresHeader.length() > 1 && expiresHeader.startsWith("'") && expiresHeader.endsWith("'")) {
+                expiresHeader = expiresHeader.substring(1, expiresHeader.length() - 1);
+            }
+            try {
+                expiry = (Headers.getHttpDateFormat().parse(expiresHeader).getTime()
+                    - System.currentTimeMillis()) / 1000L;
+            } catch (final ParseException e) {
+                // TODO: Revisit the possibility of supporting multiple formats
+            }
+        }
+        return expiry;
     }
 
     public boolean isCacheInputStream() {
