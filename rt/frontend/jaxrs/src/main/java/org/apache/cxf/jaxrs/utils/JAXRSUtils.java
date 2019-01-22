@@ -706,11 +706,11 @@ public final class JAXRSUtils {
         return size1 == size2 ? 0 : size1 < size2 ? -1 : 1;
     }
     
-    public static int compareMethodParameters(Class<?>[] para1, Class<?>[] para2) {
-        int size1 = para1.length;
-        int size2 = para2.length;
+    public static int compareMethodParameters(Class<?>[] paraList1,Class<?>[] paraList2) {
+        int size1 = paraList1.length;
+        int size2 = paraList2.length;
         for (int i = 0; i < size1 && i < size2; i++) {
-            int result = para1[i].getName().compareTo(para2[i].getName());
+            int result = paraList1[i].getName().compareTo(paraList2[i].getName());
             if (result != 0) {
                 return result;
             }
