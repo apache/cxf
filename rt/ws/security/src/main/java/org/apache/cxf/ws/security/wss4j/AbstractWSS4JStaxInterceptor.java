@@ -150,7 +150,13 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
         String certConstraints =
             (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.SUBJECT_CERT_CONSTRAINTS, msg);
         if (certConstraints != null && !"".equals(certConstraints)) {
-            securityProperties.setSubjectCertConstraints(convertCertConstraints(certConstraints));
+            String certConstraintsSeparator =
+                (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.CERT_CONSTRAINTS_SEPARATOR, msg);
+            if (certConstraintsSeparator == null || certConstraintsSeparator.isEmpty()) {
+                certConstraintsSeparator = ",";
+            }
+            securityProperties.setSubjectCertConstraints(
+                convertCertConstraints(certConstraints, certConstraintsSeparator));
         }
 
         // Now set SAML SenderVouches + Holder Of Key requirements
@@ -175,8 +181,8 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
         securityProperties.setDisableSchemaValidation(!validateSchemas);
     }
 
-    private Collection<Pattern> convertCertConstraints(String certConstraints) {
-        String[] certConstraintsList = certConstraints.split(",");
+    private Collection<Pattern> convertCertConstraints(String certConstraints, String separator) {
+        String[] certConstraintsList = certConstraints.split(separator);
         if (certConstraintsList.length > 0) {
             Collection<Pattern> subjectCertConstraints = new ArrayList<>(certConstraintsList.length);
             for (String certConstraint : certConstraintsList) {
