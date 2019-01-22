@@ -170,7 +170,7 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
     }
 
     public void writeStartElement(String prefix, String local, String namespace) throws XMLStreamException {
-        if (prefix == null || prefix.equals("")) {
+        if (prefix == null || prefix.isEmpty()) {
             writeStartElement(namespace, local);
         } else {
             isOverlaidStack.add(0, isOverlaid);

@@ -142,11 +142,11 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
 
         WebService webServiceAnn = AnnotationUtil.getPrivClassAnnotation(clz, WebService.class);
         assertTrue("Impl class should note generate name property value in webService annotation",
-                   webServiceAnn.name().equals(""));
+                   webServiceAnn.name().isEmpty());
         assertFalse("Impl class should generate portName property value in webService annotation",
-                    webServiceAnn.portName().equals(""));
+                    webServiceAnn.portName().isEmpty());
         assertFalse("Impl class should generate serviceName property value in webService annotation",
-                    webServiceAnn.serviceName().equals(""));
+                    webServiceAnn.serviceName().isEmpty());
 
     }
 

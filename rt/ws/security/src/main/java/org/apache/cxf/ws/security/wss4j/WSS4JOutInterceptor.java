@@ -219,7 +219,7 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                  * username defined in the deployment descriptor takes precedence.
                  */
                 reqData.setUsername((String) getOption(ConfigurationConstants.USER));
-                if (reqData.getUsername() == null || reqData.getUsername().equals("")) {
+                if (reqData.getUsername() == null || reqData.getUsername().isEmpty()) {
                     String username = (String) getProperty(reqData.getMsgContext(),
                             ConfigurationConstants.USER);
                     if (username != null) {
@@ -240,7 +240,7 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                         break;
                     }
                 }
-                if (userNameRequired && (reqData.getUsername() == null || reqData.getUsername().equals(""))
+                if (userNameRequired && (reqData.getUsername() == null || reqData.getUsername().isEmpty())
                         && (String)getOption(ConfigurationConstants.SIGNATURE_USER) == null) {
                     throw new SoapFault(new Message("NO_USERNAME", LOG), version
                             .getReceiver());

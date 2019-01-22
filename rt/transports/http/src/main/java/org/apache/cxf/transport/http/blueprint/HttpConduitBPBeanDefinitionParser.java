@@ -167,9 +167,9 @@ public class HttpConduitBPBeanDefinitionParser extends AbstractBPBeanDefinitionP
         String elementName = el.getLocalName();
         String classProperty = el.getAttribute("class");
         String beanref = el.getAttribute("bean");
-        if (classProperty != null && !classProperty.equals("")) {
+        if (classProperty != null && !classProperty.isEmpty()) {
             bean.addProperty(elementName, createObjectOfClass(ctx, classProperty));
-        } else if (beanref != null && !beanref.equals("")) {
+        } else if (beanref != null && !beanref.isEmpty()) {
             bean.addProperty(elementName, createRef(ctx, beanref));
         }
     }

@@ -229,7 +229,7 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
 
     public String getAttributeValue(String ns, String local) {
         Attr at;
-        if (ns == null || ns.equals("")) {
+        if (ns == null || ns.isEmpty()) {
             at = getCurrentElement().getAttributeNode(local);
         } else {
             at = getCurrentElement().getAttributeNodeNS(ns, local);

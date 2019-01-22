@@ -214,7 +214,7 @@ public class ServiceProcessor extends AbstractProcessor {
                     && serviceBinding2.getJaxwsClass().getComments() != null) {
                     jaxwsBinding.setClassJavaDoc(serviceBinding2.getJaxwsClass().getComments());
                 }
-                if (!serviceBinding2.getPackageJavaDoc().equals("")) {
+                if (!serviceBinding2.getPackageJavaDoc().isEmpty()) {
                     sclz.setPackageJavaDoc(serviceBinding2.getPackageJavaDoc());
                 }
             }

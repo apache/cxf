@@ -298,7 +298,7 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
                                              JAXWSAConstants.WSAM_INTERFACE_NAME,
                                              JAXWSAConstants.NS_WSAM);
                     String portTypePrefix = interfaceName.getPrefix();
-                    if (portTypePrefix == null || portTypePrefix.equals("")) {
+                    if (portTypePrefix == null || portTypePrefix.isEmpty()) {
                         portTypePrefix = "ns1";
                     }
                     writer.writeNamespace(portTypePrefix, interfaceName.getNamespaceURI());

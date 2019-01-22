@@ -83,7 +83,7 @@ public final class ResponseWrapper extends Wrapper {
         if (method.getAnnotation(WebResult.class) == null
             && method.getAnnotation(javax.xml.ws.ResponseWrapper.class) == null
             || method.getAnnotation(WebResult.class) != null
-            && method.getAnnotation(WebResult.class).targetNamespace().equals("")) {
+            && method.getAnnotation(WebResult.class).targetNamespace().isEmpty()) {
             field.setTargetNamespace("");
         }
 

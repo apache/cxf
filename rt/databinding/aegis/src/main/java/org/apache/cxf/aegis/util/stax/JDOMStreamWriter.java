@@ -84,7 +84,7 @@ public class JDOMStreamWriter implements XMLStreamWriter {
     }
 
     public void writeStartElement(String prefix, String local, String namespace) throws XMLStreamException {
-        if (prefix == null || prefix.equals("")) {
+        if (prefix == null || prefix.isEmpty()) {
             writeStartElement(namespace, local);
         } else {
             newChild(new Element(local, prefix, namespace));

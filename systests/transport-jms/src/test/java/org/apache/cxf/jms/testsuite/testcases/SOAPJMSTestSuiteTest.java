@@ -521,42 +521,42 @@ public class SOAPJMSTestSuiteTest extends AbstractBusClientServerTestBase {
         if (messageProperties.isSetExpiration()) {
             assertEquals(message.getJMSExpiration(), messageProperties.getExpiration().intValue());
         }
-        if (messageProperties.isSetReplyTo() && !messageProperties.getReplyTo().trim().equals("")) {
+        if (messageProperties.isSetReplyTo() && !messageProperties.getReplyTo().trim().isEmpty()) {
             assertEquals(message.getJMSReplyTo().toString(), messageProperties.getReplyTo());
         }
         if (messageProperties.isSetCorrelationID()
-            && !messageProperties.getCorrelationID().trim().equals("")) {
+            && !messageProperties.getCorrelationID().trim().isEmpty()) {
             assertEquals(message.getJMSCorrelationID(), messageProperties.getCorrelationID());
         }
         if (messageProperties.isSetDestination()
-            && !messageProperties.getDestination().trim().equals("")) {
+            && !messageProperties.getDestination().trim().isEmpty()) {
             assertEquals(message.getJMSDestination().toString(), messageProperties.getDestination());
         }
         if (messageProperties.isSetRedelivered()) {
             assertEquals(message.getJMSRedelivered(), messageProperties.isRedelivered());
         }
         if (messageProperties.isSetBindingVersion()
-            && !messageProperties.getBindingVersion().trim().equals("")) {
+            && !messageProperties.getBindingVersion().trim().isEmpty()) {
             assertEquals(message.getStringProperty(JMSSpecConstants.BINDINGVERSION_FIELD),
                          messageProperties.getBindingVersion());
         }
         if (messageProperties.isSetTargetService()
-            && !messageProperties.getTargetService().trim().equals("")) {
+            && !messageProperties.getTargetService().trim().isEmpty()) {
             assertEquals(message.getStringProperty(JMSSpecConstants.TARGETSERVICE_FIELD),
                          messageProperties.getTargetService());
         }
         if (messageProperties.isSetContentType()
-            && !messageProperties.getContentType().trim().equals("")) {
+            && !messageProperties.getContentType().trim().isEmpty()) {
             assertEquals(message.getStringProperty(JMSSpecConstants.CONTENTTYPE_FIELD),
                          messageProperties.getContentType());
         }
         if (messageProperties.isSetSoapAction()
-            && !messageProperties.getSoapAction().trim().equals("")) {
+            && !messageProperties.getSoapAction().trim().isEmpty()) {
             assertEquals(message.getStringProperty(JMSSpecConstants.SOAPACTION_FIELD),
                          messageProperties.getSoapAction());
         }
         if (messageProperties.isSetRequestURI()
-            && !messageProperties.getRequestURI().trim().equals("")) {
+            && !messageProperties.getRequestURI().trim().isEmpty()) {
             assertEquals(message.getStringProperty(JMSSpecConstants.REQUESTURI_FIELD),
                          messageProperties.getRequestURI().trim());
         }
@@ -608,23 +608,23 @@ public class SOAPJMSTestSuiteTest extends AbstractBusClientServerTestBase {
             assertEquals(header.getJMSPriority(), messageProperties.getPriority().intValue());
         }
         if (messageProperties.isSetBindingVersion()
-            && !messageProperties.getBindingVersion().trim().equals("")) {
+            && !messageProperties.getBindingVersion().trim().isEmpty()) {
             assertEquals(header.getSOAPJMSBindingVersion(), messageProperties.getBindingVersion());
         }
         if (messageProperties.isSetTargetService()
-            && !messageProperties.getTargetService().trim().equals("")) {
+            && !messageProperties.getTargetService().trim().isEmpty()) {
             assertEquals(header.getSOAPJMSTargetService(), messageProperties.getTargetService());
         }
         if (messageProperties.isSetContentType()
-            && !messageProperties.getContentType().trim().equals("")) {
+            && !messageProperties.getContentType().trim().isEmpty()) {
             assertEquals(header.getSOAPJMSContentType(), messageProperties.getContentType());
         }
         if (messageProperties.isSetSoapAction()
-            && !messageProperties.getSoapAction().trim().equals("")) {
+            && !messageProperties.getSoapAction().trim().isEmpty()) {
             assertEquals(header.getSOAPJMSSOAPAction(), messageProperties.getSoapAction());
         }
         if (messageProperties.isSetRequestURI()
-            && !messageProperties.getRequestURI().trim().equals("")) {
+            && !messageProperties.getRequestURI().trim().isEmpty()) {
             assertEquals(header.getSOAPJMSRequestURI(), messageProperties.getRequestURI().trim());
         }
         if (messageProperties.isSetIsFault()) {

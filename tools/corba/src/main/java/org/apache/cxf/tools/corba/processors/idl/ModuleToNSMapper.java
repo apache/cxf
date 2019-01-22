@@ -92,7 +92,7 @@ public class ModuleToNSMapper {
             Scope currentScope = scope;
             String parentURI = null;
             uri = "";
-            while (parentURI == null && !currentScope.toString().equals("")
+            while (parentURI == null && !currentScope.toString().isEmpty()
                    && currentScope != currentScope.getParent()) {
                 parentURI = userMap.get(currentScope.toString(separator));
                 if (parentURI == null) {

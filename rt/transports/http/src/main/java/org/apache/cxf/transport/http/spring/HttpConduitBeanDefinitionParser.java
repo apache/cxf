@@ -200,7 +200,7 @@ public class HttpConduitBeanDefinitionParser
         String elementName = element.getLocalName();
 
         String classProperty = element.getAttribute("class");
-        if (classProperty != null && !classProperty.equals("")) {
+        if (classProperty != null && !classProperty.isEmpty()) {
             try {
                 Object obj =
                     ClassLoaderUtils.loadClass(
@@ -219,15 +219,15 @@ public class HttpConduitBeanDefinitionParser
             }
         }
         String beanref = element.getAttribute("bean");
-        if (beanref != null && !beanref.equals("")) {
-            if (classProperty != null && !classProperty.equals("")) {
+        if (beanref != null && !beanref.isEmpty()) {
+            if (classProperty != null && !classProperty.isEmpty()) {
                 throw new IllegalArgumentException(
                         "Element '" + elementName + "' cannot have both "
                         + "\"bean\" and \"class\" attributes.");
 
             }
             bean.addPropertyReference(elementName, beanref);
-        } else if (classProperty == null || classProperty.equals("")) {
+        } else if (classProperty == null || classProperty.isEmpty()) {
             throw new IllegalArgumentException(
                     "Element '" + elementName
                     + "' requires at least one of the "

@@ -621,7 +621,7 @@ public final class CorbaUtils {
     public static QName processQName(QName qname, ServiceInfo serviceInfo) {
         QName result = qname;
         if ((qname.getNamespaceURI() != null)
-            && (!qname.getNamespaceURI().equals(""))
+            && (!qname.getNamespaceURI().isEmpty())
             && (!isElementFormQualified(serviceInfo, qname.getNamespaceURI()))) {
             result = new QName("", qname.getLocalPart());
         }

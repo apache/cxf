@@ -67,9 +67,9 @@ public class PortTypeProcessor extends AbstractProcessor {
                 intf.setPackageName(jaxwsBinding.getPackage());
             }
 
-            if (infBinding != null && !infBinding.getPackageJavaDoc().equals("")) {
+            if (infBinding != null && !infBinding.getPackageJavaDoc().isEmpty()) {
                 intf.setPackageJavaDoc(infBinding.getPackageJavaDoc());
-            } else if (jaxwsBinding != null && !jaxwsBinding.getPackageJavaDoc().equals("")) {
+            } else if (jaxwsBinding != null && !jaxwsBinding.getPackageJavaDoc().isEmpty()) {
                 intf.setPackageJavaDoc(jaxwsBinding.getPackageJavaDoc());
             }
 

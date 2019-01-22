@@ -316,7 +316,7 @@ public class WSDLToCorbaHelper {
                 schemaType = findSchemaType(element.getSchemaTypeName());
             }
         }
-        if (schemaName.getNamespaceURI().equals("")) {
+        if (schemaName.getNamespaceURI().isEmpty()) {
             schemaName = new QName(uri, schemaName.getLocalPart());
         }
         QName elemName = schemaName;
@@ -535,7 +535,7 @@ public class WSDLToCorbaHelper {
             }
             XmlSchemaAttribute attribute = (XmlSchemaAttribute) aog;
             QName attrName = attribute.getQName();
-            if (attrName.getNamespaceURI().equals("")) {
+            if (attrName.getNamespaceURI().isEmpty()) {
                 attrName = new QName(uri, attrName.getLocalPart());
             }
             CorbaType membertype = null;
@@ -972,7 +972,7 @@ public class WSDLToCorbaHelper {
         QName schematypeName = checkPrefix(complex.getQName());
         if (schematypeName == null) {
             schematypeName = createQNameTargetNamespace(defaultName.getLocalPart());
-            if (defaultName.getNamespaceURI().equals("")) {
+            if (defaultName.getNamespaceURI().isEmpty()) {
                 schematypeName = checkPrefix(schematypeName);
             } else {
                 schematypeName = checkPrefix(defaultName);
@@ -1319,7 +1319,7 @@ public class WSDLToCorbaHelper {
                     if (complex.getQName() != null) {
                         uri = complex.getQName().getNamespaceURI();
                     }
-                    if (elName.getNamespaceURI().equals("")) {
+                    if (elName.getNamespaceURI().isEmpty()) {
                         elName = new QName(uri, elName.getLocalPart());
                     }
                     QName arrayTypeName = elName;
@@ -1550,7 +1550,7 @@ public class WSDLToCorbaHelper {
 
     protected QName checkPrefix(QName schematypeName) {
         QName name = schematypeName;
-        if ((name != null) && (name.getPrefix() == null || name.getPrefix().equals(""))) {
+        if ((name != null) && (name.getPrefix() == null || name.getPrefix().isEmpty())) {
             if (StringUtils.isEmpty(name.getNamespaceURI())) {
                 return name;
             }
@@ -1612,7 +1612,7 @@ public class WSDLToCorbaHelper {
             schemaName = element.getRef().getTargetQName();
         }
 
-        if (schemaName.getNamespaceURI().equals("")) {
+        if (schemaName.getNamespaceURI().isEmpty()) {
             schemaName = new QName(uri, schemaName.getLocalPart());
         }
         boolean qualified = false;

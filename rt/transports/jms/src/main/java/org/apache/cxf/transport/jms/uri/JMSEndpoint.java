@@ -179,7 +179,7 @@ public class JMSEndpoint {
     private void configureProperties(Map<String, Object> params) {
         for (Map.Entry<String, Object> entry : params.entrySet()) {
             Object value = entry.getValue();
-            if (value == null || value.equals("")) {
+            if (value == null || value.isEmpty()) {
                 continue;
             }
             String key = entry.getKey();

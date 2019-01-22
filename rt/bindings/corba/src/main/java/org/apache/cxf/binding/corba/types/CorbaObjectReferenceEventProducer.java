@@ -141,8 +141,8 @@ public final class CorbaObjectReferenceEventProducer extends AbstractStartEndEve
 
         // If the binding name does not have a namespace associated with it, then we'll need to
         // get the list of all bindings and compare their local parts against our name.
-        if (wsdlBinding == null && bindingName.getNamespaceURI().equals("")
-            && !bindingName.getLocalPart().equals("")) {
+        if (wsdlBinding == null && bindingName.getNamespaceURI().isEmpty()
+            && !bindingName.getLocalPart().isEmpty()) {
             Collection<Binding> bindingsCollection = CastUtils.cast(wsdlDef.getBindings().values());
             for (Binding b : bindingsCollection) {
                 if (b.getQName().getLocalPart().equals(bindingName.getLocalPart())) {
