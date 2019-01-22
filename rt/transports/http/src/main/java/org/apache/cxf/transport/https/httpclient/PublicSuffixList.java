@@ -50,12 +50,14 @@ public final class PublicSuffixList {
         if (rules == null) {
             throw new IllegalArgumentException("Domain suffix rules are null");
         }
-        if (exceptions == null) {
-            throw new IllegalArgumentException("Domain suffix exceptions are null");
-        }
         this.type = type;
         this.rules = Collections.unmodifiableList(rules);
-        this.exceptions = Collections.unmodifiableList(exceptions);
+        this.exceptions = Collections.unmodifiableList(exceptions != null ? exceptions
+            : Collections.<String>emptyList());
+    }
+
+    public PublicSuffixList(final List<String> rules, final List<String> exceptions) {
+        this(DomainType.UNKNOWN, rules, exceptions);
     }
 
     public DomainType getType() {

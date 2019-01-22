@@ -27,7 +27,6 @@ package org.apache.cxf.transport.https.httpclient;
 
 import java.net.IDN;
 import java.util.Collection;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -58,12 +57,12 @@ public final class PublicSuffixMatcher {
             throw new IllegalArgumentException("Domain suffix rules are null");
         }
         this.rules = new ConcurrentHashMap<>(rules.size());
-        for (String rule: rules) {
+        for (final String rule : rules) {
             this.rules.put(rule, domainType);
         }
         this.exceptions = new ConcurrentHashMap<>();
         if (exceptions != null) {
-            for (String exception: exceptions) {
+            for (final String exception: exceptions) {
                 this.exceptions.put(exception, domainType);
             }
         }
@@ -75,14 +74,13 @@ public final class PublicSuffixMatcher {
         }
         this.rules = new ConcurrentHashMap<>();
         this.exceptions = new ConcurrentHashMap<>();
-        for (PublicSuffixList list: lists) {
+        for (final PublicSuffixList list : lists) {
             final DomainType domainType = list.getType();
-            for (String rule: list.getRules()) {
+            for (final String rule: list.getRules()) {
                 this.rules.put(rule, domainType);
             }
-            final List<String> listExceptions = list.getExceptions();
-            if (listExceptions != null) {
-                for (String exception: listExceptions) {
+            if (list.getExceptions() != null) {
+                for (final String exception : list.getExceptions()) {
                     this.exceptions.put(exception, domainType);
                 }
             }

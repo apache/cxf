@@ -33,6 +33,7 @@ import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.NoSuchElementException;
@@ -47,6 +48,7 @@ import javax.naming.ldap.LdapName;
 import javax.naming.ldap.Rdn;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSession;
 import javax.security.auth.x500.X500Principal;
 
@@ -58,10 +60,17 @@ import org.apache.cxf.common.logging.LogUtils;
  */
 public final class DefaultHostnameVerifier implements HostnameVerifier {
 
-    enum TYPE { IPv4, IPv6, DNS };
+    enum HostNameType {
 
-    static final int DNS_NAME_TYPE = 2;
-    static final int IP_ADDRESS_TYPE = 7;
+        IPv4(7), IPv6(7), DNS(2);
+
+        final int subjectType;
+
+        HostNameType(final int subjectType) {
+            this.subjectType = subjectType;
+        }
+
+    }
 
     private static final Logger LOG = LogUtils.getL7dLogger(DefaultHostnameVerifier.class);
 
@@ -92,22 +101,10 @@ public final class DefaultHostnameVerifier implements HostnameVerifier {
 
     public void verify(
             final String host, final X509Certificate cert) throws SSLException {
-        TYPE hostFormat = TYPE.DNS;
-        if (InetAddressUtils.isIPv4Address(host)) {
-            hostFormat = TYPE.IPv4;
-        } else {
-            String s = host;
-            if (s.startsWith("[") && s.endsWith("]")) {
-                s = host.substring(1, host.length() - 1);
-            }
-            if (InetAddressUtils.isIPv6Address(s)) {
-                hostFormat = TYPE.IPv6;
-            }
-        }
-        final int subjectType = hostFormat == TYPE.IPv4 || hostFormat == TYPE.IPv6 ? IP_ADDRESS_TYPE : DNS_NAME_TYPE;
-        final List<String> subjectAlts = extractSubjectAlts(cert, subjectType);
+        final HostNameType hostType = determineHostFormat(host);
+        final List<SubjectName> subjectAlts = getSubjectAltNames(cert);
         if (subjectAlts != null && !subjectAlts.isEmpty()) {
-            switch (hostFormat) {
+            switch (hostType) {
             case IPv4:
                 matchIPAddress(host, subjectAlts);
                 break;
@@ -130,60 +127,54 @@ public final class DefaultHostnameVerifier implements HostnameVerifier {
         }
     }
 
-    public boolean verify(final String host, final String certHostname) {
-        try {
-            matchCN(host, certHostname, this.publicSuffixMatcher);
-            return true;
-        } catch (SSLException ex) {
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.log(Level.FINE, ex.getMessage(), ex);
-            }
-            return false;
-        }
-    }
-
-    static void matchIPAddress(final String host, final List<String> subjectAlts) throws SSLException {
+    static void matchIPAddress(final String host, final List<SubjectName> subjectAlts) throws SSLException {
         for (int i = 0; i < subjectAlts.size(); i++) {
-            final String subjectAlt = subjectAlts.get(i);
-            if (host.equals(subjectAlt)) {
+            final SubjectName subjectAlt = subjectAlts.get(i);
+            if (subjectAlt.getType() == SubjectName.IP && host.equals(subjectAlt.getValue())) {
                 return;
             }
         }
-        throw new SSLException("Certificate for <" + host + "> doesn't match any "
-            + "of the subject alternative names: " + subjectAlts);
+        throw new SSLPeerUnverifiedException("Certificate for <" + host + "> doesn't match any "
+                + "of the subject alternative names: " + subjectAlts);
     }
 
-    static void matchIPv6Address(final String host, final List<String> subjectAlts) throws SSLException {
+    static void matchIPv6Address(final String host, final List<SubjectName> subjectAlts) throws SSLException {
         final String normalisedHost = normaliseAddress(host);
         for (int i = 0; i < subjectAlts.size(); i++) {
-            final String subjectAlt = subjectAlts.get(i);
-            final String normalizedSubjectAlt = normaliseAddress(subjectAlt);
-            if (normalisedHost.equals(normalizedSubjectAlt)) {
-                return;
+            final SubjectName subjectAlt = subjectAlts.get(i);
+            if (subjectAlt.getType() == SubjectName.IP) {
+                final String normalizedSubjectAlt = normaliseAddress(subjectAlt.getValue());
+                if (normalisedHost.equals(normalizedSubjectAlt)) {
+                    return;
+                }
             }
         }
-        throw new SSLException("Certificate for <" + host + "> doesn't match any "
-            + "of the subject alternative names: " + subjectAlts);
+        throw new SSLPeerUnverifiedException("Certificate for <" + host + "> doesn't match any "
+                + "of the subject alternative names: " + subjectAlts);
     }
 
-    static void matchDNSName(final String host, final List<String> subjectAlts,
+    static void matchDNSName(final String host, final List<SubjectName> subjectAlts,
                              final PublicSuffixMatcher publicSuffixMatcher) throws SSLException {
         final String normalizedHost = host.toLowerCase(Locale.ROOT);
         for (int i = 0; i < subjectAlts.size(); i++) {
-            final String subjectAlt = subjectAlts.get(i);
-            final String normalizedSubjectAlt = subjectAlt.toLowerCase(Locale.ROOT);
-            if (matchIdentityStrict(normalizedHost, normalizedSubjectAlt, publicSuffixMatcher)) {
-                return;
+            final SubjectName subjectAlt = subjectAlts.get(i);
+            if (subjectAlt.getType() == SubjectName.DNS) {
+                final String normalizedSubjectAlt = subjectAlt.getValue().toLowerCase(Locale.ROOT);
+                if (matchIdentityStrict(normalizedHost, normalizedSubjectAlt, publicSuffixMatcher)) {
+                    return;
+                }
             }
         }
-        throw new SSLException("Certificate for <" + host + "> doesn't match any "
-            + "of the subject alternative names: " + subjectAlts);
+        throw new SSLPeerUnverifiedException("Certificate for <" + host + "> doesn't match any "
+                + "of the subject alternative names: " + subjectAlts);
     }
 
     static void matchCN(final String host, final String cn,
-                 final PublicSuffixMatcher publicSuffixMatcher) throws SSLException {
-        if (!matchIdentityStrict(host, cn, publicSuffixMatcher)) {
-            throw new SSLException("Certificate for <" + host + "> doesn't match "
+                        final PublicSuffixMatcher publicSuffixMatcher) throws SSLException {
+        final String normalizedHost = host.toLowerCase(Locale.ROOT);
+        final String normalizedCn = cn.toLowerCase(Locale.ROOT);
+        if (!matchIdentityStrict(normalizedHost, normalizedCn, publicSuffixMatcher)) {
+            throw new SSLPeerUnverifiedException("Certificate for <" + host + "> doesn't match "
                 + "common name of the certificate subject: " + cn);
         }
     }
@@ -278,28 +269,42 @@ public final class DefaultHostnameVerifier implements HostnameVerifier {
         }
     }
 
-    static List<String> extractSubjectAlts(final X509Certificate cert, final int subjectType) {
-        Collection<List<?>> c = null;
-        try {
-            c = cert.getSubjectAlternativeNames();
-        } catch (final CertificateParsingException ignore) {
-            //
+    static HostNameType determineHostFormat(final String host) {
+        if (InetAddressUtils.isIPv4Address(host)) {
+            return HostNameType.IPv4;
         }
-        List<String> subjectAltList = null;
-        if (c != null) {
-            for (final List<?> aC : c) {
-                final List<?> list = aC;
-                final int type = ((Integer) list.get(0)).intValue();
-                if (type == subjectType) {
-                    final String s = (String) list.get(1);
-                    if (subjectAltList == null) {
-                        subjectAltList = new ArrayList<>();
+        String s = host;
+        if (s.startsWith("[") && s.endsWith("]")) {
+            s = host.substring(1, host.length() - 1);
+        }
+        if (InetAddressUtils.isIPv6Address(s)) {
+            return HostNameType.IPv6;
+        }
+        return HostNameType.DNS;
+    }
+
+    static List<SubjectName> getSubjectAltNames(final X509Certificate cert) {
+        try {
+            final Collection<List<?>> entries = cert.getSubjectAlternativeNames();
+            if (entries == null) {
+                return Collections.emptyList();
+            }
+            final List<SubjectName> result = new ArrayList<>();
+            for (final List<?> entry : entries) {
+                final Integer type = entry.size() >= 2 ? (Integer) entry.get(0) : null;
+                if (type == SubjectName.DNS || type == SubjectName.IP) {
+                    final Object o = entry.get(1);
+                    if (o instanceof String) {
+                        result.add(new SubjectName((String) o, type));
+                    } else if (o instanceof byte[]) {
+                        // TODO ASN.1 DER encoded form
                     }
-                    subjectAltList.add(s);
                 }
             }
+            return result;
+        } catch (final CertificateParsingException ignore) {
+            return Collections.emptyList();
         }
-        return subjectAltList;
     }
 
     /*

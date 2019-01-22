@@ -36,8 +36,9 @@ import java.util.regex.Pattern;
 public final class InetAddressUtils {
 
     private static final String IPV4_BASIC_PATTERN_STRING =
-            "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}" // initial 3 fields, 0-255 followed by .
-            + "([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])"; // final field, 0-255
+        "(([1-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){1}" // initial first field, 1-255
+        + "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){2}" // following 2 fields, 0-255 followed by .
+        + "([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])"; // final field, 0-255
 
     private static final Pattern IPV4_PATTERN =
         Pattern.compile("^" + IPV4_BASIC_PATTERN_STRING + "$");
