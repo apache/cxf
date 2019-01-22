@@ -69,7 +69,6 @@ public class HttpServiceTest extends CXFOSGiTestSupport {
     public Option[] config() {
         return new Option[] {
             cxfBaseConfig(),
-            features(karafUrl, "http"),
             features(cxfUrl, "cxf-jaxws", "cxf-http-jetty"),
             testUtils(),
             logLevel(LogLevel.INFO),
