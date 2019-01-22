@@ -197,11 +197,17 @@ public class SecurityConstants {
     public static final String SAML_ROLE_ATTRIBUTENAME = "security.saml-role-attributename";
 
     /**
-     * A comma separated String of regular expressions which will be applied to the subject DN of
-     * the certificate used for signature validation, after trust verification of the certificate
-     * chain associated with the certificate.
+     * A String of regular expressions (separated by the value specified for CERT_CONSTRAINTS_SEPARATOR)
+     * which will be applied to the subject DN of the certificate used for signature validation, after trust
+     * verification of the certificate chain associated with the certificate.
      */
     public static final String SUBJECT_CERT_CONSTRAINTS = "security.subject.cert.constraints";
+
+    /**
+     * The separator that is used to parse certificate constraints configured in the SUBJECT_CERT_CONSTRAINTS
+     * tag. By default it is a comma - ",".
+     */
+    public static final String CERT_CONSTRAINTS_SEPARATOR = "security.cert.constraints.separator";
 
     //
     // STS Client Configuration tags
