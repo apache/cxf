@@ -105,7 +105,6 @@ public class JaxRsServiceTest extends CXFOSGiTestSupport {
     public Option[] config() {
         return new Option[] {
             cxfBaseConfig(),
-            features(karafUrl, "aries-blueprint", "http"),
             features(cxfUrl, "cxf-core", "cxf-wsdl", "cxf-jaxrs", "cxf-bean-validation-core", "cxf-bean-validation"),
             logLevel(LogLevel.INFO),
             provision(serviceBundle())

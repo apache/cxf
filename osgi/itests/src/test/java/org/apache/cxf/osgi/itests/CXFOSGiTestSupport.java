@@ -56,7 +56,6 @@ public class CXFOSGiTestSupport {
     protected BundleContext bundleContext;
 
     protected MavenUrlReference cxfUrl;
-    protected MavenUrlReference karafUrl;
     protected MavenUrlReference amqUrl;
     protected MavenUrlReference springLegacyUrl;
 
@@ -70,8 +69,8 @@ public class CXFOSGiTestSupport {
      * @return
      */
     protected Option cxfBaseConfig() {
-        karafUrl = maven().groupId("org.apache.karaf").artifactId("apache-karaf-minimal").version(getKarafVersion())
-                .type("tar.gz");
+        final MavenUrlReference karafUrl = maven().groupId("org.apache.karaf").artifactId("apache-karaf-minimal")
+                .version(getKarafVersion()).type("tar.gz");
         cxfUrl = maven().groupId("org.apache.cxf.karaf").artifactId("apache-cxf").versionAsInProject()
                 .type("xml").classifier("features");
         amqUrl = maven().groupId("org.apache.activemq")
