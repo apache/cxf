@@ -78,13 +78,17 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
     public KerberosTokenInterceptorProvider() {
         super(Arrays.asList(SP11Constants.KERBEROS_TOKEN, SP12Constants.KERBEROS_TOKEN));
 
-        this.getOutInterceptors().add(new KerberosTokenOutInterceptor());
-        this.getOutFaultInterceptors().add(new KerberosTokenOutInterceptor());
-        this.getInInterceptors().add(new KerberosTokenDOMInInterceptor());
-        this.getInFaultInterceptors().add(new KerberosTokenDOMInInterceptor());
+        KerberosTokenOutInterceptor outInterceptor = new KerberosTokenOutInterceptor();
+        this.getOutInterceptors().add(outInterceptor);
+        this.getOutFaultInterceptors().add(outInterceptor);
 
-        this.getInInterceptors().add(new KerberosTokenStaxInInterceptor());
-        this.getInFaultInterceptors().add(new KerberosTokenStaxInInterceptor());
+        KerberosTokenDOMInInterceptor domInInterceptor = new KerberosTokenDOMInInterceptor();
+        this.getInInterceptors().add(domInInterceptor);
+        this.getInFaultInterceptors().add(domInInterceptor);
+
+        KerberosTokenStaxInInterceptor staxInInterceptor = new KerberosTokenStaxInInterceptor();
+        this.getInInterceptors().add(staxInInterceptor);
+        this.getInFaultInterceptors().add(staxInInterceptor);
 
         this.getOutInterceptors().add(new KerberosTokenInterceptor());
         this.getInInterceptors().add(new KerberosTokenInterceptor());

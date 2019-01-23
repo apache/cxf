@@ -75,10 +75,13 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
         super(Arrays.asList(SP11Constants.TRANSPORT_TOKEN, SP12Constants.TRANSPORT_TOKEN,
                             SP11Constants.ISSUED_TOKEN, SP12Constants.ISSUED_TOKEN,
                             SP11Constants.HTTPS_TOKEN, SP12Constants.HTTPS_TOKEN));
-        this.getOutInterceptors().add(new HttpsTokenOutInterceptor());
-        this.getOutFaultInterceptors().add(new HttpsTokenOutInterceptor());
-        this.getInInterceptors().add(new HttpsTokenInInterceptor());
-        this.getInFaultInterceptors().add(new HttpsTokenInInterceptor());
+        HttpsTokenOutInterceptor outInterceptor = new HttpsTokenOutInterceptor();
+        this.getOutInterceptors().add(outInterceptor);
+        this.getOutFaultInterceptors().add(outInterceptor);
+
+        HttpsTokenInInterceptor inInterceptor = new HttpsTokenInInterceptor();
+        this.getInInterceptors().add(inInterceptor);
+        this.getInFaultInterceptors().add(inInterceptor);
     }
 
     private static Map<String, List<String>> getProtocolHeaders(Message message) {
@@ -124,8 +127,8 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                     if (token.getAuthenticationType()
                         == HttpsToken.AuthenticationType.RequireClientCertificate) {
                         boolean disableClientCertCheck =
-                            MessageUtils.getContextualBoolean(message, 
-                                                              SecurityConstants.DISABLE_REQ_CLIENT_CERT_CHECK, 
+                            MessageUtils.getContextualBoolean(message,
+                                                              SecurityConstants.DISABLE_REQ_CLIENT_CERT_CHECK,
                                                               false);
                         if (!disableClientCertCheck) {
                             final MessageTrustDecider orig = message.get(MessageTrustDecider.class);

@@ -153,7 +153,7 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
                     SAAJUtils.getHeader(saaj).appendChild(el);
                 } catch (SOAPException e) {
                     //ignore
-                } 
+                }
 
                 WSSConfig config = (WSSConfig)message.getContextualProperty(WSSConfig.class.getName());
                 if (config == null) {

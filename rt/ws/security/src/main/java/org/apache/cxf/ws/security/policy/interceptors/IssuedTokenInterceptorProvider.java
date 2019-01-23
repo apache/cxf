@@ -78,10 +78,13 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
         this.getInInterceptors().add(in);
         this.getInFaultInterceptors().add(in);
 
-        this.getOutInterceptors().add(new IssuedTokenOutInterceptor());
-        this.getOutFaultInterceptors().add(new IssuedTokenOutInterceptor());
-        this.getInInterceptors().add(new IssuedTokenInInterceptor());
-        this.getInFaultInterceptors().add(new IssuedTokenInInterceptor());
+        IssuedTokenOutInterceptor outInterceptor = new IssuedTokenOutInterceptor();
+        this.getOutInterceptors().add(outInterceptor);
+        this.getOutFaultInterceptors().add(outInterceptor);
+
+        IssuedTokenInInterceptor inInterceptor = new IssuedTokenInInterceptor();
+        this.getInInterceptors().add(inInterceptor);
+        this.getInFaultInterceptors().add(inInterceptor);
 
         PolicyBasedWSS4JStaxOutInterceptor so = new PolicyBasedWSS4JStaxOutInterceptor();
         PolicyBasedWSS4JStaxInInterceptor si = new PolicyBasedWSS4JStaxInInterceptor();
