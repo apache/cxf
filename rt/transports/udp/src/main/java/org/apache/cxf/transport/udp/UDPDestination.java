@@ -51,6 +51,7 @@ import org.apache.cxf.workqueue.AutomaticWorkQueue;
 import org.apache.cxf.workqueue.WorkQueueManager;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.mina.core.buffer.IoBuffer;
+import org.apache.mina.core.future.CloseFuture;
 import org.apache.mina.core.session.AttributeKey;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
@@ -237,7 +238,17 @@ public class UDPDestination extends AbstractDestination {
 
             // Create streams
             InputStream in = new IoSessionInputStream();
-            OutputStream out = new IoSessionOutputStream(session);
+            OutputStream out = new IoSessionOutputStream(session) {
+                @Override
+                public void close() throws IOException {
+                    try {
+                        flush();
+                    } finally {
+                        CloseFuture future = session.closeNow();
+                        future.awaitUninterruptibly();
+                    }
+                }  
+            };
             session.setAttribute(KEY_IN, in);
             session.setAttribute(KEY_OUT, out);
             processStreamIo(session, in, out);
