@@ -62,8 +62,7 @@ public class JAXRSJaasConfigurationSecurityTest extends AbstractSpringSecurityTe
             "http://localhost:" + PORT + "/service/jaasConfigFilter/bookstorestorage/thosebooks/123";
         WebClient wc = WebClient.create(endpointAddress);
         wc.accept("text/xml");
-        wc.header(HttpHeaders.AUTHORIZATION,
-                  "Basic " + base64Encode("foo" + ":" + "bar1"));
+        wc.header(HttpHeaders.AUTHORIZATION, basicAuthHeader("foo", "bar1"));
         Response r = wc.get();
         assertEquals(401, r.getStatus());
         Object wwwAuthHeader = r.getMetadata().getFirst(HttpHeaders.WWW_AUTHENTICATE);
