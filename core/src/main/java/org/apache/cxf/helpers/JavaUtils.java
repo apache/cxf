@@ -53,7 +53,7 @@ public final class JavaUtils {
     static {
         String version = System.getProperty("java.version");
         try {
-            isJava8Before161 = version != null && version.startsWith("1.8.0")
+            isJava8Before161 = version != null && version.startsWith("1.8.0_")
                 && Integer.parseInt(version.substring(6)) < 161;
         } catch (NumberFormatException ex) {
             isJava8Before161 = false;
