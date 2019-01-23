@@ -128,7 +128,9 @@ public class DefaultSecurityContext implements LoginSecurityContext {
         
         try {
             Method m = ReflectionUtil.getMethod(principal.getClass(), "members");
-            members = (Enumeration<? extends Principal>)m.invoke(principal);
+            @SuppressWarnings("unchecked")
+            Enumeration<? extends Principal> ms = (Enumeration<? extends Principal>)m.invoke(principal);
+            members = ms;
         } catch (Exception e) {
             return false;
         }

@@ -31,7 +31,7 @@ import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.visitor.AbstractSearchConditionVisitor;
 import org.apache.hadoop.hbase.filter.BinaryComparator;
 import org.apache.hadoop.hbase.filter.ByteArrayComparable;
-import org.apache.hadoop.hbase.filter.CompareFilter.CompareOp;
+import org.apache.hadoop.hbase.filter.CompareFilter;
 import org.apache.hadoop.hbase.filter.Filter;
 import org.apache.hadoop.hbase.filter.FilterList;
 import org.apache.hadoop.hbase.filter.RegexStringComparator;
@@ -84,32 +84,33 @@ public class HBaseQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Filt
         return queries.isEmpty() ? null : queries.get(0);
     }
 
+    @SuppressWarnings("deprecation")
     private Filter buildSimpleQuery(ConditionType ct, String name, Object value) {
         name = super.getRealPropertyName(name);
         validatePropertyValue(name, value);
         Class<?> clazz = getPrimitiveFieldClass(name, value.getClass());
-        CompareOp compareOp = null;
+        CompareFilter.CompareOp compareOp = null;
         boolean regexCompRequired = false;
         switch (ct) {
         case EQUALS:
-            compareOp = CompareOp.EQUAL;
+            compareOp = CompareFilter.CompareOp.EQUAL;
             regexCompRequired = String.class == clazz && value.toString().endsWith("*");
             break;
         case NOT_EQUALS:
-            compareOp = CompareOp.NOT_EQUAL;
+            compareOp = CompareFilter.CompareOp.NOT_EQUAL;
             regexCompRequired = String.class == clazz && value.toString().endsWith("*");
             break;
         case GREATER_THAN:
-            compareOp = CompareOp.GREATER;
+            compareOp = CompareFilter.CompareOp.GREATER;
             break;
         case GREATER_OR_EQUALS:
-            compareOp = CompareOp.GREATER_OR_EQUAL;
+            compareOp = CompareFilter.CompareOp.GREATER_OR_EQUAL;
             break;
         case LESS_THAN:
-            compareOp = CompareOp.LESS;
+            compareOp = CompareFilter.CompareOp.LESS;
             break;
         case LESS_OR_EQUALS:
-            compareOp = CompareOp.LESS_OR_EQUAL;
+            compareOp = CompareFilter.CompareOp.LESS_OR_EQUAL;
             break;
         default:
             break;

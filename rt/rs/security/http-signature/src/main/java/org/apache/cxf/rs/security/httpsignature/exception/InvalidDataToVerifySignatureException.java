@@ -19,6 +19,8 @@
 package org.apache.cxf.rs.security.httpsignature.exception;
 
 public class InvalidDataToVerifySignatureException extends SignatureException {
+    private static final long serialVersionUID = 1L;
+
     public InvalidDataToVerifySignatureException() { }
 
     public InvalidDataToVerifySignatureException(String message, Throwable cause) {

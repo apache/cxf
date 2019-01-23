@@ -64,7 +64,6 @@ public class EffectivePolicyImplTest {
         Integer.valueOf(4);
     }
 
-    @SuppressWarnings("unchecked")
     private List<Interceptor<? extends Message>> createMockInterceptorList() {
         Interceptor<? extends Message> i = control.createMock(Interceptor.class);
         Interceptor<? extends Message> m = i;
@@ -301,7 +300,6 @@ public class EffectivePolicyImplTest {
         testInitialiseInterceptors(true, true);
     }
 
-    @SuppressWarnings("unchecked")
     private void testInitialiseInterceptors(boolean useIn, boolean fault) {
         EffectivePolicyImpl epi = new EffectivePolicyImpl();
         List<Assertion> alternative = new ArrayList<>();

@@ -74,10 +74,10 @@ public final class AnnotationUtils {
         }
     }
 
-    private static Class<?> loadClassOrNull(final String name) {
+    private static Class<? extends Annotation> loadClassOrNull(final String name) {
         try {
             return org.apache.cxf.common.classloader.ClassLoaderUtils.loadClass(
-                    name, AnnotationUtils.class);
+                    name, AnnotationUtils.class, Annotation.class);
         } catch (final ClassNotFoundException e) {
             return null;
         }

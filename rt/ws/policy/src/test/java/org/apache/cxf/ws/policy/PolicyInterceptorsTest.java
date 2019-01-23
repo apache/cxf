@@ -73,7 +73,6 @@ public class PolicyInterceptorsTest {
         bus = control.createMock(Bus.class);
     }
 
-    @SuppressWarnings("unchecked")
     private List<Interceptor<? extends Message>> createMockInterceptorList() {
         Interceptor<? extends Message> i = control.createMock(Interceptor.class);
         Interceptor<? extends Message> m = i;
@@ -108,7 +107,6 @@ public class PolicyInterceptorsTest {
         control.verify();
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testClientPolicyInInterceptor() {
         PolicyInInterceptor interceptor = new PolicyInInterceptor();

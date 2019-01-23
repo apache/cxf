@@ -19,6 +19,8 @@
 package org.apache.cxf.rs.security.httpsignature.exception;
 
 public class SignatureException extends RuntimeException {
+    private static final long serialVersionUID = 1L;
+
     public SignatureException() { }
 
     public SignatureException(String message) {

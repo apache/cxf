@@ -120,18 +120,21 @@ public class MockMarshaller implements Marshaller {
         return null;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public void setAdapter(XmlAdapter adapter) {
         // TODO Auto-generated method stub
 
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public <A extends XmlAdapter> void setAdapter(Class<A> type, A adapter) {
         // TODO Auto-generated method stub
 
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public <A extends XmlAdapter> A getAdapter(Class<A> type) {
         // TODO Auto-generated method stub

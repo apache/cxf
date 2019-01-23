@@ -77,7 +77,6 @@ public class EndpointPolicyImplTest {
         control = EasyMock.createNiceControl();
     }
 
-    @SuppressWarnings("unchecked")
     private List<Interceptor<? extends Message>> createMockInterceptorList() {
         Interceptor<? extends Message> i = control.createMock(Interceptor.class);
         Interceptor<? extends Message> m = i;

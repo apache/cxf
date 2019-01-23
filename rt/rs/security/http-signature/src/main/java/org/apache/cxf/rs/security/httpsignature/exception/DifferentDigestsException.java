@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.httpsignature.exception;
 
 public class DifferentDigestsException extends SignatureException {
+    private static final long serialVersionUID = 1L;
     public DifferentDigestsException() { }
 
     public DifferentDigestsException(String message) {

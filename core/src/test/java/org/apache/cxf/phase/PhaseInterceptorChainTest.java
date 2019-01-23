@@ -405,7 +405,6 @@ public class PhaseInterceptorChainTest {
                                                    Set<String> b,
                                                    Set<String> a) throws Exception {
 
-        @SuppressWarnings("unchecked")
         AbstractPhaseInterceptor<Message> p = control
             .createMock(AbstractPhaseInterceptor.class);
 

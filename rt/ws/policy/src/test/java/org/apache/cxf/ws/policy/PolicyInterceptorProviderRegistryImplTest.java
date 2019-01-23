@@ -60,7 +60,6 @@ public class PolicyInterceptorProviderRegistryImplTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void testRegister() {
         PolicyInterceptorProviderRegistryImpl reg = new PolicyInterceptorProviderRegistryImpl();
         PolicyInterceptorProvider pp = control.createMock(PolicyInterceptorProvider.class);

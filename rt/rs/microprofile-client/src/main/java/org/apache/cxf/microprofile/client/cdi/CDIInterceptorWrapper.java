@@ -38,7 +38,8 @@ public interface CDIInterceptorWrapper {
         }
 
         @Override
-        public Object invoke(Object restClient, Method m, Object[] params, Callable callable)  throws Exception {
+        public Object invoke(Object restClient, Method m, Object[] params, Callable<Object> callable) 
+            throws Exception {
             return callable.call();
         }
     }

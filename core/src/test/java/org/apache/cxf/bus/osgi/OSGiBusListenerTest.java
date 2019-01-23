@@ -187,7 +187,6 @@ public class OSGiBusListenerTest {
 
     // Creates a test service reference with the specified symbolic name and the restricted extension property.
     private ServiceReference<Object> createTestServiceReference(String name, String rst) {
-        @SuppressWarnings("unchecked")
         ServiceReference<Object> ref = control.createMock(ServiceReference.class);
         Bundle b = control.createMock(Bundle.class);
         EasyMock.expect(b.getSymbolicName()).andReturn(name).anyTimes();

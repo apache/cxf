@@ -19,6 +19,8 @@
 package org.apache.cxf.rs.security.httpsignature.exception;
 
 public class MissingDigestException extends SignatureException {
+    private static final long serialVersionUID = 1L;
+
     public MissingDigestException() { }
 
     public MissingDigestException(String message) {

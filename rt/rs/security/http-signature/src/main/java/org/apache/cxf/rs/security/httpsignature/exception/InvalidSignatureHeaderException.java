@@ -19,6 +19,8 @@
 package org.apache.cxf.rs.security.httpsignature.exception;
 
 public class InvalidSignatureHeaderException extends SignatureException {
+    private static final long serialVersionUID = 1L;
+
     public InvalidSignatureHeaderException() { }
 
     public InvalidSignatureHeaderException(String message, Throwable cause) {
