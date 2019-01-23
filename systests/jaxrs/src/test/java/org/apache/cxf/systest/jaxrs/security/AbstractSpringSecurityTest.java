@@ -24,8 +24,9 @@ import java.io.InputStream;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.http.HttpHeaders;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
@@ -34,43 +35,31 @@ import static org.junit.Assert.assertEquals;
 
 public abstract class AbstractSpringSecurityTest extends AbstractBusClientServerTestBase {
 
-    private String getStringFromInputStream(InputStream in) throws Exception {
-        return IOUtils.toString(in);
+    protected static String basicAuthHeader(String user, String password) {
+        return "Basic " + Base64Utility.encode((user + ':' + password).getBytes());
     }
 
-    protected String base64Encode(String value) {
-        return Base64Utility.encode(value.getBytes());
-    }
-
-    protected void getBook(String endpointAddress, String user, String password,
-                         int expectedStatus)
-        throws Exception {
-
-        CloseableHttpClient client = HttpClientBuilder.create().build();
-        HttpGet get = new HttpGet(endpointAddress);
-        get.addHeader("Accept", "application/xml");
-        get.addHeader("Authorization",
-                             "Basic " + base64Encode(user + ":" + password));
-        try {
-            CloseableHttpResponse response = client.execute(get);
+    protected void getBook(String endpointAddress, String user, String password, int expectedStatus) throws Exception {
+        try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
+            CloseableHttpResponse response = client.execute(RequestBuilder
+                    .get(endpointAddress)
+                    .addHeader(HttpHeaders.ACCEPT, "application/xml")
+                    .addHeader(HttpHeaders.AUTHORIZATION, basicAuthHeader(user, password)).build());
             assertEquals(expectedStatus, response.getStatusLine().getStatusCode());
             if (expectedStatus == 200) {
-                String content = EntityUtils.toString(response.getEntity());
-                String resource = "/org/apache/cxf/systest/jaxrs/resources/expected_get_book123.txt";
-                InputStream expected = getClass().getResourceAsStream(resource);
-                assertEquals("Expected value is wrong",
-                             stripXmlInstructionIfNeeded(getStringFromInputStream(expected)),
-                             stripXmlInstructionIfNeeded(content));
+                try (InputStream expected = getClass()
+                        .getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/expected_get_book123.txt")) {
+                    assertEquals("Expected value is wrong",
+                            stripXmlInstructionIfNeeded(IOUtils.toString(expected)),
+                            stripXmlInstructionIfNeeded(EntityUtils.toString(response.getEntity())));
+                }
             }
-        } finally {
-            get.releaseConnection();
         }
-
     }
-    private String stripXmlInstructionIfNeeded(String str) {
+
+    private static String stripXmlInstructionIfNeeded(String str) {
         if (str != null && str.startsWith("<?xml")) {
-            int index = str.indexOf("?>");
-            str = str.substring(index + 2);
+            return str.substring(str.indexOf("?>") + 2);
         }
         return str;
     }

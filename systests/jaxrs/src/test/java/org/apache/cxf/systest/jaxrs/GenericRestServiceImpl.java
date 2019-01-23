@@ -21,18 +21,17 @@ package org.apache.cxf.systest.jaxrs;
 import java.util.HashMap;
 import java.util.Map;
 
-@SuppressWarnings("all")
-public class GenericRestServiceImpl<T extends Book, PK extends Long> implements IRestService<T, PK> {
+public class GenericRestServiceImpl<T extends Book> implements IRestService<T> {
 
-    private Map entities = new HashMap();
+    private Map<Long, T> entities = new HashMap<>();
 
-    public T getById(PK id) {
-        return (T)entities.get((Long)id);
+    public T getById(Long id) {
+        return entities.get(id);
     }
 
-    public PK postEntity(T instance) {
+    public Long postEntity(T instance) {
         entities.put(1L, instance);
-        return (PK)entities.keySet().iterator().next();
+        return entities.keySet().iterator().next();
     }
 
 }

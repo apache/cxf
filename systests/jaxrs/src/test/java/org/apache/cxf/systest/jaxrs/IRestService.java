@@ -26,10 +26,10 @@ import javax.ws.rs.QueryParam;
 
 @SuppressWarnings("all")
 @Path("books")
-public interface IRestService<T extends Book, PK extends Long> {
+public interface IRestService<T extends Book> {
     @GET
-    T getById(@QueryParam("id") PK id);
+    T getById(@QueryParam("id") Long id);
 
     @POST
-    PK postEntity(T instance);
+    Long postEntity(T instance);
 }
