@@ -491,6 +491,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 } else if (!isRequestor() && securityToken != null
                     && securityToken.getKey() instanceof PublicKey) {
                     encr.setUseThisPublicKey((PublicKey)securityToken.getKey());
+                    encr.setKeyIdentifierType(WSConstants.KEY_VALUE);
                 } else {
                     setEncryptionUser(encr, encrToken, false, crypto);
                 }
