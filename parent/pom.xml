@@ -121,7 +121,7 @@
         <cxf.geronimo.transaction.version>3.1.4</cxf.geronimo.transaction.version>
         <cxf.jasypt.bundle.version>1.9.2_1</cxf.jasypt.bundle.version>
         <cxf.javassist.version>3.21.0-GA</cxf.javassist.version>
-        <cxf.javax.ws.rs.version>2.1.4</cxf.javax.ws.rs.version>
+        <cxf.javax.ws.rs.version>2.1.5</cxf.javax.ws.rs.version>
         <cxf.jaxb.version>2.3.2</cxf.jaxb.version>
         <cxf.jaxb.runtime.version>${cxf.jaxb.version}</cxf.jaxb.runtime.version>
         <cxf.jaxb.xjc.version>${cxf.jaxb.version}</cxf.jaxb.xjc.version>
