@@ -564,6 +564,11 @@
                     <artifactId>maven-processor-plugin</artifactId>
                     <version>3.3.3</version> 
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-invoker-plugin</artifactId>
+                    <version>3.2.0</version>
+                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
