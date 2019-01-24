@@ -1,4 +1,4 @@
-Apache CXF 3.2.7 Release Notes
+Apache CXF 3.2.8 Release Notes
 
 1. Overview
 
@@ -17,7 +17,7 @@ New features include:
 * Preliminary support for running on Java 9  (no module support yet)
 * New http-undertow transport
 
-3.2.7 fixes over 38 JIRA issues reported by users and the community since 3.2.6.
+3.2.8 fixes over 18 JIRA issues reported by users and the community since 3.2.7.
 
 
 Important notes:
@@ -69,53 +69,33 @@ for caveats when upgrading.
 
 7. Specific issues, features, and improvements fixed in this version
 
-** Bug
-* [CXF-7076] - Intermittent failure in WSDL cache
-* [CXF-7332] - JAXRS Client API doesnt support lambda
-* [CXF-7775] - embedded jetty websocket gets ClassCastException: org.eclipse.jetty.servlet.ServletContextHandler$Context cannot be cast to org.eclipse.jetty.webapp.WebAppContext$Context
-* [CXF-7820] - CXF BOM (cxf-parent) references non existing artifact (io.netty:netty:4.x)
-* [CXF-7823] - JAXBEncoderDecoder doesn't respect @XmlType's propOrder in Exception class
-* [CXF-7824] - CacheMap may have spurious null keys
-* [CXF-7831] - SocketTimeoutException when previous response was exactly chunk length bytes
-* [CXF-7832] - WrappedMessageContext containsKey not consistent with get/put
-* [CXF-7833] - Jetty session manager does not invalidate sessions
-* [CXF-7836] - Stax2 version conflict
-* [CXF-7837] - GZIPFeature Does Not Have @Provider Annotation
-* [CXF-7847] - DOMUtils init failed with IBM JDK
-* [CXF-7851] - NullPointerException in cxf-java2ws-plugin with more than one attachWsdl=true
-* [CXF-7854] - Refactor RxJava2 Flowable and Observable Rx Invokers to not use internal APIs.
-* [CXF-7857] - Mtom/XOP response contain wrong encoded Content-ID HTTP header (Rollback CXF-7317)
-* [CXF-7858] - Base64 empty string encoding issue
-* [CXF-7860] - JAX-RS @FormParam parameters are not updated when form content is modified
-* [CXF-7864] - STS: Expires lifetime is ignored if no lifetime created was specified
-* [CXF-7865] - Enable default ciphersuites exclusion filter
-* [CXF-7868] - MP Rest Client does not honor providers registered via MP Config
-* [CXF-7869] - Infinite loop in rest client
-* [CXF-7870] - JAXRSUtils referenced in AbstractBraveClientProvider
-* [CXF-7871] - WS-A RelatesTo headers missing in MAPCodec::getUnderstoodHeaders()
-* [CXF-7874] - JAX-RS SSE Leaking SSESink (s)
-* [CXF-7875] - ServiceList doesn't use proper bus to query if swagger/wadl is available.
-* [CXF-7878] - ClientPolicyCalculator ignores ConnectionRequestTimeout property
-* [CXF-7881] - HttpConduit.handleResponseOnWorkqueue will always handle response on current thread when allowCurrentThread is false and the work queue rejects the execution
 
-** New Feature
-* [CXF-5077] - Provide a way to define a specific SSLContext to be used by HTTPConduit implementations
+** Bug
+* [CXF-7883] - Handle connectionRequestTimeout in AsyncHTTPConduitFactory
+* [CXF-7888] - Unnecessary warning when using IBM XLXP JAXB implementation
+* [CXF-7891] - OpenApiAutoConfiguration doesn't work with classes-scan-packages
+* [CXF-7905] - JAXBUtils fails to setEscapeHandler due to null escapeHandler
+* [CXF-7912] - java.lang.NoSuchMethodError on RestClientBuilder.baseUri
+* [CXF-7913] - NPE in OAuth 2.0 JCacheOAuthDataProvider with isStoreJwtTokenKeyOnly
+* [CXF-7922] - Unable to invoke default interface methods in proxy-based clients
+* [CXF-7924] - cxf-java2ws-plugin: Only one WSDL is generated and deployed per artifact.
+* [CXF-7935] - SAML SubjectConfirmation validation in PolicyBasedWSS4JInInterceptor
+* [CXF-7944] - OAuthClientUtils hides error message if it contains a comma
+* [CXF-7945] - Swagger and Swagger UI modules export the same package which causes error in modular apps (Java 9+)
+* [CXF-7946] - OperationResourceInfoComparator should consider methods parameters
+* [CXF-7947] - NullPointerException in Utils.java file
 
 ** Improvement
-* [CXF-7656] - Add jackson in the cxf-jaxrs feature
-* [CXF-7808] - Ensure org.apache.cxf.jaxrs.utils.InjectionUtils#injectThroughMethod logs an error
-* [CXF-7826] - Make it possible to configure Swagger UI features
-* [CXF-7827] - shouldn't log JMS password from JMS address when using JMS transport
-* [CXF-7829] - Use Spring Boot autoconfigure-processor to optimize auto-configurations
-* [CXF-7844] - Change Zipkin/Brave XML to use brave-spring-beans
-* [CXF-7853] - Spring Boot autoconfiguration should automatically set OpenApiCustomizer if OpenApiFeature is configured
+* [CXF-7855] - Update the Brave/OpenTracing/HTrace documentation to include more code snippets
+* [CXF-7894] - ReflectionUtil, JDK-9+ warnings for illegal reflective access operation
+* [CXF-7908] - Allow to customise JAXRS server in spring boot when using cxf-spring-boot-autoconfigure
 
-** Test
-* [CXF-7810] - SAML Assertion Cookie persistence - configurable to not persist across browser restarts
+** Wish
+* [CXF-7948] - Upgrade to asm 7
 
 ** Task
-* [CXF-7806] - Add option to create JWT access tokens without persisting them
-* [CXF-7882] - FailoverTargetSelector uses the Exchange as the key in the inProgress map
+* [CXF-7838] - Remove illegal reflective access in ReflectionUtil
+* [CXF-7887] - upgrade to xmlschema 2.2.4
 
 
 
