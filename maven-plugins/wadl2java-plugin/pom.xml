@@ -138,6 +138,7 @@
                     <execution>
                         <id>test-integration</id>
                         <goals>
+                            <goal>install</goal>
                             <goal>integration-test</goal>
                             <goal>verify</goal>
                         </goals>
