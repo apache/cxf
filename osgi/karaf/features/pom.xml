@@ -166,7 +166,7 @@
                 <executions>
                     <execution>
                         <id>verify</id>
-                        <phase>process-resources</phase>
+                        <phase>verify</phase>
                         <goals>
                             <goal>verify</goal>
                         </goals>
