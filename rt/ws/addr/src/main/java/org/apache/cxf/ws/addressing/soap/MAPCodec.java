@@ -875,7 +875,8 @@ public class MAPCodec extends AbstractSoapInterceptor {
             } else if (maps.getRelatesTo() == null
                 && maps.getAction() != null
                 && (Names.WSA_DEFAULT_FAULT_ACTION.equals(maps.getAction().getValue())
-                    || Names.WSA_DEFAULT_SOAP_FAULT_ACTION.equals(maps.getAction().getValue()))) {
+                    || Names.WSA_DEFAULT_SOAP_FAULT_ACTION.equals(maps.getAction().getValue())
+                    || "http://docs.oasis-open.org/wsrf/fault".equals(maps.getAction().getValue()))) {
                 //there is an Action header that points to a fault and no relatesTo.  Use the out map for the ID
                 Message m = message.getExchange().getOutMessage();
                 maps = ContextUtils.retrieveMAPs(m, false, true, false);
