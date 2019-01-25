@@ -253,7 +253,7 @@ public class UDPDestination extends AbstractDestination {
         
         
         @Override
-        public void sessionOpened(IoSession session) {
+        public void sessionOpened(final IoSession session) {
             // Set timeouts
             session.getConfig().setWriteTimeout(getWriteTimeout());
             session.getConfig().setIdleTime(IdleStatus.READER_IDLE, getReadTimeout());
