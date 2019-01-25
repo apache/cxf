@@ -1,4 +1,4 @@
-Apache CXF 3.1.16 Release Notes
+Apache CXF 3.1.18 Release Notes
 
 1. Overview
 
@@ -25,7 +25,7 @@ http://cxf.apache.org/docs/31-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
 
-3.1.16 fixes over 28 JIRA issues reported by users and the community.
+3.1.18 fixes over 11 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -71,36 +71,23 @@ to 3.1.
 7. Specific issues, features, and improvements fixed in this version
 
 ** Bug
-* [CXF-6324] - cxf-codegen-plugin|cxf-java2ws-plugin: classifier ignored when there are more then one wsdl with different classifier is involved
-* [CXF-7317] - Non-URL encoded Content-Id href does not seem be serialized by CXF's AttachmentSerializer
-* [CXF-7682] - context.get(MessageContext.HTTP_REQUEST_HEADERS) always returns null for client
-* [CXF-7684] - Base64 encoding in AttachmentSerializer does not create correct output for large attachments
-* [CXF-7686] - WSS4JStaxOutInterceptor with WSSSecurityProperties doesn't work with LoggingOutInterceptor
-* [CXF-7687] - AuthorizationPolicy: AuthorizationType="Bearer" has no effect
-* [CXF-7688] - AttachmentDeserializer does not respect "org.apache.cxf.io.CachedOutputStream.Threshold" -property
-* [CXF-7691] - Can't add multiple instances of the same security interceptor to the same interceptor chain
-* [CXF-7700] - LoggingOutInterceptor doesn't write message body if encoding wasn't set
-* [CXF-7705] - Use Java EL api and impl bundle from Servicemix for cxf-bean-validation feature
-* [CXF-7716] - IBM Performance Team has found several performance increases
-* [CXF-7721] - JwkUtils throws NPE if Message is null
-* [CXF-7734] - Swagger2Feature - application/octet-stream media type is returned for index.html
-* [CXF-7736] - DispatchImpl doesn't work for an empty Source
-* [CXF-7740] - add NPE guard for SAAJStreamWriter
-* [CXF-7747] - FileUtils.maybeDeleteDefaultTempDir causes an IllegalStateException if it tries to remove the shutdown hook while the JVM is already shutting down
-* [CXF-7751] - Codegen plugin can't work with empty extraarg tag
-* [CXF-7754] - WrappedAttachments.toArray failure
-* [CXF-7758] - MTOM + SchemaValidation results in empty input stream from data handler
+* [CXF-7768] - ensure we close all temp queue/topic before we close a JMS connection
+* [CXF-7824] - CacheMap may have spurious null keys
+* [CXF-7832] - WrappedMessageContext containsKey not consistent with get/put
+* [CXF-7847] - DOMUtils init failed with IBM JDK
+* [CXF-7858] - Base64 empty string encoding issue
+* [CXF-7869] - Infinite loop in rest client
+* [CXF-7870] - JAXRSUtils referenced in AbstractBraveClientProvider
+* [CXF-7947] - NullPointerException in Utils.java file
 
 ** Improvement
-* [CXF-7640] -  Create a form to set the use of Spring in the classHelper on a per client way
-* [CXF-7672] - PrimitiveTextProvider: support java.net.URI and java.net.URL
-* [CXF-7678] - Fluent setters support in Beanspector
-* [CXF-7693] - Allow JWT audience claims validation not RFC 7519 compliant
-* [CXF-7704] - False positive warning log: "Unable to recognize the addressing policy"
-* [CXF-7711] - Allow providing CXF compiler instance to be used in JavaToWS
-* [CXF-7733] - Support different signature algorithms for the SAML SSO filters
-* [CXF-7752] - CVE-2018-5968 and CVE-2018-7489
+* [CXF-7796] - Support setting outbound network interface for UDP transport
+* [CXF-7827] - shouldn't log JMS password from JMS address when using JMS transport
+* [CXF-7855] - Update the Brave/OpenTracing/HTrace documentation to include more code snippets
 
-** Task
-* [CXF-7756] - JAASLoginInterceptor with server continuation enabled will cause the interceptor before ServiceInvokerInterceptor get invoked twice
+
+
+
+
+
 
