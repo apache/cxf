@@ -42,6 +42,7 @@ import org.apache.wss4j.common.token.BinarySecurity;
 import org.apache.wss4j.common.token.PKIPathSecurity;
 import org.apache.wss4j.common.token.X509Security;
 import org.apache.wss4j.common.util.AttachmentUtils;
+import org.apache.wss4j.common.util.UsernameTokenUtil;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.apache.wss4j.stax.ext.WSSConstants;
@@ -329,7 +330,7 @@ public class STSStaxTokenValidator
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
 
-        String passDigest = WSSUtils.doPasswordDigest(nonceVal, created, pwCb.getPassword());
+        String passDigest = UsernameTokenUtil.doPasswordDigest(nonceVal, created, pwCb.getPassword());
         if (!passwordType.getValue().equals(passDigest)) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }

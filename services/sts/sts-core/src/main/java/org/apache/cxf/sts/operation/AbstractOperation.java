@@ -29,6 +29,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
@@ -77,6 +79,7 @@ import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DateUtil;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.message.WSSecEncryptedKey;
@@ -375,10 +378,17 @@ public abstract class AbstractOperation {
         WSSecEncryptedKey builder = new WSSecEncryptedKey(doc);
         builder.setUserInfo(name);
         builder.setKeyIdentifierType(encryptionProperties.getKeyIdentifierType());
-        builder.setEphemeralKey(secret);
         builder.setKeyEncAlgo(keyWrapAlgorithm);
 
-        builder.prepare(stsProperties.getEncryptionCrypto());
+        SecretKey symmetricKey = null;
+        if (secret != null) {
+            symmetricKey = KeyUtils.prepareSecretKey(encryptionProperties.getEncryptionAlgorithm(), secret);
+        } else {
+            KeyGenerator keyGen = KeyUtils.getKeyGenerator(encryptionProperties.getEncryptionAlgorithm());
+            symmetricKey = keyGen.generateKey();
+        }
+
+        builder.prepare(stsProperties.getEncryptionCrypto(), symmetricKey);
 
         return builder.getEncryptedKeyElement();
     }

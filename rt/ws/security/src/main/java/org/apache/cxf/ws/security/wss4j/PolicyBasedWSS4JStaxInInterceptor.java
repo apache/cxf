@@ -55,6 +55,7 @@ import org.apache.wss4j.policy.model.AlgorithmSuite;
 import org.apache.wss4j.policy.stax.OperationPolicy;
 import org.apache.wss4j.policy.stax.enforcer.PolicyEnforcer;
 import org.apache.wss4j.policy.stax.enforcer.PolicyInputProcessor;
+import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.impl.securityToken.HttpsSecurityTokenImpl;
 import org.apache.wss4j.stax.securityEvent.HttpsTokenSecurityEvent;
@@ -271,10 +272,10 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
                 for (AssertionInfo algorithmSuite : algorithmSuites) {
                     AlgorithmSuite algSuite = (AlgorithmSuite)algorithmSuite.getAssertion();
                     if (asymSignatureAlgorithm != null) {
-                        algSuite.setAsymmetricSignature(asymSignatureAlgorithm);
+                        algSuite.getAlgorithmSuiteType().setAsymmetricSignature(asymSignatureAlgorithm);
                     }
                     if (symSignatureAlgorithm != null) {
-                        algSuite.setSymmetricSignature(symSignatureAlgorithm);
+                        algSuite.getAlgorithmSuiteType().setSymmetricSignature(symSignatureAlgorithm);
                     }
                 }
             }
@@ -426,7 +427,6 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
         if (soapAction == null) {
             soapAction = "";
         }
-
         String actor = (String)msg.getContextualProperty(SecurityConstants.ACTOR);
         final Collection<org.apache.cxf.message.Attachment> attachments = msg.getAttachments();
         int attachmentCount = 0;
@@ -435,7 +435,8 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
         }
         return new PolicyEnforcer(operationPolicies, soapAction, isRequestor(msg),
                                   actor, attachmentCount,
-                                  new WSS4JPolicyAsserter(msg.get(AssertionInfoMap.class)));
+                                  new WSS4JPolicyAsserter(msg.get(AssertionInfoMap.class)),
+                                  WSSConstants.NS_SOAP12.equals(msg.getVersion().getNamespace()));
     }
 
 }

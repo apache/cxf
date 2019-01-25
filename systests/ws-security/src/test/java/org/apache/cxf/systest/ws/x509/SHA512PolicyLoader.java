@@ -91,7 +91,7 @@ public class SHA512PolicyLoader implements AlgorithmSuiteLoader {
 
         SHA512AlgorithmSuite(SPConstants.SPVersion version, Policy nestedPolicy) {
             super(version, nestedPolicy);
-            setAsymmetricSignature("http://www.w3.org/2001/04/xmldsig-more#rsa-sha512");
+            getAlgorithmSuiteType().setAsymmetricSignature("http://www.w3.org/2001/04/xmldsig-more#rsa-sha512");
         }
 
         @Override
