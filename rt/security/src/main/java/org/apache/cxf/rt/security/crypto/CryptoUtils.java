@@ -68,10 +68,10 @@ import org.apache.cxf.helpers.IOUtils;
  * Encryption helpers
  */
 public final class CryptoUtils {
-    
+
     private CryptoUtils() {
     }
-    
+
     public static void installBouncyCastleProvider() throws Exception {
         final String bcClassName = "org.bouncycastle.jce.provider.BouncyCastleProvider";
         if (Security.getProvider(bcClassName) == null) {
@@ -79,53 +79,53 @@ public final class CryptoUtils {
         }
     }
     public static void removeBouncyCastleProvider() {
-        Security.removeProvider("org.bouncycastle.jce.provider.BouncyCastleProvider"); 
+        Security.removeProvider("org.bouncycastle.jce.provider.BouncyCastleProvider");
     }
-    
+
     public static String encodeSecretKey(SecretKey key) throws SecurityException {
         return encodeBytes(key.getEncoded());
     }
-    
-    public static String encryptSecretKey(SecretKey secretKey, PublicKey publicKey) 
+
+    public static String encryptSecretKey(SecretKey secretKey, PublicKey publicKey)
         throws SecurityException {
         KeyProperties props = new KeyProperties(publicKey.getAlgorithm());
         return encryptSecretKey(secretKey, publicKey, props);
     }
-    
+
     public static String encryptSecretKey(SecretKey secretKey, PublicKey publicKey,
         KeyProperties props) throws SecurityException {
         byte[] encryptedBytes = wrapSecretKey(secretKey, publicKey, props);
         return encodeBytes(encryptedBytes);
     }
-    
+
     public static byte[] generateSecureRandomBytes(int size) {
         SecureRandom sr = new SecureRandom();
         byte[] bytes = new byte[size];
         sr.nextBytes(bytes);
         return bytes;
     }
-    
+
     public static RSAPublicKey getRSAPublicKey(String encodedModulus,
                                                String encodedPublicExponent) {
         try {
             return getRSAPublicKey(CryptoUtils.decodeSequence(encodedModulus),
                                    CryptoUtils.decodeSequence(encodedPublicExponent));
-        } catch (Exception ex) { 
+        } catch (Exception ex) {
             throw new SecurityException(ex);
         }
     }
-    
+
     public static RSAPublicKey getRSAPublicKey(byte[] modulusBytes,
                                                byte[] publicExponentBytes) {
         try {
-            return getRSAPublicKey(KeyFactory.getInstance("RSA"), 
+            return getRSAPublicKey(KeyFactory.getInstance("RSA"),
                                    modulusBytes,
                                    publicExponentBytes);
-        } catch (Exception ex) { 
+        } catch (Exception ex) {
             throw new SecurityException(ex);
-        }         
+        }
     }
-    
+
     public static RSAPublicKey getRSAPublicKey(KeyFactory factory,
                                                byte[] modulusBytes,
                                                byte[] publicExponentBytes) {
@@ -133,7 +133,7 @@ public final class CryptoUtils {
         BigInteger publicExponent = toBigInteger(publicExponentBytes);
         return getRSAPublicKey(factory, modulus, publicExponent);
     }
-    
+
     public static RSAPublicKey getRSAPublicKey(BigInteger modulusBytes,
                                                BigInteger publicExponentBytes) {
         try {
@@ -145,28 +145,28 @@ public final class CryptoUtils {
         }
     }
 
-    
+
     public static RSAPublicKey getRSAPublicKey(KeyFactory factory,
                                                BigInteger modulus,
                                                BigInteger publicExponent) {
         try {
             return (RSAPublicKey)factory.generatePublic(
                 new RSAPublicKeySpec(modulus, publicExponent));
-        } catch (Exception ex) { 
+        } catch (Exception ex) {
             throw new SecurityException(ex);
-        }    
+        }
     }
-    
+
     public static RSAPrivateKey getRSAPrivateKey(String encodedModulus,
                                                  String encodedPrivateExponent) {
         try {
             return getRSAPrivateKey(CryptoUtils.decodeSequence(encodedModulus),
                                     CryptoUtils.decodeSequence(encodedPrivateExponent));
-        } catch (Exception ex) { 
+        } catch (Exception ex) {
             throw new SecurityException(ex);
         }
     }
-    
+
     public static RSAPrivateKey getRSAPrivateKey(byte[] modulusBytes,
                                                  byte[] privateExponentBytes) {
         BigInteger modulus =  toBigInteger(modulusBytes);
@@ -175,9 +175,9 @@ public final class CryptoUtils {
             KeyFactory factory = KeyFactory.getInstance("RSA");
             return (RSAPrivateKey)factory.generatePrivate(
                 new RSAPrivateKeySpec(modulus, privateExponent));
-        } catch (Exception ex) { 
+        } catch (Exception ex) {
             throw new SecurityException(ex);
-        }    
+        }
     }
     //CHECKSTYLE:OFF
     public static RSAPrivateKey getRSAPrivateKey(String encodedModulus,
@@ -198,7 +198,7 @@ public final class CryptoUtils {
                                     CryptoUtils.decodeSequence(encodedPrimeExpP),
                                     CryptoUtils.decodeSequence(encodedPrimeExpQ),
                                     CryptoUtils.decodeSequence(encodedCrtCoefficient));
-        } catch (Exception ex) { 
+        } catch (Exception ex) {
             throw new SecurityException(ex);
         }
     }
@@ -223,7 +223,7 @@ public final class CryptoUtils {
         try {
             KeyFactory factory = KeyFactory.getInstance("RSA");
             return (RSAPrivateKey)factory.generatePrivate(
-                new RSAPrivateCrtKeySpec(modulus, 
+                new RSAPrivateCrtKeySpec(modulus,
                                          publicExponent,
                                          privateExponent,
                                          primeP,
@@ -231,15 +231,15 @@ public final class CryptoUtils {
                                          primeExpP,
                                          primeExpQ,
                                          crtCoefficient));
-        } catch (Exception ex) { 
+        } catch (Exception ex) {
             throw new SecurityException(ex);
-        }    
+        }
     }
-    
+
     public static ECPrivateKey getECPrivateKey(String curve, String encodedPrivateKey) {
         try {
             return getECPrivateKey(curve, CryptoUtils.decodeSequence(encodedPrivateKey));
-        } catch (Exception ex) { 
+        } catch (Exception ex) {
             throw new SecurityException(ex);
         }
     }
@@ -251,17 +251,17 @@ public final class CryptoUtils {
             KeyFactory kf = KeyFactory.getInstance("EC");
             return (ECPrivateKey) kf.generatePrivate(keySpec);
 
-        } catch (Exception ex) { 
+        } catch (Exception ex) {
             throw new SecurityException(ex);
-        }    
+        }
     }
-    private static ECParameterSpec getECParameterSpec(String curve, boolean isPrivate) 
+    private static ECParameterSpec getECParameterSpec(String curve, boolean isPrivate)
         throws Exception {
         KeyPair pair = generateECKeyPair(curve);
         return isPrivate ? ((ECPublicKey) pair.getPublic()).getParams()
             : ((ECPrivateKey) pair.getPrivate()).getParams();
     }
-    
+
     public static KeyPair generateECKeyPair(String curve) {
         try {
             KeyPairGenerator kpg = KeyPairGenerator.getInstance("EC");
@@ -270,17 +270,17 @@ public final class CryptoUtils {
                                                                   + "r1");
             kpg.initialize(kpgparams);
             return kpg.generateKeyPair();
-        } catch (Exception ex) { 
+        } catch (Exception ex) {
             throw new SecurityException(ex);
         }
     }
-    
+
     public static ECPublicKey getECPublicKey(String curve, String encodedXPoint, String encodedYPoint) {
         try {
             return getECPublicKey(curve,
                                   CryptoUtils.decodeSequence(encodedXPoint),
                                   CryptoUtils.decodeSequence(encodedYPoint));
-        } catch (Exception ex) { 
+        } catch (Exception ex) {
             throw new SecurityException(ex);
         }
     }
@@ -294,9 +294,9 @@ public final class CryptoUtils {
             KeyFactory kf = KeyFactory.getInstance("EC");
             return (ECPublicKey) kf.generatePublic(keySpec);
 
-        } catch (Exception ex) { 
+        } catch (Exception ex) {
             throw new SecurityException(ex);
-        }    
+        }
     }
     private static BigInteger toBigInteger(byte[] bytes) {
         return new BigInteger(1, bytes);
@@ -310,15 +310,15 @@ public final class CryptoUtils {
             return null;
         }
     }
-    
+
     public static AlgorithmParameterSpec getGCMParameterSpec(int authTagLength, byte[] iv) {
         return new GCMParameterSpec(authTagLength, iv);
     }
-    
+
     public static byte[] signData(byte[] data, PrivateKey key, String signAlgo) {
         return signData(data, key, signAlgo, null, null);
     }
-    
+
     public static byte[] signData(byte[] data, PrivateKey key, String signAlgo, SecureRandom random,
                            AlgorithmParameterSpec params) {
         try {
@@ -329,7 +329,7 @@ public final class CryptoUtils {
             throw new SecurityException(ex);
         }
     }
-    
+
     public static Signature getSignature(PrivateKey key, String signAlgo, SecureRandom random,
                                   AlgorithmParameterSpec params) {
         try {
@@ -348,8 +348,8 @@ public final class CryptoUtils {
         }
     }
 
-    public static Signature getVerificationSignature(PublicKey key, 
-                                                        String signAlgo, 
+    public static Signature getVerificationSignature(PublicKey key,
+                                                        String signAlgo,
                                                         AlgorithmParameterSpec params) {
         try {
             Signature s = Signature.getInstance(signAlgo);
@@ -366,8 +366,8 @@ public final class CryptoUtils {
     public static boolean verifySignature(byte[] data, byte[] signature, PublicKey key, String signAlgo) {
         return verifySignature(data, signature, key, signAlgo, null);
     }
-    
-    public static boolean verifySignature(byte[] data, byte[] signature, PublicKey key, String signAlgo, 
+
+    public static boolean verifySignature(byte[] data, byte[] signature, PublicKey key, String signAlgo,
                                 AlgorithmParameterSpec params) {
         try {
             Signature s = getVerificationSignature(key, signAlgo, params);
@@ -377,15 +377,15 @@ public final class CryptoUtils {
             throw new SecurityException(ex);
         }
     }
-    
+
     public static SecretKey getSecretKey(String symEncAlgo) throws SecurityException {
         return getSecretKey(new KeyProperties(symEncAlgo));
     }
-    
+
     public static SecretKey getSecretKey(String symEncAlgo, int keySize) throws SecurityException {
         return getSecretKey(new KeyProperties(symEncAlgo, keySize));
     }
-    
+
     public static SecretKey getSecretKey(KeyProperties props) throws SecurityException {
         try {
             KeyGenerator keyGen = KeyGenerator.getInstance(props.getKeyAlgo());
@@ -408,28 +408,28 @@ public final class CryptoUtils {
                     keyGen.init(keySize);
                 }
             }
-            
+
             return keyGen.generateKey();
         } catch (Exception ex) {
             throw new SecurityException(ex);
         }
     }
-    
+
     public static String decryptSequence(String encodedToken, String encodedSecretKey)
         throws SecurityException {
         return decryptSequence(encodedToken, encodedSecretKey, new KeyProperties("AES"));
     }
-    
-    public static String decryptSequence(String encodedData, String encodedSecretKey, 
+
+    public static String decryptSequence(String encodedData, String encodedSecretKey,
         KeyProperties props) throws SecurityException {
         SecretKey key = decodeSecretKey(encodedSecretKey, props.getKeyAlgo());
         return decryptSequence(encodedData, key, props);
     }
-    
+
     public static String decryptSequence(String encodedData, Key secretKey) throws SecurityException {
         return decryptSequence(encodedData, secretKey, null);
     }
-    
+
     public static String decryptSequence(String encodedData, Key secretKey,
         KeyProperties props) throws SecurityException {
         byte[] encryptedBytes = decodeSequence(encodedData);
@@ -440,11 +440,11 @@ public final class CryptoUtils {
             throw new SecurityException(ex);
         }
     }
-    
+
     public static String encryptSequence(String sequence, Key secretKey) throws SecurityException {
         return encryptSequence(sequence, secretKey, null);
     }
-    
+
     public static String encryptSequence(String sequence, Key secretKey,
         KeyProperties keyProps) throws SecurityException {
         try {
@@ -454,7 +454,7 @@ public final class CryptoUtils {
             throw new SecurityException(ex);
         }
     }
-    
+
     public static String encodeBytes(byte[] bytes) throws SecurityException {
         try {
             return Base64UrlUtility.encode(bytes);
@@ -462,34 +462,34 @@ public final class CryptoUtils {
             throw new SecurityException(ex);
         }
     }
-    
+
     public static byte[] encryptBytes(byte[] bytes, Key secretKey) throws SecurityException {
         return encryptBytes(bytes, secretKey, null);
     }
-    
+
     public static byte[] encryptBytes(byte[] bytes, Key secretKey,
         KeyProperties keyProps) throws SecurityException {
         return processBytes(bytes, secretKey, keyProps, Cipher.ENCRYPT_MODE);
     }
-    
+
     public static byte[] decryptBytes(byte[] bytes, Key secretKey) throws SecurityException {
         return decryptBytes(bytes, secretKey, null);
     }
-    
-    public static byte[] decryptBytes(byte[] bytes, Key secretKey, 
+
+    public static byte[] decryptBytes(byte[] bytes, Key secretKey,
         KeyProperties keyProps) throws SecurityException {
         return processBytes(bytes, secretKey, keyProps, Cipher.DECRYPT_MODE);
     }
-    
-    public static byte[] wrapSecretKey(byte[] keyBytes, 
+
+    public static byte[] wrapSecretKey(byte[] keyBytes,
                                        String keyAlgo,
                                        Key wrapperKey,
                                        KeyProperties wrapperKeyProps)  throws SecurityException {
-        return wrapSecretKey(new SecretKeySpec(keyBytes, convertJCECipherToSecretKeyName(keyAlgo)), 
-                             wrapperKey, 
+        return wrapSecretKey(new SecretKeySpec(keyBytes, convertJCECipherToSecretKeyName(keyAlgo)),
+                             wrapperKey,
                              wrapperKeyProps);
     }
-    
+
     public static byte[] wrapSecretKey(Key secretKey,
                                        Key wrapperKey,
                                        KeyProperties keyProps)  throws SecurityException {
@@ -498,24 +498,24 @@ public final class CryptoUtils {
             return c.wrap(secretKey);
         } catch (Exception ex) {
             throw new SecurityException(ex);
-        }    
+        }
     }
-    
+
     public static SecretKey unwrapSecretKey(byte[] wrappedBytes,
                                             String wrappedKeyAlgo,
                                             Key unwrapperKey,
                                             String unwrapperKeyAlgo)  throws SecurityException {
-        return unwrapSecretKey(wrappedBytes, wrappedKeyAlgo, unwrapperKey, 
+        return unwrapSecretKey(wrappedBytes, wrappedKeyAlgo, unwrapperKey,
                                new KeyProperties(unwrapperKeyAlgo));
     }
-    
+
     public static SecretKey unwrapSecretKey(byte[] wrappedBytes,
                                             String wrappedKeyAlgo,
                                             Key unwrapperKey,
                                             KeyProperties keyProps)  throws SecurityException {
-        return (SecretKey)unwrapKey(wrappedBytes, wrappedKeyAlgo, unwrapperKey, keyProps, Cipher.SECRET_KEY);    
+        return (SecretKey)unwrapKey(wrappedBytes, wrappedKeyAlgo, unwrapperKey, keyProps, Cipher.SECRET_KEY);
     }
-    
+
     public static Key unwrapKey(byte[] wrappedBytes,
                                             String wrappedKeyAlgo,
                                             Key unwrapperKey,
@@ -526,12 +526,12 @@ public final class CryptoUtils {
             return c.unwrap(wrappedBytes, wrappedKeyAlgo, wrappedKeyType);
         } catch (Exception ex) {
             throw new SecurityException(ex);
-        }    
+        }
     }
-    
-    private static byte[] processBytes(byte[] bytes, 
-                                      Key secretKey, 
-                                      KeyProperties keyProps, 
+
+    private static byte[] processBytes(byte[] bytes,
+                                      Key secretKey,
+                                      KeyProperties keyProps,
                                       int mode)  throws SecurityException {
         boolean compressionSupported = keyProps != null && keyProps.isCompressionSupported();
         if (compressionSupported && mode == Cipher.ENCRYPT_MODE) {
@@ -546,18 +546,18 @@ public final class CryptoUtils {
             } else {
                 if (blockSize == -1) {
                     String javaVersion = System.getProperty("java.version");
-                    if (javaVersion.startsWith("9") || isJava8Release161OrLater(javaVersion)) {
+                    if (javaVersion.startsWith("9") || use256BitBlockSize(javaVersion)) {
                         //the default block size is 256 when use private key under java9
                         blockSize = secretKey instanceof PublicKey ? 117 : 256;
                     } else {
-                        
+
                         blockSize = secretKey instanceof PublicKey ? 117 : 128;
                     }
                 }
                 boolean updateRequired = keyProps != null && keyProps.getAdditionalData() != null;
                 int offset = 0;
                 for (; offset + blockSize < bytes.length; offset += blockSize) {
-                    byte[] next = !updateRequired ? c.doFinal(bytes, offset, blockSize) 
+                    byte[] next = !updateRequired ? c.doFinal(bytes, offset, blockSize)
                         : c.update(bytes, offset, blockSize);
                     result = addToResult(result, next);
                 }
@@ -576,13 +576,14 @@ public final class CryptoUtils {
         }
     }
 
-    private static boolean isJava8Release161OrLater(String javaVersion) {
-        return javaVersion.startsWith("1.8.0_") && Integer.valueOf(javaVersion.substring(6)) >= 161;
+    private static boolean use256BitBlockSize(String javaVersion) {
+        return javaVersion.startsWith("1.8.0_") && Integer.valueOf(javaVersion.substring(6)) >= 161
+            || javaVersion.startsWith("1.7.0_") && Integer.valueOf(javaVersion.substring(6)) >= 171;
     }
 
     public static Cipher initCipher(Key secretKey, KeyProperties keyProps, int mode)  throws SecurityException {
         try {
-            String algorithm = keyProps != null && keyProps.getKeyAlgo() != null 
+            String algorithm = keyProps != null && keyProps.getKeyAlgo() != null
                 ? keyProps.getKeyAlgo() : secretKey.getAlgorithm();
             Cipher c = Cipher.getInstance(algorithm);
             if (keyProps == null || keyProps.getAlgoSpec() == null && keyProps.getSecureRandom() == null) {
@@ -606,10 +607,10 @@ public final class CryptoUtils {
             throw new SecurityException(ex);
         }
     }
-    
+
     private static byte[] addToResult(byte[] prefix, byte[] suffix) {
         if (suffix == null || suffix.length == 0) {
-            return prefix;    
+            return prefix;
         } else if (prefix.length == 0) {
             return suffix;
         } else {
@@ -619,23 +620,23 @@ public final class CryptoUtils {
             return result;
         }
     }
-    
+
     public static SecretKey decodeSecretKey(String encodedSecretKey) throws SecurityException {
         return decodeSecretKey(encodedSecretKey, "AES");
     }
-    
-    public static SecretKey decodeSecretKey(String encodedSecretKey, String secretKeyAlgo) 
+
+    public static SecretKey decodeSecretKey(String encodedSecretKey, String secretKeyAlgo)
         throws SecurityException {
         byte[] secretKeyBytes = decodeSequence(encodedSecretKey);
         return createSecretKeySpec(secretKeyBytes, secretKeyAlgo);
     }
-    
+
     public static SecretKey decryptSecretKey(String encodedEncryptedSecretKey,
                                              PrivateKey privateKey) {
         return decryptSecretKey(encodedEncryptedSecretKey, "AES", privateKey);
     }
-    
-    
+
+
     public static SecretKey decryptSecretKey(String encodedEncryptedSecretKey,
                                              String secretKeyAlgo,
                                              PrivateKey privateKey)
@@ -643,7 +644,7 @@ public final class CryptoUtils {
         KeyProperties props = new KeyProperties(privateKey.getAlgorithm());
         return decryptSecretKey(encodedEncryptedSecretKey, secretKeyAlgo, props, privateKey);
     }
-    
+
     public static SecretKey decryptSecretKey(String encodedEncryptedSecretKey,
                                              String secretKeyAlgo,
                                              KeyProperties props,
@@ -651,7 +652,7 @@ public final class CryptoUtils {
         byte[] encryptedBytes = decodeSequence(encodedEncryptedSecretKey);
         return unwrapSecretKey(encryptedBytes, secretKeyAlgo, privateKey, props);
     }
-    
+
     public static SecretKey createSecretKeySpec(String encodedBytes, String algo) {
         return new SecretKeySpec(decodeSequence(encodedBytes), algo);
     }
@@ -665,7 +666,7 @@ public final class CryptoUtils {
             throw new SecurityException(ex);
         }
     }
-    
+
     private static String convertJCECipherToSecretKeyName(String jceCipherName) {
         if (jceCipherName != null) {
             if (jceCipherName.startsWith("AES")) {
@@ -694,14 +695,14 @@ public final class CryptoUtils {
                 throw new SecurityException("No alias exists in the keystore for: " + alias);
             }
             return keyStore.getCertificate(alias);
-        } catch (Exception ex) { 
+        } catch (Exception ex) {
             throw new SecurityException(ex);
         }
     }
     public static String encodeCertificate(Certificate cert) {
         try {
             return Base64Utility.encode(cert.getEncoded());
-        } catch (Exception ex) { 
+        } catch (Exception ex) {
             throw new SecurityException(ex);
         }
     }
@@ -729,17 +730,17 @@ public final class CryptoUtils {
             throw new SecurityException(ex);
         }
     }
-    public static PrivateKey loadPrivateKey(InputStream storeLocation, 
-                                            char[] storePassword, 
-                                            char[] keyPassword, 
+    public static PrivateKey loadPrivateKey(InputStream storeLocation,
+                                            char[] storePassword,
+                                            char[] keyPassword,
                                             String alias,
                                             String storeType) {
         KeyStore keyStore = loadKeyStore(storeLocation, storePassword, storeType);
         return loadPrivateKey(keyStore, keyPassword, alias);
     }
-    
+
     public static PrivateKey loadPrivateKey(KeyStore keyStore,
-                                            char[] keyPassword, 
+                                            char[] keyPassword,
                                             String alias) {
         try {
             if (alias == null) {
@@ -749,13 +750,13 @@ public final class CryptoUtils {
                 throw new SecurityException("No alias exists in the keystore for: " + alias);
             }
             if (!keyStore.isKeyEntry(alias)) {
-                throw new SecurityException("The given alias " + alias 
+                throw new SecurityException("The given alias " + alias
                                             + " is not a private key in the keystore.");
             }
             KeyStore.PrivateKeyEntry pkEntry = (KeyStore.PrivateKeyEntry)
                 keyStore.getEntry(alias, new KeyStore.PasswordProtection(keyPassword));
             return pkEntry.getPrivateKey();
-        } catch (Exception ex) { 
+        } catch (Exception ex) {
             throw new SecurityException(ex);
         }
     }
