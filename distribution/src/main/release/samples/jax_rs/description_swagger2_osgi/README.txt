@@ -38,7 +38,7 @@ In order to install CXF's features, you need to add the CXF's features repo usin
 
   feature:repo-add cxf 3.n.m
 
- where 3.n.m corresponds to a valid CXF version number (e.g., 3.1.4).
+ where 3.n.m corresponds to a valid CXF version number (e.g., 3.3.0).
 
 Install CXF's cxf-rs-description-swagger2 feature that installs all the required bundles
 for this demo bundle.
@@ -56,7 +56,7 @@ You can verify if the CXF JAX-RS Swagger2 Blueprint Demo is installed and starte
   START LEVEL 100 , List Threshold: 50
    ID | State  | Lvl | Version | Name                              
   -----------------------------------------------------------------
-  122 | Active |  80 | 3.1.4   | CXF JAX-RS Swagger2 Blueprint Demo
+  122 | Active |  80 | 3.3.0   | CXF JAX-RS Swagger2 Blueprint Demo
   karaf@root()>
 
 Now, you will be able to access this CXF JAXRS demo service on your Karaf instance at
