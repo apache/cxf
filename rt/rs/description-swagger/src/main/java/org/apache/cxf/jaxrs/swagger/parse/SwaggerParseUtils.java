@@ -131,6 +131,8 @@ public final class SwaggerParseUtils {
                 userOp.setVerb(operEntry.getKey().toUpperCase());
 
                 Map<String, Object> oper = CastUtils.cast((Map<?, ?>)operEntry.getValue());
+                // The operation could be null, the particular HTTP verb may not contain any
+                // operations but Swagger may still include it.
                 if (oper != null) {
                     userOp.setPath(operPath);
 

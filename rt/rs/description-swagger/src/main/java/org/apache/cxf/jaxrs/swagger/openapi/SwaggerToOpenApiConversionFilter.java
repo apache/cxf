@@ -57,8 +57,10 @@ public final class SwaggerToOpenApiConversionFilter implements ContainerRequestF
     @Override
     public void filter(ContainerRequestContext reqCtx, ContainerResponseContext respCtx) throws IOException {
         if (Boolean.TRUE == reqCtx.getProperty(OPEN_API_PROPERTY)) {
-            String swaggerJson = respCtx.getEntity() instanceof String ? (String)respCtx.getEntity()
-                    : Json.pretty(respCtx.getEntity());
+            final Object entity = respCtx.getEntity();
+            // Right before 1.5.18, the entity was always a String but became a model object
+            // (io.swagger.models.Swagger) after. For now, let us serialize it to JSON manually.
+            String swaggerJson = entity instanceof String ? (String)entity : Json.pretty(entity);
             String openApiJson = SwaggerToOpenApiConversionUtils.getOpenApiFromSwaggerJson(
                     createMessageContext(), swaggerJson, openApiConfig);
             respCtx.setEntity(openApiJson);
