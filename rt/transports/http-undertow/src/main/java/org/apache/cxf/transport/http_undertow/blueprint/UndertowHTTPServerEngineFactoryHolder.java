@@ -85,8 +85,12 @@ public class UndertowHTTPServerEngineFactoryHolder {
                 for (ThreadingParametersIdentifiedType threads : config.getIdentifiedThreadingParameters()) {
                     ThreadingParameters rThreads = new ThreadingParameters();
                     String id = threads.getId();
-                    rThreads.setMaxThreads(threads.getThreadingParameters().getMaxThreads());
-                    rThreads.setMinThreads(threads.getThreadingParameters().getMinThreads());
+                    if (threads.getThreadingParameters().getMaxThreads() != null) {
+                        rThreads.setMaxThreads(threads.getThreadingParameters().getMaxThreads());
+                    }
+                    if (threads.getThreadingParameters().getMinThreads() != null) {
+                        rThreads.setMinThreads(threads.getThreadingParameters().getMinThreads());
+                    }
                     rThreads.setWorkerIOThreads(threads.getThreadingParameters().getWorkerIOThreads());
                     threadingParametersMap.put(id, rThreads);
                 }
@@ -143,8 +147,12 @@ public class UndertowHTTPServerEngineFactoryHolder {
                 if (engine.getThreadingParameters() != null) {
                     ThreadingParametersType threads = engine.getThreadingParameters();
                     ThreadingParameters rThreads = new ThreadingParameters();
-                    rThreads.setMaxThreads(threads.getMaxThreads());
-                    rThreads.setMinThreads(threads.getMinThreads());
+                    if (threads.getMaxThreads() != null) {
+                        rThreads.setMaxThreads(threads.getMaxThreads());
+                    } 
+                    if (threads.getMinThreads() != null) {
+                        rThreads.setMinThreads(threads.getMinThreads());
+                    }
                     rThreads.setWorkerIOThreads(threads.getWorkerIOThreads());
                     eng.setThreadingParameters(rThreads);
                 }
