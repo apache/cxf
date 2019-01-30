@@ -56,7 +56,7 @@ public final class SwaggerToOpenApiConversionFilter implements ContainerRequestF
     @Override
     public void filter(ContainerRequestContext reqCtx, ContainerResponseContext respCtx) throws IOException {
         if (Boolean.TRUE == reqCtx.getProperty(OPEN_API_PROPERTY)) {
-            String swaggerJson = Json.pretty(respCtx.getEntity());
+            String swaggerJson = respCtx.getEntity() instanceof String ? (String)respCtx.getEntity() : Json.pretty(respCtx.getEntity());
             String openApiJson = SwaggerToOpenApiConversionUtils.getOpenApiFromSwaggerJson(
                     createMessageContext(), swaggerJson, openApiConfig);
             respCtx.setEntity(openApiJson);
