@@ -40,6 +40,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import io.swagger.jaxrs.listing.SwaggerSerializers;
 import org.apache.cxf.Bus;
 import org.apache.cxf.annotations.Provider;
 import org.apache.cxf.annotations.Provider.Scope;
@@ -151,6 +152,8 @@ public class Swagger2Feature extends AbstractSwaggerFeature implements SwaggerUi
         swaggerResources.add(apiListingResource);
 
         List<Object> providers = new ArrayList<>();
+        providers.add(new SwaggerSerializers());
+
         if (isRunAsFilter()) {
             providers.add(new SwaggerContainerRequestFilter(appInfo == null ? null : appInfo.getProvider(),
                                                             customizer));

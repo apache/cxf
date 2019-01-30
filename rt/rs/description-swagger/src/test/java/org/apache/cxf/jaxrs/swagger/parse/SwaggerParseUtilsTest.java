@@ -490,4 +490,10 @@ public class SwaggerParseUtilsTest {
         assertEquals(String.class, param2.getJavaType());
 
     }
+
+    @Test
+    public void testConvertSwaggerWithNullValuesForOperations() {
+        UserApplication ap = SwaggerParseUtils.getUserApplication("/swagger2petShopWithNullOperations.json");
+        assertNotNull(ap);
+    }
 }
