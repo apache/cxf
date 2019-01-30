@@ -20,7 +20,6 @@ package org.apache.cxf.jaxrs.swagger.parse;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -131,41 +130,33 @@ public final class SwaggerParseUtils {
                 userOp.setVerb(operEntry.getKey().toUpperCase());
 
                 Map<String, Object> oper = CastUtils.cast((Map<?, ?>)operEntry.getValue());
-                
-                userOp.setPath(operPath);
+                // The operation could be null, the particular HTTP verb may not contain any
+                // operations but Swagger may still include it.
+                if (oper != null) {
+                    userOp.setPath(operPath);
+    
+                    userOp.setName((String)oper.get("operationId"));
+                    List<String> opProduces = CastUtils.cast((List<?>)oper.get("produces"));
+                    userOp.setProduces(listToString(opProduces));
+    
+                    List<String> opConsumes = CastUtils.cast((List<?>)oper.get("consumes"));
+                    userOp.setConsumes(listToString(opConsumes));
 
-                userOp.setName((String)oper.get("operationId"));
-                List<String> opProduces = CastUtils.cast((List<?>)oper.get("produces"));
-                userOp.setProduces(listToString(opProduces));
-
-                List<String> opConsumes = CastUtils.cast((List<?>)oper.get("consumes"));
-                userOp.setConsumes(listToString(opConsumes));
-
-                List<Parameter> userOpParams = new LinkedList<Parameter>();
-                List<Map<String, Object>> params = CastUtils.cast((List<?>)oper.get("parameters"));
-                for (Map<String, Object> param : params) {
-                    String name = (String)param.get("name");
-                    //"query", "header", "path", "formData" or "body"
-                    String paramType = (String)param.get("in");
-                    ParameterType pType = "body".equals(paramType) ? ParameterType.REQUEST_BODY
-                        : "formData".equals(paramType)
-                        ? ParameterType.FORM : ParameterType.valueOf(paramType.toUpperCase());
-                    Parameter userParam = new Parameter(pType, name);
-
-                    setJavaType(userParam, (String)param.get("type"));
-                    userOpParams.add(userParam);
+                    List<Parameter> userOpParams = new LinkedList<Parameter>();
+                    List<Map<String, Object>> params = CastUtils.cast((List<?>)oper.get("parameters"));
+                    for (Map<String, Object> param : params) {
+                        String name = (String)param.get("name");
+                        //"query", "header", "path", "formData" or "body"
+                        String paramType = (String)param.get("in");
+                        ParameterType pType = "body".equals(paramType) ? ParameterType.REQUEST_BODY
+                            : "formData".equals(paramType)
+                            ? ParameterType.FORM : ParameterType.valueOf(paramType.toUpperCase());
+                        Parameter userParam = new Parameter(pType, name);
+    
+                        setJavaType(userParam, (String)param.get("type"));
+                        userOpParams.add(userParam);
+                    }
                 }
-                if (!userOpParams.isEmpty()) {
-                    userOp.setParameters(userOpParams);
-                }
-                List<String> opTags = CastUtils.cast((List<?>)oper.get("tags"));
-                if (opTags == null) {
-                    opTags = Collections.singletonList("");
-                }
-                for (String opTag : opTags) {
-                    userOpsMap.get(opTag).add(userOp);
-                }
-
             }
         }
 

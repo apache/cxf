@@ -485,6 +485,11 @@ public class SwaggerParseUtilsTest extends Assert {
         assertEquals("a", param2.getName());
         assertEquals(ParameterType.PATH, param2.getType());
         assertEquals(String.class, param2.getJavaType());
+    }
 
+    @Test
+    public void testConvertSwaggerWithNullValuesForOperations() {
+        UserApplication ap = SwaggerParseUtils.getUserApplication("/swagger2petShopWithNullOperations.json");
+        assertNotNull(ap);
     }
 }
