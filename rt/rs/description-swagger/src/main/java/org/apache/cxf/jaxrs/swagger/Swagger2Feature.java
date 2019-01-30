@@ -63,6 +63,7 @@ import io.swagger.jaxrs.config.DefaultReaderConfig;
 import io.swagger.jaxrs.config.ReaderConfig;
 import io.swagger.jaxrs.config.SwaggerContextService;
 import io.swagger.jaxrs.listing.ApiListingResource;
+import io.swagger.jaxrs.listing.SwaggerSerializers;
 import io.swagger.models.Swagger;
 import io.swagger.models.auth.SecuritySchemeDefinition;
 
@@ -151,6 +152,8 @@ public class Swagger2Feature extends AbstractSwaggerFeature implements SwaggerUi
         swaggerResources.add(apiListingResource);
 
         List<Object> providers = new ArrayList<>();
+        providers.add(new SwaggerSerializers());
+
         if (isRunAsFilter()) {
             providers.add(new SwaggerContainerRequestFilter(appInfo == null ? null : appInfo.getProvider(),
                                                             customizer));

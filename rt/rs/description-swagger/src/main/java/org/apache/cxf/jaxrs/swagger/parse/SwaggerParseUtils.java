@@ -131,41 +131,41 @@ public final class SwaggerParseUtils {
                 userOp.setVerb(operEntry.getKey().toUpperCase());
 
                 Map<String, Object> oper = CastUtils.cast((Map<?, ?>)operEntry.getValue());
-                
-                userOp.setPath(operPath);
+                if (oper != null) {
+                    userOp.setPath(operPath);
 
-                userOp.setName((String)oper.get("operationId"));
-                List<String> opProduces = CastUtils.cast((List<?>)oper.get("produces"));
-                userOp.setProduces(listToString(opProduces));
+                    userOp.setName((String) oper.get("operationId"));
+                    List<String> opProduces = CastUtils.cast((List<?>) oper.get("produces"));
+                    userOp.setProduces(listToString(opProduces));
 
-                List<String> opConsumes = CastUtils.cast((List<?>)oper.get("consumes"));
-                userOp.setConsumes(listToString(opConsumes));
+                    List<String> opConsumes = CastUtils.cast((List<?>) oper.get("consumes"));
+                    userOp.setConsumes(listToString(opConsumes));
 
-                List<Parameter> userOpParams = new LinkedList<>();
-                List<Map<String, Object>> params = CastUtils.cast((List<?>)oper.get("parameters"));
-                for (Map<String, Object> param : params) {
-                    String name = (String)param.get("name");
-                    //"query", "header", "path", "formData" or "body"
-                    String paramType = (String)param.get("in");
-                    ParameterType pType = "body".equals(paramType) ? ParameterType.REQUEST_BODY
-                        : "formData".equals(paramType)
-                        ? ParameterType.FORM : ParameterType.valueOf(paramType.toUpperCase());
-                    Parameter userParam = new Parameter(pType, name);
+                    List<Parameter> userOpParams = new LinkedList<>();
+                    List<Map<String, Object>> params = CastUtils.cast((List<?>) oper.get("parameters"));
+                    for (Map<String, Object> param : params) {
+                        String name = (String) param.get("name");
+                        //"query", "header", "path", "formData" or "body"
+                        String paramType = (String) param.get("in");
+                        ParameterType pType = "body".equals(paramType) ? ParameterType.REQUEST_BODY
+                                : "formData".equals(paramType)
+                                ? ParameterType.FORM : ParameterType.valueOf(paramType.toUpperCase());
+                        Parameter userParam = new Parameter(pType, name);
 
-                    setJavaType(userParam, (String)param.get("type"));
-                    userOpParams.add(userParam);
+                        setJavaType(userParam, (String) param.get("type"));
+                        userOpParams.add(userParam);
+                    }
+                    if (!userOpParams.isEmpty()) {
+                        userOp.setParameters(userOpParams);
+                    }
+                    List<String> opTags = CastUtils.cast((List<?>) oper.get("tags"));
+                    if (opTags == null) {
+                        opTags = Collections.singletonList("");
+                    }
+                    for (String opTag : opTags) {
+                        userOpsMap.get(opTag).add(userOp);
+                    }
                 }
-                if (!userOpParams.isEmpty()) {
-                    userOp.setParameters(userOpParams);
-                }
-                List<String> opTags = CastUtils.cast((List<?>)oper.get("tags"));
-                if (opTags == null) {
-                    opTags = Collections.singletonList("");
-                }
-                for (String opTag : opTags) {
-                    userOpsMap.get(opTag).add(userOp);
-                }
-
             }
         }
 
