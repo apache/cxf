@@ -40,7 +40,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import io.swagger.jaxrs.listing.SwaggerSerializers;
 import org.apache.cxf.Bus;
 import org.apache.cxf.annotations.Provider;
 import org.apache.cxf.annotations.Provider.Scope;
@@ -64,6 +63,7 @@ import io.swagger.jaxrs.config.DefaultReaderConfig;
 import io.swagger.jaxrs.config.ReaderConfig;
 import io.swagger.jaxrs.config.SwaggerContextService;
 import io.swagger.jaxrs.listing.ApiListingResource;
+import io.swagger.jaxrs.listing.SwaggerSerializers;
 import io.swagger.models.Swagger;
 import io.swagger.models.auth.SecuritySchemeDefinition;
 

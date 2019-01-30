@@ -28,9 +28,10 @@ import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.ext.Provider;
 
-import io.swagger.util.Json;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+
+import io.swagger.util.Json;
 
 @Provider
 @PreMatching
@@ -56,7 +57,8 @@ public final class SwaggerToOpenApiConversionFilter implements ContainerRequestF
     @Override
     public void filter(ContainerRequestContext reqCtx, ContainerResponseContext respCtx) throws IOException {
         if (Boolean.TRUE == reqCtx.getProperty(OPEN_API_PROPERTY)) {
-            String swaggerJson = respCtx.getEntity() instanceof String ? (String)respCtx.getEntity() : Json.pretty(respCtx.getEntity());
+            String swaggerJson = respCtx.getEntity() instanceof String ? (String)respCtx.getEntity()
+                    : Json.pretty(respCtx.getEntity());
             String openApiJson = SwaggerToOpenApiConversionUtils.getOpenApiFromSwaggerJson(
                     createMessageContext(), swaggerJson, openApiConfig);
             respCtx.setEntity(openApiJson);

@@ -131,7 +131,7 @@ public final class SwaggerParseUtils {
                 userOp.setVerb(operEntry.getKey().toUpperCase());
 
                 Map<String, Object> oper = CastUtils.cast((Map<?, ?>)operEntry.getValue());
-                if(oper != null) {
+                if (oper != null) {
                     userOp.setPath(operPath);
 
                     userOp.setName((String) oper.get("operationId"));
