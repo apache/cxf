@@ -20,6 +20,7 @@ package org.apache.cxf.jaxrs.swagger.parse;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -156,6 +157,17 @@ public final class SwaggerParseUtils {
                         setJavaType(userParam, (String)param.get("type"));
                         userOpParams.add(userParam);
                     }
+                    if (!userOpParams.isEmpty()) {
+                        userOp.setParameters(userOpParams);
+                    }
+                    List<String> opTags = CastUtils.cast((List<?>)oper.get("tags"));
+                    if (opTags == null) {
+                        opTags = Collections.singletonList("");
+                    }
+                    for (String opTag : opTags) {
+                        userOpsMap.get(opTag).add(userOp);
+                    }
+
                 }
             }
         }
