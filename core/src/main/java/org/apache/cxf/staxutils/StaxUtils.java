@@ -335,7 +335,9 @@ public final class StaxUtils {
                 if (allowInsecureParser) {
                     LOG.log(Level.WARNING, "INSECURE_PARSER_DETECTED", factory.getClass().getName());
                 } else {
-                    throw new RuntimeException("Cannot create a secure XMLInputFactory");
+                    throw new RuntimeException("Cannot create a secure XMLInputFactory, "
+                        + "you should either add woodstox or set " + ALLOW_INSECURE_PARSER
+                        + " system property to true if an unsafe mode is acceptable.");
                 }
             }
         }
