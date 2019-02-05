@@ -25,6 +25,7 @@ import java.lang.reflect.Proxy;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 
 /**
@@ -97,7 +98,7 @@ public class ProxyHelper {
     private String getSortedNameFromInterfaceArray(Class<?>[] interfaces) {
         SortedArraySet<String> arraySet = new SortedArraySet<String>();
         for (Class<?> currentInterface : interfaces) {
-            arraySet.add(currentInterface.getName() + currentInterface.getClassLoader());
+            arraySet.add(currentInterface.getName() + ClassLoaderUtils.getClassLoaderName(currentInterface));
         }
         return arraySet.toString();
     }

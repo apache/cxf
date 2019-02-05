@@ -24,6 +24,7 @@ import java.security.PrivilegedAction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 
 public class ProxyClassLoaderCache {
@@ -42,7 +43,7 @@ public class ProxyClassLoaderCache {
             LOG.log(Level.FINE, "interface for new created ProxyClassLoader is "
                 + proxyInterface.getName());
             LOG.log(Level.FINE, "interface's classloader for new created ProxyClassLoader is "
-                + proxyInterface.getClassLoader());
+                + ClassLoaderUtils.getClassLoaderName(proxyInterface));
             return createProxyClassLoader(proxyInterface);
         }
 
@@ -80,7 +81,7 @@ public class ProxyClassLoaderCache {
                 String ifName = currentInterface.getName();
                 LOG.log(Level.FINE, "the interface we are checking is " + currentInterface.getName());
                 LOG.log(Level.FINE, "the interface' classloader we are checking is " 
-                    + currentInterface.getClassLoader());
+                    + getClassLoader(currentInterface));
                 if (!ifName.startsWith("org.apache.cxf") && !ifName.startsWith("java")) {
                     // cache and retrieve customer interface
                     LOG.log(Level.FINE, "the customer interface is " + currentInterface.getName()

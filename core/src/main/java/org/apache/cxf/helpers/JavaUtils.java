@@ -23,6 +23,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.cxf.common.util.SystemPropertyAction;
+
 public final class JavaUtils {
 
     /** Use this character as suffix */
@@ -51,7 +53,7 @@ public final class JavaUtils {
     private static boolean isJava8Before161;
 
     static {
-        String version = System.getProperty("java.version");
+        String version = SystemPropertyAction.getProperty("java.version");
         try {
             isJava8Before161 = version != null && version.startsWith("1.8.0_")
                 && Integer.parseInt(version.substring(6)) < 161;

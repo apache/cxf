@@ -290,6 +290,12 @@ public final class ClassLoaderUtils {
         }
         return loadClass2(className, callingClass).asSubclass(type);
     }
+
+    public static String getClassLoaderName(Class<?> type) {
+        ClassLoader loader = getClassLoader(type);
+        return loader == null ? "null" : loader.toString();
+    }
+
     private static Class<?> loadClass2(String className, Class<?> callingClass)
         throws ClassNotFoundException {
         try {

@@ -40,6 +40,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxrs.client.ClientProxyImpl;
@@ -82,7 +83,7 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
         Method m;
         try {
             Class<?> jaxrsUtilsClass = Class.forName("org.apache.cxf.jaxrs.utils.JAXRSUtils");
-            m = jaxrsUtilsClass.getDeclaredMethod("getCurrentMessage");
+            m = ReflectionUtil.getDeclaredMethod(jaxrsUtilsClass, "getCurrentMessage");
         } catch (Throwable t) {
             // expected in non-JAX-RS server environments
             if (LOG.isLoggable(Level.FINEST)) {
