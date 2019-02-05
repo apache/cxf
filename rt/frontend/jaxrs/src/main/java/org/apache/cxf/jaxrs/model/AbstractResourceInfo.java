@@ -36,6 +36,7 @@ import javax.ws.rs.core.Context;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalProxy;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 
@@ -119,7 +120,7 @@ public abstract class AbstractResourceInfo {
         if (cls == Object.class || cls == null) {
             return;
         }
-        for (Field f : cls.getDeclaredFields()) {
+        for (Field f : ReflectionUtil.getDeclaredFields(cls)) {
             for (Annotation a : f.getAnnotations()) {
                 if (a.annotationType() == Context.class
                     && (f.getType().isInterface() || f.getType() == Application.class)) {
