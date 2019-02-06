@@ -76,10 +76,17 @@
         </jaxws:properties>
     </jaxws:endpoint>
     
+    <bean id="kerberosCallbackHandler2" 
+          class="org.apache.cxf.systest.kerberos.common.KerberosServicePasswordCallback">
+         <property name="username" value="dave"/>
+         <property name="password" value="dave"/>
+    </bean>
+    
     <bean id="kerberosValidator2" class="org.apache.wss4j.dom.validate.KerberosTokenValidator">
         <property name="contextName" value="dave"/>
         <property name="serviceName" value="dave/service.ws.apache.org@service.ws.apache.org"/>
         <property name="usernameServiceNameForm" value="true"/>
+        <property name="callbackHandler" ref="kerberosCallbackHandler2"/>
     </bean>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="KerberosOverTransport3" address="https://localhost:${testutil.ports.Server.2}/DoubleItKerberosTransport3" serviceName="s:DoubleItService" endpointName="s:DoubleItKerberosTransportPort3" implementor="org.apache.cxf.systest.kerberos.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/kerberos/wssec/kerberos/DoubleItKerberos.wsdl" depends-on="tls-settings">
         <jaxws:properties>
