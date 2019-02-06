@@ -6,3 +6,11 @@ alice {
 bob {
     com.sun.security.auth.module.Krb5LoginModule required refreshKrb5Config=true useKeyTab=false storeKey=true principal="bob/service.ws.apache.org";
 };
+
+carol {
+    com.sun.security.auth.module.Krb5LoginModule required refreshKrb5Config=true useKeyTab=false principal="carol@service.ws.apache.org";
+};
+
+dave {
+    com.sun.security.auth.module.Krb5LoginModule required refreshKrb5Config=true useKeyTab=true keyTab="${project.build.directory}/dave.keytab" storeKey=true principal="dave/service.ws.apache.org@service.ws.apache.org";
+};

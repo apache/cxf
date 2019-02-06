@@ -65,6 +65,20 @@
             <entry key="security.callback-handler" value-ref="kerberosCallbackHandler"/>
         </jaxws:properties>
     </jaxws:client>
+    
+    <bean id="kerberosCallbackHandler2" 
+          class="org.apache.cxf.systest.kerberos.common.KerberosClientPasswordCallback">
+          <property name="username" value="carol"/>
+          <property name="password" value="carol"/>
+    </bean>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItKerberosTransportPort3" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.kerberos.jaas.context" value="carol" />
+            <entry key="ws-security.kerberos.spn" value="dave@service.ws.apache.org" />
+            <entry key="security.callback-handler" value-ref="kerberosCallbackHandler2"/>
+        </jaxws:properties>
+    </jaxws:client>
+    
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItKerberosSymmetricPort" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.encryption.properties" value="bob.properties"/>

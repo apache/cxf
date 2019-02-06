@@ -38,14 +38,18 @@ import org.apache.wss4j.dom.message.token.KerberosSecurity;
  */
 public class KerberosClientPasswordCallback implements CallbackHandler {
 
+    private String username = "alice";
+    private String password = "alice";
+    private String servicePrincipal = "bob@service.ws.apache.org";
+
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof NameCallback) {
                 NameCallback nameCallback = (NameCallback)callbacks[i];
-                nameCallback.setName("alice");
+                nameCallback.setName(username);
             } else if (callbacks[i] instanceof PasswordCallback) {
                 PasswordCallback passwordCallback = (PasswordCallback)callbacks[i];
-                passwordCallback.setPassword("alice".toCharArray());
+                passwordCallback.setPassword(password.toCharArray());
             } else if (callbacks[i] instanceof WSPasswordCallback) {
                 WSPasswordCallback wsPasswordCallback = (WSPasswordCallback)callbacks[i];
                 // Get a custom (Kerberos) token directly using the WSS4J APIs
@@ -53,7 +57,7 @@ public class KerberosClientPasswordCallback implements CallbackHandler {
                     KerberosSecurity kerberosSecurity = new KerberosSecurity(DOMUtils.getEmptyDocument());
 
                     try {
-                        kerberosSecurity.retrieveServiceTicket("alice", this, "bob@service.ws.apache.org",
+                        kerberosSecurity.retrieveServiceTicket(username, this, servicePrincipal,
                                                   false, false, null);
                         kerberosSecurity.addWSUNamespace();
                         WSSConfig wssConfig = WSSConfig.getNewInstance();
@@ -68,6 +72,31 @@ public class KerberosClientPasswordCallback implements CallbackHandler {
             }
         }
     }
+
+    public String getServicePrincipal() {
+        return servicePrincipal;
+    }
+
+    public void setServicePrincipal(String servicePrincipal) {
+        this.servicePrincipal = servicePrincipal;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
 
 
 }

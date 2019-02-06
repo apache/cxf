@@ -306,6 +306,9 @@
         <wsdl:port name="DoubleItKerberosTransportPort2" binding="tns:DoubleItKerberosTransportBinding">
             <soap:address location="https://localhost:9009/DoubleItKerberosTransport2"/>
         </wsdl:port>
+        <wsdl:port name="DoubleItKerberosTransportPort3" binding="tns:DoubleItKerberosTransportBinding">
+            <soap:address location="https://localhost:9009/DoubleItKerberosTransport3"/>
+        </wsdl:port>
         <wsdl:port name="DoubleItKerberosSymmetricPort" binding="tns:DoubleItKerberosSymmetricBinding">
             <soap:address location="http://localhost:9001/DoubleItKerberosSymmetric"/>
         </wsdl:port>
