@@ -297,9 +297,14 @@ public class JavaDocProvider implements DocumentationProvider {
         }
         return "<div class=\"block\">";
     }
+
     protected String getOperLink() {
         String operLink = "<A NAME=\"";
-        return javaDocsBuiltByVersion == JAVA_VERSION_16 ? operLink : operLink.toLowerCase();
+        return javaDocsBuiltByVersion == JAVA_VERSION_16
+                ? operLink
+                : javaDocsBuiltByVersion <= JAVA_VERSION_18
+                        ? operLink.toLowerCase()
+                        : "<a id=\"";
     }
 
     protected String getResponseMarker() {
